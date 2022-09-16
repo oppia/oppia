@@ -53,6 +53,7 @@ import { SkillEditorNavabarComponent } from './navbar/skill-editor-navbar.compon
 import { SkillQuestionsTabComponent } from './questions-tab/skill-questions-tab.component';
 import { SkillPreviewTabComponent } from './skill-preview-tab/skill-preview-tab.component';
 import { SkillEditorMainTabComponent } from './editor-tab/skill-editor-main-tab.component';
+import { SkillEditorPageComponent } from './skill-editor-page.component';
 
 @NgModule({
   imports: [
@@ -86,7 +87,8 @@ import { SkillEditorMainTabComponent } from './editor-tab/skill-editor-main-tab.
     SkillMisconceptionsEditorComponent,
     SkillQuestionsTabComponent,
     SkillPreviewTabComponent,
-    SkillEditorMainTabComponent
+    SkillEditorMainTabComponent,
+    SkillEditorPageComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
@@ -106,7 +108,8 @@ import { SkillEditorMainTabComponent } from './editor-tab/skill-editor-main-tab.
     SkillMisconceptionsEditorComponent,
     SkillQuestionsTabComponent,
     SkillPreviewTabComponent,
-    SkillEditorMainTabComponent
+    SkillEditorMainTabComponent,
+    SkillEditorPageComponent
   ],
   providers: [
     {
