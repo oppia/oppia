@@ -331,7 +331,7 @@ describe('Classroom Admin Page component ', () => {
     ).and.returnValue(Promise.resolve());
     spyOn(
       classroomBackendApiService,
-      'doesClassroomWithUrlFragmentExist'
+      'doesClassroomWithUrlFragmentExistAsync'
     ).and.returnValue(Promise.resolve(false));
 
     component.saveClassroomData('classroomId');
@@ -361,7 +361,7 @@ describe('Classroom Admin Page component ', () => {
       component.selectedClassroomDict = cloneDeep(classroomDict);
       component.selectedClassroomDict.urlFragment = 'discrete-math';
 
-      expect(component.duplicateClassroomUrlFragment).toBeFalse();
+      expect(component.classroomUrlFragmentIsDuplicate).toBeFalse();
       expect(component.classroomUrlFragmentIsValid).toBeTrue();
 
       spyOn(
@@ -370,14 +370,14 @@ describe('Classroom Admin Page component ', () => {
       ).and.returnValue(Promise.resolve());
       spyOn(
         classroomBackendApiService,
-        'doesClassroomWithUrlFragmentExist'
+        'doesClassroomWithUrlFragmentExistAsync'
       ).and.returnValue(Promise.resolve(true));
 
 
       component.saveClassroomData('classroomId');
       tick();
 
-      expect(component.duplicateClassroomUrlFragment).toBeTrue();
+      expect(component.classroomUrlFragmentIsDuplicate).toBeTrue();
       expect(component.classroomUrlFragmentIsValid).toBeFalse();
       expect(component.classroomViewerMode).toBeFalse();
       expect(component.classroomEditorMode).toBeTrue();
@@ -579,14 +579,14 @@ describe('Classroom Admin Page component ', () => {
     'should enable error messgage when classroom name exceeds max len',
     () => {
       expect(component.classroomNameIsValid).toBeTrue();
-      expect(component.classroomNameExceedsMaxLen).toBeFalse();
+      expect(component.classroomNameIsTooLong).toBeFalse();
 
       component.classroomName = (
         'Long classroom name with some randome texts abcdefghi');
       component.onClassroomNameChange();
 
       expect(component.classroomNameIsValid).toBeFalse();
-      expect(component.classroomNameExceedsMaxLen).toBeTrue();
+      expect(component.classroomNameIsTooLong).toBeTrue();
     });
 
   it(
@@ -623,7 +623,7 @@ describe('Classroom Admin Page component ', () => {
       expect(component.classroomNameIsValid).toBeTrue();
       expect(component.duplicateClassroomName).toBeFalse();
       expect(component.emptyClassroomName).toBeFalse();
-      expect(component.classroomNameExceedsMaxLen).toBeFalse();
+      expect(component.classroomNameIsTooLong).toBeFalse();
 
       component.classroomIdToClassroomName = {
         physicsId: 'physics',
@@ -636,34 +636,34 @@ describe('Classroom Admin Page component ', () => {
       expect(component.classroomNameIsValid).toBeTrue();
       expect(component.duplicateClassroomName).toBeFalse();
       expect(component.emptyClassroomName).toBeFalse();
-      expect(component.classroomNameExceedsMaxLen).toBeFalse();
+      expect(component.classroomNameIsTooLong).toBeFalse();
     });
 
   it(
     'should present error messgae when clasroom url fragment is empty', () => {
       expect(component.classroomUrlFragmentIsValid).toBeTrue();
-      expect(component.emptyClassroomUrlFrgament).toBeFalse();
+      expect(component.classroomUrlFragmentIsEmpty).toBeFalse();
 
       component.urlFragment = '';
 
       component.onClassroomUrlFragmentChange();
 
       expect(component.classroomUrlFragmentIsValid).toBeFalse();
-      expect(component.emptyClassroomUrlFrgament).toBeTrue();
+      expect(component.classroomUrlFragmentIsEmpty).toBeTrue();
     });
 
   it(
     'should present error message when classroom url fragment exceeds max len',
     () => {
       expect(component.classroomUrlFragmentIsValid).toBeTrue();
-      expect(component.classroomUrlFragmentExceedsmaxLen).toBeFalse();
+      expect(component.classroomUrlFragmentIsTooLong).toBeFalse();
 
       component.urlFragment = 'long-url-fragment-for-raising-error-msg';
 
       component.onClassroomUrlFragmentChange();
 
       expect(component.classroomUrlFragmentIsValid).toBeFalse();
-      expect(component.classroomUrlFragmentExceedsmaxLen).toBeTrue();
+      expect(component.classroomUrlFragmentIsTooLong).toBeTrue();
     });
 
   it(
@@ -683,8 +683,8 @@ describe('Classroom Admin Page component ', () => {
     'should not present error for valid classroom url fragment', () => {
       expect(component.classroomUrlFragmentIsValid).toBeTrue();
       expect(component.urlFragmentRegexMatched).toBeTrue();
-      expect(component.classroomUrlFragmentExceedsmaxLen).toBeFalse();
-      expect(component.emptyClassroomUrlFrgament).toBeFalse();
+      expect(component.classroomUrlFragmentIsTooLong).toBeFalse();
+      expect(component.classroomUrlFragmentIsEmpty).toBeFalse();
 
       component.urlFragment = 'physics-url-fragment';
 
@@ -692,19 +692,19 @@ describe('Classroom Admin Page component ', () => {
 
       expect(component.classroomUrlFragmentIsValid).toBeTrue();
       expect(component.urlFragmentRegexMatched).toBeTrue();
-      expect(component.classroomUrlFragmentExceedsmaxLen).toBeFalse();
-      expect(component.emptyClassroomUrlFrgament).toBeFalse();
+      expect(component.classroomUrlFragmentIsTooLong).toBeFalse();
+      expect(component.classroomUrlFragmentIsEmpty).toBeFalse();
     });
 
   it(
     'should remove duplicate url fragment error message on model change',
     () => {
-      component.duplicateClassroomUrlFragment = true;
+      component.classroomUrlFragmentIsDuplicate = true;
       component.urlFragment = 'physics';
 
       component.onClassroomUrlFragmentChange();
 
-      expect(component.duplicateClassroomUrlFragment).toBeFalse();
+      expect(component.classroomUrlFragmentIsDuplicate).toBeFalse();
     });
 
   it(

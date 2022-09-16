@@ -80,16 +80,16 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomDetailsIsShown: boolean = false;
   classroomViewerMode: boolean = false;
   classroomEditorMode: boolean = false;
-  savingClassroomData: boolean = false;
+  classroomDataSaveInProgress: boolean = false;
 
-  classroomNameExceedsMaxLen: boolean = false;
+  classroomNameIsTooLong: boolean = false;
   emptyClassroomName: boolean = false;
   duplicateClassroomName: boolean = false;
   classroomNameIsValid: boolean = true;
 
-  classroomUrlFragmentExceedsmaxLen: boolean = false;
-  emptyClassroomUrlFrgament: boolean = false;
-  duplicateClassroomUrlFragment: boolean = false;
+  classroomUrlFragmentIsTooLong: boolean = false;
+  classroomUrlFragmentIsEmpty: boolean = false;
+  classroomUrlFragmentIsDuplicate: boolean = false;
   urlFragmentRegexMatched: boolean = true;
   classroomUrlFragmentIsValid: boolean = true;
   cyclicCheckError: boolean = false;
@@ -129,7 +129,7 @@ export class ClassroomAdminPageComponent implements OnInit {
 
         this.existingClassroomNames = (
           Object.values(this.classroomIdToClassroomName));
-        let index = this.existingClassroomNames.indexOf(this.classroomName);
+        const index = this.existingClassroomNames.indexOf(this.classroomName);
         this.existingClassroomNames.splice(index, 1);
       }
     );
@@ -178,17 +178,17 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   saveClassroomData(classroomId: string): void {
-    this.savingClassroomData = true;
+    this.classroomDataSaveInProgress = true;
     let backendDict = this.convertClassroomDictToBackendForm(
       this.updatedClassroomDict);
-    this.classroomBackendApiService.doesClassroomWithUrlFragmentExist(
+    this.classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
       this.urlFragment).then(response => {
       if (response && (
         this.selectedClassroomDict.urlFragment !==
           this.updatedClassroomDict.urlFragment)
       ) {
-        this.savingClassroomData = false;
-        this.duplicateClassroomUrlFragment = true;
+        this.classroomDataSaveInProgress = false;
+        this.classroomUrlFragmentIsDuplicate = true;
         this.classroomUrlFragmentIsValid = false;
         return;
       }
@@ -200,7 +200,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         classroomId, backendDict).then(() => {
         this.classroomIdToClassroomName[this.classroomId] = this.classroomName;
         this.selectedClassroomDict = cloneDeep(this.updatedClassroomDict);
-        this.savingClassroomData = false;
+        this.classroomDataSaveInProgress = false;
       });
     });
   }
@@ -242,10 +242,10 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomDataIsChanged = false;
         this.duplicateClassroomName = false;
         this.emptyClassroomName = false;
-        this.classroomNameExceedsMaxLen = false;
-        this.emptyClassroomUrlFrgament = false;
-        this.duplicateClassroomUrlFragment = false;
-        this.classroomUrlFragmentExceedsmaxLen = false;
+        this.classroomNameIsTooLong = false;
+        this.classroomUrlFragmentIsEmpty = false;
+        this.classroomUrlFragmentIsDuplicate = false;
+        this.classroomUrlFragmentIsTooLong = false;
         this.classroomUrlFragmentIsValid = true;
         this.cyclicCheckError = false;
       }, () => {
@@ -303,7 +303,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     if (this.classroomName === '') {
       this.emptyClassroomName = true;
       this.classroomNameIsValid = false;
-      this.classroomNameExceedsMaxLen = false;
+      this.classroomNameIsTooLong = false;
       this.duplicateClassroomName = false;
       return;
     } else {
@@ -314,12 +314,12 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.classroomName.length >
       AppConstants.MAX_CHARS_IN_CLASSROOM_NAME
     ) {
-      this.classroomNameExceedsMaxLen = true;
+      this.classroomNameIsTooLong = true;
       this.duplicateClassroomName = false;
       this.classroomNameIsValid = false;
       return;
     } else {
-      this.classroomNameExceedsMaxLen = false;
+      this.classroomNameIsTooLong = false;
     }
 
     if (this.existingClassroomNames.indexOf(this.classroomName) !== -1) {
@@ -334,27 +334,27 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.classroomUrlFragmentIsValid = true;
 
     if (this.urlFragment === '') {
-      this.emptyClassroomUrlFrgament = true;
-      this.duplicateClassroomUrlFragment = false;
+      this.classroomUrlFragmentIsEmpty = true;
+      this.classroomUrlFragmentIsDuplicate = false;
       this.urlFragmentRegexMatched = true;
       this.classroomUrlFragmentIsValid = false;
-      this.classroomUrlFragmentExceedsmaxLen = false;
+      this.classroomUrlFragmentIsTooLong = false;
       return;
     } else {
-      this.emptyClassroomUrlFrgament = false;
+      this.classroomUrlFragmentIsEmpty = false;
     }
 
     if (
       this.urlFragment.length >
       AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
-      this.classroomUrlFragmentExceedsmaxLen = true;
-      this.duplicateClassroomUrlFragment = false;
+      this.classroomUrlFragmentIsTooLong = true;
+      this.classroomUrlFragmentIsDuplicate = false;
       this.classroomUrlFragmentIsValid = false;
       this.urlFragmentRegexMatched = true;
       return;
     } else {
-      this.classroomUrlFragmentExceedsmaxLen = false;
+      this.classroomUrlFragmentIsTooLong = false;
     }
 
     let validUrlFragmentRegex = new RegExp(
@@ -363,13 +363,13 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.urlFragmentRegexMatched = true;
     } else {
       this.urlFragmentRegexMatched = false;
-      this.duplicateClassroomUrlFragment = false;
+      this.classroomUrlFragmentIsDuplicate = false;
       this.classroomUrlFragmentIsValid = false;
       return;
     }
 
-    if (this.duplicateClassroomUrlFragment) {
-      this.duplicateClassroomUrlFragment = false;
+    if (this.classroomUrlFragmentIsDuplicate) {
+      this.classroomUrlFragmentIsDuplicate = false;
       this.classroomUrlFragmentIsValid = true;
     }
   }

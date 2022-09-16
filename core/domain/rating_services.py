@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (exp_models, user_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user])
+    models.Names.EXPLORATION, models.Names.USER])
 transaction_services = models.Registry.import_transaction_services()
 
 ALLOWED_RATINGS = [1, 2, 3, 4, 5]
