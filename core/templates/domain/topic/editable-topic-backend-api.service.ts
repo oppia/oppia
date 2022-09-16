@@ -350,9 +350,9 @@ export class EditableTopicBackendApiService {
   }
 
   private _getTopicIdToTopicName(
-    topicIds: string[],
-    successCallback: (value: TopicIdToTopicNameResponse) => void,
-    errorCallback: (reason: string) => void
+      topicIds: string[],
+      successCallback: (value: TopicIdToTopicNameResponse) => void,
+      errorCallback: (reason: string) => void
   ): void {
     const topicIdToTopicNameUrl = this.urlInterpolationService.interpolateUrl(
       '/topic_id_to_topic_name_handler/?' +
@@ -360,16 +360,16 @@ export class EditableTopicBackendApiService {
         comma_separated_topic_ids: topicIds.join(',')
       });
 
-      this.http.get<TopicIdToTopicNameBackendResponse>(topicIdToTopicNameUrl)
+    this.http.get<TopicIdToTopicNameBackendResponse>(topicIdToTopicNameUrl)
       .toPromise().then((response) => {
-      if (successCallback) {
-        successCallback(
-          response.topic_id_to_topic_name
-        );
-      }
-    }, (errorResponse) => {
-      errorCallback(errorResponse.error.error);
-    });
+        if (successCallback) {
+          successCallback(
+            response.topic_id_to_topic_name
+          );
+        }
+      }, (errorResponse) => {
+        errorCallback(errorResponse.error.error);
+      });
   }
 
   async getTopicIdToTopicNameAsync(topicIds: string[]):
