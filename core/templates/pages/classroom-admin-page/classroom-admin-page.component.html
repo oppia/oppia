@@ -25,11 +25,14 @@
       <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
         <div class="oppia-classroom-tile"
              (click)="getClassroomData(classroom.key)">
-          <span *ngIf="!(classroomEditorMode && classroom.key == classroomId)">
+          <span *ngIf="!(classroomEditorMode && classroom.key === classroomId)">
             {{classroom.value}}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key == classroomId">
+          <span *ngIf="classroomEditorMode && classroom.key === classroomId && classroomName.length > 0">
             {{this.classroomName}}
+          </span>
+          <span *ngIf="classroomEditorMode && classroom.key === classroomId && classroomName.length === 0">
+            [New Classroom]
           </span>
           <button mat-button matSuffix mat-icon-button
                   aria-label="Clear"
@@ -63,13 +66,13 @@
                         rows="1">
               </textarea>
               <p *ngIf="classroomNameExceedsMaxLen" class="oppia-warning-text">
-                A classroom name should contain at most 39 characters.
+                The classroom name should contain at most 39 characters.
               </p>
               <p *ngIf="emptyClassroomName" class="oppia-warning-text">
-                A classroom name should not be empty.
+                The classroom name should not be empty.
               </p>
               <p *ngIf="duplicateClassroomName" class="oppia-warning-text">
-                A classroom with this name already exists.
+                The classroom with this name already exists.
               </p>
             </div>
           </div>
@@ -89,17 +92,16 @@
                         rows="1">
               </textarea>
               <p *ngIf="classroomUrlFragmentExceedsmaxLen" class="oppia-warning-text">
-                A classroom url fragment should contain at most 20 characters.
+                The classroom url fragment should contain at most 20 characters.
               </p>
               <p *ngIf="emptyClassroomUrlFrgament" class="oppia-warning-text">
-                A classroom url fragment should not be empty.
+                The classroom url fragment should not be empty.
               </p>
               <p *ngIf="duplicateClassroomUrlFragment" class="oppia-warning-text">
-                A classroom with this url fragment already exists.
+                The classroom with this url fragment already exists.
               </p>
               <p *ngIf="!urlFragmentRegexMatched" class="oppia-warning-text">
-                A classroom url fragment should only contain hyphens seperated lowercase
-                characters.
+                The classroom URL fragment should only contain lowercase letters separated by hyphens.
               </p>
             </div>
           </div>
@@ -266,7 +268,7 @@
       <button class="btn add-new-classroom"
               (click)="createNewClassroom()"
               [disabled]="classroomEditorMode">
-        Add new classroom
+        + ADD NEW CLASSROOM
       </button>
     </div>
   </div>
@@ -398,6 +400,7 @@
     background-color: #00645c;
     color: #fff;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 12px;
     margin-top: 10px;
   }
   .add-new-classroom:hover {

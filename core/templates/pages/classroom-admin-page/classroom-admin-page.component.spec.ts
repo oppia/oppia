@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the classroom component.
+ * @fileoverview Tests for the classroom admin component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -609,10 +609,7 @@ describe('Classroom Admin Page component ', () => {
       expect(component.classroomNameIsValid).toBeTrue();
       expect(component.duplicateClassroomName).toBeFalse();
 
-      component.classroomIdToClassroomName = {
-        physicsId: 'physics',
-        chemistryId: 'chemistry'
-      };
+      component.existingClassroomNames = ['physics', 'chemistry'];
       component.classroomName = 'physics';
 
       component.onClassroomNameChange();

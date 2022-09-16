@@ -44,14 +44,14 @@ export class CreateNewClassroomModalComponent
   creatingNewClassroom: boolean = false;
 
   classroomNameExceedsMaxLen: boolean = false;
-  emptyClassroomName: boolean = true;
+  emptyClassroomName: boolean = false;
   duplicateClassroomName: boolean = false;
   classroomNameIsValid: boolean = false;
 
   classroomUrlFragmentExceedsmaxLen: boolean = false;
-  emptyClassroomUrlFrgament: boolean = true;
+  emptyClassroomUrlFrgament: boolean = false;
   duplicateClassroomUrlFragment: boolean = false;
-  urlFragmentRegexMatched: boolean = false;
+  urlFragmentRegexMatched: boolean = true;
   classroomUrlFragmentIsValid: boolean = false;
 
   getNewClassroomId(): void {
@@ -100,6 +100,8 @@ export class CreateNewClassroomModalComponent
 
     if (this.newClassroomName === '') {
       this.emptyClassroomName = true;
+      this.classroomNameExceedsMaxLen = false;
+      this.duplicateClassroomName = false;
       this.classroomNameIsValid = false;
       return;
     } else {
@@ -111,6 +113,7 @@ export class CreateNewClassroomModalComponent
       AppConstants.MAX_CHARS_IN_CLASSROOM_NAME
     ) {
       this.classroomNameExceedsMaxLen = true;
+      this.duplicateClassroomName = false;
       this.classroomNameIsValid = false;
       return;
     } else {
@@ -130,6 +133,9 @@ export class CreateNewClassroomModalComponent
 
     if (this.newClassroomUrlFragment === '') {
       this.emptyClassroomUrlFrgament = true;
+      this.duplicateClassroomUrlFragment = false;
+      this.classroomUrlFragmentExceedsmaxLen = false;
+      this.urlFragmentRegexMatched = true;
       this.classroomUrlFragmentIsValid = false;
       return;
     } else {
@@ -141,6 +147,8 @@ export class CreateNewClassroomModalComponent
       AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
       this.classroomUrlFragmentExceedsmaxLen = true;
+      this.duplicateClassroomUrlFragment = false;
+      this.urlFragmentRegexMatched = true;
       this.classroomUrlFragmentIsValid = false;
       return;
     } else {
@@ -153,6 +161,7 @@ export class CreateNewClassroomModalComponent
       this.urlFragmentRegexMatched = true;
     } else {
       this.urlFragmentRegexMatched = false;
+      this.duplicateClassroomUrlFragment = false;
       this.classroomUrlFragmentIsValid = false;
       return;
     }

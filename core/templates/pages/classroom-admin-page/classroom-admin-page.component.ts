@@ -69,6 +69,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds = {};
   topicNameToPrerequisiteTopicNames: TopicNameToPrerequisiteTopicNames = {};
   topicsCountInClassroom: number = 0;
+  existingClassroomNames: string[] = [];
 
   pageIsInitialized: boolean = false;
   classroomDataIsChanged: boolean = false;
@@ -121,6 +122,11 @@ export class ClassroomAdminPageComponent implements OnInit {
           this.topicIdToPrerequisiteTopicIds).length;
 
         this.classroomDataIsChanged = false;
+
+        this.existingClassroomNames = (
+          Object.values(this.classroomIdToClassroomName));
+        let index = this.existingClassroomNames.indexOf(this.classroomName);
+        this.existingClassroomNames.splice(index, 1);
       }
     );
   }
@@ -229,7 +235,12 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomViewerMode = true;
         this.updateClassroomPropertiesFromDict(this.selectedClassroomDict);
         this.classroomDataIsChanged = false;
+        this.duplicateClassroomName = false;
+        this.emptyClassroomName = false;
+        this.classroomNameExceedsMaxLen = false;
+        this.emptyClassroomUrlFrgament = false;
         this.duplicateClassroomUrlFragment = false;
+        this.classroomUrlFragmentExceedsmaxLen = false;
         this.classroomUrlFragmentIsValid = true;
       }, () => {
         // Note to developers:
@@ -286,6 +297,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     if (this.classroomName === '') {
       this.emptyClassroomName = true;
       this.classroomNameIsValid = false;
+      this.classroomNameExceedsMaxLen = false;
       this.duplicateClassroomName = false;
       return;
     } else {
@@ -304,10 +316,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.classroomNameExceedsMaxLen = false;
     }
 
-    let existingClassroomNames: string[] = (
-      Object.values(this.classroomIdToClassroomName));
-
-    if (existingClassroomNames.indexOf(this.classroomName) !== -1) {
+    if (this.existingClassroomNames.indexOf(this.classroomName) !== -1) {
       this.duplicateClassroomName = true;
       this.classroomNameIsValid = false;
     } else {
@@ -321,7 +330,9 @@ export class ClassroomAdminPageComponent implements OnInit {
     if (this.urlFragment === '') {
       this.emptyClassroomUrlFrgament = true;
       this.duplicateClassroomUrlFragment = false;
+      this.urlFragmentRegexMatched = true;
       this.classroomUrlFragmentIsValid = false;
+      this.classroomUrlFragmentExceedsmaxLen = false;
       return;
     } else {
       this.emptyClassroomUrlFrgament = false;
@@ -334,6 +345,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.classroomUrlFragmentExceedsmaxLen = true;
       this.duplicateClassroomUrlFragment = false;
       this.classroomUrlFragmentIsValid = false;
+      this.urlFragmentRegexMatched = true;
       return;
     } else {
       this.classroomUrlFragmentExceedsmaxLen = false;
@@ -345,6 +357,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.urlFragmentRegexMatched = true;
     } else {
       this.urlFragmentRegexMatched = false;
+      this.duplicateClassroomUrlFragment = false;
       this.classroomUrlFragmentIsValid = false;
       return;
     }
