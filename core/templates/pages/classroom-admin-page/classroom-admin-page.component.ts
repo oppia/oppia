@@ -238,6 +238,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomEditorMode = false;
         this.classroomViewerMode = true;
         this.updateClassroomPropertiesFromDict(this.selectedClassroomDict);
+        this.getTopicDependencyByTopicName(this.topicIdToPrerequisiteTopicIds);
         this.classroomDataIsChanged = false;
         this.duplicateClassroomName = false;
         this.emptyClassroomName = false;
@@ -246,6 +247,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.duplicateClassroomUrlFragment = false;
         this.classroomUrlFragmentExceedsmaxLen = false;
         this.classroomUrlFragmentIsValid = true;
+        this.cyclicCheckError = false;
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is
@@ -409,6 +411,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.classroomDataIsChanged = true;
       this.addNewTopicInputIsShown = false;
       this.topicsCountInClassroom += 1;
+      this.newTopicId = '';
     }, () => {
       this.topicWithGivenIdExists = false;
     });
@@ -421,6 +424,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   removeNewTopicInputField(): void {
     this.topicWithGivenIdExists = true;
     this.addNewTopicInputIsShown = false;
+    this.newTopicId = '';
   }
 
   onNewTopicInputModelChange(): void {
@@ -428,7 +432,6 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.topicWithGivenIdExists = true;
     }
   }
-
 
   getTopicIdFromTopicName(topicName: string): string {
     let topicIdForGivenTopicName: string = '';
@@ -497,10 +500,10 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.topicIdToPrerequisiteTopicIds[currentTopicId].splice(index, 1);
     }
 
-    this.updatedClassroomDict.topicIdToPrerequisiteTopicIds = (
-      this.topicIdToPrerequisiteTopicIds);
     this.validateDependencyGraph();
     this.classroomDataIsChanged = true;
+    this.updatedClassroomDict.topicIdToPrerequisiteTopicIds = (
+      this.topicIdToPrerequisiteTopicIds);
   }
 
   showDependencyGraphDropdown(topicName: string): void {

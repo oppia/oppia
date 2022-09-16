@@ -178,6 +178,12 @@
                   </button>
                 </div>
               </div>
+              <p *ngIf="cyclicCheckError && currentTopicOnEdit === topic.key"
+                 class="oppia-warning-text cyclic-check-error">
+                There is a cycle in the prerequisite dependencies.
+                Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
+                Please fix this error to save the changes.
+              </p>
               <div ngbDropdown
                    *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topic.key">
                 <button ngbDropdownToggle mat-button
@@ -233,10 +239,6 @@
                 Topic with given ID does not exist.
               </p>
             </div>
-
-            <p *ngIf="cyclicCheckError" class="oppia-warning-text">
-              Cyclic dependency detected.
-            </p>
           </div>
 
           <div *ngIf="classroomEditorMode" class="action-buttons">
@@ -275,6 +277,9 @@
 </mat-card>
 
 <style>
+  .cyclic-check-error {
+    margin: 0 10px;
+  }
   .add-new-topic {
     margin-top: 10px;
   }
