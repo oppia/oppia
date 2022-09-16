@@ -37,6 +37,10 @@ interface TopicNameToPrerequisiteTopicNames {
   [topicName: string]: string[];
 }
 
+interface TopicIdToTopicName {
+  [topicId: string]: string;
+}
+
 
 @Component({
   selector: 'oppia-classroom-admin-page',
@@ -63,8 +67,8 @@ export class ClassroomAdminPageComponent implements OnInit {
   courseDetails: string = '';
   topicListIntro: string = '';
   topicIds: string[] = [];
-  eligibleTopicNames = [];
-  topicIdsToTopicName = {};
+  eligibleTopicNames: string[] = [];
+  topicIdsToTopicName: TopicIdToTopicName = {};
   newTopicId: string = '';
   topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds = {};
   topicNameToPrerequisiteTopicNames: TopicNameToPrerequisiteTopicNames = {};
@@ -94,7 +98,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   topicWithGivenIdExists: boolean = true;
 
   dependencyGraphDropdownIsShown: boolean = false;
-  currentTopicOnEdit: string;
+  currentTopicOnEdit!: string;
   selectedTopics: string[] = [];
 
   getClassroomData(classroomId: string): void {
@@ -427,11 +431,14 @@ export class ClassroomAdminPageComponent implements OnInit {
 
 
   getTopicIdFromTopicName(topicName: string): string {
+    let topicIdForGivenTopicName: string = '';
     for (let topicId in this.topicIdsToTopicName) {
       if (this.topicIdsToTopicName[topicId] === topicName) {
-        return topicId;
+        topicIdForGivenTopicName = topicId;
+        break;
       }
     }
+    return topicIdForGivenTopicName;
   }
 
   validateDependencyGraph(): void {
