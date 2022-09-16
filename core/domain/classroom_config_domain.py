@@ -129,7 +129,7 @@ class Classroom:
         if len(name) > constants.MAX_CHARS_IN_CLASSROOM_NAME:
             raise utils.ValidationError(
                 'Classroom name should be at most %d characters, received %s.'
-                % (name_limit, name))
+                % (constants.MAX_CHARS_IN_CLASSROOM_NAME, name))
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
