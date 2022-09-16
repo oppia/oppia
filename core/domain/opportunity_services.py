@@ -645,7 +645,7 @@ def get_exploration_opportunity_summary_by_id(
     """
     exp_opportunity_summary_model = (
         opportunity_models.ExplorationOpportunitySummaryModel.get(
-            opportunity_id))
+            opportunity_id, strict=False))
     if exp_opportunity_summary_model is None:
         return None
     return get_exploration_opportunity_summary_from_model(
