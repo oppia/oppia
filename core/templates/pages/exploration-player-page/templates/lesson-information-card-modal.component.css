@@ -455,7 +455,6 @@
   border-radius: 4px;
   color: #fff;
   cursor: default;
-  display: none;
   font-size: 14px;
   font-style: Roboto, Arial, sans-serif;
   padding: 8px 10px;
@@ -468,7 +467,6 @@
   background-color: #00645c;
   color: #fff;
   cursor: default;
-  display: none;
   height: 10px;
   position: absolute;
   right: 28px;

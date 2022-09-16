@@ -82,6 +82,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // The below property is defined only when the learner is on a
   // checkpointed state, and is undefined otherwise.
   translatedCongratulatoryCheckpointMessage: string | undefined;
+  showTooltip: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -241,18 +242,14 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   copyProgressUrl(): void {
     this.clipboard.copy(this.loggedOutProgressUniqueUrl);
-    const messArrow = document.getElementsByClassName('uid-btn-message-arrow');
-    const messBox = document.getElementsByClassName('uid-btn-message-box');
-    if(messArrow[0]==undefined || messBox[0]==undefined){
-      return ;
-    }
-    messArrow[0].classList.add('d-block');
-    messBox[0].classList.add('d-block');
+    this.showTooltip = true;
     setTimeout(() => {
-      messArrow[0].classList.remove('d-block');
-      messBox[0].classList.remove('d-block');
-    }, 1000);
+      this.showTooltip = false;
+    }
+    , 1000);
   }
+
+
 
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(

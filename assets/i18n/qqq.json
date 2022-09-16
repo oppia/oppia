@@ -954,6 +954,8 @@
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4": "Text displayed on the save progress menu of exploration lesson info modal telling the users that the progress URL generated will save their progress for the next 72 hours only.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5": "Text displayed on the save progress menu of exploration lesson info modal prompting the users to write or copy the genrated URL.",
 	"I18N_SAVE_PROGRESS": "Text displayed at the end of a chapter to prompt the user to login or signup to save chapter progress.",
+	"I18N_SAVE_PROGRESS_BUTTON_TEXT": "Text displayed on the button in the Save progress card for copying the unique URL of the progress",
+	"I18N_SAVE_PROGRESS_COPY_TOOLTIP": "Text that will be display in a tooltip for a second when the user clicks the copy button",
 	"I18N_SAVE_PROGRESS_TEXT": "Text which appears on the save progress button and the save progress menu in the exploration lesson info modal.",
 	"I18N_SHARE_LESSON": "Text displayed before the buttons to share an exploration.",
 	"I18N_SHOW_LESS": "Text, which when clicked on, contracts the section it is a part of.",

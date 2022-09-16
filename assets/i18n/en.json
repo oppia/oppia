@@ -954,6 +954,8 @@
     "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4": "You may lose your progress after 72 hours.",
     "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5": "Write or copy the link below",
     "I18N_SAVE_PROGRESS": "Log in or sign up to save your progress and play through the next lesson.",
+    "I18N_SAVE_PROGRESS_BUTTON_TEXT": "Copy",
+    "I18N_SAVE_PROGRESS_COPY_TOOLTIP": "Copied!",
     "I18N_SAVE_PROGRESS_TEXT": "Save Progress",
     "I18N_SHARE_LESSON": "Share this lesson",
     "I18N_SHOW_LESS": "Show Less",
