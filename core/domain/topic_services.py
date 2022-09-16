@@ -653,9 +653,9 @@ def _save_topic(
             'which is too old. Please reload the page and try again.'
             % (topic_model.version, topic.version))
 
-    topic_model = populate_topic_model_fields(topic_model, topic)
+    topic_model_to_commit = populate_topic_model_fields(topic_model, topic)
     change_dicts = [change.to_dict() for change in change_list]
-    topic_model.commit(committer_id, commit_message, change_dicts)
+    topic_model_to_commit.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_TOPIC, None, [topic.id])
     topic.version += 1
@@ -1580,7 +1580,8 @@ def populate_topic_model_fields(
     topic_model.meta_tag_content = topic.meta_tag_content
     topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
     topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
-
+    topic_model.skill_ids_for_diagnostic_test = (
+        topic.skill_ids_for_diagnostic_test)
     return topic_model
 
 
