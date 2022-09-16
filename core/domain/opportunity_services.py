@@ -40,7 +40,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
 
 (opportunity_models,) = models.Registry.import_models([
-    models.NAMES.opportunity
+    models.Names.OPPORTUNITY
 ])
 
 # NOTE TO DEVELOPERS: The functions:
@@ -627,6 +627,29 @@ def get_exploration_opportunity_summaries_by_ids(
                 get_exploration_opportunity_summary_from_model(
                     exp_opportunity_summary_model))
     return opportunities
+
+
+def get_exploration_opportunity_summary_by_id(
+    opportunity_id: str
+) -> Optional[opportunity_domain.ExplorationOpportunitySummary]:
+    """Returns an ExplorationOpportunitySummary object corresponding to the
+    opportunity id.
+
+    Args:
+        opportunity_id: str. An opportunity id.
+
+    Returns:
+        ExplorationOpportunitySummary|None. An ExplorationOpportunitySummary
+        domain object corresponding to the opportunity id if it exists, else
+        None.
+    """
+    exp_opportunity_summary_model = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get(
+            opportunity_id, strict=False))
+    if exp_opportunity_summary_model is None:
+        return None
+    return get_exploration_opportunity_summary_from_model(
+        exp_opportunity_summary_model)
 
 
 def get_exploration_opportunity_summaries_by_topic_id(

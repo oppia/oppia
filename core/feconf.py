@@ -70,16 +70,22 @@ SUPPORTED_OBJ_TYPES = {
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# When DEV_MODE is true check that we are running in development environment.
-# The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
-# need for an explicit check.
-if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
-    server_software = os.getenv('SERVER_SOFTWARE')
-    if (
-            server_software and
-            not server_software.startswith(('Development', 'gunicorn'))
-    ):
-        raise Exception('DEV_MODE can\'t be true on production.')
+
+def check_dev_mode_is_true() -> None:
+    """When DEV_MODE is true check that we are running in development
+    environment. The SERVER_SOFTWARE environment variable does not exist
+    in Travis, hence the need for an explicit check.
+    """
+    if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
+        server_software = os.getenv('SERVER_SOFTWARE')
+        if (
+                server_software and
+                not server_software.startswith(('Development', 'gunicorn'))
+        ):
+            raise Exception('DEV_MODE can\'t be true on production.')
+
+
+check_dev_mode_is_true()
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -133,42 +139,37 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
     'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
 
 
-# Valid model names.
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
+class ValidModelNames(enum.Enum):
     """Enum for valid model names."""
 
-    activity = 'activity' # pylint: disable=invalid-name
-    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
-    audit = 'audit' # pylint: disable=invalid-name
-    base_model = 'base_model' # pylint: disable=invalid-name
-    beam_job = 'beam_job' # pylint: disable=invalid-name
-    blog = 'blog' # pylint: disable=invalid-name
-    classifier = 'classifier' # pylint: disable=invalid-name
-    classroom = 'classroom' # pylint: disable=invalid-name
-    collection = 'collection' # pylint: disable=invalid-name
-    config = 'config' # pylint: disable=invalid-name
-    email = 'email' # pylint: disable=invalid-name
-    exploration = 'exploration' # pylint: disable=invalid-name
-    feedback = 'feedback' # pylint: disable=invalid-name
-    improvements = 'improvements' # pylint: disable=invalid-name
-    job = 'job' # pylint: disable=invalid-name
-    learner_group = 'learner_group' # pylint: disable=invalid-name
-    opportunity = 'opportunity' # pylint: disable=invalid-name
-    question = 'question' # pylint: disable=invalid-name
-    recommendations = 'recommendations' # pylint: disable=invalid-name
-    skill = 'skill' # pylint: disable=invalid-name
-    statistics = 'statistics' # pylint: disable=invalid-name
-    auth = 'auth' # pylint: disable=invalid-name
-    story = 'story' # pylint: disable=invalid-name
-    subtopic = 'subtopic' # pylint: disable=invalid-name
-    suggestion = 'suggestion' # pylint: disable=invalid-name
-    topic = 'topic' # pylint: disable=invalid-name
-    translation = 'translation' # pylint: disable=invalid-name
-    user = 'user' # pylint: disable=invalid-name
+    ACTIVITY = 'activity'
+    APP_FEEDBACK_REPORT = 'app_feedback_report'
+    AUDIT = 'audit'
+    BASE_MODEL = 'base_model'
+    BEAM_JOB = 'beam_job'
+    BLOG = 'blog'
+    CLASSIFIER = 'classifier'
+    CLASSROOM = 'classroom'
+    COLLECTION = 'collection'
+    CONFIG = 'CONFIG'
+    EMAIL = 'email'
+    EXPLORATION = 'exploration'
+    FEEDBACK = 'feedback'
+    IMPROVEMENTS = 'improvements'
+    JOB = 'job'
+    LEARNER_GROUP = 'learner_group'
+    OPPORTUNITY = 'opportunity'
+    QUESTION = 'question'
+    RECOMMENDATIONS = 'recommendations'
+    SKILL = 'skill'
+    STATISTICS = 'statistics'
+    AUTH = 'auth'
+    STORY = 'story'
+    SUBTOPIC = 'subtopic'
+    SUGGESTION = 'suggestion'
+    TOPIC = 'topic'
+    TRANSLATION = 'translation'
+    USER = 'user'
 
 
 # A mapping of interaction ids to classifier properties.
@@ -698,6 +699,9 @@ DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
 DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = (
     lambda sender_username: (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
+DEFAULT_EMAIL_SUBJECT_FN: Callable[[str], str] = (
+    lambda exp_title: (
+        'Your Oppia exploration "%s" has been unpublished' % exp_title))
 
 VALID_MODERATOR_ACTIONS: Dict[
     str,
@@ -705,10 +709,7 @@ VALID_MODERATOR_ACTIONS: Dict[
 ] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
-        'email_subject_fn': (
-            lambda exp_title: (
-                'Your Oppia exploration "%s" has been unpublished' % exp_title)
-        ),
+        'email_subject_fn': DEFAULT_EMAIL_SUBJECT_FN,
         'email_intent': 'unpublish_exploration',
         'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
         'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
@@ -755,6 +756,10 @@ MAX_NUMBER_OF_SKILL_IDS = 20
 # The maximum number of blog post cards to be visible on each page in blog
 # homepage.
 MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
+
+# The maximum number of blog post cards to be visible on each page in blog
+# search results homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
 
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
@@ -911,6 +916,7 @@ BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
+BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
 AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
