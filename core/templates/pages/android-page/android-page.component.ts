@@ -31,12 +31,15 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   styleUrls: []
 })
 export class AndroidPageComponent implements OnInit, OnDestroy {
+  @ViewChild('androidUpdatesSection') androidUpdatesSectionRef: (
+    ElementRef<Element>);
   @ViewChild('feature1') featureRef1: ElementRef<Element>;
   @ViewChild('feature2') featureRef2: ElementRef<Element>;
   @ViewChild('feature3') featureRef3: ElementRef<Element>;
   @ViewChild('feature4') featureRef4: ElementRef<Element>;
 
   featuresShown = 0;
+  androidUpdatesSectionIsSeen = false;
 
   directiveSubscriptions = new Subscription();
   constructor(
@@ -56,14 +59,23 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   ngAfterViewInit(): void {
     this.setPageTitle();
     const featuresSectionObserver = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && this.featuresShown < 4) {
-        this.featuresShown++;
+      if (entry.isIntersecting) {
+        ++this.featuresShown;
       }
     });
+    const androidUpdatesSectionObserver = (
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && !this.androidUpdatesSectionIsSeen) {
+          this.androidUpdatesSectionIsSeen= true;
+        }
+      })
+    );
     featuresSectionObserver.observe(this.featureRef1.nativeElement);
     featuresSectionObserver.observe(this.featureRef2.nativeElement);
     featuresSectionObserver.observe(this.featureRef3.nativeElement);
     featuresSectionObserver.observe(this.featureRef4.nativeElement);
+    androidUpdatesSectionObserver.observe(
+      this.androidUpdatesSectionRef.nativeElement);
   }
 
   setPageTitle(): void {
