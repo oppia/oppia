@@ -2013,7 +2013,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     )
 
     def validate(
-        self, exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
+        self, exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        validation_from_exploration: bool = False
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -2073,41 +2074,45 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
-        # Validation for Continue interaction.
-        if self.id == 'Continue':
-            self._validate_continue_input()
+        # These validations should only be run when we are validating for
+        # an exploration because as of now(16 Sept 2022) the data related
+        # to Question model is not yet fixed.
+        if validation_from_exploration:
+            # Validation for Continue interaction.
+            if self.id == 'Continue':
+                self._validate_continue_input()
 
-        # Validation for EndExploration interaction.
-        elif self.id == 'EndExploration':
-            self._validate_end_exploration_input()
+            # Validation for EndExploration interaction.
+            elif self.id == 'EndExploration':
+                self._validate_end_exploration_input()
 
-        # Validation for NumericInput interaction.
-        elif self.id == 'NumericInput':
-            self._validate_numeric_input()
+            # Validation for NumericInput interaction.
+            elif self.id == 'NumericInput':
+                self._validate_numeric_input()
 
-        # Validation for FractionInput interaction.
-        elif self.id == 'FractionInput':
-            self._validate_fraction_input()
+            # Validation for FractionInput interaction.
+            elif self.id == 'FractionInput':
+                self._validate_fraction_input()
 
-        # Validation for NumberWithUnits interaction.
-        elif self.id == 'NumberWithUnits':
-            self._validate_number_with_units_input()
+            # Validation for NumberWithUnits interaction.
+            elif self.id == 'NumberWithUnits':
+                self._validate_number_with_units_input()
 
-        # Validation for MultipleChoiceInput interaction.
-        elif self.id == 'MultipleChoiceInput':
-            self._validate_multi_choice_input()
+            # Validation for MultipleChoiceInput interaction.
+            elif self.id == 'MultipleChoiceInput':
+                self._validate_multi_choice_input()
 
-        # Validation for ItemSelectionInput interaction.
-        elif self.id == 'ItemSelectionInput':
-            self._validate_item_selec_input()
+            # Validation for ItemSelectionInput interaction.
+            elif self.id == 'ItemSelectionInput':
+                self._validate_item_selec_input()
 
-        # Validation for DragAndDropSortInput interaction.
-        elif self.id == 'DragAndDropSortInput':
-            self._validate_drag_and_drop_input()
+            # Validation for DragAndDropSortInput interaction.
+            elif self.id == 'DragAndDropSortInput':
+                self._validate_drag_and_drop_input()
 
-        # Validation for TextInput interaction.
-        elif self.id == 'TextInput':
-            self._validate_text_input()
+            # Validation for TextInput interaction.
+            elif self.id == 'TextInput':
+                self._validate_text_input()
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
@@ -4339,7 +4344,7 @@ class State(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        allow_null_interaction: bool
+        allow_null_interaction: bool, validation_from_exploration: bool = False
     ) -> None:
         """Validates various properties of the State.
 
@@ -4368,7 +4373,7 @@ class State(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
-            self.interaction.validate(exp_param_specs_dict)
+            self.interaction.validate(exp_param_specs_dict, validation_from_exploration)
 
         content_id_list = []
         content_id_list.append(self.content.content_id)
