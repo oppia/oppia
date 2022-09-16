@@ -81,11 +81,11 @@
           </div>
           <!-- CkDrop End -->
         </div>
-        <div>
+        <div *ngIf="!suppressDefaultAnswerGroup()">
           <div class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
             <div class="option-list-default" [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}">
               <div class="oppia-rule-header-warning-placement"
-                   *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings())"
+                   *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome))"
                    (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
                    ngbTooltip="{{getOutcomeTooltip(defaultOutcome)}}"
                    placement="bottom">
@@ -115,7 +115,7 @@
                                                [outcome]="defaultOutcome"
                                                [taggedSkillMisconceptionId]="null"
                                                [isEditable]="editabilityService.isEditable()"
-                                               [suppressWarnings]="suppressDefaultAnswerGroupWarnings()"
+                                               [suppressWarnings]="suppressDefaultAnswerGroup()"
                                                [displayFeedback]="!isLinearWithNoFeedback(defaultOutcome)"
                                                [addState]="addState"
                                                (onSaveAnswerGroupFeedback)="saveDefaultOutcomeFeedback($event)"
