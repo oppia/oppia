@@ -948,15 +948,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
                         'translation': '<p>default_outcome in Hindi</p>',
                         'needs_update': False
                     }
-                },                    
+                },
                 'ca_choices_0': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>option 1 in Hindi</p>',
                         'needs_update': False
                     }
-                },                            
-                'ca_choices_1':  {
+                },
+                'ca_choices_1': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>1,000 in Hindi</p>',
@@ -1016,7 +1016,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         # content only consisting of digits.
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - 
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} -
             {'en', 'hi'}
         )
         self.assertEqual(opportunity_model.translation_counts, {'hi': 4})
