@@ -407,6 +407,9 @@ describe('Admin dev mode activities tab', () => {
       expect(component.setStatusMessage.emit)
         .toHaveBeenCalledWith('Processing...');
 
+      // The status message changes after the completion of the asynchronous
+      // call, thus the whenStable method is used to detect the changes and
+      // validate accordingly.
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
           'Dummy new classroom generated successfully.');
@@ -424,6 +427,9 @@ describe('Admin dev mode activities tab', () => {
         expect(component.setStatusMessage.emit)
           .toHaveBeenCalledWith('Processing...');
 
+        // The status message changes after the completion of the asynchronous
+        // call, thus the whenStable method is used to detect the changes and
+        // validate accordingly.
         fixture.whenStable().then(() => {
           expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
             'Server error: New classroom data not generated.');

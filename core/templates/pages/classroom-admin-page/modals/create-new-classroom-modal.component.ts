@@ -41,16 +41,16 @@ export class CreateNewClassroomModalComponent
   newClassroomName: string = '';
   newClassroomId: string = '';
   newClassroomUrlFragment: string = '';
-  creatingNewClassroom: boolean = false;
+  newClassroomCreationInProgress: boolean = false;
 
-  classroomNameExceedsMaxLen: boolean = false;
+  classroomNameIsTooLong: boolean = false;
   emptyClassroomName: boolean = false;
   duplicateClassroomName: boolean = false;
   classroomNameIsValid: boolean = false;
 
-  classroomUrlFragmentExceedsmaxLen: boolean = false;
-  emptyClassroomUrlFrgament: boolean = false;
-  duplicateClassroomUrlFragment: boolean = false;
+  classroomUrlFragmentIsTooLong: boolean = false;
+  classroomUrlFragmentIsEmpty: boolean = false;
+  classroomUrlFragmentIsDuplicate: boolean = false;
   urlFragmentRegexMatched: boolean = true;
   classroomUrlFragmentIsValid: boolean = false;
 
@@ -67,14 +67,14 @@ export class CreateNewClassroomModalComponent
   }
 
   createClassroom(classroomName: string, classroomUrlFragment: string): void {
-    this.creatingNewClassroom = true;
-    this.duplicateClassroomUrlFragment = false;
-    this.classroomBackendApiService.doesClassroomWithUrlFragmentExist(
+    this.newClassroomCreationInProgress = true;
+    this.classroomUrlFragmentIsDuplicate = false;
+    this.classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
       classroomUrlFragment).then(response => {
       if (response) {
-        this.duplicateClassroomUrlFragment = true;
+        this.classroomUrlFragmentIsDuplicate = true;
         this.classroomUrlFragmentIsValid = false;
-        this.creatingNewClassroom = false;
+        this.newClassroomCreationInProgress = false;
         return;
       }
       let defaultClassroomDict = {
@@ -89,7 +89,7 @@ export class CreateNewClassroomModalComponent
       this.classroomBackendApiService.updateClassroomDataAsync(
         this.newClassroomId, defaultClassroomDict).then(() => {
         this.ngbActiveModal.close(defaultClassroomDict);
-        this.creatingNewClassroom = false;
+        this.newClassroomCreationInProgress = false;
       });
     });
   }
@@ -100,7 +100,7 @@ export class CreateNewClassroomModalComponent
 
     if (this.newClassroomName === '') {
       this.emptyClassroomName = true;
-      this.classroomNameExceedsMaxLen = false;
+      this.classroomNameIsTooLong = false;
       this.duplicateClassroomName = false;
       this.classroomNameIsValid = false;
       return;
@@ -112,12 +112,12 @@ export class CreateNewClassroomModalComponent
       this.newClassroomName.length >
       AppConstants.MAX_CHARS_IN_CLASSROOM_NAME
     ) {
-      this.classroomNameExceedsMaxLen = true;
+      this.classroomNameIsTooLong = true;
       this.duplicateClassroomName = false;
       this.classroomNameIsValid = false;
       return;
     } else {
-      this.classroomNameExceedsMaxLen = false;
+      this.classroomNameIsTooLong = false;
     }
 
     if (this.existingClassroomNames.indexOf(this.newClassroomName) !== -1) {
@@ -132,27 +132,27 @@ export class CreateNewClassroomModalComponent
     this.classroomUrlFragmentIsValid = true;
 
     if (this.newClassroomUrlFragment === '') {
-      this.emptyClassroomUrlFrgament = true;
-      this.duplicateClassroomUrlFragment = false;
-      this.classroomUrlFragmentExceedsmaxLen = false;
+      this.classroomUrlFragmentIsEmpty = true;
+      this.classroomUrlFragmentIsDuplicate = false;
+      this.classroomUrlFragmentIsTooLong = false;
       this.urlFragmentRegexMatched = true;
       this.classroomUrlFragmentIsValid = false;
       return;
     } else {
-      this.emptyClassroomUrlFrgament = false;
+      this.classroomUrlFragmentIsEmpty = false;
     }
 
     if (
       this.newClassroomUrlFragment.length >
       AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
-      this.classroomUrlFragmentExceedsmaxLen = true;
-      this.duplicateClassroomUrlFragment = false;
+      this.classroomUrlFragmentIsTooLong = true;
+      this.classroomUrlFragmentIsDuplicate = false;
       this.urlFragmentRegexMatched = true;
       this.classroomUrlFragmentIsValid = false;
       return;
     } else {
-      this.classroomUrlFragmentExceedsmaxLen = false;
+      this.classroomUrlFragmentIsTooLong = false;
     }
 
     let validUrlFragmentRegex = new RegExp(
@@ -161,13 +161,13 @@ export class CreateNewClassroomModalComponent
       this.urlFragmentRegexMatched = true;
     } else {
       this.urlFragmentRegexMatched = false;
-      this.duplicateClassroomUrlFragment = false;
+      this.classroomUrlFragmentIsDuplicate = false;
       this.classroomUrlFragmentIsValid = false;
       return;
     }
 
-    if (this.duplicateClassroomUrlFragment) {
-      this.duplicateClassroomUrlFragment = false;
+    if (this.classroomUrlFragmentIsDuplicate) {
+      this.classroomUrlFragmentIsDuplicate = false;
       this.classroomUrlFragmentIsValid = true;
     }
   }

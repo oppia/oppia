@@ -11,33 +11,33 @@
                 rows="1"
                 (ngModelChange)="onClassroomNameChange()">
       </textarea>
-      <p *ngIf="classroomNameExceedsMaxLen" class="oppia-warning-text">
+      <p *ngIf="classroomNameIsTooLong" class="oppia-warning-text">
         The classroom name should contain at most 39 characters.
       </p>
       <p *ngIf="emptyClassroomName" class="oppia-warning-text">
         The classroom name should not be empty.
       </p>
       <p *ngIf="duplicateClassroomName" class="oppia-warning-text">
-        The classroom with this name already exists.
+        A classroom with this name already exists.
       </p>
     </div>
   </div>
 
   <div class="row new-classroom-input-data">
-    <span class="col-lg-3 col-md-3 col-sm-3">Url Fragment</span>
+    <span class="col-lg-3 col-md-3 col-sm-3">URL Fragment</span>
     <div class="new-classroom-name-input">
       <textarea [(ngModel)]="newClassroomUrlFragment"
                 rows="1"
                 (ngModelChange)="onClassroomUrlFragmentChange()">
       </textarea>
-      <p *ngIf="classroomUrlFragmentExceedsmaxLen" class="oppia-warning-text">
-        The classroom url fragment should contain at most 20 characters.
+      <p *ngIf="classroomUrlFragmentIsTooLong" class="oppia-warning-text">
+        The classroom URL fragment should contain at most 20 characters.
       </p>
-      <p *ngIf="emptyClassroomUrlFrgament" class="oppia-warning-text">
-        The classroom url fragment should not be empty.
+      <p *ngIf="classroomUrlFragmentIsEmpty" class="oppia-warning-text">
+        The classroom URL fragment should not be empty.
       </p>
-      <p *ngIf="duplicateClassroomUrlFragment" class="oppia-warning-text">
-        The classroom with this url fragment already exists.
+      <p *ngIf="classroomUrlFragmentIsDuplicate" class="oppia-warning-text">
+        A classroom with this URL fragment already exists.
       </p>
       <p *ngIf="!urlFragmentRegexMatched" class="oppia-warning-text">
         The classroom URL fragment should only contain lowercase letters separated by hyphens.
@@ -48,14 +48,14 @@
 <div class="modal-footer">
   <button class="btn btn-secondary"
           (click)="cancel()"
-          [disabled]="creatingNewClassroom">
+          [disabled]="newClassroomCreationInProgress">
     Cancel
   </button>
   <button class="btn btn-success"
           (click)="createClassroom(newClassroomName, newClassroomUrlFragment)"
           [disabled]="!(classroomNameIsValid && classroomUrlFragmentIsValid)">
-    <span *ngIf="!creatingNewClassroom">Create</span>
-    <mat-spinner *ngIf="creatingNewClassroom"
+    <span *ngIf="!newClassroomCreationInProgress">Create</span>
+    <mat-spinner *ngIf="newClassroomCreationInProgress"
                  class="oppia-create-classroom-spinning-button"
                  [diameter]="22">
     </mat-spinner>

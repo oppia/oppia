@@ -471,7 +471,7 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.doesClassroomWithUrlFragmentExist(
+      classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
         'classroom-url-fragment').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -492,7 +492,7 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.doesClassroomWithUrlFragmentExist(
+      classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
         'classroom-url-fragment').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(

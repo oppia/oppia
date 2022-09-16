@@ -260,7 +260,7 @@ export class ClassroomBackendApiService {
       successCallback: (value: boolean) => void,
       errorCallback: (errorResponse: HttpErrorResponse) => void
   ): void {
-    let classroomUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
+    const classroomUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       '/classroom_url_fragment_handler/<classroom_url_fragment>', {
         classroom_url_fragment: classroomUrlFragment
       });
@@ -275,7 +275,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  async doesClassroomWithUrlFragmentExist(classroomUrlFragment: string):
+  async doesClassroomWithUrlFragmentExistAsync(classroomUrlFragment: string):
        Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesClassroomWithUrlFragmentExist(
