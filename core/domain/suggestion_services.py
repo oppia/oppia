@@ -2912,52 +2912,53 @@ def increment_question_review_stats(
 
 
 def enqueue_contributor_ranking_notification_email_task(
-     contributor_user_id: str, contribution_type: str,
-     contribution_sub_type: str, language_code: str, rank_name: str,
- ) -> None:
-     """Adds a 'send feedback email' (instant) task into the task queue.
-     Attributes:
-         contributor_user_id: str. The ID of the contributor.
-         contribution_type: str. The type of the contribution i.e.
-             translation or question.
-         contribution_sub_type: str. The sub type of the contribution
-             i.e. submissions/acceptances/reviews/edits.
-         language_code: str. The language code of the suggestion.
-         rank_name: str. The name of the rank that the contributor achieved.
-     Raises:
-         Exception. The contribution type must be offered on the Contributor
-             Dashboard.
-         Exception. The contribution subtype must be offered on the Contributor
-             Dashboard.
-     """
-     # contributor_user_id is alrerady validated in the controller layer.
-     # TODO(#16062): Rank name should be valid to send notification emails.
-     if language_code not in [language['id'] for language in (
-             constants.SUPPORTED_AUDIO_LANGUAGES)]:
-         raise Exception(
-             'Not supported language code: %s' % language_code)
-     if contribution_type not in [
-         feconf.CONTRIBUTION_TYPE_TRANSLATION,
-         feconf.CONTRIBUTION_TYPE_QUESTION
-     ]:
-         raise Exception(
-             'Invalid contribution type: %s' % contribution_type)
-     if contribution_sub_type not in [
-         feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE,
-         feconf.CONTRIBUTION_SUBTYPE_REVIEW,
-         feconf.CONTRIBUTION_SUBTYPE_EDIT,
-     ]:
-         raise Exception(
-             'Invalid contribution subtype: %s' % contribution_sub_type)
+    contributor_user_id: str, contribution_type: str,
+    contribution_sub_type: str, language_code: str, rank_name: str,
+) -> None:
+    """Adds a 'send feedback email' (instant) task into the task queue.
+    Attributes:
+        contributor_user_id: str. The ID of the contributor.
+        contribution_type: str. The type of the contribution i.e.
+            translation or question.
+        contribution_sub_type: str. The sub type of the contribution
+            i.e. submissions/acceptances/reviews/edits.
+        language_code: str. The language code of the suggestion.
+        rank_name: str. The name of the rank that the contributor achieved.
 
-     payload = {
-         'contributor_user_id': contributor_user_id,
-         'contribution_type': contribution_type,
-         'contribution_sub_type': contribution_sub_type,
-         'language_code': language_code,
-         'rank_name': rank_name,
-     }
+    Raises:
+        Exception. The contribution type must be offered on the Contributor
+            Dashboard.
+        Exception. The contribution subtype must be offered on the Contributor
+            Dashboard.
+    """
+    # contributor_user_id is alrerady validated in the controller layer.
+    # TODO(#16062): Rank name should be valid to send notification emails.
+    if language_code not in [language['id'] for language in (
+            constants.SUPPORTED_AUDIO_LANGUAGES)]:
+        raise Exception(
+            'Not supported language code: %s' % language_code)
+    if contribution_type not in [
+        feconf.CONTRIBUTION_TYPE_TRANSLATION,
+        feconf.CONTRIBUTION_TYPE_QUESTION
+    ]:
+        raise Exception(
+            'Invalid contribution type: %s' % contribution_type)
+    if contribution_sub_type not in [
+        feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE,
+        feconf.CONTRIBUTION_SUBTYPE_REVIEW,
+        feconf.CONTRIBUTION_SUBTYPE_EDIT,
+    ]:
+        raise Exception(
+            'Invalid contribution subtype: %s' % contribution_sub_type)
 
-     taskqueue_services.enqueue_task(
-         feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
-         payload, 0)
+    payload = {
+        'contributor_user_id': contributor_user_id,
+        'contribution_type': contribution_type,
+        'contribution_sub_type': contribution_sub_type,
+        'language_code': language_code,
+        'rank_name': rank_name,
+    }
+
+    taskqueue_services.enqueue_task(
+        feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
+        payload, 0)
