@@ -2078,35 +2078,35 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             self._validate_continue_input()
 
         # Validation for EndExploration interaction.
-        if self.id == 'EndExploration':
+        elif self.id == 'EndExploration':
             self._validate_end_exploration_input()
 
         # Validation for NumericInput interaction.
-        if self.id == 'NumericInput':
+        elif self.id == 'NumericInput':
             self._validate_numeric_input()
 
         # Validation for FractionInput interaction.
-        if self.id == 'FractionInput':
+        elif self.id == 'FractionInput':
             self._validate_fraction_input()
 
         # Validation for NumberWithUnits interaction.
-        if self.id == 'NumberWithUnits':
+        elif self.id == 'NumberWithUnits':
             self._validate_number_with_units_input()
 
         # Validation for MultipleChoiceInput interaction.
-        if self.id == 'MultipleChoiceInput':
+        elif self.id == 'MultipleChoiceInput':
             self._validate_multi_choice_input()
 
         # Validation for ItemSelectionInput interaction.
-        if self.id == 'ItemSelectionInput':
+        elif self.id == 'ItemSelectionInput':
             self._validate_item_selec_input()
 
         # Validation for DragAndDropSortInput interaction.
-        if self.id == 'DragAndDropSortInput':
+        elif self.id == 'DragAndDropSortInput':
             self._validate_drag_and_drop_input()
 
         # Validation for TextInput interaction.
-        if self.id == 'TextInput':
+        elif self.id == 'TextInput':
             self._validate_text_input()
 
     def _validate_customization_args(self) -> None:
