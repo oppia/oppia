@@ -2082,10 +2082,10 @@ def _create_translation_review_stats_from_model(
         translation_review_stats_model.reviewed_translations_count,
         translation_review_stats_model.reviewed_translation_word_count,
         translation_review_stats_model.accepted_translations_count,
+        translation_review_stats_model.accepted_translation_word_count,
         (
             translation_review_stats_model
             .accepted_translations_with_reviewer_edits_count),
-        translation_review_stats_model.accepted_translation_word_count,
         translation_review_stats_model.first_contribution_date,
         translation_review_stats_model.last_contribution_date
     )
