@@ -973,6 +973,8 @@ def populate_exp_model_fields(
     exp_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
     exp_model.edits_allowed = exploration.edits_allowed
+    exp_model.android_proto_size_in_bytes = (
+        exploration.android_proto_size_in_bytes)
 
     return exp_model
 
@@ -1451,7 +1453,8 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
+        android_proto_size_in_bytes=exploration.android_proto_size_in_bytes
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)

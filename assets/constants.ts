@@ -4954,11 +4954,27 @@ export default {
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
-  // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
+  // This is linked to SUPPORTED_LANGUAGES_CODES in android_validation_constants.
   "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
     "code": "en",
     "description": "English",
     "decimal_separator": "."
+  }, {
+    "code": "hi-en",
+    "description": "Hinglish",
+    "decimal_separator": "."
+  }, {
+    "code": "ar",
+    "description": "Arabic",
+    "decimal_separator": ","
+  }, {
+    "code": "hi",
+    "description": "Hindi",
+    "decimal_separator": "."
+  }, {
+    "code": "pt-br",
+    "description": "Brazilian Portuguese",
+    "decimal_separator": ","
   }],
 
   // List of supported content languages in which we can create explorations or
@@ -5777,7 +5793,6 @@ export default {
       "NumericExpressionInput",
       "AlgebraicExpressionInput",
       "MathEquationInput",
-      "NumberWithUnits",
       "RatioExpressionInput"
     ]
   }],

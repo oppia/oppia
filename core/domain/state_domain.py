@@ -43,6 +43,8 @@ from core.domain import html_cleaner  # pylint: disable=invalid-import-from # is
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
+from proto_files import state_pb2, languages_pb2
+from proto_files.state_pb2 import InteractionInstanceDto
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -322,6 +324,24 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
         return html_list
 
+    def to_android_answer_group_proto(self):
+        """Returns a proto representation of the answer group object.
+                Returns:
+                    BaseAnswerGroupDto. The proto object.
+                """
+        misconception_proto = {}
+        if self.tagged_skill_misconception_id is not None:
+            skill_id, misconception_id = (
+                self.tagged_skill_misconception_id.split('-'))
+            misconception_proto = state_pb2.MisconceptionDto(
+                skill_id=skill_id,
+                misconception_id=misconception_id)
+
+        return state_pb2.BaseAnswerGroupDto(
+            outcome=self.outcome.to_android_outcome_proto(),
+            tagged_skill_misconception=misconception_proto
+        )
+
     @staticmethod
     def convert_html_in_answer_group(
         answer_group_dict: AnswerGroupDict,
@@ -424,6 +444,14 @@ class Hint(translation_domain.BaseTranslatableObject):
     def validate(self) -> None:
         """Validates all properties of Hint."""
         self.hint_content.validate()
+
+    def to_android_hint_proto(self):
+        """Returns a proto representation of the hint object.
+        Returns:
+            HintDto. The proto object.
+        """
+        return state_pb2.HintDto(
+            hint_content=self.hint_content.to_android_content_proto())
 
     @staticmethod
     def convert_html_in_hint(
@@ -563,6 +591,15 @@ class Solution(translation_domain.BaseTranslatableObject):
         interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
             interaction_id).normalize_answer(self.correct_answer)
         self.explanation.validate()
+
+    def to_android_solution_proto(self) -> None:
+        """Returns a proto representation of the solution object.
+        Returns:
+            BaseSolutionDto. The proto object.
+        """
+        return state_pb2.BaseSolutionDto(
+            explanation=self.explanation.to_android_content_proto()
+        )
 
     @staticmethod
     def convert_html_in_solution(
@@ -1023,6 +1060,100 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 customization_args_dict
             )
         )
+
+    def to_android_interaction_proto(self) -> InteractionInstanceDto:
+        """Returns a proto representation of the interaction object.
+        Returns:
+            InteractionInstance|dict. The InteractionInstance proto object
+            if the id of the interaction matches else return an empty dict.
+        """
+        interaction_instance = None
+        interaction_proto = {}
+        if self.id is not None:
+            interaction_instance = (
+                interaction_registry.Registry.get_interaction_by_id(self.id)
+            )
+
+        if self.id == 'Continue':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                continue_instance=(
+                    interaction_instance.to_android_continue_proto(
+                        self.default_outcome, self.customization_args)))
+        elif self.id == 'FractionInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                fraction_input=(
+                    interaction_instance.to_android_fraction_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.hints, self.solution, self.answer_groups)))
+        elif self.id == 'ItemSelectionInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                item_selection_input=(
+                    interaction_instance.to_android_item_selection_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.hints, self.answer_groups)))
+        elif self.id == 'MultipleChoiceInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                multiple_choice_input=(
+                    interaction_instance.to_android_multiple_choice_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.hints, self.answer_groups)))
+        elif self.id == 'NumericInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                numeric_input=(
+                    interaction_instance.to_android_numeric_input_proto(
+                        self.default_outcome, self.solution,
+                        self.hints, self.answer_groups)))
+        elif self.id == 'TextInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                text_input=interaction_instance.to_android_text_input_proto(
+                    self.default_outcome, self.customization_args,
+                    self.solution, self.hints, self.answer_groups))
+        elif self.id == 'RatioExpressionInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                ratio_expression_input=(
+                    interaction_instance.to_android_ratio_expression_input_proto(
+                        # pylint: disable=line-too-long
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
+        elif self.id == 'ImageClickInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                image_click_input=(
+                    interaction_instance.to_android_image_click_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.hints, self.answer_groups)))
+        elif self.id == 'DragAndDropSortInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                drag_and_drop_sort_input=(
+                    interaction_instance.to_android_drag_and_drop_sort_input_proto(
+                        # pylint: disable=line-too-long
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
+        elif self.id == 'AlgebraicExpressionInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                algebraic_expression_input=(
+                    interaction_instance.to_android_algebraic_expression_proto(
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
+        elif self.id == 'MathEquationInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                math_equation_input=(
+                    interaction_instance.to_android_math_equation_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
+        elif self.id == 'NumericExpressionInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                numeric_expression_input=(
+                    interaction_instance.to_android_numeric_expression_proto(
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
+        elif self.id == 'EndExploration':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                end_exploration=(
+                    interaction_instance.to_android_end_exploration_proto()))
+        else:
+            interaction_proto = None
+
+        return interaction_proto
 
     @classmethod
     def create_default_interaction(
@@ -1783,6 +1914,17 @@ class Outcome(translation_domain.BaseTranslatableObject):
                     'Expected outcome refresher_exploration_id to be a string, '
                     'received %s' % self.refresher_exploration_id)
 
+    def to_android_outcome_proto(self) -> state_pb2.OutcomeDto:
+        """Returns a proto representation of the outcome object.
+        Returns:
+            OutcomeDto. The proto object.
+        """
+        return state_pb2.OutcomeDto(
+            destination_state=self.dest,
+            feedback=self.feedback.to_android_content_proto(),
+            labelled_as_correct=self.labelled_as_correct
+        )
+
     @staticmethod
     def convert_html_in_outcome(
         outcome_dict: OutcomeDict, conversion_fn: Callable[[str], str]
@@ -1919,6 +2061,19 @@ class Voiceover:
                 'or zero if not yet specified %s' %
                 self.duration_secs)
 
+    def to_android_voiceover_proto(self):
+        """Returns a proto representation of the voiceover object.
+        Returns:
+            VoiceoverDto. The proto object.
+        """
+        # TODO(#15176): Investigate on how to found problematic exploration
+        # and remove the type casting.
+        return languages_pb2.VoiceoverFileDto(
+            filename=self.filename,
+            file_size_bytes=int(self.file_size_bytes),
+            duration_secs=float(self.duration_secs)
+        )
+
 
 class WrittenTranslationDict(TypedDict):
     """Dictionary representing the WrittenTranslation object."""
@@ -2046,6 +2201,30 @@ class WrittenTranslation:
             raise utils.ValidationError(
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
+
+    def to_android_written_translation_proto(self) -> \
+            languages_pb2.WrittenTranslationDto:
+        """Returns a proto representation of the written translation object.
+        Returns:
+            WrittenTranslationDto. The proto object.
+        """
+        written_translation_proto = {}
+        if self.data_format in (
+                WrittenTranslation.DATA_FORMAT_HTML,
+                WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
+            written_translation_proto = (
+                languages_pb2.WrittenTranslationDto(
+                    translatable_text=(
+                        TranslatableItem.to_written_translatable_text_proto(
+                            self.translation))))
+        else:
+            written_translation_proto = (
+                languages_pb2.WrittenTranslationDto(
+                    set_of_translatable_text=(
+                        TranslatableItem.to_written_translatable_set_proto(
+                            self.translation))))
+
+        return written_translation_proto
 
 
 class WrittenTranslationsDict(TypedDict):
@@ -2330,6 +2509,52 @@ class WrittenTranslations:
                     html_string_list.append(written_translation.translation)
         return html_string_list
 
+    def to_android_written_translations_proto(self):
+        """Returns a proto representation of the written translations object.
+        Returns:
+            WrittenTranslationsDto. The proto object.
+        """
+        translation_language_mapping_protos = (
+            self._get_translation_language_mapping_protos())
+
+        return languages_pb2.WrittenTranslationsDto(
+            translation_language_mapping=translation_language_mapping_protos
+        )
+
+    def _get_translation_language_mapping_protos(self):
+        """Creates a WrittenTranslationContentMapping proto object.
+        Returns:
+            list(WrittenTranslationContentMappingDto). The proto object list.
+        """
+        language_to_content_id_written_translation_map = (
+            collections.defaultdict(dict))
+        for (content_id, language_code_to_written_translation) in (
+                self.translations_mapping.items()):
+            for (lang_code, written_translation) in (
+                    language_code_to_written_translation.items()):
+                written_translation_proto = (
+                    written_translation.to_android_written_translation_proto())
+                language_to_content_id_map = (
+                    language_to_content_id_written_translation_map[lang_code])
+                language_to_content_id_map[content_id] = (
+                    written_translation_proto)
+
+        written_translation_content_mapping_protos_list = []
+
+        language_code = (
+            android_validation_constants.LANGUAGE_CODE_TO_ENUM_MAP)
+
+        for (lang_code, written_translation_content_map) in (
+                language_to_content_id_written_translation_map.items()):
+            if lang_code in (
+                    android_validation_constants.SUPPORTED_LANGUAGE_CODES):
+                proto = languages_pb2.WrittenTranslationContentMappingDto(
+                    language=language_code[lang_code],
+                    translation_content_mapping=written_translation_content_map)
+                written_translation_content_mapping_protos_list.append(proto)
+
+        return written_translation_content_mapping_protos_list
+
     @staticmethod
     def convert_html_in_written_translations(
         written_translations_dict: WrittenTranslationsDict,
@@ -2552,6 +2777,52 @@ class RecordedVoiceovers:
                 'The content_id %s does not exist.' % content_id)
 
         self.voiceovers_mapping.pop(content_id, None)
+
+    def to_android_recorded_voiceovers_proto(self):
+        """Returns a proto representation of the recorded voiceovers object.
+        Returns:
+            RecordedVoicoversDto. The proto object.
+        """
+        voiceover_content_mapping_protos = (
+            self._get_voiceovers_content_mapping_protos())
+
+        return languages_pb2.RecordedVoiceoversDto(
+            voiceover_content_mapping=voiceover_content_mapping_protos
+        )
+
+    def _get_voiceovers_content_mapping_protos(self):
+        """Creates a VoiceoverContentMapping proto object.
+        Returns:
+            list(VoiceoverContentMappingDto). The proto object list.
+        """
+        language_to_content_id_voiceover_file_map = (
+            collections.defaultdict(dict))
+        for (content_id, language_code_to_voiceover) in (
+                self.voiceovers_mapping.items()):
+            for (language_code, voiceover) in (
+                    language_code_to_voiceover.items()):
+                voiceover_proto = voiceover.to_android_voiceover_proto()
+                language_to_content_id_map = (
+                    language_to_content_id_voiceover_file_map[language_code])
+                language_to_content_id_map[content_id] = voiceover_proto
+
+        language_code = (
+            android_validation_constants.LANGUAGE_CODE_TO_ENUM_MAP)
+
+        voiceover_content_mapping_protos_list = []
+
+        for (lang_code, voiceover_file_content_map) in (
+                language_to_content_id_voiceover_file_map.items()):
+            if lang_code in (
+                    android_validation_constants.SUPPORTED_LANGUAGE_CODES):
+                voiceover_content_mapping_proto = (
+                    languages_pb2.VoiceoverContentMappingDto(
+                        language=language_code[lang_code],
+                        voiceover_content_mapping=voiceover_file_content_map))
+                voiceover_content_mapping_protos_list.append(
+                    voiceover_content_mapping_proto)
+
+        return voiceover_content_mapping_protos_list
 
 
 class RuleSpecDict(TypedDict):
@@ -2925,6 +3196,16 @@ class SubtitledHtml:
         """
         return cls(content_id, '')
 
+    def to_android_content_proto(self):
+        """Returns a proto representation of the subtitled html object.
+        Returns:
+            SubtitledTextDto. The proto object.
+        """
+        return languages_pb2.SubtitledTextDto(
+            content_id=self.content_id,
+            text=self.html
+        )
+
 
 class SubtitledUnicodeDict(TypedDict):
     """Dictionary representing the SubtitledUnicode object."""
@@ -3007,6 +3288,16 @@ class SubtitledUnicode:
         """
         return cls(content_id, '')
 
+    def to_android_content_proto(self):
+        """Returns a proto representation of the subtitled unicode object.
+        Returns:
+            SubtitledTextDto. The proto object.
+        """
+        return languages_pb2.SubtitledTextDto(
+            content_id=self.content_id,
+            text=self.unicode_str
+        )
+
 
 class TranslatableItemDict(TypedDict):
     """Dictionary representing the TranslatableItem object."""
@@ -3083,6 +3374,28 @@ class TranslatableItem:
         return self.data_format in [
             TranslatableItem.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
             TranslatableItem.DATA_FORMAT_SET_OF_UNICODE_STRING]
+
+    @classmethod
+    def to_written_translatable_text_proto(cls, translation):
+        """Creates a WrittenTranslatableText proto object.
+        Args:
+            translation: str. The translated content.
+        Returns:
+            WrittenTranslatableTextDto. The proto object.
+        """
+        return languages_pb2.WrittenTranslatableTextDto(translation=translation)
+
+    @classmethod
+    def to_written_translatable_set_proto(cls, translations):
+        """Creates a SetOfWrittenTranslatableText proto object.
+        Args:
+            translations: list(str). The translated content.
+        Returns:
+            WrittenTranslatableSetDto. The proto object.
+        """
+        return languages_pb2.SetOfWrittenTranslatableTextDto(
+            translations=translations
+        )
 
 
 DomainObjectCustomizationArgsConversionFnTypes = Union[
@@ -4103,6 +4416,35 @@ class State(translation_domain.BaseTranslatableObject):
             'card_is_checkpoint': self.card_is_checkpoint,
             'next_content_id_index': self.next_content_id_index
         }
+
+    def to_android_state_proto(self):
+        """Returns a proto representation of the state object.
+        Returns:
+            StateDto. The proto object.
+        """
+        state_proto = {}
+        content_proto = self.content.to_android_content_proto()
+        recorded_voiceovers_proto = (
+            self.recorded_voiceovers.to_android_recorded_voiceovers_proto())
+        written_translations_proto = (
+            self.written_translations.to_android_written_translations_proto())
+        interaction_proto = self.interaction.to_android_interaction_proto()
+
+        if self.interaction.to_android_interaction_proto() is None:
+            state_proto = state_pb2.StateDto(
+                content=content_proto,
+                recorded_voiceovers=recorded_voiceovers_proto,
+                written_translations=written_translations_proto
+            )
+        else:
+            state_proto = state_pb2.StateDto(
+                content=content_proto,
+                recorded_voiceovers=recorded_voiceovers_proto,
+                written_translations=written_translations_proto,
+                interaction=interaction_proto
+            )
+
+        return state_proto
 
     @classmethod
     def from_dict(cls, state_dict: StateDict) -> State:

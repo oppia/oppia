@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from extensions.interactions import base
+from proto_files import state_pb2
 
 
 class EndExploration(base.BaseInteraction):
@@ -64,3 +65,11 @@ class EndExploration(base.BaseInteraction):
         },
         'default_value': [],
     }]
+
+    @classmethod
+    def to_android_end_exploration_proto(cls):
+        """Creates a EndExplorationInstanceDto proto object.
+        Returns:
+            EndExplorationInstanceDto. The proto object.
+        """
+        return state_pb2.EndExplorationInstanceDto()

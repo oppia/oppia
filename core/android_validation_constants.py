@@ -22,6 +22,7 @@ from __future__ import annotations
 import re
 
 from core.constants import constants
+from proto_files import languages_pb2
 
 
 # These are the valid interactions that are allowed in an exploration
@@ -34,11 +35,19 @@ VALID_INTERACTION_IDS = [
     'AlgebraicExpressionInput', 'Continue', 'DragAndDropSortInput',
     'EndExploration', 'FractionInput', 'ImageClickInput', 'ItemSelectionInput',
     'MathEquationInput', 'MultipleChoiceInput', 'NumericExpressionInput',
-    'NumericInput', 'NumberWithUnits', 'RatioExpressionInput', 'TextInput'
+    'NumericInput', 'RatioExpressionInput', 'TextInput'
 ]
 
 # This is linked to SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID in constants.ts.
-SUPPORTED_LANGUAGES = ['en']
+SUPPORTED_LANGUAGE_CODES = ['en', 'hi-en', 'ar', 'hi', 'pt-br']
+
+LANGUAGE_CODE_TO_ENUM_MAP = {
+    'en': languages_pb2.LanguageType.Value('ENGLISH'),
+    'hi-en': languages_pb2.LanguageType.Value('HINGLISH'),
+    'ar': languages_pb2.LanguageType.Value('ARABIC'),
+    'hi': languages_pb2.LanguageType.Value('HINDI'),
+    'pt-br': languages_pb2.LanguageType.Value('BRAZILIAN_PORTUGUESE')
+}
 
 # This is linked to VALID_RTE_COMPONENTS_FOR_ANDROID in constants.ts.
 VALID_RTE_COMPONENTS = ['image', 'math', 'skillreview']

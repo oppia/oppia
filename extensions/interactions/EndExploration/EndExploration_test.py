@@ -18,16 +18,18 @@
 
 from __future__ import annotations
 
+from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions.EndExploration import EndExploration # pylint: disable=unused-import # isort: skip
 
 
 class EndExplorationTests(test_utils.GenericTestBase):
 
-    # At Oppia, we require all files to have an associated test file, since
-    # that's how the backend test coverage checks detect that there are Python
-    # files to cover in the first place. For files that don't have logic
-    # (like extensions/interactions/EndExploration/EndExploration.py), a
-    # trivial test like the one here is sufficient.
-    def test_trivial(self) -> None:
-        pass
+    def test_end_exploration_converted_to_proto_correctly(self):
+        end_exploration = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'EndExploration'))
+        end_exploration_proto = (
+            end_exploration.to_android_end_exploration_proto())
+
+        self.assertEqual(int(end_exploration_proto.ByteSize()), 0)

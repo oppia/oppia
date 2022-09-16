@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from extensions.interactions import base
+from proto_files import state_pb2
 
 
 class Continue(base.BaseInteraction):
@@ -52,3 +53,40 @@ class Continue(base.BaseInteraction):
             'unicode_str': 'Continue'
         },
     }]
+
+    @classmethod
+    def to_android_continue_proto(cls, default_outcome, customization_args):
+        """Creates a ContinueInstanceDto proto object.
+        Args:
+            default_outcome: Outcome. The domain object.
+            customization_args: CustomizationArgs. The domain object.
+        Returns:
+            ContinueInstanceDto. The proto object.
+        """
+        outcome_proto = default_outcome.to_android_outcome_proto()
+        customization_args_proto = (
+            cls._convert_customization_args_to_proto(customization_args)
+        )
+
+        return state_pb2.ContinueInstanceDto(
+            customization_args = customization_args_proto,
+            default_outcome = outcome_proto
+        )
+
+    @classmethod
+    def _convert_customization_args_to_proto(cls, customization_args):
+        """Creates a CustomizationArgsDto proto object
+        for ContinueInstanceDto.
+        Args:
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+        Returns:
+            CustomizationArgsDto. The proto object.
+        """
+        content = customization_args['buttonText'].value
+
+        return state_pb2.ContinueInstanceDto.CustomizationArgsDto(
+            button_text=content.to_android_content_proto()
+        )

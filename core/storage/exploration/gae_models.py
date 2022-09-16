@@ -238,6 +238,9 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     edits_allowed = datastore_services.BooleanProperty(
         default=True, indexed=True)
+    # Size in bytes of Android Proto representation.
+    android_proto_size_in_bytes = datastore_services.IntegerProperty(
+        indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -269,7 +272,9 @@ class ExplorationModel(base_models.VersionedModel):
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'edits_allowed': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'edits_allowed': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'android_proto_size_in_bytes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

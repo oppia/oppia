@@ -54,6 +54,7 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
+from proto_files.exploration_pb2 import ExplorationDto
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2129,7 +2130,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return self.is_demo_exploration_id(self.id)
 
     @property
-    def android_proto_size_in_bytes(self):
+    def android_proto_size_in_bytes(self) -> int:
         """Returns the most up-to-date size of the exploration proto,
         recomputing from scratch if necessary.
 
@@ -3752,11 +3753,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return html_list
 
-    def to_android_exploration_proto(self):
+    def to_android_exploration_proto(self) -> ExplorationDto:
         """Returns a proto representation of the exploration object.
 
         Returns:
-            ExplorationDto. The proto object.
+            c. The proto object.
         """
         exp_state_protos = {}
         for (state_name, state) in self.states.items():
@@ -3770,7 +3771,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             states=exp_state_protos
         )
 
-    def get_proto_size(self):
+    def get_proto_size(self) -> int:
         """Calculate the byte size of the proto object.
 
         Returns:

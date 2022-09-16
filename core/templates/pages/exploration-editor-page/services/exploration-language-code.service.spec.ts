@@ -50,7 +50,7 @@ describe('Exploration Language Code Service', () => {
     expect(elcs._isValid('en')).toBe(true);
 
     spyOn(cs, 'isExplorationLinkedToStory').and.returnValue(true);
-    expect(elcs.getSupportedContentLanguages().length).toBe(1);
+    expect(elcs.getSupportedContentLanguages().length).toBe(5);
     expect(elcs.getSupportedContentLanguages()[0].code).toBe('en');
   });
 });

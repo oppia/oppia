@@ -18,16 +18,62 @@
 
 from __future__ import annotations
 
+from core.domain import interaction_registry, state_domain
 from core.tests import test_utils
 from extensions.interactions.Continue import Continue # pylint: disable=unused-import # isort: skip
 
 
 class ContinueTests(test_utils.GenericTestBase):
 
-    # At Oppia, we require all files to have an associated test file, since
-    # that's how the backend test coverage checks detect that there are Python
-    # files to cover in the first place. For files that don't have logic
-    # (like extensions/interactions/Continue/Continue.py), a trivial
-    # test like the one here is sufficient.
-    def test_trivial(self) -> None:
-        pass
+    def test_continue_interaction_converted_to_proto_correctly(self):
+        interaction_dict = {
+            'answer_groups': [],
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'buttonText': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': 'Click me!',
+                    },
+                },
+            },
+            'default_outcome': {
+                'dest': 'end_state_name',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>html outcome</p>',
+                },
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+            },
+            'hints': [],
+            'id': 'Continue',
+            'solution': None,
+        }
+        continue_instance = (
+            interaction_registry.Registry.get_interaction_by_id('Continue'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(interaction_dict))
+        continue_proto = continue_instance.to_android_continue_proto(
+            interaction_domain.default_outcome,
+            interaction_domain.customization_args)
+
+        self.assertEqual(
+            continue_proto.customization_args.button_text.content_id,
+            'ca_placeholder_0')
+        self.assertEqual(
+            continue_proto.customization_args.button_text.text,
+            'Click me!')
+        self.assertEqual(
+            continue_proto.default_outcome.destination_state,
+            'end_state_name')
+        self.assertFalse(continue_proto.default_outcome.labelled_as_correct)
+        self.assertEqual(
+            continue_proto.default_outcome.feedback.content_id,
+            'default_outcome')
+        self.assertEqual(
+            continue_proto.default_outcome.feedback.text,
+            '<p>html outcome</p>')

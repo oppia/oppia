@@ -8,6 +8,7 @@ __pycache__/
 gae_runtime/*
 # Ignore the auto-generated protobuf python code.
 proto_files/*.py
+extensions/classifiers/proto/google/protobuf/*.ts
 extensions/classifiers/proto/*.ts
 extensions/classifiers/proto/*.js
 # We have added .git over here such that "git check-ignore" command should
