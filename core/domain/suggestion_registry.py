@@ -1738,6 +1738,7 @@ class TranslationReviewStatsDict(TypedDict):
     reviewed_translations_count: int
     reviewed_translation_word_count: int
     accepted_translations_count: int
+    accepted_translation_word_count: int
     accepted_translations_with_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
@@ -1754,6 +1755,7 @@ class TranslationReviewStats:
         reviewed_translations_count: int,
         reviewed_translation_word_count: int,
         accepted_translations_count: int,
+        accepted_translation_word_count: int,
         accepted_translations_with_reviewer_edits_count: int,
         first_contribution_date: datetime.date,
         last_contribution_date: datetime.date
@@ -1764,6 +1766,7 @@ class TranslationReviewStats:
         self.reviewed_translations_count = reviewed_translations_count
         self.reviewed_translation_word_count = reviewed_translation_word_count
         self.accepted_translations_count = accepted_translations_count
+        self.accepted_translation_word_count = accepted_translation_word_count
         self.accepted_translations_with_reviewer_edits_count = (
             accepted_translations_with_reviewer_edits_count
         )
@@ -1786,6 +1789,8 @@ class TranslationReviewStats:
             'reviewed_translation_word_count': (
                 self.reviewed_translation_word_count),
             'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
             'accepted_translations_with_reviewer_edits_count': (
                 self.accepted_translations_with_reviewer_edits_count),
             'first_contribution_date': self.first_contribution_date,
