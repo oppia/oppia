@@ -24,7 +24,6 @@ import shutil
 import signal
 import subprocess
 import threading
-from tkinter import Y
 
 from core import feconf
 from core import utils

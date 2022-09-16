@@ -50,22 +50,22 @@ jobs:
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicsAndSkillsDashboard" --prod_env
         env:
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Topic and Story Editor E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditor" --prod_env
         env:
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Topic and Story Editor File Upload E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditorFileUploadFeatures" --prod_env
         env:
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Topic and Story Viewer E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryViewer" --prod_env
         env:
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
