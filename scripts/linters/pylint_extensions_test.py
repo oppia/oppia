@@ -2583,9 +2583,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
     def test_raises_error_if_gap_in_ignore_and_comment_is_more_than_fifteen(
         self
     ):
-        node_with_ignore_and_more_than_ten_gap = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
+        node_with_ignore_and_more_than_fifteen_gap = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
         )
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
@@ -2613,12 +2615,12 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                     return 'hi' #@
                 """
             )
-        node_with_ignore_and_more_than_ten_gap.file = filename
+        node_with_ignore_and_more_than_fifteen_gap.file = filename
 
         message1 = testutils.Message(
             msg_id='mypy-ignore-used',
             line=18,
-            node=node_with_ignore_and_more_than_ten_gap
+            node=node_with_ignore_and_more_than_fifteen_gap
         )
         message2 = testutils.Message(
             msg_id='redundant-type-comment',
@@ -2628,7 +2630,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             message1, message2
         ):
             self.checker_test_object.checker.visit_module(
-                node_with_ignore_and_more_than_ten_gap
+                node_with_ignore_and_more_than_fifteen_gap
             )
         temp_file.close()
 
@@ -3157,9 +3159,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
-        node_with_object_and_less_than_ten_gap = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
+        node_with_object_and_less_than_fifteen_gap = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
         )
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
@@ -3180,11 +3184,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                     return 'hi' #@
                 """
             )
-        node_with_object_and_less_than_ten_gap.file = filename
+        node_with_object_and_less_than_fifteen_gap.file = filename
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_module(
-                node_with_object_and_less_than_ten_gap
+                node_with_object_and_less_than_fifteen_gap
             )
         temp_file.close()
 
