@@ -44,7 +44,6 @@ from core.domain import interaction_registry  # pylint: disable=invalid-import-f
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 from proto_files import state_pb2, languages_pb2
-from proto_files.state_pb2 import InteractionInstanceDto
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -326,9 +325,10 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
     def to_android_answer_group_proto(self):
         """Returns a proto representation of the answer group object.
-                Returns:
-                    BaseAnswerGroupDto. The proto object.
-                """
+
+        Returns:
+            BaseAnswerGroupDto. The proto object.
+        """
         misconception_proto = {}
         if self.tagged_skill_misconception_id is not None:
             skill_id, misconception_id = (
@@ -447,6 +447,7 @@ class Hint(translation_domain.BaseTranslatableObject):
 
     def to_android_hint_proto(self):
         """Returns a proto representation of the hint object.
+
         Returns:
             HintDto. The proto object.
         """
@@ -594,6 +595,7 @@ class Solution(translation_domain.BaseTranslatableObject):
 
     def to_android_solution_proto(self) -> None:
         """Returns a proto representation of the solution object.
+
         Returns:
             BaseSolutionDto. The proto object.
         """
@@ -1061,8 +1063,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             )
         )
 
-    def to_android_interaction_proto(self) -> InteractionInstanceDto:
+    def to_android_interaction_proto(self) -> state_pb2.InteractionInstanceDto:
         """Returns a proto representation of the interaction object.
+
         Returns:
             InteractionInstance|dict. The InteractionInstance proto object
             if the id of the interaction matches else return an empty dict.
@@ -1111,8 +1114,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         elif self.id == 'RatioExpressionInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
                 ratio_expression_input=(
-                    interaction_instance.to_android_ratio_expression_input_proto(
-                        # pylint: disable=line-too-long
+                    interaction_instance.to_android_ratio_expression_input_proto(# pylint: disable=line-too-long
                         self.default_outcome, self.customization_args,
                         self.solution, self.hints, self.answer_groups)))
         elif self.id == 'ImageClickInput':
@@ -1124,8 +1126,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         elif self.id == 'DragAndDropSortInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
                 drag_and_drop_sort_input=(
-                    interaction_instance.to_android_drag_and_drop_sort_input_proto(
-                        # pylint: disable=line-too-long
+                    interaction_instance.to_android_drag_and_drop_sort_input_proto(# pylint: disable=line-too-long
                         self.default_outcome, self.customization_args,
                         self.solution, self.hints, self.answer_groups)))
         elif self.id == 'AlgebraicExpressionInput':
@@ -1916,6 +1917,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
 
     def to_android_outcome_proto(self) -> state_pb2.OutcomeDto:
         """Returns a proto representation of the outcome object.
+
         Returns:
             OutcomeDto. The proto object.
         """
@@ -2063,6 +2065,7 @@ class Voiceover:
 
     def to_android_voiceover_proto(self):
         """Returns a proto representation of the voiceover object.
+
         Returns:
             VoiceoverDto. The proto object.
         """
@@ -2202,9 +2205,10 @@ class WrittenTranslation:
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
 
-    def to_android_written_translation_proto(self) -> \
-            languages_pb2.WrittenTranslationDto:
+    def to_android_written_translation_proto(
+        self) -> languages_pb2.WrittenTranslationDto:
         """Returns a proto representation of the written translation object.
+
         Returns:
             WrittenTranslationDto. The proto object.
         """
@@ -2511,6 +2515,7 @@ class WrittenTranslations:
 
     def to_android_written_translations_proto(self):
         """Returns a proto representation of the written translations object.
+
         Returns:
             WrittenTranslationsDto. The proto object.
         """
@@ -2523,6 +2528,7 @@ class WrittenTranslations:
 
     def _get_translation_language_mapping_protos(self):
         """Creates a WrittenTranslationContentMapping proto object.
+
         Returns:
             list(WrittenTranslationContentMappingDto). The proto object list.
         """
@@ -2780,6 +2786,7 @@ class RecordedVoiceovers:
 
     def to_android_recorded_voiceovers_proto(self):
         """Returns a proto representation of the recorded voiceovers object.
+
         Returns:
             RecordedVoicoversDto. The proto object.
         """
@@ -2792,6 +2799,7 @@ class RecordedVoiceovers:
 
     def _get_voiceovers_content_mapping_protos(self):
         """Creates a VoiceoverContentMapping proto object.
+
         Returns:
             list(VoiceoverContentMappingDto). The proto object list.
         """
@@ -3198,6 +3206,7 @@ class SubtitledHtml:
 
     def to_android_content_proto(self):
         """Returns a proto representation of the subtitled html object.
+
         Returns:
             SubtitledTextDto. The proto object.
         """
@@ -3290,6 +3299,7 @@ class SubtitledUnicode:
 
     def to_android_content_proto(self):
         """Returns a proto representation of the subtitled unicode object.
+
         Returns:
             SubtitledTextDto. The proto object.
         """
@@ -3380,6 +3390,7 @@ class TranslatableItem:
         """Creates a WrittenTranslatableText proto object.
         Args:
             translation: str. The translated content.
+
         Returns:
             WrittenTranslatableTextDto. The proto object.
         """
@@ -3390,6 +3401,7 @@ class TranslatableItem:
         """Creates a SetOfWrittenTranslatableText proto object.
         Args:
             translations: list(str). The translated content.
+
         Returns:
             WrittenTranslatableSetDto. The proto object.
         """
@@ -4419,6 +4431,7 @@ class State(translation_domain.BaseTranslatableObject):
 
     def to_android_state_proto(self):
         """Returns a proto representation of the state object.
+
         Returns:
             StateDto. The proto object.
         """

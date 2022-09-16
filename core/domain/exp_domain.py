@@ -54,7 +54,6 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-from proto_files.exploration_pb2 import ExplorationDto
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3753,7 +3752,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return html_list
 
-    def to_android_exploration_proto(self) -> ExplorationDto:
+    def to_android_exploration_proto(self) -> exploration_pb2.ExplorationDto:
         """Returns a proto representation of the exploration object.
 
         Returns:
