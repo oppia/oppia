@@ -3784,6 +3784,8 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             'reviewed_translation_word_count': (
                 self.REVIEWED_TRANSLATION_WORD_COUNT),
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
             'accepted_translations_with_reviewer_edits_count': (
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
             'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
@@ -3795,6 +3797,7 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
             self.REVIEWED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )
@@ -3967,6 +3970,8 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             'reviewed_translation_word_count': (
                 self.REVIEWED_TRANSLATION_WORD_COUNT),
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
             'accepted_translations_with_reviewer_edits_count': (
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
             'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
@@ -4030,6 +4035,7 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
             self.REVIEWED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )
