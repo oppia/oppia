@@ -1592,7 +1592,7 @@ def get_topic_id_to_diagnostic_test_skill_ids(
     return topic_id_to_diagnostic_test_skill_ids
 
 
-def get_topic_id_to_topic_name_dict(topic_ids):
+def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:
     """Returns a dict with topic ID as key and topic name as value, for all
     given topic IDs.
 
