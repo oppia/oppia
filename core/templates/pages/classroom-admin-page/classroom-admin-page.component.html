@@ -1,18 +1,10 @@
 <mat-card class="oppia-editor-card-with-avatar">
   <div class="card-content">
     <div>
-      <h3>Classroom config properties</h3>
+      <h3>Classroom details</h3>
     </div>
     <hr>
     <div>
-      <p>
-        Configure the details of a classroom.
-      </p>
-
-      <p class="existing-classroom-header">
-        <strong>Existing Classrooms</strong>
-      </p>
-
       <mat-spinner class="loading-spinner"
                    *ngIf="!pageIsInitialized"
                    [diameter]="30">
@@ -138,11 +130,9 @@
 
           <div>
             <hr>
-            <p><strong>Topics and its prerequisites</strong></p>
+            <p><strong>Topics and their prerequisites</strong></p>
             <p class="topic-dependency-description">
-              The below dependencies between the topics will be used to generate
-              the diagnostic test and based on the performance topics are
-              recommended to the new learners.
+              The prerequisite topics below are used to generate the diagnostic test.
             </p>
 
             <p *ngIf="topicsCountInClassroom == 0">
@@ -178,17 +168,11 @@
                   </button>
                 </div>
               </div>
-              <p *ngIf="cyclicCheckError && currentTopicOnEdit === topic.key"
-                 class="oppia-warning-text cyclic-check-error">
-                There is a cycle in the prerequisite dependencies.
-                Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
-                Please fix this error to save the changes.
-              </p>
               <div ngbDropdown
                    *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topic.key">
                 <button ngbDropdownToggle mat-button
                         (click)="getAvailablePrerequisiteTopicNamesForDropdown(topic.key)"
-                        class="dropdown-toggle">
+                        class="dropdown-toggle prerequisite-dropdown-selector">
                   Select Prerequisite
                 </button>
 
@@ -211,6 +195,12 @@
                   </ng-container>
                 </ul>
               </div>
+              <p *ngIf="cyclicCheckError && currentTopicOnEdit === topic.key"
+                 class="oppia-warning-text cyclic-check-error">
+                There is a cycle in the prerequisite dependencies.
+                Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
+                Please fix this error to save the changes.
+              </p>
             </div>
 
             <div *ngIf="classroomEditorMode">
@@ -277,6 +267,9 @@
 </mat-card>
 
 <style>
+  .prerequisite-dropdown-selector {
+    margin-left: 22%;
+  }
   .cyclic-check-error {
     margin: 0 10px;
   }
