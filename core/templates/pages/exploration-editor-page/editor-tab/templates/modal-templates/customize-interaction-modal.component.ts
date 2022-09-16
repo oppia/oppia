@@ -256,6 +256,12 @@ export class CustomizeInteractionModalComponent
   isSaveInteractionButtonEnabled(): boolean {
     let exploration = this.getTitle(this.stateInteractionIdService.displayed);
     if (exploration === 'End Exploration') {
+      let inp = document.getElementsByClassName('form-control display-inline');
+      console.log(inp[0], "shiv");
+      let ele = angular.element(inp[0]);
+      let ans = ele.attr('ng-reflect-model');
+      console.log(ans, "check");
+      if(ans === "")  return false;
       return true;
     }
     return !!(
