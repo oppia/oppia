@@ -2083,10 +2083,10 @@ def _create_translation_review_stats_from_model(
         translation_review_stats_model.reviewed_translations_count,
         translation_review_stats_model.reviewed_translation_word_count,
         translation_review_stats_model.accepted_translations_count,
+        translation_review_stats_model.accepted_translation_word_count,
         (
             translation_review_stats_model
             .accepted_translations_with_reviewer_edits_count),
-        translation_review_stats_model.accepted_translation_word_count,
         translation_review_stats_model.first_contribution_date,
         translation_review_stats_model.last_contribution_date
     )
@@ -2150,7 +2150,7 @@ def _create_question_review_stats_from_model(
     )
 
 
-def _get_all_translation_review_stats(
+def get_all_translation_review_stats(
     user_id: str
 ) -> List[suggestion_registry.TranslationReviewStats]:
     """Gets all TranslationReviewStatsModels corresponding to the supplied
@@ -2174,7 +2174,7 @@ def _get_all_translation_review_stats(
     ]
 
 
-def _get_all_question_contribution_stats(
+def get_all_question_contribution_stats(
     user_id: str
 ) -> List[suggestion_registry.QuestionContributionStats]:
     """Gets all QuestionContributionStatsModels corresponding to the supplied
@@ -2198,7 +2198,7 @@ def _get_all_question_contribution_stats(
     ]
 
 
-def _get_all_question_review_stats(
+def get_all_question_review_stats(
     user_id: str
 ) -> List[suggestion_registry.QuestionReviewStats]:
     """Gets all QuestionReviewStatsModels corresponding to the supplied
@@ -2237,9 +2237,9 @@ def get_all_contributor_stats(
     """
     translation_contribution_stats = get_all_translation_contribution_stats(
         user_id)
-    translation_review_stats = _get_all_translation_review_stats(user_id)
-    question_contribution_stats = _get_all_question_contribution_stats(user_id)
-    question_review_stats = _get_all_question_review_stats(user_id)
+    translation_review_stats = get_all_translation_review_stats(user_id)
+    question_contribution_stats = get_all_question_contribution_stats(user_id)
+    question_review_stats = get_all_question_review_stats(user_id)
 
     return suggestion_registry.ContributorStatsSummary(
         user_id,
