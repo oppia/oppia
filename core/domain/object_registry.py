@@ -24,7 +24,11 @@ from core import constants
 from core import feconf
 from extensions.objects.models import objects
 
-from typing import Any, Dict, Type
+from typing import Dict, List, Optional, Type, Union
+
+AllowedDefaultValueTypes = Union[
+    str, int, float, bool, List[str], Dict[str, Optional[str]]
+]
 
 
 class Registry:
@@ -74,14 +78,11 @@ class Registry:
         return cls.objects_dict[obj_type]
 
 
-# Here we used Any type, because this method returns a dictionary that contains
-# default object values and these object values can be of type str, int, bool,
-# list, and other types too.
-def get_default_object_values() -> Dict[str, Any]:
+def get_default_object_values() -> Dict[str, AllowedDefaultValueTypes]:
     """Returns a dictionary containing the default object values."""
     # TODO(wxy): Cache this as it is accessed many times.
 
-    default_object_values: Dict[str, Any] = json.loads(
+    default_object_values: Dict[str, AllowedDefaultValueTypes] = json.loads(
         constants.get_package_file_contents(
             'extensions', feconf.OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH
         )
