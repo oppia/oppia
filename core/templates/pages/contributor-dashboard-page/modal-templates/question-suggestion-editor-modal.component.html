@@ -1,6 +1,12 @@
 <div class="oppia-question-suggestion-editor-modal">
   <div class="modal-header">
     <h3>{{skill.getDescription()}}</h3>
+    <button type="button"
+            class="close oppia-close-button"
+            (click)="cancel()"
+            aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
   </div>
 
   <div class="modal-body">
@@ -18,7 +24,7 @@
         </h3>
         <ul>
           <li *ngFor="let explanation of skill.getRubricExplanations(skillDifficultyString)">
-            <span [innerHtml]="explanation" class="d-block mt-1"></span>
+            <span [innerHtml]="explanation" class="d-block mt-1 oppia-explanation"></span>
           </li>
         </ul>
       </div>
@@ -44,24 +50,40 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-    <button *ngIf="newQuestionIsBeingCreated"
-            title="To Save please add: interaction, hint, solution and address all misconceptions"
-            class="btn btn-success e2e-test-save-question-button"
-            (click)="done()"
-            [disabled]="!isQuestionValid()">
-      {{isEditing ? 'Update' : 'Submit'}} Question
+    <button class="btn btn-secondary"
+            (click)="onClickChangeDifficulty()">
+      Go Back
     </button>
+    <div class="oppia-buttons-right">
+      <button class="btn btn-secondary mr-2"
+              (click)="cancel()">
+        Cancel
+      </button>
+      <button *ngIf="newQuestionIsBeingCreated"
+              title="To Save please add: interaction, hint, solution and address all misconceptions"
+              class="btn btn-success e2e-test-save-question-button"
+              (click)="done()"
+              [disabled]="!isQuestionValid()">
+        {{ isEditing ? 'Update' : 'Submit' }} Question
+      </button>
+    </div>
   </div>
 </div>
 
 <style>
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-close-button {
+    top: 3px;
+  }
   .oppia-question-editor-section {
     padding: 0 100px;
   }
 
   .oppia-question-suggestion-editor-modal {
-    padding: 0 25px;
+    padding: 0;
   }
 
   .oppia-question-suggestion-editor-modal>.modal-header {
@@ -78,22 +100,43 @@
 
   @media only screen and (max-width: 1023px) {
     .oppia-question-editor-section {
-    padding: 0 75px;
+      padding: 0 75px;
+    }
   }
-  }
-
-  @media only screen and (max-width: 767px) {
+  @media only screen and (max-width: 700px) {
     .oppia-question-editor-section {
-    padding: 0 50px;
+      padding: 0;
+    }
   }
-  }
-
-  @media only screen and (max-width: 510px) {
+  @media only screen and (max-width: 500px) {
     .oppia-question-editor-section {
-    padding: 0 25px;
+      padding: 0;
+    }
+    .oppia-question-suggestion-editor-modal {
+      padding: 0;
+    }
+    h3 {
+      font-size: 20px;
+    }
+    .oppia-question-editor-section h3 {
+      font-size: 18px;
+    }
+    .oppia-explanation {
+      font-size: 16px;
+    }
   }
-  .oppia-question-suggestion-editor-modal {
-    padding: 0;
-  }
+  @media only screen and (max-width: 350px) {
+    .modal-footer, .oppia-buttons-right {
+      display: flex;
+      flex-direction: column;
+    }
+    .oppia-buttons-right {
+      align-items: center;
+      width: 100%;
+    }
+    .modal-footer .btn {
+      margin-bottom: 10px;
+      width: 50%;
+    }
   }
 </style>

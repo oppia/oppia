@@ -18,7 +18,7 @@
 
 import isEqual from 'lodash/isEqual';
 
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -38,6 +38,8 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -47,6 +49,12 @@ class UiConfig {
   'language'?: string;
   'languageDirection'?: string;
 }
+
+enum ExpansionTabType {
+  CONTENT,
+  TRANSLATION
+}
+
 export interface TranslationOpportunity {
   id: string;
   heading: string;
@@ -123,12 +131,30 @@ export class TranslationModalComponent {
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
   editorIsShown = true;
+  isContentExpanded: boolean = false;
+  isTranslationExpanded: boolean = true;
+  isContentOverflowing: boolean = false;
+  isTranslationOverflowing: boolean = false;
+  textWhenExpanded: string = 'View Less';
+  textWhenContracted: string = 'View More';
+  // The value of cutoff must be equal to 'max-height' - 1 set in the
+  // class '.oppia-container-contracted' in 'translation-modal.component.html'.
+  cutoff_height: number = 29;
   ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION = [
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
     'oppia-noninteractive-math',
     'oppia-noninteractive-skillreview'
   ];
+
+  @ViewChild('contentPanel')
+    contentPanel!: RteOutputDisplayComponent;
+
+  @ViewChild('contentContainer')
+    contentContainer!: ElementRef;
+
+  @ViewChild('translationContainer')
+    translationContainer!: ElementRef;
 
   constructor(
     public readonly activeModal: NgbActiveModal,
@@ -140,9 +166,14 @@ export class TranslationModalComponent {
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly userService: UserService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly wds: WindowDimensionsService
   ) {
     this.contextService = OppiaAngularRootComponent.contextService;
+  }
+
+  public get expansionTabType(): typeof ExpansionTabType {
+    return ExpansionTabType;
   }
 
   ngOnInit(): void {
@@ -187,6 +218,35 @@ export class TranslationModalComponent {
           this.translationLanguageService.getActiveLanguageDirection())
       }
     };
+  }
+
+  ngAfterViewInit(): void {
+    this.computePanelOverflowState();
+  }
+
+  ngAfterViewChecked(): void {
+    this.computeTranslationEditorOverflowState();
+  }
+
+  computeTranslationEditorOverflowState(): void {
+    const windowHeight = this.wds.getHeight();
+    const heightLimit = windowHeight * (this.cutoff_height) / 100;
+
+    this.isTranslationOverflowing = (
+      this.translationContainer?.nativeElement.offsetHeight >=
+        heightLimit
+    );
+  }
+
+  computePanelOverflowState(): void {
+    // The delay of 500ms is required to allow the content to load
+    // before the overflow status is calculated. Values less than
+    // 500ms also work but they sometimes lead to unexpected results.
+    setTimeout(() => {
+      this.isContentOverflowing = (
+        this.contentPanel?.elementRef.nativeElement.offsetHeight >
+        this.contentContainer?.nativeElement.offsetHeight);
+    }, 500);
   }
 
   // TODO(#13221): Remove this method completely after the change detection
@@ -235,6 +295,14 @@ export class TranslationModalComponent {
     this.activeRuleDescription = this.getRuleDescription(
       ruleType, interactionId
     );
+  }
+
+  toggleExpansionState(tab: ExpansionTabType): void {
+    if (tab === ExpansionTabType.CONTENT) {
+      this.isContentExpanded = !this.isContentExpanded;
+    } else if (tab === ExpansionTabType.TRANSLATION) {
+      this.isTranslationExpanded = !this.isTranslationExpanded;
+    }
   }
 
   onContentClick(event: MouseEvent): boolean | void {
@@ -458,7 +526,6 @@ export class TranslationModalComponent {
             this.resetEditor();
           } else {
             this.activeWrittenTranslation = '';
-            this.resetEditor();
           }
         }, (errorReason: string) => {
           this.contextService.resetImageSaveDestination();

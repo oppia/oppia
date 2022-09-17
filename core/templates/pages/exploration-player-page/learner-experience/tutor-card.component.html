@@ -41,7 +41,7 @@
             {{ 'I18N_PLAYER_PREVIOUS_RESPONSES' | translate:{previousResponses: displayedCard.getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)} }}
           </span>
           <span class="conversation-skin-responses-dropdown-icon">
-            <i class="material-icons conversation-skin-responses-dropdown-icon" [ngClass]="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">&#xE037;</i>
+            <i class="fas fa-play conversation-skin-responses-dropdown-icon" [ngClass]="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}"></i>
           </span>
         </span>
       </h4>
@@ -101,9 +101,9 @@
         <span [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}">
           {{ interactionInstructions | translate }}
         </span>
-        <i *ngIf="canWindowShowTwoCards() && !isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
-        <i *ngIf="canWindowShowTwoCards() && isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C4;</i>
-        <i *ngIf="!canWindowShowTwoCards()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5DB;</i>
+        <i *ngIf="canWindowShowTwoCards() && !isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="fas fa-arrow-right position-relative"></i>
+        <i *ngIf="canWindowShowTwoCards() && isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="fas fa-arrow-left position-relative"></i>
+        <i *ngIf="!canWindowShowTwoCards()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="fas fa-arrow-down position-relative"></i>
       </div>
 
       <div *ngIf="!displayedCard.getInteractionId() && !isOnTerminalCard() && !conceptCardIsBeingShown">
@@ -170,3 +170,5 @@
     </div>
   </div>
 </div>
+<oppia-checkpoint-celebration-modal class="checkpoint-celebration-modal-container">
+</oppia-checkpoint-celebration-modal>

@@ -375,7 +375,7 @@
   font-size: 22px;
 }
 .oppia-top-navigation-bar .oppia-user-avatar-icon {
-  margin-top: -1px;
+  font-size: 36px;
 }
 .oppia-top-navigation-bar .oppia-admin-text {
   right: 4px;
@@ -505,7 +505,7 @@
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (min-width: 300px) and (max-width: 768px) {
   .oppia-top-navigation-bar .nav-mobile-header-text-container {
     display: inline-block;
     font-size: 1px;

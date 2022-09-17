@@ -49,7 +49,6 @@ var ExplorationEditorMainTab = function() {
   var editorWelcomeModal = $('.e2e-test-welcome-modal');
   var explanationTextAreaElement = $('.e2e-test-explanation-textarea');
   var explorationGraph = $('.e2e-test-exploration-graph');
-  var fadeIn = $('.e2e-test-editor-cards-container');
   var feedbackBubble = $('.e2e-test-feedback-bubble');
   var feedbackEditor = $('.e2e-test-open-feedback-editor');
   var hintTextElement = $('.e2e-test-hint-text');
@@ -86,6 +85,7 @@ var ExplorationEditorMainTab = function() {
   var stateEditorTag = $('.e2e-test-state-content-editor');
   var stateNameContainer = $('.e2e-test-state-name-container');
   var stateNameInput = $('.e2e-test-state-name-input');
+  var stateNameText = $('.e2e-test-state-name-text');
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.$(nodeLabelLocator);
   };
@@ -102,6 +102,8 @@ var ExplorationEditorMainTab = function() {
   var addSolutionButton = $('.e2e-test-oppia-add-solution-button');
   var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
   var cancelOutcomeDestButton = $('.e2e-test-cancel-outcome-dest');
+  var checkpointSelectionCheckbox = $(
+    '.e2e-test-checkpoint-selection-checkbox');
   var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
   var confirmDeleteInteractionButton = $(
     '.e2e-test-confirm-delete-interaction');
@@ -470,8 +472,11 @@ var ExplorationEditorMainTab = function() {
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     if (expectFadeIn) {
-      await waitFor.fadeInToComplete(
-        fadeIn, 'Editor taking long to fade in');
+      // We use browser.pause() here because waiting for the fade-in to complete
+      // doesn't work for some reason. Also, since the fade-in is a client-side
+      // animation, it should always happen in the same amount of time.
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.pause(5000);
     }
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
@@ -574,6 +579,10 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     await createNewInteraction(interactionId);
     await customizeInteraction.apply(null, arguments);
+  };
+
+  this.enableCheckpointForCurrentState = async function() {
+    await action.click('Checkpoint checkbox', checkpointSelectionCheckbox);
   };
 
   // This function should not usually be invoked directly; please consider
@@ -814,14 +823,12 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = async function(stateName) {
     await action.waitForAutosave();
     await general.scrollToTop();
-    var nodeStateElement = await explorationGraph.$(
-      `.e2e-test-node=${stateName}`);
+    var nodeElement = await explorationGraph.$(
+      `.e2e-test-node*=${stateName}`);
     await waitFor.visibilityOf(
-      nodeStateElement,
+      nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    var nodeElement = await explorationGraph.$$(
-      `.e2e-test-node=${stateName}`)[0];
-    var deleteNode = nodeElement.$(deleteNodeLocator);
+    var deleteNode = await nodeElement.$(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
@@ -883,8 +890,11 @@ var ExplorationEditorMainTab = function() {
       '.e2e-test-state-name-submit');
     await action.click('State Name Submit button', stateNameSubmitButton);
 
-    // Wait for state name container to completely disappear
-    // and re-appear again.
+    // We need to use browser.pause() in order to wait for the state name
+    // container to disappear as webdriverio checks for its presence even before
+    // it disappears.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
     await waitFor.visibilityOf(
       stateNameContainer, 'State Name Container takes too long to appear');
     await waitFor.textToBePresentInElement(
@@ -898,11 +908,11 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, 'State Name Container taking too long to show up');
     await waitFor.textToBePresentInElement(
       stateNameContainer, name,
-      'Expecting current state ' + await stateNameContainer.getAttribute(
-        'textContent') + ' to be ' + name);
+      'Expecting current state ' + await stateNameText.getText() +
+      ' to be ' + name);
     await waitFor.visibilityOf(
-      stateNameContainer, 'State name container taking too long to appear');
-    expect(await stateNameContainer.getAttribute('textContent')).toMatch(name);
+      stateNameText, 'State name container taking too long to appear');
+    expect(await stateNameText.getText()).toMatch(name);
   };
 };
 

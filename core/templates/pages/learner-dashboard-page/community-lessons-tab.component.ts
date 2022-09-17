@@ -31,7 +31,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import './community-lessons-tab.component.css';
 
 
-interface showMoreInSectionDict {
+interface ShowMoreInSectionDict {
   [section: string]: boolean;
 }
 
@@ -91,7 +91,7 @@ export class CommunityLessonsTabComponent {
   moveToPrevPage: string = 'MOVE_TO_PREV_PAGE';
   moveToNextPage: string = 'MOVE_TO_NEXT_PAGE';
   dropdownEnabled: boolean = false;
-  showMoreInSection: showMoreInSectionDict = {
+  showMoreInSection: ShowMoreInSectionDict = {
     incomplete: false,
     completed: false,
     playlist: false,

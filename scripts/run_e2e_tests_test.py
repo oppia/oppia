@@ -40,6 +40,7 @@ TOTAL_E2E_SUITES = [
     'additionalPlayerFeatures',
     'adminPage',
     'blogDashboard',
+    'checkpointFeatures',
     'classroomPage',
     'classroomPageFileUploadFeatures',
     'collections',
@@ -91,14 +92,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     """Test the run_e2e_tests methods."""
 
     def setUp(self):
-        super(RunE2ETestsTests, self).setUp()
+        super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
             self.exit_stack.close()
         finally:
-            super(RunE2ETestsTests, self).tearDown()
+            super().tearDown()
 
     def test_all_the_e2e_test_suites_are_present(self):
         test_in_protractor = run_e2e_tests.SUITES_STILL_IN_PROTRACTOR

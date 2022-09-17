@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, MisconceptionSkillMap, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
 import { ExternalSaveService } from 'services/external-save.service';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
@@ -36,11 +36,6 @@ export interface MisconceptionUpdatedValues {
 interface Outcome {
   feedback: SubtitledHtmlBackendDict;
   labelledAsCorrect: boolean;
-}
-
-interface TaggedMisconception {
-  skillId: string;
-  misconceptionId: number;
 }
 
 @Component({

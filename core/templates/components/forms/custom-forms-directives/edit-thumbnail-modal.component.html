@@ -50,7 +50,7 @@
         <div @fade class="oppia-thumbnail-container e2e-test-thumbnail-container" *ngIf="uploadedImage"
              [ngStyle]="{'background': previewDescriptionBgColor, 'color': previewDescriptionBgColor ? '#FFFFFF' : '', 'width': aspectRatio === '4:3' ? '248px' : '320px' }">
           <button class="btn btn-secondary oppia-thumbnail-reset-button e2e-thumbnail-reset-button e2e-test-thumbnail-reset-button" (click)="reset()">
-            <i class="material-icons oppia-vcenter">&#xE14C;</i>
+            <i class="fas fa-times oppia-vcenter"></i>
           </button>
           <div>
             <oppia-thumbnail-display *ngIf="uploadedImage"

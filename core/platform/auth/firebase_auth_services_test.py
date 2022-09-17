@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
 
 auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 
 UidsPartitionTupleType = Tuple[
     List[Tuple[int, str]],
@@ -252,6 +252,10 @@ class FirebaseAdminSdkStub:
             uids_to_delete = set(uids)
             errors = []
         else:
+            # Here we use cast because method 'utils.partition' returns a
+            # broader type Tuple[Iterable[...], Iterable[...]], thus to
+            # narrow down the type to 'UidsPartitionTupleType' we used
+            # cast here.
             disabled_uids, enabled_uids = cast(
                 UidsPartitionTupleType,
                 utils.partition(
@@ -651,6 +655,10 @@ class FirebaseAdminSdkStub:
             if error_to_raise is not None:
                 raise error_to_raise
 
+            # Here we use cast because method 'utils.partition' returns a
+            # broader type Tuple[Iterable[...], Iterable[...]], thus to
+            # narrow down the type to 'UidsZipPartitionTupleType' we used
+            # cast here.
             uids_to_delete, uids_to_fail = cast(
                 UidsZipPartitionTupleType,
                 utils.partition(
@@ -709,6 +717,10 @@ class FirebaseAdminSdkStub:
             if error_to_raise is not None:
                 raise error_to_raise
 
+            # Here we use cast because method 'utils.partition' returns a
+            # broader type Tuple[Iterable[...], Iterable[...]], thus to
+            # narrow down the type to 'RecordsPartitionTupleType' we used
+            # cast here.
             records_to_import, records_to_fail = cast(
                 RecordsPartitionTupleType,
                 utils.partition(
@@ -719,10 +731,10 @@ class FirebaseAdminSdkStub:
 
             self.import_users([record for _, (record, _) in records_to_import])
 
+            errors = [(i, error) for i, (_, error) in records_to_fail]
             return self._create_user_import_result_fragile(
-                len(records), cast(
-                    List[Tuple[int, str]],
-                    [(i, error) for i, (_, error) in records_to_fail]))
+                len(records), errors=errors
+            )
 
         assert self._test is not None
         return self._test.swap(firebase_auth, 'import_users', mock_import_users)
@@ -756,7 +768,7 @@ class FirebaseAdminSdkStub:
             dict(str: *)|None. The decoded claims or None.
         """
         try:
-            # Casting the result here because the type stubs for library 'json'
+            # Here we use cast because the type stubs for library 'json'
             # returns 'Any' from json.loads.
             # https://github.com/python/typeshed/blob/30ad9e945f42cca1190cdba58c65bdcfc313480f/stdlib/json/__init__.pyi#L36
             return cast(
@@ -901,7 +913,7 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
             raises=Exception('unexpected call'))
 
         with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
-            with self.assertRaisesRegex(ValueError, 'uh-oh!'): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(ValueError, 'uh-oh!'):
                 firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
@@ -914,7 +926,7 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
             firebase_admin, 'initialize_app', raises=ValueError('uh-oh!'))
 
         with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
-            with self.assertRaisesRegex(ValueError, 'uh-oh!'): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(ValueError, 'uh-oh!'):
                 firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
@@ -928,13 +940,13 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     EMAIL = 'foo@bar.com'
 
     def setUp(self) -> None:
-        super(FirebaseAuthServicesTestBase, self).setUp()
+        super().setUp()
         self.firebase_sdk_stub = FirebaseAdminSdkStub()
         self.firebase_sdk_stub.install(self)
 
     def tearDown(self) -> None:
         self.firebase_sdk_stub.uninstall()
-        super(FirebaseAuthServicesTestBase, self).tearDown()
+        super().tearDown()
 
     def capture_logging(
         self, min_level: int = logging.INFO
@@ -952,7 +964,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         Returns:
             Context manager. The context manager for capturing logging messages.
         """
-        return super(FirebaseAuthServicesTestBase, self).capture_logging(
+        return super().capture_logging(
             min_level=min_level)
 
     def create_request(
@@ -1018,11 +1030,11 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
     def test_raises_error_when_user_does_not_exist(self) -> None:
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id=None).put()
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
                 ValueError, 'user_id=uid has no Firebase account'):
             firebase_auth_services.grant_super_admin_privileges('uid')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
                 ValueError, 'user_id=uid has no Firebase account'):
             firebase_auth_services.revoke_super_admin_privileges('uid')
 
@@ -1038,7 +1050,7 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
         firebase_auth_services.grant_super_admin_privileges('uid')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
                 firebase_auth.RevokedSessionCookieError, 'invalid'):
             firebase_auth.verify_session_cookie(cookie, check_revoked=True)
 
@@ -1056,7 +1068,7 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
         firebase_auth_services.revoke_super_admin_privileges('uid')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
                 firebase_auth.RevokedSessionCookieError, 'invalid'):
             firebase_auth.verify_session_cookie(cookie, check_revoked=True)
 
@@ -1064,7 +1076,7 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
     def setUp(self) -> None:
-        super(EstablishAuthSessionTests, self).setUp()
+        super().setUp()
         self.id_token = (
             self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL))
 
@@ -1074,7 +1086,7 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
         firebase_auth_services.establish_auth_session(req, res)
 
-        self.assert_matches_regexps( # type: ignore[no-untyped-call]
+        self.assert_matches_regexps(
             res.headers.get_all('Set-Cookie'), ['session=.*;'])
 
     def test_does_nothing_when_request_has_cookie(self) -> None:
@@ -1093,7 +1105,7 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
         req = self.create_request()
         res = self.create_response()
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
                 firebase_auth.InvalidIdTokenError, 'missing id_token'):
             firebase_auth_services.establish_auth_session(req, res)
 
@@ -1104,12 +1116,12 @@ class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
 
     def test_deletes_cookie_from_response(self) -> None:
         res = self.create_response(session_cookie='abc')
-        self.assert_matches_regexps( # type: ignore[no-untyped-call]
+        self.assert_matches_regexps(
             res.headers.get_all('Set-Cookie'),
             ['session=abc;'])
 
         firebase_auth_services.destroy_auth_session(res)
-        self.assert_matches_regexps( # type: ignore[no-untyped-call]
+        self.assert_matches_regexps(
             res.headers.get_all('Set-Cookie'),
             ['session=abc;', 'session=; Max-Age=0;'])
 
@@ -1157,7 +1169,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             firebase_auth, 'verify_session_cookie',
             error=firebase_auth.ExpiredSessionCookieError('uh-oh', None))
 
-        with always_raise_expired_session_cookie_error, self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with always_raise_expired_session_cookie_error, self.assertRaisesRegex(
                 auth_domain.StaleAuthSessionError, 'expired'
         ):
             firebase_auth_services.get_auth_claims_from_request(
@@ -1175,10 +1187,12 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_auth.RevokedSessionCookieError('uh-oh'))
 
         with always_raise_revoked_session_cookie_error:
-            self.assertRaisesRegex( # type: ignore[no-untyped-call]
-                auth_domain.StaleAuthSessionError, 'revoked',
-                lambda: firebase_auth_services.get_auth_claims_from_request(
-                    self.create_request(session_cookie=cookie)))
+            with self.assertRaisesRegex(
+                auth_domain.StaleAuthSessionError, 'revoked'
+            ):
+                firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)
+                )
 
     def test_raises_user_disabled_error_when_user_is_disabled(self) -> None:
         cookie = firebase_auth.create_session_cookie(
@@ -1192,7 +1206,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             firebase_auth, 'verify_session_cookie',
             error=firebase_auth.UserDisabledError('uh-oh'))
 
-        with always_raise_expired_session_cookie_error, self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with always_raise_expired_session_cookie_error, self.assertRaisesRegex(
                 auth_domain.UserDisabledError, 'user is being deleted'
         ):
             firebase_auth_services.get_auth_claims_from_request(
@@ -1208,10 +1222,12 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_exceptions.UnknownError('uh-oh'))
 
         with always_raise_unknown_error:
-            self.assertRaisesRegex( # type: ignore[no-untyped-call]
-                auth_domain.InvalidAuthSessionError, 'uh-oh',
-                lambda: firebase_auth_services.get_auth_claims_from_request(
-                    self.create_request(session_cookie=cookie)))
+            with self.assertRaisesRegex(
+                auth_domain.InvalidAuthSessionError, 'uh-oh'
+            ):
+                firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)
+                )
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):
@@ -1277,7 +1293,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        with self.assertRaisesRegex(Exception, 'already associated'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'):
             firebase_auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -1287,7 +1303,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         # Erase the user_id collision, but leave the auth_id collision.
         auth_models.UserIdByFirebaseAuthIdModel.delete_by_id('aid')
 
-        with self.assertRaisesRegex(Exception, 'already associated'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'):
             firebase_auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -1307,7 +1323,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
-        with self.assertRaisesRegex(Exception, 'already associated'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'):
             firebase_auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
@@ -1319,7 +1335,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         # Erase the user_id collision, but leave the auth_id collision.
         auth_models.UserIdByFirebaseAuthIdModel.delete_by_id('aid1')
 
-        with self.assertRaisesRegex(Exception, 'already associated'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'):
             firebase_auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
@@ -1395,7 +1411,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         with update_user_swap, log_capturing_context as logs:
             firebase_auth_services.mark_user_for_deletion('uid')
 
-        self.assert_matches_regexps(logs, ['could not update']) # type: ignore[no-untyped-call]
+        self.assert_matches_regexps(logs, ['could not update'])
         self.assertIsNone(
             firebase_auth_services.get_user_id_from_auth_id('aid'))
         self.assertEqual(
@@ -1410,7 +1426,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         with self.capture_logging() as logs:
             firebase_auth_services.mark_user_for_deletion('uid')
 
-        self.assert_matches_regexps( # type: ignore[no-untyped-call]
+        self.assert_matches_regexps(
             logs, [
             r'\[WIPEOUT\] User with user_id=uid has no Firebase account'
         ])
@@ -1422,7 +1438,7 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
     AUTH_ID = 'sub'
 
     def setUp(self) -> None:
-        super(FirebaseSpecificAssociationTests, self).setUp()
+        super().setUp()
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID))
@@ -1439,7 +1455,7 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
         self.assertFalse(
             firebase_auth_services
             .verify_external_auth_associations_are_deleted(self.USER_ID))
-        self.assert_matches_regexps(logs, ['could not connect']) # type: ignore[no-untyped-call]
+        self.assert_matches_regexps(logs, ['could not connect'])
 
     def test_delete_user_when_firebase_succeeds(self) -> None:
         with self.capture_logging() as logs:
@@ -1461,7 +1477,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
     UNKNOWN_ERROR = firebase_exceptions.UnknownError('error')
 
     def setUp(self) -> None:
-        super(DeleteAuthAssociationsTests, self).setUp()
+        super().setUp()
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
         user_settings = user_services.create_new_user(self.AUTH_ID, self.EMAIL)
         self.user_id = user_settings.user_id
@@ -1509,7 +1525,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.delete_external_auth_associations(
                 self.user_id)
 
-        self.assert_matches_regexps( # type: ignore[no-untyped-call]
+        self.assert_matches_regexps(
             logs, [
             r'\[WIPEOUT\] Firebase account already deleted',
         ])

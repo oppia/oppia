@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -187,10 +187,11 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         return errors if sum(counts) == 0 else []
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
-# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
-# we added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class ApplyAuditDoFns(beam.PTransform):  # type: ignore[misc]
     """Runs every Audit DoFn targeting the models of a specific kind."""
 
@@ -200,7 +201,7 @@ class ApplyAuditDoFns(beam.PTransform):  # type: ignore[misc]
         Args:
             kind: str. The kind of models this PTransform will receive.
         """
-        super(ApplyAuditDoFns, self).__init__(
+        super().__init__(
             label='Apply every Audit DoFn targeting %s' % kind)
         self._kind = kind
         self._do_fn_types = tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind])
@@ -228,10 +229,11 @@ class ApplyAuditDoFns(beam.PTransform):  # type: ignore[misc]
         )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
-# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
-# we added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
     """Returns PCollection of (key, count) pairs for each input model."""
 
@@ -241,7 +243,7 @@ class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetExistingModelKeyCounts, self).__init__(
+        super().__init__(
             label='Generate (key, count)s for all existing %ss' % kind)
         self._kind = kind
 
@@ -264,10 +266,11 @@ class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
         )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
-# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
-# we added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
     """Returns PCollection of (key, error) pairs for each referenced model."""
 
@@ -277,7 +280,7 @@ class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetMissingModelKeyErrors, self).__init__(
+        super().__init__(
             label='Generate (key, error)s from the ID properties in %s' % kind)
         self._id_referencing_properties = (
             ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR[kind])

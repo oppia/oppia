@@ -43,6 +43,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 
 import './add-syllabus-items.component.css';
+import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 
 
 interface SearchDropDownItems {
@@ -56,6 +57,7 @@ interface SearchDropDownItems {
 })
 export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   @Input() learnerGroupId: string = '';
+  @Input() learnerGroup!: LearnerGroupData;
   @Input() syllabusStorySummaries: StorySummary[] = [];
   @Input() syllabusSubtopicSummaries: LearnerGroupSubtopicSummary[] = [];
   @Input() syllabusStoryIds: string[] = [];
@@ -85,12 +87,10 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   SEARCH_DROPDOWN_TYPES!: SearchDropDownItems[];
   selectionDetails!: SyllabusSelectionDetails;
   SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownItems[];
-  KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
-  activeMenuName: string = '';
   searchIsInProgress = false;
   syllabusFilter!: LearnerGroupSyllabusFilter;
   debounceTimeout = 1000;
@@ -112,8 +112,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories();
-    this.KEYBOARD_EVENT_TO_KEY_CODES = (
-      this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES);
     this.ACTION_OPEN = this.navigationService.ACTION_OPEN;
     this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
     this.SUPPORTED_CONTENT_LANGUAGES = (
@@ -367,12 +365,25 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.updateLearnerGroupSyllabus();
   }
 
-  isStoryPartOfSyllabus(storyId: string): boolean {
+  isStoryPartOfAddedSyllabus(storyId: string): boolean {
     return this.syllabusStoryIds.indexOf(storyId) !== -1;
   }
 
-  isSubtopicPartOfSyllabus(subtopicPageId: string): boolean {
+  isSubtopicPartOfAddedSyllabus(subtopicPageId: string): boolean {
     return this.syllabusSubtopicPageIds.indexOf(subtopicPageId) !== -1;
+  }
+
+  isStoryPartOfGroupSyllabus(storyId: string): boolean {
+    return (
+      this.learnerGroup && this.learnerGroup.storyIds.indexOf(storyId) !== -1
+    );
+  }
+
+  isSubtopicPartOfGroupSyllabus(subtopicPageId: string): boolean {
+    return (
+      this.learnerGroup &&
+      this.learnerGroup.subtopicPageIds.indexOf(subtopicPageId) !== -1
+    );
   }
 
   ngOnDestroy(): void {

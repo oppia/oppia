@@ -5,7 +5,8 @@
       Choose Interaction
     </h3>
 
-    <h3 *ngIf="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
+    <h3 class="oppia-customization-header"
+        *ngIf="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
       Customize Interaction ({{ getTitle(stateInteractionIdService.displayed) }})
     </h3>
     <i class="fa fa-times" (click)="cancel()"></i>
@@ -111,6 +112,11 @@
 </div>
 
 <style>
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
   .interaction-editor-form .boolean-checkbox {
     float: left;
     margin-right: 4px;
@@ -153,6 +159,11 @@
   }
 
   @media screen and (max-width: 768px) {
+    .modal-footer {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+    }
     .customize-interaction-modal .modal-content {
       border: 0;
       border-radius: 0;
@@ -179,6 +190,18 @@
 
     .customize-interaction-modal .modal-header-blue h3 {
       color: #fff;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .modal-footer .btn {
+      height: 50px;
+    }
+    .oppia-customization-header {
+      font-size: 18px;
+    }
+    .oppia-interaction-customization-label {
+      font-size: 16px;
     }
   }
 </style>

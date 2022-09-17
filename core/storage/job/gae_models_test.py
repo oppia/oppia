@@ -24,8 +24,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import job_models
 
-(base_models, job_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.job])
+(base_models, job_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.JOB
+])
 
 
 class JobModelTest(test_utils.GenericTestBase):
@@ -55,7 +56,7 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
     """Tests for Oppia job models with setUp."""
 
     def setUp(self) -> None:
-        super(JobModelSetUpJobsTest, self).setUp()
+        super().setUp()
         job_models.JobModel(
             id='MyJobId1', job_type='JobType1',
             status_code=job_models.STATUS_CODE_FAILED).put()

@@ -25,7 +25,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import feedback_models
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 
 class InvalidEntityTypeError(base_validation_errors.BaseAuditError):
@@ -35,4 +35,4 @@ class InvalidEntityTypeError(base_validation_errors.BaseAuditError):
         self, model: feedback_models.GeneralFeedbackThreadModel
     ) -> None:
         message = 'entity type %s is invalid.' % model.entity_type
-        super(InvalidEntityTypeError, self).__init__(message, model)
+        super().__init__(message, model)

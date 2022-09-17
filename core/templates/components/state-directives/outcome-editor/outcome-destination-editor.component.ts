@@ -112,7 +112,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   }
 
   updateOptionNames(): void {
-    // The seTimeout is being used here to update the view.
+    // The setTimeout is being used here to update the view.
     setTimeout(() => {
       let activeStateName = this.stateEditorService.getActiveStateName();
       if (activeStateName === null) {
@@ -200,7 +200,6 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
           let newStateName = this.outcomeNewStateName;
           this.outcome.dest = newStateName;
-
           this.addState.emit(newStateName);
         }
       }));

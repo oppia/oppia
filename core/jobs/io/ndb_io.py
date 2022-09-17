@@ -35,6 +35,10 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
 class GetModels(beam.PTransform): # type: ignore[misc]
     """Reads NDB models from the datastore using a query."""
 
@@ -47,7 +51,7 @@ class GetModels(beam.PTransform): # type: ignore[misc]
             query: datastore_services.Query. The query used to fetch models.
             label: str|None. The label of the PTransform.
         """
-        super(GetModels, self).__init__(label=label)
+        super().__init__(label=label)
         self.query = query
 
     def expand(
@@ -75,6 +79,10 @@ class GetModels(beam.PTransform): # type: ignore[misc]
         )
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
 class PutModels(beam.PTransform): # type: ignore[misc]
     """Writes NDB models to the datastore."""
 
@@ -102,6 +110,10 @@ class PutModels(beam.PTransform): # type: ignore[misc]
         )
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
 class DeleteModels(beam.PTransform): # type: ignore[misc]
     """Deletes NDB models from the datastore."""
 

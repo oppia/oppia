@@ -23,18 +23,16 @@ from core import utils
 from core.domain import feedback_domain
 from core.tests import test_utils
 
-from typing import Dict
-
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     THREAD_ID = 'exp0.thread0'
 
     def setUp(self) -> None:
-        super(FeedbackThreadDomainUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL) # type: ignore[no-untyped-call]
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
@@ -91,14 +89,14 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
-    MESSAGE_ID = 'message0'
+    MESSAGE_ID = 0
     THREAD_ID = 'exploration.exp0.thread0'
-    FULL_MESSAGE_ID = THREAD_ID + '.' + MESSAGE_ID
+    FULL_MESSAGE_ID = THREAD_ID + '.' + str(MESSAGE_ID)
 
     def setUp(self) -> None:
-        super(FeedbackMessageDomainUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
@@ -136,13 +134,15 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(FeedbackMessageReferenceDomainTests, self).setUp()
+        super().setUp()
         self.exp_id = 'exp'
-        self.message_id = 'message'
+        self.message_id = 10
         self.thread_id = 'exp.thread'
 
     def test_to_dict(self) -> None:
-        expected_feedback_message_reference: Dict[str, str] = {
+        expected_feedback_message_reference: (
+            feedback_domain.FeedbackMessageReferenceDict
+        ) = {
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.exp_id,
             'thread_id': self.thread_id,

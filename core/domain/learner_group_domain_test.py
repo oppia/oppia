@@ -39,8 +39,8 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'title': 'title',
             'description': 'description',
             'facilitator_user_ids': ['user_1'],
-            'student_user_ids': ['user_2', 'user_3', 'user_4'],
-            'invited_student_user_ids': ['user_5', 'user_6'],
+            'learner_user_ids': ['user_2', 'user_3', 'user_4'],
+            'invited_learner_user_ids': ['user_5', 'user_6'],
             'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }
@@ -50,9 +50,9 @@ class LearnerGroupTest(test_utils.GenericTestBase):
         self.assertEqual(learner_group.description, 'description')
         self.assertEqual(learner_group.facilitator_user_ids, ['user_1'])
         self.assertEqual(
-            learner_group.student_user_ids, ['user_2', 'user_3', 'user_4'])
+            learner_group.learner_user_ids, ['user_2', 'user_3', 'user_4'])
         self.assertEqual(
-            learner_group.invited_student_user_ids, ['user_5', 'user_6'])
+            learner_group.invited_learner_user_ids, ['user_5', 'user_6'])
         self.assertEqual(
             learner_group.subtopic_page_ids,
             ['subtopic_1', 'subtopic_2'])
@@ -76,8 +76,8 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'title': 'title',
             'description': 'description',
             'facilitator_user_ids': ['user_1'],
-            'student_user_ids': ['user_2', 'user_3', 'user_4'],
-            'invited_student_user_ids': ['user_5', 'user_6'],
+            'learner_user_ids': ['user_2', 'user_3', 'user_4'],
+            'invited_learner_user_ids': ['user_5', 'user_6'],
             'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }
@@ -87,7 +87,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             expected_learner_group_dict)
 
     def test_validation(self) -> None:
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             learner_group_domain.LearnerGroup(
                 '3232', 'title', 'description',
                 [],
@@ -97,7 +97,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['story_1', 'story_2']),
             'Expected learner group to have at least one facilitator.')
 
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             learner_group_domain.LearnerGroup(
                 '3232', 'title', 'description',
                 ['user_1'],
@@ -105,9 +105,9 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['user_5', 'user_6'],
                 ['subtopic_1', 'subtopic_2'],
                 ['story_1', 'story_2']),
-            'Learner group student cannot be invited to join the group.')
+            'Learner group learner cannot be invited to join the group.')
 
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             learner_group_domain.LearnerGroup(
                 '3232', 'title', 'description',
                 ['user_1'],
@@ -115,9 +115,9 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['user_5', 'user_6'],
                 ['subtopic_1', 'subtopic_2'],
                 ['story_1', 'story_2']),
-            'Learner group facilitator cannot be a student of the group.')
+            'Learner group facilitator cannot be a learner of the group.')
 
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             learner_group_domain.LearnerGroup(
                 '3232', 'title', 'description',
                 ['user_1'],

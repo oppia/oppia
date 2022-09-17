@@ -38,21 +38,24 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Set, Tuple, cast, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import question_models
     from mypy_imports import skill_models
+    from mypy_imports import topic_models
+    from mypy_imports import user_models
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
-        models.NAMES.skill, models.NAMES.user, models.NAMES.question,
-        models.NAMES.topic]))
-datastore_services = models.Registry.import_datastore_services()
+        models.Names.SKILL, models.Names.USER, models.Names.QUESTION,
+        models.Names.TOPIC]))
 
 
 # Repository GET methods.
-def get_merged_skill_ids():
+def get_merged_skill_ids() -> List[str]:
     """Returns the skill IDs of skills that have been merged.
 
     Returns:
@@ -61,7 +64,7 @@ def get_merged_skill_ids():
     return [skill.id for skill in skill_models.SkillModel.get_merged_skills()]
 
 
-def get_all_skill_summaries():
+def get_all_skill_summaries() -> List[skill_domain.SkillSummary]:
     """Returns the summaries of all skills present in the datastore.
 
     Returns:
@@ -76,13 +79,17 @@ def get_all_skill_summaries():
 
 
 def _get_skill_summaries_in_batches(
-        num_skills_to_fetch, urlsafe_start_cursor, sort_by):
+    num_skills_to_fetch: int,
+    urlsafe_start_cursor: Optional[str],
+    sort_by: Optional[str]
+) -> Tuple[List[skill_domain.SkillSummary], Optional[str], bool]:
     """Returns the summaries of skills present in the datastore.
 
     Args:
         num_skills_to_fetch: int. Number of skills to fetch.
         urlsafe_start_cursor: str or None. The cursor to the next page.
-        sort_by: str. A string indicating how to sort the result.
+        sort_by: str|None. A string indicating how to sort the result, or None
+            if no sort is required.
 
     Returns:
         3-tuple(skill_summaries, new_urlsafe_start_cursor, more). where:
@@ -112,18 +119,25 @@ def _get_skill_summaries_in_batches(
 
 
 def get_filtered_skill_summaries(
-        num_skills_to_fetch, status, classroom_name, keywords,
-        sort_by, urlsafe_start_cursor):
+    num_skills_to_fetch: int,
+    status: Optional[str],
+    classroom_name: Optional[str],
+    keywords: List[str],
+    sort_by: Optional[str],
+    urlsafe_start_cursor: Optional[str]
+) -> Tuple[List[skill_domain.AugmentedSkillSummary], Optional[str], bool]:
     """Returns all the skill summary dicts after filtering.
 
     Args:
         num_skills_to_fetch: int. Number of skills to fetch.
-        status: str. The status of the skill.
-        classroom_name: str. The classroom_name of the topic to which the skill
-            is assigned to.
+        status: str|None. The status of the skill, or None if no status is
+            provided to filter skills id.
+        classroom_name: str|None. The classroom_name of the topic to which
+            the skill is assigned to.
         keywords: list(str). The keywords to look for
             in the skill description.
-        sort_by: str. A string indicating how to sort the result.
+        sort_by: str|None. A string indicating how to sort the result, or None
+            if no sorting is required.
         urlsafe_start_cursor: str or None. The cursor to the next page.
 
     Returns:
@@ -140,7 +154,7 @@ def get_filtered_skill_summaries(
             more: bool. If True, there are (probably) more results after this
                 batch. If False, there are no further results after this batch.
     """
-    augmented_skill_summaries = []
+    augmented_skill_summaries: List[skill_domain.AugmentedSkillSummary] = []
     new_urlsafe_start_cursor = urlsafe_start_cursor
     more = True
 
@@ -161,7 +175,10 @@ def get_filtered_skill_summaries(
 
 
 def _get_augmented_skill_summaries_in_batches(
-        num_skills_to_fetch, urlsafe_start_cursor, sort_by):
+    num_skills_to_fetch: int,
+    urlsafe_start_cursor: Optional[str],
+    sort_by: Optional[str]
+) -> Tuple[List[skill_domain.AugmentedSkillSummary], Optional[str], bool]:
     """Returns all the Augmented skill summaries after attaching
     topic and classroom.
 
@@ -179,15 +196,17 @@ def _get_augmented_skill_summaries_in_batches(
         _get_skill_summaries_in_batches(
             num_skills_to_fetch, urlsafe_start_cursor, sort_by))
 
-    assigned_skill_ids = collections.defaultdict(lambda: {
+    assigned_skill_ids: Dict[
+        str, Dict[str, List[str]]
+    ] = collections.defaultdict(lambda: {
         'topic_names': [],
         'classroom_names': []
     })
 
     all_topic_models = topic_models.TopicModel.get_all()
     all_topics = [topic_fetchers.get_topic_from_model(topic_model)
-                  if topic_model is not None else None
-                  for topic_model in all_topic_models]
+                  for topic_model in all_topic_models
+                  if topic_model is not None]
 
     topic_classroom_dict = {}
     all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
@@ -227,13 +246,17 @@ def _get_augmented_skill_summaries_in_batches(
     return augmented_skill_summaries, new_urlsafe_start_cursor, more
 
 
-def _filter_skills_by_status(augmented_skill_summaries, status):
+def _filter_skills_by_status(
+    augmented_skill_summaries: List[skill_domain.AugmentedSkillSummary],
+    status: Optional[str]
+) -> List[skill_domain.AugmentedSkillSummary]:
     """Returns the skill summary dicts after filtering by status.
 
     Args:
         augmented_skill_summaries: list(AugmentedSkillSummary). The list
             of augmented skill summaries.
-        status: str. The status of the skill.
+        status: str|None. The status of the skill, or None if no status is
+            provided to filter skills id.
 
     Returns:
         list(AugmentedSkillSummary). The list of AugmentedSkillSummaries
@@ -260,15 +283,20 @@ def _filter_skills_by_status(augmented_skill_summaries, status):
                     augmented_skill_summary)
         return assigned_augmented_skill_summaries
 
+    return []
 
-def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
+
+def _filter_skills_by_classroom(
+    augmented_skill_summaries: List[skill_domain.AugmentedSkillSummary],
+    classroom_name: Optional[str]
+) -> List[skill_domain.AugmentedSkillSummary]:
     """Returns the skill summary dicts after filtering by classroom_name.
 
     Args:
         augmented_skill_summaries: list(AugmentedSkillSummary).
             The list of augmented skill summaries.
-        classroom_name: str. The classroom_name of the topic to which the skill
-            is assigned to.
+        classroom_name: str|None. The classroom_name of the topic to which
+            the skill is assigned to.
 
     Returns:
         list(AugmentedSkillSummary). The list of augmented skill summaries with
@@ -287,7 +315,10 @@ def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
     return augmented_skill_summaries_with_classroom_name
 
 
-def _filter_skills_by_keywords(augmented_skill_summaries, keywords):
+def _filter_skills_by_keywords(
+    augmented_skill_summaries: List[skill_domain.AugmentedSkillSummary],
+    keywords: List[str]
+) -> List[skill_domain.AugmentedSkillSummary]:
     """Returns whether the keywords match the skill description.
 
     Args:
@@ -312,7 +343,9 @@ def _filter_skills_by_keywords(augmented_skill_summaries, keywords):
     return filtered_augmented_skill_summaries
 
 
-def get_multi_skill_summaries(skill_ids):
+def get_multi_skill_summaries(
+    skill_ids: List[str]
+) -> List[skill_domain.SkillSummary]:
     """Returns a list of skill summaries matching the skill IDs provided.
 
     Args:
@@ -330,7 +363,9 @@ def get_multi_skill_summaries(skill_ids):
     return skill_summaries
 
 
-def get_rubrics_of_skills(skill_ids):
+def get_rubrics_of_skills(
+    skill_ids: List[str]
+) -> Tuple[Dict[str, Optional[List[skill_domain.RubricDict]]], List[str]]:
     """Returns a list of rubrics corresponding to given skills.
 
     Args:
@@ -341,7 +376,9 @@ def get_rubrics_of_skills(skill_ids):
         corresponding ids and the list of deleted skill ids, if any.
     """
     skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
-    skill_id_to_rubrics_dict = {}
+    skill_id_to_rubrics_dict: Dict[
+        str, Optional[List[skill_domain.RubricDict]]
+    ] = {}
 
     for skill in skills:
         if skill is not None:
@@ -357,7 +394,9 @@ def get_rubrics_of_skills(skill_ids):
     return skill_id_to_rubrics_dict, deleted_skill_ids
 
 
-def get_descriptions_of_skills(skill_ids):
+def get_descriptions_of_skills(
+    skill_ids: List[str]
+) -> Tuple[Dict[str, str], List[str]]:
     """Returns a list of skill descriptions corresponding to the given skills.
 
     Args:
@@ -368,7 +407,7 @@ def get_descriptions_of_skills(skill_ids):
         corresponding ids and the list of deleted skill ids, if any.
     """
     skill_summaries = get_multi_skill_summaries(skill_ids)
-    skill_id_to_description_dict = {}
+    skill_id_to_description_dict: Dict[str, str] = {}
 
     for skill_summary in skill_summaries:
         if skill_summary is not None:
@@ -378,13 +417,14 @@ def get_descriptions_of_skills(skill_ids):
     deleted_skill_ids = []
     for skill_id in skill_ids:
         if skill_id not in skill_id_to_description_dict:
-            skill_id_to_description_dict[skill_id] = None
             deleted_skill_ids.append(skill_id)
 
     return skill_id_to_description_dict, deleted_skill_ids
 
 
-def get_skill_summary_from_model(skill_summary_model):
+def get_skill_summary_from_model(
+    skill_summary_model: skill_models.SkillSummaryModel
+) -> skill_domain.SkillSummary:
     """Returns a domain object for an Oppia skill summary given a
     skill summary model.
 
@@ -407,7 +447,7 @@ def get_skill_summary_from_model(skill_summary_model):
     )
 
 
-def get_image_filenames_from_skill(skill):
+def get_image_filenames_from_skill(skill: skill_domain.Skill) -> List[str]:
     """Get the image filenames from the skill.
 
     Args:
@@ -420,7 +460,9 @@ def get_image_filenames_from_skill(skill):
     return html_cleaner.get_image_filenames_from_html_strings(html_list)
 
 
-def get_all_topic_assignments_for_skill(skill_id):
+def get_all_topic_assignments_for_skill(
+    skill_id: str
+) -> List[skill_domain.TopicAssignment]:
     """Returns a list containing all the topics to which the given skill is
     assigned along with topic details.
 
@@ -446,7 +488,30 @@ def get_all_topic_assignments_for_skill(skill_id):
     return topic_assignments
 
 
-def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
+def get_topic_names_with_given_skill_in_diagnostic_test(
+    skill_id: str
+) -> List[str]:
+    """Returns a list of topic names for which the given skill is assigned
+    to that topic's diagnostic test.
+
+    Args:
+        skill_id: str. ID of the skill.
+
+    Returns:
+        list(str). A list of topic names for which the given skill is assigned
+        to that topic's diagnostic test.
+    """
+    topics = topic_fetchers.get_all_topics()
+    topic_names = []
+    for topic in topics:
+        if skill_id in topic.skill_ids_for_diagnostic_test:
+            topic_names.append(topic.name)
+    return topic_names
+
+
+def replace_skill_id_in_all_topics(
+    user_id: str, old_skill_id: str, new_skill_id: str
+) -> None:
     """Replaces the old skill id with the new one in all the associated topics.
 
     Args:
@@ -499,7 +564,7 @@ def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
                     old_skill_id, new_skill_id))
 
 
-def remove_skill_from_all_topics(user_id, skill_id):
+def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
     """Deletes the skill with the given id from all the associated topics.
 
     Args:
@@ -530,7 +595,27 @@ def remove_skill_from_all_topics(user_id, skill_id):
                     skill_id, skill_name))
 
 
-def get_skill_summary_by_id(skill_id, strict=True):
+@overload
+def get_skill_summary_by_id(
+    skill_id: str
+) -> skill_domain.SkillSummary: ...
+
+
+@overload
+def get_skill_summary_by_id(
+    skill_id: str, *, strict: Literal[True]
+) -> skill_domain.SkillSummary: ...
+
+
+@overload
+def get_skill_summary_by_id(
+    skill_id: str, *, strict: Literal[False]
+) -> Optional[skill_domain.SkillSummary]: ...
+
+
+def get_skill_summary_by_id(
+    skill_id: str, strict: bool = True
+) -> Optional[skill_domain.SkillSummary]:
     """Returns a domain object representing a skill summary.
 
     Args:
@@ -561,7 +646,12 @@ def get_new_skill_id() -> str:
     return skill_models.SkillModel.get_new_id('')
 
 
-def _create_skill(committer_id, skill, commit_message, commit_cmds):
+def _create_skill(
+    committer_id: str,
+    skill: skill_domain.Skill,
+    commit_message: str,
+    commit_cmds: List[skill_domain.SkillChange]
+) -> None:
     """Creates a new skill.
 
     Args:
@@ -602,7 +692,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         skill.description)
 
 
-def does_skill_with_description_exist(description):
+def does_skill_with_description_exist(description: str) -> bool:
     """Checks if skill with provided description exists.
 
     Args:
@@ -616,7 +706,7 @@ def does_skill_with_description_exist(description):
     return existing_skill is not None
 
 
-def save_new_skill(committer_id, skill):
+def save_new_skill(committer_id: str, skill: skill_domain.Skill) -> None:
     """Saves a new skill.
 
     Args:
@@ -630,7 +720,11 @@ def save_new_skill(committer_id, skill):
         })])
 
 
-def apply_change_list(skill_id, change_list, committer_id):
+def apply_change_list(
+    skill_id: str,
+    change_list: List[skill_domain.SkillChange],
+    committer_id: str
+) -> skill_domain.Skill:
     """Applies a changelist to a skill and returns the result.
 
     Args:
@@ -659,64 +753,189 @@ def apply_change_list(skill_id, change_list, committer_id):
                         raise Exception(
                             'The user does not have enough rights to edit the '
                             'skill description.')
-                    skill.update_description(change.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type UpdateSkillPropertyDescriptionCmd.
+                    update_description_cmd = cast(
+                        skill_domain.UpdateSkillPropertyDescriptionCmd,
+                        change
+                    )
+                    skill.update_description(update_description_cmd.new_value)
                     (
                         opportunity_services
                         .update_skill_opportunity_skill_description(
-                            skill.id, change.new_value))
+                            skill.id, update_description_cmd.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
-                    skill.update_language_code(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateSkillPropertyLanguageCodeCmd.
+                    update_language_code_cmd = cast(
+                        skill_domain.UpdateSkillPropertyLanguageCodeCmd,
+                        change
+                    )
+                    skill.update_language_code(
+                        update_language_code_cmd.new_value
+                    )
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
-                    skill.update_superseding_skill_id(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillPropertySupersedingSkillIdCmd.
+                    update_superseding_skill_id_cmd = cast(
+                        skill_domain.UpdateSkillPropertySupersedingSkillIdCmd,
+                        change
+                    )
+                    skill.update_superseding_skill_id(
+                        update_superseding_skill_id_cmd.new_value
+                    )
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
-                    skill.record_that_all_questions_are_merged(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillPropertyAllQuestionsMergedCmd.
+                    update_all_questions_merged_cmd = cast(
+                        skill_domain.UpdateSkillPropertyAllQuestionsMergedCmd,
+                        change
+                    )
+                    skill.record_that_all_questions_are_merged(
+                        update_all_questions_merged_cmd.new_value
+                    )
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateSkillContentsPropertyExplanationCmd.
+                    update_explanation_cmd = cast(
+                        skill_domain.UpdateSkillContentsPropertyExplanationCmd,
+                        change
+                    )
                     explanation = (
-                        state_domain.SubtitledHtml.from_dict(change.new_value))
+                        state_domain.SubtitledHtml.from_dict(
+                            update_explanation_cmd.new_value
+                        )
+                    )
                     explanation.validate()
                     skill.update_explanation(explanation)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    worked_examples_list = [
-                        skill_domain.WorkedExample.from_dict(worked_example)
-                        for worked_example in change.new_value]
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillContentsPropertyWorkedExamplesCmd.
+                    update_worked_examples_cmd = cast(
+                        skill_domain.UpdateSkillContentsPropertyWorkedExamplesCmd,  # pylint: disable=line-too-long
+                        change
+                    )
+                    worked_examples_list: List[skill_domain.WorkedExample] = []
+                    for worked_example in update_worked_examples_cmd.new_value:
+                        worked_examples_list.append(
+                            skill_domain.WorkedExample.from_dict(worked_example)
+                        )
                     skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                add_skill_misconception_cmd = cast(
+                    skill_domain.AddSkillMisconceptionCmd,
+                    change
+                )
                 misconception = skill_domain.Misconception.from_dict(
-                    change.new_misconception_dict)
+                    add_skill_misconception_cmd.new_misconception_dict)
                 skill.add_misconception(misconception)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
-                skill.delete_misconception(change.misconception_id)
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                delete_misconception_cmd = cast(
+                    skill_domain.DeleteSkillMisconceptionCmd,
+                    change
+                )
+                skill.delete_misconception(
+                    delete_misconception_cmd.misconception_id
+                )
             elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
-                skill.add_prerequisite_skill(change.skill_id)
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                add_prerequisite_skill_cmd = cast(
+                    skill_domain.AddPrerequisiteSkillCmd,
+                    change
+                )
+                skill.add_prerequisite_skill(
+                    add_prerequisite_skill_cmd.skill_id
+                )
             elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
-                skill.delete_prerequisite_skill(change.skill_id)
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                delete_prerequisite_skill_cmd = cast(
+                    skill_domain.DeletePrerequisiteSkillCmd,
+                    change
+                )
+                skill.delete_prerequisite_skill(
+                    delete_prerequisite_skill_cmd.skill_id
+                )
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                update_rubric_cmd = cast(
+                    skill_domain.UpdateRubricsCmd,
+                    change
+                )
                 skill.update_rubric(
-                    change.difficulty, change.explanations)
+                    update_rubric_cmd.difficulty,
+                    update_rubric_cmd.explanations
+                )
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
                         skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyNameCmd.
+                    update_property_name_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyNameCmd,
+                        change
+                    )
                     skill.update_misconception_name(
-                        change.misconception_id, change.new_value)
+                        update_property_name_cmd.misconception_id,
+                        update_property_name_cmd.new_value
+                    )
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyNotesCmd.
+                    update_property_notes_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyNotesCmd,
+                        change
+                    )
                     skill.update_misconception_notes(
-                        change.misconception_id, change.new_value)
+                        update_property_notes_cmd.misconception_id,
+                        update_property_notes_cmd.new_value
+                    )
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyFeedbackCmd.
+                    update_property_feedback_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyFeedbackCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     skill.update_misconception_feedback(
-                        change.misconception_id, change.new_value)
+                        update_property_feedback_cmd.misconception_id,
+                        update_property_feedback_cmd.new_value
+                    )
                 elif (change.property_name ==
-                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED):  # pylint: disable=line-too-long
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyMustBeAddressedCmd.
+                    update_property_must_be_addressed_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyMustBeAddressedCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     skill.update_misconception_must_be_addressed(
-                        change.misconception_id, change.new_value)
+                        update_property_must_be_addressed_cmd.misconception_id,
+                        update_property_must_be_addressed_cmd.new_value
+                    )
                 else:
                     raise Exception('Invalid change dict.')
             elif (change.cmd in (
@@ -775,7 +994,12 @@ def populate_skill_model_fields(
     return skill_model
 
 
-def _save_skill(committer_id, skill, commit_message, change_list):
+def _save_skill(
+    committer_id: str,
+    skill: skill_domain.Skill,
+    commit_message: str,
+    change_list: List[skill_domain.SkillChange]
+) -> None:
     """Validates a skill and commits it to persistent storage. If
     successful, increments the version number of the incoming skill domain
     object by 1.
@@ -800,7 +1024,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     # Skill model cannot be None as skill is passed as parameter here and that
     # is only possible if a skill model with that skill id exists.
     skill_model = skill_models.SkillModel.get(
-        skill.id, strict=False)
+        skill.id, strict=True)
 
     if skill.version > skill_model.version:
         raise Exception(
@@ -822,7 +1046,12 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill.version += 1
 
 
-def update_skill(committer_id, skill_id, change_list, commit_message):
+def update_skill(
+    committer_id: str,
+    skill_id: str,
+    change_list: List[skill_domain.SkillChange],
+    commit_message: Optional[str]
+) -> None:
     """Updates a skill. Commits changes.
 
     Args:
@@ -850,11 +1079,21 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
         for change in change_list
     )
     if misconception_is_deleted:
-        deleted_skill_misconception_ids = [
-            skill.generate_skill_misconception_id(change.misconception_id)
-            for change in change_list
-            if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
-        ]
+        deleted_skill_misconception_ids: List[str] = []
+        for change in change_list:
+            if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
+                # Here we use cast because we are narrowing down the type of
+                # 'change' from SkillChange to a specific change command
+                # DeleteSkillMisconceptionCmd.
+                delete_skill_misconception_cmd = cast(
+                    skill_domain.DeleteSkillMisconceptionCmd,
+                    change
+                )
+                deleted_skill_misconception_ids.append(
+                    skill.generate_skill_misconception_id(
+                        delete_skill_misconception_cmd.misconception_id
+                    )
+                )
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
@@ -862,7 +1101,11 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
             deleted_skill_misconception_ids)
 
 
-def delete_skill(committer_id, skill_id, force_deletion=False):
+def delete_skill(
+    committer_id: str,
+    skill_id: str,
+    force_deletion: bool = False
+) -> None:
     """Deletes the skill with the given skill_id.
 
     Args:
@@ -890,7 +1133,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
         skill_id)
 
 
-def delete_skill_summary(skill_id):
+def delete_skill_summary(skill_id: str) -> None:
     """Delete a skill summary model.
 
     Args:
@@ -899,7 +1142,7 @@ def delete_skill_summary(skill_id):
     """
 
     skill_summary_model = (
-        skill_models.SkillSummaryModel.get(skill_id, False))
+        skill_models.SkillSummaryModel.get(skill_id, strict=False))
     if skill_summary_model is not None:
         skill_summary_model.delete()
 
@@ -915,11 +1158,24 @@ def compute_summary_of_skill(
 
     Returns:
         SkillSummary. The computed summary for the given skill.
+
+    Raises:
+        Exception. No data available for when the skill was last_updated.
+        Exception. No data available for when the skill was created.
     """
     skill_model_misconception_count = len(skill.misconceptions)
     skill_model_worked_examples_count = len(
         skill.skill_contents.worked_examples)
 
+    if skill.created_on is None:
+        raise Exception(
+            'No data available for when the skill was created.'
+        )
+
+    if skill.last_updated is None:
+        raise Exception(
+            'No data available for when the skill was last_updated.'
+        )
     skill_summary = skill_domain.SkillSummary(
         skill.id, skill.description, skill.language_code,
         skill.version, skill_model_misconception_count,
@@ -930,7 +1186,7 @@ def compute_summary_of_skill(
     return skill_summary
 
 
-def create_skill_summary(skill_id):
+def create_skill_summary(skill_id: str) -> None:
     """Creates and stores a summary of the given skill.
 
     Args:
@@ -974,7 +1230,7 @@ def populate_skill_summary_model_fields(
     return skill_summary_model
 
 
-def save_skill_summary(skill_summary):
+def save_skill_summary(skill_summary: skill_domain.SkillSummary) -> None:
     """Save a skill summary domain object as a SkillSummaryModel
     entity in the datastore.
 
@@ -991,7 +1247,9 @@ def save_skill_summary(skill_summary):
     skill_summary_model.put()
 
 
-def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
+def create_user_skill_mastery(
+    user_id: str, skill_id: str, degree_of_mastery: float
+) -> None:
     """Creates skill mastery of a user.
 
     Args:
@@ -1005,7 +1263,9 @@ def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
     save_user_skill_mastery(user_skill_mastery)
 
 
-def save_user_skill_mastery(user_skill_mastery):
+def save_user_skill_mastery(
+    user_skill_mastery: skill_domain.UserSkillMastery
+) -> None:
     """Stores skill mastery of a user.
 
     Args:
@@ -1022,7 +1282,9 @@ def save_user_skill_mastery(user_skill_mastery):
     user_skill_mastery_model.put()
 
 
-def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
+def create_multi_user_skill_mastery(
+    user_id: str, degrees_of_mastery: Dict[str, float]
+) -> None:
     """Creates the mastery of a user in multiple skills.
 
     Args:
@@ -1044,7 +1306,7 @@ def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
     user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
 
 
-def get_user_skill_mastery(user_id, skill_id):
+def get_user_skill_mastery(user_id: str, skill_id: str) -> Optional[float]:
     """Fetches the mastery of user in a particular skill.
 
     Args:
@@ -1063,10 +1325,17 @@ def get_user_skill_mastery(user_id, skill_id):
 
     if not user_skill_mastery_model:
         return None
-    return user_skill_mastery_model.degree_of_mastery
+
+    # TODO(#15621): The explicit declaration of type for ndb properties
+    # should be removed. Currently, these ndb properties are annotated with
+    # Any return type. Once we have proper return type we can remove this.
+    degree_of_mastery: float = user_skill_mastery_model.degree_of_mastery
+    return degree_of_mastery
 
 
-def get_multi_user_skill_mastery(user_id, skill_ids):
+def get_multi_user_skill_mastery(
+    user_id: str, skill_ids: List[str]
+) -> Dict[str, Optional[float]]:
     """Fetches the mastery of user in multiple skills.
 
     Args:
@@ -1079,7 +1348,7 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
         are the corresponding mastery degree of the user or None if
         UserSkillMasteryModel does not exist for the skill.
     """
-    degrees_of_mastery = {}
+    degrees_of_mastery: Dict[str, Optional[float]] = {}
     model_ids = []
 
     for skill_id in skill_ids:
@@ -1125,7 +1394,9 @@ def get_multi_users_skills_mastery(
 
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
-    degrees_of_masteries = {user_id: {} for user_id in user_ids}
+    degrees_of_masteries: Dict[
+        str, Dict[str, Optional[float]]
+    ] = {user_id: {} for user_id in user_ids}
     for i, (user_id, skill_id) in enumerate(all_combinations):
         skill_mastery_model = skill_mastery_models[i]
         if skill_mastery_model is None:
@@ -1138,7 +1409,7 @@ def get_multi_users_skills_mastery(
     return degrees_of_masteries
 
 
-def skill_has_associated_questions(skill_id):
+def skill_has_associated_questions(skill_id: str) -> bool:
     """Returns whether or not any question has this skill attached.
 
     Args:
@@ -1153,7 +1424,9 @@ def skill_has_associated_questions(skill_id):
     return len(question_ids) > 0
 
 
-def get_sorted_skill_ids(degrees_of_mastery):
+def get_sorted_skill_ids(
+    degrees_of_mastery: Dict[str, Optional[float]]
+) -> List[str]:
     """Sort the dict based on the mastery value.
 
     Args:
@@ -1168,8 +1441,12 @@ def get_sorted_skill_ids(degrees_of_mastery):
         skill_id: degree for skill_id, degree in degrees_of_mastery.items()
         if degree is not None}
 
+    sort_fn: Callable[[str], float] = (
+        lambda skill_id: skill_dict_with_float_value[skill_id]
+            if skill_dict_with_float_value.get(skill_id) else 0
+        )
     sorted_skill_ids_with_float_value = sorted(
-        skill_dict_with_float_value, key=skill_dict_with_float_value.get)
+        skill_dict_with_float_value, key=sort_fn)
     skill_ids_with_none_value = [
         skill_id for skill_id, degree in degrees_of_mastery.items()
         if degree is None]
@@ -1179,7 +1456,7 @@ def get_sorted_skill_ids(degrees_of_mastery):
     return sorted_skill_ids[:feconf.MAX_NUMBER_OF_SKILL_IDS]
 
 
-def filter_skills_by_mastery(user_id, skill_ids):
+def filter_skills_by_mastery(user_id: str, skill_ids: List[str]) -> List[str]:
     """Given a list of skill_ids, it returns a list of
     feconf.MAX_NUMBER_OF_SKILL_IDS skill_ids in which the user has
     the least mastery.(Please note that python 2.7 considers the None
@@ -1204,7 +1481,10 @@ def filter_skills_by_mastery(user_id, skill_ids):
 
 
 def get_untriaged_skill_summaries(
-    skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids):
+    skill_summaries: List[skill_domain.SkillSummary],
+    skill_ids_assigned_to_some_topic: Set[str],
+    merged_skill_ids: List[str]
+) -> List[skill_domain.SkillSummary]:
     """Returns a list of skill summaries for all skills that are untriaged.
 
     Args:
@@ -1229,7 +1509,8 @@ def get_untriaged_skill_summaries(
     return untriaged_skill_summaries
 
 
-def get_categorized_skill_ids_and_descriptions():
+def get_categorized_skill_ids_and_descriptions(
+) -> skill_domain.CategorizedSkills:
     """Returns a CategorizedSkills domain object for all the skills that are
     categorized.
 
@@ -1258,13 +1539,15 @@ def get_categorized_skill_ids_and_descriptions():
     for topic in topics:
         subtopics = topic.subtopics
         for skill_id in topic.uncategorized_skill_ids:
+            description = skill_descriptions[skill_id]
             categorized_skills.add_uncategorized_skill(
                 topic.name, skill_id,
-                skill_descriptions[skill_id])
+                description)
         for subtopic in subtopics:
             for skill_id in subtopic.skill_ids:
+                description = skill_descriptions[skill_id]
                 categorized_skills.add_subtopic_skill(
                     topic.name, subtopic.title,
-                    skill_id, skill_descriptions[skill_id])
+                    skill_id, description)
 
     return categorized_skills

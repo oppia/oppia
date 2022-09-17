@@ -336,7 +336,7 @@ class BaseHandler(webapp2.RequestHandler):
         if not schema_validation_succeeded:
             return
 
-        super(BaseHandler, self).dispatch()
+        super().dispatch()
 
     def validate_and_normalize_args(self):
         """Validates schema for controller layer handler class arguments.

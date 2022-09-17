@@ -40,8 +40,8 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
   templateUrl: './state-skill-editor.component.html'
 })
 export class StateSkillEditorComponent implements OnInit {
-  @Output() onSaveLinkedSkillId: EventEmitter<string> = (
-    new EventEmitter<string>());
+  @Output() onSaveLinkedSkillId: EventEmitter<string | null> = (
+    new EventEmitter<string | null>());
 
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
@@ -127,7 +127,7 @@ export class StateSkillEditorComponent implements OnInit {
       DeleteStateSkillModalComponent, {
         backdrop: true,
       }).result.then(() => {
-      this.stateLinkedSkillIdService.displayed = undefined;
+      this.stateLinkedSkillIdService.displayed = null;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(this.stateLinkedSkillIdService.displayed);
     }, () => {

@@ -10,10 +10,7 @@
                 placeholder="{{ 'I18N_PLAYER_LEAVE_FEEDBACK' | translate }}" [oppiaFocusOn]="feedbackPopoverId">
       </textarea>
       <span class="oppia-input-box-subtitle">
-        <em>
-          Feedback message should be at most
-          {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
-        </em>
+        <em [innerHTML]="'I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH }"></em>
       </span>
     </div>
 
@@ -46,9 +43,13 @@
     resize: none;
     width: 250px;
   }
+  .oppia-close-popover-button {
+    position: absolute;
+  }
   input {
+    margin-right: 5px;
     position: relative;
-    top: -2px;
+    top: -3px;
     vertical-align: bottom;
   }
   label {
