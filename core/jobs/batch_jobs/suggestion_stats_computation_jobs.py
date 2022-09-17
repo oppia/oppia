@@ -270,10 +270,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             return translation_contributions_stats_model
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences of
-# stubs in Typeshed, MyPy assuming CombineFn class is of type Any. Thus to
-# avoid MyPy's error (Class cannot subclass 'CombineFn' (has type 'Any')),
-# we added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to assume
+# that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
+# subclass 'CombineFn' (has type 'Any')), we added an ignore here.
 class CombineStats(beam.CombineFn):  # type: ignore[misc]
     """CombineFn for combining the stats."""
 
