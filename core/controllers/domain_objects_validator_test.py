@@ -253,7 +253,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     """Tests to validate exploration change coming from frontend"""
 
     def test_incorrect_exp_state_domain_content(self) -> None:
-        """Tests the state content of exploration change"""
+        """Tests the state content of exploration change."""
         incorrect_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -275,7 +275,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
                 incorrect_change_dict)
 
     def test_incorrect_exp_state_domain_translations(self):
-        """Tests the state translations of exploration change"""
+        """Tests the state translations of exploration change."""
         incorrect_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
@@ -303,7 +303,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             Exception, 'Image tag \'alt-with-value\' attribute '
-            'should not be empty.'
+            'should not be less than 5.'
         ):
             domain_objects_validator.validate_exploration_change(
                 incorrect_change_dict)

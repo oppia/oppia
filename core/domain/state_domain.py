@@ -2064,7 +2064,7 @@ def validate_rte_tags(
             )
         if tag['autoplay-with-value'].strip() not in (
             'true', 'false', '\'true\'', '\'false\'',
-            '\"true\"', '\"false\"'
+            '\"true\"', '\"false\"', True, False
         ):
             raise utils.ValidationError(
                 'Video tag \'autoplay-with-value\' attribute should be '
