@@ -49,9 +49,9 @@ if MYPY:  # pragma: no cover
     exp_models, feedback_models, skill_models,
     story_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.collection, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.user
+    models.Names.AUTH, models.Names.COLLECTION, models.Names.EMAIL,
+    models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.SKILL,
+    models.Names.STORY, models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -75,10 +75,10 @@ class ValidateModelWithUserId(base_validation.ValidateBaseModelId):
         self._pattern = feconf.USER_ID_REGEX
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(
     user_models.PendingDeletionRequestModel
 )
@@ -113,10 +113,10 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):  # type: ignore[misc]
                 model, incorrect_keys)
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(user_models.UserQueryModel)
 class ValidateOldModelsMarkedDeleted(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate old models and mark them for deletion"""
@@ -416,10 +416,10 @@ def user_contribution_rights_model_relationships(
     yield model.id, [user_models.UserSettingsModel]
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(
     user_models.ExplorationUserDataModel
 )
@@ -459,10 +459,10 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
                 model)
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(
     user_models.UserQueryModel
 )

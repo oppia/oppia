@@ -66,6 +66,11 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
 
+# TODO(#15995): Narrow down this Dict type to each issue customization arg type.
+IssuesCustomizationArgsDictType = Dict[
+    str, Dict[str, Union[str, int, List[str]]]
+]
+
 
 class SubmittedAnswerDict(TypedDict):
     """Dictionary representing the SubmittedAnswer object."""
@@ -86,7 +91,7 @@ class ExplorationIssueDict(TypedDict):
     """Dictionary representing the ExplorationIssue object."""
 
     issue_type: str
-    issue_customization_args: Dict[str, Dict[str, Union[str, int]]]
+    issue_customization_args: IssuesCustomizationArgsDictType
     playthrough_ids: List[str]
     schema_version: int
     is_valid: bool
@@ -98,7 +103,7 @@ class PlaythroughDict(TypedDict):
     exp_id: str
     exp_version: int
     issue_type: str
-    issue_customization_args: Dict[str, Dict[str, Union[str, int]]]
+    issue_customization_args: IssuesCustomizationArgsDictType
     actions: List[LearnerActionDict]
 
 
@@ -606,7 +611,7 @@ class StateStats:
             self.__class__.__name__,
             ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         """Implements == comparison between two StateStats instances, returning
@@ -796,16 +801,20 @@ class SessionStateStats:
             'num_times_solution_viewed',
             'num_completions'
         ]
-        # Use ignore[misc] here because mypy does not recognize that keys
-        # represented by the variable exp_stats_property are string literals.
         for exp_stats_property in exploration_stats_properties:
             if exp_stats_property not in aggregated_stats:
                 raise utils.ValidationError(
                     '%s not in aggregated stats dict.' % (exp_stats_property))
+            # Here we use MyPy ignore because MyPy does not recognize
+            # that keys represented by the variable exp_stats_property
+            # are string literals.
             if not isinstance(aggregated_stats[exp_stats_property], int): # type: ignore[misc]
                 raise utils.ValidationError(
                     'Expected %s to be an int, received %s' % (
                         exp_stats_property,
+                        # Here we use MyPy ignore because MyPy does not
+                        # recognize that keys represented by the variable
+                        # exp_stats_property are string literals.
                         aggregated_stats[exp_stats_property] # type: ignore[misc]
                     )
                 )
@@ -831,7 +840,7 @@ class SessionStateStats:
         # hence dict form of the data is returned from here.
         return aggregated_stats
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         """Implements == comparison between two SessionStateStats instances,
@@ -986,7 +995,7 @@ class Playthrough:
         exp_id: str,
         exp_version: int,
         issue_type: str,
-        issue_customization_args: Dict[str, Dict[str, Union[str, int]]],
+        issue_customization_args: IssuesCustomizationArgsDictType,
         actions: List[LearnerAction]
     ):
         """Constructs a Playthrough domain object.
@@ -1104,7 +1113,7 @@ class ExplorationIssue:
     def __init__(
         self,
         issue_type: str,
-        issue_customization_args: Dict[str, Dict[str, Union[str, int]]],
+        issue_customization_args: IssuesCustomizationArgsDictType,
         playthrough_ids: List[str],
         schema_version: int,
         is_valid: bool
@@ -1128,7 +1137,7 @@ class ExplorationIssue:
         self.schema_version = schema_version
         self.is_valid = is_valid
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         if not isinstance(other, ExplorationIssue):

@@ -74,7 +74,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             created_on=datetime.datetime.now(),
             last_updated=datetime.datetime.now())
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error(self, expected_error_substring: str) -> None:  # type: ignore[override]
         """Checks that the skill passes strict validation."""
@@ -82,9 +82,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.skill.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_skill_id_validation_fails_with_invalid_skill_id_type(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Skill id should be a string'):
@@ -97,9 +97,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid skill id'):
             skill_domain.Skill.require_valid_skill_id('abc')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_valid_misconception_id(self) -> None:
         self.skill.next_misconception_id = 'invalid_id'  # type: ignore[assignment]
         self._assert_validation_error(
@@ -412,30 +412,35 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.skill.superseding_skill_id, '1')
         self.assertEqual(self.skill.all_questions_merged, True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_valid_misconception_must_be_addressed(self) -> None:
         self.skill.validate()
         must_be_addressed = 'False'
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             ValueError, 'must_be_addressed should be a bool value'):
             self.skill.update_misconception_must_be_addressed(
                 0, must_be_addressed)  # type: ignore[arg-type]
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.misconceptions[0].must_be_addressed = 'False'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected must_be_addressed to be a bool'
         )
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing. In this test only that part should
-    # be removed which is followed up by ignore statement.
     def test_rubrics_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.rubrics = 'rubric'  # type: ignore[assignment]
         self._assert_validation_error('Expected rubrics to be a list')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.rubrics = ['rubric']  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each rubric to be a Rubric object')
@@ -478,20 +483,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'invalid_difficulty', ['<p>Explanation</p>'])]
         self._assert_validation_error('Invalid difficulty received for rubric')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_valid_rubric_difficulty_type(self) -> None:
         self.skill.rubrics = [skill_domain.Rubric(10, ['<p>Explanation</p>'])]  # type: ignore[arg-type]
         self._assert_validation_error('Expected difficulty to be a string')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_valid_rubric_explanation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.rubrics[0].explanations = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected explanations to be a list')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.rubrics[0].explanations = [0]  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each explanation to be a string')
@@ -519,9 +527,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'The difficulties should be ordered as follows')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_description_validation(self) -> None:
         self.skill.description = 0  # type: ignore[assignment]
         self._assert_validation_error('Description should be a string')
@@ -533,20 +541,24 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Skill description should be less than 100 chars')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_prerequisite_skill_ids_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.prerequisite_skill_ids = 0  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected prerequisite_skill_ids to be a list')
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.prerequisite_skill_ids = [0]  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each skill ID to be a string')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_language_code_validation(self) -> None:
         self.skill.language_code = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected language code to be a string')
@@ -554,16 +566,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing. In this test, only some cases
-    # should be removed, preferably type ignore ones.
     def test_schema_versions_validation(self) -> None:
         self.skill.skill_contents_schema_version = 100
         self._assert_validation_error(
             'Expected skill contents schema version to be %s' %
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.skill_contents_schema_version = 'a'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected skill contents schema version to be an integer')
@@ -573,6 +584,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'Expected misconceptions schema version to be %s' %
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.misconceptions_schema_version = 'a'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected misconceptions schema version to be an integer')
@@ -583,49 +597,73 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'Expected rubric schema version to be %s' %
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.rubric_schema_version = 'a'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected rubric schema version to be an integer')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_misconception_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.misconceptions[0].feedback = 0  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected misconception feedback to be a string')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.misconceptions[0].notes = 0  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected misconception notes to be a string')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.misconceptions[0].name = 0  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected misconception name to be a string')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.misconceptions = ['']  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each misconception to be a Misconception object')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.misconceptions = ''  # type: ignore[assignment]
         self._assert_validation_error('Expected misconceptions to be a list')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_skill_contents_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.skill_contents.worked_examples = ''  # type: ignore[assignment]
         self._assert_validation_error('Expected worked examples to be a list')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.skill_contents.worked_examples = [1]  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected worked example to be a WorkedExample object')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         example = skill_domain.WorkedExample('question', 'explanation')  # type: ignore[arg-type]
         self.skill.skill_contents.worked_examples = [example]
         self._assert_validation_error(
             'Expected example question to be a SubtitledHtml object')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         example = skill_domain.WorkedExample(
             state_domain.SubtitledHtml(
                 '2', '<p>Example Question 1</p>'), 'explanation')  # type: ignore[arg-type]
@@ -633,10 +671,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected example explanation to be a SubtitledHtml object')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.skill_contents.explanation = 'explanation'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected skill explanation to be a SubtitledHtml object')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.skill.skill_contents = ''  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
@@ -665,9 +709,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 '<p>default_feedback</p>', True)]
         self._assert_validation_error('Duplicate misconception ID found')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_skill_migration_validation(self) -> None:
         self.skill.superseding_skill_id = 'TestSkillId'
         self.skill.all_questions_merged = None  # type: ignore[assignment]
@@ -867,14 +911,22 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_rubrics_from_model(self) -> None:
         """Checks that skill misconception id is generated correctly."""
-        # Here we are defining a VersionedRubricDict and in VersionedRubricDict
-        # there is no key exists with the name `explanation`, but here for
-        # testing purposes we are defining `explanation` key which causes MyPy
-        # to throw error. Thus to avoid the error, we used ignore here.
         versioned_rubrics: skill_domain.VersionedRubricDict = {
             'schema_version': 1,
             'rubrics': [
+                # Here we use MyPy ignore because we are defining a
+                # VersionedRubricDict and in VersionedRubricDict there
+                # is no key exists with the name 'explanation', but here
+                # for testing purposes we are defining 'explanation' key
+                # which causes MyPy to throw a error. Thus to avoid the error,
+                # we used ignore here.
                 {'explanation': 'explanation1'},  # type: ignore[typeddict-item]
+                # Here we use MyPy ignore because we are defining a
+                # VersionedRubricDict and in VersionedRubricDict there
+                # is no key exists with the name 'explanation', but here
+                # for testing purposes we are defining 'explanation' key
+                # which causes MyPy to throw a error. Thus to avoid the error,
+                # we used ignore here.
                 {'explanation': 'explanation2'}  # type: ignore[typeddict-item]
             ]
         }
@@ -1205,9 +1257,9 @@ class SkillSummaryTests(test_utils.GenericTestBase):
     def test_validation_passes_with_valid_properties(self) -> None:
         self.skill_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_description(self) -> None:
         self.skill_summary.description = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -1220,9 +1272,9 @@ class SkillSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Description field should not be empty'):
             self.skill_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_language_code(self) -> None:
         self.skill_summary.language_code = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -1236,9 +1288,9 @@ class SkillSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid language code: invalid'):
             self.skill_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_misconception_count(self) -> None:
         self.skill_summary.misconception_count = '10'  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -1254,9 +1306,9 @@ class SkillSummaryTests(test_utils.GenericTestBase):
                 'received \'-1\'')):
             self.skill_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_worked_examples_count(self) -> None:
         self.skill_summary.worked_examples_count = '10'  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -1314,7 +1366,7 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
             'topic_id': 'topic_id1',
             'topic_name': 'Topic1',
             'topic_version': 2,
-            'subtopic_id': 1,
+            'subtopic_id': 1
         }
         self.assertEqual(
             self.topic_assignments.to_dict(),

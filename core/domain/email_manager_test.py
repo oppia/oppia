@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (email_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.email, models.NAMES.suggestion])
+    [models.Names.EMAIL, models.Names.SUGGESTION])
 
 
 class FailedMLTest(test_utils.EmailTestBase):
@@ -673,6 +673,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
     ) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            email_manager.SIGNUP_EMAIL_CONTENT.default_value, dict
+        )
         config_services.set_property(
             self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
                 'subject': (
@@ -2001,6 +2005,337 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS)
+
+
+class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
+    """Test that correct email is sent when notifying contributor
+    achievements."""
+
+    USERNAME: Final = 'user'
+    USER_EMAIL: Final = 'user@example.com'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_EMAIL, self.USERNAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        user_services.update_email_preferences(
+            self.user_id, True, False, False, False)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+
+    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'question', 'edit', None,
+                'Initial Contributor'
+            ))
+        with self.can_not_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+        messages = self._get_sent_email_messages(
+            self.USER_EMAIL)
+
+        self.assertEqual(len(messages), 0)
+
+    def test_that_email_not_sent_if_user_can_not_receive_emails(self) -> None:
+        user_services.update_email_preferences(
+            self.user_id, False, False, False, False)
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'question', 'edit', None,
+                'Initial Contributor'
+            ))
+        with self.can_not_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+        messages = self._get_sent_email_messages(
+            self.USER_EMAIL)
+        self.assertEqual(len(messages), 0)
+
+    def test_that_translation_submitter_acceptance_ranking_email_is_sent(
+        self) -> None:
+        expected_email_subject = 'Oppia Translator Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for submitting translations in हिन्दी '
+            '(Hindi). Your efforts help Oppia grow better every day and '
+            'support students around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'translation', 'acceptance', 'hi',
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+
+    def test_that_question_submitter_acceptance_ranking_email_is_sent(
+        self) -> None:
+        expected_email_subject = 'Oppia Question Submitter Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for submitting practice questions. Your '
+            'efforts help Oppia grow better every day and support students '
+            'around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'question', 'acceptance', None,
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+
+    def test_that_translation_reviewer_review_ranking_email_is_sent(
+        self) -> None:
+        expected_email_subject = 'Oppia Translation Reviewer Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for reviewing translations in हिन्दी '
+            '(Hindi). Your efforts help Oppia grow better every day and '
+            'support students around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'translation', 'review', 'hi',
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+
+    def test_that_question_reviewer_review_ranking_email_is_sent(
+        self) -> None:
+        expected_email_subject = 'Oppia Question Reviewer Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for reviewing  practice questions. Your '
+            'efforts help Oppia grow better every day and support students '
+            'around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'question', 'review', None,
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+
+    def test_that_translation_reviewer_edit_ranking_email_is_sent(
+        self) -> None:
+        expected_email_subject = 'Oppia Translation Reviewer Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for correcting translations in हिन्दी '
+            '(Hindi). Your efforts help Oppia grow better every day and '
+            'support students around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'translation', 'edit', 'hi',
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+
+    def test_that_question_reviewer_edit_ranking_email_is_sent(
+        self) -> None:
+        expected_email_subject = 'Oppia Question Reviewer Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for correcting practice questions. '
+            'Your efforts help Oppia grow better every day and support '
+            'students around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'question', 'edit', None,
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
 
 
 class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
@@ -5890,6 +6225,31 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
+
+    def test_without_language_code_email_not_sent_to_new_translation_reviewer(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The language_code cannot be None'
+        ):
+            with self.can_not_send_emails_ctx:
+                email_manager.send_email_to_new_contribution_reviewer(
+                    self.translation_reviewer_id,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+                )
+
+    def test_without_language_code_email_not_sent_to_removed_translation_reviewer(   # pylint: disable=line-too-long
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The language_code cannot be None'
+        ):
+            with self.can_not_send_emails_ctx:
+                email_manager.send_email_to_removed_contribution_reviewer(
+                    self.translation_reviewer_id,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
 
     def test_assign_translation_reviewer_email_for_invalid_review_category(
         self

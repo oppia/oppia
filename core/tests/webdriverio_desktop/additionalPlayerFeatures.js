@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,18 +19,18 @@
  * refresher explorations, state parameters, etc.
  */
 
-var action = require('../protractor_utils/action.js');
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var action = require('../webdriverio_utils/action.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
   var explorationEditorPage = null;
@@ -69,7 +69,7 @@ describe('Full exploration editor', function() {
       'Let us learn how to add fractions in an amazing way';
       const EXPLORATION_TITLE = 'Fractions';
       const EXPLORATION_CATEGORY = 'Mathematics';
-      const EXPLORATION_LANGUAGE = 'Deutsch';
+      const EXPLORATION_LANGUAGE = 'Deutsch (German)';
       const EXPLORATION_TAGS = ['maths', 'english', 'fractions', 'addition'];
 
       await workflow.createAddExpDetailsAndPublishExp(
@@ -128,7 +128,7 @@ describe('Full exploration editor', function() {
 
     await explorationEditorMainTab.moveToState('card 2');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'this is card 2 with non-inline interaction'));
+      'this is card 2 with non-inline interaction'), true);
     await explorationEditorMainTab.setInteraction('CodeRepl');
     await explorationEditorMainTab.addResponse(
       'CodeRepl', await forms.toRichText('Nice. Press continue button'),
@@ -144,9 +144,9 @@ describe('Full exploration editor', function() {
 
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
-    var backButton = element(by.css('.e2e-test-back-button'));
-    var nextCardButton = element(by.css('.e2e-test-next-card-button'));
-    expect(await backButton.isPresent()).toEqual(true);
+    var backButton = $('.e2e-test-back-button');
+    var nextCardButton = $('.e2e-test-next-card-button');
+    expect(await backButton.isExisting()).toEqual(true);
     await explorationPlayerPage.submitAnswer('CodeRepl');
     await waitFor.visibilityOf(
       nextCardButton, 'Next Card button taking too long to show up.');
@@ -190,19 +190,19 @@ describe('Full exploration editor', function() {
 
     var refresherExplorationId = await general.getExplorationIdFromEditor();
 
-    await browser.get(
+    await browser.url(
       '/explore/' + refresherExplorationId + '?parent=' + parentId1 +
       '&parent=' + parentId2);
     await waitFor.pageToFullyLoad();
 
     await explorationPlayerPage.clickOnReturnToParentButton();
 
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     var currentExplorationId = url.split('/')[4].split('?')[0];
     expect(currentExplorationId).toBe(parentId2);
     await explorationPlayerPage.clickOnReturnToParentButton();
 
-    url = await browser.getCurrentUrl();
+    url = await browser.getUrl();
     currentExplorationId = url.split('/')[4];
     expect(currentExplorationId).toBe(parentId1);
     await users.logout();
@@ -228,7 +228,7 @@ describe('Full exploration editor', function() {
       await explorationEditorMainTab.moveToState('card 2');
       await explorationEditorMainTab.setContent(
         await forms.toRichText(
-          'this is card 2 with previous answer {{answer}}'));
+          'this is card 2 with previous answer {{answer}}'), true);
       await explorationEditorMainTab.setInteraction(
         'MultipleChoiceInput',
         [
@@ -360,8 +360,7 @@ describe('Full exploration editor', function() {
     await libraryPage.get();
     await libraryPage.findExploration('Exploration with Recommendation');
     await libraryPage.playExploration('Exploration with Recommendation');
-    var recommendedExplorationTile = element(
-      by.css('.e2e-test-exp-summary-tile-title'));
+    var recommendedExplorationTile = $('.e2e-test-exp-summary-tile-title');
     var recommendedExplorationName = await action.getText(
       'Recommended Exploration Tile', recommendedExplorationTile);
     expect(recommendedExplorationName).toEqual('Recommended Exploration 1');

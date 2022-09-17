@@ -266,8 +266,7 @@ var _addExplorationRole = async function(roleName, username) {
     'Username input',
     $('.e2e-test-role-username'),
     username);
-  await action.select(
-    'Role select', $('.e2e-test-role-select'), roleName);
+  await action.matSelect('Role select', $('.e2e-test-role-select'), roleName);
   await action.click(
     'Save role', $('.e2e-test-save-role'));
 };
@@ -298,7 +297,7 @@ var addExplorationPlaytester = async function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = async function(roleName) {
-  var explorationRoleNameLocator = '.e2e-test-role-' + roleName + '-name';
+  var explorationRoleNameLocator = '.e2e-test-' + roleName + '-role-names';
   return await $$(explorationRoleNameLocator).map(async function(elem) {
     return await elem.getText();
   });
@@ -374,7 +373,7 @@ var createQuestion = async function() {
   await skillEditorPage.moveToQuestionsTab();
   await skillEditorPage.clickCreateQuestionButton();
   await explorationEditorMainTab.setContent(
-    await forms.toRichText('Question 1'));
+    await forms.toRichText('Question 1'), true);
   await explorationEditorMainTab.setInteraction(
     'TextInput', 'Placeholder', 5);
   await explorationEditorMainTab.addResponse(

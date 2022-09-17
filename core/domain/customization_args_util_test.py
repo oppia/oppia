@@ -209,9 +209,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Invalid customization arg name: 23'
         ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'ItemSelectionInput',
@@ -297,9 +297,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Invalid customization arg name: False'
         ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',
@@ -347,9 +347,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'Expected customization args to be a dict, received %s'
             % customization_args_with_invalid_type
         ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',

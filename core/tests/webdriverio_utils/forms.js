@@ -199,13 +199,13 @@ var RichTextEditor = async function(elem) {
   await rteElements[0].click();
 
   var _appendContentText = async function(text) {
-    await rteElements[0].setValue(text);
+    await rteElements[0].addValue(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
-      elem.$('.' + buttonName),
+      elem.$(buttonName),
       'Toolbar button takes too long to be clickable.');
-    await elem.$('.' + buttonName).click();
+    await elem.$(buttonName).click();
   };
   var _clearContent = async function() {
     expect(
@@ -226,37 +226,37 @@ var RichTextEditor = async function(elem) {
       await _appendContentText(text);
     },
     appendBoldText: async function(text) {
-      await _clickToolbarButton('cke_button__bold');
+      await _clickToolbarButton('.cke_button__bold');
       await _appendContentText(text);
-      await _clickToolbarButton('cke_button__bold');
+      await _clickToolbarButton('.cke_button__bold');
     },
     appendItalicText: async function(text) {
-      await _clickToolbarButton('cke_button__italic');
+      await _clickToolbarButton('.cke_button__italic');
       await _appendContentText(text);
-      await _clickToolbarButton('cke_button__italic');
+      await _clickToolbarButton('.cke_button__italic');
     },
     appendOrderedList: async function(textArray) {
       await _appendContentText('\n');
-      await _clickToolbarButton('cke_button__numberedlist');
+      await _clickToolbarButton('.cke_button__numberedlist');
       for (var i = 0; i < textArray.length; i++) {
         await _appendContentText(textArray[i] + '\n');
       }
-      await _clickToolbarButton('cke_button__numberedlist');
+      await _clickToolbarButton('.cke_button__numberedlist');
     },
     appendUnorderedList: async function(textArray) {
       await _appendContentText('\n');
-      await _clickToolbarButton('cke_button__bulletedlist');
+      await _clickToolbarButton('.cke_button__bulletedlist');
       for (var i = 0; i < textArray.length; i++) {
         await _appendContentText(textArray[i] + '\n');
       }
-      await _clickToolbarButton('cke_button__bulletedlist');
+      await _clickToolbarButton('.cke_button__bulletedlist');
     },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: async function(componentName) {
       await _clickToolbarButton(
-        'cke_button__oppia' + componentName.toLowerCase());
+        '.cke_button__oppia' + componentName.toLowerCase());
 
       var modalDialogElements = await modalDialogElementsSelector();
       var modalDialogLength = modalDialogElements.length;
@@ -323,9 +323,13 @@ var UnicodeEditor = function(elem) {
 };
 
 var AutocompleteDropdownEditor = function(elem) {
-  var containerLocator = '.select2-container';
-  var searchInputLocator = '.select2-search input';
-  var dropdownElement = '.select2-dropdown';
+  var containerLocator = '.e2e-test-exploration-category-dropdown';
+  var searchInputLocator = '.mat-select-search-input.mat-input-element';
+  var categorySelectorChoice = '.e2e-test-exploration-category-selector-choice';
+  var searchInputLocatorTextElement = function(text) {
+    return $$(`.e2e-test-exploration-category-selector-choice=${text}`);
+  };
+
   return {
     setValue: async function(text) {
       await action.click('Container Element', elem.$(containerLocator));
@@ -333,14 +337,20 @@ var AutocompleteDropdownEditor = function(elem) {
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
+
       await action.setValue(
-        'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
-        text + '\n');
+        'Dropdown Element Search', $(searchInputLocator), text);
+
+      var searchInputLocatorTextOption = await searchInputLocatorTextElement(
+        text)[0];
+      await action.click(
+        'Dropdown Element Select',
+        searchInputLocatorTextOption);
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await action.click('Container Element', await elem.$(containerLocator));
-      var actualOptions = await dropdownElement.$$('<li>').map(
+      await action.click(
+        'Container Element', await elem.$(containerLocator));
+      var actualOptions = await $$(categorySelectorChoice).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
         }
@@ -349,7 +359,7 @@ var AutocompleteDropdownEditor = function(elem) {
       // Re-close the dropdown.
       await action.setValue(
         'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
+        $(searchInputLocator),
         '\n');
     }
   };
@@ -544,7 +554,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     // Remove comments introduced by angular for bindings using replace.
     expect(
       (
-        await arrayOfElems[arrayPointer].getAttribute('innerHTML')
+        await arrayOfElems[arrayPointer].getHTML(false)
       ).replace(/<!--[^>]*-->/g, '').trim()
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
