@@ -1,7 +1,0 @@
-[
-  {
-    "to_version": "45",
-    "from_version": "42",
-    "cmd": "migrate_states_schema_to_latest_version"
-  }
-]
