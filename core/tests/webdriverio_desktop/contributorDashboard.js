@@ -180,7 +180,7 @@ describe('Contributor dashboard page', function() {
     let width = (await browser.getWindowSize()).width;
     if (width < 769) {
       var basicSettings = $('.e2e-test-settings-container');
-      // await action.click('Basic Settings', basicSettings);
+      await action.click('Basic Settings', basicSettings);
     }
     await explorationEditorSettingsTab.setTitle('exp1');
     await explorationEditorSettingsTab.setLanguage('English');
