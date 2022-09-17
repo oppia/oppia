@@ -44,8 +44,7 @@ class MockNgbModalRef {
   };
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Skill editor page', () => {
+describe('Skill editor page', () => {
   let component: SkillEditorPageComponent;
   let fixture: ComponentFixture<SkillEditorPageComponent>;
   let localStorageService: LocalStorageService;
