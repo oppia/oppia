@@ -673,6 +673,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
     ) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            email_manager.SIGNUP_EMAIL_CONTENT.default_value, dict
+        )
         config_services.set_property(
             self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
                 'subject': (
