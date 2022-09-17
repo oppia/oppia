@@ -261,44 +261,49 @@ def validate_exploration_change(exp_change_dict):
         exp_change_dict['property_name'] ==
         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
     ):
-        answer_groups = exp_change_dict['new_value']
-        for answer_group in answer_groups:
-            if answer_group['tagged_skill_misconception_id'] is not None:
-                raise base.BaseHandler.InvalidInputException(
-                    'tagged_skill_misconception_id of the answer '
-                    'group should be None.'
-                )
-            if len(answer_group['rule_specs']) == 0:
-                raise base.BaseHandler.InvalidInputException(
-                    'The answer group should contain atleast one rule spec.'
-                )
-            if answer_group['outcome']['dest'] == '':
-                raise base.BaseHandler.InvalidInputException(
-                    'The destination for the answer group is not valid.'
-                )
-            if (
-                answer_group['outcome']['labelled_as_correct'] is True and
-                answer_group['outcome']['dest'] == exp_change_dict['state_name']
-            ):
-                raise base.BaseHandler.InvalidInputException(
-                    'The outcome labelled_as_correct should not be True if'
-                    'the destination is (try again).'
-                )
-            if answer_group['outcome']['refresher_exploration_id'] is not None:
-                raise base.BaseHandler.InvalidInputException(
-                    'The refresher exploration id of the answer group '
-                    'outcome should be None.'
-                )
+        if (
+            exp_change_dict['property_name'] ==
+            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+        ):
+            answer_groups = exp_change_dict['new_value']
+            for answer_group in answer_groups:
+                if answer_group['tagged_skill_misconception_id'] is not None:
+                    raise base.BaseHandler.InvalidInputException(
+                        'tagged_skill_misconception_id of the answer '
+                        'group should be None.'
+                    )
+                if len(answer_group['rule_specs']) == 0:
+                    raise base.BaseHandler.InvalidInputException(
+                        'The answer group should contain atleast one rule spec.'
+                    )
+                if answer_group['outcome']['dest'] == '':
+                    raise base.BaseHandler.InvalidInputException(
+                        'The destination for the answer group is not valid.'
+                    )
+                if (
+                    answer_group['outcome']['labelled_as_correct'] is True and
+                    answer_group['outcome']['dest'] == exp_change_dict[
+                        'state_name']
+                ):
+                    raise base.BaseHandler.InvalidInputException(
+                        'The outcome labelled_as_correct should not be True if'
+                        'the destination is (try again).'
+                    )
+                if answer_group['outcome'][
+                    'refresher_exploration_id'] is not None:
+                    raise base.BaseHandler.InvalidInputException(
+                        'The refresher exploration id of the answer group '
+                        'outcome should be None.'
+                    )
 
-    elif (
-        exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY and
-        exp_change_dict['property_name'] ==
-        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-    ):
-        default_outcome = exp_change_dict['new_value']
-        if default_outcome['dest'] == '':
-            raise base.BaseHandler.InvalidInputException(
-                    'The destination for the default outcome is not valid.'
-                )
+        elif (
+            exp_change_dict['property_name'] ==
+            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+        ):
+            default_outcome = exp_change_dict['new_value']
+            if default_outcome['dest'] == '':
+                raise base.BaseHandler.InvalidInputException(
+                        'The destination for the default outcome is not valid.'
+                    )
 
     return exp_change_dict
