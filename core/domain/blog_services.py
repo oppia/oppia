@@ -775,7 +775,7 @@ def get_published_blog_post_summaries(
         size: int or None. Number of blog post summaries to return if there are
             at least that many, otherwise it contains all remaining results. If
             None, maximum number of blog post summaries to display on blog
-            homepage will be returned if there are atleast that many.
+            homepage will be returned if there are at least that many.
 
     Returns:
         list(BlogPostSummaries). These are sorted in order of the

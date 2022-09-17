@@ -8,6 +8,56 @@ button:focus {
   outline: none;
 }
 
+
+@media (max-width: 570px) {
+  .blog-post-page-breadcrumb .oppia-blog-post-page-back-button {
+    margin-left: -10px;
+  }
+}
+
+.blog-post-page-breadcrumb .oppia-navbar-back-button {
+  cursor: pointer;
+}
+
+.blog-post-page-breadcrumb .oppia-navbar-breadcrumb-separator:after {
+  border-left-style: ridge;
+  border-width: 2px;
+  content: "";
+  font-size: 30px;
+}
+
+.blog-post-page-breadcrumb .oppia-navbar-breadcrumb {
+  display: -webkit-inline-box;
+  flex-flow: column;
+  margin-left: -10px;
+  overflow-wrap: break-word;
+  padding-top: 3px;
+}
+
+.blog-post-page-breadcrumb .oppia-blog-home-page-title {
+  cursor: pointer;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+.blog-post-page-breadcrumb .oppia-blog-post-title {
+  color: #fff;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.2rem;
+}
+
+@media(max-width: 768px) {
+  .blog-post-page-breadcrumb .oppia-blog-post-title {
+    font-size: 1rem;
+  }
+
+  .blog-post-page-breadcrumb .oppia-blog-home-page-title {
+    font-size: 1.2rem;
+  }
+}
+
 oppia-blog-post-page .oppia-blog-post-page-card {
   max-width: 1000px;
   width: 70vw;

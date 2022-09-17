@@ -18,11 +18,14 @@
 
 import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter} from '@angular/core';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { FormControl } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import '../blog-home-page.component.css';
+import { BlogPostSearchService } from 'services/blog-search.service';
+import isEqual from 'lodash/isEqual';
 
+import '../blog-home-page.component.css';
 @Component({
   selector: 'oppia-tag-filter',
   templateUrl: './tag-filter.component.html'
@@ -44,8 +47,11 @@ export class TagFilterComponent implements OnInit {
   filteredTags!: Observable<string[]>;
 
   @ViewChild('tagFilterInput') tagFilterInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('trigger') autoTrigger: MatAutocompleteTrigger;
 
-  constructor() {
+  constructor(
+    private blogPostSearchService: BlogPostSearchService
+  ) {
     this.filteredTags = this.tagFilter.valueChanges.pipe(
       startWith(null),
       map((tag: string | null) => (
@@ -71,7 +77,6 @@ export class TagFilterComponent implements OnInit {
     this.removeTag(tag, this.selectedTags);
     this.refreshSearchDropDownTags();
     this.tagFilter.setValue(null);
-    this.selectionsChange.emit(this.selectedTags);
   }
 
   selectTag(event: { option: { viewValue: string}}): void {
@@ -79,7 +84,6 @@ export class TagFilterComponent implements OnInit {
     this.refreshSearchDropDownTags();
     this.tagFilterInput.nativeElement.value = '';
     this.tagFilter.setValue(null);
-    this.selectionsChange.emit(this.selectedTags);
   }
 
   refreshSearchDropDownTags(): void {
@@ -93,5 +97,15 @@ export class TagFilterComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshSearchDropDownTags();
+    this.filteredTags.pipe(
+      debounceTime(1500), distinctUntilChanged()
+    ).subscribe(() => {
+      if (!isEqual(
+        this.blogPostSearchService.lastSelectedTags, this.selectedTags
+      )) {
+        this.autoTrigger.closePanel();
+        this.selectionsChange.emit(this.selectedTags);
+      }
+    });
   }
 }

@@ -14,10 +14,14 @@
 import { ElementRef } from '@angular/core';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
 import { TagFilterComponent } from './tag-filter.component';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { BlogPostSearchService } from 'services/blog-search.service';
+import { Observable } from 'rxjs';
 /**
  * @fileoverview Unit tests for Tag Filter Component.
  */
@@ -29,6 +33,7 @@ describe('Tag Filter component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
         FormsModule,
         ReactiveFormsModule,
         MaterialModule,
@@ -38,12 +43,20 @@ describe('Tag Filter component', () => {
         TagFilterComponent,
         MockTranslatePipe,
       ],
+      providers: [
+        BlogPostSearchService,
+      ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TagFilterComponent);
     component = fixture.componentInstance;
+    component.autoTrigger = {
+      closePanel() {
+        return;
+      }
+    } as MatAutocompleteTrigger;
   });
 
   it('should be defined', () => {
@@ -55,7 +68,15 @@ describe('Tag Filter component', () => {
     fixture.detectChanges();
     component.selectedTags = ['tag1', 'tag2'];
     component.listOfDefaultTags = ['tag1', 'tag2', 'tag3', 'tag4'];
-
+    component.filteredTags = {
+      pipe: (param1: string[], parm2: string[]) => {
+        return {
+          subscribe(callb: () => void) {
+            callb();
+          }
+        };
+      }
+    } as Observable<string[]>;
     component.ngOnInit();
 
     expect(component.filteredTags).toBeDefined();
@@ -91,6 +112,5 @@ describe('Tag Filter component', () => {
     component.deselectTag('tag1');
 
     expect(component.selectedTags).toEqual(['tag2', 'tag3']);
-    expect(component.selectionsChange.emit).toHaveBeenCalled();
   });
 });

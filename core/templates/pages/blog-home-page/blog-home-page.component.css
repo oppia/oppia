@@ -194,3 +194,31 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
 oppia-blog-home-page .blog-post-card {
   margin-top: 30px;
 }
+
+.blog-homepage .oppia-navbar-breadcrumb-separator:after {
+  border-left-style: ridge;
+  border-width: 2px;
+  content: "";
+  font-size: 30px;
+}
+
+.blog-homepage .oppia-navbar-breadcrumb {
+  display: -webkit-inline-box;
+  flex-flow: column;
+  margin-left: -10px;
+  overflow-wrap: break-word;
+  padding-top: 3px;
+}
+
+@media(max-width:500px) {
+  .mobile-navbar-blog-homepage {
+    font-size: 14px;
+    line-height: 0px;
+    vertical-align: text-top;
+  }
+
+  .oppia-navbar-breadcrumb.main-blog-homepage-mobile-breadcrumb {
+    line-height: 12px;
+    padding-top: 15px;
+  }
+}

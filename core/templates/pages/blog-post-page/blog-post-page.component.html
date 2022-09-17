@@ -18,7 +18,7 @@
         <button class="mr-0 mt-auto ml-auto mb-2"
                 mat-icon-button
                 [matMenuTriggerFor]="menu"
-                aria-label="">
+                aria-label="Button to open sharing links menu.">
           <mat-icon class="share-blog-post-button">share</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
@@ -34,7 +34,8 @@
                     (mouseleave)="$event.stopImmediatePropagation()"
                     matTooltip="Copied"
                     matTooltipPosition="right"
-                    aria-tooltip="Button that copies the blog post page url which can be then shared accross different platforms">
+                    aria-tooltip="Button that copies the blog post page url which can be then shared accross different platforms."
+                    aria-label="Button that copies the blog post page url which can be then shared accross different platforms.">
               <span class="material-icons"> content_copy </span>
             </button>
           </div>
@@ -45,7 +46,7 @@
                            layoutAlignType="center center"
                            [shareType]="'blog'"
                            class="oppia-collection-footer-sharing-links"
-                           aria-label="Social media links">
+                           aria-label="Social media links to share blog post on different social media platforms.">
             </sharing-links>
           </div>
         </mat-menu>

@@ -68,7 +68,8 @@ export class BlogPostSearchService {
     return this._searchOffset === null;
   }
 
-  _updateSearchFields(itemsType: string, urlComponent: string): string[] {
+  _getSelectedTagsFromUrl(itemsType: string, urlComponent: string): string[] {
+    // Returns list of tags for which the filter is applied from the url.
     const itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
     const itemCodes = itemCodeGroup ? itemCodeGroup[0] : null;
 
@@ -164,7 +165,7 @@ export class BlogPostSearchService {
         continue;
       }
       try {
-        selectedTags = this._updateSearchFields(itemsType, urlComponent);
+        selectedTags = this._getSelectedTagsFromUrl(itemsType, urlComponent);
       } catch (error) {
         selectedTags = [];
       }
@@ -223,6 +224,10 @@ export class BlogPostSearchService {
   get onInitialSearchResultsLoaded():
     EventEmitter<SearchResponseData> {
     return this._initialSearchResultsLoadedEventEmitter;
+  }
+
+  get lastSelectedTags(): string[] {
+    return this._lastSelectedTags;
   }
 }
 

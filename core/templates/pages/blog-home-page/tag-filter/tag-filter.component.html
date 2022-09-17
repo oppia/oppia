@@ -12,13 +12,14 @@
         </button>
       </mat-chip>
       <input placeholder="New tag ..."
-              #tagFilterInput
-              [formControl]="tagFilter"
-              [matAutocomplete]="auto"
-              [matChipInputFor]="chipList">
+             #tagFilterInput
+             #trigger="matAutocompleteTrigger"
+             [formControl]="tagFilter"
+             [matAutocomplete]="auto"
+             [matChipInputFor]="chipList">
     </mat-chip-list>
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)">
-      <mat-option *ngFor="let tag of filteredTags | async" [value]="tag">
+      <mat-option *ngFor="let tag of filteredTags | async" [value]="tag" (click)="$event.stopPropagation(); trigger.openPanel()">
         {{ tag }}
       </mat-option>
     </mat-autocomplete>
