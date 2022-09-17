@@ -138,8 +138,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.mock_pre_accept_validate_does_nothing):
                     with self.swap(
                         suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
+                        '_get_change_list_for_accepting_edit_state_content_suggestion',  # pylint: disable=line-too-long
+                        self.mock_get_change_list_does_nothing
+                    ):
                         suggestion_services.accept_suggestion(
                             suggestion_id, reviewer_id,
                             commit_message, review_message)
@@ -235,9 +236,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             expected_suggestion_dict, observed_suggestion.to_dict())
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_cannot_create_suggestion_with_invalid_suggestion_type(
         self
     ) -> None:

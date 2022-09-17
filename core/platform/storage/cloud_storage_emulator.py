@@ -161,6 +161,8 @@ class EmulatorBlob:
         """
         return self._raw_bytes
 
+    # Here we use object because we want to allow every object with which
+    # we can compare.
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False

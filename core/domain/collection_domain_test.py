@@ -255,7 +255,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
         self, expected_error_substring: str
@@ -269,16 +269,16 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         """Test validating a new, valid collection."""
         self.collection.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_title_validation(self) -> None:
         self.collection.title = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected title to be a string')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_category_validation(self) -> None:
         self.collection.category = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected category to be a string')
@@ -287,9 +287,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.objective = ''
         self._assert_validation_error('objective must be specified')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.collection.objective = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected objective to be a string')
 
@@ -297,23 +297,25 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.language_code = ''
         self._assert_validation_error('language must be specified')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.collection.language_code = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected language code to be a string')
 
         self.collection.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing. In this test only those cases should
-    # be removed where `type: ignore` is added.
     def test_tags_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.collection.tags = 'abc'  # type: ignore[assignment]
         self._assert_validation_error('Expected tags to be a list')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.collection.tags = [2, 3]  # type: ignore[list-item]
         self._assert_validation_error('Expected each tag to be a string')
 
@@ -336,9 +338,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected tags to be unique, but found duplicates')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_schema_version_validation(self) -> None:
         self.collection.schema_version = 'some_schema_version'  # type: ignore[assignment]
         self._assert_validation_error('Expected schema version to be an int')
@@ -348,9 +350,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'Expected schema version to be %s' %
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_nodes_validation(self) -> None:
         self.collection.nodes = {}  # type: ignore[assignment]
         self._assert_validation_error('Expected nodes to be a list')
@@ -415,9 +417,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.validate(strict=False)
         self.collection.validate(strict=True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_collection_node_exploration_id_validation(self) -> None:
         # Validate CollectionNode's exploration_id.
         collection_node0 = self.collection.get_node('exp_id_0')
@@ -518,9 +520,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 0)
 
     def test_update_collection_contents_from_model(self) -> None:
-        # For test purposes we're defining fields that do not match with
-        # defined VersionedCollectionDict. So, in order to prevent MyPy
-        # errors we add an ignore statement here.
+        # Here we use MyPy ignore because for test purposes we're defining
+        # fields that do not match with defined VersionedCollectionDict. So,
+        # in order to prevent MyPy errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
@@ -545,9 +547,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_update_collection_contents_from_model_with_schema_version_5(
         self
     ) -> None:
-        # For test purposes we're defining fields that do not match with
-        # defined VersionedCollectionDict. So, in order to prevent MyPy
-        # errors we add an ignore statement here.
+        # Here we use MyPy ignore because for test purposes we're defining
+        # fields that do not match with defined VersionedCollectionDict. So,
+        # in order to prevent MyPy errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
@@ -581,9 +583,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_update_collection_contents_from_model_with_invalid_schema_version(
         self
     ) -> None:
-        # For test purposes we're defining fields that do not match with
-        # defined VersionedCollectionDict. So, in order to prevent MyPy
-        # errors we add an ignore statement here.
+        # Here we use MyPy ignore because for test purposes we're defining
+        # fields that do not match with defined VersionedCollectionDict. So,
+        # in order to prevent MyPy errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
@@ -777,9 +779,9 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
     def test_from_yaml_with_no_schema_version_specified_raises_error(
         self
     ) -> None:
-        # Argument schema_version of collection expects int value but here
-        # we are passing None which causes MyPy to throw an error. Thus we
-        # add an ignore here.
+        # Here we use MyPy ignore because the argument schema_version of
+        # collection expects int value but here we are passing None which
+        # causes MyPy to throw an error. Thus we add an ignore here.
         collection = collection_domain.Collection(
             self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
             None, [], 0) # type: ignore[arg-type]

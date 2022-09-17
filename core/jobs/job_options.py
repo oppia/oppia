@@ -26,6 +26,11 @@ from apache_beam.options import pipeline_options
 from typing import List, Optional
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PipelineOptions class is of type Any. Thus to avoid MyPy's
+# error (Class cannot subclass 'PipelineOptions' (has type 'Any')), we
+# added an ignore here.
 class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
     """Option class for configuring the behavior of Oppia jobs."""
 

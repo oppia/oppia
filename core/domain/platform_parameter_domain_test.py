@@ -275,10 +275,11 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                # The expected type of 'server_mode' key is Enum defined under
-                # the name ServerMode, but for testing purpose we are providing
-                # namedtuple (MockEnum) which causes MyPy to throw error. Thus
-                # to avoid the error, we used ignore here.
+                # Here we use MyPy ignore because the expected type of
+                # 'server_mode' key is Enum defined under the name ServerMode,
+                # but for testing purpose we are providing namedtuple (MockEnum)
+                # which causes MyPy to throw error. Thus to avoid the error,
+                # we used ignore here.
                 'server_mode': mock_enum,  # type: ignore[typeddict-item]
             },
         )

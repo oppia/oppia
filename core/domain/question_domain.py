@@ -37,7 +37,7 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, cast, overload
 from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -354,12 +354,13 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
-        # In _convert_* functions, we allow less strict typing because here
-        # we are working with previous versions of the domain object and in
-        # previous versions of the domain object there are some fields that are
-        # discontinued in the latest domain object. So, while accessing these
-        # discontinued fields MyPy throws an error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because in _convert_* functions, we allow less
+        # strict typing because here we are working with previous versions of
+        # the domain object and in previous versions of the domain object there
+        # are some fields that are discontinued in the latest domain object and
+        # here 'content_ids_to_audio_translations' is discontinued in the
+        # latest recorded_voiceovers. So, while accessing these discontinued
+        # fields MyPy throws an error. Thus to avoid the error, we used ignore.
         question_state_dict['recorded_voiceovers'] = {
             'voiceovers_mapping': (
                 question_state_dict.pop('content_ids_to_audio_translations'))  # type: ignore[misc]
@@ -404,11 +405,13 @@ class Question(translation_domain.BaseTranslatableObject):
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:
             answer_group['tagged_skill_misconception_id'] = None
-            # In _convert_* functions, we allow less strict typing because here
-            # we are working with previous versions of the domain object and in
-            # previous versions of the domain object there are some fields that
-            # are discontinued in the latest domain object. So, while accessing
-            # these discontinued fields MyPy throws an error. Thus to avoid the
+            # Here we use MyPy ignore because in _convert_* functions, we allow
+            # less strict typing because here we are working with previous
+            # versions of the domain object and in previous versions of the
+            # domain object there are some fields that are discontinued in
+            # the latest domain object and here 'tagged_misconception_id' is
+            # discontinued in the latest answer_group. So, while accessing these
+            # discontinued fields MyPy throws an error. Thus to avoid the
             # error, we used ignore here.
             del answer_group['tagged_misconception_id']  # type: ignore[misc]
 
@@ -699,16 +702,18 @@ class Question(translation_domain.BaseTranslatableObject):
             for lang_code in translations_mapping[content_id]:
                 translations_mapping[
                     content_id][lang_code]['data_format'] = 'html'
-                # In _convert_* functions, we allow less strict typing
-                # because here we are working with previous versions of
-                # the domain object and in previous versions of the domain
-                # object there are some fields (eg. html) that are discontinued
-                # in the latest domain object. So, while accessing these
-                # discontinued fields MyPy throws an error. Thus to avoid
-                # the error, we used ignore here.
+                # Here we use MyPy ignore because in _convert_* functions, we
+                # allow less strict typing because here we are working with
+                # previous versions of the domain object and in previous
+                # versions of the domain object there are some fields (eg. html)
+                # that are discontinued in the latest domain object. So, while
+                # accessing these discontinued fields MyPy throws an error. Thus
+                # to avoid the error, we used ignore here.
                 translations_mapping[
                     content_id][lang_code]['translation'] = (
                         translations_mapping[content_id][lang_code]['html'])  # type: ignore[misc]
+                # Here we use MyPy ignore because MyPy doesn't allow key
+                # deletion from TypedDict.
                 del translations_mapping[content_id][lang_code]['html']  # type: ignore[misc]
 
         interaction_id = question_state_dict['interaction']['id']
@@ -985,13 +990,13 @@ class Question(translation_domain.BaseTranslatableObject):
                     rule_type = rule_spec_dict['rule_type']
                     rule_inputs = rule_spec_dict['inputs']['x']
                     rule_type_to_inputs[rule_type].add(rule_inputs)
-                # In _convert_* functions, we allow less strict typing because
-                # here we are working with previous versions of the domain
-                # object and in previous versions of the domain object there are
-                # some fields whose type does not match with the latest domain
-                # object's types. So, while assigning these fields according to
-                # the previous version MyPy throws an error. Thus to avoid the
-                # error, we used ignore here.
+                # Here we use MyPy ignore because in _convert_* functions, we
+                # allow less strict typing because here we are working with
+                # previous versions of the domain object and in previous
+                # versions of the domain object there are some fields whose type
+                # does not match with the latest domain object's types. So,
+                # while assigning these old fields  MyPy throws an error. Thus
+                # to avoid the error, we used ignore here.
                 answer_group_dict['rule_specs'] = [{
                     'rule_type': rule_type,
                     'inputs': {'x': list(rule_type_to_inputs[rule_type])}  # type: ignore[dict-item]
@@ -1060,17 +1065,24 @@ class Question(translation_domain.BaseTranslatableObject):
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     content_id = content_id_counter.generate_content_id(
                         'rule_input_')
-                    # The expected type for `rule_spec_dict['inputs']['x']`
-                    # is AllowedRuleSpecInputTypes but here we are providing
-                    # Dict[str, AllowedRuleSpecInputTypes] values which causes
-                    # MyPy to throw `incompatible type` error. Thus to avoid
-                    # the error, we used ignore here.
+                    # Here we use MyPy ignore because the expected
+                    # type for `rule_spec_dict['inputs']['x']` is
+                    # AllowedRuleSpecInputTypes but here we are providing
+                    # Dict[str, AllowedRuleSpecInputTypes] values which
+                    # causes MyPy to throw `incompatible type` error. Thus
+                    # to avoid the error, we used ignore here.
                     # Convert to TranslatableSetOfNormalizedString.
                     if interaction_id == 'TextInput':
                         rule_spec_dict['inputs']['x'] = {
                             'contentId': content_id,
                             'normalizedStrSet': rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
+                    # Here we use MyPy ignore because the expected
+                    # type for `rule_spec_dict['inputs']['x']` is
+                    # AllowedRuleSpecInputTypes but here we are providing
+                    # Dict[str, AllowedRuleSpecInputTypes] values which
+                    # causes MyPy to throw `incompatible type` error. Thus
+                    # to avoid the error, we used ignore here.
                     elif interaction_id == 'SetInput':
                         # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
@@ -1109,6 +1121,27 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: str,
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> str: ...
+
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: List[str],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> List[str]: ...
+
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: List[List[str]],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> List[List[str]]: ...
+
         # Here we use MyPy ignore because MyPy expects a return value in
         # every condition when we define a return type but here we are
         # returning only in if-else conditions and we are not returning
@@ -1119,7 +1152,7 @@ class Question(translation_domain.BaseTranslatableObject):
             new_type: str,
             value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict]
-        ) -> Union[List[str], str]:
+        ) -> Union[List[List[str]], List[str], str]:
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -1161,28 +1194,24 @@ class Question(translation_domain.BaseTranslatableObject):
                 assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes it's type as
-                # recursive, like if this method returns List[str] then MyPy
-                # assumes it's type as List[List[str]]. So, because of this,
-                # MyPy throws an error. Thus to avoid the error, we used
-                # ignore here.
+                # Here we use cast because this 'elif' condition forces value
+                # to have type List[str].
+                set_of_content_ids = cast(List[str], value)
                 return [
-                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
+                    migrate_rule_inputs_and_answers(
                         'TranslatableHtmlContentId', html, choices
-                    ) for html in value
+                    ) for html in set_of_content_ids
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes its type as
-                # recursive, like if this method returns List[str] then MyPy
-                # assumes it's type as List[List[str]]. So, because of this,
-                # MyPy throws an error. Thus to avoid the error, we used
-                # ignore here.
+                # Here we use cast because this 'elif' condition forces value
+                # to have type List[List[str]].
+                list_of_set_of_content_ids = cast(
+                    List[List[str]], value
+                )
                 return [
-                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
+                    migrate_rule_inputs_and_answers(
                         'SetOfTranslatableHtmlContentIds', html_set, choices
-                    ) for html_set in value
+                    ) for html_set in list_of_set_of_content_ids
                 ]
 
         interaction_id = question_state_dict['interaction']['id']

@@ -118,10 +118,10 @@ def get_topic_similarities_dict() -> Dict[str, Dict[str, float]]:
     if topic_similarities_entity is None:
         topic_similarities_entity = create_default_topic_similarities()
 
-    # TODO(#15610): The return type of json.loads() method is Dict[str, Any]
-    # but from the implementation we know it only returns the values of
-    # type Dict[str, Dict[str, float]. So to narrow down the type from
-    # Dict[str, Any], we used cast here.
+    # TODO(#15610): Here we use cast because the return type of json.loads()
+    # method is Dict[str, Any] but from the implementation we know it only
+    # returns the values of type Dict[str, Dict[str, float]. So to narrow down
+    # the type from Dict[str, Any], we used cast here.
     return cast(
         Dict[str, Dict[str, float]],
         json.loads(topic_similarities_entity.content)

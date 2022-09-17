@@ -81,20 +81,22 @@ class ModelPropertyTests(test_utils.TestBase):
         model = SubclassOfBaseModel()
 
         with self.assertRaisesRegex(TypeError, 'not a model class'):
-            # ModelProperty has model_class argument, which can only accept
-            # classes that are inherited from BaseModel. But here we are
-            # passing an object of SubclassOfBaseModel. So, to avoid mypy
-            # error we added an ignore here.
+            # Here we use MyPy ignore because ModelProperty has
+            # model_class argument, which can only accept classes
+            # that are inherited from BaseModel. But here we are
+            # passing an object of SubclassOfBaseModel. So, to
+            # avoid mypy error we added an ignore here.
             model_property.ModelProperty(model, SubclassOfBaseModel.value)  # type: ignore[arg-type]
 
     def test_init_raises_type_error_when_model_is_unrelated_to_base_model(
         self
     ) -> None:
         with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):
-            # ModelProperty has model_class argument, which can only accept
-            # classes that are inherited from BaseModel. But here we are
-            # passing a class that is inherited from datastore_services.Model.
-            # Thus to silent mypy error, we added an ignore here.
+            # Here we use MyPy ignore because ModelProperty has model_class
+            # argument, which can only accept classes that are inherited from
+            # BaseModel. But here we are passing a class that is inherited from
+            # datastore_services.Model. Thus to silence mypy error, we added an
+            # ignore here.
             model_property.ModelProperty(
                 SubclassOfNdbModel, SubclassOfNdbModel.value)  # type: ignore[arg-type]
 

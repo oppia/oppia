@@ -24,7 +24,7 @@ from core import feconf
 from core import utils
 from core.domain import value_generators_domain
 
-from typing import Any, Dict, List, Union, cast
+from typing import Dict, List, Union
 from typing_extensions import TypedDict
 
 
@@ -223,17 +223,11 @@ class ParamChange:
             param_change_dict['customization_args']
         )
 
-    # This method returns the single value of a parameter which can be of type
-    # str, int and other types too. That's why Any is used as return type.
-    def get_value(self, context_params: Dict[str, Any]) -> Any:
+    def get_value(self, context_params: Dict[str, str]) -> str:
         """Generates a single value for a parameter change."""
-        # The generate_value() can accept different types of customization
-        # keyword args But here we are providing CustomizationArgsDict as
-        # keywords args which causes MyPy to throw error. Thus to match
-        # the argument type we used cast here.
-        custom_args = cast(Dict[str, Any], self.customization_args)
-        return self.generator.generate_value(
-            context_params, **custom_args)
+        value: str = self.generator.generate_value(
+            context_params, **self.customization_args)
+        return value
 
     def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""

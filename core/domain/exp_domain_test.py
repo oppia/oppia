@@ -452,18 +452,18 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
                 'version': 1
             })
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exp_version(self) -> None:
         with self.assertRaisesRegex(
             Exception,
             'Expected version to be an int, received invalid_version'):
             exp_domain.ExpVersionReference('exp_id', 'invalid_version')  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exp_id(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Expected exp_id to be a str, received 0'):
@@ -515,6 +515,9 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             logged_out_learner_progress_object.to_dict(),
             logged_out_learner_progress_dict)
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_exploration_id_incorrect_type(self) -> None:
         self.transient_checkpoint_url.exploration_id = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -523,6 +526,9 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         ):
             self.transient_checkpoint_url.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_furthest_reached_checkpoint_state_name_incorrect_type(
         self
     ) -> None:
@@ -533,6 +539,9 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         ):
             self.transient_checkpoint_url.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_furthest_reached_checkpoint_exp_version_incorrect_type(
         self
     ) -> None:
@@ -543,6 +552,9 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         ):
             self.transient_checkpoint_url.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_most_recently_reached_checkpoint_state_name_incorrect_type(
         self
     ) -> None:
@@ -553,6 +565,9 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         ):
             self.transient_checkpoint_url.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_most_recently_reached_checkpoint_exp_version_incorrect_type(
         self
     ) -> None:
@@ -1284,9 +1299,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'RuleSpec \'Contains\' is missing inputs')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected inputs to be a dict')
@@ -1345,9 +1360,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert default_outcome is not None
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
 
         self._assert_validation_error(
@@ -1356,9 +1371,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome.dest_if_really_stuck = None
 
         # Try setting the outcome destination to something other than a string.
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         outcome.dest = 15  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected outcome dest to be a string')
@@ -1368,9 +1383,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
         exploration.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         outcome.labelled_as_correct = 'hello'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'The "labelled_as_correct" field should be a boolean')
@@ -1390,9 +1405,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Try setting the outcome destination if stuck to something other
         # than a string.
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected dest_if_really_stuck to be a string')
@@ -1416,16 +1431,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         outcome.dest = destination
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         outcome.param_changes = 'Changes'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected outcome param_changes to be a list')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         outcome.param_changes = [param_domain.ParamChange(
             0, 'generator_id', {})]  # type: ignore[arg-type]
         self._assert_validation_error(
@@ -1435,9 +1450,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.param_changes = []
         exploration.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(
             exploration,
@@ -1449,9 +1464,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.refresher_exploration_id = 'valid_string'
         exploration.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(
             exploration,
@@ -1478,9 +1493,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state(new_state_name)
 
         # Validate InteractionInstance.
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         interaction.id = 15  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected interaction id to be a string')
@@ -1503,16 +1518,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec.rule_type = 'Contains'
         exploration.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         interaction.customization_args = []  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected customization args to be a dict')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         interaction.customization_args = {15: ''}  # type: ignore[dict-item]
         self._assert_validation_error(
             exploration,
@@ -1522,9 +1537,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         interaction.customization_args = {
             15: state_domain.InteractionCustomizationArg('', {  # type: ignore[dict-item, no-untyped-call]
                 'type': 'unicode'
@@ -1537,9 +1552,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         interaction.answer_groups = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected answer groups to be a list')
@@ -1595,18 +1610,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_interaction_solution(None)
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         interaction.hints = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected hints to be a list')
         interaction.hints = []
 
         # Validate AnswerGroup.
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -1624,6 +1636,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     })
             ],
             [],
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             1  # type: ignore[arg-type]
         )
         init_state.update_interaction_answer_groups([state_answer_group])
@@ -1658,9 +1673,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'to be <skill_id>-<misconception_id>, received '
             'invalid_tagged_skill_misconception_id')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         init_state.interaction.answer_groups[0].rule_specs = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
@@ -1689,9 +1704,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.language_code = 'en'
         exploration.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         exploration.param_specs = 'A string'  # type: ignore[assignment]
         self._assert_validation_error(exploration, 'param_specs to be a dict')
 
@@ -1718,18 +1733,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(None)
         exploration.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         exploration.tags = 'this should be a list'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected \'tags\' to be a list')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         exploration.tags = [123]  # type: ignore[list-item]
         self._assert_validation_error(exploration, 'to be a string')
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         exploration.tags = ['abc', 123]  # type: ignore[list-item]
         self._assert_validation_error(exploration, 'to be a string')
 
@@ -2297,9 +2315,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'declared in the exploration param_specs.'):
             exp_domain.Exploration.from_dict(demo_dict)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_category(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2311,9 +2329,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected category to be a string, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_objective(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2325,9 +2343,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected objective to be a string, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_blurb(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2339,9 +2357,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected blurb to be a string, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_language_code(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2353,9 +2371,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected language_code to be a string, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_author_notes(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2367,9 +2385,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected author_notes to be a string, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_states(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2381,9 +2399,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected states to be a dict, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_exploration_outcome_dest(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2397,9 +2412,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Every outcome should have a destination.'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_outcome_dest_type(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2413,9 +2428,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected outcome dest to be a string, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_states_schema_version(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2427,9 +2442,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'This exploration has no states schema version.'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_auto_tts_enabled(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2441,9 +2456,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_correctness_feedback_enabled(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2456,9 +2471,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_edits_allowed(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2471,9 +2486,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected edits_allowed to be a bool, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_param_specs(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2494,9 +2509,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='', end_state_name='End')
         exploration.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
         exploration.param_changes = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected param_changes to be a list, received 1'):
@@ -2797,9 +2812,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     def test_validation_passes_with_valid_properties(self) -> None:
         self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_title(self) -> None:
         self.exp_summary.title = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2807,9 +2822,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected title to be a string, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_category(self) -> None:
         self.exp_summary.category = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2817,9 +2832,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected category to be a string, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_objective(self) -> None:
         self.exp_summary.objective = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2827,9 +2842,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected objective to be a string, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_language_code(self) -> None:
         self.exp_summary.language_code = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2843,9 +2858,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid language_code: invalid'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_tags(self) -> None:
         self.exp_summary.tags = 'tags'  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2853,9 +2868,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected \'tags\' to be a list, received tags'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_tag_in_tags(self) -> None:
         self.exp_summary.tags = ['tag', 2]  # type: ignore[list-item]
         with self.assertRaisesRegex(
@@ -2905,9 +2920,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Some tags duplicate each other'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_rating_type(self) -> None:
         self.exp_summary.ratings = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2921,9 +2936,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected ratings to have keys: 1, 2, 3, 4, 5, received 1, 10'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_value_type_for_ratings(self) -> None:
         self.exp_summary.ratings = {'1': 0, '2': 'one', '3': 0, '4': 0, '5': 0}  # type: ignore[dict-item]
         with self.assertRaisesRegex(
@@ -2942,9 +2957,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.exp_summary.validate()
         self.assertEqual(self.exp_summary.scaled_average_rating, 1)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_scaled_average_rating(self) -> None:
         self.exp_summary.scaled_average_rating = 'one'  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2953,18 +2968,18 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         ):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_status(self) -> None:
         self.exp_summary.status = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected status to be string, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_community_owned(self) -> None:
         self.exp_summary.community_owned = '1'  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2972,9 +2987,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected community_owned to be bool, received 1'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_contributors_summary(self) -> None:
         self.exp_summary.contributors_summary = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2982,18 +2997,18 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected contributors_summary to be dict, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_owner_ids_type(self) -> None:
         self.exp_summary.owner_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected owner_ids to be list, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_owner_id_in_owner_ids(self) -> None:
         self.exp_summary.owner_ids = ['1', 2, '3']  # type: ignore[list-item]
         with self.assertRaisesRegex(
@@ -3001,9 +3016,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected each id in owner_ids to be string, received 2'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_editor_ids_type(self) -> None:
         self.exp_summary.editor_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -3011,9 +3026,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected editor_ids to be list, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_editor_id_in_editor_ids(
         self
     ) -> None:
@@ -3023,9 +3038,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected each id in editor_ids to be string, received 2'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_voice_artist_ids_type(self) -> None:
         self.exp_summary.voice_artist_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -3033,9 +3048,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected voice_artist_ids to be list, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_voice_artist_id_in_voice_artists_ids(
         self
     ) -> None:
@@ -3045,9 +3060,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected each id in voice_artist_ids to be string, received 2'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_viewer_ids_type(self) -> None:
         self.exp_summary.viewer_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -3055,9 +3070,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected viewer_ids to be list, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(
         self
     ) -> None:
@@ -3079,9 +3094,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         ):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_contributor_ids_type(self) -> None:
         self.exp_summary.contributor_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -3089,9 +3104,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected contributor_ids to be list, received 0'):
             self.exp_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
         self
     ) -> None:

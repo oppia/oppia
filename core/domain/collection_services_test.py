@@ -309,10 +309,11 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save collection'):
-            # The argument `change_list` of update_collection method can only
-            # accept values of type List[Dict[]], but here for testing purposes
-            # we are providing None which causes MyPy to throw incompatible
-            # argument type error. Thus to avoid the error, we used ignore here.
+            # Here we use MyPy ignore because the argument `change_list`
+            # of update_collection method can only accept values of type
+            # List[Dict[]], but here for testing purposes we are providing
+            # None which causes MyPy to throw incompatible argument type
+            # error. Thus to avoid the error, we used ignore here.
             collection_services.update_collection(
                 self.owner_id, 'collection_id', None, 'commit message')  # type: ignore[arg-type]
 

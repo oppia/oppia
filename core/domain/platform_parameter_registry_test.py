@@ -94,9 +94,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             INVALID = 'invalid'
         with self.assertRaisesRegex(
             Exception, 'Unsupported data type \'invalid\''):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             registry.Registry.create_platform_parameter(
                 ParamNames.PARAMETER_A, 'test', DataType.INVALID)  # type: ignore[arg-type]
 

@@ -25,7 +25,7 @@ from core import feconf
 from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 
-from typing import Any, Dict, Union
+from typing import Dict, Union
 
 
 class EmailTests(test_utils.GenericTestBase):
@@ -37,7 +37,7 @@ class EmailTests(test_utils.GenericTestBase):
         """
         observed_log_messages = []
 
-        def _mock_logging_function(msg: str, *args: Any) -> None:
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
@@ -84,7 +84,7 @@ class EmailTests(test_utils.GenericTestBase):
         """
         observed_log_messages = []
 
-        def _mock_logging_function(msg: str, *args: Any) -> None:
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 

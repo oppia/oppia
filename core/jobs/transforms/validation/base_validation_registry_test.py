@@ -27,6 +27,8 @@ class GetAuditsByKindTests(test_utils.TestBase):
 
     unique_obj = object()
 
+    # Here we use object because we need to mock the behavior of
+    # 'base_validation_registry.get_audit_do_fn_types_by_kind' method.
     @classmethod
     def get_audit_do_fn_types_by_kind_mock(cls) -> object:
         """Returns the unique_obj."""
@@ -48,6 +50,9 @@ class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
 
     unique_obj = object()
 
+    # Here we use object because we need to mock the behavior of
+    # 'get_id_referencing_properties_by_kind_of_possessor' method of
+    # base_validation_registry.
     @classmethod
     def get_id_referencing_properties_by_kind_of_possessor_mock(cls) -> object:
         """Returns the unique_obj."""
@@ -70,6 +75,9 @@ class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
 
     unique_obj = object()
 
+    # Here we use object because we need to mock the behavior of
+    # 'get_all_model_kinds_referenced_by_properties' method of
+    # base_validation_registry.
     @classmethod
     def get_all_model_kinds_referenced_by_properties_mock(cls) -> object:
         """Returns the unique_obj."""

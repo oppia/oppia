@@ -19,8 +19,6 @@ from __future__ import annotations
 from core.platform.transactions import cloud_transaction_services
 from core.tests import test_utils
 
-from typing import Any
-
 
 class CloudTransactionServicesTests(test_utils.GenericTestBase):
     """Unit tests for the cloud_transaction_services.py"""
@@ -34,7 +32,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             def __enter__(self) -> None:
                 calls_made['enter_context'] = True
 
-            def __exit__(self, *unused_args: Any) -> None:
+            def __exit__(self, *unused_args: str) -> None:
                 calls_made['exit_context'] = True
 
         class MockClient:

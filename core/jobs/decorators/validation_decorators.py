@@ -148,10 +148,10 @@ class AuditsExisting:
             typehints.with_input_types(
                 typehints.Union[self._targeted_model_types]),
             typehints.with_output_types(base_validation_errors.BaseAuditError))
-        # TODO(#15613): The return type of functions with_input_types and
-        # with_output_types is Any, because these functions are not type
-        # annotated yet in Apache_beam library. Thus to return the appropriate
-        # type from function instead of Any. We used cast here.
+        # TODO(#15613): Here we use cast because the return type of functions
+        # with_input_types and with_output_types is Any, because these functions
+        # are not type annotated yet in Apache_beam library. Thus to return the
+        # appropriate type from function instead of Any. We used cast here.
         return cast(
             Type[beam.DoFn],
             with_input_types(with_output_types(do_fn_type))

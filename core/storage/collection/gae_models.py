@@ -27,7 +27,7 @@ from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -215,8 +215,10 @@ class CollectionModel(base_models.VersionedModel):
         """Returns the total number of collections."""
         return cls.get_all().count()
 
-    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly type those NDB JSON properties, we
+    # can remove Any type from here.
     @staticmethod
     def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the CollectionModel dict.
@@ -246,8 +248,10 @@ class CollectionModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): Here we use type Any because this '_reconstitute' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly type those NDB JSON properties, we
+    # can remove Any type from the argument of '_reconstitute' method.
     def _reconstitute(self, snapshot_dict: Dict[str, Any]) -> CollectionModel:
         """Populates the model instance with the snapshot.
 
@@ -281,16 +285,20 @@ class CollectionModel(base_models.VersionedModel):
             'rights_model': CollectionRightsModel.get_by_id(self.id)
         }
 
-    def compute_models_to_commit(
+    # Here we use MyPy ignore because super class (VersionedModel)
+    # defines this 'additional_models' argument as broader type but here
+    # we are sure that in this sub-class (CollectionModel) argument
+    # 'additional_models' is always going to be of type Dict[str,
+    # CollectionRightsModel]. So, due to this conflict in argument types,
+    # a conflict in signatures occurred which causes MyPy to throw an
+    # error. Thus, to avoid the error, we used ignore here.
+    def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,
         commit_type: str,
         commit_message: Optional[str],
         commit_cmds: base_models.AllowedCommitCmdsListType,
-        # We expect Mapping because we want to allow models that inherit
-        # from BaseModel as the values, if we used Dict this wouldn't
-        # be allowed.
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Dict[str, CollectionRightsModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -323,11 +331,7 @@ class CollectionModel(base_models.VersionedModel):
             additional_models
         )
 
-        # The cast is needed because the additional_models is list of BaseModels
-        # and we want to hint the mypy that this is CollectionRightsModel.
-        collection_rights_model = cast(
-            CollectionRightsModel, additional_models['rights_model']
-        )
+        collection_rights_model = additional_models['rights_model']
         collection_commit_log = CollectionCommitLogEntryModel.create(
             self.id,
             self.version,
@@ -346,7 +350,7 @@ class CollectionModel(base_models.VersionedModel):
             'versioned_model': models_to_put['versioned_model'],
         }
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
@@ -565,8 +569,10 @@ class CollectionRightsModel(base_models.VersionedModel):
         super().commit(
             committer_id, commit_message, commit_cmds)
 
-    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly type those NDB JSON properties, we
+    # can remove Any type from here.
     @staticmethod
     def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the CollectionRightsModel dict.
@@ -608,10 +614,10 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#15911): This '_reconstitute' method accepts content NDB JSON
-    # properties and those NDB JSON properties have loose typing. So, once
-    # we explicitly typed those NDB JSON properties we can remove Any type
-    # from the argument of '_reconstitute' method.
+    # TODO(#15911): Here we use type Any because this '_reconstitute' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly type those NDB JSON properties, we
+    # can remove Any type from the argument of '_reconstitute' method.
     def _reconstitute(
         self, snapshot_dict: Dict[str, Any]
     ) -> CollectionRightsModel:

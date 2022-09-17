@@ -387,9 +387,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'additional story references list of the topic.'):
             self.topic.add_additional_story('story_id_2')
 
-    # Here we override the definition of the function from the parent class,
-    # but that is fine as _assert_validation_error is supposed to be
-    # customizable and thus we add an ignore.
+    # Here we use MyPy ignore because we override the definition of the function
+    # from the parent class, but that is fine as _assert_validation_error is
+    # supposed to be customizable and thus we add an ignore.
     def _assert_validation_error(  # type: ignore[override]
         self,
         expected_error_substring: str
@@ -590,9 +590,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id')
         ]
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         # Here, a bool value is expected but for test purpose we're assigning it
         # a string type. Thus to avoid MyPy error, we added an ignore here.
         self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore[assignment]
@@ -1256,9 +1256,9 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag',
             current_time, current_time)
 
-    # Here we override the definition of the function from the parent class,
-    # but that is fine as _assert_validation_error is supposed to be
-    # customizable and thus we add an ignore.
+    # Here we use MyPy ignore because we override the definition of the function
+    # from the parent class, but that is fine as _assert_validation_error is
+    # supposed to be customizable and thus we add an ignore.
     def _assert_validation_error(  # type: ignore[override]
         self,
         expected_error_substring: str
@@ -1287,9 +1287,11 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self) -> None:
         self.topic_summary.thumbnail_bg_color = '#C6DCDA'
+
         self.topic_summary.thumbnail_filename = None
         self._assert_validation_error(
             'Topic thumbnail image is not provided.')
+
         self.topic_summary.thumbnail_bg_color = None
         self.topic_summary.thumbnail_filename = 'test.svg'
         self._assert_validation_error(

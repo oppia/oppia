@@ -267,7 +267,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         """Tests that the update_stats returns if a state name is undefined."""
         # Here we use MyPy ignore because AggregatedStatsDict can only accept
         # Dict[str, int] but for testing purpose here we are providing str for
-        # one of the value which causes MyPy to throw a error. Thus to avoid
+        # one of the value which causes MyPy to throw an error. Thus to avoid
         # the error, we used ignore here.
         aggregated_stats: stats_domain.AggregatedStatsDict = {
             'num_starts': '1',  # type: ignore[typeddict-item]
