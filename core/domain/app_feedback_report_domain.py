@@ -27,8 +27,11 @@ from core.domain import app_feedback_report_constants
 from core.domain import story_domain
 from core.domain import topic_domain
 
-from typing import Any, Dict, List, Match, Optional
+from typing import Any, Dict, List, Match, Optional, Union
+from typing_extensions import TypedDict
 
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 from core.domain import exp_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
@@ -36,11 +39,37 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.Names.APP_FEEDBACK_REPORT]
+)
+
+
+class AppFeedbackReportDict(TypedDict):
+    """Dictionary representing the AppFeedbackReport object."""
+
+    report_id: str
+    schema_version: int
+    platform: str
+    submitted_on_timestamp: str
+    local_timezone_offset_hrs: int
+    ticket_id: Optional[str]
+    scrubbed_by: Optional[str]
+    user_supplied_feedback: UserSuppliedFeedbackDict
+    device_system_context: DeviceSystemContextDict
+    app_context: AppContextDict
+
+
+class AndroidFeedbackReportDict(TypedDict):
+    """Type for the android feedback report dictionary."""
+
+    platform_type: str
+    android_report_info_schema_version: int
+    app_context: AndroidAppContextDict
+    device_context: AndroidDeviceContextDict
+    report_submission_timestamp_sec: int
+    report_submission_utc_offset_hrs: int
+    system_context: AndroidSystemContextDict
+    user_supplied_feedback: UserSuppliedFeedbackDict
 
 
 class AppFeedbackReport:
@@ -94,7 +123,7 @@ class AppFeedbackReport:
         self.device_system_context = device_system_context
         self.app_context = app_context
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppFeedbackReportDict:
         """Returns a dict representing this AppFeedbackReport domain object.
 
         Returns:
@@ -228,12 +257,14 @@ class AppFeedbackReport:
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
     @classmethod
-    def from_dict(cls, report_dict: Dict[str, Any]) -> AppFeedbackReport:
+    def from_submitted_feedback_dict(
+        cls, report_dict: AndroidFeedbackReportDict
+    ) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict of the report sent in
         an incoming feedback report request.
 
         Args:
-            report_dict: dict. A dict representing the incoming feebdack report
+            report_dict: dict. A dict representing the incoming feedback report
                 sent in a request.
 
         Returns:
@@ -252,7 +283,7 @@ class AppFeedbackReport:
 
     @classmethod
     def get_android_report_from_dict(
-        cls, report_dict: Dict[str, Any]
+        cls, report_dict: AndroidFeedbackReportDict
     ) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict for an Android
         report.
@@ -334,8 +365,9 @@ class AppFeedbackReport:
             'The given report type %s is invalid.' % report_type_name)
 
     @classmethod
-    def get_category_from_string(cls, category_name: str) -> (
-        app_feedback_report_constants.CATEGORY):
+    def get_category_from_string(
+        cls, category_name: str
+    ) -> app_feedback_report_constants.Category:
         """Determines the category based on the JSON value.
 
         Args:
@@ -345,7 +377,7 @@ class AppFeedbackReport:
             CATEGORY. The enum representing this category.
         """
         for category_type in app_feedback_report_constants.ALLOWED_CATEGORIES:
-            if category_name == category_type.name:
+            if category_name == category_type.value:
                 return category_type
         raise utils.InvalidInputException(
             'The given category %s is invalid.' % category_name)
@@ -371,9 +403,9 @@ class AppFeedbackReport:
 
     @classmethod
     def get_entry_point_from_json(
-        cls, entry_point_json: Dict[str, Any]
+        cls, entry_point_json: EntryPointDict
     ) -> EntryPoint:
-        """Determines the entry point type based on the rececived JSON.
+        """Determines the entry point type based on the received JSON.
 
         Args:
             entry_point_json: dict. The JSON data of the entry point.
@@ -384,24 +416,49 @@ class AppFeedbackReport:
 
         Raises:
             InvalidInputException. The given entry point is invalid.
+            Exception. No topic_id provided for LessonPlayerEntryPoint.
+            Exception. No story_id provided for LessonPlayerEntryPoint.
+            Exception. No exploration_id provided for LessonPlayerEntryPoint.
+            Exception. No topic_id provided for RevisionCardEntryPoint.
+            Exception. No subtopic_id provided for RevisionCardEntryPoint.
         """
         entry_point_name = entry_point_json['entry_point_name']
         if entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name):
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value):
             return NavigationDrawerEntryPoint()
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.lesson_player.name):
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value):
+            if entry_point_json['entry_point_topic_id'] is None:
+                raise Exception(
+                    'No topic_id provided for LessonPlayerEntryPoint.'
+                )
+            if entry_point_json['entry_point_story_id'] is None:
+                raise Exception(
+                    'No story_id provided for LessonPlayerEntryPoint.'
+                )
+            if entry_point_json['entry_point_exploration_id'] is None:
+                raise Exception(
+                    'No exploration_id provided for LessonPlayerEntryPoint.'
+                )
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.revision_card.name):
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.value):
+            if entry_point_json['entry_point_topic_id'] is None:
+                raise Exception(
+                    'No topic_id provided for RevisionCardEntryPoint.'
+                )
+            if entry_point_json['entry_point_subtopic_id'] is None:
+                raise Exception(
+                    'No subtopic_id provided for RevisionCardEntryPoint.'
+                )
             return RevisionCardEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.crash.name):
+            app_feedback_report_constants.EntryPoint.CRASH.value):
             return CrashEntryPoint()
         else:
             raise utils.InvalidInputException(
@@ -427,13 +484,22 @@ class AppFeedbackReport:
             'The given Android network type %s is invalid.' % network_type_name)
 
 
+class UserSuppliedFeedbackDict(TypedDict):
+    """Dictionary representing the UserSuppliedFeedback object."""
+
+    report_type: str
+    category: str
+    user_feedback_selected_items: List[str]
+    user_feedback_other_text_input: str
+
+
 class UserSuppliedFeedback:
     """Domain object for the user-supplied information in feedback reports."""
 
     def __init__(
         self,
         report_type: app_feedback_report_constants.ReportType,
-        category: app_feedback_report_constants.CATEGORY,
+        category: app_feedback_report_constants.Category,
         user_feedback_selected_items: List[str],
         user_feedback_other_text_input: str
     ) -> None:
@@ -442,7 +508,7 @@ class UserSuppliedFeedback:
         Args:
             report_type: ReportType. The type of feedback submitted by the user
                 as an enum.
-            category: CATEGORY. The category enum that this specific report_type
+            category: Category. The category enum that this specific report_type
                 is providing feedback on that correponds.
             user_feedback_selected_items: list(str). A list of strings that
                 represent any options selected by the user for the feedback
@@ -455,15 +521,15 @@ class UserSuppliedFeedback:
         self.user_feedback_selected_items = user_feedback_selected_items
         self.user_feedback_other_text_input = user_feedback_other_text_input
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> UserSuppliedFeedbackDict:
         """Returns a dict representing this UserSuppliedFeedback domain object.
 
         Returns:
             dict. A dict, mapping all fields of UserSuppliedFeedback instance.
         """
         return {
-            'report_type': self.report_type.name,
-            'category': self.category.name,
+            'report_type': self.report_type.value,
+            'category': self.category.value,
             'user_feedback_selected_items': self.user_feedback_selected_items,
             'user_feedback_other_text_input': (
                 self.user_feedback_other_text_input)
@@ -514,7 +580,7 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_category(
-        cls, category: app_feedback_report_constants.CATEGORY
+        cls, category: app_feedback_report_constants.Category
     ) -> None:
         """Checks whether the category is valid.
 
@@ -535,7 +601,7 @@ class UserSuppliedFeedback:
     @classmethod
     def require_valid_user_feedback_items_for_category(
         cls,
-        category: app_feedback_report_constants.CATEGORY,
+        category: app_feedback_report_constants.Category,
         selected_items: List[str],
         other_text_input: str
     ) -> None:
@@ -593,6 +659,13 @@ class UserSuppliedFeedback:
                     'Invalid option %s selected by user.' % item)
 
 
+class DeviceSystemContextDict(TypedDict):
+    """Dictionary representing the DeviceSystemContext object."""
+
+    version_name: str
+    device_country_locale_code: str
+
+
 class DeviceSystemContext:
     """Domain object for the device and system information from the device used
     to submit the report.
@@ -612,7 +685,7 @@ class DeviceSystemContext:
         self.version_name = version_name
         self.device_country_locale_code = device_country_locale_code
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> DeviceSystemContextDict:
         """Returns a dict representing this DeviceSystemContext domain object.
         Subclasses should override this to propertly format any additional
         properties.
@@ -635,6 +708,37 @@ class DeviceSystemContext:
         raise NotImplementedError(
             'Subclasses of DeviceSystemContext should implement domain '
             'validation.')
+
+
+class AndroidDeviceContextDict(TypedDict):
+    """Type for the android device context dictionary."""
+
+    android_device_model: str
+    android_sdk_version: int
+    build_fingerprint: str
+    network_type: str
+
+
+class AndroidSystemContextDict(TypedDict):
+    """Type for the android system context dictionary."""
+
+    platform_version: str
+    package_version_code: int
+    android_device_country_locale_code: str
+    android_device_language_locale_code: str
+
+
+class AndroidDeviceSystemContextDict(TypedDict):
+    """Dictionary representing the AndroidDeviceSystemContext object."""
+
+    version_name: str
+    package_version_code: int
+    device_country_locale_code: str
+    device_language_locale_code: str
+    device_model: str
+    sdk_version: int
+    build_fingerprint: str
+    network_type: str
 
 
 class AndroidDeviceSystemContext(DeviceSystemContext):
@@ -682,7 +786,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         self.build_fingerprint = build_fingerprint
         self.network_type = network_type
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AndroidDeviceSystemContextDict:
         """Returns a dict representing this AndroidDeviceSystemContext domain
         object.
 
@@ -863,6 +967,14 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                 'Invalid network type, received: %s.' % network_type)
 
 
+class AppContextDict(TypedDict):
+    """Dictionary representing the AppContext object."""
+
+    entry_point: EntryPointDict
+    text_language_code: str
+    audio_language_code: str
+
+
 class AppContext:
     """Domain object for the Oppia app information of the user's Oppia instance
     at the time they submitted the report.
@@ -888,7 +1000,7 @@ class AppContext:
         self.text_language_code = text_language_code
         self.audio_language_code = audio_language_code
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppContextDict:
         """Returns a dict representing this AppContext domain object. Subclasses
         should override this to propertly format any additional properties.
 
@@ -911,6 +1023,20 @@ class AppContext:
         raise NotImplementedError(
             'Subclasses of AppContext should implement their own validation '
             'checks.')
+
+
+class AndroidAppContextDict(TypedDict):
+    """Dictionary representing the AndroidAppContext object."""
+
+    entry_point: EntryPointDict
+    text_language_code: str
+    audio_language_code: str
+    text_size: str
+    only_allows_wifi_download_and_update: bool
+    automatically_update_topics: bool
+    account_is_profile_admin: bool
+    event_logs: List[str]
+    logcat_logs: List[str]
 
 
 class AndroidAppContext(AppContext):
@@ -967,7 +1093,7 @@ class AndroidAppContext(AppContext):
         self.event_logs = event_logs
         self.logcat_logs = logcat_logs
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AndroidAppContextDict:
         """Returns a dict representing this AndroidAppContext domain object.
 
         Returns:
@@ -1089,6 +1215,16 @@ class AndroidAppContext(AppContext):
                     text_size))
 
 
+class EntryPointDict(TypedDict):
+    """Dictionary representing the EntryPoint object."""
+
+    entry_point_name: str
+    entry_point_exploration_id: Optional[str]
+    entry_point_story_id: Optional[str]
+    entry_point_topic_id: Optional[str]
+    entry_point_subtopic_id: Optional[str]
+
+
 class EntryPoint:
     """Domain object for the entry point used to initiate the feedback
     report.
@@ -1096,7 +1232,7 @@ class EntryPoint:
 
     def __init__(
         self,
-        entry_point: app_feedback_report_constants.ENTRY_POINT,
+        entry_point: app_feedback_report_constants.EntryPoint,
         topic_id: Optional[str] = None,
         story_id: Optional[str] = None,
         exploration_id: Optional[str] = None,
@@ -1115,13 +1251,16 @@ class EntryPoint:
             subtopic_id: int|None. The id for the current subtopic if the report
                 was sent during a revision session.
         """
-        self.entry_point_name = entry_point.name
+        self.entry_point_name = entry_point.value
         self.topic_id = topic_id
         self.story_id = story_id
         self.exploration_id = exploration_id
         self.subtopic_id = subtopic_id
 
-    def to_dict(self) -> Dict[str, Any]:
+    # Here we use type Any because in sub-classes this method can be
+    # re-implemented with different return types. So, to allow every
+    # return type we used Any type here.
+    def to_dict(self) -> Any:
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1148,7 +1287,7 @@ class EntryPoint:
     def require_valid_entry_point_name(
         cls,
         actual_name: str,
-        expected_entry_point: app_feedback_report_constants.ENTRY_POINT
+        expected_entry_point: app_feedback_report_constants.EntryPoint
     ) -> None:
         """Validates this EntryPoint name.
 
@@ -1160,7 +1299,7 @@ class EntryPoint:
         Raises:
             ValidationError. The name is not valid for the type.
         """
-        expected_name = expected_entry_point.name
+        expected_name = expected_entry_point.value
         if actual_name is None:
             raise utils.ValidationError('No entry point name supplied.')
         if not isinstance(actual_name, str):
@@ -1200,16 +1339,22 @@ class EntryPoint:
                     exploration_id, story_id, expected_story_id))
 
 
+class NavigationDrawerEntryPointDict(TypedDict):
+    """Dictionary representing the NavigationDrawerEntryPoint object."""
+
+    entry_point_name: str
+
+
 class NavigationDrawerEntryPoint(EntryPoint):
     """Domain object for the Android navigation drawer entry point."""
 
     def __init__(self) -> None:
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super().__init__(
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer, None,
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER, None,
             None, None, None)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> NavigationDrawerEntryPointDict:
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1230,7 +1375,16 @@ class NavigationDrawerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER)
+
+
+class LessonPlayerEntryPointDict(TypedDict):
+    """Dictionary representing the LessonPlayerEntryPoint object."""
+
+    entry_point_name: str
+    topic_id: Optional[str]
+    story_id: Optional[str]
+    exploration_id: Optional[str]
 
 
 class LessonPlayerEntryPoint(EntryPoint):
@@ -1250,10 +1404,10 @@ class LessonPlayerEntryPoint(EntryPoint):
                 user is playing when intiating the report.
         """
         super().__init__(
-            app_feedback_report_constants.ENTRY_POINT.lesson_player,
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER,
             topic_id=topic_id, story_id=story_id, exploration_id=exploration_id)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> LessonPlayerEntryPointDict:
         """Returns a dict representing this LessonPlayerEntryPoint domain
         object.
 
@@ -1276,7 +1430,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.lesson_player)
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if self.story_id is None:
             raise utils.ValidationError(
@@ -1284,6 +1438,14 @@ class LessonPlayerEntryPoint(EntryPoint):
         story_domain.Story.require_valid_story_id(self.story_id)
         self.require_valid_entry_point_exploration(
             self.exploration_id, self.story_id)
+
+
+class RevisionCardEntryPointDict(TypedDict):
+    """Dictionary representing the RevisionCardEntryPoint object."""
+
+    entry_point_name: str
+    topic_id: Optional[str]
+    subtopic_id: Optional[str]
 
 
 class RevisionCardEntryPoint(EntryPoint):
@@ -1299,10 +1461,10 @@ class RevisionCardEntryPoint(EntryPoint):
                 reviewing when intiating the report.
         """
         super().__init__(
-            app_feedback_report_constants.ENTRY_POINT.revision_card,
+            app_feedback_report_constants.EntryPoint.REVISION_CARD,
             topic_id, None, None, subtopic_id)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> RevisionCardEntryPointDict:
         """Returns a dict representing this RevisionCardEntryPoint domain
         object.
 
@@ -1325,12 +1487,18 @@ class RevisionCardEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.revision_card)
+            app_feedback_report_constants.EntryPoint.REVISION_CARD)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % (
                     self.subtopic_id))
+
+
+class CrashEntryPointDict(TypedDict):
+    """Dictionary representing the CrashEntryPoint object."""
+
+    entry_point_name: str
 
 
 class CrashEntryPoint(EntryPoint):
@@ -1339,10 +1507,10 @@ class CrashEntryPoint(EntryPoint):
     def __init__(self) -> None:
         """Constructs an CrashEntryPoint domain object."""
         super().__init__(
-                app_feedback_report_constants.ENTRY_POINT.crash, None, None,
+                app_feedback_report_constants.EntryPoint.CRASH, None, None,
                 None, None)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> CrashEntryPointDict:
         """Returns a dict representing this CrashEntryPoint domain object.
 
         Returns:
@@ -1362,7 +1530,20 @@ class CrashEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.crash)
+            app_feedback_report_constants.EntryPoint.CRASH)
+
+
+class AppFeedbackReportTicketDict(TypedDict):
+    """Dictionary representing the AppFeedbackReportTicket object."""
+
+    ticket_id: str
+    ticket_name: str
+    platform: str
+    github_issue_repo_name: Optional[str]
+    github_issue_number: Optional[int]
+    archived: bool
+    newest_report_creation_timestamp_isoformat: Optional[str]
+    reports: List[str]
 
 
 class AppFeedbackReportTicket:
@@ -1376,7 +1557,7 @@ class AppFeedbackReportTicket:
         github_issue_repo_name: Optional[str],
         github_issue_number: Optional[int],
         archived: bool,
-        newest_report_creation_timestamp: datetime.datetime,
+        newest_report_creation_timestamp: Optional[datetime.datetime],
         reports: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportTicket domain object.
@@ -1392,7 +1573,8 @@ class AppFeedbackReportTicket:
                 this ticket.
             archived: bool. Whether this ticket is archived.
             newest_report_creation_timestamp: datetime.datetime. Timestamp in
-                UTC of the newest submitted report that is in this ticket.
+                UTC of the newest submitted report that is in this ticket, or
+                None if there is no report.
             reports: list(str). The list of IDs for the AppFeedbackReports
                 assigned to this ticket.
         """
@@ -1405,7 +1587,7 @@ class AppFeedbackReportTicket:
         self.newest_report_creation_timestamp = newest_report_creation_timestamp
         self.reports = reports
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppFeedbackReportTicketDict:
         """Returns a dict representing this AppFeedbackReportTicket domain
         object.
 
@@ -1420,8 +1602,10 @@ class AppFeedbackReportTicket:
             'github_issue_repo_name': self.github_issue_repo_name,
             'github_issue_number': self.github_issue_number,
             'archived': self.archived,
-            'newest_report_creation_timestamp': (
-                self.newest_report_creation_timestamp.isoformat()),
+            'newest_report_creation_timestamp_isoformat': (
+                self.newest_report_creation_timestamp.isoformat()
+                if self.newest_report_creation_timestamp else None
+            ),
             'reports': self.reports
         }
 
@@ -1541,6 +1725,25 @@ class AppFeedbackReportTicket:
                     app_feedback_report_constants.GITHUB_REPO_CHOICES))
 
 
+AcceptableEntryPointClasses = Union[
+    NavigationDrawerEntryPointDict,
+    LessonPlayerEntryPointDict,
+    RevisionCardEntryPointDict,
+    CrashEntryPointDict
+]
+
+
+class AppFeedbackReportDailyStatsDict(TypedDict):
+    """Dictionary representing the AppFeedbackReportDailyStats object."""
+
+    stats_id: str
+    ticket: AppFeedbackReportTicketDict
+    platform: str
+    stats_tracking_date: str
+    total_reports_submitted: int
+    daily_param_stats: Dict[str, Dict[str, int]]
+
+
 class AppFeedbackReportDailyStats:
     """Domain object for report statistics on a single day for a specific
     ticket.
@@ -1577,7 +1780,7 @@ class AppFeedbackReportDailyStats:
         self.total_reports_submitted = total_reports_submitted
         self.daily_param_stats = daily_param_stats
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppFeedbackReportDailyStatsDict:
         """Returns a dict representing this AppFeedbackReportDailyStats domain
         object.
 
@@ -1653,7 +1856,7 @@ class AppFeedbackReportDailyStats:
                 'The parameter stats should be a dict, '
                 'received: %r' % param_stats)
         allowed_parameter_names = [
-            parameter.name for parameter in (
+            parameter.value for parameter in (
                 app_feedback_report_constants.ALLOWED_STATS_PARAMETERS)]
         for (param_name, param_count_obj) in param_stats.items():
             if param_name not in allowed_parameter_names:
@@ -1679,7 +1882,7 @@ class ReportStatsParameterValueCounts:
         """
         self.parameter_value_counts = parameter_value_counts
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, int]:
         """Returns a dict representing this ReportStatsParameterValueCounts
         domain object.
 
@@ -1707,6 +1910,13 @@ class ReportStatsParameterValueCounts:
                     'received: %r' % param_count)
 
 
+class AppFeedbackReportFilterDict(TypedDict):
+    """Dictionary representing the AppFeedbackReportFilter object."""
+
+    filter_field: str
+    filter_options: List[str]
+
+
 class AppFeedbackReportFilter:
     """Domain object for a filter that can be applied to the collection of
     feedback reports.
@@ -1714,13 +1924,13 @@ class AppFeedbackReportFilter:
 
     def __init__(
         self,
-        filter_field: app_feedback_report_constants.FILTER_FIELD_NAMES,
+        filter_field: app_feedback_report_constants.FilterFieldNames,
         filter_options: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.
 
         Args:
-            filter_field: FILTER_FIELD_NAMES. The enum type for the filter
+            filter_field: FilterFieldNames. The enum type for the filter
                 category, correponding to a field in the AppFeedbackReport
                 object.
             filter_options: list(str). The possible values for the given filter.
@@ -1728,7 +1938,7 @@ class AppFeedbackReportFilter:
         self.filter_field = filter_field
         self.filter_options = filter_options
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppFeedbackReportFilterDict:
         """Returns a dict representing this AppFeedbackReportFilter domain
         object.
 

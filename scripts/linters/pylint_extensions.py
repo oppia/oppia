@@ -20,12 +20,14 @@ presubmit checks. Next message id would be C0041.
 
 from __future__ import annotations
 
+import copy
 import fnmatch
 import linecache
 import re
 import tokenize
 
 from core import handler_schema_constants
+from pylint import utils as pylint_utils
 
 from .. import docstrings_checker
 
@@ -42,6 +44,19 @@ EXCLUDED_PHRASES = [
 
 ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS = [
     'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:']
+
+ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
+
+# TODO(#16024): Currently, the following directories are not annotated with
+# MyPy type annotations completely, and still, we are using exceptional types
+# in these dirs which causes linters to throw an error. So, once these dirs
+# are annotated completely, we can remove these dirs from this list and fix
+# the lint errors accordingly.
+EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
+    'core/controllers/',
+    'extensions/',
+    'scripts/'
+]
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1366,6 +1381,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
     # If import from any of these is made, it may not be a module.
     EXCLUDED_IMPORT_MODULES = [
         '__future__',
+        'types',
         'typing',
         'mypy_imports',
         'typing_extensions'
@@ -1921,6 +1937,108 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                         'single-line-pragma', line=line_num)
 
 
+class TypeIgnoreCommentChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks if MyPy's type ignores are properly
+    documented or not.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS = (
+        EXCLUDED_TYPE_COMMENT_DIRECTORIES
+    )
+
+    name = 'type-ignore-comment'
+    priority = -1
+    msgs = {
+        'C0045': (
+            'Please try to avoid the use of \'type: ignore\' if possible.'
+            ' If \'type: ignore\' is really necessary, then add a proper'
+            ' comment with clear justification. The format of the comment'
+            ' should be -> Here we use MyPy ignore because ...',
+            'mypy-ignore-used',
+            'MyPy ignores (except for \'type: ignore[no-untyped-call]\')'
+            ' should be accompanied by proper comments. The format of'
+            ' comments should be -> Here we use MyPy ignore because ...'
+        ),
+        'C0046': (
+            'Extra comment is present for MyPy type: ignore. Please'
+            ' remove it.',
+            'redundant-type-comment',
+            'No corresponding \'type: ignore\' is found for the comment.'
+        )
+    }
+
+    def visit_module(self, node):
+        """Visit a module to ensure that there is a comment for each MyPy
+        type ignore.
+
+        Args:
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        for directory in self.EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS:
+            if directory in node.root().file:
+                return
+        tokens = pylint_utils.tokenize_module(node)
+        self._process_module_tokens(tokens, node)
+
+    def _process_module_tokens(self, tokens, node):
+        """Checks if the MyPy type ignores present in a module are properly
+        documented by a code comment or not. Also, checks for unnecessary code
+        comments for which no corresponding type: ignore is found.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        expected_type_ignore_comment_substring = (
+            r'Here we use MyPy ignore because'
+        )
+        type_ignore_comment_present = False
+        no_of_type_ignore_comments = 0
+        previous_comment_line_number = 0
+        comment_line_number = 0
+
+        for (token_type, _, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.COMMENT:
+                line = line.lstrip()
+
+                if expected_type_ignore_comment_substring in line:
+                    type_ignore_comment_present = True
+                    no_of_type_ignore_comments += 1
+
+                    if no_of_type_ignore_comments > 1:
+                        previous_comment_line_number = comment_line_number
+                        self.add_message(
+                            'redundant-type-comment',
+                            line=previous_comment_line_number,
+                            node=node
+                        )
+
+                    comment_line_number = line_num
+
+                if re.search(r'(\s*type:\s*ignore)', line):
+                    if 'type: ignore[no-untyped-call]' in line:
+                        continue
+                    if (
+                        type_ignore_comment_present and
+                        line_num <= (
+                            comment_line_number +
+                            ALLOWED_LINES_OF_GAP_IN_COMMENT
+                        )
+                    ):
+                        type_ignore_comment_present = False
+                        no_of_type_ignore_comments = 0
+                    else:
+                        self.add_message(
+                            'mypy-ignore-used', line=line_num, node=node
+                        )
+
+        if type_ignore_comment_present:
+            self.add_message(
+                'redundant-type-comment', line=comment_line_number)
+
+
 class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that there is a single space
     after keywords like `if`, `elif`, `while`, and `yield`.
@@ -1957,6 +2075,393 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                         'single-space-after-keyword',
                         args=(token),
                         line=line_num)
+
+
+class ExceptionalTypesCommentChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks that there is always a comment
+    for exceptional types in the backend type annotations.
+    """
+
+    EXCEPTIONAL_TYPE_STATUS_DICT = {
+        'type_comment_pending': False,
+        'type_comment_line_num': 0,
+        'outside_function_signature_block': True,
+        'outside_args_section': True,
+        'type_present_inside_arg_section': False,
+        'type_present_inside_return_section': False,
+        'type_present_in_function_signature': False,
+        'args_section_end_line_num': 0,
+        'func_def_start_line': 0,
+    }
+
+    EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS = (
+        EXCLUDED_TYPE_COMMENT_DIRECTORIES
+    )
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'comment-for-exceptional-types'
+    priority = -1
+    msgs = {
+        'C0047': (
+            'Any type is used. If the Any type is really needed, then please'
+            ' add a proper comment with clear justification why other specific'
+            ' types cannot be used. The format of the comment should be'
+            ' -> Here we use type Any because ...',
+            'any-type-used',
+            'Annotations with Any type should only be done for exceptional'
+            ' cases with proper explanation in the code comment.'
+        ),
+        'C0048': (
+            'cast function is used. If the cast is really needed, then please'
+            ' add a proper comment with clear justification why cast function'
+            ' is needed. The format of the comment should be -> Here use cast'
+            ' because ...',
+            'cast-func-used',
+            'Casting of any value should be done with a proper explanation in'
+            ' the code comment.'
+        ),
+        'C0049': (
+            'object class is used. If the object class is really needed, then'
+            ' please add a proper comment with clear justification why other'
+            ' specific types cannot be used. The format of the comment should'
+            ' be -> Here we use object because ...',
+            'object-class-used',
+            'Annotations with object should only be done for exceptional'
+            ' cases with proper explanation in the code comment.'
+        )
+    }
+
+    def visit_module(self, node):
+        """Visit a module to ensure that there is a comment for each exceptional
+        type (cast, Any and object).
+
+        Args:
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        for directory in self.EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS:
+            if directory in node.root().file:
+                return
+        tokens = pylint_utils.tokenize_module(node)
+        self._process_module_tokens(tokens, node)
+
+    def _process_module_tokens(self, tokens, node):
+        """Checks whether an exceptional type in backend type annotations is
+        documented. If exceptional type is not documented, then it adds a
+        message accordingly.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        self.check_comment_is_present_with_any_type(tokens, node)
+        self.check_comment_is_present_with_cast_method(tokens, node)
+        self.check_comment_is_present_with_object_class(tokens, node)
+
+    def _check_import_status(
+        self, import_status_dict, token_type, token, line_num
+    ):
+        """Checks whether the single-line import or multi-line import is
+        present inside the module. If multi-line import is present then
+        it checks whether the linters are currently inside multi-line
+        import's scope or not.
+
+        Args:
+            import_status_dict: dict. This dictionary contains the variables
+                that tracks the module's import status, where:
+                1st element of dict: Indicates whether single line import
+                    is encountered or not.
+                2nd element of dict: Indicates the line number if import
+                    is encountered, otherwise it is zero.
+                3rd element of dict: Indicates whether the multi-line import is
+                    encountered and linters are in it's scope or not.
+                    import(
+                        << multi-line import's scope >>
+                    )
+            token_type: int. The kind of token that pylint provided.
+            token: str. The token of module the pylint provided.
+            line_num: int. The line number of given token.
+        """
+        # Checking if single-line import is present.
+        # Eg: from typing import Any.
+        if token_type == tokenize.NAME:
+            if token == 'import':
+                import_status_dict['single_line_import'] = True
+                import_status_dict['import_line_num'] = line_num
+
+        # Checking if multi-line import is present.
+        # Eg: from typing import (
+        #   Any, Callable, Dict, FrozenSet, Iterator, List, Set,
+        #   Tuple, Type, cast
+        # )
+        if token_type == tokenize.OP:
+            if import_status_dict['single_line_import'] and token == '(':
+                import_status_dict['inside_multi_line_import_scope'] = True
+                import_status_dict['single_line_import'] = False
+            if (
+                import_status_dict['inside_multi_line_import_scope'] and
+                token == ')'
+            ):
+                import_status_dict['inside_multi_line_import_scope'] = False
+
+    def _check_exceptional_type_is_documented(
+        self, type_status_dict, import_status_dict, token_type, token,
+        line, line_num, exceptional_type, node
+    ):
+        """Checks whether the given exceptional type in a module has been
+        documented or not. If the exceptional type is not documented then
+        adds an error message.
+
+        Args:
+            type_status_dict: dict. The dict containing all the information
+                about the exceptional type that was passed to this method.
+            import_status_dict: Optional[Dict]. This dictionary contains the
+                variables that tracks the module's import status, whether a
+                multi-line import or single-line import is present, or None
+                if the given exceptional_type is not imported in the module.
+            token_type: int. The kind of token that pylint provided.
+            token: str. The token of module the pylint provided.
+            line: str. The line of the module where current token is present.
+            line_num: int. The line number of given token.
+            exceptional_type: str. The exceptional type for which this method
+                is called, Possible values can be 'Any' or 'object'.
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        # Checking if linters are in argument-section, return-section or
+        # outside of the function signature.
+        # Eg:
+        #       <outside function signature block>
+        #   def func(<argument-section>) -> <return-section>:
+        #       <outside function signature block>.
+        if token_type == tokenize.NAME:
+            if token == 'def':
+                type_status_dict['outside_function_signature_block'] = False
+                type_status_dict['func_def_start_line'] = line_num
+                type_status_dict['outside_args_section'] = False
+
+        if token_type == tokenize.OP:
+            if token == '->':
+                type_status_dict['outside_args_section'] = True
+                type_status_dict['args_section_end_line_num'] = line_num
+            if type_status_dict['outside_args_section'] and token == ':':
+                type_status_dict['outside_function_signature_block'] = True
+
+        # Checking if exceptional_type is present in function definition or not.
+        if token_type == tokenize.NAME and token == exceptional_type:
+            if not type_status_dict['outside_args_section']:
+                type_status_dict['type_present_inside_arg_section'] = True
+            elif (
+                type_status_dict['outside_args_section'] and
+                type_status_dict['args_section_end_line_num'] == line_num
+            ):
+                type_status_dict['type_present_inside_return_section'] = True
+
+        if (
+            type_status_dict['type_present_inside_arg_section'] or
+            type_status_dict['type_present_inside_return_section']
+        ):
+            type_status_dict['type_present_in_function_signature'] = True
+
+        if type_status_dict['outside_function_signature_block']:
+            if type_status_dict['type_present_in_function_signature']:
+                if (
+                    type_status_dict['type_comment_pending'] and
+                    type_status_dict['func_def_start_line'] <= (
+                        type_status_dict['type_comment_line_num'] +
+                        ALLOWED_LINES_OF_GAP_IN_COMMENT
+                    )
+                ):
+                    type_status_dict['type_comment_pending'] = False
+                else:
+                    self._add_exceptional_type_error_message(
+                        exceptional_type,
+                        type_status_dict['func_def_start_line'],
+                        node
+                    )
+
+                type_status_dict['type_present_in_function_signature'] = False
+                type_status_dict['type_present_inside_arg_section'] = False
+                type_status_dict['type_present_inside_return_section'] = False
+            if token_type == tokenize.NAME and token == exceptional_type:
+                if exceptional_type == 'object':
+                    # Excluding the case when object is called:
+                    # Eg: var = object()
+                    if 'object()' in line:
+                        return
+                # Passing those cases where Any is imported.
+                if exceptional_type == 'Any':
+                    if (
+                        import_status_dict['single_line_import'] and
+                        import_status_dict['import_line_num'] == line_num
+                    ):
+                        return
+                    elif import_status_dict['inside_multi_line_import_scope']:
+                        return
+                # Checking if comment for exceptional_type is present and it's
+                # with in the range (minimum 15 line of gaps).
+                if (
+                    type_status_dict['type_comment_pending'] and
+                    line_num <= (
+                        type_status_dict['type_comment_line_num'] +
+                        ALLOWED_LINES_OF_GAP_IN_COMMENT
+                    )
+                ):
+                    type_status_dict['type_comment_pending'] = False
+                else:
+                    self._add_exceptional_type_error_message(
+                        exceptional_type, line_num, node
+                    )
+
+    def _add_exceptional_type_error_message(
+        self, exceptional_type, line_num, node
+    ):
+        """This method should be called only when an exceptional type error is
+        encountered. If the exceptional type is Any then 'any-type-used' error
+        message is added, for object 'object-class-used' is added and for cast
+        'cast-func-used' is added.
+
+        Args:
+            exceptional_type: str. The exceptional type for which this method
+                is called, Possible values can be 'Any', 'object' and 'cast'.
+            line_num: int. The line number where error is encountered.
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        if exceptional_type == 'Any':
+            self.add_message(
+                'any-type-used', line=line_num, node=node
+            )
+        if exceptional_type == 'object':
+            self.add_message(
+                'object-class-used', line=line_num, node=node
+            )
+        if exceptional_type == 'cast':
+            self.add_message(
+                'cast-func-used', line=line_num, node=node
+            )
+
+    def check_comment_is_present_with_object_class(self, tokens, node):
+        """Checks whether the object class in a module has been documented
+        or not. If the object class is not documented then adds an error
+        message.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        object_class_status_dict = copy.deepcopy(
+            self.EXCEPTIONAL_TYPE_STATUS_DICT
+        )
+
+        expected_object_class_comment_substring = r'Here we use object because'
+
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            line = line.strip()
+
+            if token_type == tokenize.COMMENT:
+                if expected_object_class_comment_substring in line:
+                    object_class_status_dict[
+                        'type_comment_pending'
+                    ] = True
+                    object_class_status_dict['type_comment_line_num'] = line_num
+
+            self._check_exceptional_type_is_documented(
+                object_class_status_dict, None, token_type, token,
+                line, line_num, 'object', node
+            )
+
+    def check_comment_is_present_with_cast_method(self, tokens, node):
+        """Checks whether the cast method in a module has been documented
+        or not. If the cast method is not documented then adds an error
+        message.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        expected_cast_method_comment_substring = r'Here we use cast because'
+        cast_comment_present = False
+        cast_comment_line_num = 0
+        import_status_dict = {
+            'single_line_import': False,
+            'import_line_num': 0,
+            'inside_multi_line_import_scope': False
+        }
+
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            line = line.strip()
+
+            if token_type == tokenize.COMMENT:
+                if expected_cast_method_comment_substring in line:
+                    cast_comment_present = True
+                    cast_comment_line_num = line_num
+
+            self._check_import_status(
+                import_status_dict, token_type, token, line_num
+            )
+
+            if token_type == tokenize.NAME and token == 'cast':
+                # Passing those cases where cast is imported.
+                if (
+                    import_status_dict['single_line_import'] and
+                    import_status_dict['import_line_num'] == line_num
+                ):
+                    pass
+                elif import_status_dict['inside_multi_line_import_scope']:
+                    pass
+                # Throwing an error when cast is encountered but there is no
+                # corresponding comment exist.
+                elif (
+                    cast_comment_present and
+                    line_num <= (
+                        cast_comment_line_num +
+                        ALLOWED_LINES_OF_GAP_IN_COMMENT
+                    )
+                ):
+                    cast_comment_present = False
+                else:
+                    self._add_exceptional_type_error_message(
+                        'cast', line_num, node
+                    )
+
+    def check_comment_is_present_with_any_type(self, tokens, node):
+        """Checks whether the Any type in a module has been documented
+        or not. If the Any type is not documented then adds an error
+        message.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        import_status_dict = {
+            'single_line_import': False,
+            'import_line_num': 0,
+            'inside_multi_line_import_scope': False
+        }
+
+        any_type_status_dict = copy.deepcopy(
+            self.EXCEPTIONAL_TYPE_STATUS_DICT
+        )
+
+        expected_any_type_comment_substring = r'Here we use type Any because'
+
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            line = line.strip()
+
+            if token_type == tokenize.COMMENT:
+                if expected_any_type_comment_substring in line:
+                    any_type_status_dict[
+                        'type_comment_pending'
+                    ] = True
+                    any_type_status_dict['type_comment_line_num'] = line_num
+
+            self._check_import_status(
+                import_status_dict, token_type, token, line_num
+            )
+
+            self._check_exceptional_type_is_documented(
+                any_type_status_dict, import_status_dict, token_type, token,
+                line, line_num, 'Any', node
+            )
 
 
 class InequalityWithNoneChecker(checkers.BaseChecker):
@@ -2318,7 +2823,9 @@ def register(linter):
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
+    linter.register_checker(TypeIgnoreCommentChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
+    linter.register_checker(ExceptionalTypesCommentChecker(linter))
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))

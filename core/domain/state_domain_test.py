@@ -37,12 +37,15 @@ from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.domain import translation_domain
 from core.tests import test_utils
+from extensions.interactions import base
+
+from typing import Dict, List, Optional, Tuple, Type, Union
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
@@ -52,7 +55,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
             translation_dict)
 
-    def test_get_all_html_in_exploration_with_drag_and_drop_interaction(self):
+    def test_get_all_html_in_exploration_with_drag_and_drop_interaction(
+        self
+    ) -> None:
         """Test the method for extracting all the HTML from a state having
         DragAndDropSortInput interaction.
         """
@@ -60,11 +65,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_content_dict = {
+        state_content_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {
                 'value': [
                     {
@@ -124,7 +131,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
-        state_solution_dict = {
+        state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': [
                 '<p>state customization arg html 1</p>',
@@ -137,7 +144,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        state_written_translations_dict = {
+        state_written_translations_dict: (
+            state_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content': {
                     'en': {
@@ -320,6 +329,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -335,10 +346,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             rules_registry.Registry.get_html_field_types_to_rule_specs(
                 state_schema_version=41))
 
-        def mock_get_html_field_types_to_rule_specs(unused_cls):
+        def mock_get_html_field_types_to_rule_specs(
+            unused_cls: Type[state_domain.State]
+        ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        def mock_get_interaction_by_id(cls, interaction_id):
+        def mock_get_interaction_by_id(
+            cls: Type[interaction_registry.Registry],
+            interaction_id: str
+        ) -> base.BaseInteraction:
             interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
             interaction.answer_type = 'ListOfSetsOfHtmlStrings'
             return interaction
@@ -396,7 +412,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>state customization arg html 4</p>',
                 '<p>state content html</p>'])
 
-    def test_get_all_html_in_exploration_with_text_input_interaction(self):
+    def test_get_all_html_in_exploration_with_text_input_interaction(
+        self
+    ) -> None:
         """Test the method for extracting all the HTML from a state having
         TextInput interaction.
         """
@@ -406,7 +424,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
 
-        state_content_dict = {
+        state_content_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
@@ -443,7 +461,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 )
             ),
         ]
-        state_solution_dict = {
+        state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
             'explanation': {
@@ -451,7 +469,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        state_interaction_cust_args = {
+        state_interaction_cust_args: Dict[
+            str, Dict[str, Union[Dict[str, str], int]]
+        ] = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -470,6 +490,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_answer_group)
         state.update_interaction_default_outcome(state_default_outcome)
         state.update_interaction_hints(state_hint_list)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -486,7 +508,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>This is solution for state1</p>',
                 '<p>state content html</p>'])
 
-    def test_get_all_html_in_exploration_with_item_selection_interaction(self):
+    def test_get_all_html_in_exploration_with_item_selection_interaction(
+        self
+    ) -> None:
         """Test the method for extracting all the HTML from a state having
         ItemSelectionInput interaction.
         """
@@ -496,11 +520,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
 
-        state_content_dict = {
+        state_content_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], int]]
+        ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
             },
@@ -556,7 +582,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
-        state_solution_dict = {
+        state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': [
                 '<p>state customization arg html 1</p>',
@@ -586,6 +612,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -595,10 +623,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             rules_registry.Registry.get_html_field_types_to_rule_specs(
                 state_schema_version=41))
 
-        def mock_get_html_field_types_to_rule_specs(unused_cls):
+        def mock_get_html_field_types_to_rule_specs(
+            unused_cls: Type[state_domain.State]
+        ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        def mock_get_interaction_by_id(cls, interaction_id):
+        def mock_get_interaction_by_id(
+            cls: Type[interaction_registry.Registry],
+            interaction_id: str
+        ) -> base.BaseInteraction:
             interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
             interaction.answer_type = 'SetOfHtmlString'
             interaction.can_have_solution = True
@@ -635,7 +668,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>init_state customization arg html 4</p>',
                 '<p>state content html</p>'])
 
-    def test_rule_spec_with_invalid_html_format(self):
+    def test_rule_spec_with_invalid_html_format(self) -> None:
         """Test the method for extracting all the HTML from a state
         when the rule_spec has invalid html format.
         """
@@ -687,7 +720,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 mock_html_field_types_to_rule_specs_dict.values()):
             html_type_dict['format'] = 'invalid format'
 
-        def mock_get_html_field_types_to_rule_specs(unused_cls):
+        def mock_get_html_field_types_to_rule_specs(
+            unused_cls: Type[state_domain.State]
+        ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
@@ -699,7 +734,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'The rule spec does not belong to a valid format.'):
                 state.get_all_html_content_strings()
 
-    def test_update_customization_args_with_invalid_content_id(self):
+    def test_update_customization_args_with_invalid_content_id(self) -> None:
         """Test the method for updating interaction customization arguments
         when a content_id is invalid (set to None).
         """
@@ -708,7 +743,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, Optional[str]]], int]]
+        ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
             },
@@ -736,7 +773,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state.update_interaction_customization_args(
                 state_customization_args_dict)
 
-    def test_rule_spec_with_html_having_invalid_input_variable(self):
+    def test_rule_spec_with_html_having_invalid_input_variable(self) -> None:
         """Test the method for extracting all the HTML from a state
         when the rule_spec has html but the input variable is invalid.
         """
@@ -760,7 +797,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], int]]
+        ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
             },
@@ -800,7 +839,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
                     ['y'])
 
-        def mock_get_html_field_types_to_rule_specs(unused_cls):
+        def mock_get_html_field_types_to_rule_specs(
+            unused_cls: Type[state_domain.State]
+        ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
@@ -813,7 +854,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'Html in it.'):
                 state.get_all_html_content_strings()
 
-    def test_get_all_html_when_solution_has_invalid_answer_type(self):
+    def test_get_all_html_when_solution_has_invalid_answer_type(self) -> None:
         """Test the method for extracting all the HTML from a state
         when the interaction has a solution but the answer_type for the
         corrent_answer is invalid.
@@ -822,11 +863,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_content_dict = {
+        state_content_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {
                 'value': [
                     {
@@ -857,8 +900,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        state_solution_dict = {
-            'interaction_id': '',
+        state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': [
                 ['<p>state customization arg html 1</p>'],
@@ -879,6 +921,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_customization_args_dict)
         state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -893,7 +937,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             rules_registry.Registry.get_html_field_types_to_rule_specs(
                 state_schema_version=41))
 
-        def mock_get_html_field_types_to_rule_specs(unused_cls):
+        def mock_get_html_field_types_to_rule_specs(
+            unused_cls: Type[state_domain.State]
+        ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
@@ -905,7 +951,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'correct_answer type.'):
                 state.get_all_html_content_strings()
 
-    def test_get_all_html_when_interaction_is_none(self):
+    def test_get_all_html_when_interaction_is_none(self) -> None:
         """Test the method for extracting all the HTML from a state
         when the state has no interaction.
         """
@@ -913,7 +959,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_content_dict = {
+        state_content_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
@@ -925,14 +971,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         html_list = state.get_all_html_content_strings()
         self.assertEqual(html_list, ['', '<p>state content html</p>'])
 
-    def test_export_state_to_dict(self):
+    def test_export_state_to_dict(self) -> None:
         """Test exporting a state to a dict."""
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['New state'])
 
         state_dict = exploration.states['New state'].to_dict()
-        expected_dict = {
+        expected_dict: state_domain.StateDict = {
             'classifier_model_id': None,
             'content': {
                 'content_id': 'content',
@@ -978,13 +1024,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_dict, state_dict)
 
-    def test_can_undergo_classification(self):
+    def test_can_undergo_classification(self) -> None:
         """Test the can_undergo_classification() function."""
         exploration_id = 'eid'
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
+        assets_list: List[Tuple[str, bytes]] = []
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
@@ -1001,13 +1047,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             state_without_training_data.can_undergo_classification())
 
-    def test_get_training_data(self):
+    def test_get_training_data(self) -> None:
         """Test retrieval of training data."""
         exploration_id = 'eid'
         test_exp_filepath = os.path.join(
             feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
+        assets_list: List[Tuple[str, bytes]] = []
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
@@ -1024,7 +1070,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(observed_training_data, expected_training_data)
 
-    def test_get_content_html_with_correct_state_name_returns_html(self):
+    def test_get_content_html_with_correct_state_name_returns_html(
+        self
+    ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
@@ -1045,12 +1093,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
 
-    def test_rte_content_validation_for_android(self):
+    def test_rte_content_validation_for_android(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -1063,12 +1111,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict
         )
         init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         init_state.update_interaction_solution(state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
@@ -1165,7 +1217,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'value="&amp;quot;htt://link.com&amp'
                     ';quot;"></oppia-noninteractive-link></p>')
             }))
-        self.assertTrue(init_state.is_rte_content_supported_on_android())
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
@@ -1176,16 +1228,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
-    def test_interaction_validation_for_android(self):
+    def test_interaction_validation_for_android(self) -> None:
         _checked_interaction_ids = set()
 
-        def _create_init_state_for_interaction_verification():
+        def _create_init_state_for_interaction_verification(
+        ) -> state_domain.State:
             """Creates an init state for interaction verification."""
             exploration = (
                 exp_domain.Exploration.create_default_exploration('0'))
-            return exploration.states[exploration.init_state_name]
+            state: state_domain.State = (
+                exploration.states[exploration.init_state_name]
+            )
+            return state
 
-        def _verify_interaction_supports_android(self, interaction_id):
+        def _verify_interaction_supports_android(
+            self: StateDomainUnitTests, interaction_id: Optional[str]
+        ) -> None:
             """Checks that the provided interaction is supported on Android."""
             init_state = _create_init_state_for_interaction_verification()
             init_state.update_interaction_id(interaction_id)
@@ -1193,7 +1251,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 init_state.interaction.is_supported_on_android_app())
             _checked_interaction_ids.add(interaction_id)
 
-        def _verify_interaction_does_not_support_android(self, interaction_id):
+        def _verify_interaction_does_not_support_android(
+            self: StateDomainUnitTests, interaction_id: str
+        ) -> None:
             """Checks that the provided interaction is not supported on
             Android.
             """
@@ -1203,7 +1263,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 init_state.interaction.is_supported_on_android_app())
             _checked_interaction_ids.add(interaction_id)
 
-        def _verify_all_interaction_ids_checked(self):
+        def _verify_all_interaction_ids_checked(
+            self: StateDomainUnitTests
+        ) -> None:
             """Verifies that all the interaction ids are checked."""
             all_interaction_ids = set(
                 interaction_registry.Registry.get_all_interaction_ids())
@@ -1236,7 +1298,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         _verify_all_interaction_ids_checked(self)
 
-    def test_get_content_html_with_invalid_content_id_raise_error(self):
+    def test_get_content_html_with_invalid_content_id_raise_error(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
@@ -1254,7 +1316,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ValueError, 'Content ID Invalid id does not exist'):
             init_state.get_content_html('Invalid id')
 
-    def test_get_content_id_mapping_needing_translations_with_existing_translations(self): # pylint: disable=line-too-long
+    def test_get_content_id_mapping_needing_translations_with_existing_translations(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_content(
@@ -1298,7 +1362,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -1307,11 +1371,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
-        written_translations_dict = {
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'hi': {
@@ -1358,7 +1424,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>The default outcome.</p>'
         )
 
-    def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
+    def test_get_content_id_mapping_needing_translations_with_interaction_translations(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_content(
@@ -1367,7 +1435,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is content</p>'
             }))
         init_state.update_interaction_id('TextInput')
-        state_interaction_cust_args = {
+        state_interaction_cust_args: Dict[
+            str, Dict[str, Union[Dict[str, str], int]]
+        ] = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -1414,7 +1484,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -1423,11 +1493,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
-        written_translations_dict = {
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {},
                 'hint_1': {},
@@ -1488,7 +1560,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(rule_translatable_item.interaction_id, 'TextInput')
         self.assertEqual(rule_translatable_item.rule_type, 'Contains')
 
-    def test_get_content_id_mapping_needing_translations_for_set_input_rule(self): # pylint: disable=line-too-long
+    def test_get_content_id_mapping_needing_translations_for_set_input_rule(
+        self
+    ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_content(
@@ -1519,7 +1593,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(
             [state_answer_group])
 
-        written_translations_dict = {
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {},
                 'feedback_1': {},
@@ -1539,7 +1613,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(rule_translatable_item.interaction_id, 'SetInput')
         self.assertEqual(rule_translatable_item.rule_type, 'Equals')
 
-    def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
+    def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         # Set the content.
@@ -1550,7 +1626,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }))
         # Set the multiple choice interaction.
         init_state.update_interaction_id('MultipleChoiceInput')
-        state_interaction_cust_args = {
+        state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
             'showChoicesInShuffledOrder': {
                 'value': True
             },
@@ -1581,7 +1657,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state.update_interaction_default_outcome(default_outcome)
         # Set the translations.
-        written_translations_dict = {
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {},
                 'default_outcome': {},
@@ -1616,7 +1692,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             'ca_choices_2' in content_id_mapping_needing_translations)
 
-    def test_content_id_existance_checks_work_correctly(self):
+    def test_content_id_existance_checks_work_correctly(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
 
@@ -1626,7 +1702,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.get_content_html('content0')
         self.assertEqual(init_state.has_content_id('content0'), False)
 
-    def test_add_translation_works_correctly(self):
+    def test_add_translation_works_correctly(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_content(
@@ -1641,7 +1717,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(init_state.get_translation_counts(), {'hi': 1})
 
-    def test_get_translation_counts_returns_correct_value(self):
+    def test_get_translation_counts_returns_correct_value(self) -> None:
         state = state_domain.State.create_default_state(None)
         state.update_content(
             state_domain.SubtitledHtml.from_dict({
@@ -1656,7 +1732,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
         state.update_interaction_hints(hints_list)
 
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -1665,6 +1741,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, solution_dict)
 
@@ -1681,7 +1759,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(state.get_translation_counts(), {'hi': 2})
 
-    def test_state_operations(self):
+    def test_state_operations(self) -> None:
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         self.assertNotIn('invalid_state_name', exploration.states)
@@ -1729,8 +1807,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.rename_state('State 2', 'END')
 
         # Ensure the other states are connected to END.
+        # Ruling out the possibility of None for mypy type checking.
+        assert (
+            exploration.states['Renamed state'].interaction.default_outcome is
+            not None
+        )
         exploration.states[
             'Renamed state'].interaction.default_outcome.dest = 'State 2'
+        assert (
+            exploration.states['State 2'].interaction.default_outcome is
+            not None
+        )
         exploration.states['State 2'].interaction.default_outcome.dest = 'END'
 
         # Ensure the other states have interactions.
@@ -1767,50 +1854,58 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
-    def test_update_solicit_answer_details(self):
+    def test_update_solicit_answer_details(self) -> None:
         """Test updating solicit_answer_details."""
         state = state_domain.State.create_default_state('state_1')
         self.assertEqual(state.solicit_answer_details, False)
         state.update_solicit_answer_details(True)
         self.assertEqual(state.solicit_answer_details, True)
 
-    def test_update_solicit_answer_details_with_non_bool_fails(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_update_solicit_answer_details_with_non_bool_fails(self) -> None:
         """Test updating solicit_answer_details with non bool value."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(Exception, (
             'Expected solicit_answer_details to be a boolean, received')):
-            init_state.update_solicit_answer_details('abc')
+            init_state.update_solicit_answer_details('abc')  # type: ignore[arg-type]
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
 
-    def test_update_linked_skill_id(self):
+    def test_update_linked_skill_id(self) -> None:
         """Test updating linked_skill_id."""
         state = state_domain.State.create_default_state('state_1')
         self.assertEqual(state.linked_skill_id, None)
         state.update_linked_skill_id('string_2')
         self.assertEqual(state.linked_skill_id, 'string_2')
 
-    def test_update_card_is_checkpoint(self):
+    def test_update_card_is_checkpoint(self) -> None:
         """Test update card_is_checkpoint."""
         state = state_domain.State.create_default_state('state_1')
         self.assertEqual(state.card_is_checkpoint, False)
         state.update_card_is_checkpoint(True)
         self.assertEqual(state.card_is_checkpoint, True)
 
-    def test_update_card_is_checkpoint_with_non_bool_fails(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_update_card_is_checkpoint_with_non_bool_fails(self) -> None:
         """Test updating card_is_checkpoint with non bool value."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
         with self.assertRaisesRegex(Exception, (
             'Expected card_is_checkpoint to be a boolean, received')):
-            init_state.update_card_is_checkpoint('abc')
+            init_state.update_card_is_checkpoint('abc')  # type: ignore[arg-type]
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
 
-    def test_convert_html_fields_in_state_with_drag_and_drop_interaction(self):
+    def test_convert_html_fields_in_state_with_drag_and_drop_interaction(
+        self
+    ) -> None:
         """Test the method for converting all the HTML in a state having
         DragAndDropSortInput interaction.
         """
@@ -1822,7 +1917,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-        written_translations_dict_with_old_math_schema = {
+        written_translations_dict_with_old_math_schema: (
+            state_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content1': {
                     'en': {
@@ -1879,7 +1976,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        answer_group_dict_with_old_math_schema = {
+        answer_group_dict_with_old_math_schema: state_domain.AnswerGroupDict = {
             'outcome': {
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
@@ -1967,12 +2064,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-        state_dict_with_old_math_schema = {
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2044,8 +2140,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
-
             },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'next_content_id_index': 0,
             'written_translations': (
                 written_translations_dict_with_old_math_schema)
         }
@@ -2055,7 +2154,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content', 'html': 'Hello!'
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2129,6 +2227,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
 
             },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'next_content_id_index': 0,
             'written_translations': (
                 written_translations_dict_with_new_math_schema)
         }
@@ -2140,7 +2242,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
-    def test_convert_html_fields_in_state_with_item_selection_interaction(self):
+    def test_convert_html_fields_in_state_with_item_selection_interaction(
+        self
+    ) -> None:
         """Test the method for converting all the HTML in a state having
         ItemSelection interaction.
         """
@@ -2152,7 +2256,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-        answer_group_with_old_math_schema = [{
+        answer_group_with_old_math_schema: List[
+            state_domain.AnswerGroupDict
+        ] = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {
@@ -2228,12 +2334,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
-        state_dict_with_old_math_schema = {
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2297,7 +2402,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
 
         state_dict_with_new_math_schema = {
@@ -2305,7 +2417,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content', 'html': 'Hello!'
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2369,7 +2480,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
         interaction_registry.Registry.get_all_specs_for_state_schema_version(
             41)['ItemSelectionInput']['can_have_solution'] = True
@@ -2382,7 +2500,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
-    def test_convert_html_fields_in_state_with_text_input_interaction(self):
+    def test_convert_html_fields_in_state_with_text_input_interaction(
+        self
+    ) -> None:
         """Test the method for converting all the HTML in a state having
         TextInput interaction.
         """
@@ -2394,7 +2514,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-        answer_group_with_old_math_schema = {
+        answer_group_with_old_math_schema: state_domain.AnswerGroupDict = {
             'outcome': {
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
@@ -2439,12 +2559,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }
 
-        state_dict_with_old_math_schema = {
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': html_with_old_math_schema
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2497,7 +2616,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_old_math_schema
                         }
                     }]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
 
         state_dict_with_new_math_schema = {
@@ -2505,7 +2631,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content', 'html': html_with_new_math_schema
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2558,7 +2683,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -2567,7 +2699,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
 
-    def test_convert_html_fields_in_state_with_math_expression_input(self):
+    def test_convert_html_fields_in_state_with_math_expression_input(
+        self
+    ) -> None:
         """Test the method for converting all the HTML in a state having
         MathExpressionInput interaction.
         """
@@ -2579,7 +2713,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-        answer_group_with_old_math_schema = {
+        answer_group_with_old_math_schema: state_domain.AnswerGroupDict = {
             'outcome': {
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
@@ -2624,12 +2758,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }
 
-        state_dict_with_old_math_schema = {
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': html_with_old_math_schema
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2672,7 +2805,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_old_math_schema
                         }
                     }]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
 
         state_dict_with_new_math_schema = {
@@ -2680,7 +2820,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content', 'html': html_with_new_math_schema
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2723,7 +2862,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -2732,7 +2878,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
 
-    def test_convert_html_fields_in_state_with_old_written_translations(self):
+    def test_convert_html_fields_in_state_with_old_written_translations(
+        self
+    ) -> None:
         """Test the method for converting all the HTML in a state having
         written_translations in the old format. This is needed for converting
         older snapshots (prior to state schema version 35) properly.
@@ -2748,48 +2896,82 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-        written_translations_dict_with_old_math_schema_and_old_format = {
+        # Here we use MyPy ignore because we are defining an older version
+        # dictionary of WrittenTranslations that contains `html` key, but
+        # the type of this dict is defined according to the latest version
+        # of WrittenTranslations that do not contain 'html' key. So, due to
+        # this conflict in presences of keys MyPy throws an error. Thus to
+        # avoid the error, we used ignore here.
+        written_translations_dict_with_old_math_schema_and_old_format: (
+            state_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content1': {
-                    'en': {
+                    'en': {  # type: ignore[typeddict-item]
                         'html': html_with_old_math_schema,
                         'needs_update': True
                     },
-                    'hi': {
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
+                    'hi': {  # type: ignore[typeddict-item]
                         'html': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
-                    'hi': {
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
+                    'hi': {  # type: ignore[typeddict-item]
                         'html': html_with_old_math_schema,
                         'needs_update': False
                     },
-                    'en': {
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
+                    'en': {  # type: ignore[typeddict-item]
                         'html': 'hello!',
                         'needs_update': False
                     }
                 }
             }
         }
-        written_translations_dict_with_new_math_schema_and_old_format = {
+        # Here we use MyPy ignore because we are defining an older version
+        # dictionary of WrittenTranslations that contains `html` key, but
+        # the type of this dict is defined according to the latest version
+        # of WrittenTranslations that do not contain 'html' key. So, due to
+        # this conflict in presences of keys MyPy throws an error. Thus to
+        # avoid the error, we used ignore here.
+        written_translations_dict_with_new_math_schema_and_old_format: (
+            state_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content1': {
-                    'en': {
+                    'en': {  # type: ignore[typeddict-item]
                         'html': html_with_new_math_schema,
                         'needs_update': True
                     },
-                    'hi': {
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
+                    'hi': {  # type: ignore[typeddict-item]
                         'html': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
-                    'hi': {
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
+                    'hi': {  # type: ignore[typeddict-item]
                         'html': html_with_new_math_schema,
                         'needs_update': False
                     },
-                    'en': {
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
+                    'en': {  # type: ignore[typeddict-item]
                         'html': 'hello!',
                         'needs_update': False
                     }
@@ -2797,7 +2979,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        answer_group_dict_with_old_math_schema = {
+        answer_group_dict_with_old_math_schema: state_domain.AnswerGroupDict = {
             'outcome': {
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
@@ -2819,7 +3001,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-        answer_group_dict_with_new_math_schema = {
+        answer_group_dict_with_new_math_schema: state_domain.AnswerGroupDict = {
             'outcome': {
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
@@ -2841,12 +3023,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-        state_dict_with_old_math_schema = {
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -2918,18 +3099,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
-
             },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'next_content_id_index': 0,
             'written_translations': (
                 written_translations_dict_with_old_math_schema_and_old_format)
         }
 
-        state_dict_with_new_math_schema = {
+        state_dict_with_new_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -3003,6 +3186,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
 
             },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'next_content_id_index': 0,
             'written_translations': (
                 written_translations_dict_with_new_math_schema_and_old_format)
         }
@@ -3015,14 +3202,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_having_rule_spec_with_invalid_format(
-            self):
+        self
+    ) -> None:
         """Test the method for converting the HTML in a state
         when the rule_spec has invalid html format.
         """
         html_with_old_math_schema = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
-        answer_group_with_old_math_schema = [{
+        answer_group_with_old_math_schema: List[
+            state_domain.AnswerGroupDict
+        ] = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {
@@ -3050,12 +3240,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
-        state_dict_with_old_math_schema = {
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -3100,7 +3289,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
@@ -3111,7 +3307,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             html_type_dict['format'] = 'invalid format'
 
         def mock_get_html_field_types_to_rule_specs(
-                unused_cls, state_schema_version=None): # pylint: disable=unused-argument
+            unused_cls: Type[state_domain.State],  # pylint: disable=unused-argument
+            state_schema_version: Optional[int] = None  # pylint: disable=unused-argument
+        ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
@@ -3126,14 +3324,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     add_math_content_to_math_rte_components,
                     state_uses_old_rule_template_schema=True)
 
-    def test_convert_html_fields_in_rule_spec_with_invalid_input_variable(self):
+    def test_convert_html_fields_in_rule_spec_with_invalid_input_variable(
+        self
+    ) -> None:
         """Test the method for converting the HTML in a state
         when the rule_spec has invalid input variable.
         """
         html_with_old_math_schema = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
-        answer_group_with_old_math_schema = [{
+        answer_group_with_old_math_schema: List[
+            state_domain.AnswerGroupDict
+        ] = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {
@@ -3161,12 +3363,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
-        state_dict_with_old_math_schema = {
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -3211,7 +3412,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
@@ -3223,7 +3431,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
                     ['y'])
 
-        def mock_get_html_field_types_to_rule_specs(unused_cls):
+        def mock_get_html_field_types_to_rule_specs(
+            unused_cls: Type[state_domain.State]
+        ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
@@ -3239,7 +3449,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     html_validation_service.
                     add_math_content_to_math_rte_components)
 
-    def test_convert_html_fields_in_rule_spec_with_invalid_correct_answer(self):
+    def test_convert_html_fields_in_rule_spec_with_invalid_correct_answer(
+        self
+    ) -> None:
         """Test the method for converting the HTML in a state when the
         interaction solution has invalid answer type.
         """
@@ -3247,26 +3459,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
-        state_dict_with_old_math_schema = {
+        old_solution_dict: state_domain.SolutionDict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+            'html': html_with_old_math_schema
+            }
+        }
+
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': html_with_old_math_schema
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
-                'solution': {
-                    'interaction_id': '',
-                    'answer_is_exclusive': True,
-                    'correct_answer': 'Answer1',
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': html_with_old_math_schema
-                    }
-                },
+                'solution': old_solution_dict,
                 'answer_groups': [],
                 'default_outcome': {
                     'param_changes': [],
@@ -3304,7 +3516,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         }
                     }
                 ]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
@@ -3313,7 +3532,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         mock_html_field_types_to_rule_specs_dict['NormalizedString'] = (
             mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString'))
 
-        def mock_get_html_field_types_to_rule_specs(unused_cls):
+        def mock_get_html_field_types_to_rule_specs(
+            unused_cls: Type[state_domain.State]
+        ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
@@ -3329,7 +3550,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     html_validation_service.
                     add_math_content_to_math_rte_components)
 
-    def test_convert_html_fields_in_state_when_interaction_is_none(self):
+    def test_convert_html_fields_in_state_when_interaction_is_none(
+        self
+    ) -> None:
         """Test the method for converting all the HTML in a state having
         no interaction.
         """
@@ -3342,12 +3565,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
 
-        state_dict_with_old_math_schema = {
+        state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': html_with_old_math_schema
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -3367,7 +3589,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': None,
+                'customization_args': {},
                 'confirmed_unclassified_answers': [],
                 'id': None,
                 'hints': [
@@ -3383,15 +3605,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_old_math_schema
                         }
                     }]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
 
-        state_dict_with_new_math_schema = {
+        state_dict_with_new_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': html_with_new_math_schema
             },
             'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
@@ -3411,7 +3639,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': None,
+                'customization_args': {},
                 'confirmed_unclassified_answers': [],
                 'id': None,
                 'hints': [
@@ -3427,9 +3655,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
             'explanation': {
@@ -3445,16 +3680,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_dict_with_new_math_schema)
         # Assert that no action is performed on a solution dict when the
         # interaction ID is None.
+        # Here we use MyPy ignore because for testing purposes here we are
+        # not defining BaseInteractionDict's Key.
         self.assertEqual(
             state_domain.Solution.convert_html_in_solution(
                 None, solution_dict,
                 html_validation_service.
                 add_math_content_to_math_rte_components,
                 rules_registry.Registry.get_html_field_types_to_rule_specs(),
-                {}
+                {}  # type: ignore[typeddict-item]
             ), solution_dict)
 
-    def test_subtitled_html_validation_with_invalid_html_type(self):
+    def test_subtitled_html_validation_with_invalid_html_type(self) -> None:
         """Test validation of subtitled HTML with invalid html type."""
         subtitled_html = state_domain.SubtitledHtml(
             'content_id', '<p>some html</p>')
@@ -3466,7 +3703,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'html', 20):
                 subtitled_html.validate()
 
-    def test_subtitled_html_validation_with_invalid_content(self):
+    def test_subtitled_html_validation_with_invalid_content(self) -> None:
         """Test validation of subtitled HTML with invalid content."""
         subtitled_html = state_domain.SubtitledHtml(
             'content_id', '<p>some html</p>')
@@ -3477,7 +3714,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
-    def test_subtitled_unicode_validation_with_invalid_html_type(self):
+    def test_subtitled_unicode_validation_with_invalid_html_type(self) -> None:
         """Test validation of subtitled unicode with invalid unicode type."""
         subtitled_unicode = state_domain.SubtitledUnicode(
             'content_id', 'some string')
@@ -3489,7 +3726,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_unicode, 'unicode_str', 20):
                 subtitled_unicode.validate()
 
-    def test_subtitled_unicode_validation_with_invalid_content(self):
+    def test_subtitled_unicode_validation_with_invalid_content(self) -> None:
         """Test validation of subtitled unicode with invalid content."""
         subtitled_unicode = state_domain.SubtitledUnicode(
             'content_id', 'some html string')
@@ -3500,7 +3737,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_unicode, 'content_id', 20):
                 subtitled_unicode.validate()
 
-    def test_voiceover_validation(self):
+    def test_voiceover_validation(self) -> None:
         """Test validation of voiceover."""
         audio_voiceover = state_domain.Voiceover('a.mp3', 20, True, 24.5)
         audio_voiceover.validate()
@@ -3560,7 +3797,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
 
-    def test_written_translation_validation(self):
+    def test_written_translation_validation(self) -> None:
         """Test validation of translation script."""
         written_translation = state_domain.WrittenTranslation(
             'html', 'Test.', True)
@@ -3589,7 +3826,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(written_translation, 'data_format', 2):
                 written_translation.validate()
 
-    def test_hints_validation(self):
+    def test_hints_validation(self) -> None:
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
@@ -3604,7 +3841,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -3613,6 +3850,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict
         )
@@ -3644,7 +3883,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
 
-    def test_update_customization_args_with_non_unique_content_ids(self):
+    def test_update_customization_args_with_non_unique_content_ids(
+        self
+    ) -> None:
         """Test that update customization args throws an error when passed
         customization args with non-unique content ids.
         """
@@ -3668,7 +3909,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'showChoicesInShuffledOrder': {'value': True}
             })
 
-    def test_solution_validation(self):
+    def test_solution_validation(self) -> None:
         """Test validation of state solution."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
@@ -3685,7 +3926,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
         init_state.update_interaction_hints(hints_list)
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
             'explanation': {
@@ -3694,6 +3935,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         # Object type of answer must match that of correct_answer.
         with self.assertRaisesRegex(
             AssertionError,
@@ -3716,7 +3959,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 init_state.interaction.id, solution_dict))
         exploration.validate()
 
-    def test_validate_state_unique_content_ids(self):
+    def test_validate_state_unique_content_ids(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('MultipleChoiceInput')
@@ -3734,14 +3977,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected all content_ids to be unique, received'
         ):
+            value = init_state.interaction.customization_args['choices'].value
+            # Ruling out the possibility of any other type for mypy type
+            # checking.
+            assert isinstance(value, list)
             with self.swap(
-                init_state.interaction.customization_args['choices'].value[0],
+                value[0],
                 'content_id',
                 'content'
             ):
                 exploration.validate()
 
-    def test_validate_state_content_id_indexes(self):
+    def test_validate_state_content_id_indexes(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('MultipleChoiceInput')
@@ -3763,7 +4010,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.validate()
 
-    def test_validate_state_solicit_answer_details(self):
+    def test_validate_state_solicit_answer_details(self) -> None:
         """Test validation of solicit_answer_details."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
@@ -3792,7 +4039,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, True)
 
-    def test_validate_state_linked_skill_id(self):
+    def test_validate_state_linked_skill_id(self) -> None:
         """Test validation of linked_skill_id."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
@@ -3804,7 +4051,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 exploration.validate()
         self.assertEqual(init_state.linked_skill_id, None)
 
-    def test_validate_state_card_is_checkpoint(self):
+    def test_validate_state_card_is_checkpoint(self) -> None:
         """Test validation of card_is_checkpoint."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
@@ -3816,13 +4063,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 exploration.validate()
         self.assertEqual(init_state.card_is_checkpoint, True)
 
-    def test_validate_solution_answer_is_exclusive(self):
+    def test_validate_solution_answer_is_exclusive(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         # Solution should be set to None as default.
         self.assertEqual(exploration.init_state.interaction.solution, None)
 
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -3835,14 +4082,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '')
             )
         ]
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         solution_dict = {
-            'answer_is_exclusive': 1,
+            'answer_is_exclusive': 1,  # type: ignore[typeddict-item]
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
@@ -3856,15 +4108,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected answer_is_exclusive to be bool, received 1'):
             exploration.validate()
 
-    def test_validate_non_list_param_changes(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_list_param_changes(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        exploration.init_state.param_changes = 0
+        exploration.init_state.param_changes = 0  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             Exception, 'Expected state param_changes to be a list, received 0'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
-    def test_validate_duplicate_content_id_with_answer_group_feedback(self):
+    def test_validate_duplicate_content_id_with_answer_group_feedback(
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
@@ -3895,9 +4152,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'Found a duplicate content id feedback_1'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
-    def test_validate_duplicate_content_id_with_answer_group_rules(self):
+    def test_validate_duplicate_content_id_with_answer_group_rules(
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
@@ -3931,9 +4190,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'Found a duplicate content id rule_input_Contains'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
-    def test_validate_duplicate_content_id_with_default_outcome(self):
+    def test_validate_duplicate_content_id_with_default_outcome(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         default_outcome = state_domain.Outcome(
             'Introduction', None,
@@ -3951,9 +4210,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'Found a duplicate content id default_outcome'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
-    def test_validate_duplicate_content_id_with_hints(self):
+    def test_validate_duplicate_content_id_with_hints(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         hints_list = [
             state_domain.Hint(
@@ -3970,16 +4229,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'Found a duplicate content id hint_1'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
-    def test_validate_duplicate_content_id_with_solution(self):
+    def test_validate_duplicate_content_id_with_solution(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         subtitled_html = state_domain.SubtitledHtml('content_id', 'some html')
 
         hints_list = [state_domain.Hint(subtitled_html)]
 
         exploration.init_state.interaction.hints = hints_list
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -3987,6 +4246,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             }
         }
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_solution(solution)
@@ -3998,11 +4259,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'Found a duplicate content id solution'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
-    def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
+    def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         with contextlib.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
@@ -4012,13 +4278,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
 
             exploration.init_state.convert_state_dict_to_yaml(
-                'invalid_state_dict', 10)
+                'invalid_state_dict', 10)  # type: ignore[arg-type]
 
         self.assertEqual(len(captured_logs), 1)
         self.assertIn('Bad state dict: invalid_state_dict', captured_logs[0])
 
     def test_cannot_update_hints_with_content_id_not_in_written_translations(
-            self):
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         old_hints_list = [
             state_domain.Hint(
@@ -4035,7 +4302,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
-        written_translations_dict = {
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'hi': {
@@ -4059,7 +4326,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
     def test_cannot_update_hints_with_content_id_not_in_recorded_voiceovers(
-            self):
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         old_hints_list = [
             state_domain.Hint(
@@ -4076,7 +4344,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
-        recorded_voiceovers_dict = {
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
                     'en': {
@@ -4100,7 +4368,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
     def test_cannot_update_hints_with_new_content_id_in_written_translations(
-            self):
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         old_hints_list = [
             state_domain.Hint(
@@ -4117,7 +4386,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
-        written_translations_dict = {
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'hint_2': {
                     'hi': {
@@ -4148,7 +4417,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
     def test_cannot_update_hints_with_new_content_id_in_recorded_voiceovers(
-            self):
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         old_hints_list = [
             state_domain.Hint(
@@ -4165,7 +4435,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
-        recorded_voiceovers_dict = {
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'hint_1': {
                     'en': {
@@ -4196,7 +4466,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'The content_id hint_2 already exists in recorded_voiceovers'):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
-    def test_cannot_update_interaction_solution_with_non_dict_solution(self):
+    def test_cannot_update_interaction_solution_with_non_dict_solution(
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         hints_list = [
             state_domain.Hint(
@@ -4204,7 +4476,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'hint_1', '<p>Hello, this is html1 for state2</p>')
             )
         ]
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': u'hello_world!',
             'explanation': {
@@ -4212,21 +4484,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': u'<p>hello_world is a string</p>'
             }
         }
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.solution is not None
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution_dict)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected solution to be a Solution object,'
             'received test string'):
-            exploration.init_state.update_interaction_solution('test string')
+            exploration.init_state.update_interaction_solution('test string')  # type: ignore[arg-type]
 
-    def test_update_interaction_solution_with_no_solution(self):
+    def test_update_interaction_solution_with_no_solution(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         hints_list = [
             state_domain.Hint(
@@ -4241,24 +4520,33 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertIsNone(exploration.init_state.interaction.solution)
 
-    def test_cannot_update_interaction_hints_with_non_list_hints(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_cannot_update_interaction_hints_with_non_list_hints(
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list'):
-            exploration.init_state.update_interaction_hints({})
+            exploration.init_state.update_interaction_hints({})  # type: ignore[arg-type]
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_cannot_update_non_list_interaction_confirmed_unclassified_answers(
-            self):
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegex(
             Exception, 'Expected confirmed_unclassified_answers to be a list'):
             (
                 exploration.init_state
-                .update_interaction_confirmed_unclassified_answers({}))
+                .update_interaction_confirmed_unclassified_answers({}))  # type: ignore[arg-type]
 
-    def test_update_interaction_confirmed_unclassified_answers(self):
+    def test_update_interaction_confirmed_unclassified_answers(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
@@ -4290,15 +4578,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.confirmed_unclassified_answers,
             [state_answer_group])
 
-    def test_cannot_update_non_list_interaction_answer_groups(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_cannot_update_non_list_interaction_answer_groups(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegex(
             Exception, 'Expected interaction_answer_groups to be a list'):
             exploration.init_state.update_interaction_answer_groups(
-                'invalid_answer_groups')
+                'invalid_answer_groups')  # type: ignore[arg-type]
 
-    def test_cannot_update_answer_groups_with_non_dict_rule_inputs(self):
+    def test_cannot_update_answer_groups_with_non_dict_rule_inputs(
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
@@ -4313,7 +4606,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
-        state_answer_group.rule_specs[0].inputs = []
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        state_answer_group.rule_specs[0].inputs = []  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             Exception,
@@ -4322,23 +4618,37 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 [state_answer_group])
 
-    def test_cannot_update_answer_groups_with_non_list_rule_specs(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_cannot_update_answer_groups_with_non_list_rule_specs(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'), False, [], None, None
-            ), {}, [], None
+            ), [], [], None
         )
-        state_answer_group.rule_specs = {}
+        state_answer_group.rule_specs = {}  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             Exception, 'Expected answer group rule specs to be a list'):
             exploration.init_state.update_interaction_answer_groups(
                 [state_answer_group])
 
-    def test_cannot_update_answer_groups_with_invalid_rule_input_value(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_cannot_update_answer_groups_with_invalid_rule_input_value(
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        test_inputs: Dict[str, Dict[str, Union[str, List[str]]]] = {
+            'x': {
+                'contentId': 'rule_input_Equals',
+                'normalizedStrSet': [[]]  # type: ignore[list-item]
+                }
+            }
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -4347,12 +4657,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [
                 state_domain.RuleSpec(
                     'Contains',
-                    {
-                        'x': {
-                            'contentId': 'rule_input_Equals',
-                            'normalizedStrSet': [[]]
-                            }
-                    })
+                    test_inputs
+                )
             ],
             [],
             None
@@ -4368,10 +4674,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 [state_answer_group])
 
-    def test_validate_rule_spec(self):
-        observed_log_messages = []
+    def test_validate_rule_spec(self) -> None:
+        observed_log_messages: List[str] = []
 
-        def _mock_logging_function(msg, *args):
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
@@ -4413,10 +4719,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ]
         )
 
-    def test_get_all_translatable_content_for_state_content(self):
+    def test_get_all_translatable_content_for_state_content(self) -> None:
         """Get all translatable fields for state content."""
         state = state_domain.State.create_default_state('state_1')
-        state_content_dict = {
+        state_content_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
@@ -4433,10 +4739,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             translatable_contents, ['<p>state content html</p>']
         )
 
-    def test_get_all_translatable_content_for_text_input_answer_groups(self):
+    def test_get_all_translatable_content_for_text_input_answer_groups(
+        self
+    ) -> None:
         """Get all the translatable fields for answer group."""
         state = state_domain.State.create_default_state('state_1')
-        state_answer_group = [
+        state_answer_group: List[state_domain.AnswerGroup] = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'destination', None, state_domain.SubtitledHtml(
@@ -4469,7 +4777,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ['Test rule spec.']]
         )
 
-    def test_get_all_translatable_content_for_set_input_answer_groups(self):
+    def test_get_all_translatable_content_for_set_input_answer_groups(
+        self
+    ) -> None:
         """Get all the translatable fields for answer group."""
         state = state_domain.State.create_default_state('state_1')
         state_answer_group = [
@@ -4508,10 +4818,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ]
         )
 
-    def test_get_all_translatable_content_for_solution(self):
+    def test_get_all_translatable_content_for_solution(self) -> None:
         """Get all translatable fields for solution."""
         state = state_domain.State.create_default_state('state_1')
-        state_solution_dict = {
+        state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
             'explanation': {
@@ -4520,6 +4830,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         state.update_interaction_id('TextInput')
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -4533,10 +4845,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             translatable_contents, ['<p>This is solution for state_1</p>'])
 
-    def test_test_get_all_translatable_content_for_unicode_cust_args(self):
+    def test_test_get_all_translatable_content_for_unicode_cust_args(
+        self
+    ) -> None:
         """Get all the translatable fields for customization args."""
         state = state_domain.State.create_default_state('state_1')
-        state_interaction_cust_args = {
+        state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -4557,10 +4871,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             translatable_contents, ['Translatable cust args.'])
 
-    def test_get_all_translatable_content_for_html_in_cust_args(self):
+    def test_get_all_translatable_content_for_html_in_cust_args(self) -> None:
         state = state_domain.State.create_default_state('state_1')
         state.update_interaction_id('MultipleChoiceInput')
-        state_interaction_cust_args = {
+        state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
             'showChoicesInShuffledOrder': {
                 'value': True
             },
@@ -4584,7 +4898,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             translatable_contents, ['Hello world!'])
 
-    def test_get_all_translatable_content_for_hints(self):
+    def test_get_all_translatable_content_for_hints(self) -> None:
         """Get all translatable fields for hints."""
         hint = state_domain.Hint(state_domain.SubtitledHtml(
             'hint_1', '<p>Hello, this is html1 for state_1</p>'))
@@ -4604,9 +4918,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
     """Test methods for InteractionCustomizationArg domain object."""
 
-    def test_traverse_by_schema_and_convert(self):
-        html = []
-        def extract_html(value, unused_schema_obj_type):
+    def test_traverse_by_schema_and_convert(self) -> None:
+        html: List[str] = []
+        def extract_html(
+            value: state_domain.SubtitledHtml,
+            unused_schema_obj_type: str
+        ) -> List[str]:
             """Extracts html from SubtitledHtml values.
 
             Args:
@@ -4643,7 +4960,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
 
         self.assertEqual(html, ['<p>testing</p>'])
 
-    def test_traverse_by_schema_and_get(self):
+    def test_traverse_by_schema_and_get(self) -> None:
         html = []
 
         schema = {
@@ -4674,8 +4991,8 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
 class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
     """Test SubtitledUnicode domain object methods."""
 
-    def test_from_and_to_dict(self):
-        subtitled_unicode_dict = {
+    def test_from_and_to_dict(self) -> None:
+        subtitled_unicode_dict: state_domain.SubtitledUnicodeDict = {
             'content_id': 'id',
             'unicode_str': ''
         }
@@ -4683,7 +5000,7 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
             subtitled_unicode_dict)
         self.assertEqual(subtitled_unicode.to_dict(), subtitled_unicode_dict)
 
-    def test_create_default(self):
+    def test_create_default(self) -> None:
         subtitled_unicode = (
             state_domain.SubtitledUnicode.create_default_subtitled_unicode(
                 'id')
@@ -4697,7 +5014,7 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 
-    def test_data_formats_are_correct_and_complete(self):
+    def test_data_formats_are_correct_and_complete(self) -> None:
         translatable_class_names_in_data_formats = sorted(
             state_domain.WrittenTranslation.
             DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values())
@@ -4705,8 +5022,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             translatable_class_names_in_data_formats,
             translatable_object_registry.Registry.get_all_class_names())
 
-    def test_from_and_to_dict_works_correctly(self):
-        written_translations_dict = {
+    def test_from_and_to_dict_works_correctly(self) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content1': {
                     'en': {
@@ -4750,7 +5067,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             written_translations.to_dict(), written_translations_dict)
 
-    def test_get_content_ids_for_text_translation_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
+    def test_get_content_ids_for_text_translation_return_correct_list_of_content_id(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {}
         })
@@ -4763,7 +5082,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
 
-    def test_get_translated_content_in_non_existing_language_raise_error(self):
+    def test_get_translated_content_in_non_existing_language_raise_error(
+        self
+    ) -> None:
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
                 'content': {
@@ -4784,7 +5105,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'exist in hi language code'):
             written_translations.get_translated_content('content', 'hi')
 
-    def test_get_translated_content_for_invalid_content_id_raise_error(self):
+    def test_get_translated_content_for_invalid_content_id_raise_error(
+        self
+    ) -> None:
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
                 'content': {
@@ -4804,7 +5127,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Invalid content_id: invalid_id'):
             written_translations.get_translated_content('invalid_id', 'hi')
 
-    def test_add_content_id_for_translations_adds_content_id(self):
+    def test_add_content_id_for_translations_adds_content_id(self) -> None:
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {}
         })
@@ -4821,8 +5144,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_for_text_translation(),
             ['content_id'])
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
-            self):
+        self
+    ) -> None:
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {}
         })
@@ -4830,11 +5157,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Expected content_id to be a string, received 123'):
             written_translations.add_content_id_for_translation(
-                invalid_content_id)
+                invalid_content_id)  # type: ignore[arg-type]
 
     def test_add_content_id_for_translation_with_existing_content_id_raise_error( # pylint: disable=line-too-long
-            self):
-        written_translations_dict = {
+        self
+    ) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'feedback_1': {
                     'en': {
@@ -4854,8 +5182,10 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.add_content_id_for_translation(
                 existing_content_id)
 
-    def test_delete_content_id_for_translations_deletes_content_id(self):
-        old_written_translations_dict = {
+    def test_delete_content_id_for_translations_deletes_content_id(
+        self
+    ) -> None:
+        old_written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'en': {
@@ -4877,8 +5207,10 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(written_translations.get_content_ids_for_text_translation()), 0)
 
-    def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(self): # pylint: disable=line-too-long
-        written_translations_dict = {
+    def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {}
             }
@@ -4891,7 +5223,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.delete_content_id_for_translation(
                 nonexisting_content_id_to_delete)
 
-    def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(self): # pylint: disable=line-too-long
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {}
         })
@@ -4899,25 +5236,36 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Expected content_id to be a string, '):
             written_translations.delete_content_id_for_translation(
-                invalid_content_id_to_delete)
+                invalid_content_id_to_delete)  # type: ignore[arg-type]
 
-    def test_validation_with_invalid_content_id_raise_error(self):
-        written_translations_dict = {
+    def test_validation_with_invalid_content_id_raise_error(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
-                123: {}
+                123: {}  # type: ignore[dict-item]
             }
         }
 
         written_translations = state_domain.WrittenTranslations.from_dict(
             written_translations_dict)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected content_id to be a string, '):
-            written_translations.validate([123])
+            written_translations.validate([123])  # type: ignore[list-item]
 
-    def test_validate_non_dict_language_code_to_written_translation(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_dict_language_code_to_written_translation(
+        self
+    ) -> None:
         written_translations = state_domain.WrittenTranslations({
-            'en': []
+            'en': []  # type: ignore[dict-item]
         })
 
         with self.assertRaisesRegex(
@@ -4925,11 +5273,16 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Expected content_id value to be a dict, received []')):
             written_translations.validate(None)
 
-    def test_validation_with_invalid_type_language_code_raise_error(self):
-        written_translations_dict = {
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validation_with_invalid_type_language_code_raise_error(
+        self
+    ) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
-                    123: {
+                    123: {  # type: ignore[dict-item]
                         'data_format': 'html',
                         'translation': 'hello!',
                         'needs_update': False
@@ -4945,8 +5298,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected language_code to be a string, '):
             written_translations.validate(['content'])
 
-    def test_validation_with_unknown_language_code_raise_error(self):
-        written_translations_dict = {
+    def test_validation_with_unknown_language_code_raise_error(self) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'ed': {
@@ -4964,8 +5317,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Invalid language_code: ed'):
             written_translations.validate(['content'])
 
-    def test_validation_with_invalid_content_id_list(self):
-        written_translations_dict = {
+    def test_validation_with_invalid_content_id_list(self) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'en': {
@@ -4987,8 +5340,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                 'content ids [\'invalid_content\']')):
             written_translations.validate(['invalid_content'])
 
-    def test_get_content_ids_that_are_correctly_translated(self):
-        written_translations_dict = {
+    def test_get_content_ids_that_are_correctly_translated(self) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {},
                 'hint_1': {}
@@ -5002,8 +5355,10 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_that_are_correctly_translated(
                 'hi'), [])
 
-    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations(self): # pylint: disable=line-too-long
-        written_translations_dict = {
+    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'hi': {
@@ -5022,8 +5377,10 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_that_are_correctly_translated(
                 'hi'), ['content'])
 
-    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations_needs_update(self): # pylint: disable=line-too-long
-        written_translations_dict = {
+    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations_needs_update(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'hi': {
@@ -5046,8 +5403,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on recorded voiceovers."""
 
-    def test_from_and_to_dict_wroks_correctly(self):
-        recorded_voiceovers_dict = {
+    def test_from_and_to_dict_wroks_correctly(self) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content1': {
                     'en': {
@@ -5085,7 +5442,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             recorded_voiceovers.to_dict(), recorded_voiceovers_dict)
 
-    def test_get_content_ids_for_voiceovers_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
+    def test_get_content_ids_for_voiceovers_return_correct_list_of_content_id(
+        self
+    ) -> None:
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
             'voiceovers_mapping': {}
         })
@@ -5098,7 +5457,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers.get_content_ids_for_voiceovers(),
             ['feedback_2', 'feedback_1'])
 
-    def test_add_content_id_for_voiceovers_adds_content_id(self):
+    def test_add_content_id_for_voiceovers_adds_content_id(self) -> None:
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
             'voiceovers_mapping': {}
         })
@@ -5115,8 +5474,12 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers.get_content_ids_for_voiceovers(),
             ['content_id'])
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_add_content_id_for_voiceover_with_invalid_content_id_raise_error(
-            self):
+        self
+    ) -> None:
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
             'voiceovers_mapping': {}
         })
@@ -5124,11 +5487,12 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Expected content_id to be a string, received 123'):
             recorded_voiceovers.add_content_id_for_voiceover(
-                invalid_content_id)
+                invalid_content_id)  # type: ignore[arg-type]
 
     def test_add_content_id_for_voiceover_with_existing_content_id_raise_error( # pylint: disable=line-too-long
-            self):
-        recorded_voiceovers_dict = {
+        self
+    ) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'feedback_1': {
                     'en': {
@@ -5149,8 +5513,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers.add_content_id_for_voiceover(
                 existing_content_id)
 
-    def test_delete_content_id_for_voiceovers_deletes_content_id(self):
-        old_recorded_voiceovers_dict = {
+    def test_delete_content_id_for_voiceovers_deletes_content_id(self) -> None:
+        old_recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
                     'en': {
@@ -5173,8 +5537,10 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(recorded_voiceovers.get_content_ids_for_voiceovers()), 0)
 
-    def test_delete_content_id_for_voiceover_with_nonexisting_content_id_raise_error(self): # pylint: disable=line-too-long
-        recorded_voiceovers_dict = {
+    def test_delete_content_id_for_voiceover_with_nonexisting_content_id_raise_error(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {}
             }
@@ -5187,7 +5553,12 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers.delete_content_id_for_voiceover(
                 nonexisting_content_id_to_delete)
 
-    def test_delete_content_id_for_voiceover_with_invalid_content_id_raise_error(self): # pylint: disable=line-too-long
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_delete_content_id_for_voiceover_with_invalid_content_id_raise_error(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
             'voiceovers_mapping': {}
         })
@@ -5195,25 +5566,34 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Expected content_id to be a string, '):
             recorded_voiceovers.delete_content_id_for_voiceover(
-                invalid_content_id_to_delete)
+                invalid_content_id_to_delete)  # type: ignore[arg-type]
 
-    def test_validation_with_invalid_content_id_raise_error(self):
-        recorded_voiceovers_dict = {
+    def test_validation_with_invalid_content_id_raise_error(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
-                123: {}
+                123: {}  # type: ignore[dict-item]
             }
         }
 
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
             recorded_voiceovers_dict)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected content_id to be a string, '):
-            recorded_voiceovers.validate([123])
+            recorded_voiceovers.validate([123])  # type: ignore[list-item]
 
-    def test_validate_non_dict_language_code_to_voiceover(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_dict_language_code_to_voiceover(self) -> None:
         recorded_voiceovers = state_domain.RecordedVoiceovers({
-            'en': []
+            'en': []  # type: ignore[dict-item]
         })
 
         with self.assertRaisesRegex(
@@ -5221,11 +5601,16 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Expected content_id value to be a dict, received []')):
             recorded_voiceovers.validate(None)
 
-    def test_validation_with_invalid_type_language_code_raise_error(self):
-        recorded_voiceovers_dict = {
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validation_with_invalid_type_language_code_raise_error(
+        self
+    ) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
-                    123: {
+                    123: {  # type: ignore[dict-item]
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': False,
@@ -5242,8 +5627,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected language_code to be a string, '):
             recorded_voiceovers.validate(['content'])
 
-    def test_validation_with_unknown_language_code_raise_error(self):
-        recorded_voiceovers_dict = {
+    def test_validation_with_unknown_language_code_raise_error(self) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
                     'ed': {
@@ -5262,8 +5647,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Invalid language_code: ed'):
             recorded_voiceovers.validate(['content'])
 
-    def test_validation_with_invalid_content_id_list(self):
-        recorded_voiceovers_dict = {
+    def test_validation_with_invalid_content_id_list(self) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
                     'en': {
@@ -5289,24 +5674,27 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
 
-    def test_validate_non_str_filename(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_str_filename(self) -> None:
         self.voiceover.validate()
-        self.voiceover.filename = 0
+        self.voiceover.filename = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected audio filename to be a string'):
             self.voiceover.validate()
 
-    def test_validate_filename(self):
+    def test_validate_filename(self) -> None:
         self.voiceover.validate()
         self.voiceover.filename = 'invalid_filename'
         with self.assertRaisesRegex(Exception, 'Invalid audio filename'):
             self.voiceover.validate()
 
-    def test_validate_audio_extension(self):
+    def test_validate_audio_extension(self) -> None:
         self.voiceover.validate()
         self.voiceover.filename = 'filename.png'
         with self.assertRaisesRegex(
@@ -5317,46 +5705,55 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
                 % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))):
             self.voiceover.validate()
 
-    def test_validate_non_int_file_size_bytes(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_int_file_size_bytes(self) -> None:
         self.voiceover.validate()
-        self.voiceover.file_size_bytes = 'file_size_bytes'
+        self.voiceover.file_size_bytes = 'file_size_bytes'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected file size to be an int'):
             self.voiceover.validate()
 
-    def test_validate_negative_file_size_bytes(self):
+    def test_validate_negative_file_size_bytes(self) -> None:
         self.voiceover.validate()
         self.voiceover.file_size_bytes = -1
         with self.assertRaisesRegex(Exception, 'Invalid file size'):
             self.voiceover.validate()
 
-    def test_validate_non_bool_needs_update(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_bool_needs_update(self) -> None:
         self.voiceover.validate()
-        self.voiceover.needs_update = 'needs_update'
+        self.voiceover.needs_update = 'needs_update'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected needs_update to be a bool'):
             self.voiceover.validate()
 
-    def test_validate_str_duration_secs(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_str_duration_secs(self) -> None:
         self.voiceover.validate()
-        self.voiceover.duration_secs = 'duration_secs'
+        self.voiceover.duration_secs = 'duration_secs'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected duration_secs to be a float'):
             self.voiceover.validate()
 
-    def test_validate_int_duration_secs(self):
+    def test_validate_int_duration_secs(self) -> None:
         self.voiceover.validate()
         self.voiceover.duration_secs = 10
         self.voiceover.validate()
         self.assertEqual(self.voiceover.duration_secs, 10)
 
-    def test_validate_float_duration_secs(self):
+    def test_validate_float_duration_secs(self) -> None:
         self.voiceover.validate()
         self.voiceover.duration_secs = 10.5
         self.voiceover.validate()
         self.assertEqual(self.voiceover.duration_secs, 10.5)
 
-    def test_validate_negative_duration_seconds(self):
+    def test_validate_negative_duration_seconds(self) -> None:
         self.voiceover.validate()
         self.voiceover.duration_secs = -1.45
         with self.assertRaisesRegex(
@@ -5367,8 +5764,8 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
 
 class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
-    def test_state_version_history_gets_created(self):
-        expected_dict = {
+    def test_state_version_history_gets_created(self) -> None:
+        expected_dict: state_domain.StateVersionHistoryDict = {
             'previously_edited_in_version': 1,
             'state_name_in_previous_version': 'state 1',
             'committer_id': 'user_1'
@@ -5379,8 +5776,8 @@ class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_dict, actual_dict)
 
-    def test_state_version_history_gets_created_from_dict(self):
-        state_version_history_dict = {
+    def test_state_version_history_gets_created_from_dict(self) -> None:
+        state_version_history_dict: state_domain.StateVersionHistoryDict = {
             'previously_edited_in_version': 1,
             'state_name_in_previous_version': 'state 1',
             'committer_id': 'user_1'

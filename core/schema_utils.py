@@ -88,8 +88,8 @@ ALL_SCHEMAS: Dict[str, type] = {
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
-# Using Dict[str, Any] here for schema because the following schema can have a
-# recursive structure and mypy doesn't support recursive type currently.
+# Here we use type Any because the following schema can have a recursive
+# structure and mypy doesn't support recursive type currently.
 # See: https://github.com/python/mypy/issues/731
 def normalize_against_schema(
         obj: Any,
@@ -114,6 +114,8 @@ def normalize_against_schema(
     Raises:
         Exception. The object fails to validate against the schema.
     """
+    # Here we use type Any because 'normalized_obj' can be of type int, str,
+    # Dict, List and other types too.
     normalized_obj: Any = None
 
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_WEAK_MULTIPLE:
@@ -132,13 +134,13 @@ def normalize_against_schema(
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
         from core.domain import object_registry
-        obj_class = object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
+        obj_class = object_registry.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
                 obj, obj_class.get_schema(), apply_custom_validators=False)
         else:
-            normalized_obj = obj_class.normalize(obj)
+            normalized_obj = obj_class.normalize(obj)  # type: ignore[no-untyped-call]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
@@ -350,7 +352,7 @@ class Normalizers:
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
-        # Using a cast here because the return value of getattr() method is
+        # Here we use cast because the return value of getattr() method is
         # dynamic and mypy will assume it to be Any otherwise.
         return cast(Callable[..., str], getattr(cls, normalizer_id))
 
@@ -428,7 +430,7 @@ class _Validators:
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
-        # Using a cast here because the return value of getattr() method is
+        # Here we use cast because the return value of getattr() method is
         # dynamic and mypy will assume it to be Any otherwise.
         return cast(Callable[..., bool], getattr(cls, validator_id))
 
@@ -541,11 +543,11 @@ class _Validators:
         return obj <= max_value
 
     @staticmethod
-    def does_not_contain_email(obj: object) -> bool:
+    def does_not_contain_email(obj: str) -> bool:
         """Ensures that obj doesn't contain a valid email.
 
         Args:
-            obj: object. The object to validate.
+            obj: str. The object to validate.
 
         Returns:
             bool. Whether the given object doesn't contain a valid email.

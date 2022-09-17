@@ -25,7 +25,10 @@ import unittest
 from core import feconf
 from core import utils
 from core.domain import classifier_domain
+from core.domain import state_domain
 from core.tests import test_utils
+
+from typing import List
 
 
 class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
@@ -34,7 +37,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.training_data: classifier_domain.TrainingDataType = [
+        self.training_data: List[state_domain.TrainingDataDict] = [
             {
                 'answer_group_index': 1,
                 'answers': ['a1', 'a2']
@@ -82,6 +85,16 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         return training_job
 
     def test_to_dict(self) -> None:
+        expected_training_data: List[state_domain.TrainingDataDict] = [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ]
         expected_training_job_dict: (
             classifier_domain.ClassifierTrainingJobDict
         ) = {
@@ -95,16 +108,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
                     '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'),
             'state_name': 'a state name',
             'status': 'NEW',
-            'training_data': [
-                {
-                    'answer_group_index': 1,
-                    'answers': ['a1', 'a2']
-                },
-                {
-                    'answer_group_index': 2,
-                    'answers': ['a2', 'a3']
-                }
-            ],
+            'training_data': expected_training_data,
             'algorithm_version': 1
         }
         observed_training_job = self._get_training_job_from_dict(
@@ -117,7 +121,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def test_validation_status(self) -> None:
         self.training_job_dict['status'] = 'invalid_status'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             re.escape(
                 'Expected status to be in %s'
@@ -127,31 +131,37 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def test_validation_interaction_id(self) -> None:
         self.training_job_dict['interaction_id'] = 'invalid_interaction_id'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid interaction id'):
             training_job.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_training_data_without_answer_group_index(self) -> None:
         self.training_job_dict['training_data'] = [
-            {
+            {  # type: ignore[typeddict-item]
                 'answers': ['a1', 'a2']
             }
         ]
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected answer_group_index to be a key in training_data'
             'list item'):
             training_job.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_training_data_without_answers(self) -> None:
         self.training_job_dict['training_data'] = [
-            {
+            {  # type: ignore[typeddict-item]
                 'answer_group_index': 1
             }
         ]
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected answers to be a key in training_data list item'):
             training_job.validate()
@@ -163,21 +173,24 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def test_validation_with_invalid_state_name(self) -> None:
         self.training_job_dict['state_name'] = 'A string #'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid character # in the state name'):
             training_job.validate()
 
     def test_validation_with_invalid_algorithm_id(self) -> None:
         self.training_job_dict['algorithm_id'] = 'abc'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid algorithm id'):
             training_job.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_training_data(self) -> None:
-        self.training_job_dict['training_data'] = {}
+        self.training_job_dict['training_data'] = {}  # type: ignore[arg-type]
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected training_data to be a list'):
             training_job.validate()
 
@@ -193,7 +206,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
 
     def test_status_update_with_invalid_status(self) -> None:
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The status change %s to %s is not valid.' %
             ('NEW', 'invalid_status')):
@@ -298,7 +311,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
     def test_exp_version_with_invalid_data(self) -> None:
         self.mapping_dict['exp_version'] = -2
         mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected version to be greater than 0'):
             mapping.validate()
 

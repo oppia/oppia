@@ -155,7 +155,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ]
         }
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             actual_output_for_ckeditor, expected_output_for_ckeditor)
 
     def test_validate_soup_for_rte(self) -> None:
@@ -752,7 +752,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'e="++--"></oppia-noninteractive-math>'
             )
         }]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, re.escape('Expecting value: line 1 column 1 (char 0)')
         ):
             html_validation_service.add_math_content_to_math_rte_components(
@@ -1036,7 +1036,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'alid_4d123_width_23d122_vertical_2d123.svg')
             }]
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             html_validation_service.validate_math_content_attribute_in_html(
                 html_string_with_filename_having_invalid_format
             ),
@@ -1080,9 +1080,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         invalid_xml = False  # type: ignore[assignment]
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),

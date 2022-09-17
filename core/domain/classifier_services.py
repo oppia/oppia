@@ -28,15 +28,31 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_services
+from core.domain import state_domain
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
+
+
+class JobInfoDict(TypedDict):
+    """Type for the job info dictionary."""
+
+    algorithm_id: str
+    interaction_id: str
+    exp_id: str
+    exp_version: int
+    next_scheduled_check_time: datetime.datetime
+    state_name: str
+    training_data: List[state_domain.TrainingDataDict]
+    status: str
+    algorithm_version: int
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -56,8 +72,6 @@ def generate_signature(
     Returns:
         str. The signature of the payload data.
     """
-    # Ruling out the possibility of Any other type for vm_id.
-    assert isinstance(vm_id, str)
     converted_vm_id = vm_id.encode('utf-8')
     if isinstance(message, str):
         message = message.encode('utf-8')
@@ -113,12 +127,12 @@ def handle_trainable_states(
     Raises:
         Exception. No classifier algorithm found for the given interaction id.
     """
-    job_dicts_list = []
+    job_dicts_list: List[JobInfoDict] = []
     exp_id = exploration.id
     exp_version = exploration.version
     for state_name in state_names:
         state = exploration.states[state_name]
-        training_data = state.get_training_data()  # type: ignore[no-untyped-call]
+        training_data = state.get_training_data()
         interaction_id = state.interaction.id
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise Exception(
@@ -437,8 +451,8 @@ def fetch_next_job() -> Optional[classifier_domain.ClassifierTrainingJob]:
 # TODO(#15451): Add stubs for protobuf once we have enough type info regarding
 # protobuf's library. Because currently, the stubs in typeshed is not fully
 # type annotated yet and the main repository is also not type annotated yet.
-# The argument classifier_data_proto can accept instances of
-# `TextClassifierFrozenModel` class. But since we excluded
+# Here we use object because the argument classifier_data_proto can accept
+# instances of `TextClassifierFrozenModel` class. But since we excluded
 # proto_files/ from the static type annotations, this argument
 # is annotated as general object type.
 def store_classifier_data(job_id: str, classifier_data_proto: object) -> None:
@@ -618,11 +632,11 @@ def migrate_state_training_jobs(
         set(state_training_jobs_mapping.algorithm_ids_to_job_ids.keys()))
 
     if len(algorithm_ids_to_add) > 0:
-        job_dicts = []
+        job_dicts: List[JobInfoDict] = []
 
         for algorithm_id in algorithm_ids_to_add:
             next_scheduled_check_time = datetime.datetime.utcnow()
-            training_data = exploration.states[state_name].get_training_data()  # type: ignore[no-untyped-call]
+            training_data = exploration.states[state_name].get_training_data()
 
             classifier_domain.ClassifierTrainingJob(
                 'job_id_dummy', algorithm_id, interaction_id, exp_id,

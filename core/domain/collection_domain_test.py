@@ -49,19 +49,19 @@ title: A title
 class CollectionChangeTests(test_utils.GenericTestBase):
 
     def test_collection_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             collection_domain.CollectionChange({'invalid': 'data'})
 
     def test_collection_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             collection_domain.CollectionChange({'cmd': 'invalid'})
 
     def test_collection_change_object_with_missing_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'exploration_id, new_value')):
@@ -72,7 +72,7 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             })
 
     def test_collection_change_object_with_extra_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             collection_domain.CollectionChange({
@@ -87,7 +87,7 @@ class CollectionChangeTests(test_utils.GenericTestBase):
     def test_collection_change_object_with_invalid_collection_property(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_collection_property: '
                 'invalid is not allowed')):
@@ -255,13 +255,13 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
         self, expected_error_substring: str
     ) -> None:
         """Checks that the collection passes strict validation."""
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.collection.validate()
 
@@ -269,16 +269,16 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         """Test validating a new, valid collection."""
         self.collection.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_title_validation(self) -> None:
         self.collection.title = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected title to be a string')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_category_validation(self) -> None:
         self.collection.category = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected category to be a string')
@@ -287,9 +287,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.objective = ''
         self._assert_validation_error('objective must be specified')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.collection.objective = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected objective to be a string')
 
@@ -297,23 +297,25 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.language_code = ''
         self._assert_validation_error('language must be specified')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.collection.language_code = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected language code to be a string')
 
         self.collection.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing. In this test only those cases should
-    # be removed where `type: ignore` is added.
     def test_tags_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.collection.tags = 'abc'  # type: ignore[assignment]
         self._assert_validation_error('Expected tags to be a list')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.collection.tags = [2, 3]  # type: ignore[list-item]
         self._assert_validation_error('Expected each tag to be a string')
 
@@ -336,9 +338,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected tags to be unique, but found duplicates')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_schema_version_validation(self) -> None:
         self.collection.schema_version = 'some_schema_version'  # type: ignore[assignment]
         self._assert_validation_error('Expected schema version to be an int')
@@ -348,9 +350,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'Expected schema version to be %s' %
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_nodes_validation(self) -> None:
         self.collection.nodes = {}  # type: ignore[assignment]
         self._assert_validation_error('Expected nodes to be a list')
@@ -415,9 +417,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.validate(strict=False)
         self.collection.validate(strict=True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_collection_node_exploration_id_validation(self) -> None:
         # Validate CollectionNode's exploration_id.
         collection_node0 = self.collection.get_node('exp_id_0')
@@ -487,7 +489,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_node('test_exp')
         self.assertEqual(len(collection.nodes), 1)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Exploration is already part of this collection: test_exp'
             ):
@@ -499,7 +501,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.swap_nodes(0, 1)
         self.assertEqual(collection.nodes[0].exploration_id, 'another_exp')
         self.assertEqual(collection.nodes[1].exploration_id, 'test_exp')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Both indices point to the same collection node.'
             ):
@@ -508,7 +510,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.delete_node('another_exp')
         self.assertEqual(len(collection.nodes), 1)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Exploration is not part of this collection: another_exp'
             ):
@@ -518,9 +520,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 0)
 
     def test_update_collection_contents_from_model(self) -> None:
-        # For test purposes we're defining fields that do not match with
-        # defined VersionedCollectionDict. So, in order to prevent MyPy
-        # errors we add an ignore statement here.
+        # Here we use MyPy ignore because for test purposes we're defining
+        # fields that do not match with defined VersionedCollectionDict. So,
+        # in order to prevent MyPy errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
@@ -545,9 +547,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_update_collection_contents_from_model_with_schema_version_5(
         self
     ) -> None:
-        # For test purposes we're defining fields that do not match with
-        # defined VersionedCollectionDict. So, in order to prevent MyPy
-        # errors we add an ignore statement here.
+        # Here we use MyPy ignore because for test purposes we're defining
+        # fields that do not match with defined VersionedCollectionDict. So,
+        # in order to prevent MyPy errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
@@ -581,9 +583,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_update_collection_contents_from_model_with_invalid_schema_version(
         self
     ) -> None:
-        # For test purposes we're defining fields that do not match with
-        # defined VersionedCollectionDict. So, in order to prevent MyPy
-        # errors we add an ignore statement here.
+        # Here we use MyPy ignore because for test purposes we're defining
+        # fields that do not match with defined VersionedCollectionDict. So,
+        # in order to prevent MyPy errors we add an ignore statement here.
         versioned_collection_contents: (
             collection_domain.VersionedCollectionDict
         ) = {
@@ -591,7 +593,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'collection_contents': {} # type: ignore[typeddict-item]
         }
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Collection is version .+ but current collection schema version '
             'is %d' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
@@ -767,7 +769,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(yaml_content_2, yaml_content)
 
         # Should not be able to create a collection from no YAML content.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'Please ensure that you are uploading a YAML text file, '
             'not a zip file. The YAML parser returned the following error: '
@@ -777,16 +779,16 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
     def test_from_yaml_with_no_schema_version_specified_raises_error(
         self
     ) -> None:
-        # Argument schema_version of collection expects int value but here
-        # we are passing None which causes MyPy to throw an error. Thus we
-        # add an ignore here.
+        # Here we use MyPy ignore because the argument schema_version of
+        # collection expects int value but here we are passing None which
+        # causes MyPy to throw an error. Thus we add an ignore here.
         collection = collection_domain.Collection(
             self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
             None, [], 0) # type: ignore[arg-type]
 
         yaml_content = collection.to_yaml()
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid YAML file: no schema version specified.'):
             collection_domain.Collection.from_yaml(
                 self.COLLECTION_ID, yaml_content)
@@ -798,7 +800,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         yaml_content = collection.to_yaml()
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1 to .+ collection YAML files at '
             'present.'):
@@ -1058,19 +1060,19 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.collection_summary.language_code = 'invalid'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self) -> None:
         self.collection_summary.tags = ['', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Tags should be non-empty'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_unallowed_characters_in_tag(self) -> None:
         self.collection_summary.tags = ['123', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Tags should only contain lowercase '
                 'letters and spaces, received \'123\'')):
@@ -1078,21 +1080,21 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_whitespace_in_tag_start(self) -> None:
         self.collection_summary.tags = [' ab', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \' ab\''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_end(self) -> None:
         self.collection_summary.tags = ['ab ', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \'ab \''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_adjacent_whitespace_in_tag(self) -> None:
         self.collection_summary.tags = ['a   b', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Adjacent whitespace in tags should '
                 'be collapsed, received \'a   b\'')):
@@ -1100,7 +1102,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_duplicate_tags(self) -> None:
         self.collection_summary.tags = ['abc', 'abc', 'ab']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected tags to be unique, but found duplicates'):
             self.collection_summary.validate()

@@ -269,6 +269,15 @@ describe('Learner dashboard functionality', function() {
       await
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
         'Learner Dashboard Skill 1', 'Concept card explanation', false));
+
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    // A minimum of two questions are required for skill to get assigned in a
+    // topic’s diagnostic test.
+    await workflow.createQuestion();
+    await workflow.createQuestion();
+
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
@@ -276,6 +285,9 @@ describe('Learner dashboard functionality', function() {
       'Learner Dashboard Skill 1', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+
+    await topicEditorPage.addDiagnosticTestSkill('Learner Dashboard Skill 1');
+
     await topicEditorPage.addSubtopic(
       'Learner Dashboard Subtopic 1', 'ld-subtopic-one',
       '../data/test2_svg.svg', 'Subtopic content');
@@ -356,7 +368,7 @@ describe('Learner dashboard functionality', function() {
       await skillEditorPage.moveToQuestionsTab();
       await skillEditorPage.clickCreateQuestionButton();
       await explorationEditorMainTab.setContent(
-        await forms.toRichText('Question 1'));
+        await forms.toRichText('Question 1'), true);
       await explorationEditorMainTab.setInteraction(
         'TextInput', 'Placeholder', 5);
       await explorationEditorMainTab.addResponse(
@@ -386,6 +398,7 @@ describe('Learner dashboard functionality', function() {
       'Learner Dashboard Skill 2', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    await topicEditorPage.addDiagnosticTestSkill('Learner Dashboard Skill 2');
     await topicEditorPage.addSubtopic(
       'Learner Dashboard Subtopic 2', 'ld-subtopic-two',
       Constants.TEST_SVG_PATH, 'Subtopic content');

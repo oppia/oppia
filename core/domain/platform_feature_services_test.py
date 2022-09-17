@@ -47,7 +47,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
@@ -104,10 +104,11 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.original_feature_name_set = (
             feature_services.ALL_FEATURES_NAMES_SET
         )
-        # The expected type of 'ALL_FEATURES_LIST' is a list of 'PARAM_NAMES'
-        # Enum, but here for testing purposes we are providing a list of
-        # 'ParamNames' enums, which causes MyPy to throw an 'Incompatible types
-        # in assignment' error. Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because the expected type of ALL_FEATURES_LIST
+        # is a list of 'PARAM_NAMES' Enum, but here for testing purposes we are
+        # providing a list of 'ParamNames' enums, which causes MyPy to throw an
+        # 'Incompatible types in assignment' error. Thus to avoid the error, we
+        # used ignore here.
         feature_services.ALL_FEATURES_LIST = param_name_enums  # type: ignore[assignment]
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
@@ -230,7 +231,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_feature_flag_values_with_unknown_name_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unknown feature flag'):
             feature_services.is_feature_enabled('feature_that_does_not_exist')
 
@@ -260,7 +261,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self
     ) -> None:
         unknown_name = 'feature_that_does_not_exist'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unknown feature flag: %s' % unknown_name):
             feature_services.update_feature_flag_rules(
                 unknown_name, self.user_id, 'test update',
@@ -274,7 +275,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_update_feature_flag_rules_with_invalid_rules_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'must have a server_mode filter'):
             feature_services.update_feature_flag_rules(
                 self.dev_feature.name, self.user_id, 'test update',

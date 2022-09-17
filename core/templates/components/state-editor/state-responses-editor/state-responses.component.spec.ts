@@ -395,7 +395,7 @@ describe('State Responses Component', () => {
       defaultOutcome);
     spyOn(component, 'openAddAnswerGroupModal');
 
-    expect(component.answerGroups).toEqual(undefined);
+    expect(component.answerGroups).toEqual([]);
     expect(component.defaultOutcome).toEqual(undefined);
     expect(component.activeAnswerGroupIndex).toBe(undefined);
 
@@ -437,7 +437,7 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService, 'getInapplicableSkillMisconceptionIds')
       .and.returnValue(['misconception1']);
 
-    expect(component.answerGroups).toEqual(undefined);
+    expect(component.answerGroups).toEqual([]);
     expect(component.defaultOutcome).toEqual(undefined);
     expect(component.activeAnswerGroupIndex).toBe(undefined);
     expect(component.inapplicableSkillMisconceptionIds).toEqual(undefined);
@@ -569,7 +569,7 @@ describe('State Responses Component', () => {
     spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(true);
+    expect(component.suppressDefaultAnswerGroup()).toBe(true);
   });
 
   it('should suppress default answer group warnings if each choice' +
@@ -613,14 +613,14 @@ describe('State Responses Component', () => {
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(
       answerChoices as AnswerChoice[]);
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(true);
+    expect(component.suppressDefaultAnswerGroup()).toBe(true);
   });
 
   it('should not suppress warnings for interactions other than multiple' +
     ' choice input or item selection input', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(false);
+    expect(component.suppressDefaultAnswerGroup()).toBe(false);
   });
 
   it('should save displayed value when solicit answer details' +
@@ -877,12 +877,9 @@ describe('State Responses Component', () => {
     ' on delete button', () => {
     spyOn(ngbModal, 'open').and.callThrough();
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
@@ -898,12 +895,9 @@ describe('State Responses Component', () => {
       } as NgbModalRef
     );
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -919,12 +913,9 @@ describe('State Responses Component', () => {
       } as NgbModalRef
     );
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
   });
@@ -937,7 +928,12 @@ describe('State Responses Component', () => {
     );
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.saveTaggedMisconception('misconception1', 'skill1');
+    component.saveTaggedMisconception(
+      {
+        misconceptionId: 1,
+        skillId: 'skill1'
+      }
+    );
 
     expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
   });
@@ -967,6 +963,17 @@ describe('State Responses Component', () => {
     expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
   });
 
+  it('should update active answer group when destination is changed', () => {
+    spyOn(responsesService, 'updateActiveAnswerGroup')
+      .and.callFake((destIfReallyStuck, callback) => {
+        callback(null);
+      });
+    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
+
+    component.saveActiveAnswerGroupDestIfStuck(defaultOutcome);
+
+    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
+  });
 
   it('should update active answer group when correctness' +
     ' label is changed', () => {
@@ -1020,6 +1027,19 @@ describe('State Responses Component', () => {
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeDest(defaultOutcome);
+
+    expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
+  });
+
+  it('should update default outcome when default' +
+    ' outcome destination for stuck learner is changed', () => {
+    spyOn(responsesService, 'updateDefaultOutcome')
+      .and.callFake((destIfReallyStuck, callback) => {
+        callback(null);
+      });
+    spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
+
+    component.saveDefaultOutcomeDestIfStuck(defaultOutcome);
 
     expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
   });

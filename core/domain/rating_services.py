@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (exp_models, user_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user])
+    models.Names.EXPLORATION, models.Names.USER])
 transaction_services = models.Registry.import_transaction_services()
 
 ALLOWED_RATINGS = [1, 2, 3, 4, 5]
@@ -108,10 +108,10 @@ def assign_rating_to_exploration(
         exploration_id, user_id, new_rating, old_rating)
 
     exploration_summary.scaled_average_rating = (
-        exp_services.get_scaled_average_rating(  # type: ignore[no-untyped-call]
+        exp_services.get_scaled_average_rating(
             exploration_summary.ratings))
 
-    exp_services.save_exploration_summary(exploration_summary)  # type: ignore[no-untyped-call]
+    exp_services.save_exploration_summary(exploration_summary)
 
 
 def get_user_specific_rating_for_exploration(

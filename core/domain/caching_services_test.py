@@ -33,7 +33,7 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict
+from typing import Dict, List, Optional, Union
 
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -260,11 +260,12 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
 
-        # get_multi has namespace argument, which can accept only keys of
-        # DESERIALIZATION_FUNCTIONS Dict and 'invalid' is not one of them.
-        # So, we don't have any overload function for 'invalid' key.
-        # that's why we added call-overload ignore statement here.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        # Here we use MyPy ignore because get_multi has namespace argument,
+        # which can accept only keys of DESERIALIZATION_FUNCTIONS Dict and
+        # 'invalid' is not one of them. So, we don't have any overload function
+        # for 'invalid' key but still we are passing 'invalid' to function which
+        # causes MyPy to throw an error. Thus to avoid error, we used ignore.
+        with self.assertRaisesRegex(
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.get_multi( # type: ignore[call-overload]
@@ -272,7 +273,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c'])
 
         invalid_sub_namespace = 'sub:namespace'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Sub-namespace %s cannot contain \':\'.' % invalid_sub_namespace):
             caching_services.get_multi(
@@ -284,13 +285,18 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         ids exist or don't exist in the cache returns reasonable output.
         """
         # Key value mapping tests that strings, numbers, booleans, floats,
-        # lists, and Nonetypes are all correctly set and get from the cache.
-        key_value_mapping = {
-            'a': '1', 'b': 2, 'c': [True, None],
+        # lists, and Nonetypes are all correctly set and fetched from the cache.
+        key_value_mapping: Dict[
+            str, Union[str, int, List[Optional[bool]], Dict[str, float]]
+        ] = {
+            'a': '1',
+            'b': 2,
+            'c': [True, None],
             'd': {
                 'd.1': 1.2,
                 'd.2': 30
-            }}
+            }
+        }
 
         exploration_id = 'id'
 
@@ -307,9 +313,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        # set_mutli can accept str with literal(default), but here
-        # we passing object. Hence, ignore statement is used.
-        caching_services.set_multi( # type: ignore[call-overload]
+        caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         default_exploration = (
             exp_domain.Exploration.create_default_exploration(
@@ -666,11 +670,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         default_exploration = exp_domain.Exploration.from_dict(
             self.exploration_dict_with_unicode_characters)
 
-        # id_value_mapping is a Dict whose values can be any of the type from
-        # Exploration, Skill, Story, Topic, Collection, str. hence Any type
-        # has to be used here for the value type of id_value_mapping dictionary.
         def mock_memory_cache_services_set_multi(
-            id_value_mapping: Dict[str, Any]
+            id_value_mapping: Dict[str, bytes]
         ) -> None:
             # The json encoded string is the string that is set to the cache
             # when an exploration is created in the development server. This

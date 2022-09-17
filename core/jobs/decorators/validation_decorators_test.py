@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
 base_models, exp_models = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration])
+    [models.Names.BASE_MODEL, models.Names.EXPLORATION])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -69,10 +69,10 @@ class MockAuditsExisting(validation_decorators.AuditsExisting):
         cls._DO_FN_TYPES_BY_KIND.clear()
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class DoFn(beam.DoFn):  # type: ignore[misc]
     """Simple DoFn that does nothing."""
 
@@ -81,10 +81,10 @@ class DoFn(beam.DoFn):  # type: ignore[misc]
         pass
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class UnrelatedDoFn(beam.DoFn):  # type: ignore[misc]
     """Simple DoFn that does nothing."""
 
@@ -142,7 +142,7 @@ class AuditsExistingTests(test_utils.TestBase):
     def test_targets_every_subclass_when_a_base_model_is_targeted(self) -> None:
         self.assertIs(MockAuditsExisting(base_models.BaseModel)(DoFn), DoFn)
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types_by_kind().items(),
             [(cls.__name__, {DoFn}) for cls in [base_models.BaseModel] + (
                 models.Registry.get_all_storage_model_classes())
@@ -153,63 +153,63 @@ class AuditsExistingTests(test_utils.TestBase):
     ) -> None:
         MockAuditsExisting(base_models.BaseModel)(DoFn)
         MockAuditsExisting(base_models.BaseModel)(UnrelatedDoFn)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('BaseModel'),
             [DoFn, UnrelatedDoFn])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
             [DoFn, UnrelatedDoFn])
 
         MockAuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('BaseModel'),
             [DoFn, UnrelatedDoFn])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
             [DerivedDoFn, UnrelatedDoFn])
 
     def test_keeps_derived_do_fn_when_base_do_fn_is_added_later(self) -> None:
         MockAuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
         MockAuditsExisting(exp_models.ExplorationModel)(UnrelatedDoFn)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('BaseModel'),
             [])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
             [DerivedDoFn, UnrelatedDoFn])
 
         MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('BaseModel'),
             [DoFn])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
             [DerivedDoFn, UnrelatedDoFn])
 
     def test_does_not_register_duplicate_do_fns(self) -> None:
         MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
 
         MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
 
     def test_raises_value_error_when_given_no_args(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Must target at least one model'
         ):
             MockAuditsExisting()
 
     def test_raises_type_error_when_given_unregistered_model(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, re.escape(
                 '%r is not a model registered in core.platform' % FooModel),
         ):
             MockAuditsExisting(FooModel)
 
     def test_raises_type_error_when_decorating_non_do_fn_class(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, '%r is not a subclass of DoFn' % NotDoFn,
         ):
             MockAuditsExisting(base_models.BaseModel)(NotDoFn)
@@ -309,24 +309,24 @@ class RelationshipsOfTests(test_utils.TestBase):
             MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
             {'BazModel'})
 
-    # TODO(#13059): After we fully type the codebase we plan to get rid of the
-    # tests that intentionally test wrong inputs that we can normally catch by
-    # typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_rejects_values_that_are_not_types(self) -> None:
         foo_model = FooModel()
 
-        with self.assertRaisesRegex(TypeError, 'is an instance, not a type'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'is an instance, not a type'):
             MockRelationshipsOf(foo_model)  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get rid of the
-    # tests that intentionally test wrong inputs that we can normally catch by
-    # typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_rejects_types_that_are_not_models(self) -> None:
-        with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):
             MockRelationshipsOf(int)  # type: ignore[arg-type]
 
     def test_rejects_relationship_generator_with_wrong_name(self) -> None:
-        with self.assertRaisesRegex(ValueError, 'Please rename the function'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'Please rename the function'):
             @MockRelationshipsOf(BarModel)
             def unused_bar_model_relationships(
                 unused_model: Type[base_models.BaseModel]

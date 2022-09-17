@@ -41,7 +41,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (stats_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.feedback, models.NAMES.user
+    models.Names.STATISTICS, models.Names.FEEDBACK, models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -54,7 +54,7 @@ class MockNumbersModel(datastore_services.Model):
 class BaseEventHandlerTests(test_utils.GenericTestBase):
 
     def test_handle_event_raises_not_implemented_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'Subclasses of BaseEventHandler should implement the '
@@ -464,9 +464,11 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
             normalized_answer='answer_submitted'
         )
 
-        state_answers = stats_services.get_state_answers(  # type: ignore[no-untyped-call]
+        state_answers = stats_services.get_state_answers(
             exp_id, exploration.version,
             exploration.init_state_name)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state_answers is not None
 
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'answer_submitted',
@@ -538,7 +540,7 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.exploration = (
             self.save_new_valid_exploration('exp_id', self.admin_id))
 

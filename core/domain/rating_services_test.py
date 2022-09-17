@@ -27,13 +27,14 @@ from core.domain import rating_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Optional, overload
+from typing_extensions import Final, Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class RatingServicesTests(test_utils.GenericTestBase):
@@ -46,7 +47,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
     def test_rating_assignation(self) -> None:
         """Check ratings are correctly assigned to an exploration."""
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             self.EXP_ID,
             exp_domain.Exploration.create_default_exploration(self.EXP_ID))
 
@@ -95,7 +96,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
         time_allowed_for_computation = datetime.timedelta(seconds=10)
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             self.EXP_ID,
             exp_domain.Exploration.create_default_exploration(self.EXP_ID))
 
@@ -122,10 +123,10 @@ class RatingServicesTests(test_utils.GenericTestBase):
         exp_id_a: Final = 'exp_id_A'
         exp_id_b: Final = 'exp_id_B'
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             exp_id_a,
             exp_domain.Exploration.create_default_exploration(exp_id_a))
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             exp_id_b,
             exp_domain.Exploration.create_default_exploration(exp_id_b))
 
@@ -159,38 +160,38 @@ class RatingServicesTests(test_utils.GenericTestBase):
             {'1': 0, '2': 0, '3': 1, '4': 0, '5': 1})
 
     def test_invalid_ratings_are_forbidden(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Expected a rating 1-5, received 0'
             ):
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, 0)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Expected a rating 1-5, received 7'
             ):
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, 7)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Expected the rating to be an integer, received 2'
             ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, '2')  # type: ignore[arg-type]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Expected the rating to be an integer, received aaa'
             ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, 'aaa')  # type: ignore[arg-type]
 
     def test_invalid_exploration_ids_are_forbidden(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid exploration id invalid_id'
             ):
             rating_services.assign_rating_to_exploration(
@@ -199,23 +200,42 @@ class RatingServicesTests(test_utils.GenericTestBase):
     def test_rating_assignation_with_no_exploration_summary_ratings(
         self
     ) -> None:
+        @overload
+        def _mock_get_exploration_summary_by_id(
+            exp_id: str,
+        ) -> exp_domain.ExplorationSummary: ...
+
+        @overload
+        def _mock_get_exploration_summary_by_id(
+                exp_id: str, *, strict: Literal[True]
+        ) -> exp_domain.ExplorationSummary: ...
+
+        @overload
+        def _mock_get_exploration_summary_by_id(
+            exp_id: str, *, strict: Literal[False]
+        ) -> Optional[exp_domain.ExplorationSummary]: ...
 
         def _mock_get_exploration_summary_by_id(
             exp_id: str, strict: bool = True
-        ) -> exp_models.ExpSummaryModel:
+        ) -> Optional[exp_domain.ExplorationSummary]:
             """Assign None to exploration summary ratings."""
             exp_summary_model = exp_models.ExpSummaryModel.get(
                 exp_id, strict=strict
             )
-            # Ruling out the possibility of None for mypy type checking.
-            assert exp_summary_model is not None
-            exp_summary_model.ratings = None
-            return exp_summary_model
+            if exp_summary_model:
+                exp_summary = exp_fetchers.get_exploration_summary_from_model(
+                    exp_summary_model)
+            else:
+                return None
+            exp_summary.ratings = {}
+            return exp_summary
 
         with self.swap(
-            exp_fetchers, 'get_exploration_summary_by_id',
-            _mock_get_exploration_summary_by_id):
-            exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+            exp_fetchers,
+            'get_exploration_summary_by_id',
+            _mock_get_exploration_summary_by_id
+        ):
+            exp_services.save_new_exploration(
                 'exp_id_a',
                 exp_domain.Exploration.create_default_exploration('exp_id_a'))
 

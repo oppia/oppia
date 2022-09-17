@@ -62,13 +62,13 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 self.DRAFT_CHANGELIST, 1, 1, self.EXP_ID))
 
     def test_try_upgrade_raises_exception_if_versions_are_invalid(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'Current draft version is greater than the exploration version.'):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 2, 1, self.EXP_ID)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -78,7 +78,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
     def test_try_upgrade_failure_due_to_unsupported_commit_type(self) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -90,7 +90,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     def test_try_upgrade_failure_due_to_unimplemented_upgrade_methods(
         self
     ) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
             'Ran Exploration Migration job.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -147,7 +147,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
 
             # Create and migrate the exploration.
             self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 self.USER_ID, self.EXP_ID, exp_migration_change_list,
                 'Ran Exploration Migration job.')
 
@@ -167,6 +167,58 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
+
+    def test_convert_states_v51_dict_to_v52_dict(self) -> None:
+        draft_change_list_v51_1 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        draft_change_list_v51_2 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'next_content_id_index',
+                'new_value': 'new value'
+            })
+        ]
+        draft_change_list_v51_3 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Intro',
+                'content_id': 'content_id',
+                'language_code': 'en',
+                'content_html': 'content',
+                'translation_html': 'content',
+                'data_format': 'format_1',
+            })
+        ]
+        self.create_and_migrate_new_exploration('51', '52')
+
+        migrated_draft_change_list_v52_1 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v51_1, 1, 2, self.EXP_ID)
+        )
+        assert migrated_draft_change_list_v52_1 is not None
+        self.assertEqual(
+            [change.to_dict() for change in draft_change_list_v51_1],
+            [change.to_dict() for change in migrated_draft_change_list_v52_1]
+        )
+
+        migrated_draft_change_list_v52_2 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v51_2, 1, 2, self.EXP_ID)
+        )
+        self.assertIsNone(migrated_draft_change_list_v52_2)
+
+        migrated_draft_change_list_v52_3 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v51_3, 1, 2, self.EXP_ID)
+        )
+        self.assertIsNone(migrated_draft_change_list_v52_3)
 
     def test_convert_states_v50_dict_to_v51_dict(self) -> None:
         draft_change_list_v50 = [
@@ -1127,22 +1179,44 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'written_translations',
                 'new_value': {
                     'translations_mapping': {
+                        # Here we use MyPy ignore because we are testing convert
+                        # function and in convert function we are working with
+                        # previous versions of the domain object and in previous
+                        # versions of the domain object there are some fields
+                        # (eg: html) that are discontinued in the latest domain
+                        # object. So, while defining these old keys MyPy throw
+                        # an error. To avoid the error, we used ignore here.
                         'content1': {
-                            'en': {
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': html_content,
                                 'needs_update': True
                             },
-                            'hi': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
-                            'hi': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': html_content,
                                 'needs_update': False
                             },
-                            'en': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': 'hello!',
                                 'needs_update': False
                             }
@@ -1330,22 +1404,44 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'written_translations',
                 'new_value': {
                     'translations_mapping': {
+                        # Here we use MyPy ignore because we are testing convert
+                        # function and in convert function we are working with
+                        # previous versions of the domain object and in previous
+                        # versions of the domain object there are some fields
+                        # (eg: html) that are discontinued in the latest domain
+                        # object. So, while defining these old keys MyPy throw
+                        # an error. To avoid the error, we used ignore here.
                         'content1': {
-                            'en': {
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': expected_html_content,
                                 'needs_update': True
                             },
-                            'hi': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
-                            'hi': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': expected_html_content,
                                 'needs_update': False
                             },
-                            'en': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': 'hello!',
                                 'needs_update': False
                             }
@@ -1523,7 +1619,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list_v33_dict_list = [
             change.to_dict() for change in migrated_draft_change_list_v33
         ]
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expected_draft_change_list_v33_dict_list,
             migrated_draft_change_list_v33_dict_list)
 
@@ -1629,7 +1725,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
-                'new_value': {
+                'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
@@ -1655,7 +1751,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                     'training_data': [],
                     'tagged_misconception_id': None
-                }
+                }]
             })
         ]
         # Version 30 replaces the tagged_misconception_id in version 29
@@ -1665,7 +1761,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
-                'new_value': {
+                'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
@@ -1691,7 +1787,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                     'training_data': [],
                     'tagged_skill_misconception_id': None
-                }
+                }]
             })
         ]
         # Migrate exploration to state schema version 30.

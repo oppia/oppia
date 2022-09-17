@@ -85,6 +85,22 @@ angular.module('oppia').controller('RteHelperModalController', [
       }
     }
 
+    // The 'defaultRTEComponent' variable controls whether the delete button
+    // needs to be shown. If the RTE component has default values, there is no
+    // need for a delete button as the 'Cancel' button would have
+    // the same functionality.
+    $scope.defaultRTEComponent = true;
+    for (let i = 0; i < customizationArgSpecs.length; i++) {
+      let caName = customizationArgSpecs[i].name;
+      let attrsCaDict = attrsCustomizationArgsDict;
+      if (
+        attrsCaDict.hasOwnProperty(caName) &&
+        attrsCaDict[caName] !== customizationArgSpecs[i].default_value
+      ) {
+        $scope.defaultRTEComponent = false;
+      }
+    }
+
     $scope.cancel = function() {
       for (let i = 0; i < customizationArgSpecs.length; i++) {
         let caName = customizationArgSpecs[i].name;
@@ -105,15 +121,20 @@ angular.module('oppia').controller('RteHelperModalController', [
       $uibModalInstance.dismiss(true);
     };
 
+    $scope.delete = function() {
+      $uibModalInstance.dismiss(true);
+    };
+
     $scope.disableSaveButtonForMathRte = function() {
       // This method disables the save button when the Math SVG has not yet
       // been generated but being processed.
       if (!$scope.currentRteIsMathExpressionEditor) {
         return false;
       } else {
+        const { value } = $scope.tmpCustomizationArgs[0];
         return (
-          $scope.tmpCustomizationArgs[0].value.
-            mathExpressionSvgIsBeingProcessed);
+          value.mathExpressionSvgIsBeingProcessed || value.raw_latex === ''
+        );
       }
     };
     $scope.save = function() {

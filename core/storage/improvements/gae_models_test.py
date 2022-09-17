@@ -27,8 +27,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import improvements_models
 
-base_models, improvements_models = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.improvements])
+base_models, improvements_models = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.IMPROVEMENTS
+])
 
 
 class TaskEntryModelTests(test_utils.GenericTestBase):
@@ -230,7 +231,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'issue_description',
             status=constants.TASK_STATUS_OPEN)
 
-        with self.assertRaisesRegex(Exception, 'Task id .* already exists'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Task id .* already exists'):
             improvements_models.TaskEntryModel.create(
                 constants.TASK_ENTITY_TYPE_EXPLORATION,
                 'eid',
