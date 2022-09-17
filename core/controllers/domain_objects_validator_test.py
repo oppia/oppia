@@ -250,7 +250,7 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
 
 
 class ValidateExplorationChangeTests(test_utils.GenericTestBase):
-    """Tests to validate exploration change coming from frontend."""
+    """Tests to validate exploration change coming from frontend"""
 
     def test_incorrect_exp_state_domain_content(self) -> None:
         """Tests the state content of exploration change"""

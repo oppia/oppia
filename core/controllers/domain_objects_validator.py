@@ -253,8 +253,8 @@ def validate_exploration_change(exp_change_dict):
             that needs to be validated.
 
     Returns:
-        exp_change_dict: dict. The exploration change dictionary
-        after validation.
+        exp_domain.ExplorationChange. The exploration change domain
+        object.
     """
     exp_change_dict = validate_suggestion_change(exp_change_dict)
     if exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
@@ -278,4 +278,4 @@ def validate_exploration_change(exp_change_dict):
                         )
                         written_translation_obj.validate()
 
-    return exp_change_dict
+    return exp_domain.ExplorationChange.from_dict(exp_change_dict)
