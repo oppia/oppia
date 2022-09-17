@@ -243,3 +243,39 @@ def validate_suggestion_images(files):
     # The files argument do not represent any domain class, hence dict form
     # of the data is returned from here.
     return files
+
+
+def validate_exploration_change(exp_change_dict):
+    """Validate the exploration change list
+
+    Args:
+        exp_change_dict: dict. The exploration change dictionary
+            that needs to be validated.
+
+    Returns:
+        exp_change_dict: dict. The exploration change dictionary
+        after validation.
+    """
+    exp_change_dict = validate_suggestion_change(exp_change_dict)
+    if exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
+        if exp_change_dict[
+            'property_name'] == exp_domain.STATE_PROPERTY_CONTENT:
+            content_obj = state_domain.SubtitledHtml.from_dict(
+                exp_change_dict['new_value'])
+            content_obj.validate()
+
+        elif exp_change_dict[
+            'property_name'] == exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS:
+            written_translations = exp_change_dict['new_value']
+            for translations in written_translations.values():
+                for language_code_to_written_translation in (
+                    translations.values()):
+                    for written_translation in (
+                        language_code_to_written_translation.values()):
+                        written_translation_obj = (
+                            state_domain.WrittenTranslation.from_dict(
+                                written_translation)
+                        )
+                        written_translation_obj.validate()
+
+    return exp_change_dict

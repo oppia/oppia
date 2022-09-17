@@ -21,6 +21,8 @@ import os
 from core import feconf
 from core import utils
 from core.controllers import domain_objects_validator
+from core.domain import exp_domain
+from core.domain import state_domain
 from core.tests import test_utils
 
 
@@ -245,3 +247,63 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
             ) as f:
                 files[filename] = f.read()
         domain_objects_validator.validate_suggestion_images(files)
+
+
+class ValidateExplorationChangeTests(test_utils.GenericTestBase):
+    """Tests to validate exploration change coming from frontend."""
+
+    def test_incorrect_exp_state_domain_content(self) -> None:
+        """Tests the state content of exploration change"""
+        incorrect_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'New state',
+            'old_value': state_domain.SubtitledHtml(
+                'content', '').to_dict(),
+            'new_value': state_domain.SubtitledHtml(
+                'content',
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;abc.png&quot;" caption-with-value="&quot;'
+                '&quot;" alt-with-value="&quot;&quot;">'
+                '</oppia-noninteractive-image>').to_dict()
+        }
+        with self.assertRaisesRegex(
+            Exception, 'Image tag \'alt-with-value\' attribute '
+            'should not be empty.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                incorrect_change_dict)
+
+    def test_incorrect_exp_state_domain_translations(self):
+        """Tests the state translations of exploration change"""
+        incorrect_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
+            'state_name': 'New state',
+            'old_value': state_domain.WrittenTranslations({
+                'content': {
+                    'en': state_domain.WrittenTranslation(
+                        'html', '', False)
+                }
+            }).to_dict(),
+            'new_value': state_domain.WrittenTranslations({
+                'content': {
+                    'en': state_domain.WrittenTranslation(
+                        'html',
+                        (
+                            '<oppia-noninteractive-image filepath-with-value='
+                            '"&quot;abc.png&quot;" caption-with-value="&quot;'
+                            '&quot;" alt-with-value="&quot;&quot;">'
+                            '</oppia-noninteractive-image>'
+                        ),
+                        True
+                    )
+                }
+            }).to_dict()
+        }
+        with self.assertRaisesRegex(
+            Exception, 'Image tag \'alt-with-value\' attribute '
+            'should not be empty.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                incorrect_change_dict)

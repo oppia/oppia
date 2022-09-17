@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import bs4
 import collections
 import copy
 import itertools
@@ -37,6 +36,7 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
+import bs4
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, overload
 )
@@ -1922,6 +1922,7 @@ class Voiceover:
                 'or zero if not yet specified %s' %
                 self.duration_secs)
 
+
 def validate_rte_tags(
     html: str, is_tags_nested_inside_tabs_or_collapsible: bool = False
 ) -> None:
@@ -1944,6 +1945,18 @@ def validate_rte_tags(
                 'Image tag does not have \'alt-with-value\' attribute.'
             )
 
+        if len(tag['alt-with-value'].strip()) < 5:
+            raise utils.ValidationError(
+                'Image tag \'alt-with-value\' attribute should not '
+                'be less than 5.'
+            )
+
+        if len(tag['content-with-value'].strip()) > 500:
+            raise utils.ValidationError(
+                'Image tag \'content-with-value\' attribute should not '
+                'be greater than 500 characters.'
+            )
+
         if not tag.has_attr('filepath-with-value'):
             raise utils.ValidationError(
                 'Image tag does not have \'filepath-with-value\' attribute.'
@@ -1957,21 +1970,20 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        else:
-            if tag['text-with-value'] is None:
-                raise utils.ValidationError(
-                    'SkillReview tag should not have \'text-with-value\' '
-                    'attribute value as None.'
-                )
+        if tag['text-with-value'] is None:
+            raise utils.ValidationError(
+                'SkillReview tag should not have \'text-with-value\' '
+                'attribute value as None.'
+            )
 
-            if (
-                tag['text-with-value'].strip() in
-                ('&quot;&quot;', '', '\'\'', '\"\"')
-            ):
-                raise utils.ValidationError(
-                    'SkillReview tag should not have \'text-with-value\' '
-                    'attribute value as empty string.'
-                )
+        if (
+            tag['text-with-value'].strip() in
+            ('&quot;&quot;', '', '\'\'', '\"\"')
+        ):
+            raise utils.ValidationError(
+                'SkillReview tag should not have \'text-with-value\' '
+                'attribute value as empty string.'
+            )
 
         if not tag.has_attr('skill_id-with-value'):
             raise utils.ValidationError(
@@ -1979,21 +1991,20 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        else:
-            if tag['skill_id-with-value'] is None:
-                raise utils.ValidationError(
-                    'SkillReview tag should not have '
-                    '\'skill_id-with-value\' attribute value as None.'
-                )
+        if tag['skill_id-with-value'] is None:
+            raise utils.ValidationError(
+                'SkillReview tag should not have '
+                '\'skill_id-with-value\' attribute value as None.'
+            )
 
-            if (
-                tag['skill_id-with-value'].strip() in
-                ('&quot;&quot;', '', '\'\'', '\"\"')
-            ):
-                raise utils.ValidationError(
-                    'SkillReview tag should not have '
-                    '\'skill_id-with-value\' attribute value as empty.'
-                )
+        if (
+            tag['skill_id-with-value'].strip() in
+            ('&quot;&quot;', '', '\'\'', '\"\"')
+        ):
+            raise utils.ValidationError(
+                'SkillReview tag should not have '
+                '\'skill_id-with-value\' attribute value as empty.'
+            )
 
     for tag in soup.find_all('oppia-noninteractive-video'):
         if not tag.has_attr('start-with-value'):
@@ -2001,65 +2012,72 @@ def validate_rte_tags(
                 'Video tag does not have \'start-with-value\' '
                 'attribute.'
             )
-        else:
-            if (
-                tag['start-with-value'].strip() in
-                ('&quot;&quot;', '', '\'\'', '\"\"')
-            ):
-                raise utils.ValidationError(
-                    'Video tag \'start-with-value\' attribute should not'
-                    'be empty.'
-                )
+
+        if (
+            tag['start-with-value'].strip() in
+            ('&quot;&quot;', '', '\'\'', '\"\"')
+        ):
+            raise utils.ValidationError(
+                'Video tag \'start-with-value\' attribute should not'
+                'be empty.'
+            )
 
         if not tag.has_attr('end-with-value'):
             raise utils.ValidationError(
                 'Video tag does not have \'end-with-value\' '
                 'attribute.'
             )
-        else:
-            if (
-                tag['end-with-value'].strip() in
-                ('&quot;&quot;', '', '\'\'', '\"\"')
-            ):
-                raise utils.ValidationError(
-                    'Video tag \'end-with-value\' attribute should not'
-                    'be empty.'
-                )
+
+        if (
+            tag['end-with-value'].strip() in
+            ('&quot;&quot;', '', '\'\'', '\"\"')
+        ):
+            raise utils.ValidationError(
+                'Video tag \'end-with-value\' attribute should not'
+                'be empty.'
+            )
+
+        start_value = tag['start-with-value'].strip()
+        end_value = tag['end-with-value'].strip()
+        if start_value > end_value and start_value != '0' and end_value != '0':
+            raise utils.ValidationError(
+                'Start value should not be greater than End value in Video tag.'
+            )
 
         if not tag.has_attr('autoplay-with-value'):
             raise utils.ValidationError(
                 'Video tag does not have \'autoplay-with-value\' '
                 'attribute.'
             )
-        else:
-            if tag['autoplay-with-value'].strip() not in (
-                'true', 'false', '\'true\'', '\'false\'',
-                '\"true\"', '\"false\"'
-            ):
-                raise utils.ValidationError(
-                    'Video tag \'autoplay-with-value\' attribute should be '
-                    'a boolean value.'
-                )
+
+        if tag['autoplay-with-value'].strip() not in (
+            'true', 'false', '\'true\'', '\'false\'',
+            '\"true\"', '\"false\"'
+        ):
+            raise utils.ValidationError(
+                'Video tag \'autoplay-with-value\' attribute should be '
+                'a boolean value.'
+            )
 
         if not tag.has_attr('video_id-with-value'):
             raise utils.ValidationError(
                 'Video tag does not have \'video_id-with-value\' '
                 'attribute.'
             )
-        else:
-            if tag['video_id-with-value'] is None:
-                raise utils.ValidationError(
-                    'Video tag \'video_id-with-value\' attribute should not'
-                    'be None.'
-                )
-            elif (
-                tag['video_id-with-value'].strip() in
-                ('&quot;&quot;', '', '\'\'', '\"\"')
-            ):
-                raise utils.ValidationError(
-                    'Video tag \'video_id-with-value\' attribute should not'
-                    'be empty.'
-                )
+
+        if tag['video_id-with-value'] is None:
+            raise utils.ValidationError(
+                'Video tag \'video_id-with-value\' attribute should not'
+                'be None.'
+            )
+        elif (
+            tag['video_id-with-value'].strip() in
+            ('&quot;&quot;', '', '\'\'', '\"\"')
+        ):
+            raise utils.ValidationError(
+                'Video tag \'video_id-with-value\' attribute should not'
+                'be empty.'
+            )
 
     for tag in soup.find_all('oppia-noninteractive-link'):
         if not tag.has_attr('text-with-value'):
@@ -2068,13 +2086,12 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        else:
-            empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
-            if tag['text-with-value'].strip() in empty_values:
-                raise utils.ValidationError(
-                    'Link tag \'text-with-value\' attribute should not'
-                    'be empty.'
-                )
+        empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
+        if tag['text-with-value'].strip() in empty_values:
+            raise utils.ValidationError(
+                'Link tag \'text-with-value\' attribute should not'
+                'be empty.'
+            )
 
         if not tag.has_attr('url-with-value'):
             raise utils.ValidationError(
@@ -2082,13 +2099,12 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        else:
-            empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
-            if tag['url-with-value'].strip() in empty_values:
-                raise utils.ValidationError(
-                    'Link tag \'url-with-value\' attribute should not'
-                    'be empty.'
-                )
+        empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
+        if tag['url-with-value'].strip() in empty_values:
+            raise utils.ValidationError(
+                'Link tag \'url-with-value\' attribute should not'
+                'be empty.'
+            )
 
     for tag in soup.find_all('oppia-noninteractive-math'):
         if not tag.has_attr('math_content-with-value'):
@@ -2096,29 +2112,58 @@ def validate_rte_tags(
                 'Math tag does not have \'math_content-with-value\' '
                 'attribute.'
             )
-        else:
-            math_content_json = html_validation_service.unescape_html(
-                tag['math_content-with-value'])
-            math_content_list = json.loads(math_content_json)
 
-            if 'raw_latex' not in math_content_list:
-                raise utils.ValidationError(
-                    'Math tag does not have \'raw_latex-with-value\' '
-                    'attribute.'
-                )
-            elif math_content_list['raw_latex'] is None:
-                raise utils.ValidationError(
-                    'Math tag \'raw_latex-with-value\' attribute should not'
-                    ' be None.'
-                )
-            elif (
-                math_content_list['raw_latex'].strip()
-                in ('&quot;&quot;', '', '\'\'', '\"\"')
-            ):
-                raise utils.ValidationError(
-                    'Math tag \'raw_latex-with-value\' attribute should not'
-                    ' be empty.'
-                )
+        math_content_json = html_validation_service.unescape_html(
+            tag['math_content-with-value'])
+        math_content_list = json.loads(math_content_json)
+
+        if 'raw_latex' not in math_content_list:
+            raise utils.ValidationError(
+                'Math tag does not have \'raw_latex-with-value\' '
+                'attribute.'
+            )
+
+        if math_content_list['raw_latex'] is None:
+            raise utils.ValidationError(
+                'Math tag \'raw_latex-with-value\' attribute should not '
+                'be None.'
+            )
+
+        if (
+            math_content_list['raw_latex'].strip()
+            in ('&quot;&quot;', '', '\'\'', '\"\"')
+        ):
+            raise utils.ValidationError(
+                'Math tag \'raw_latex-with-value\' attribute should not '
+                'be empty.'
+            )
+
+        if 'svg_filename' not in math_content_list:
+            raise utils.ValidationError(
+                'Math tag does not have \'svg_filename-with-value\' '
+                'attribute.'
+            )
+
+        if math_content_list['svg_filename'] is None:
+            raise utils.ValidationError(
+                'Math tag \'svg_filename-with-value\' attribute should not '
+                'be None.'
+            )
+
+        if (
+            math_content_list['svg_filename'].strip()
+            in ('&quot;&quot;', '', '\'\'', '\"\"')
+        ):
+            raise utils.ValidationError(
+                'Math tag \'svg_filename-with-value\' attribute should not '
+                'be empty.'
+            )
+
+        if math_content_list['svg_filename'].strip()[-4:] != '.svg':
+            raise utils.ValidationError(
+                'Math tag \'svg_filename-with-value\' attribute should '
+                'have svg extension.'
+            )
 
     if is_tags_nested_inside_tabs_or_collapsible:
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
@@ -2134,6 +2179,7 @@ def validate_rte_tags(
                 'Collapsible tag should not be present inside another '
                 'Tabs or Collapsible tag.'
             )
+
 
 def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
     """Validates `Tabs` and `Collapsible` RTE tags
@@ -2162,7 +2208,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
             for tab_content in tab_content_list:
                 validate_rte_tags(
                     tab_content['content'],
-                    is_tags_nested_inside_tabs_or_collapsible = True
+                    is_tags_nested_inside_tabs_or_collapsible=True
                 )
         except Exception:
             raise utils.ValidationError(
@@ -2187,7 +2233,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
 
             validate_rte_tags(
                 collapsible_content_list,
-                is_tags_nested_inside_tabs_or_collapsible = True
+                is_tags_nested_inside_tabs_or_collapsible=True
             )
 
         except:
@@ -2340,8 +2386,13 @@ class WrittenTranslation:
                 self.needs_update)
 
         # Validate translations.
-        validate_rte_tags(self.translation)
-        validate_tabs_and_collapsible_rte_tags(self.translation)
+        if isinstance(self.translation, list):
+            for html in self.translation:
+                validate_rte_tags(html)
+                validate_tabs_and_collapsible_rte_tags(html)
+        else:
+            validate_rte_tags(self.translation)
+            validate_tabs_and_collapsible_rte_tags(self.translation)
 
 
 class WrittenTranslationsDict(TypedDict):
