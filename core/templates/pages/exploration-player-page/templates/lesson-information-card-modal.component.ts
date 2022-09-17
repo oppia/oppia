@@ -245,8 +245,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.showTooltip = true;
     setTimeout(() => {
       this.showTooltip = false;
-    }
-    , 1000);
+    }, 1000);
   }
 
 
