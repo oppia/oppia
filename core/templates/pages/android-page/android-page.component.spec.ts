@@ -29,7 +29,7 @@ class MockIntersectionObserver {
   unobserve: () => void;
 
   constructor(
-    public callback: (entries: Array<IntersectionObserverEntry>) => void
+    public callback: (entries: IntersectionObserverEntry[]) => void
   ) {
     this.observe = () => {
       callback([{
@@ -53,7 +53,7 @@ class MockTranslateService {
   }
 }
 
-fdescribe('Android page', () => {
+describe('Android page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
   beforeEach(async() => {
@@ -138,7 +138,7 @@ fdescribe('Android page', () => {
   });
 
   it('should attach intersection observers', () => {
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    // eslint-disable-next-line
     (window as any).IntersectionObserver = MockIntersectionObserver;
     component.androidUpdatesSectionRef = new ElementRef(
       document.createElement('div'));

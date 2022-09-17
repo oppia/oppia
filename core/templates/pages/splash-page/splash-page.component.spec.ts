@@ -136,7 +136,7 @@ describe('Splash Page', () => {
     component.onClickAccessAndroidButton();
 
     expect(mockWindowRef.nativeWindow.location.href).toEqual('/android');
-  })
+  });
 
   it('should record analytics when Start Contributing is clicked', function() {
     spyOn(

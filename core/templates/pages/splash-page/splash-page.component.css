@@ -72,11 +72,10 @@
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
+  margin-bottom: 40px;
   margin-top: -20px;
   min-width: 300px;
   padding: 10px;
-  text-transform: uppercase;
-  margin-bottom: 40px;
   text-transform: none;
 }
 

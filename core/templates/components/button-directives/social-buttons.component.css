@@ -53,10 +53,10 @@
 }
 
 .oppia-footer-social .oppia-android-app-button {
+  border: 1px solid;
   color: #fff;
-  width: 140px;
   margin-top: 20px;
   padding: 5px;
   text-align: center;
-  border: 1px solid;
+  width: 140px;
 }

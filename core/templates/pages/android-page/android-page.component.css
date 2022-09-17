@@ -22,40 +22,40 @@
   );
   background-size: cover;
   display: flex;
-  width: 320px;
   height: 300px;
   margin-top: -10vh;
+  width: 320px;
 }
 
 .oppia-android-updates-checkbox {
-  transform: scale(1.65);
   margin-left: 2px;
+  transform: scale(1.65);
 }
 
 .oppia-android-updates-button {
-  background: #00645C;
+  background: #00645c;
   border-radius: 4px;
-  color: #FFFFFF;
-  font-family: 'Capriola';
+  color: #fff;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 16px;
   font-style: normal;
   font-weight: 400;
-  font-size: 16px;
   line-height: 20px;
   width: 300px;
 }
 
 .oppia-android-updates-checkbox-label {
   display: block;
-  padding-left: 30px;
-  margin-top: -25px;
-  font-family: 'Roboto';
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 18px;
   font-weight: 400;
+  margin-top: -25px;
+  padding-left: 30px;
 }
 
 .oppia-android-updates-input-padding {
-  padding-top: 50px;
   max-width: 365px;
+  padding-top: 50px;
 }
 
 .oppia-android-updates-input {
@@ -63,32 +63,32 @@
 }
 
 .oppia-android-updates-input:focus-visible {
-  outline-color: #00645C;
+  outline-color: #00645c;
 }
 
 .oppia-android-updates-asterisk-color {
+  color: #ff3a44;
   font-weight: 700;
-  color: #FF3A44;
 }
 
 .oppia-android-updates-input-label {
-  font-family: 'Capriola';
-  font-weight: 400;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 18px;
+  font-weight: 400;
 }
 
 .oppia-android-updates-main-text {
-  font-family: 'Capriola';
-  font-weight: 400;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 48px;
+  font-weight: 400;
   line-height: 60px;
   padding-top: 170px;
 }
 
 .oppia-android-sub-text {
-  font-family: 'Roboto';
-  font-weight: 400;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 18px;
+  font-weight: 400;
   line-height: 24px;
 }
 
@@ -98,8 +98,8 @@
 }
 
 .oppia-android-bold-text {
+  color: #00645c;
   font-weight: 700;
-  color: #00645C;
 }
 
 .oppia-android-updates-text-container {
@@ -112,10 +112,10 @@
 }
 
 .oppia-android-app-updates-background {
-  background-color: #DDEDEB;
-  width: 100vw;
+  background-color: #ddedeb;
   margin-left: 50%;
   transform: translateX(-50%);
+  width: 100vw;
 }
 
 .oppia-android-app-updates-container {
@@ -134,8 +134,8 @@
 
 .oppia-android-key-feature-image {
   flex: 1;
-  transform: scale(1.25);
   margin-top: -12vh;
+  transform: scale(1.25);
 }
 
 .oppia-android-key-feature-description {
@@ -147,13 +147,13 @@
 }
 
 .oppia-android-key-feature-text {
-  font-family: Roboto;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 24px;
   font-weight: 700;
 }
 
 .oppia-android-key-feature-subtext {
-  font-family: Roboto;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 18px;
   font-weight: 400;
 }
@@ -169,14 +169,14 @@
 }
 
 .oppia-android-features {
-  font-family: Capriola, Roboto, Arial, sans-serif;
-  margin-left: 12vh;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   height: 100vh;
+  margin-left: 12vh;
 }
 
 .oppia-android-features-main-text {
-  line-height: 60px;
   font-size: 48px;
+  line-height: 60px;
 }
 
 .oppia-android-page-container {
@@ -184,8 +184,8 @@
 }
 
 .oppia-android-page {
-  max-width: 1280px;
   margin: auto;
+  max-width: 1280px;
 }
 
 .oppia-android-text-color {
@@ -193,9 +193,9 @@
 }
 
 .oppia-android-main-text {
-  font-family: Capriola, Roboto, Arial, sans-serif;
-  line-height: 60px;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 48px;
+  line-height: 60px;
 }
 
 @keyframes oppia-android-main-body-animation {
@@ -209,8 +209,8 @@
 }
 
 .oppia-android-main-body {
-  margin-left: 50%;
   animation: oppia-android-main-body-animation 0.25s ease-in 2.2s 1 normal forwards;
+  margin-left: 50%;
   white-space: pre;
 }
 
@@ -228,27 +228,27 @@
 }
 
 .oppia-android-beta-description {
-  font-family: Roboto;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
   font-style: normal;
   font-weight: 400;
-  font-size: 18px;
   line-height: 21px;
 }
 
 .oppia-android-support-text {
-  color: #009C8A;
-  font-family: 'Roboto';
+  color: #009c8a;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
   font-style: normal;
   font-weight: 400;
-  font-size: 14px;
   line-height: 16px;
-  padding: 89px 0 5px 0;
   margin-left: 8%;
+  padding: 89px 0 5px 0;
 }
 
 .oppia-android-google-play-logo {
-  margin-left: 25vh;
   display: block;
+  margin-left: 25vh;
 }
 
 @keyframes android-hero-image-animation {
@@ -272,10 +272,10 @@
 }
 
 .oppia-android-hero-image-container {
-  flex: 1;
   animation: android-hero-image-animation 0.4s ease-in 2s 1 normal forwards;
-  visibility: hidden;
+  flex: 1;
   overflow-x: clip;
+  visibility: hidden;
 }
 
 .oppia-web-only {
@@ -297,8 +297,8 @@
   }
 
   .oppia-android-page {
-    max-width: 360px;
     margin: auto;
+    max-width: 360px;
     padding: 0 15px;
   }
 
@@ -313,16 +313,16 @@
 
   .oppia-android-beta-description-container {
     padding: 58px 0 0 0;
-    word-break: break-word;
     white-space: normal;
     width: 240px;
+    word-break: break-word;
   }
 
   .oppia-android-support-text {
     font-size: 11px;
     line-height: 12px;
-    padding: 58px 0;
     margin: 0;
+    padding: 58px 0;
     width: 170px;
   }
 
@@ -340,25 +340,25 @@
   }
 
   .oppia-android-hero-image-container {
-    flex: 1;
     animation: none;
-    visibility: visible;
+    flex: 1;
     overflow: visible;
+    visibility: visible;
   }
 
   .oppia-android-features {
-    margin-left: 0;
     height: 100vh;
+    margin-left: 0;
   }
 
   .oppia-android-features-main-text {
-    line-height: 23px;
     font-size: 18px;
+    line-height: 23px;
   }
 
   .oppia-android-main-body {
-    margin: 0;
     animation: none;
+    margin: 0;
     white-space: pre;
   }
 
@@ -369,8 +369,8 @@
 
   .oppia-android-logo {
     height: 14px;
-    padding: 0;
     margin: 0 1px 1px 0;
+    padding: 0;
   }
 
   .oppia-android-key-feature-container {
@@ -380,8 +380,8 @@
 
   .oppia-android-key-feature-image {
     flex: none;
-    transform: scale(1.5);
     margin-top: 10vh;
+    transform: scale(1.5);
   }
 
   .oppia-android-key-feature-text,
@@ -395,35 +395,35 @@
 
   .oppia-android-carousel-item-container {
     display: flex;
-    justify-content: center;
     gap: 10px;
+    justify-content: center;
     margin: 20px 0;
   }
 
   .oppia-android-carousel-item {
+    border: 1px solid #00645c;
+    border-radius: 50%;
     height: 5px;
     width: 5px;
-    border-radius: 50%;
-    border: 1px solid #00645C;
   }
 
   .oppia-android-carousel-item-active {
-    background-color: #00645C;
+    background-color: #00645c;
   }
 
   .oppia-android-speech-bubble-text {
+    font-size: 14px;
+    line-height: 18px;
     margin-left: 0;
     margin-top: -30px;
-    line-height: 18px;
-    font-size: 14px;
     text-align: center;
   }
 
   .oppia-android-speech-bubble {
-    width: 180px;
     height: 170px;
-    margin-top: -10vh;
     margin-left: -40px;
+    margin-top: -10vh;
+    width: 180px;
   }
 
   .oppia-android-avatar-img {

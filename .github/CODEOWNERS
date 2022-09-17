@@ -134,7 +134,7 @@
 
 # Core documentation
 /CHANGELOG @oppia/release-workflow-reviewers
-/core/tempate/pages/android/ @oppia/core-reviewers
+/core/templates/pages/android-page/ @oppia/core-reviewers
 /core/templates/pages/about-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/about-page/about-page.constants.ts @oppia/angular-migration-reviewers
 /core/templates/pages/license-page/ @oppia/angular-migration-reviewers

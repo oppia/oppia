@@ -59,10 +59,15 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('androidUpdatesSection') androidUpdatesSectionRef!: (
     ElementRef<Element>);
+
   @ViewChild('featuresMainText') featuresMainTextRef!: ElementRef<Element>;
+
   @ViewChild('feature1') featureRef1!: ElementRef<Element>;
+
   @ViewChild('feature2') featureRef2!: ElementRef<Element>;
+
   @ViewChild('feature3') featureRef3!: ElementRef<Element>;
+
   @ViewChild('feature4') featureRef4!: ElementRef<Element>;
 
   featuresShown = 0;
@@ -71,6 +76,7 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
+
   ANDROID_APP_URL = (
     'https://play.google.com/store/apps/details?id=org.oppia.android'
   );
