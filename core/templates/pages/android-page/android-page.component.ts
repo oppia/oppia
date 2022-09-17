@@ -23,29 +23,64 @@ import { Subscription } from 'rxjs';
 
 import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { animate, keyframes, style, transition, trigger } from '@angular/animations';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
+import './android-page.component.css';
 
 @Component({
   selector: 'android-page',
   templateUrl: './android-page.component.html',
-  styleUrls: []
+  styleUrls: [],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('1s ease', keyframes([
+          style({ opacity: 0 }),
+          style({ opacity: 1 })
+        ]))
+      ])
+    ]),
+    trigger('delayedFadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('1s 1s ease', keyframes([
+          style({ opacity: 0 }),
+          style({ opacity: 1 })
+        ]))
+      ])
+    ])
+  ]
 })
 export class AndroidPageComponent implements OnInit, OnDestroy {
-  @ViewChild('androidUpdatesSection') androidUpdatesSectionRef: (
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @ViewChild('androidUpdatesSection') androidUpdatesSectionRef!: (
     ElementRef<Element>);
-  @ViewChild('feature1') featureRef1: ElementRef<Element>;
-  @ViewChild('feature2') featureRef2: ElementRef<Element>;
-  @ViewChild('feature3') featureRef3: ElementRef<Element>;
-  @ViewChild('feature4') featureRef4: ElementRef<Element>;
+  @ViewChild('featuresMainText') featuresMainTextRef!: ElementRef<Element>;
+  @ViewChild('feature1') featureRef1!: ElementRef<Element>;
+  @ViewChild('feature2') featureRef2!: ElementRef<Element>;
+  @ViewChild('feature3') featureRef3!: ElementRef<Element>;
+  @ViewChild('feature4') featureRef4!: ElementRef<Element>;
 
   featuresShown = 0;
   androidUpdatesSectionIsSeen = false;
+  featuresMainTextIsSeen = false;
+  OPPIA_AVATAR_IMAGE_URL = (
+    this.urlInterpolationService
+      .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
+  ANDROID_APP_URL = (
+    'https://play.google.com/store/apps/details?id=org.oppia.android'
+  );
 
   directiveSubscriptions = new Subscription();
   constructor(
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   ngOnInit(): void {
@@ -54,10 +89,14 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
+    if (this.windowDimensionsService.getWidth() < 1000) {
+      this.featuresShown = 1;
+    }
   }
 
   ngAfterViewInit(): void {
     this.setPageTitle();
+
     const featuresSectionObserver = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         ++this.featuresShown;
@@ -66,7 +105,14 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
     const androidUpdatesSectionObserver = (
       new IntersectionObserver(([entry]) => {
         if (entry.isIntersecting && !this.androidUpdatesSectionIsSeen) {
-          this.androidUpdatesSectionIsSeen= true;
+          this.androidUpdatesSectionIsSeen = true;
+        }
+      })
+    );
+    const featuresMainTextObserver = (
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && !this.featuresMainTextIsSeen) {
+          this.featuresMainTextIsSeen = true;
         }
       })
     );
@@ -76,11 +122,16 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
     featuresSectionObserver.observe(this.featureRef4.nativeElement);
     androidUpdatesSectionObserver.observe(
       this.androidUpdatesSectionRef.nativeElement);
+    featuresMainTextObserver.observe(this.featuresMainTextRef.nativeElement);
+  }
+
+  changeFeaturesShown(featureNumber: number): void {
+    this.featuresShown = featureNumber;
   }
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+      'I18N_ANDROID_PAGE_TITLE');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 

@@ -68,14 +68,16 @@
 
 .splash-page .oppia-splash-button {
   background-color: #015c53;
-  border-radius: 0;
+  border-radius: 5px;
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
   margin-top: -20px;
-  min-width: 250px;
+  min-width: 300px;
   padding: 10px;
   text-transform: uppercase;
+  margin-bottom: 40px;
+  text-transform: none;
 }
 
 .splash-page .oppia-splash-button:hover,

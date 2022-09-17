@@ -1,4 +1,5 @@
 {
+	"I18N_ANDROID_PAGE_TITLE": "Title displayed on the browser tab when on the android page.",
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Text displayed in the About the Oppia Foundation page. - Text shown in the top left corner of the nav bar.",
 	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "Title displayed on the browser tab when on the about foundation page.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Text shown at the bottom of the About section of Oppia's About page.",
@@ -55,6 +56,7 @@
 	"I18N_ABOUT_PAGE_TITLE": "Title of the About page that explains Oppia mission and the Oppia foundation.",
 	"I18N_ABOUT_PAGE_TITLE_SECTION_ONE": "Title of the first section of about page indicating to get started.",
 	"I18N_ABOUT_PAGE_WIFI_FEATURE": "Text below fourth icon in second section of Oppia's About page telling about the feature of low bandwidth requirement.",
+	"I18N_ACTION_ACCESS_ANDROID_APP": "Text displayed inside a button in the splash page. Clicking on it directs the user to the Google play store URL for the Oppia Android app.",
 	"I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Text displayed in a button on the Teach page. - When the user clicks the button they are taken to a form that allows them to apply to the 'Teach with Oppia' program. The 'Teach with Oppia' text should be in English.",
 	"I18N_ACTION_BROWSE_EXPLORATIONS": "Text displayed in a button on the Home and Teach pages. - When the user clicks the button they are taken to the library page.",
 	"I18N_ACTION_BROWSE_LESSONS": "Text displayed in a button on the Home page. - When the user clicks the button they are taken to the library page. The text in the button needs to be less than 29 characters long.",
@@ -66,6 +68,7 @@
 	"I18N_ACTION_GUIDE_FOR_TEACHERS": "First button in last section of Oppia's About page targeting guide for teachers page.",
 	"I18N_ACTION_TIPS_FOR_PARENTS": "Second button in last section of Oppia's about page targeting tips for parents and guardians page.",
 	"I18N_ACTION_VISIT_CLASSROOM": "Button below paragraph in first and fourth section in Oppia's About page targeting the classroom.",
+	"I18N_ACTION_VISIT_WEB_CLASSROOM": "Button shown in the splash page. Clicking on it leads to the web classroom page.",
 	"I18N_ADD_SYLLABUS_DESCRIPTION_TEXT": "Text displayed to explain the add syllabus feature while adding new syllabus items to learner group.",
 	"I18N_ADD_SYLLABUS_SEARCH_PLACEHOLDER": "Placeholder text that appears in the search bar while adding new syllabus items to learner group.",
 	"I18N_ATTRIBUTION_HTML_STEP_ONE": "Step one of attributing Oppia in HTML",

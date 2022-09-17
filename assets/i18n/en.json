@@ -1,4 +1,5 @@
 {
+    "I18N_ANDROID_PAGE_TITLE": "Android | Oppia",
     "I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "About the Oppia Foundation",
     "I18N_ABOUT_FOUNDATION_PAGE_TITLE": "About the Oppia Foundation | Oppia",
     "I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Create an Exploration",
@@ -55,6 +56,7 @@
     "I18N_ABOUT_PAGE_TITLE": "About | Oppia",
     "I18N_ABOUT_PAGE_TITLE_SECTION_ONE": "Get Started with Oppia",
     "I18N_ABOUT_PAGE_WIFI_FEATURE": "Low Bandwidth Required",
+    "I18N_ACTION_ACCESS_ANDROID_APP": "Access the Android app",
     "I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Apply to Teach With Oppia",
     "I18N_ACTION_BROWSE_EXPLORATIONS": "Browse our Explorations",
     "I18N_ACTION_BROWSE_LESSONS": "Browse our Lessons",
@@ -66,6 +68,7 @@
     "I18N_ACTION_GUIDE_FOR_TEACHERS": "Guide for teachers",
     "I18N_ACTION_TIPS_FOR_PARENTS": "Tips for parents and guardians",
     "I18N_ACTION_VISIT_CLASSROOM": "Visit classroom",
+    "I18N_ACTION_VISIT_WEB_CLASSROOM": "Visit the Web Classroom",
     "I18N_ADD_SYLLABUS_DESCRIPTION_TEXT": "Add skills or stories to your syllabus to automatically send them to your students.",
     "I18N_ADD_SYLLABUS_SEARCH_PLACEHOLDER": "Search eg. Story,  Physics, English",
     "I18N_ATTRIBUTION_HTML_STEP_ONE": "Copy and paste the HTML",

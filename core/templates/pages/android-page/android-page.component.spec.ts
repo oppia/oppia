@@ -16,13 +16,35 @@
  * @fileoverview Unit tests for about foundation page.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter, ElementRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 
 import { AndroidPageComponent } from './android-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
+
+class MockIntersectionObserver {
+  observe: () => void;
+  unobserve: () => void;
+
+  constructor(
+    public callback: (entries: Array<IntersectionObserverEntry>) => void
+  ) {
+    this.observe = () => {
+      callback([{
+        isIntersecting: true,
+        boundingClientRect: new DOMRectReadOnly(),
+        intersectionRatio: 1,
+        intersectionRect: new DOMRectReadOnly(),
+        rootBounds: null,
+        target: document.createElement('div'),
+        time: 1
+      }]);
+    };
+    this.unobserve = jasmine.createSpy('unobserve');
+  }
+}
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -31,12 +53,12 @@ class MockTranslateService {
   }
 }
 
-describe('About foundation page', () => {
+fdescribe('Android page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
-      declarations: [AboutFoundationPageComponent],
+      declarations: [AndroidPageComponent],
       providers: [
         UrlInterpolationService,
         PageTitleService,
@@ -49,12 +71,12 @@ describe('About foundation page', () => {
     }).compileComponents();
   });
 
-  let component: AboutFoundationPageComponent;
+  let component: AndroidPageComponent;
 
   beforeEach(() => {
-    const aboutFoundationPageComponent = TestBed.createComponent(
-      AboutFoundationPageComponent);
-    component = aboutFoundationPageComponent.componentInstance;
+    const androidPageComponent = TestBed.createComponent(
+      AndroidPageComponent);
+    component = androidPageComponent.componentInstance;
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
   });
@@ -89,9 +111,9 @@ describe('About foundation page', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+      'I18N_ANDROID_PAGE_TITLE');
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+      'I18N_ANDROID_PAGE_TITLE');
   });
 
   it('should unsubscribe on component destruction', () => {
@@ -104,5 +126,36 @@ describe('About foundation page', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
+  });
+
+  it('should change feature selection', () => {
+    component.ngOnInit();
+    expect(component.featuresShown).toBe(1);
+
+    component.changeFeaturesShown(3);
+
+    expect(component.featuresShown).toBe(3);
+  });
+
+  it('should attach intersection observers', () => {
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    (window as any).IntersectionObserver = MockIntersectionObserver;
+    component.androidUpdatesSectionRef = new ElementRef(
+      document.createElement('div'));
+    component.featuresMainTextRef = new ElementRef(
+      document.createElement('div'));
+    component.featureRef1 = new ElementRef(document.createElement('div'));
+    component.featureRef2 = new ElementRef(document.createElement('div'));
+    component.featureRef3 = new ElementRef(document.createElement('div'));
+    component.featureRef4 = new ElementRef(document.createElement('div'));
+    component.androidUpdatesSectionIsSeen = false;
+    component.featuresMainTextIsSeen = false;
+    spyOn(component, 'setPageTitle');
+
+    component.ngAfterViewInit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+    expect(component.androidUpdatesSectionIsSeen).toBe(true);
+    expect(component.featuresMainTextIsSeen).toBe(true);
   });
 });
