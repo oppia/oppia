@@ -218,7 +218,7 @@ class RegistryUnitTest(test_utils.TestBase):
     def test_import_models_invalid(self) -> None:
         """Tests import_models function with an invalid option."""
         with self.assertRaisesRegex(Exception, 'Invalid model name: '):
-            # Using type ignore[list-item] because list item 0 is a string.
+            # Here we use MyPy ignore because list item 0 is a string.
             # expected type class names. This is done to test the function
             # with invalid model names.
             self.registry_instance.import_models(['']) # type: ignore[list-item]
@@ -361,6 +361,10 @@ class RegistryUnitTest(test_utils.TestBase):
             pass
 
         with self.swap(constants, 'EMULATOR_MODE', False):
+            # Here we use cast because sys.modules can only accept ModuleTypes
+            # but for testing purposes here we are providing MockCloudTaskqueue
+            # which is of class type. So because of this MyPy throws an error.
+            # Thus to avoid the error, we used cast here.
             sys.modules['core.platform.taskqueue.cloud_taskqueue_services'] = (
                 cast(ModuleType, MockCloudTaskqueue)
             )
@@ -399,6 +403,10 @@ class RegistryUnitTest(test_utils.TestBase):
             pass
 
         with self.swap(constants, 'EMULATOR_MODE', False):
+            # Here we use cast because sys.modules can only accept ModuleTypes
+            # but for testing purposes here we are providing MockCloudStorage
+            # which is of class type. So because of this MyPy throws an error.
+            # Thus to avoid the error, we used cast here.
             # Mock Cloud Storage since importing it fails in emulator env.
             sys.modules['core.platform.storage.cloud_storage_services'] = (
                 cast(ModuleType, MockCloudStorage)
