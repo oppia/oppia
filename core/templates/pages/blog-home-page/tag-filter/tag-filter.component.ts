@@ -47,7 +47,7 @@ export class TagFilterComponent implements OnInit {
   filteredTags!: Observable<string[]>;
 
   @ViewChild('tagFilterInput') tagFilterInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('trigger') autoTrigger: MatAutocompleteTrigger;
+  @ViewChild('trigger') autoTrigger!: MatAutocompleteTrigger;
 
   constructor(
     private blogPostSearchService: BlogPostSearchService
