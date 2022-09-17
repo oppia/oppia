@@ -131,7 +131,7 @@ describe('Splash Page', () => {
   });
 
   it('should direct users to the android page on click', function() {
-    expect(mockWindowRef.nativeWindow.location.href).toEqual('');
+    expect(mockWindowRef.nativeWindow.location.href).not.toEqual('/android');
 
     component.onClickAccessAndroidButton();
 
