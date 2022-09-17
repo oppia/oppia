@@ -32,7 +32,7 @@ from core.constants import constants
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 
-from typing import Any, Dict, List
+from typing import Dict, List, Union
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -93,7 +93,9 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_yaml_dict_conversion(self) -> None:
         """Test yaml_from_dict and dict_from_yaml methods."""
-        test_dicts: List[Dict[str, Any]] = [
+        test_dicts: List[
+            Dict[str, Union[str, int, List[Union[str, int, Dict[str, float]]]]]
+        ] = [
             {},
             {'a': 'b'},
             {'a': 2},
@@ -114,7 +116,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_recursively_remove_key_for_empty_dict(self) -> None:
         """Test recursively_remove_key method for an empty dict."""
-        d: Dict[str, Any] = {}
+        d: Dict[str, str] = {}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {})
 
@@ -189,6 +191,9 @@ class UtilsTests(test_utils.GenericTestBase):
             'http://test.com?a=b&redirectUrl=http%3A%2F%2Fredirect.com'
         )
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'URL query parameter name must be a string'
             ):
@@ -462,9 +467,10 @@ class UtilsTests(test_utils.GenericTestBase):
         utils.require_valid_name(name, 'name_type')
 
         invalid_name = 0
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(Exception, '0 must be a string.'):
-            # Type ignore is used below because we are providing integer
-            # argument instead of string for invalid_name for testing purposes.
             utils.require_valid_name(invalid_name, 'name_type') # type: ignore[arg-type]
 
     def test_require_valid_meta_tag_content(self) -> None:
@@ -474,6 +480,9 @@ class UtilsTests(test_utils.GenericTestBase):
         non_string_meta_tag_content = 0
         invalid_type_error = (
             'Expected meta tag content to be a string, received 0')
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(Exception, invalid_type_error):
             utils.require_valid_meta_tag_content(non_string_meta_tag_content) # type: ignore[arg-type]
         lengthy_meta_tag_content = 'a' * 200
@@ -492,6 +501,9 @@ class UtilsTests(test_utils.GenericTestBase):
         non_string_page_title_fragment_for_web = 0
         invalid_type_error = (
             'Expected page title fragment to be a string, received 0')
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(Exception, invalid_type_error):
             utils.require_valid_page_title_fragment_for_web(
                 non_string_page_title_fragment_for_web) # type: ignore[arg-type]
@@ -559,10 +571,16 @@ class UtilsTests(test_utils.GenericTestBase):
         non_string_name = 0
         non_string_name_expected_error = (
             'name-type field must be a string. Received 0.')
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(Exception, non_string_name_expected_error):
             utils.require_valid_url_fragment(non_string_name, 'name-type', 20) # type: ignore[arg-type]
 
     def test_validate_convert_to_hash(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected string, received 1 of type %s' % type(1)):
             utils.convert_to_hash(1, 10) # type: ignore[arg-type]
@@ -685,6 +703,9 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_require_valid_thumbnail_filename(self) -> None:
         """Test thumbnail filename validation."""
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename(
             'Expected thumbnail filename to be a string, received 10', 10) # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename(
@@ -712,6 +733,9 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_require_valid_image_filename(self) -> None:
         """Test image filename validation."""
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self._assert_valid_image_filename(
             'Expected image filename to be a string, received 10', 10) # type: ignore[arg-type]
         self._assert_valid_image_filename(
@@ -802,9 +826,9 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_url_open(self) -> None:
         response = utils.url_open('http://www.google.com')
-        self.assertEqual(response.getcode(), 200) # type: ignore[attr-defined]
+        self.assertEqual(response.getcode(), 200)
         self.assertEqual(
-            response.url, 'http://www.google.com') # type: ignore[attr-defined]
+            response.url, 'http://www.google.com')
 
     def test_get_random_int(self) -> None:
         self.assertLess(utils.get_random_int(5), 5)
