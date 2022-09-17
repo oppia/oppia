@@ -35,7 +35,8 @@ import './base-content.component.css';
 
 @Component({
   selector: 'oppia-base-content',
-  templateUrl: './base-content.component.html'
+  templateUrl: './base-content.component.html',
+  styleUrls: ['./base-content.component.css']
 })
 export class BaseContentComponent {
   loadingMessage: string = '';

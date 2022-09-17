@@ -1,5 +1,5 @@
 <form #hybridForm="ngForm">
-  <schema-based-choices-editor *ngIf="'choices' in schema ? true : false"
+  <schema-based-choices-editor *ngIf="schema['choices']"
                                [(ngModel)]="localValue"
                                [schema]="schema"
                                [choices]="schema.choices"
@@ -7,7 +7,7 @@
                                name="choicesEditor">
   </schema-based-choices-editor>
 
-  <schema-based-bool-editor *ngIf="schema.type === 'bool' && 'choices' in schema ? true : false"
+  <schema-based-bool-editor *ngIf="schema.type === 'bool' && schema['choices']"
                             [(ngModel)]="localValue"
                             [disabled]="disabled"
                             [labelForFocusTarget]="labelForFocusTarget"
@@ -56,7 +56,7 @@
                             name="htmlEditor">
   </schema-based-html-editor>
 
-  <schema-based-list-editor *ngIf="schema.type === 'list' && 'choices' in schema ? true : false"
+  <schema-based-list-editor *ngIf="schema.type === 'list' && schema['choices']"
                             [(ngModel)]="localValue"
                             [localValue]="localValue"
                             [disabled]="disabled"
@@ -68,7 +68,7 @@
                             name="listEditor">
   </schema-based-list-editor>
 
-  <schema-based-dict-editor *ngIf="schema.type === 'dict' && 'choices' in schema ? true : false"
+  <schema-based-dict-editor *ngIf="schema.type === 'dict' && schema['choices']"
                             [(ngModel)]="localValue"
                             [disabled]="disabled"
                             [propertySchemas]="schema.properties"
@@ -76,7 +76,7 @@
                             name="dictEditor">
   </schema-based-dict-editor>
 
-  <schema-based-custom-editor *ngIf="schema.type === 'custom' && 'choices' in schema ? true : false"
+  <schema-based-custom-editor *ngIf="schema.type === 'custom' && schema['choices']"
                               [(ngModel)]="localValue"
                               [schema]="schema"
                               name="customEditor">

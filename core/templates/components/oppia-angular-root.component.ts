@@ -77,7 +77,7 @@ import { ReviewTestBackendApiService } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
-// import '../third-party-imports/ckeditor.import';
+import '../third-party-imports/ckeditor.import';
 
 import { NoninteractiveCollapsible } from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
 import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';

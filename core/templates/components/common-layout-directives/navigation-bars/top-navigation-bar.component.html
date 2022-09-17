@@ -30,7 +30,7 @@
     </picture>
   </a>
 </div>
-<div class="nav-mobile-header-text-container"
+<div class="nav-mobile-header-text-container oppia-top-navigation-bar"
      *ngIf="headerText?.length">
   <span class="nav-mobile-header-editor">
     {{ headerText }}
@@ -40,7 +40,7 @@
   </span>
 </div>
 <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
-     class="navbar-header"
+     class="navbar-header oppia-top-navigation-bar"
      *ngIf="userMenuIsShown">
   <ul class="nav oppia-navbar-nav"
       *ngIf="standardNavIsShown">

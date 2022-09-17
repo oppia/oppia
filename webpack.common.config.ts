@@ -556,7 +556,8 @@ module.exports = {
           }
         },
         {
-          loader: 'angular2-template-loader'
+          loader: path.resolve(
+            'angular-template-style-url-replacer.webpack-loader')
         }
       ]
     },
