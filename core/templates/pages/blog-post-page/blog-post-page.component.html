@@ -58,7 +58,7 @@
       </mat-card-content>
     </div>
   </mat-card>
-  <div class="d-flex blog-card-tag-container flex-wrap pt-2 mx-auto oppia-blog-post-page-card">
+  <div class="d-flex blog-card-tag-container flex-wrap pt-2 mx-auto mb-5 oppia-blog-post-page-card">
     <h4 class="blog-post-sub-heading-font my-auto mr-2">
       {{ 'I18N_BLOG_POST_PAGE_TAGS_HEADING' | translate }}
     </h4>
@@ -67,7 +67,7 @@
       <span>{{ tag }}</span>
     </div>
   </div>
-  <div class="oppia-blog-post-page-card post-to-recommend-section mx-auto mb-5">
+  <div *ngIf="postsToRecommend.length !== 0" class="oppia-blog-post-page-card post-to-recommend-section mx-auto mb-5">
     <h3 class="post-to-recommend-section-heading">
       {{ 'I18N_BLOG_POST_PAGE_RECOMMENDATION_SECTON_HEADING' | translate }}
     </h3>
