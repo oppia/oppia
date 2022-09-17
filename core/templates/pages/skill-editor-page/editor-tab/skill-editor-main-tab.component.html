@@ -25,7 +25,8 @@
                   [(ngModel)]="topicName"
                   (change)="changeSelectedTopic(topicName)"
                   [disabled]="!isTopicDropdownEnabled()">
-                  <option *ngFor="let topic of getAssignedSkillTopicData() | keyvalue" [value]="topic.key">{{topic.key}}</option>
+            <option *ngFor="let topic of getAssignedSkillTopicData() | keyvalue"
+                    [value]="topic.key">{{topic.key}}</option>
           </select>
         </div>
         <div class="status-box" *ngIf="isTopicDropdownEnabled()">

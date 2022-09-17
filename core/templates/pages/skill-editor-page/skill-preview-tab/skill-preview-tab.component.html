@@ -13,14 +13,15 @@
               <select [(ngModel)]="interactionFilter"
                       class="form-control"
                       (change)="applyFilters()">
-                    <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS" [value]="interaction">{{ interaction }}</option>
+                <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS"
+                        [value]="interaction">{{ interaction }}</option>
               </select>
             </div>
             <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item">
               <div (click)="selectQuestionToPreview(idx)">
                 <div class="question-data">
                   <oppia-rte-output-display class="question-text"
-                                             [rteString]="question.question_state_data.content.html">
+                                            [rteString]="question.question_state_data.content.html">
                   </oppia-rte-output-display>
                   <span *ngIf="question.question_state_data.interaction.id==='TextInput'">
                     {{"Text Input"}}

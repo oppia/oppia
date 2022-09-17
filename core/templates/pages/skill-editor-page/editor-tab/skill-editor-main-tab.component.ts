@@ -63,7 +63,7 @@ export class SkillEditorMainTabComponent implements OnInit {
         'Please save all pending ' +
         'changes before viewing the questions list.');
 
-      modalRef.result.then(null, function() {
+      modalRef.result.then(null, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.

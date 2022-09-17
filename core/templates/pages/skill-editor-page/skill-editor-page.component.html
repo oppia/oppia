@@ -12,12 +12,12 @@
              placement="bottom"
              class="e2e-test-main-tab">
             <i class="fas fa-pen navbar-tab-icon"
-              [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
+               [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
           </a>
           <div [hidden]="!getWarningsCount()"
-              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-              (mouseover)="warningsAreShown"
-              (mouseleave)="!warningsAreShown">
+               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+               (mouseover)="warningsAreShown"
+               (mouseleave)="!warningsAreShown">
             <span class="oppia-editor-warnings-count">
               {{getWarningsCount()}}
             </span>
@@ -56,7 +56,7 @@
           </a>
         </li>
       </div>
-    </div>      
+    </div>
   </div>
 
   <div *ngIf="getActiveTabName() === 'main'">
