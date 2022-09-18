@@ -36,6 +36,7 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -137,8 +138,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.mock_pre_accept_validate_does_nothing):
                     with self.swap(
                         suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
+                        '_get_change_list_for_accepting_edit_state_content_suggestion',  # pylint: disable=line-too-long
+                        self.mock_get_change_list_does_nothing
+                    ):
                         suggestion_services.accept_suggestion(
                             suggestion_id, reviewer_id,
                             commit_message, review_message)
@@ -234,9 +236,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             expected_suggestion_dict, observed_suggestion.to_dict())
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_cannot_create_suggestion_with_invalid_suggestion_type(
         self
     ) -> None:
@@ -5872,3 +5874,90 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
                     'en', 'fr'},
                 feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
             })
+
+
+class EmailsTaskqueueTests(test_utils.GenericTestBase):
+    """Tests for tasks in emails taskqueue."""
+
+    def test_create_new_instant_task(self) -> None:
+        user_id = 'user'
+        (
+            suggestion_services
+            .enqueue_contributor_ranking_notification_email_task(
+                user_id, feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE, 'hi',
+                'Initial Contributor'
+            ))
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EMAILS),
+            1)
+
+        tasks = self.get_pending_tasks(
+            queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
+        self.assertEqual(
+            tasks[0].url,
+            feconf
+            .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS)
+        # Ruling out the possibility of None for mypy type checking.
+        assert tasks[0].payload is not None
+        self.assertEqual(
+            tasks[0].payload['contributor_user_id'], user_id)
+        self.assertEqual(
+            tasks[0].payload['contribution_type'],
+            feconf.CONTRIBUTION_TYPE_TRANSLATION)
+        self.assertEqual(
+            tasks[0].payload['contribution_sub_type'],
+            feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE)
+        self.assertEqual(tasks[0].payload['language_code'], 'hi')
+        self.assertEqual(
+            tasks[0].payload['rank_name'], 'Initial Contributor')
+
+    def test_create_email_task_raises_exception_for_invalid_language_code(
+        self
+    ) -> None:
+        user_id = 'user'
+        with self.assertRaisesRegex(
+            Exception,
+            'Not supported language code: error'):
+            (
+                suggestion_services
+                .enqueue_contributor_ranking_notification_email_task
+            )(
+                user_id, feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE, 'error',
+                'Initial Contributor'
+            )
+
+    def test_create_email_task_raises_exception_for_invalid_contribution_type(
+        self
+    ) -> None:
+        user_id = 'user'
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid contribution type: test'):
+            (
+                suggestion_services
+                .enqueue_contributor_ranking_notification_email_task
+            )(
+                user_id, 'test',
+                feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE, 'hi',
+                'Initial Contributor'
+            )
+
+    def test_create_email_task_raises_exception_for_wrong_contribution_subtype(
+        self
+    ) -> None:
+        user_id = 'user'
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid contribution subtype: test'):
+            (
+                suggestion_services
+                .enqueue_contributor_ranking_notification_email_task
+            )(
+                user_id, feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                'test', 'hi',
+                'Initial Contributor'
+            )

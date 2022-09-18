@@ -48,17 +48,17 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
                 image, filename)
 
     def test_image_validation_checks(self) -> None:
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self._assert_image_validation_error(
             None,  # type: ignore[arg-type]
             'image.png',
             'No image supplied'
         )
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self._assert_image_validation_error(
             self.raw_image, None, 'No filename supplied')  # type: ignore[arg-type]
 
