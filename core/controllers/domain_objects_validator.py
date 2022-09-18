@@ -244,6 +244,7 @@ def validate_suggestion_images(files):
     # of the data is returned from here.
     return files
 
+
 def validate_exploration_change(exp_change_dict):
     """Validate the exploration change list
 
@@ -252,10 +253,18 @@ def validate_exploration_change(exp_change_dict):
             that needs to be validated.
 
     Returns:
-        exp_change_dict: dict. The exploration change dictionary
-        after validation.
+        exp_domain.ExplorationChange. The exploration change domain
+        object.
     """
-    exp_change_dict = validate_suggestion_change(exp_change_dict)
+    if exp_change_dict.get('cmd') is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Missing cmd key in change dict')
+    exp_change_commands = [
+        command['name'] for command in
+        exp_domain.ExplorationChange.ALLOWED_COMMANDS
+    ]
+    if exp_change_dict['cmd'] in exp_change_commands:
+        exp_domain.ExplorationChange(exp_change_dict)
     if (
         exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY and
         exp_change_dict['property_name'] ==
@@ -295,7 +304,6 @@ def validate_exploration_change(exp_change_dict):
                         'The refresher exploration id of the answer group '
                         'outcome should be None.'
                     )
-
         elif (
             exp_change_dict['property_name'] ==
             exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
@@ -306,4 +314,4 @@ def validate_exploration_change(exp_change_dict):
                         'The destination for the default outcome is not valid.'
                     )
 
-    return exp_change_dict
+    return exp_domain.ExplorationChange.from_dict(exp_change_dict)
