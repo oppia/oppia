@@ -523,7 +523,8 @@ export class SettingsTabComponent
     }).result.then(() => {
       this.editableExplorationBackendApiService.deleteExplorationAsync(
         this.explorationId).then(() => {
-        this.windowRef.nativeWindow.location = this.CREATOR_DASHBOARD_PAGE_URL;
+        this.windowRef.nativeWindow.location = (
+          this.CREATOR_DASHBOARD_PAGE_URL as unknown as Location);
       });
     }, () => {
       this.alertsService.clearWarnings();

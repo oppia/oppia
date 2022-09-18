@@ -63,6 +63,7 @@ import './tutor-card.component.css';
 @Component({
   selector: 'oppia-tutor-card',
   templateUrl: './tutor-card.component.html',
+  styleUrls: ['./tutor-card.component.css'],
   animations: [
     trigger('expandInOut', [
       state('in', style({
