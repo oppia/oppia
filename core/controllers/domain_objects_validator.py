@@ -256,7 +256,17 @@ def validate_exploration_change(exp_change_dict):
         exp_domain.ExplorationChange. The exploration change domain
         object.
     """
-    exp_change_dict = validate_suggestion_change(exp_change_dict)
+    if exp_change_dict.get('cmd') is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Missing cmd key in change dict')
+
+    exp_change_commands = [
+        command['name'] for command in
+        exp_domain.ExplorationChange.ALLOWED_COMMANDS
+    ]
+
+    if exp_change_dict['cmd'] in exp_change_commands:
+        exp_domain.ExplorationChange(exp_change_dict)
     if exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
         if exp_change_dict[
             'property_name'] == exp_domain.STATE_PROPERTY_CONTENT:

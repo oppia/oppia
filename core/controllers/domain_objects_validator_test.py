@@ -269,7 +269,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             Exception, 'Image tag \'alt-with-value\' attribute '
-            'should not be empty.'
+            'should not be less than 5.'
         ):
             domain_objects_validator.validate_exploration_change(
                 incorrect_change_dict)
