@@ -51,9 +51,8 @@
             (click)="publishStory()"
             [ngClass]="{'btn-success': !isStorySaveable() && getWarningsCount() === 0 && validationIssues.length === 0 && explorationValidationIssues.length === 0 && prepublishValidationIssues.length === 0}"
             [disabled]="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0 || explorationValidationIssues.length > 0 || prepublishValidationIssues.length > 0">
-      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+      <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
-        &#xE2C3;
       </i>
       <span class="oppia-save-publish-button-label">
         Publish Story
@@ -75,14 +74,13 @@
            *ngIf="showNavigationOptions">
         <div class="story-nav-dropdown-option"
              (click)="selectMainTab()">
-          <i class="material-icons">
-            &#xE254;
+          <i class="fas fa-pen navbar-tab-icon">
           </i>
           <span>Editor</span>
         </div>
         <div class="story-nav-dropdown-option"
              (click)="selectPreviewTab()">
-          <i class="material-icons">&#xE037;</i>
+          <i class="fas fa-play navbar-tab-icon"></i>
           <span>Preview</span>
         </div>
       </div>
@@ -101,8 +99,7 @@
       </div>
       <div class="story-nav-dropdown-content">
         <div class="story-nav-dropdown-text" (click)="toggleWarningText()">
-          <i *ngIf="!getTotalWarningsCount()" class="material-icons">
-            &#xE254;
+          <i *ngIf="!getTotalWarningsCount()" class="fas fa-pen navbar-tab-icon">
           </i>
           <span>{{ activeTab }}</span>
           <span *ngIf="getTotalWarningsCount()">
@@ -120,20 +117,20 @@
            *ngIf="showStoryEditOptions">
         <div class="story-nav-dropdown-option"
              (click)="discardChanges()">
-          <i class="material-icons">&#xE254;</i>
+          <i class="fas fa-pen navbar-tab-icon"></i>
           <span>Discard Changes</span>
         </div>
         <div class="story-nav-dropdown-option e2e-test-mobile-publish-button">
           <div *ngIf="!isStoryPublished()"
                (click)="publishStory()"
                [attr.disabled]="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
-            <i class="material-icons">&#xE254;</i>
+            <i class="fas fa-pen navbar-tab-icon"></i>
             <span>Publish Story</span>
           </div>
           <div (click)="unpublishStory()"
                *ngIf="isStoryPublished()"
                [attr.disabled]="isStorySaveable()">
-            <i class="material-icons">&#xE254;</i>
+            <i class="fas fa-pen navbar-tab-icon"></i>
             <span>Unpublish Story</span>
           </div>
         </div>
@@ -174,6 +171,9 @@
   }
   .story-nav-mobile {
     display: none;
+  }
+  .story-nav-mobile .navbar-tab-icon {
+      padding: 5px;
   }
   .oppia-dropdown-menu-container {
     margin-right: 5px;

@@ -134,7 +134,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  suppressDefaultAnswerGroupWarnings(): boolean {
+  suppressDefaultAnswerGroup(): boolean {
     let interactionId = this.getCurrentInteractionId();
     let answerGroups = this.responsesService.getAnswerGroups();
     // This array contains the text of each of the possible answers

@@ -37,8 +37,8 @@ CLIENT = tasks_v2.CloudTasksClient(
         if constants.EMULATOR_MODE else auth.default()[0]))
 
 
-# In the type annotation below, payload is of type Dict[str, Any] because
-# the payload here has no constraints.
+# Here we use type Any because the payload here has no constraints, so that's
+# why payload is annotated with 'Dict[str, Any]' type.
 def create_http_task(
         queue_name: str,
         url: str,
@@ -69,8 +69,8 @@ def create_http_task(
     parent = CLIENT.queue_path(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
-    # In the type annotation below, task is of type Dict[str, Any] because
-    # its structure can vary a lot.
+    # Here we use type Any because task's structure can vary a lot. So, to allow
+    # every type of value we used Dict[str, Any] type here.
     # We can see how the proto message for Task is defined. See the link:
     # https://github.com/googleapis/python-tasks/blob/2f6ae8318e9a6fc2963d4a7825ee96e41f330043/google/cloud/tasks_v2/types/task.py#L29
     task: Dict[str, Any] = {
