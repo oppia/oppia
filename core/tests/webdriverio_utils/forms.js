@@ -89,8 +89,7 @@ var GraphEditor = function(graphInputContainer) {
       await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        var graphVertexElement = await vertexElement(i);
-        await action.click(`Vertex Element ${i}`, graphVertexElement);
+        await action.click(`Vertex Element ${i}`, await vertexElement(i));
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -662,11 +661,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     var prevScrollTop = -1;
     var actualDiffDict = {};
     var scrollBarWebElement = null;
+    var scrollBarElements = await $$('.CodeMirror-vscrollbar');
     if (codeMirrorPaneToScroll === 'first') {
-      var scrollBarElements = await $$('.CodeMirror-vscrollbar');
       scrollBarWebElement = scrollBarElements[0];
     } else {
-      var scrollBarElements = await $$('.CodeMirror-vscrollbar');
       var lastElement = scrollBarElements.length - 1;
       scrollBarWebElement = scrollBarElements[lastElement];
     }
