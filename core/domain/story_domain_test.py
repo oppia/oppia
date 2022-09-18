@@ -242,7 +242,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.signup('user@example.com', 'user')
         self.signup('user1@example.com', 'user1')
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error(self, expected_error_substring: str) -> None:  # type: ignore[override]
         """Checks that the story passes validation.
@@ -281,9 +281,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.Story.deserialize(story.serialize()).to_dict())
 
     def test_valid_story_id(self) -> None:
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self._assert_valid_story_id('Story id should be a string', 10)  # type: ignore[arg-type]
         self._assert_valid_story_id('Invalid story id', 'abc')
 
@@ -306,9 +306,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 thumbnail_filename)
 
     def test_thumbnail_filename_validation_for_story(self) -> None:
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename_for_story(
             'Expected thumbnail filename to be a string, received 10', 10)  # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename_for_story(
@@ -325,9 +325,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
     def test_thumbnail_filename_validation_for_story_node(self) -> None:
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename_for_story_node(
             'Expected thumbnail filename to be a string, received 10', 10)  # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename_for_story_node(
@@ -388,9 +388,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.update_node_thumbnail_filename(
                 'invalid_id', 'invalid_thumbnail.svg')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_story_description_validation(self) -> None:
         self.story.description = 1  # type: ignore[assignment]
         self._assert_validation_error(
@@ -509,9 +509,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(self.story.has_exploration('exp_id'))
         self.assertFalse(self.story.has_exploration('exp_id_2'))
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_title_validation(self) -> None:
         self.story.title = 1  # type: ignore[assignment]
         self._assert_validation_error('Title should be a string')
@@ -520,9 +520,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Story title should be less than 39 chars')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_thumbnail_filename_validation(self) -> None:
         self.story.thumbnail_filename = []  # type: ignore[assignment]
         self._assert_validation_error(
@@ -567,17 +567,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.story.thumbnail_filename, 'img.svg')
         self.assertEqual(self.story.thumbnail_size_in_bytes, len(raw_image))
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_notes_validation(self) -> None:
         self.story.notes = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected notes to be a string, received 1')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_language_code_validation(self) -> None:
         self.story.language_code = 0  # type: ignore[assignment]
         self._assert_validation_error(
@@ -586,9 +586,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_schema_version_validation(self) -> None:
         self.story.story_contents_schema_version = 'schema_version'  # type: ignore[assignment]
         self._assert_validation_error(
@@ -602,9 +602,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 self.story.story_contents_schema_version)
         )
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_corresponding_topic_id_validation(self) -> None:
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
@@ -612,9 +609,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         # Setting invalid topic id type.
         invalid_topic_id = 123
         self.story.corresponding_topic_id = invalid_topic_id  # type: ignore[assignment]
@@ -632,17 +629,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story_domain.StoryNode.get_number_from_node_id('node_10'), 10)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_node_outline_finalized_validation(self) -> None:
         self.story.story_contents.nodes[0].outline_is_finalized = 'abs'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected outline_is_finalized to be a boolean')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_node_title_validation(self) -> None:
         self.story.story_contents.nodes[0].title = 1  # type: ignore[assignment]
         self._assert_validation_error(
@@ -653,9 +650,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Chapter title should be less than 36 chars')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_node_description_validation(self) -> None:
         self.story.story_contents.nodes[0].description = 1  # type: ignore[assignment]
         self._assert_validation_error(
@@ -698,16 +695,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         self.story.story_contents.initial_node_id = 'node_1'
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story.story_contents.nodes = {}  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected nodes field to be a list, received {}')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story.story_contents.nodes = ['node_1']  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each node to be a StoryNode object, received node_1')
@@ -739,16 +736,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected all acquired skills to be distinct.')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story.story_contents.nodes[0].acquired_skill_ids = [1]  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each acquired skill id to be a string, received 1')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story.story_contents.nodes[0].acquired_skill_ids = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected acquired skill ids to be a list, received 1')
@@ -758,24 +755,24 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected all prerequisite skills to be distinct.')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story.story_contents.nodes[0].prerequisite_skill_ids = [1]  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each prerequisite skill id to be a string, received 1')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story.story_contents.nodes[0].prerequisite_skill_ids = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected prerequisite skill ids to be a list, received 1')
         self.story.story_contents.nodes[0].prerequisite_skill_ids = ['1']
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story.story_contents.nodes[0].thumbnail_filename = []  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected thumbnail filename to be a string, received')
@@ -1209,33 +1206,39 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         ]
         self.story.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_rearrange_node_in_story_fail_with_invalid_from_index_value(
         self
     ) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be a number, '
                        'received None'):
             self.story.rearrange_node_in_story(None, 2)  # type: ignore[arg-type]
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be a number, '
                        'received a'):
             self.story.rearrange_node_in_story('a', 2)  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_rearrange_node_in_story_fail_with_invalid_to_index_value(
         self
     ) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be a number, '
                        'received None'):
             self.story.rearrange_node_in_story(1, None)  # type: ignore[arg-type]
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be a number, '
                        'received a'):
@@ -1397,9 +1400,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_exploration_id(self) -> None:
         self.story.story_contents.nodes[0].exploration_id = 1  # type: ignore[assignment]
         self._assert_validation_error(
@@ -1410,17 +1413,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected exploration ID to not be an empty string')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_outline(self) -> None:
         self.story.story_contents.nodes[0].outline = 0  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected outline to be a string')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_list_destination_node_ids(self) -> None:
         self.story.story_contents.nodes[0].destination_node_ids = 0  # type: ignore[assignment]
         self._assert_validation_error(
@@ -1432,9 +1435,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'The story node with ID %s points to itself.' % self.NODE_ID_1)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_node_id(self) -> None:
         self.story.story_contents.nodes[0].destination_node_ids = [0]  # type: ignore[list-item]
         self._assert_validation_error('Expected node ID to be a string')
@@ -1520,7 +1523,7 @@ class StorySummaryTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.story_summary.to_dict(), self.story_summary_dict)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error(self, expected_error_substring: str) -> None:  # type: ignore[override]
         """Checks that the story summary passes validation.
@@ -1533,9 +1536,9 @@ class StorySummaryTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.story_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_thumbnail_filename_validation(self) -> None:
         self.story_summary.thumbnail_filename = []  # type: ignore[assignment]
         self._assert_validation_error(
@@ -1559,9 +1562,9 @@ class StorySummaryTests(test_utils.GenericTestBase):
     def test_validation_passes_with_valid_properties(self) -> None:
         self.story_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_title(self) -> None:
         self.story_summary.title = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -1581,9 +1584,9 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'Story Url Fragment field should not be empty'):
             self.story_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_with_nonstring_url_fragment(self) -> None:
         self.story_summary.url_fragment = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -1610,9 +1613,9 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'Received Abc Def!.'):
             self.story_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_description(self) -> None:
         self.story_summary.description = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -1620,25 +1623,28 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'Expected description to be a string, received 0'):
             self.story_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validation_fails_with_invalid_node_titles(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story_summary.node_titles = '10'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected node_titles to be a list, received \'10\''):
             self.story_summary.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.story_summary.node_titles = [5]  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each chapter title to be a string, received 5'):
             self.story_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_language_code(self) -> None:
         self.story_summary.language_code = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
