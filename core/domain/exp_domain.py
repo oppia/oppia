@@ -3214,7 +3214,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, choices: List[str],
         answer_groups: List[state_domain.AnswerGroup],
         is_item_selection_interaction = False
-    ) -> Tuple(Any):
+    ) -> None:
         """Handles choices present in the ItemSelectionInput or
         in MultipleChoiceInput interactions, implements the following -
             - If only one choice is empty then simply removes it
@@ -3229,9 +3229,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             groups.
             is_item_selection_interaction: bool. If the answer group belongs
             to ItemSelectionInput interaction or not.
-
-        Returns:
-            choices_to_save: List[str]. The list of valid choices.
         """
         empty_choices = []
         seen_choices = []
@@ -3305,8 +3302,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
-        return (choices, answer_groups)
-
     @classmethod
     def _item_selec_no_ans_group_should_be_same(
         cls, answer_groups: List[state_domain.AnswerGroup]
@@ -3350,7 +3345,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _equals_should_come_before_idx_rule(
         cls, answer_groups: List[state_domain.AnswerGroup]
-    ) -> List[state_domain.AnswerGroup]:
+    ) -> None:
         """Performs the following -
             - Inside DragAndDrop interaction the `Equals` rule should always
             come before `HasElementXAtPositionY` otherwise the rule will
@@ -3360,9 +3355,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             answer_groups: List[state_domain.AnswerGroup]. The answer group.
-
-        Returns:
-            List[state_domain.AnswerGroup]. The modified answer group.
         """
         ele_x_at_y_rules = []
         rules_to_remove = []
@@ -3414,12 +3406,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
-        return answer_groups
-
     @classmethod
     def _equals_should_come_before_misplace_by_one_rule(
         cls, answer_groups: List[state_domain.AnswerGroup]
-    ) -> List[state_domain.AnswerGroup]:
+    ) -> None:
         """Inside DragAndDrop interaction the `Equals` rule should always come
         before `IsEqualToOrderingWithOneItemAtIncorrectPosition` otherwise the
         rule will never going to match, this helper functions simply removes
@@ -3427,9 +3417,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             answer_groups: List[state_domain.AnswerGroup]. The answer group.
-
-        Returns:
-            List[state_domain.AnswerGroup]. The modified answer group.
         """
         off_by_one_rules = []
         rules_to_remove = []
@@ -3473,8 +3460,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Removal of empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
-
-        return answer_groups
 
     @classmethod
     def _set_lower_and_upper_bounds(
@@ -3577,7 +3562,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _numeric_ans_group_should_not_be_subset(
         cls, answer_groups: List[state_domain.AnswerGroup]
-    ) -> List[state_domain.AnswerGroup]:
+    ) -> None:
         """An answer group should not be a subset of another answer group in
         NumericInput interaction otherwise the later answer group will be
         redundant and will never be matched. Simply the invalid rule will be
@@ -3588,9 +3573,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             answer_groups: List[state_domain.AnswerGroup]. The answer group.
-
-        Returns:
-            List[state_domain.AnswerGroup]. The modified answer group.
         """
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
@@ -3698,8 +3680,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Removal of empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
-
-        return answer_groups
 
     @classmethod
     def _get_rule_value_of_fraction_interaction(
@@ -3848,7 +3828,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _text_interaction_contains_rule_should_come_after(
         cls,
         answer_groups: List[state_domain.AnswerGroup]
-    ) -> List[state_domain.AnswerGroup]:
+    ) -> None:
         """In TextInput interaction `contains` rule should always come
         after any other rule where the `contains` string is a substring
         of the other rule's string. Otherwise the other rule will become
@@ -3857,10 +3837,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Args:
             answer_groups: List[state_domain.AnswerGroup]. The list of answer
                 groups of a state.
-
-        Returns:
-            answer_groups: List[state_domain.AnswerGroup]. The updated list of
-            answer groups of a state.
         """
         seen_strings_contains = []
         empty_ans_groups = []
@@ -3888,13 +3864,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
-        return answer_groups
-
     @classmethod
     def _text_interaction_starts_with_rule_should_come_after(
         cls,
         answer_groups: List[state_domain.AnswerGroup]
-    ) -> List[state_domain.AnswerGroup]:
+    ) -> None:
         """In TextInput interaction `starts-with` rule should always come
         after any other rule where a `starts-with` string is a prefix of
         the other rule's string. Otherwise the other rule will become
@@ -3903,10 +3877,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Args:
             answer_groups: List[state_domain.AnswerGroup]. The list of answer
                 groups of a state.
-
-        Returns:
-            answer_groups: List[state_domain.AnswerGroup]. The updated list of
-            answer groups of a state.
         """
         seen_strings_startswith = []
         empty_ans_groups = []
@@ -3932,8 +3902,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Removal of empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
-
-        return answer_groups
 
     @classmethod
     def _remove_duplicate_rules_inside_answer_groups(
@@ -4020,6 +3988,366 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
+    def _fix_continue_interaction(
+        cls, state_dict: state_domain.StateDict, language_code: str
+    ) -> None:
+        """
+        """
+        # Text should have a max-length of 20.
+        text_value = state_dict['interaction'][
+            'customization_args']['buttonText']['value']['unicode_str']
+        if len(text_value) > 20:
+            if language_code == 'en':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continue'
+
+            elif language_code == 'es':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continuar'
+
+            elif language_code == 'nl':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Doorgaan'
+
+            elif language_code == 'ru':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Продолжить'
+
+            elif language_code == 'sr':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continue'
+
+            elif language_code == 'bg':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continue'
+
+            elif language_code == 'fr':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continuer'
+
+            elif language_code == 'ca':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continua'
+
+            elif language_code == 'hu':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Folytatás'
+
+            elif language_code == 'zh':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = '继续'
+
+            elif language_code == 'it':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continua'
+
+            elif language_code == 'fi':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Jatka'
+
+            elif language_code == 'pt':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continuar'
+
+            elif language_code == 'de':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Fortfahren'
+
+            elif language_code == 'ar':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'استمرار'
+
+            elif language_code == 'cs':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continue'
+
+            elif language_code == 'tr':
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'İlerle'
+
+            else:
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continue'
+
+    @classmethod
+    def _fix_end_interaction(cls, state_dict: state_domain.StateDict) -> None:
+        """
+        """
+        # Should be at most 3 recommended explorations.
+        recc_exp_ids = state_dict['interaction'][
+            'customization_args']['recommendedExplorationIds']['value']
+        if len(recc_exp_ids) > 3:
+            recc_exp_ids = recc_exp_ids[0:3]
+
+        state_dict['interaction']['customization_args'][
+            'recommendedExplorationIds']['value'] = recc_exp_ids
+
+    @classmethod
+    def _fix_numeric_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """
+        """
+        answer_groups = state_dict['interaction']['answer_groups']
+        # Each answer group should not be a subset of any answer
+        # group that comes before it.
+        cls._numeric_ans_group_should_not_be_subset(answer_groups)
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+                # For x in [a-b, a+b], b must be a positive value.
+                if rule_spec['rule_type'] == 'IsWithinTolerance':
+                    tol = rule_spec['inputs']['tol']
+                    if tol <= 0:
+                        rule_spec['inputs']['tol'] = abs(tol)
+
+                # For x in [a, b], a must not be greater than b.
+                if rule_spec['rule_type'] == 'IsInclusivelyBetween':
+                    if (
+                        rule_spec['inputs']['a'] > rule_spec[
+                            'inputs']['b']
+                    ):
+                        rule_spec['inputs']['a'], rule_spec[
+                            'inputs']['b'] = rule_spec['inputs'][
+                                'b'], rule_spec['inputs']['a']
+
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
+    @classmethod
+    def _fix_fraction_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """
+        """
+        # All rules should have solutions that do not match
+        # previous rules' solutions.
+        answer_groups = state_dict['interaction']['answer_groups']
+        answer_groups = (
+            cls._fraction_interaction_rules_range_should_not_intersect(
+                answer_groups
+            )
+        )
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
+    @classmethod
+    def _fix_multiple_choice_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """
+        """
+        selected_equals_choices = []
+        empty_ans_groups = []
+        answer_groups = state_dict['interaction']['answer_groups']
+        # No answer choice should appear in more than one answer group.
+        for answer_group in answer_groups:
+            unwanted_rule = []
+            for rule_spec in answer_group['rule_specs']:
+                if rule_spec['rule_type'] == 'Equals':
+                    if (
+                        rule_spec['inputs']['x'] in
+                        selected_equals_choices
+                    ):
+                        unwanted_rule.append(rule_spec)
+                    else:
+                        selected_equals_choices.append(
+                            rule_spec['inputs']['x'])
+            for ele in unwanted_rule:
+                answer_group['rule_specs'].remove(ele)
+
+            if len(answer_group['rule_specs']) == 0:
+                empty_ans_groups.append(answer_group)
+
+        # Removal of empty answer group.
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+        # Answer choices should be non-empty and unique.
+        choices = (
+            state_dict['interaction']['customization_args'][
+                'choices']['value']
+        )
+
+        cls._choices_should_be_unique_and_non_empty(
+            choices, answer_groups)
+        state_dict['interaction']['customization_args']['choices'][
+            'value'] = choices
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
+    @classmethod
+    def _fix_item_selection_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """
+        """
+        min_value = (
+            state_dict['interaction']['customization_args']
+            ['minAllowableSelectionCount']['value']
+        )
+        max_value = (
+            state_dict['interaction']['customization_args']
+            ['maxAllowableSelectionCount']['value']
+        )
+        choices = (
+            state_dict['interaction']['customization_args'][
+                'choices']['value']
+        )
+
+        # None of the answer groups should be same.
+        answer_groups = state_dict['interaction']['answer_groups']
+
+        answer_groups = cls._item_selec_no_ans_group_should_be_same(
+            answer_groups)
+
+        empty_ans_groups = []
+        for answer_group in answer_groups:
+            invalid_rules = []
+            for rule_spec in answer_group['rule_specs']:
+                # `==` should have between min and max
+                # number of selections.
+                if rule_spec['rule_type'] == 'Equals':
+                    rule_value = rule_spec['inputs']['x']
+                    if (
+                        len(rule_value) < min_value or
+                        len(rule_value) > max_value
+                    ):
+                        if answer_group['outcome'][
+                            'dest'] == state_name:
+                            invalid_rules.append(rule_spec)
+                        else:
+                            if len(rule_value) < min_value:
+                                min_value = len(rule_value)
+                            elif len(rule_value) > max_value:
+                                max_value = len(rule_value)
+
+            for invalid_rule in invalid_rules:
+                answer_group['rule_specs'].remove(invalid_rule)
+
+            if len(answer_group['rule_specs']) == 0:
+                empty_ans_groups.append(answer_group)
+
+        # Removal of empty answer groups.
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+        # Min no of selec should be no greater than max num.
+        if min_value > max_value:
+            min_value, max_value = max_value, min_value
+
+        # There should be enough choice to have min num of selec.
+        if len(choices) < min_value:
+            min_value = 1
+
+        state_dict['interaction']['customization_args'][
+            'minAllowableSelectionCount']['value'] = min_value
+        state_dict['interaction']['customization_args'][
+            'maxAllowableSelectionCount']['value'] = max_value
+        cls._choices_should_be_unique_and_non_empty(
+            choices, answer_groups, True)
+        state_dict['interaction']['customization_args']['choices'][
+            'value'] = choices
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
+    @classmethod
+    def _fix_drag_and_drop_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """
+        """
+        answer_groups = state_dict['interaction']['answer_groups']
+        multi_item_value = (
+            state_dict['interaction']['customization_args']
+            ['allowMultipleItemsInSamePosition']['value']
+        )
+        invalid_rules = []
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+                # Multi items in same place iff setting on.
+                if not multi_item_value:
+                    for ele in rule_spec['inputs']['x']:
+                        if len(ele) > 1:
+                            invalid_rules.append(rule_spec)
+
+                # == +/- 1 no option if multi item set off.
+                if not multi_item_value:
+                    if rule_spec['rule_type'] == (
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+                        invalid_rules.append(rule_spec)
+
+                # Validates for a < b, a should not be the same as b.
+                if (
+                    rule_spec['rule_type'] ==
+                    'HasElementXBeforeElementY' and rule_spec[
+                        'inputs']['x'] == rule_spec['inputs']['y']
+                ):
+                    invalid_rules.append(rule_spec)
+
+        empty_ans_groups = []
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if len(answer_group['rule_specs']) == 0:
+                    empty_ans_groups.append(answer_group)
+
+        # Removal of empty answer groups.
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+        # `==` should come before idx(a) == b if it satisfies
+        # that condition.
+        cls._equals_should_come_before_idx_rule(
+            answer_groups)
+
+        # `==` should come before == +/- 1 if they are off by
+        # at most 1 value.
+        cls._equals_should_come_before_misplace_by_one_rule(
+            answer_groups)
+
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
+    @classmethod
+    def _fix_text_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """
+        """
+        answer_groups = state_dict['interaction']['answer_groups']
+        # Text input height shoule be >= 1 and <= 10.
+        rows_value = int(
+            state_dict['interaction']['customization_args'][
+                'rows']['value']
+        )
+        if rows_value < 1 or rows_value > 10:
+            state_dict['interaction']['customization_args'][
+                'rows']['value'] = 10
+
+        cls._text_interaction_contains_rule_should_come_after(
+            answer_groups)
+
+        cls._text_interaction_starts_with_rule_should_come_after(
+            answer_groups)
+
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
     # ########################################################.
     # Fix validation errors for exploration state interaction.
     # ########################################################.
@@ -4040,350 +4368,26 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted state dictionary.
         """
         for state_name, state_dict in states_dict.items():
-            # Continue Interaction.
-            # Text should have a max-length of 20.
             if state_dict['interaction']['id'] == 'Continue':
-                text_value = state_dict['interaction'][
-                    'customization_args']['buttonText']['value']['unicode_str']
-                if len(text_value) > 20:
-                    if language_code == 'en':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continue'
-
-                    elif language_code == 'es':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continuar'
-
-                    elif language_code == 'nl':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Doorgaan'
-
-                    elif language_code == 'ru':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Продолжить'
-
-                    elif language_code == 'sr':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continue'
-
-                    elif language_code == 'bg':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continue'
-
-                    elif language_code == 'fr':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continuer'
-
-                    elif language_code == 'ca':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continua'
-
-                    elif language_code == 'hu':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Folytatás'
-
-                    elif language_code == 'zh':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = '继续'
-
-                    elif language_code == 'it':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continua'
-
-                    elif language_code == 'fi':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Jatka'
-
-                    elif language_code == 'pt':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continuar'
-
-                    elif language_code == 'de':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Fortfahren'
-
-                    elif language_code == 'ar':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'استمرار'
-
-                    elif language_code == 'cs':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continue'
-
-                    elif language_code == 'tr':
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'İlerle'
-
-                    else:
-                        state_dict['interaction']['customization_args'][
-                            'buttonText']['value']['unicode_str'] = 'Continue'
-
-            # End Interaction.
-            if state_dict['interaction']['id'] == 'EndExploration':
-                # Should be at most 3 recommended explorations.
-                recc_exp_ids = state_dict['interaction'][
-                    'customization_args']['recommendedExplorationIds']['value']
-                if len(recc_exp_ids) > 3:
-                    recc_exp_ids = recc_exp_ids[0:3]
-
-                state_dict['interaction']['customization_args'][
-                    'recommendedExplorationIds']['value'] = recc_exp_ids
-
-            # NumericInput Interaction.
-            if state_dict['interaction']['id'] == 'NumericInput':
-                answer_groups = state_dict['interaction']['answer_groups']
-                # Each answer group should not be a subset of any answer
-                # group that comes before it.
-                answer_groups = cls._numeric_ans_group_should_not_be_subset(
-                    answer_groups)
-                for answer_group in answer_groups:
-                    for rule_spec in answer_group['rule_specs']:
-                        # For x in [a-b, a+b], b must be a positive value.
-                        if rule_spec['rule_type'] == 'IsWithinTolerance':
-                            tol = rule_spec['inputs']['tol']
-                            if tol <= 0:
-                                rule_spec['inputs']['tol'] = abs(tol)
-
-                        # For x in [a, b], a must not be greater than b.
-                        if rule_spec['rule_type'] == 'IsInclusivelyBetween':
-                            if (
-                                rule_spec['inputs']['a'] > rule_spec[
-                                    'inputs']['b']
-                            ):
-                                rule_spec['inputs']['a'], rule_spec[
-                                    'inputs']['b'] = rule_spec['inputs'][
-                                        'b'], rule_spec['inputs']['a']
-
-                state_dict['interaction']['answer_groups'] = answer_groups
-
-                cls._remove_duplicate_rules_inside_answer_groups(
-                    answer_groups, state_name)
-
-            # FractionInput Interaction.
-            if state_dict['interaction']['id'] == 'FractionInput':
-                # All rules should have solutions that do not match
-                # previous rules' solutions.
-                answer_groups = state_dict['interaction']['answer_groups']
-                answer_groups = (
-                    cls._fraction_interaction_rules_range_should_not_intersect(
-                        answer_groups
-                    )
-                )
-                state_dict['interaction']['answer_groups'] = answer_groups
-
-                cls._remove_duplicate_rules_inside_answer_groups(
-                    answer_groups, state_name)
-
-            # MultipleChoiceInput Interaction.
-            if state_dict['interaction']['id'] == 'MultipleChoiceInput':
-                selected_equals_choices = []
-                empty_ans_groups = []
-                answer_groups = state_dict['interaction']['answer_groups']
-                # No answer choice should appear in more than one answer group.
-                for answer_group in answer_groups:
-                    unwanted_rule = []
-                    for rule_spec in answer_group['rule_specs']:
-                        if rule_spec['rule_type'] == 'Equals':
-                            if (
-                                rule_spec['inputs']['x'] in
-                                selected_equals_choices
-                            ):
-                                unwanted_rule.append(rule_spec)
-                            else:
-                                selected_equals_choices.append(
-                                    rule_spec['inputs']['x'])
-                    for ele in unwanted_rule:
-                        answer_group['rule_specs'].remove(ele)
-
-                    if len(answer_group['rule_specs']) == 0:
-                        empty_ans_groups.append(answer_group)
-
-                # Removal of empty answer group.
-                for empty_ans_group in empty_ans_groups:
-                    answer_groups.remove(empty_ans_group)
-
-                # Answer choices should be non-empty and unique.
-                choices = (
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value']
-                )
-
-                choices, answer_groups = (
-                    cls._choices_should_be_unique_and_non_empty(
-                        choices, answer_groups)
-                )
-                state_dict['interaction']['customization_args']['choices'][
-                    'value'] = choices
-
-                state_dict['interaction']['answer_groups'] = answer_groups
-
-                cls._remove_duplicate_rules_inside_answer_groups(
-                    answer_groups, state_name)
-
-            # ItemSelectionInput Interaction.
-            if state_dict['interaction']['id'] == 'ItemSelectionInput':
-                min_value = (
-                    state_dict['interaction']['customization_args']
-                    ['minAllowableSelectionCount']['value']
-                )
-                max_value = (
-                    state_dict['interaction']['customization_args']
-                    ['maxAllowableSelectionCount']['value']
-                )
-                choices = (
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value']
-                )
-
-                # None of the answer groups should be the same.
-                answer_groups = state_dict['interaction']['answer_groups']
-
-                answer_groups = cls._item_selec_no_ans_group_should_be_same(
-                    answer_groups)
-
-                empty_ans_groups = []
-                for answer_group in answer_groups:
-                    invalid_rules = []
-                    for rule_spec in answer_group['rule_specs']:
-                        # `==` should have between min and max
-                        # number of selections.
-                        if rule_spec['rule_type'] == 'Equals':
-                            rule_value = rule_spec['inputs']['x']
-                            if (
-                                len(rule_value) < min_value or
-                                len(rule_value) > max_value
-                            ):
-                                if answer_group['outcome'][
-                                    'dest'] == state_name:
-                                    invalid_rules.append(rule_spec)
-                                else:
-                                    if len(rule_value) < min_value:
-                                        min_value = len(rule_value)
-                                    elif len(rule_value) > max_value:
-                                        max_value = len(rule_value)
-
-                    for invalid_rule in invalid_rules:
-                        answer_group['rule_specs'].remove(invalid_rule)
-
-                    if len(answer_group['rule_specs']) == 0:
-                        empty_ans_groups.append(answer_group)
-
-                # Removal of empty answer groups.
-                for empty_ans_group in empty_ans_groups:
-                    answer_groups.remove(empty_ans_group)
-
-                # Min no of selec should be no greater than max num.
-                if min_value > max_value:
-                    min_value, max_value = max_value, min_value
-
-                # There should be enough choice to have min num of selec.
-                if len(choices) < min_value:
-                    min_value = 1
-
-                state_dict['interaction']['customization_args'][
-                    'minAllowableSelectionCount']['value'] = min_value
-                state_dict['interaction']['customization_args'][
-                    'maxAllowableSelectionCount']['value'] = max_value
-
-                choices, answer_groups = (
-                    cls._choices_should_be_unique_and_non_empty(
-                        choices, answer_groups, True)
-                )
-                state_dict['interaction']['customization_args']['choices'][
-                    'value'] = choices
-
-                state_dict['interaction']['answer_groups'] = answer_groups
-
-                cls._remove_duplicate_rules_inside_answer_groups(
-                    answer_groups, state_name)
-
-            # DragAndDropInput Interaction.
-            if state_dict['interaction']['id'] == 'DragAndDropSortInput':
-                answer_groups = state_dict['interaction']['answer_groups']
-                multi_item_value = (
-                    state_dict['interaction']['customization_args']
-                    ['allowMultipleItemsInSamePosition']['value']
-                )
-                invalid_rules = []
-                for answer_group in answer_groups:
-                    for rule_spec in answer_group['rule_specs']:
-                        # Multi items in same place iff setting on.
-                        if not multi_item_value:
-                            for ele in rule_spec['inputs']['x']:
-                                if len(ele) > 1:
-                                    invalid_rules.append(rule_spec)
-
-                        # == +/- 1 no option if multi item set off.
-                        if not multi_item_value:
-                            if rule_spec['rule_type'] == (
-                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
-                                invalid_rules.append(rule_spec)
-
-                        # Validates for a < b, a should not be the same as b.
-                        if (
-                            rule_spec['rule_type'] ==
-                            'HasElementXBeforeElementY' and rule_spec[
-                                'inputs']['x'] == rule_spec['inputs']['y']
-                        ):
-                            invalid_rules.append(rule_spec)
-
-                empty_ans_groups = []
-                for invalid_rule in invalid_rules:
-                    for answer_group in answer_groups:
-                        for rule_spec in answer_group['rule_specs']:
-                            if rule_spec == invalid_rule:
-                                answer_group['rule_specs'].remove(rule_spec)
-
-                        if len(answer_group['rule_specs']) == 0:
-                            empty_ans_groups.append(answer_group)
-
-                # Removal of empty answer groups.
-                for empty_ans_group in empty_ans_groups:
-                    answer_groups.remove(empty_ans_group)
-
-                # `==` should come before idx(a) == b if it satisfies
-                # that condition.
-                answer_groups = cls._equals_should_come_before_idx_rule(
-                    answer_groups)
-
-                # `==` should come before == +/- 1 if they are off by
-                # at most 1 value.
-                answer_groups = (
-                    cls._equals_should_come_before_misplace_by_one_rule(
-                        answer_groups)
-                )
-
-                state_dict['interaction']['answer_groups'] = answer_groups
-
-                cls._remove_duplicate_rules_inside_answer_groups(
-                    answer_groups, state_name)
-
-            # TextInput Interaction.
-            if state_dict['interaction']['id'] == 'TextInput':
-                answer_groups = state_dict['interaction']['answer_groups']
-                # Text input height shoule be >= 1 and <= 10.
-                rows_value = int(
-                    state_dict['interaction']['customization_args'][
-                        'rows']['value']
-                )
-                if rows_value < 1 or rows_value > 10:
-                    state_dict['interaction']['customization_args'][
-                        'rows']['value'] = 10
-
-                answer_groups = (
-                    cls._text_interaction_contains_rule_should_come_after(
-                        answer_groups)
-                )
-
-                answer_groups = (
-                    cls._text_interaction_starts_with_rule_should_come_after(
-                        answer_groups)
-                )
-
-                state_dict['interaction']['answer_groups'] = answer_groups
-
-                cls._remove_duplicate_rules_inside_answer_groups(
-                    answer_groups, state_name)
+                cls._fix_continue_interaction(state_dict, language_code)
+            elif state_dict['interaction']['id'] == 'EndExploration':
+                cls._fix_end_interaction
+            elif state_dict['interaction']['id'] == 'NumericInput':
+                cls._fix_numeric_input_interaction(state_dict, state_name)
+            elif state_dict['interaction']['id'] == 'FractionInput':
+                cls._fix_fraction_input_interaction(state_dict, state_name)
+            elif state_dict['interaction']['id'] == 'MultipleChoiceInput':
+                cls._fix_multiple_choice_input_interaction(
+                    state_dict, state_name)
+            elif state_dict['interaction']['id'] == 'ItemSelectionInput':
+                cls._fix_item_selection_input_interaction(
+                    state_dict, state_name)
+            elif state_dict['interaction']['id'] == 'DragAndDropSortInput':
+                cls._fix_drag_and_drop_input_interaction(
+                    state_dict, state_name)
+            elif state_dict['interaction']['id'] == 'TextInput':
+                cls._fix_text_input_interaction(
+                    state_dict, state_name)
 
             # Update translations and voiceovers.
             cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
@@ -4396,87 +4400,99 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # ################################################.
 
     @classmethod
-    def _helper_to_fix_rte(html):
+    def _fix_rte(cls, html):
+        """Handles all the invalid RTE tags, performs the following
+            - `oppia-noninteractive-image`
+                - If `alt-with-value` attribute not in the image tag,
+                introduces the attribute and assign empty value
+                - If `filepath-with-value` attribute not in image tag,
+                removes the tag
+                - If `filepath-with-value` attribute empty then removes
+                the tag
+                - If `caption-with-value` attribute not in the image tag,
+                introduces the attribute and assign empty value
+            - `oppia-noninteractive-skillreview`
+                - If `text-with-value` attribute is not present or empty or
+                None, removes the tag
+            - `oppia-noninteractive-math`
+                - If `math_content-with-value` attribute not in math tag,
+                removes the tag
+                - If `raw_latex` is not present or empty or None, removes
+                the tag
+            - `oppia-noninteractive-video`
+                - If `start-with-value` or `end-with-value` is not present,
+                introduce them to the tag and assign 0 to them
+                - If `autoplay-with-value` is not present or is not boolean,
+                introduce it to the tag and assign `false` to them
+                - If `video_id-with-value` is not present, removes the tag
+            - `oppia-noninteractive-link`
+                - If `text-with-value` or `url-with-value` is not present,
+                removes the tag
         """
-        """
+        empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
         soup = bs4.BeautifulSoup(html, 'html.parser')
 
         for tag in soup.find_all('oppia-noninteractive-image'):
             if not tag.has_attr('alt-with-value'):
                 tag['alt-with-value'] = '&quot;&quot;'
-
             if not tag.has_attr('filepath-with-value'):
                 tag.decompose()
+            else:
+                if tag['filepath-with-value'] in empty_values:
+                    tag.decompose()
+            if not tag.has_attr('caption-with-value'):
+                tag['caption-with-value'] = '&quot;&quot;'
 
         for tag in soup.find_all('oppia-noninteractive-skillreview'):
-
             if not tag.has_attr('text-with-value'):
                 tag.decompose()
-
             else:
                 if tag['text-with-value'] is None:
                     tag.decompose()
-
-                if (
-                    tag['text-with-value'].strip() in
-                    ('&quot;&quot;', '', '\'\'', '\"\"')
-                ):
+                if tag['text-with-value'].strip() in empty_values:
                     tag.decompose()
-
             if not tag.has_attr('skill_id-with-value'):
                 tag.decompose()
-
             else:
                 if tag['skill_id-with-value'] is None:
                     tag.decompose()
-
-                if (
-                    tag['skill_id-with-value'].strip() in
-                    ('&quot;&quot;', '', '\'\'', '\"\"')
-                ):
+                if tag['skill_id-with-value'].strip() in empty_values:
                     tag.decompose()
 
         for tag in soup.find_all('oppia-noninteractive-video'):
             if not tag.has_attr('start-with-value'):
                 tag['start-with-value'] = '0'
             else:
-                if (
-                    tag['start-with-value'].strip() in
-                    ('&quot;&quot;', '', '\'\'', '\"\"')
-                ):
+                if tag['start-with-value'].strip() in empty_values:
                     tag['start-with-value'] = '0'
-
             if not tag.has_attr('end-with-value'):
                 tag['end-with-value'] = '0'
             else:
-                if (
-                    tag['end-with-value'].strip() in
-                    ('&quot;&quot;', '', '\'\'', '\"\"')
-                ):
+                if tag['end-with-value'].strip() in empty_values:
                     tag['end-with-value'] = '0'
-
             if not tag.has_attr('autoplay-with-value'):
                 tag['autoplay-with-value'] = 'false'
             else:
-                if (
-                    tag['autoplay-with-value'].strip() not in
-                    (
-                        'true', 'false', '\'true\'', '\'false\'',
-                        '\"true\"', '\"false\"'
-                    )
+                if tag['autoplay-with-value'].strip() not in (
+                    'true', 'false', '\'true\'', '\'false\'',
+                    '\"true\"', '\"false\"', True, False
                 ):
                     tag['autoplay-with-value'] = 'false'
-
             if not tag.has_attr('video_id-with-value'):
                 tag.decompose()
             else:
                 if tag['video_id-with-value'] is None:
                     tag.decompose()
-                elif (
-                    tag['video_id-with-value'].strip() in
-                    ('&quot;&quot;', '', '\'\'', '\"\"')
-                ):
+                elif tag['video_id-with-value'].strip() in empty_values:
                     tag.decompose()
+            start_value = float(tag['start-with-value'])
+            end_value = float(tag['end-with-value'])
+            if (
+                start_value > end_value and start_value != 0.0
+                and end_value != 0.0
+            ):
+                tag['end-with-value'] = '0'
+                tag['start-with-value'] = '0'
 
         for tag in soup.find_all('oppia-noninteractive-link'):
             if (
@@ -4484,9 +4500,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 not tag.has_attr('url-with-value')
             ):
                 tag.decompose()
-
             else:
-                empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
                 if (
                     tag['text-with-value'].strip() in empty_values or
                     tag['url-with-value'] in empty_values
@@ -4497,6 +4511,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('math_content-with-value'):
                 tag.decompose()
             else:
+                if tag['math_content-with-value'] in empty_values:
+                    tag.decompose()
                 math_content_json = html_validation_service.unescape_html(
                     tag['math_content-with-value'])
                 math_content_list = json.loads(math_content_json)
@@ -4505,10 +4521,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     tag.decompose()
                 elif math_content_list['raw_latex'] is None:
                     tag.decompose()
-                elif (
-                    math_content_list['raw_latex'].strip()
-                    in ('&quot;&quot;', '', '\'\'', '\"\"')
-                ):
+                elif math_content_list['raw_latex'].strip() in empty_values:
                     tag.decompose()
 
         return str(soup).replace('<br/>', '<br>')
@@ -4517,29 +4530,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _update_general_state_rte(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
-        """Handles all the invalid RTE tags, performs the following
-            - `oppia-noninteractive-image`
-                - If `alt-with-value` attribute not in the image tag,
-                introduces the attribute and assign empty value
-                - If `filepath-with-value` attribute not in image tag,
-                removes the tag
-            - `oppia-noninteractive-math`
-                - If `math_content-with-value` attribute not in math tag,
-                removes the tag
-                - If `raw_latex` is not present or empty or None, removes
-                the tag
-            - `oppia-noninteractive-skillreview`
-                - If `text-with-value` attribute is not present or empty or
-                None, removes the tag
-            - `oppia-noninteractive-video`
-                - If `start-with-value` or `end-with-value` is not present,
-                introduce them to the tag and assign 0 to them
-                - If `autoplay-with-value` is not present or is not boolean,
-                introduce it to the tag and assign `false` to them
-                - If `video_id-with-value` is not present, removes the tag
-            - `oppia-noninteractive-link`
-                - If `text-with-value` or `url-with-value` is not present,
-                removes the tag
+        """Update the state RTE content and translations
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -4551,71 +4542,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state in states_dict.values():
             html = state['content']['html']
-            soup = bs4.BeautifulSoup(html, 'html.parser')
-
-            for tag in soup:
-                if tag.name == 'oppia-noninteractive-image':
-                    if not tag.has_attr('alt-with-value'):
-                        tag['alt-with-value'] = '&quot;&quot;'
-
-                    if not tag.has_attr('filepath-with-value'):
-                        tag.decompose()
-
-                elif tag.name == 'oppia-noninteractive-math':
-                    if not tag.has_attr('math_content-with-value'):
-                        tag.decompose()
-                    else:
-                        math_content_tag = tag['math_content-with-value']
-                        if not math_content_tag.has_attr('raw_latex'):
-                            tag.decompose()
-                        elif math_content_tag['raw_latex'] is None:
-                            tag.decompose()
-                        elif math_content_tag['raw_latex'].strip() == '':
-                            tag.decompose()
-
-                elif tag.name == 'oppia-noninteractive-skillreview':
-                    if not tag.has_attr('text-with-value'):
-                        tag.decompose()
-                    elif tag['text-with-value'] is None:
-                        tag.decompose()
-                    elif tag['text-with-value'].strip() == '':
-                        tag.decompose()
-
-                elif tag.name == 'oppia-noninteractive-video':
-                    if not tag.has_attr('start-with-value'):
-                        tag['start-with-value'] = '0'
-
-                    if not tag.has_attr('end-with-value'):
-                        tag['end-with-value'] = '0'
-
-                    if not tag.has_attr('autoplay-with-value'):
-                        tag['autoplay-with-value'] = 'false'
-
-                    if not tag.has_attr('autoplay-with-value'):
-                        if tag['autoplay-with-value'].strip() not in (
-                            'true', 'false'):
-                            tag['autoplay-with-value'] = 'false'
-
-                    if not tag.has_attr('video_id-with-value'):
-                        tag.decompose()
-
-                    else:
-                        if tag['video_id-with-value'] is None:
-                            tag.decompose()
-                        elif tag['video_id-with-value'].strip() == '':
-                            tag.decompose()
-
-                elif tag.name == 'oppia-noninteractive-link':
-                    if (
-                        not tag.has_attr('text-with-value') or
-                        not tag.has_attr('url-with-value')
-                    ):
-                        tag.decompose()
-
-                    elif tag['text-with-value'].strip() == '':
-                        tag.decompose()
-
-            state['content']['html'] = str(soup)
+            
+            state['content']['html'] = cls._fix_rte(html)
 
         return states_dict
 
