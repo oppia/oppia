@@ -68,7 +68,7 @@ describe('Exploration Editor Suggestion Modal Component', () => {
 
       component.suggestionIsHandled = false;
       component.suggestionIsValid = true;
-      component.threadUibModalInstance = {
+      component.threadNgbModalInstance = {
         close: () => {},
         dismiss: () => {}
       };
@@ -132,7 +132,7 @@ describe('Exploration Editor Suggestion Modal Component', () => {
 
         component.suggestionIsHandled = true;
         component.suggestionIsValid = false;
-        component.threadUibModalInstance = {
+        component.threadNgbModalInstance = {
           close: () => {},
           dismiss: () => {}
         };
@@ -168,7 +168,7 @@ describe('Exploration Editor Suggestion Modal Component', () => {
       component.suggestionIsValid = false;
       component.unsavedChangesExist = false;
       component.suggestionIsHandled = true;
-      component.threadUibModalInstance = {
+      component.threadNgbModalInstance = {
         close: () => {},
         dismiss: () => {}
       };
@@ -203,7 +203,7 @@ describe('Exploration Editor Suggestion Modal Component', () => {
       component.suggestionIsValid = false;
       component.unsavedChangesExist = false;
       component.suggestionStatus = 'rejected';
-      component.threadUibModalInstance = {
+      component.threadNgbModalInstance = {
         close: () => {},
         dismiss: () => {}
       };
@@ -225,7 +225,7 @@ describe('Exploration Editor Suggestion Modal Component', () => {
       component.suggestionIsValid = true;
       component.unsavedChangesExist = false;
       component.suggestionStatus = 'rejected';
-      component.threadUibModalInstance = {
+      component.threadNgbModalInstance = {
         close: () => {},
         dismiss: () => {}
       };

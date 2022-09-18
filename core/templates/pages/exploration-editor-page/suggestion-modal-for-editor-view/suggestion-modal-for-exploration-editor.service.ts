@@ -59,7 +59,7 @@ export class SuggestionModalForExplorationEditorService {
       hasUnsavedChanges: boolean,
       isSuggestionValid: boolean,
       setActiveThread = (threadId => {}),
-      threadUibModalInstance = null
+      threadNgbModalInstance = null
   ): void {
     const modalRef = this.ngbModal.open(
       ExplorationEditorSuggestionModalComponent, {
@@ -79,8 +79,8 @@ export class SuggestionModalForExplorationEditorService {
       isSuggestionValid),
     modalRef.componentInstance.suggestionStatus = (
       activeThread.getSuggestionStatus()),
-    modalRef.componentInstance.threadUibModalInstance = (
-      threadUibModalInstance),
+    modalRef.componentInstance.threadNgbModalInstance = (
+      threadNgbModalInstance),
     modalRef.componentInstance.unsavedChangesExist = (
       hasUnsavedChanges);
 
@@ -130,7 +130,7 @@ export class SuggestionModalForExplorationEditorService {
   showSuggestionModal(
       suggestionType: string,
       extraParams: ExtraParams,
-      threadUibModalInstance = null): void {
+      threadNgbModalInstance = null): void {
     if (!extraParams.activeThread) {
       throw new Error(
         'Trying to show suggestion of a non-existent thread.');
@@ -140,7 +140,7 @@ export class SuggestionModalForExplorationEditorService {
       this.showEditStateContentSuggestionModal(
         extraParams.activeThread, extraParams.isSuggestionHandled,
         extraParams.hasUnsavedChanges, extraParams.isSuggestionValid,
-        extraParams.setActiveThread, threadUibModalInstance);
+        extraParams.setActiveThread, threadNgbModalInstance);
     }
   }
 }

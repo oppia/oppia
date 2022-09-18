@@ -227,7 +227,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
         suggestionIsHandled: '',
         suggestionIsValid: false,
         suggestionStatus: false,
-        threadUibModalInstance: '',
+        threadNgbModalInstance: '',
         unsavedChangesExist: '',
       },
       result: Promise.resolve({
@@ -255,7 +255,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
         suggestionIsHandled: null,
         suggestionIsValid: false,
         suggestionStatus: false,
-        threadUibModalInstance: null,
+        threadNgbModalInstance: null,
         unsavedChangesExist: null,
       },
       result: Promise.resolve({

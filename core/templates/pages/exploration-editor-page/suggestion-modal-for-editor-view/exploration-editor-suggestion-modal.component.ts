@@ -35,7 +35,7 @@ export class ExplorationEditorSuggestionModalComponent
   @Input() suggestionIsHandled: boolean;
   @Input() suggestionIsValid: boolean;
   @Input() suggestionStatus: string;
-  @Input() threadUibModalInstance: NgbActiveModal;
+  @Input() threadNgbModalInstance: NgbActiveModal;
   @Input() unsavedChangesExist: boolean;
 
   canEdit: boolean;
@@ -56,8 +56,8 @@ export class ExplorationEditorSuggestionModalComponent
   }
 
   acceptSuggestion(): void {
-    if (this.threadUibModalInstance !== null) {
-      this.threadUibModalInstance.close();
+    if (this.threadNgbModalInstance !== null) {
+      this.threadNgbModalInstance.close();
     }
     this.suggestionModalService.acceptSuggestion(this.ngbActiveModal, {
       action: AppConstants.ACTION_ACCEPT_SUGGESTION,
@@ -74,8 +74,8 @@ export class ExplorationEditorSuggestionModalComponent
   }
 
   rejectSuggestion(): void {
-    if (this.threadUibModalInstance !== null) {
-      this.threadUibModalInstance.close();
+    if (this.threadNgbModalInstance !== null) {
+      this.threadNgbModalInstance.close();
     }
 
     return this.suggestionModalService.rejectSuggestion(
