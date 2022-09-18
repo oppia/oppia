@@ -224,7 +224,11 @@ describe('Contributor dashboard page', function() {
       image,
       'Test image taking too long to appear.');
     let images = await $$('.e2e-test-image');
-    expect(images.length).toEqual(1);
+    if (width < 769) {
+      expect(images.length).toEqual(10);
+    } else {
+      expect(images.length).toEqual(1);
+    }
 
     // Copy tool should copy image on pressing 'Done'.
     await waitFor.visibilityOf(
