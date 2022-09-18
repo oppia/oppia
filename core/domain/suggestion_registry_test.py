@@ -2432,7 +2432,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'Expected language_code to be en, received None'):
             suggestion.validate()
 
-    def test_get_all_html_conztent_strings(self) -> None:
+    def test_get_all_html_content_strings(self) -> None:
         suggestion = suggestion_registry.SuggestionAddQuestion(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],

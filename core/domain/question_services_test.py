@@ -560,6 +560,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         }), question_domain.QuestionChange({
             'cmd': 'update_question_property',
             'property_name': 'next_content_id_index',
+            'old_value': 0,
             'new_value': content_id_generator.next_content_id_index,
         })]
         question_services.update_question(
@@ -582,6 +583,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         }), question_domain.QuestionChange({
             'cmd': 'update_question_property',
             'property_name': 'next_content_id_index',
+            'old_value': 0,
             'new_value': self.content_id_generator.next_content_id_index,
         })]
 
@@ -939,6 +941,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             question_state_data, ['skillid12345'],
+            content_id_generator.next_content_id_index,
             inapplicable_skill_misconception_ids=(
                 inapplicable_skill_misconception_ids))
         question_services.create_new_question_skill_link(
@@ -1181,15 +1184,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -1200,7 +1213,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -1275,7 +1288,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
@@ -1286,12 +1299,20 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                             'file_size_bytes': 100,
                             'needs_update': False
                         }
-                    }
+                    },
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -1302,7 +1323,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -1353,14 +1374,22 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data
             .recorded_voiceovers.to_dict(), {
                 'voiceovers_mapping': {
-                    'ca_placeholder_0': {},
-                    'content': {
+                    'ca_placeholder_6': {},
+                    'content_0': {
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
                             'needs_update': False,
-                            'duration_secs': 0.0}},
-                    'rule_input_1': {}}})
+                            'duration_secs': 0.0
+                        }
+                    },
+                    'rule_input_3': {},
+                    'hint_4': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'solution_5': {}
+                }
+            })
 
     def test_migrate_question_state_from_v31_to_latest(self) -> None:
         answer_group = {
@@ -1387,15 +1416,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -1406,7 +1445,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -1481,15 +1520,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -1504,7 +1553,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -1576,15 +1625,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -1602,7 +1661,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -1685,15 +1744,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -1704,7 +1773,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -1726,7 +1795,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'answer_is_exclusive': False,
                     'explanation': {
                         'html': 'Solution explanation',
-                        'content_id': 'content_2'
+                        'content_id': 'explanation_1'
                     }
                 },
                 'id': 'MathExpressionInput'
@@ -1793,15 +1862,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -1812,7 +1891,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -1834,7 +1913,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'answer_is_exclusive': False,
                     'explanation': {
                         'html': 'Solution explanation',
-                        'content_id': 'content_2'
+                        'content_id': 'explanation_1'
                     }
                 },
                 'id': 'MathExpressionInput'
@@ -1898,15 +1977,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -1917,7 +2006,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -1939,7 +2028,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'answer_is_exclusive': False,
                     'explanation': {
                         'html': 'Solution explanation',
-                        'content_id': 'content_2'
+                        'content_id': 'explanation_1'
                     }
                 },
                 'id': 'MathExpressionInput'
@@ -2024,12 +2113,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }]
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    'content_1': {},
+                    'content': {},
                     'feedback_1': {},
                     'feedback_2': {},
                     'feedback_3': {}
@@ -2037,7 +2126,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
-                    'content_1': {},
+                    'content': {},
                     'feedback_1': {},
                     'feedback_2': {},
                     'feedback_3': {}
@@ -2100,20 +2189,23 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         state_data = question.question_state_data
         self.assertEqual(sorted(
             state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
-                'content_1', 'feedback_1', 'feedback_3'])
-        self.assertEqual(sorted(
-            state_data.written_translations.translations_mapping.keys()), [
-                'content_1', 'feedback_1', 'feedback_3'])
+                'content_0', 'feedback_1', 'feedback_2'])
 
     def test_migrate_question_state_from_v35_to_latest(self) -> None:
         # Test restructuring of written_translations.
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -2133,7 +2225,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2142,7 +2234,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': None
             },
             'param_changes': [],
@@ -2171,36 +2263,29 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        migrated_translations_mapping = (
-            question
-            .question_state_data.written_translations.to_dict())
-        self.assertEqual(
-            migrated_translations_mapping,
-            {
-                'translations_mapping': {
-                    'explanation': {
-                        'en': {
-                            'data_format': 'html',
-                            'translation': '<p>test</p>',
-                            'needs_update': True
-                        }
-                    }
-                }
-            })
-
         # Test migration of PencilCodeEditor customization argument from
         # intial_code to intialCode.
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -2215,7 +2300,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2265,15 +2350,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         # Test population of default value of SubtitledHtml list.
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -2284,7 +2379,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2327,7 +2422,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             migrated_ca,
             {
                 'choices': {
-                    'value': [{'content_id': 'ca_choices_0', 'html': ''}]
+                    'value': [{'content_id': 'ca_choices_2', 'html': ''}]
                 },
                 'showChoicesInShuffledOrder': {'value': True}
             })
@@ -2335,11 +2430,17 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         # Test migration of html list to SubtitledHtml list.
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {}
@@ -2356,7 +2457,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2400,13 +2501,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             {
                 'choices': {
                     'value': [{
-                        'content_id': 'ca_choices_0',
+                        'content_id': 'ca_choices_2',
                         'html': 'one'
                     }, {
-                        'content_id': 'ca_choices_1',
+                        'content_id': 'ca_choices_3',
                         'html': 'two'
                     }, {
-                        'content_id': 'ca_choices_2',
+                        'content_id': 'ca_choices_4',
                         'html': 'three'
                     }]
                 },
@@ -2417,14 +2518,28 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         # Test restructuring of written_translations.
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {},
+                    'ca_placeholder_0': {},
+                }
             },
             'written_translations': {
-                'translations_mapping': {}
+                'translations_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {},
+                    'ca_placeholder_0': {},
+                }
             },
             'interaction': {
                 'answer_groups': [{
@@ -2432,8 +2547,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'dest': None,
                         'dest_if_really_stuck': None,
                         'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': 'Correct Answer'
+                            'content_id': 'default_outcome_2',
+                            'html': 'Correct Ans2er'
                         },
                         'param_changes': [],
                         'refresher_exploration_id': None,
@@ -2461,7 +2576,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2509,7 +2624,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             migrated_rule_spec,
             {
                 'inputs': {'x': {
-                    'contentId': 'rule_input_2',
+                    'contentId': 'rule_input_3',
                     'normalizedStrSet': ['test']
                 }},
                 'rule_type': 'Equals'
@@ -2540,15 +2655,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -2559,7 +2684,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2629,15 +2754,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -2648,7 +2783,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2726,15 +2861,27 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -2753,7 +2900,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2796,10 +2943,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             rule_spec.inputs['x'],
             {
-                'contentId': 'rule_input_4',
+                'contentId': 'rule_input_3',
                 'normalizedStrSet': ['Test']
             })
-        self.assertEqual(question.question_state_data.next_content_id_index, 5)
 
     def test_migrate_question_state_with_set_input_from_v40_to_latest(
         self
@@ -2828,15 +2974,27 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_buttonText_0': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'ca_buttonText_0': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -2854,7 +3012,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2897,10 +3055,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             rule_spec.inputs['x'],
             {
-                'contentId': 'rule_input_4',
+                'contentId': 'rule_input_3',
                 'unicodeStrSet': ['Test']
             })
-        self.assertEqual(question.question_state_data.next_content_id_index, 5)
 
     def test_migrate_question_state_from_v41_with_item_selection_input_interaction_to_latest(  # pylint: disable=line-too-long
         self
@@ -2929,15 +3086,29 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_choices_2': {},
+                    'ca_choices_3': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_choices_2': {},
+                    'ca_choices_3': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -2960,7 +3131,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -2973,7 +3144,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'answer_is_exclusive': True,
                     'correct_answer': ['<p>Choice 1</p>'],
                     'explanation': {
-                        'content_id': 'solution',
+                        'content_id': 'explanation_1',
                         'html': 'This is <i>solution</i> for state1'
                     }
                 },
@@ -3010,9 +3181,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         rule_spec = answer_group_object.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],
-            ['ca_choices_2', 'ca_choices_3'])
+            ['ca_choices_4', 'ca_choices_5'])
         self.assertEqual(
-            solution.correct_answer, ['ca_choices_2'])
+            solution.correct_answer, ['ca_choices_4'])
 
     def test_migrate_question_state_from_v41_with_drag_and_drop_sort_input_interaction_to_latest(  # pylint: disable=line-too-long
         self
@@ -3058,15 +3229,29 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_choices_2': {},
+                    'ca_choices_3': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_choices_2': {},
+                    'ca_choices_3': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -3088,7 +3273,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -3101,7 +3286,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'answer_is_exclusive': True,
                     'correct_answer': [['<p>Choice 1</p>', '<p>Choice 2</p>']],
                     'explanation': {
-                        'content_id': 'solution',
+                        'content_id': 'explanation_1',
                         'html': 'This is <i>solution</i> for state1'
                     }
                 },
@@ -3131,24 +3316,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_group_object = question.question_state_data.interaction.answer_groups[0]
+        answer_group_object = (
+            question.question_state_data.interaction.answer_groups[0])
         solution = question.question_state_data.interaction.solution
         # Ruling out the possibility of None for mypy type checking.
         assert solution is not None
         self.assertEqual(
             answer_group_object.rule_specs[0].inputs['x'],
-            [['ca_choices_2', 'ca_choices_3', 'invalid_content_id']])
+            [['ca_choices_4', 'ca_choices_5', 'invalid_content_id']])
         self.assertEqual(
             answer_group_object.rule_specs[1].inputs['x'],
-            [['ca_choices_2']])
+            [['ca_choices_4']])
         self.assertEqual(
             answer_group_object.rule_specs[2].inputs['x'],
-            'ca_choices_2')
+            'ca_choices_4')
         self.assertEqual(
             answer_group_object.rule_specs[3].inputs,
-            {'x': 'ca_choices_2', 'y': 'ca_choices_3'})
+            {'x': 'ca_choices_4', 'y': 'ca_choices_5'})
         self.assertEqual(
-            solution.correct_answer, [['ca_choices_2', 'ca_choices_3']])
+            solution.correct_answer, [['ca_choices_4', 'ca_choices_5']])
 
     def test_migrate_question_state_from_v42_to_latest(self) -> None:
         answer_group = {
@@ -3175,15 +3361,27 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -3202,7 +3400,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -3272,15 +3470,27 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -3299,7 +3509,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -3364,15 +3574,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -3388,7 +3608,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],
@@ -3499,15 +3719,25 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }
         question_state_dict = {
             'content': {
-                'content_id': 'content_1',
+                'content_id': 'content',
                 'html': 'Question 1'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
-                    'explanation': {}
+                    'content': {},
+                    'explanation_1': {},
+                    'feedback_1': {},
+                    'default_outcome_2': {},
+                    'hint_1': {}
                 }
             },
             'interaction': {
@@ -3525,7 +3755,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'dest': None,
                     'dest_if_really_stuck': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': 'default_outcome_2',
                         'html': 'Correct Answer'
                     },
                     'param_changes': [],

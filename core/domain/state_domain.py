@@ -247,85 +247,6 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
         self.outcome.validate()
 
-    def get_all_html_content_strings(self, interaction_id: str) -> List[str]:
-        """Get all html content strings in the AnswerGroup.
-
-        Args:
-            interaction_id: str. The interaction id that the answer group is
-                associated with.
-
-        Returns:
-            list(str). The list of all html content strings in the interaction.
-
-        Raises:
-            Exception. The Rule spec has an invalid format.
-            Exception. The Rule spec has no valid input variable
-                with HTML in it.
-        """
-        html_list = []
-
-        # TODO(#9413): Find a way to include a reference to the interaction
-        # type in the Draft change lists.
-        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
-        # the interaction-id from the rules_index_dict until issue-9413 has
-        # been fixed, because this method has no reference to the interaction
-        # type and draft changes use this method. The rules_index_dict below
-        # is used to figure out the assembly of the html in the rulespecs.
-
-        outcome_html = self.outcome.feedback.html
-        html_list += [outcome_html]
-
-        html_field_types_to_rule_specs = (
-            rules_registry.Registry.get_html_field_types_to_rule_specs())
-        for rule_spec in self.rule_specs:
-            for interaction_and_rule_details in (
-                    html_field_types_to_rule_specs.values()):
-                # Check that the value corresponds to the answer group's
-                # associated interaction id.
-                if (
-                        interaction_and_rule_details['interactionId'] !=
-                        interaction_id):
-                    continue
-
-                rule_type_has_html = (
-                    rule_spec.rule_type in
-                    interaction_and_rule_details['ruleTypes'].keys())
-                if rule_type_has_html:
-                    html_type_format = interaction_and_rule_details['format']
-                    input_variables_from_html_mapping = (
-                        interaction_and_rule_details['ruleTypes'][
-                            rule_spec.rule_type][
-                                'htmlInputVariables'])
-                    input_variable_match_found = False
-                    for input_variable in rule_spec.inputs.keys():
-                        if input_variable in input_variables_from_html_mapping:
-                            input_variable_match_found = True
-                            rule_input_variable = (
-                                rule_spec.inputs[input_variable])
-                            if (html_type_format ==
-                                    feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
-                                html_list += [rule_input_variable]
-                            elif (html_type_format ==
-                                  feconf.HTML_RULE_VARIABLE_FORMAT_SET):
-                                for value in rule_input_variable:
-                                    if isinstance(value, str):
-                                        html_list += [value]
-                            elif (html_type_format ==
-                                  feconf.
-                                  HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
-                                for rule_spec_html in rule_input_variable:
-                                    html_list += rule_spec_html
-                            else:
-                                raise Exception(
-                                    'The rule spec does not belong to a valid'
-                                    ' format.')
-                    if not input_variable_match_found:
-                        raise Exception(
-                            'Rule spec should have at least one valid input '
-                            'variable with Html in it.')
-
-        return html_list
-
     @staticmethod
     def convert_html_in_answer_group(
         answer_group_dict: AnswerGroupDict,
@@ -1069,66 +990,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], None)
-
-    def get_all_html_content_strings(self) -> List[str]:
-        """Get all html content strings in the interaction.
-
-        Returns:
-            list(str). The list of all html content strings in the interaction.
-
-        Raises:
-            Exception. The solution has invalid type.
-        """
-        html_list = []
-
-        for answer_group in self.answer_groups:
-            # Here, we are asserting that self.id is never going to be None,
-            # because interaction_id can only be None when there are no answer
-            # groups.
-            assert self.id is not None
-            html_list += answer_group.get_all_html_content_strings(self.id)
-
-        if self.default_outcome:
-            default_outcome_html = self.default_outcome.feedback.html
-            html_list += [default_outcome_html]
-
-        for hint in self.hints:
-            hint_html = hint.hint_content.html
-            html_list += [hint_html]
-
-        if self.id is None:
-            return html_list
-
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.id))
-
-        if self.solution and interaction.can_have_solution:
-            solution_html = self.solution.explanation.html
-            html_list += [solution_html]
-            html_field_types_to_rule_specs = (
-                rules_registry.Registry.get_html_field_types_to_rule_specs())
-
-            if self.solution.correct_answer:
-                for html_type in html_field_types_to_rule_specs.keys():
-                    if html_type == interaction.answer_type:
-                        if (
-                                html_type ==
-                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
-                            for value in self.solution.correct_answer:
-                                html_list += value
-                        elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
-                            for value in self.solution.correct_answer:
-                                html_list += [value]
-                        else:
-                            raise Exception(
-                                'The solution does not have a valid '
-                                'correct_answer type.')
-
-        for ca_name in self.customization_args:
-            html_list += self.customization_args[ca_name].get_html()
-
-        return html_list
 
     @staticmethod
     def convert_html_in_interaction(
@@ -3422,17 +3283,6 @@ class State(translation_domain.BaseTranslatableObject):
 
         return state_dict
 
-    def get_all_html_content_strings(self) -> List[str]:
-        """Get all html content strings in the state.
-
-        Returns:
-            list(str). The list of all html content strings in the interaction.
-        """
-        html_list = (
-            self.interaction.get_all_html_content_strings() + [
-                self.content.html])
-        return html_list
-
     def get_content_html(self, content_id: str) -> Union[str, List[str]]:
         """Returns the content belongs to a given content id of the object.
 
@@ -3501,17 +3351,18 @@ class State(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group['rule_specs']:
                 for input_name in sorted(rule_spec['inputs'].keys()):
                     input_value = rule_spec['inputs'][input_name]
-                    assert isinstance(input_value, dict)
+                    if not isinstance(input_value, dict):
+                        continue
                     if 'normalizedStrSet' in input_value:
                         yield (
                             input_value,
                             translation_domain.ContentType.RULE,
-                            None)
+                            'input')
                     if 'unicodeStrSet' in input_value:
                         yield (
                             input_value,
                             translation_domain.ContentType.RULE,
-                            None)
+                            'input')
 
         for hint in interaction['hints']:
             yield (
@@ -3581,7 +3432,14 @@ class State(translation_domain.BaseTranslatableObject):
         ] = {}
 
         OBJECT_CONTENT_IDS_REPLACERS['TranslatableHtmlContentId'] = (
-            lambda old_id, id_mapping: id_mapping[old_id]
+            lambda old_id, id_mapping: (
+                # INVALID_CONTENT_ID doesn't corresponds to any existing
+                # content in the state.
+                # Such Ids cannot be replaced with any new id.
+                id_mapping[old_id]
+                if old_id != feconf.INVALID_CONTENT_ID else
+                old_id
+            )
         )
         OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'] = (
             lambda ids_set, id_mapping: [
@@ -3668,12 +3526,6 @@ class State(translation_domain.BaseTranslatableObject):
                     rule_type = rule_spec['rule_type']
                     for key, value_class in rules_variables[rule_type]:
                         if value_class not in OBJECT_CONTENT_IDS_REPLACERS:
-                            continue
-
-                        # INVALID_CONTENT_ID doesn't corresponds to any existing
-                        # content in the state.
-                        # Such Ids cannot be replaced with any new id.
-                        if rule_input[key] == feconf.INVALID_CONTENT_ID:
                             continue
 
                         rule_input[key] = OBJECT_CONTENT_IDS_REPLACERS[

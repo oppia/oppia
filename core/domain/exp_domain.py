@@ -2359,9 +2359,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
             content_id_for_default_outcome: The content_id for the default
                 outcome of the new state.
         """
+        if state_name in self.states:
+                raise ValueError('Duplicate state name %s' % state_name)
+
         self.states[state_name] = state_domain.State.create_default_state(
-                state_name, content_id_for_state_content,
-                content_id_for_default_outcome)
+            state_name, content_id_for_state_content,
+            content_id_for_default_outcome)
 
     def rename_state(self, old_state_name: str, new_state_name: str) -> None:
         """Renames the given state.
@@ -3758,21 +3761,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'next_content_id_index': self.next_content_id_index
         }
-
-    def get_all_html_content_strings(self) -> List[str]:
-        """Gets all html content strings used in this exploration.
-
-        Returns:
-            list(str). The list of html content strings.
-        """
-        html_list = []
-        for state in self.states.values():
-            content_html = state.content.html
-            interaction_html_list = (
-                state.interaction.get_all_html_content_strings())
-            html_list += [content_html] + interaction_html_list
-
-        return html_list
 
 
 class ExplorationSummaryMetadataDict(TypedDict):

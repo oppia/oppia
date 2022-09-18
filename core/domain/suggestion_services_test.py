@@ -52,10 +52,11 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
 
-(suggestion_models, feedback_models, user_models) = (
-    models.Registry.import_models(
-        [models.Names.SUGGESTION, models.Names.FEEDBACK, models.Names.USER]
-    )
+(suggestion_models, feedback_models, opportunity_models, user_models) = (
+    models.Registry.import_models([
+        models.Names.SUGGESTION, models.Names.FEEDBACK,
+        models.Names.OPPORTUNITY, models.Names.USER
+    ])
 )
 
 
@@ -1004,16 +1005,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
-        solution_content_id = content_id_generator.generate(
-            translation_domain.ContentType.SOLUTION)
-        state.recorded_voiceovers.add_content_id_for_voiceover(
-            solution_content_id)
 
         new_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': solution_content_id,
+                'content_id': state.interaction.solution.explanation.content_id,
                 'html': '<p>This is the updated solution.</p>',
             },
         }
@@ -1065,6 +1062,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {
@@ -1075,11 +1073,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'id': 'test_id',
                 'version': 12,
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index),
                 'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
             'skill_id': skill_id,
@@ -1106,8 +1106,27 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exploration1', self.author_id, ['state 1'], ['TextInput'],
                 category='Algebra'))
+        audio_language_codes = set(
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
+        model = opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exploration1',
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=2,
+            incomplete_translation_language_codes=(
+                audio_language_codes - set(['en'])),
+            translation_counts={},
+            language_codes_needing_voice_artists=audio_language_codes,
+            language_codes_with_assigned_voice_artists=[]
+        )
+        model.update_timestamps()
+        model.put()
+
         old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
+            'content_0', '<p>old content html</p>').to_dict()
         exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
@@ -1115,7 +1134,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state 1',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>old content html</p>'
             }
         })]
@@ -1124,7 +1143,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>Translation for original content.</p>',
@@ -1144,7 +1163,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.update_question_suggestion(
                 suggestion.suggestion_id,
                 0.1,
-                exploration.states['state 1'].to_dict()
+                exploration.states['state 1'].to_dict(),
+                5
             )
 
     def test_update_question_suggestion_to_change_skill_difficulty(
@@ -1198,58 +1218,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_suggestion.change.skill_difficulty,
             0.6)
-
-    def test_accept_suggestion_commit_message_after_updating_a_suggestion(
-        self
-    ) -> None:
-        exploration = (
-            self.save_new_linear_exp_with_state_names_and_interactions(
-                'exploration1', self.author_id, ['state 1'], ['TextInput'],
-                category='Algebra'))
-        old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(
-            state_domain.SubtitledHtml.from_dict(old_content))
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'state 1',
-            'new_value': {
-                'content_id': 'content_0',
-                'html': '<p>old content html</p>'
-            }
-        })]
-        exp_services.update_exploration(
-            self.author_id, exploration.id, change_list, '')
-        add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'state 1',
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': '<p>old content html</p>',
-            'translation_html': '<p>Translation for original content.</p>',
-            'data_format': 'html'
-        }
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'exploration1', self.target_version_at_submission,
-            self.author_id, add_translation_change_dict, 'test description')
-
-        suggestion_services.update_translation_suggestion(
-            suggestion.suggestion_id, '<p>Updated translation</p>'
-        )
-
-        suggestion_services.accept_suggestion(
-            suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
-        )
-        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            'exploration1')
-
-        self.assertEqual(
-            snapshots_metadata[2]['commit_message'],
-            'Accepted suggestion by author: Accepted (with edits)')
-
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category: str = (
@@ -3390,6 +3358,26 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
 
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        audio_language_codes = set(
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
+        model = opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.target_id,
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=2,
+            incomplete_translation_language_codes=(
+                audio_language_codes - set(['en'])),
+            translation_counts={},
+            language_codes_needing_voice_artists=audio_language_codes,
+            language_codes_with_assigned_voice_artists=[]
+        )
+        model.update_timestamps()
+        model.put()
+
     def test_get_returns_empty_for_reviewers_who_authored_the_suggestions(
         self
     ) -> None:
@@ -4012,7 +4000,27 @@ class CommunityContributionStatsUnitTests(BaseSuggestionServicesTest):
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
-        self.save_new_valid_exploration(self.target_id, self.author_id)
+        exploration = self.save_new_valid_exploration(
+            self.target_id, self.author_id)
+        audio_language_codes = set(
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
+        model = opportunity_models.ExplorationOpportunitySummaryModel(
+            id=exploration.id,
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=2,
+            incomplete_translation_language_codes=(
+                audio_language_codes - set(['en'])),
+            translation_counts={},
+            language_codes_needing_voice_artists=audio_language_codes,
+            language_codes_with_assigned_voice_artists=[]
+        )
+        model.update_timestamps()
+        model.put()
+
         self.save_new_skill(self.skill_id, self.author_id)
 
     def test_create_edit_state_content_suggestion_does_not_change_the_counts(

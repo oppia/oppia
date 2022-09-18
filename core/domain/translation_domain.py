@@ -387,6 +387,24 @@ class BaseTranslatableObject:
         """
         return len(self.get_all_contents_which_need_translations())
 
+
+    def get_all_html_content_strings(self) -> List[str]:
+        """Gets all html content strings used in the object.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_list = []
+        content_collection = self.get_translatable_contents_collection()
+        translatable_contents = (
+            content_collection.content_id_to_translatable_content.values())
+        for translatable_content in translatable_contents:
+            if translatable_content.content_format == (
+                TranslatableContentFormat.HTML):
+                html_list.append(translatable_content.content_value)
+
+        return html_list
+
     def validate_translatable_contents(
         self, next_content_id_index: int
     ) -> None:

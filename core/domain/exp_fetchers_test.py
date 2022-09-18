@@ -23,7 +23,9 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import state_domain
+from core.domain import stats_services
 from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
@@ -165,12 +167,13 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def test_retrieval_of_exp_versions_for_invalid_state_schema_version(
         self
     ) -> None:
+        self.maxDiff = None
         error_regex = (
             'Exploration\\(id=%s, version=%s, states_schema_version=%s\\) '
                 'does not match the latest schema version %s' % (
                     self.EXP_1_ID,
                     '1',
-                    '52',
+                    feconf.CURRENT_STATE_SCHEMA_VERSION,
                     '60'
                 )
         )
@@ -392,7 +395,15 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             self.owner_id, self.EXP_1_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state'
+                    'state_name': 'New state',
+                    'content_id_for_state_content': (
+                        self.content_id_generator_1.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        self.content_id_generator_1.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
                 })
             ], 'A commit message.'
         )
@@ -472,12 +483,13 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
         """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
-category: Algebra
-correctness_feedback_enabled: false
+category: Art
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
-objective: An objective
+next_content_id_index: 6
+objective: Exp objective...
 param_changes: []
 param_specs: {}
 schema_version: %d
@@ -486,8 +498,8 @@ states:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
-      html: ''
+      content_id: content_0
+      html: <p>Congratulations, you have finished!</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -499,36 +511,51 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_0: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
   %s:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_1
       html: ''
     interaction:
-      answer_groups: []
+      answer_groups:
+      - outcome:
+          dest: End
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_4
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_0
+            content_id: ca_placeholder_5
             unicode_str: ''
         rows:
           value: 1
       default_outcome:
-        dest: End
+        dest: Introduction
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: feedback_2
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -538,19 +565,15 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
+        ca_placeholder_5: {}
+        content_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        rule_input_4: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Old Title
@@ -558,6 +581,121 @@ title: Old Title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    STATES_AT_V41 = {
+        "Introduction": {
+            "classifier_model_id": None,
+            "content": {"content_id": "content", "html": ""},
+            "interaction": {
+                "answer_groups": [
+                    {
+                        "outcome": {
+                            "dest": "End",
+                            "feedback": {
+                                "content_id": "feedback_1",
+                                "html": "<p>Correct!</p>",
+                            },
+                            "labelled_as_correct": False,
+                            "missing_prerequisite_skill_id": None,
+                            "param_changes": [],
+                            "refresher_exploration_id": None,
+                        },
+                        "rule_specs": [
+                            {
+                                "inputs": {
+                                    "x": {
+                                        "contentId": "rule_input_3",
+                                        "normalizedStrSet": ["InputString"],
+                                    }
+                                },
+                                "rule_type": "Equals",
+                            }
+                        ],
+                        "tagged_skill_misconception_id": None,
+                        "training_data": [],
+                    }
+                ],
+                "confirmed_unclassified_answers": [],
+                "customization_args": {
+                    "placeholder": {
+                        "value": {
+                            "content_id": "ca_placeholder_2",
+                            "unicode_str": ""
+                        }
+                    },
+                    "rows": {"value": 1},
+                },
+                "default_outcome": {
+                    "dest": "Introduction",
+                    "feedback": {
+                        "content_id": "default_outcome",
+                        "html": ""
+                    },
+                    "labelled_as_correct": False,
+                    "missing_prerequisite_skill_id": None,
+                    "param_changes": [],
+                    "refresher_exploration_id": None,
+                },
+                "hints": [],
+                "id": "TextInput",
+                "solution": None,
+            },
+            "next_content_id_index": 4,
+            "param_changes": [],
+            "recorded_voiceovers": {
+                "voiceovers_mapping": {
+                    "ca_placeholder_2": {},
+                    "content": {},
+                    "default_outcome": {},
+                    "feedback_1": {},
+                    "rule_input_3": {},
+                }
+            },
+            "solicit_answer_details": False,
+            "written_translations": {
+                "translations_mapping": {
+                    "ca_placeholder_2": {},
+                    "content": {},
+                    "default_outcome": {},
+                    "feedback_1": {},
+                    "rule_input_3": {},
+                }
+            },
+        },
+        "End": {
+            "classifier_model_id": None,
+            "content": {
+                "content_id": "content",
+                "html": "<p>Congratulations, you have finished!</p>",
+            },
+            "interaction": {
+                "answer_groups": [],
+                "confirmed_unclassified_answers": [],
+                "customization_args": {
+                    "recommendedExplorationIds": {
+                        "value": []
+                    }
+                },
+                "default_outcome": None,
+                "hints": [],
+                "id": "EndExploration",
+                "solution": None,
+            },
+            "next_content_id_index": 0,
+            "param_changes": [],
+            "recorded_voiceovers": {
+                "voiceovers_mapping": {
+                    "content": {}
+                }
+            },
+            "solicit_answer_details": False,
+            "written_translations": {
+                "translations_mapping": {
+                    "content": {}
+                }
+            },
+        },
+    }
 
     ALBERT_EMAIL: Final = 'albert@example.com'
     ALBERT_NAME: Final = 'albert'
@@ -576,9 +714,21 @@ title: Old Title
         swap_exp_schema_46 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
         with swap_states_schema_41, swap_exp_schema_46:
-            self.save_new_valid_exploration(
-                self.OLD_EXP_ID, self.albert_id, title='Old Title',
-                end_state_name='End')
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.OLD_EXP_ID, title='Old Title', category='Art',
+                objective='Exp objective...')
+            exploration_model = exp_models.ExplorationModel(id=self.OLD_EXP_ID)
+            exp_services.populate_exp_model_fields(
+                exploration_model, exploration)
+
+        exploration_model.states = self.STATES_AT_V41
+        rights_manager.create_new_exploration_rights(
+            exploration_model.id, self.albert_id)
+        exploration_model.commit(self.albert_id, 'Created new exploration.', [])
+        exp_services.regenerate_exploration_summary_with_new_contributor(
+            self.OLD_EXP_ID, self.albert_id)
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration_model.id, exploration_model.version)
 
         # Create standard exploration that should not be converted.
         new_exp = self.save_new_valid_exploration(
@@ -653,9 +803,22 @@ title: Old Title
         swap_exp_schema_46 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
         with swap_states_schema_41, swap_exp_schema_46:
-            self.save_new_valid_exploration(
-                exp_id, self.albert_id, title='Old Title',
-                end_state_name=end_state_name)
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id, title='Old Title', category='Art',
+                objective='Exp objective...')
+            exploration_model = exp_models.ExplorationModel(id=exp_id)
+            exp_services.populate_exp_model_fields(
+                exploration_model, exploration)
+
+        exploration_model.states = self.STATES_AT_V41
+        rights_manager.create_new_exploration_rights(
+            exploration_model.id, self.albert_id)
+        exploration_model.commit(self.albert_id, 'Created new exploration.', [])
+        exp_services.regenerate_exploration_summary_with_new_contributor(
+            exp_id, self.albert_id)
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration_model.id, exploration_model.version)
+
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
             [exp_id])
@@ -669,7 +832,8 @@ title: Old Title
         # In version 1, the title was 'Old title'.
         # In version 2, the title becomes 'New title'.
         exploration_model.title = 'New title'
-        exploration_model.commit(self.albert_id, 'Changed title.', [])
+        exploration_model.commit(
+            self.albert_id, 'Changed title and states.', [])
 
         # Version 2 of exploration.
         exploration_model = exp_models.ExplorationModel.get(
@@ -698,7 +862,7 @@ title: Old Title
             'param_changes': [],
             'classifier_model_id': None,
             'content': {
-                'content_id': 'content_0',
+                'content_id': 'content',
                 'html': '<p>Unicode Characters 😍😍😍😍</p>'
             },
             'next_content_id_index': 5,

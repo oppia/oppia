@@ -177,14 +177,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': 'new value'
             })
         ]
-        draft_change_list_v51_2 = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Intro',
-                'property_name': 'next_content_id_index',
-                'new_value': 'new value'
-            })
-        ]
         draft_change_list_v51_3 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -207,12 +199,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             [change.to_dict() for change in draft_change_list_v51_1],
             [change.to_dict() for change in migrated_draft_change_list_v52_1]
         )
-
-        migrated_draft_change_list_v52_2 = (
-            draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v51_2, 1, 2, self.EXP_ID)
-        )
-        self.assertIsNone(migrated_draft_change_list_v52_2)
 
         migrated_draft_change_list_v52_3 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(

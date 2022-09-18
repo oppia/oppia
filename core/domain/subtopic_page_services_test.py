@@ -165,7 +165,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         }
         expected_page_contents_dict = {
             'subtitled_html': {
-                'content_id': 'content_0', 'html': '<p>hello world</p>'
+                'content_id': 'content', 'html': '<p>hello world</p>'
             },
             'recorded_voiceovers': recorded_voiceovers,
             'written_translations': {
@@ -177,7 +177,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.subtopic_page.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
-                'content_id': 'content_0'
+                'content_id': 'content'
             }))
         self.subtopic_page.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers))
