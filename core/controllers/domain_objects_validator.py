@@ -265,11 +265,8 @@ def validate_exploration_change(exp_change_dict):
     ]
     if exp_change_dict['cmd'] in exp_change_commands:
         exp_domain.ExplorationChange(exp_change_dict)
-    if (
-        exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY and
-        exp_change_dict['property_name'] ==
-        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-    ):
+    # Validate state properties.
+    if exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
         if (
             exp_change_dict['property_name'] ==
             exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
@@ -295,8 +292,8 @@ def validate_exploration_change(exp_change_dict):
                         'state_name']
                 ):
                     raise base.BaseHandler.InvalidInputException(
-                        'The outcome labelled_as_correct should not be True if'
-                        'the destination is (try again).'
+                        'The outcome labelled_as_correct should not be True if '
+                        'the destination is state itself.'
                     )
                 if answer_group['outcome'][
                     'refresher_exploration_id'] is not None:

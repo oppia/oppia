@@ -254,10 +254,10 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
     interaction_answer_groups = [{
         'rule_specs': [{
-                'inputs': {
-                    'x': 60
-                },
-                'rule_type': 'IsLessThanOrEqualTo'
+            'inputs': {
+                'x': 60
+            },
+            'rule_type': 'IsLessThanOrEqualTo'
         }],
         'outcome': {
             'dest': feconf.DEFAULT_INIT_STATE_NAME,
@@ -284,9 +284,9 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     }
 
     def test_incorrect_exp_change_object_raises_exception(self) -> None:
-        """"""
+        """Exploration change dictionary should have `cmd` attribute"""
         incorrect_change_dict = {
-            'state_name': 'State 3',
+            'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
@@ -300,7 +300,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
                 incorrect_change_dict)
 
     def test_tagged_skill_misconception_id_should_be_None(self) -> None:
-        """"""
+        """The `tagged_skill_misconception_id` inside answer group should
+        be None otherwise the error will be raised"""
         test_ans_groups = self.interaction_answer_groups.copy()
         test_change_dict = self.change_dict.copy()
         test_change_dict['new_value'] = test_ans_groups
@@ -320,7 +321,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         domain_objects_validator.validate_exploration_change(test_change_dict)
 
     def test_atleast_one_rule_spec_should_be_present(self) -> None:
-        """"""
+        """Atleast one rule spec should be present inside the answer group
+        otherwise the error will be raised"""
         test_ans_groups = self.interaction_answer_groups.copy()
         test_change_dict = self.change_dict.copy()
         test_change_dict['new_value'] = test_ans_groups
@@ -342,9 +344,94 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         domain_objects_validator.validate_exploration_change(test_change_dict)
 
     def test_destination_should_not_be_empty(self) -> None:
-        """"""
+        """Destination node inside answer group should not be empty
+        otherwise the error will be raised"""
         test_ans_groups = self.interaction_answer_groups.copy()
         test_change_dict = self.change_dict.copy()
         test_change_dict['new_value'] = test_ans_groups
         # Invaid answer group with empty destination state.
-        
+        test_ans_groups[0]['outcome']['dest'] = ''
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'The destination for the answer group is not valid.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                test_change_dict)
+        # Vaid answer group with non empty destination state does not
+        # raise any error.
+        test_ans_groups[0]['outcome']['dest'] = 'Introduction'
+        domain_objects_validator.validate_exploration_change(
+            test_change_dict)
+
+    def test_when_labelled_as_correct_the_destination_should_not_be_state_itself( # pylint: disable=line-too-long
+        self) -> None:
+        """When the `labelled_as_correct` value of answer group is True 
+        then the destination should not be the state itself"""
+        test_ans_groups = self.interaction_answer_groups.copy()
+        test_change_dict = self.change_dict.copy()
+        test_change_dict['new_value'] = test_ans_groups
+        # Invalid answer group with `labelled_as_correct` value True and
+        # the destination is state itself.
+        test_ans_groups[0]['outcome']['labelled_as_correct'] = True
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'The outcome labelled_as_correct should not be True '
+            'if the destination is state itself.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                test_change_dict)
+        # Valid answer group with `labelled_as_correct` value False and
+        # destination is state itself.
+        test_ans_groups[0]['outcome']['labelled_as_correct'] = False
+        domain_objects_validator.validate_exploration_change(
+            test_change_dict)
+
+    def test_refresher_exploration_id_should_be_None(self) -> None:
+        """Refresher exploration if inside answer group should be None
+        otherwise the error will be raised"""
+        test_ans_groups = self.interaction_answer_groups.copy()
+        test_change_dict = self.change_dict.copy()
+        test_change_dict['new_value'] = test_ans_groups
+        # Invalid answer group with refresher_exploration_id as not
+        # None will raise an error.
+        test_ans_groups[0]['outcome']['refresher_exploration_id'] = 'Not None'
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'The refresher exploration id of the answer group '
+            'outcome should be None.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                test_change_dict)
+        # Valid answer group with refresher_exploration_id as None will
+        # not raise any error.
+        test_ans_groups[0]['outcome']['refresher_exploration_id'] = None
+        domain_objects_validator.validate_exploration_change(
+            test_change_dict)
+
+    def test_default_outcome_destination_should_not_be_empty(self):
+        """Default outcome destination should not be empty otherwise
+        the error will be raised"""
+        default_outcome = {
+            'dest': '',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': ''
+            },
+            'labelled_as_correct': 'false',
+            'missing_prerequisite_skill_id': None,
+            'param_changes': [],
+            'refresher_exploration_id': None
+        }
+        test_change_dict = self.change_dict.copy()
+        test_change_dict['property_name'] = (
+            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME)
+        test_change_dict['new_value'] = default_outcome
+        # Default outcome destination should not be empty else
+        # the error will be raise.
+        default_outcome['dest'] = ''
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'The destination for the default outcome is not valid.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                test_change_dict)
+        # Default outcome with valid state will not raise any errors.
+        default_outcome['dest'] = 'state'
+        domain_objects_validator.validate_exploration_change(
+            test_change_dict)
