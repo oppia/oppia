@@ -115,12 +115,14 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'creatorDashboard',
     'embedding',
     'explorationFeedbackTab',
+    'explorationHistoryTab',
     'explorationImprovementsTab',
     'explorationStatisticsTab',
     'explorationTranslationTab',
     'extensions',
     'featureGating',
     'fileUploadExtensions',
+    'fileUploadFeatures',
     'learner',
     'learnerDashboard',
     'library',
@@ -141,8 +143,6 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
-    'explorationHistoryTab',
-    'fileUploadFeatures',
 ]
 
 

@@ -150,7 +150,7 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
           await waitFor.presenceOf(
             imageUploadInput,
             'Image upload input element took too long to load');
-          await imageUploadInput.keys(absPath);
+          await imageUploadInput.addValue(absPath);
         }
       }
       await action.click('Shape tool', shapeTool);
@@ -164,7 +164,7 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
     await waitFor.visibilityOf(
       modal.$('.e2e-test-saved-diagram-container'),
       'Diagram container not visible');
-    await action.setValue('Alt text input', altTextInputElement, altText);
+    await action.addValue('Alt text input', altTextInputElement, altText);
   }
 };
 

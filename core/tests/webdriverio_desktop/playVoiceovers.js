@@ -54,9 +54,9 @@ describe('Voiceover player', function() {
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
-      'Hindi', '../data/cafe.mp3');
+      'हिन्दी (Hindi)', '../data/cafe.mp3');
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
-      'Arabic', '../data/ambient-noise.mp3');
+      'العربية (Arabic)', '../data/ambient-noise.mp3');
     await explorationEditorPage.saveChanges('Added voiceovers');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voiceoverPlayerTest');
@@ -72,11 +72,11 @@ describe('Voiceover player', function() {
     await libraryPage.get();
     await libraryPage.playExploration('voiceoverPlayerTest');
     await explorationPlayerPage.expandAudioBar();
-    await explorationPlayerPage.changeVoiceoverLanguage('Hindi');
+    await explorationPlayerPage.changeVoiceoverLanguage('हिन्दी (Hindi)');
     await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
     await explorationPlayerPage.pressPauseButton();
-    await explorationPlayerPage.changeVoiceoverLanguage('Arabic');
+    await explorationPlayerPage.changeVoiceoverLanguage('العربية (Arabic)');
     await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
   });
