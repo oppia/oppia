@@ -257,9 +257,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_update_user_settings_for_invalid_display_alias_raises_error(
         self
     ) -> None:
@@ -273,6 +270,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         self.modifiable_new_user_data.user_id = user_id
         self.modifiable_new_user_data.pin = None
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         for display_alias, error_msg in bad_display_aliases_with_expected_error:
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 self.modifiable_new_user_data.display_alias = display_alias  # type: ignore[assignment]
@@ -295,11 +295,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(user_settings.display_alias, display_alias)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing. In this test, only some part
-    # should be removed. Because we are testing the correct email
-    # format for which we have to provide the string type value.
     def test_create_new_user_with_invalid_emails_raises_exception(self) -> None:
         bad_email_addresses_with_expected_error_message = [
             ('@', 'Invalid email address: @'),
@@ -315,6 +310,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 )
             )
         ]
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 user_services.create_new_user('auth_id', email)  # type: ignore[arg-type]
@@ -3094,15 +3092,15 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self) -> None:
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
             user_services.update_subject_interests(self.user_id, 'not a list')  # type: ignore[arg-type]
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
             user_services.update_subject_interests(self.user_id, [1, 2, 3])  # type: ignore[list-item]
 

@@ -116,18 +116,18 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.subtopic_page.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_subtopic_topic_id_validation(self) -> None:
         self.subtopic_page.topic_id = 1  # type: ignore[assignment]
         self._assert_subtopic_validation_error(
             'Expected topic_id to be a string'
         )
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_language_code_validation(self) -> None:
         self.subtopic_page.language_code = 0  # type: ignore[assignment]
         self._assert_subtopic_validation_error(
@@ -262,18 +262,18 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 'subtopic_id': 'subtopic_id'
             })
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_version_number(self) -> None:
         self.subtopic_page.version = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected version number to be an int'):
             self.subtopic_page.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_page_contents_schema_version_type(self) -> None:
         self.subtopic_page.page_contents_schema_version = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(

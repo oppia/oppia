@@ -449,9 +449,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'Expected all answer groups to have destination for the '
             'stuck learner as None.')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_invalid_list_of_inapplicable_skill_misconception_ids(
         self
     ) -> None:
@@ -464,9 +464,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'Expected inapplicable_skill_misconception_ids to be a list of '
                 'strings, received [\'Test\', 1]'))
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_invalid_type_of_inapplicable_skill_misconception_ids(
         self
     ) -> None:
@@ -516,16 +516,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question.language_code = 'abc'
         self._assert_question_domain_validation_error('Invalid language code')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.question.question_state_data = 'State data'  # type: ignore[assignment]
         self._assert_question_domain_validation_error(
             'Expected question state data to be a State object')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.question.question_state_data_schema_version = 'abc'  # type: ignore[assignment]
         self._assert_question_domain_validation_error(
             'Expected schema version to be an integer')
@@ -537,16 +537,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     feconf.CURRENT_STATE_SCHEMA_VERSION,
                     self.question.question_state_data_schema_version))
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.question.linked_skill_ids = 'Test'  # type: ignore[assignment]
         self._assert_question_domain_validation_error(
             'Expected linked_skill_ids to be a list of strings')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.question.linked_skill_ids = None  # type: ignore[assignment]
         self._assert_question_domain_validation_error(
             'inked_skill_ids is either null or an empty list')
@@ -555,9 +555,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'linked_skill_ids is either null or an empty list')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.question.linked_skill_ids = ['Test', 1]  # type: ignore[list-item]
         self._assert_question_domain_validation_error(
             'Expected linked_skill_ids to be a list of strings')
@@ -566,25 +566,25 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'linked_skill_ids has duplicate skill ids')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.question.language_code = 1  # type: ignore[assignment]
         self._assert_question_domain_validation_error(
             'Expected language_code to be a string'
         )
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.question.version = 'abc'  # type: ignore[assignment]
         self._assert_question_domain_validation_error(
             'Expected version to be an integer'
         )
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.question.id = 123  # type: ignore[assignment]
         self._assert_question_domain_validation_error(
             'Expected ID to be a string'
@@ -689,7 +689,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_question_state_dict_conversion_from_v28_to_v29(self) -> None:
 
-        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
         # Removing 'solicit_answer_details' from question_data.
         del self.question_state_dict['solicit_answer_details']  # type: ignore[misc]
 
@@ -747,8 +748,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'answer_groups'][0]['tagged_skill_misconception_id'])
 
     def test_question_state_dict_conversion_from_v30_to_v31(self) -> None:
-        # For testing purposes here we are defining an empty VoiceoverDict,
-        # Because here we are checking when this dict passes throw conversion
+        # Here we use MyPy ignore because here we are defining an empty
+        # VoiceoverDict, for checking when this dict passes throw conversion
         # functions, keys are populated automatically or not. So, due to the
         # absence of keys MyPy throws an `Missing key` error. Thus to avoid
         # the error, we used ignore here.
@@ -884,12 +885,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
-        # Here, we are defining AnswerGroupDict and while defining
-        # AnswerGroupDict MyPy expects that all keys are defined, but for
-        # testing purposes here we are defining only rule_specs and outcome
-        # key which causes MyPy to throw `Missing keys' error. Thus to avoid
-        # the error, we used ignore here.
         self.question_state_dict['interaction']['answer_groups'] = [
+            # Here we use MyPy ignore because here we are defining
+            # AnswerGroupDict and while defining AnswerGroupDict MyPy
+            # expects that all keys are defined, but for testing purposes
+            # here we are defining only rule_specs and outcome key which
+            # causes MyPy to throw `Missing keys' error. Thus to avoid the
+            # error, we used ignore here.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [{
                     'inputs': {
@@ -904,6 +906,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     }
                 },
             },
+            # Here we use MyPy ignore because here we are defining
+            # AnswerGroupDict and while defining AnswerGroupDict MyPy
+            # expects that all keys are defined, but for testing purposes
+            # here we are defining only rule_specs and outcome key which
+            # causes MyPy to throw `Missing keys' error. Thus to avoid the
+            # error, we used ignore here.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [{
                     'inputs': {
@@ -918,6 +926,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     }
                 },
             },
+            # Here we use MyPy ignore because here we are defining
+            # AnswerGroupDict and while defining AnswerGroupDict MyPy
+            # expects that all keys are defined, but for testing purposes
+            # here we are defining only rule_specs and outcome key which
+            # causes MyPy to throw `Missing keys' error. Thus to avoid the
+            # error, we used ignore here.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [{
                     'inputs': {
@@ -932,6 +946,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     }
                 },
             },
+            # Here we use MyPy ignore because here we are defining
+            # AnswerGroupDict and while defining AnswerGroupDict MyPy
+            # expects that all keys are defined, but for testing purposes
+            # here we are defining only rule_specs and outcome key which
+            # causes MyPy to throw `Missing keys' error. Thus to avoid the
+            # error, we used ignore here.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [],
                 'outcome': {
@@ -1002,11 +1022,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
-        # Here, we are defining AnswerGroupDict and while defining
-        # AnswerGroupDict MyPy expects that all keys are defined, but for
-        # testing purposes here we are defining only rule_specs and outcome
-        # key which causes MyPy to throw `Missing keys' error. Thus to avoid
-        # the error, we used ignore here.
+        # Here we use MyPy ignore because we are defining AnswerGroupDict
+        # and while defining AnswerGroupDict MyPy expects that all keys are
+        # defined, but for testing purposes here we are defining only rule_specs
+        # and outcome key which causes MyPy to throw `Missing keys' error. Thus
+        # to avoid the error, we used ignore here.
         test_value['state']['interaction']['answer_groups'] = [
             {  # type: ignore[typeddict-item]
                 'rule_specs': [{
@@ -1058,11 +1078,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
-        # Here, we are defining AnswerGroupDict and while defining
-        # AnswerGroupDict MyPy expects that all keys are defined, but for
-        # testing purposes here we are defining only rule_specs and outcome
-        # key which causes MyPy to throw `Missing keys' error. Thus to avoid
-        # the error, we used ignore here.
+        # Here we use MyPy ignore because we are defining AnswerGroupDict
+        # and while defining AnswerGroupDict MyPy expects that all keys are
+        # defined, but for testing purposes here we are defining only rule_specs
+        # and outcome key which causes MyPy to throw `Missing keys' error. Thus
+        # to avoid the error, we used ignore here.
         test_value['state']['interaction']['answer_groups'] = [
             {  # type: ignore[typeddict-item]
                 'rule_specs': [{
@@ -1104,13 +1124,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_question_state_dict_conversion_from_v35_to_v36(self) -> None:
 
-        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
-        # do not accept 'html' key, because the latest version of
-        # WrittenTranslation does not have any `html` attribute, but for testing
-        # purposes here we are defining an older version of WrittenTranslation
-        # for which we have to provide `html` key. So, due to this MyPy throws
-        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because we are defining WrittenTranslationDict
+        # and WrittenTranslationDict do not accept 'html' key, because the
+        # latest version of WrittenTranslation does not have any `html`
+        # attribute, but for testing purposes here we are defining an older
+        # version of WrittenTranslation for which we have to provide `html`
+        # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
+        # error. Thus to avoid the error, we used ignore here.
         self.question_state_dict[
             'written_translations']['translations_mapping'] = {
             'temp_id_1': {
@@ -1118,6 +1138,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
@@ -1155,19 +1177,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'initial_code': {}
         }
 
-        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
-        # do not accept 'html' key, because the latest version of
-        # WrittenTranslation does not have any `html` attribute, but for testing
-        # purposes here we are defining an older version of WrittenTranslation
-        # for which we have to provide `html` key. So, due to this MyPy throws
-        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because we are defining WrittenTranslationDict
+        # and WrittenTranslationDict do not accept 'html' key, because the
+        # latest version of WrittenTranslation does not have any `html`
+        # attribute, but for testing purposes here we are defining an older
+        # version of WrittenTranslation for which we have to provide `html`
+        # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
+        # error. Thus to avoid the error, we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
@@ -1204,19 +1228,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         }
 
-        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
-        # do not accept 'html' key, because the latest version of
-        # WrittenTranslation does not have any `html` attribute, but for testing
-        # purposes here we are defining an older version of WrittenTranslation
-        # for which we have to provide `html` key. So, Due to this MyPy throwing
-        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because we are defining WrittenTranslationDict
+        # and WrittenTranslationDict do not accept 'html' key, because the
+        # latest version of WrittenTranslation does not have any `html`
+        # attribute, but for testing purposes here we are defining an older
+        # version of WrittenTranslation for which we have to provide `html`
+        # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
+        # error. Thus to avoid the error, we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
@@ -1241,19 +1267,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         }
 
-        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
-        # do not accept 'html' key, because the latest version of
-        # WrittenTranslation does not have any `html` attribute, but for testing
-        # purposes here we are defining an older version of WrittenTranslation
-        # for which we have to provide `html` key. So, due to this MyPy throwing
-        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because we are defining WrittenTranslationDict
+        # and WrittenTranslationDict do not accept 'html' key, because the
+        # latest version of WrittenTranslation does not have any `html`
+        # attribute, but for testing purposes here we are defining an older
+        # version of WrittenTranslation for which we have to provide `html`
+        # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
+        # error. Thus to avoid the error, we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
@@ -1314,19 +1342,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['id'] = 'ItemSelectionInput'
         test_value['state']['interaction']['customization_args'] = {}
 
-        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
-        # do not accept 'html' key, because the latest version of
-        # WrittenTranslation does not have any `html` attribute, but for testing
-        # purposes here we are defining an older version of WrittenTranslation
-        # for which we have to provide `html` key. So, due to this MyPy throwing
-        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because we are defining WrittenTranslationDict
+        # and WrittenTranslationDict do not accept 'html' key, because the
+        # latest version of WrittenTranslation does not have any `html`
+        # attribute, but for testing purposes here we are defining an older
+        # version of WrittenTranslation for which we have to provide `html`
+        # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
+        # error. Thus to avoid the error, we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
@@ -1898,7 +1928,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state']['card_is_checkpoint'], False)
 
     def test_question_state_dict_conversion_from_v44_to_v45(self) -> None:
-        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
         del self.question_state_dict['linked_skill_id']  # type: ignore[misc]
 
         test_value: question_domain.VersionedQuestionStateDict = {
@@ -2072,11 +2106,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
-        # Here, we are defining AnswerGroupDict and while defining
-        # AnswerGroupDict MyPy expects that all keys are defined, but for
-        # testing purposes here we are defining only outcome key which
-        # causes MyPy to throw `Missing keys' error. Thus to avoid the
-        # error, we used ignore here.
+        # Here we use MyPy ignore because we are defining AnswerGroupDict
+        # and while defining AnswerGroupDict MyPy expects that all keys
+        # are defined, but for testing purposes here we are defining only
+        # outcome key which causes MyPy to throw `Missing keys' error.
+        # Thus to avoid the error, we used ignore here.
         question_data['interaction']['answer_groups'] = [
             {  # type: ignore[typeddict-item]
                 'outcome': {
@@ -2161,18 +2195,18 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     def test_validation_with_valid_properties(self) -> None:
         self.observed_object.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_id(self) -> None:
         self.observed_object.id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected id to be a string, received 1'):
             self.observed_object.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_interaction_id(self) -> None:
         self.observed_object.interaction_id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2180,9 +2214,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'Expected interaction id to be a string, received 1'):
             self.observed_object.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_question_content(self) -> None:
         self.observed_object.question_content = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2190,9 +2224,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'Expected question content to be a string, received 1'):
             self.observed_object.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_created_on(self) -> None:
         self.observed_object.created_on = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2200,9 +2234,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'Expected created on to be a datetime, received 1'):
             self.observed_object.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_last_updated(self) -> None:
         self.observed_object.last_updated = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2210,9 +2244,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_invalid_list_of_misconception_ids(self) -> None:
         """Test to verify that the validation fails when
         misconception_ids value is an invalid list.
@@ -2225,9 +2259,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
                 'received [\'Test\', 1]')):
             self.observed_object.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_invalid_type_of_misconception_ids(self) -> None:
         """Test to verify that the validation fails when
         misconception_ids value is an invalid type.

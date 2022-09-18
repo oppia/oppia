@@ -38,7 +38,7 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, Optional, Union, cast
+from typing import Dict, List, Optional, Union, cast
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -70,15 +70,6 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement accept.'):
             self.base_suggestion.accept('test_message')
-
-    def test_base_class_get_change_list_for_accepting_suggestion_raises_error(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            'Subclasses of BaseSuggestion should implement '
-            'get_change_list_for_accepting_suggestion.'):
-            self.base_suggestion.get_change_list_for_accepting_suggestion()
 
     def test_base_class_pre_accept_validate_raises_error(self) -> None:
         with self.assertRaisesRegex(
@@ -267,9 +258,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_target_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -283,15 +271,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.target_id = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected target_id to be a string'
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_target_version_at_submission(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -305,6 +293,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.target_version_at_submission = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -331,9 +322,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_author_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -347,6 +335,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.author_id = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected author_id to be a string'
@@ -376,9 +367,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_final_reviewer_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -392,6 +380,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected final_reviewer_id to be a string'
@@ -421,9 +412,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_score_category(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -437,6 +425,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.score_category = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected score_category to be a string'
@@ -493,9 +484,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_change(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -509,6 +497,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change = {}  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to be an ExplorationChange'
@@ -568,7 +559,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         # Here we use MyPy ignore because 'property_name' can only accept
         # 'content' string literal but here we are providing 'invalid_property'
-        # which causes MyPy to throw a error. Thus to avoid the error, we used
+        # which causes MyPy to throw an error. Thus to avoid the error, we used
         # ignore here.
         suggestion.change.property_name = 'invalid_property'  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -1123,9 +1114,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_target_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1139,15 +1127,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.target_id = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected target_id to be a string'
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_target_version_at_submission(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1161,6 +1149,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.target_version_at_submission = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1187,9 +1178,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_author_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1203,6 +1191,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.author_id = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected author_id to be a string'
@@ -1229,9 +1220,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_final_reviewer_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1245,6 +1233,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected final_reviewer_id to be a string'
@@ -1271,9 +1262,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_score_category(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1287,6 +1275,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.score_category = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected score_category to be a string'
@@ -1343,9 +1334,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_change(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1359,6 +1347,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change = {}  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to be an ExplorationChange'
@@ -1430,9 +1421,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
         self
     ) -> None:
@@ -1447,6 +1435,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.language_code = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -1684,6 +1675,16 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             suggestion.change.content_html, expected_html_content)
 
 
+TestChangeDictType = Dict[
+    str,
+    Union[
+        str,
+        float,
+        Dict[str, Union[state_domain.StateDict, int, str, List[str]]]
+    ]
+]
+
+
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     """Tests for the SuggestionAddQuestion class."""
 
@@ -1797,9 +1798,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_change_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
@@ -1814,6 +1812,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change = 'invalid_change'  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -1879,9 +1880,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change.question_dict = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -1933,9 +1934,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change.skill_difficulty = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -1981,9 +1982,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.pre_accept_validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change.skill_id = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -2016,24 +2017,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         ):
             suggestion.pre_accept_validate()
 
-    def test_get_change_list_for_accepting_suggestion(self) -> None:
-        expected_suggestion_dict = self.suggestion_dict
-
-        suggestion = suggestion_registry.SuggestionAddQuestion(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
-
-        # Method `get_change_list_for_accepting_suggestion` does not return any
-        # value but for testing purposes we are still comparing it's return
-        # value with None which causes MyPy to throw error. Thus to avoid the
-        # error, we used ignore here.
-        self.assertIsNone(suggestion.get_change_list_for_accepting_suggestion())  # type: ignore[func-returns-value]
-
     def test_populate_old_value_of_change(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
@@ -2046,10 +2029,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        # Method `populate_old_value_of_change` does not return any value but
-        # for testing purpose we are still comparing it's return value with None
-        # which causes MyPy to throw error. Thus to avoid the error, we used
-        # ignore here.
+        # Here we use MyPy ignore because method `populate_old_value_of_change`
+        # does not return any value but for testing purpose we are still
+        # comparing it's return value with None which causes MyPy to throw
+        # error. Thus to avoid the error, we used ignore here.
         self.assertIsNone(suggestion.populate_old_value_of_change())  # type: ignore[func-returns-value]
 
     def test_cannot_accept_suggestion_with_invalid_skill_id(self) -> None:
@@ -2090,9 +2073,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'new_value': 'bn',
             'old_value': 'en'
         }
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change cmd must be equal to '
@@ -2228,10 +2211,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.6
         }
 
-        # Method `pre_update_validate` does not return any value but for testing
-        # purpose we are still comparing it's return value with None which
-        # causes MyPy to throw error. Thus to avoid the error, we used
-        # ignore here.
+        # Here we use MyPy ignore because method `pre_update_validate` does not
+        # return any value but for testing purpose we are still comparing it's
+        # return value with None which causes MyPy to throw error. Thus to avoid
+        # the error, we used ignore here.
         self.assertEqual(
             suggestion.pre_update_validate(  # type: ignore[func-returns-value]
                 question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
@@ -2282,10 +2265,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
 
-        # Method `pre_update_validate` does not return any value but for testing
-        # purpose we are still comparing it's return value with None which
-        # causes MyPy to throw error. Thus to avoid the error, we used
-        # ignore here.
+        # Here we use MyPy ignore because method `pre_update_validate` does not
+        # return any value but for testing purpose we are still comparing it's
+        # return value with None which causes MyPy to throw error. Thus to avoid
+        # the error, we used ignore here.
         self.assertEqual(
             suggestion.pre_update_validate(  # type: ignore[func-returns-value]
                 question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
@@ -2295,9 +2278,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             None
         )
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_author_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -2311,6 +2291,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.author_id = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected author_id to be a string'):
@@ -2335,9 +2318,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'Expected author_id to be in a valid user ID format.'):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_final_reviewer_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -2351,6 +2331,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected final_reviewer_id to be a string'):
@@ -2387,8 +2370,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
-        # Here, the value of `question_dict` key is of Union type so to narrow
-        # down the type to QuestionDict we used assert here.
+        # Here we use cast because the value of `question_dict` key is a
+        # Union of all allowed change dict types. So, to narrow down the type
+        # to QuestionDict, we used assert here.
         assert isinstance(
             expected_suggestion_dict['change']['question_dict'], dict
         )
@@ -2408,9 +2392,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
         self
     ) -> None:
@@ -2425,6 +2406,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.language_code = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -2818,7 +2802,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
-        change: Dict[str, Union[str, float, Dict[str, Any]]] = {
+        change: TestChangeDictType = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2854,7 +2838,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
-        change: Dict[str, Union[str, float, Dict[str, Any]]] = {
+        change: TestChangeDictType = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2946,9 +2930,9 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         ):
             self.voiceover_application.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_target_id_raise_exception(self) -> None:
         self.voiceover_application.validate()
 
@@ -2969,9 +2953,9 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         ):
             self.voiceover_application.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_author_id_raise_exception(self) -> None:
         self.voiceover_application.validate()
 
@@ -2981,9 +2965,9 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         ):
             self.voiceover_application.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_final_reviewer_id_raise_exception(
         self
     ) -> None:
@@ -3049,9 +3033,9 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         ):
             self.voiceover_application.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_language_code_type_raise_exception(
         self
     ) -> None:
@@ -3076,9 +3060,9 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         ):
             self.voiceover_application.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_filename_type_raise_exception(
         self
     ) -> None:
@@ -3091,9 +3075,9 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         ):
             self.voiceover_application.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_content_type_raise_exception(self) -> None:
         self.assertEqual(self.voiceover_application.content, '<p>Content</p>')
         self.voiceover_application.validate()
@@ -3629,9 +3613,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_translation_reviewer_counts_fails_for_non_integer_counts(
         self
     ) -> None:
@@ -3652,9 +3636,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_translation_suggestion_counts_fails_for_non_integer_count(
         self
     ) -> None:
@@ -3675,9 +3659,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_question_reviewer_count_fails_for_non_integer_count(
         self
     ) -> None:
@@ -3696,9 +3680,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_question_suggestion_count_fails_for_non_integer_count(
         self
     ) -> None:
@@ -3811,6 +3795,8 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             'reviewed_translation_word_count': (
                 self.REVIEWED_TRANSLATION_WORD_COUNT),
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
             'accepted_translations_with_reviewer_edits_count': (
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
             'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
@@ -3822,6 +3808,7 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
             self.REVIEWED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )
@@ -3994,6 +3981,8 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             'reviewed_translation_word_count': (
                 self.REVIEWED_TRANSLATION_WORD_COUNT),
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
             'accepted_translations_with_reviewer_edits_count': (
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
             'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
@@ -4057,6 +4046,7 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
             self.REVIEWED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )

@@ -1598,9 +1598,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update topic name')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_url_fragment_existence_fails_for_non_string_url_fragment(
         self
     ) -> None:
@@ -1608,9 +1608,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Topic URL fragment should be a string.'):
             topic_services.does_topic_with_url_fragment_exist(123)  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_name_existence_fails_for_non_string_name(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Name should be a string.'):

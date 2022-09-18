@@ -35,7 +35,8 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, Iterator, List, Mapping, Optional, Tuple, Union, overload
+    Any, Callable, Dict, Iterator, List, Mapping, Optional, Tuple, Union,
+    cast, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 
@@ -62,9 +63,10 @@ AllowedRuleSpecInputTypes = Union[
     Dict[str, Union[str, List[str]]],
 ]
 
-# Here, `CustomizationArgsDictType` is a type for customization_args dictionary,
-# and we used Any type here because it accepts the values of customization args
-# and that values can be of type str, int, bool, List and other types too.
+# TODO(#15982): Here we use type Any because `CustomizationArgsDictType` is a
+# type for customization_args dictionary, and we used Any type here because
+# it accepts the values of customization args and that values can be of type
+# str, int, bool, List and other types too.
 CustomizationArgsDictType = Dict[str, Dict[str, Any]]
 
 
@@ -550,12 +552,14 @@ class Solution(translation_domain.BaseTranslatableObject):
                                 assert isinstance(html_list, list)
                                 for answer_html_index, answer_html in enumerate(
                                         html_list):
-                                    # MyPy does not allow indexing on union type
-                                    # and here correct_answer is a Union type of
-                                    # str, int and List[str]. So because of this
-                                    # MyPy throws an error. Thus to avoid the
-                                    # error, we used ignore here.
-                                    solution_dict['correct_answer'][list_index][  # type: ignore[index]
+                                    # Here we use cast because above assert
+                                    # conditions forces correct_answer to be of
+                                    # type List[List[str]].
+                                    correct_answer = cast(
+                                        List[List[str]],
+                                        solution_dict['correct_answer']
+                                    )
+                                    correct_answer[list_index][
                                         answer_html_index] = (
                                             conversion_fn(answer_html))
                         elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
@@ -568,13 +572,14 @@ class Solution(translation_domain.BaseTranslatableObject):
                             for answer_html_index, answer_html in enumerate(
                                     solution_dict['correct_answer']):
                                 assert isinstance(answer_html, str)
-                                # Here correct_answer is a Union type of
-                                # List[str], List[int] and List[List[str]], and
-                                # because of this MyPy is not able to set the
-                                # value properly and throwing an error for the
-                                # same. Thus to avoid the error, we used ignore
-                                # here.
-                                solution_dict['correct_answer'][  # type: ignore[call-overload]
+                                # Here we use cast because above assert
+                                # conditions forces correct_answer to be of
+                                # type List[str].
+                                set_of_html_correct_answer = cast(
+                                    List[str],
+                                    solution_dict['correct_answer']
+                                )
+                                set_of_html_correct_answer[
                                     answer_html_index] = (
                                         conversion_fn(answer_html))
                         else:
@@ -1108,8 +1113,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     SubtitledHtml dict or SubtitledUnicode dict.
     """
 
-    # Here we used Any because values in schema dictionary can be of type str,
-    # List, Dict and other types too.
+    # Here we use type Any because values in schema dictionary can be of type
+    # str, List, Dict and other types too.
     def __init__(
         self, value: Union[str, Dict[str, str]], schema: Dict[str, Any]
     ) -> None:
@@ -1158,7 +1163,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                 kwargs['interaction_id'])
         return translatable_contents_collection
 
-    # Here, we used Any type because this method returns the values of
+    # Here we use type Any because this method returns the values of
     # customization args and that values can be of type str, int, bool,
     # List and other types too. So to make the return type generalize
     # for every type of values, we used Any here.
@@ -1206,8 +1211,9 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             )
         }
 
-    # In argument 'ca_schema', we used Any type because values in schema
-    # dictionary can be of type str, List, Dict and other types too.
+    # Here we use type Any because argument 'ca_schema' can accept schema
+    # dictionaries that can contain values of types str, List, Dict and other
+    # types too.
     @classmethod
     def from_customization_arg_dict(
         cls, ca_dict: CustomizationArgsDictType, ca_schema: Dict[str, Any]
@@ -1348,11 +1354,11 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             validate_html
         )
 
-    # Here, we used Any type for `value` argument because it can accept values
-    # of customization arg and that values can be of type 'Dict[Dict[..]]`, str,
-    # int, bool and other types too, And for argument `schema` we used Any type
-    # because values in schema dictionary can be of type str, List, Dict and
-    # other types too.
+    # TODO(#15982): Here we use type Any because `value` argument can accept
+    # values of customization arg and that values can be of type Dict[Dict[..]],
+    # str, int, bool and other types too, and for argument `schema` we used Any
+    # type because values in schema dictionary can be of type str, List, Dict
+    # and other types too.
     @staticmethod
     def traverse_by_schema_and_convert(
         schema: Dict[str, Any],
@@ -1409,11 +1415,11 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 
         return value
 
-    # Here, we used Any type for `value` argument because it can accept values
-    # of customization arg and that values can be of type 'Dict[Dict[..]]`, str,
-    # int, bool and other types too, And for argument `schema` we used Any type
-    # because values in schema dictionary can be of type str, List, Dict and
-    # other types too.
+    # TODO(#15982): Here we use type Any because `value` argument can accept
+    # values of customization arg and that values can be of type Dict[Dict[..]],
+    # str, int, bool and other types too, and for argument `schema` we used Any
+    # type because values in schema dictionary can be of type str, List, Dict
+    # and other types too.
     @staticmethod
     def traverse_by_schema_and_get(
         schema: Dict[str, Any],
@@ -2214,17 +2220,15 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                                 for value_index, value in enumerate(
                                         rule_input_variable):
                                     if isinstance(value, str):
-                                        # Here, `rule_spec_dict['inputs'][
-                                        # input_variable]` is of Union type
-                                        # because it can accept various types
-                                        # of values but here we are indexing
-                                        # this Union type and MyPy does not
-                                        # allow indexing of Union types, so
-                                        # because of this MyPy throws an error.
-                                        # Thus to avoid the error, we used
-                                        # ignore here.
-                                        rule_spec_dict['inputs'][  # type: ignore[index, call-overload]
-                                            input_variable][value_index] = (  # type: ignore[index]
+                                        # Here we use cast because above assert
+                                        # conditions forces 'inputs' to be of
+                                        # type Dict[str, List[str]].
+                                        variable_format_set_input = cast(
+                                            Dict[str, List[str]],
+                                            rule_spec_dict['inputs']
+                                        )
+                                        variable_format_set_input[
+                                            input_variable][value_index] = (
                                                 conversion_fn(value))
                         elif (html_type_format ==
                               feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
@@ -2238,16 +2242,15 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                                     input_variable_list):
                                 for rule_html_index, rule_html in enumerate(
                                         html_list):
-                                    # Here, `rule_spec_dict['inputs'][
-                                    # input_variable]` is of Union type because
-                                    # it can accept various types of values but
-                                    # here we are indexing this Union type and
-                                    # MyPy does not allow indexing of Union
-                                    # types, so because of this MyPy throws an
-                                    # error. Thus to avoid the error, we used
-                                    # ignore here.
-                                    rule_spec_dict['inputs'][input_variable][  # type: ignore[index]
-                                        list_index][rule_html_index] = (  # type: ignore[index]
+                                    # Here we use cast because above assert
+                                    # conditions forces 'inputs' to be of
+                                    # type Dict[str, List[List[str]]].
+                                    list_of_sets_inputs = cast(
+                                        Dict[str, List[List[str]]],
+                                        rule_spec_dict['inputs']
+                                    )
+                                    list_of_sets_inputs[input_variable][
+                                        list_index][rule_html_index] = (
                                             conversion_fn(rule_html))
                         else:
                             raise Exception(
@@ -2754,11 +2757,11 @@ class State(translation_domain.BaseTranslatableObject):
         """
         self.param_changes = param_changes
 
-    def update_interaction_id(self, interaction_id: str) -> None:
+    def update_interaction_id(self, interaction_id: Optional[str]) -> None:
         """Update the interaction id attribute.
 
         Args:
-            interaction_id: str. The new interaction id to set.
+            interaction_id: str|None. The new interaction id to set.
         """
         if self.interaction.id:
             old_content_id_list = [

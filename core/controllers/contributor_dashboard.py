@@ -26,10 +26,13 @@ from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import story_fetchers
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
+
+from typing import List, Union
 
 
 class ContributorDashboardPage(base.BaseHandler):
@@ -701,3 +704,187 @@ class TranslationPreferenceHandler(base.BaseHandler):
         user_services.update_preferred_translation_language_code(
             self.user_id, language_code)
         self.render_json({})
+
+
+class ContributorStatsSummariesHandler(base.BaseHandler):
+    """Returns contribution statistics for the supplied contribution type."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'contribution_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'contribution_subtype': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_fetch_contributor_dashboard_stats
+    def get(self, contribution_type, contribution_subtype, username):
+        """Handles GET requests."""
+        if contribution_type not in [
+            feconf.CONTRIBUTION_TYPE_TRANSLATION,
+            feconf.CONTRIBUTION_TYPE_QUESTION
+        ]:
+            raise self.InvalidInputException(
+                'Invalid contribution type %s.' % (contribution_type)
+            )
+        if contribution_subtype not in [
+            feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
+            feconf.CONTRIBUTION_SUBTYPE_REVIEW
+        ]:
+            raise self.InvalidInputException(
+                'Invalid contribution subtype %s.' % (contribution_subtype)
+            )
+
+        user_id = user_services.get_user_id_from_username(username)
+
+        if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
+            if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
+                stats = (
+                    suggestion_services.get_all_translation_contribution_stats(
+                        user_id))
+                self.values = {
+                    'translation_contribution_stats': _get_client_side_stats(
+                        stats)
+                }
+
+            if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
+                stats = suggestion_services.get_all_translation_review_stats(
+                    user_id)
+                self.values = {
+                    'translation_review_stats': _get_client_side_stats(
+                        stats)
+                }
+
+        if contribution_type == feconf.CONTRIBUTION_TYPE_QUESTION:
+            if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
+                stats = suggestion_services.get_all_question_contribution_stats(
+                    user_id)
+                self.values = {
+                    'question_contribution_stats': _get_client_side_stats(
+                        stats)
+                }
+
+            if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
+                stats = suggestion_services.get_all_question_review_stats(
+                    user_id)
+                self.values = {
+                    'question_review_stats': _get_client_side_stats(stats)
+                }
+
+        self.render_json(self.values)
+
+
+class ContributorAllStatsSummariesHandler(base.BaseHandler):
+    """Returns all contribution statistics associated with the user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_fetch_all_contributor_dashboard_stats
+    def get(self, username):
+        """Handles GET requests."""
+        user_id = user_services.get_user_id_from_username(username)
+
+        stats = suggestion_services.get_all_contributor_stats(user_id)
+        response = {}
+
+        if stats.translation_contribution_stats is not None:
+            response['translation_contribution_stats'] = _get_client_side_stats(
+                stats.translation_contribution_stats)
+
+        if stats.translation_review_stats is not None:
+            response['translation_review_stats'] = _get_client_side_stats(
+                stats.translation_review_stats)
+
+        if stats.question_contribution_stats is not None:
+            response['question_contribution_stats'] = _get_client_side_stats(
+                stats.question_contribution_stats)
+
+        if stats.question_review_stats is not None:
+            response['question_review_stats'] = _get_client_side_stats(
+                stats.question_review_stats)
+
+        self.render_json(response)
+
+
+def _get_client_side_stats(
+    backend_stats: List[Union[
+        suggestion_registry.TranslationContributionStats,
+        suggestion_registry.TranslationReviewStats,
+        suggestion_registry.QuestionContributionStats,
+        suggestion_registry.QuestionReviewStats
+    ]]
+):
+    """Returns corresponding stats dicts with all the necessary
+    information for the frontend.
+
+    Args:
+        backend_stats: list. Stats domain objects.
+
+    Returns:
+        list. Dict representations of TranslationContributionStats/
+        TranslationReviewStats/QuestionContributionStats/
+        QuestionReviewStats domain objects with additional keys:
+            topic_name: str. Topic name.
+            contribution_months: str. Unique translation contribution
+                months of format: "%b %Y", e.g. "Jan 2021".
+        Unnecessary keys topic_id, contribution_dates, contributor_user_id
+        are consequently deleted.
+    """
+    stats_dicts = [
+        stats.to_dict() for stats in backend_stats
+    ]
+    topic_ids = [
+        stats_dict['topic_id']
+        for stats_dict in stats_dicts
+    ]
+    topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
+    topic_name_by_topic_id = {
+        topic_summary.id: topic_summary.name
+        for topic_summary in topic_summaries if topic_summary is not None
+    }
+    for stats_dict in stats_dicts:
+        stats_dict['topic_name'] = topic_name_by_topic_id.get(
+            stats_dict['topic_id'], 'UNKNOWN')
+
+        # TODO(#16051): TranslationContributionStats to use
+        # first_contribution_date and last_contribution_date.
+        if 'contribution_dates' in stats_dict.keys():
+            sorted_contribution_dates = sorted(stats_dict['contribution_dates'])
+            first_contribution_date = sorted_contribution_dates[0]
+            last_contribution_date = sorted_contribution_dates[-1]
+            del stats_dict['contribution_dates']
+        else:
+            first_contribution_date = stats_dict['first_contribution_date']
+            last_contribution_date = stats_dict['last_contribution_date']
+        stats_dict['first_contribution_date'] = (
+            first_contribution_date.strftime('%b %Y'))
+        stats_dict['last_contribution_date'] = (
+            last_contribution_date.strftime('%b %Y'))
+
+        del stats_dict['topic_id']
+        del stats_dict['contributor_user_id']
+    return stats_dicts

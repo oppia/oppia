@@ -23,8 +23,8 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, TypeVar
-from typing_extensions import Final, Literal
+from typing import Dict, List, Optional, Sequence, TypeVar
+from typing_extensions import Final, Literal, TypedDict
 
 SELF_REPORT_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_REPORT_MODEL', bound='AppFeedbackReportModel'
@@ -46,6 +46,26 @@ PLATFORM_CHOICE_ANDROID: Final = 'android'
 PLATFORM_CHOICE_WEB: Final = 'web'
 PLATFORM_CHOICES: Final = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES: Final = PLATFORM_CHOICES
+
+
+class ReportInfoDict(TypedDict):
+    """Type for the report_info dictionary."""
+
+    user_feedback_selected_items: List[str]
+    user_feedback_other_text_input: str
+    build_fingerprint: str
+    event_logs: List[str]
+    logcat_logs: List[str]
+    package_version_code: int
+    language_locale_code: str
+    entry_point_info: Dict[str, str]
+    text_size: str
+    only_allows_wifi_download_and_update: bool
+    automatically_update_topics: bool
+    is_curriculum_admin: bool
+    android_device_language_locale_code: str
+    account_is_profile_admin: bool
+    network_type: str
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -196,8 +216,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
         entry_point_subtopic_id: Optional[str],
         text_language_code: str,
         audio_language_code: str,
-        android_report_info: Optional[Dict[str, Any]],
-        web_report_info: Optional[Dict[str, Any]]
+        android_report_info: Optional[ReportInfoDict],
+        web_report_info: Optional[ReportInfoDict]
     ) -> str:
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
