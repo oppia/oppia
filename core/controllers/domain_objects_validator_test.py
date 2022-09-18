@@ -21,6 +21,8 @@ import os
 from core import feconf
 from core import utils
 from core.controllers import domain_objects_validator
+from core.domain import exp_domain
+from core.domain import state_domain
 from core.tests import test_utils
 
 
@@ -245,3 +247,104 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
             ) as f:
                 files[filename] = f.read()
         domain_objects_validator.validate_suggestion_images(files)
+
+
+class ValidateExplorationChangeTests(test_utils.GenericTestBase):
+    """Tests to validate exploration change coming from frontend"""
+
+    interaction_answer_groups = [{
+        'rule_specs': [{
+                'inputs': {
+                    'x': 60
+                },
+                'rule_type': 'IsLessThanOrEqualTo'
+        }],
+        'outcome': {
+            'dest': feconf.DEFAULT_INIT_STATE_NAME,
+            'dest_if_really_stuck': None,
+            'feedback': {
+                'content_id': 'feedback_1',
+                'html': '<p>Try again</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        },
+        'training_data': ['answer1', 'answer2', 'answer3'],
+        'tagged_skill_misconception_id': None
+    }]
+
+    change_dict = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+        'property_name': (
+            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+        'new_value': interaction_answer_groups
+    }
+
+    def test_incorrect_exp_change_object_raises_exception(self) -> None:
+        """"""
+        incorrect_change_dict = {
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
+        }
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'Missing cmd key in change dict'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                incorrect_change_dict)
+
+    def test_tagged_skill_misconception_id_should_be_None(self) -> None:
+        """"""
+        test_ans_groups = self.interaction_answer_groups.copy()
+        test_change_dict = self.change_dict.copy()
+        test_change_dict['new_value'] = test_ans_groups
+        # Invalid answer group with tagged_skill_misconception_id as not None
+        # will raise an error.
+        test_ans_groups[0]['tagged_skill_misconception_id'] = 'Not None'
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'tagged_skill_misconception_id of the answer group '
+            'should be None.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                test_change_dict)
+
+        # Valid answer group with tagged_skill_misconception_id as None
+        # does not raise an error.
+        test_ans_groups[0]['tagged_skill_misconception_id'] = None
+        domain_objects_validator.validate_exploration_change(test_change_dict)
+
+    def test_atleast_one_rule_spec_should_be_present(self) -> None:
+        """"""
+        test_ans_groups = self.interaction_answer_groups.copy()
+        test_change_dict = self.change_dict.copy()
+        test_change_dict['new_value'] = test_ans_groups
+        # Invalid answer group with no rule spec will raise an error.
+        test_ans_groups[0]['rule_specs'] = []
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'The answer group should contain atleast one rule spec.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                test_change_dict)
+
+        # Valid answer group with one rule spec does not raise an error.
+        test_ans_groups[0]['rule_specs'] = [{
+            'inputs': {
+                'x': 60
+            },
+            'rule_type': 'IsLessThanOrEqualTo'
+        }]
+        domain_objects_validator.validate_exploration_change(test_change_dict)
+
+    def test_destination_should_not_be_empty(self) -> None:
+        """"""
+        test_ans_groups = self.interaction_answer_groups.copy()
+        test_change_dict = self.change_dict.copy()
+        test_change_dict['new_value'] = test_ans_groups
+        # Invaid answer group with empty destination state.
+        
