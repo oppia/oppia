@@ -1826,19 +1826,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-                # Check if tagged_skill_misconception_id is None or not.
-                if group.tagged_skill_misconception_id is not None:
-                    raise utils.ValidationError(
-                        'The outcome for answer group %s in state %s has '
-                        'tagged skill misconception id, which '
-                        'should be None' % (str(group_idx + 1), state_name)
-                    )
-
                 # Check if the answergroup has atleast one rulespec.
                 if len(group.rule_specs) == 0:
                     raise utils.ValidationError(
                         'The outcome for answer group %s in state %s has '
-                        'no rule specs, atleast one is required ' % (
+                        'no rule specs, atleast one is required' % (
                             str(group_idx + 1), state_name)
                     )
 
