@@ -929,6 +929,8 @@ COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_STATS_SUMMARIES_URL = '/contributorstatssummaries'
+CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = '/contributorallstatssummaries'
 CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
@@ -1596,6 +1598,7 @@ CONTRIBUTION_TYPE_QUESTION: Final = 'question'
 CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
 CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
+CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [

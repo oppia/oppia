@@ -80,13 +80,14 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import google.cloud.logging
-from typing import Any, Dict, Optional, Type, TypeVar, cast
+from typing import Any, Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
+    from mypy_imports import memory_cache_services as cache_services
 
 T = TypeVar('T')  # pylint: disable=invalid-name
 
@@ -113,14 +114,14 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Using Dict[str, Any] because this class inherits this attribute
+    # Here we use type Any because this class inherits this attribute
     # from core.controllers.base.BaseModel.
     URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Using Dict[str, Any] because this class inherits this attribute
+    # Here we use type Any because this class inherits this attribute
     # from core.controllers.base.BaseModel.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
@@ -133,7 +134,7 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "post" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def post(self) -> None:
@@ -145,7 +146,7 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
@@ -156,7 +157,7 @@ class WarmupPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
@@ -257,6 +258,13 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
+    get_redirect_route(
+        r'%s/<contribution_type>/<contribution_subtype>/<username>' % (
+            feconf.CONTRIBUTOR_STATS_SUMMARIES_URL),
+        contributor_dashboard.ContributorStatsSummariesHandler),
+    get_redirect_route(
+        r'%s/<username>' % feconf.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL,
+        contributor_dashboard.ContributorAllStatsSummariesHandler),
     get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
@@ -1131,12 +1139,9 @@ class NdbWsgiMiddleware:
         start_response: webapp2.Response
     ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
-            cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
+            cache_services.CLOUD_NDB_REDIS_CLIENT)
         with datastore_services.get_ndb_context(global_cache=global_cache):
-            # Cast is needed since webapp2.WSGIApplication is not
-            # correctly typed.
-            return cast(
-                webapp2.Response, self.wsgi_app(environ, start_response))
+            return self.wsgi_app(environ, start_response)
 
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)

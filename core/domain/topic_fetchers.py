@@ -651,13 +651,14 @@ def get_canonical_story_dicts(
         pending_node_titles = [node.title for node in pending_nodes]
         completed_node_titles = utils.compute_list_difference(
             story_summary.node_titles, pending_node_titles)
-        # Here, the return type of 'to_human_readable_dict()' method is
-        # HumanReadableStorySummaryDict which does not have topic_url_fragment,
-        # story_is_published and other keys. To overcome this missing keys
-        # issues, we defined a CannonicalStoryDict and assigned it to the
-        # `story_summary_dict`. Due this a conflict in type assignment is
-        # raised which cause MyPy to throw `Incompatible types in assignment`
-        # error. Thus to avoid error, we used ignore here.
+        # Here we use MyPy ignore because the return type of
+        # 'to_human_readable_dict()' method is HumanReadableStorySummaryDict
+        # which do not contain topic_url_fragment, story_is_published and
+        # other keys. To overcome this missing keys issue, we have defined
+        # a CannonicalStoryDict and assigned it to the `story_summary_dict`.
+        # So, due to this a conflict in type assignment is raised which cause
+        # MyPy to throw `Incompatible types in assignment` error. Thus, to
+        # avoid the error, we used ignore here.
         story_summary_dict: CannonicalStoryDict = (
             story_summary.to_human_readable_dict()  # type: ignore[assignment]
         )

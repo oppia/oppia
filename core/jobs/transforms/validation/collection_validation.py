@@ -114,8 +114,8 @@ class ValidateCollectionCommitLogEntryModel(
 ):
     """Overrides _get_change_domain_class for CollectionCommitLogEntryModel."""
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's _get_change_domain_class() method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's _get_change_domain_class() method.
     def _get_change_domain_class(  # type: ignore[override]
         self, input_model: collection_models.CollectionCommitLogEntryModel
     ) -> Optional[
