@@ -18,13 +18,16 @@
 
 from __future__ import annotations
 
+from extensions import domain
 from extensions.issues import base
+
+from typing import List
 
 
 class EarlyQuit(base.BaseExplorationIssueSpec):
     """Issue that's recorded when the learner quits the exploration early."""
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'state_name',
         'description': 'State name',
         'schema': {
