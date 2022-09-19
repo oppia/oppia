@@ -2214,7 +2214,7 @@ describe('ImageEditor', () => {
     }, 150);
   });
 
-  fit('should alert user if resampled gif file is not obtained when the user' +
+  it('should alert user if resampled gif file is not obtained when the user' +
   ' saves image', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
@@ -2262,6 +2262,7 @@ describe('ImageEditor', () => {
       .and.returnValue(null);
 
     component.saveUploadedFile();
+    tick();
 
     expect(alertsService.addWarning)
       .toHaveBeenCalledWith('Could not get resampled file.');

@@ -183,11 +183,8 @@ describe('ExplorationCreationService', () => {
       );
       spyOn(alertsService, 'addWarning');
       spyOn(loaderService, 'hideLoadingScreen');
-      let form = new FormData();
-      form.append(
-        'payload', JSON.stringify({error: 'Failed to upload exploration'}));
       spyOn(ecbas, 'uploadExploration').and.callFake((_: string) => {
-        return Promise.reject(new Response(form, { status: 404 }));
+        return Promise.reject({ error: 'Failed to upload exploration' });
       });
 
       ecs.showUploadExplorationModal();
