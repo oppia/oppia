@@ -1,5 +1,4 @@
 core.controllers.acl_decorators_test
-core.controllers.admin_test
 core.controllers.base_test
 core.controllers.blog_admin_test
 core.controllers.blog_homepage_test

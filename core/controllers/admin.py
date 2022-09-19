@@ -283,7 +283,7 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'version': version
                 }
-            elif action == 'update_feature_flag_rules':
+            else:
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rules = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')
@@ -746,7 +746,7 @@ class AdminRoleHandler(base.BaseHandler):
             self.render_json({
                 'usernames': user_services.get_usernames_by_role(role)
             })
-        elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
+        else:
             username = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_USERNAME)
             user_id = user_services.get_user_id_from_username(username)
@@ -857,11 +857,16 @@ class TopicManagerRoleHandler(base.BaseHandler):
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
-        elif action == 'deassign':
+        else:
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 
-            if not topic_fetchers.get_topic_rights_with_user(user_id):
+            # We add no branch coverage flag here because if the case where
+            # user does not have manager rights in topic happens, it will be
+            # caught before in topic_services.deassign_manager_role_from_topic
+            # method and the else part of the if condition given below will
+            # never execute.
+            if not topic_fetchers.get_topic_rights_with_user(user_id): # pragma: no branch
                 user_services.remove_user_role(
                     user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
