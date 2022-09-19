@@ -1208,22 +1208,44 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'written_translations',
                 'new_value': {
                     'translations_mapping': {
+                        # Here we use MyPy ignore because we are testing convert
+                        # function and in convert function we are working with
+                        # previous versions of the domain object and in previous
+                        # versions of the domain object there are some fields
+                        # (eg: html) that are discontinued in the latest domain
+                        # object. So, while defining these old keys MyPy throw
+                        # an error. To avoid the error, we used ignore here.
                         'content1': {
-                            'en': {
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': html_content,
                                 'needs_update': True
                             },
-                            'hi': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
-                            'hi': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': html_content,
                                 'needs_update': False
                             },
-                            'en': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': 'hello!',
                                 'needs_update': False
                             }
@@ -1411,22 +1433,44 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'written_translations',
                 'new_value': {
                     'translations_mapping': {
+                        # Here we use MyPy ignore because we are testing convert
+                        # function and in convert function we are working with
+                        # previous versions of the domain object and in previous
+                        # versions of the domain object there are some fields
+                        # (eg: html) that are discontinued in the latest domain
+                        # object. So, while defining these old keys MyPy throw
+                        # an error. To avoid the error, we used ignore here.
                         'content1': {
-                            'en': {
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': expected_html_content,
                                 'needs_update': True
                             },
-                            'hi': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
-                            'hi': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': expected_html_content,
                                 'needs_update': False
                             },
-                            'en': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': 'hello!',
                                 'needs_update': False
                             }
@@ -1710,7 +1754,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
-                'new_value': {
+                'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
@@ -1736,7 +1780,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                     'training_data': [],
                     'tagged_misconception_id': None
-                }
+                }]
             })
         ]
         # Version 30 replaces the tagged_misconception_id in version 29
@@ -1746,7 +1790,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
-                'new_value': {
+                'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
@@ -1772,7 +1816,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                     'training_data': [],
                     'tagged_skill_misconception_id': None
-                }
+                }]
             })
         ]
         # Migrate exploration to state schema version 30.

@@ -30,7 +30,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 
 @validation_decorators.AuditsExisting(skill_models.SkillSnapshotMetadataModel)
@@ -64,8 +64,8 @@ class ValidateSkillCommitLogEntryModel(
 ):
     """Overrides _get_change_domain_class for SkillCommitLogEntryModel."""
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's _get_change_domain_class() method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's _get_change_domain_class() method.
     def _get_change_domain_class(  # type: ignore[override]
         self, input_model: skill_models.SkillCommitLogEntryModel
     ) -> Optional[Type[skill_domain.SkillChange]]:

@@ -29,7 +29,7 @@ from core.domain import param_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Callable, OrderedDict
+from typing import Callable, OrderedDict
 from typing_extensions import Final
 import webapp2
 
@@ -50,7 +50,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
         class MockWrapper(test_utils.FunctionWrapper):
 
-            def pre_call_hook(self, args: OrderedDict[str, Any]) -> None:
+            def pre_call_hook(self, args: OrderedDict[str, str]) -> None:
                 """Mock pre call hook.
 
                 Args:
@@ -67,7 +67,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                 testcase.assertEqual(args.get('kwarg'), 'bar')
 
             def post_call_hook(
-                self, args: OrderedDict[str, Any], result: str
+                self, args: OrderedDict[str, str], result: str
             ) -> None:
                 """Mock post call hook.
 
@@ -393,9 +393,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
             Exception, 'Expected params to be a dict'):
             self.delete_json('random_url', params='invalid_params')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_cannot_get_response_with_non_dict_params(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Expected params to be a dict'):
@@ -632,9 +632,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(Exception, ''):
                 mock_exception_func()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'mocked_now must be datetime, got: 123'

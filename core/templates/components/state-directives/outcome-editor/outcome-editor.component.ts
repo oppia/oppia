@@ -245,6 +245,11 @@ export class OutcomeEditorComponent implements OnInit {
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
     if (!this.isSelfLoop(this.outcome)) {
       this.outcome.refresherExplorationId = null;
+    } else {
+      if (this.outcome.labelledAsCorrect) {
+        this.outcome.labelledAsCorrect = false;
+        this.onChangeCorrectnessLabel();
+      }
     }
     this.savedOutcome.refresherExplorationId = (
       this.outcome.refresherExplorationId);

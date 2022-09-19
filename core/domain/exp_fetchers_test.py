@@ -34,7 +34,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class ExplorationRetrievalTests(test_utils.GenericTestBase):
@@ -237,9 +237,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     self.EXP_1_ID, [1, 2, 3, 4]))
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             ValueError,
             'At least one version number is invalid'):

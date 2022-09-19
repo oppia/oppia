@@ -27,6 +27,7 @@ import zipfile
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import change_domain
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -49,7 +50,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Type, Union
 from typing_extensions import Final
 
 MYPY = False
@@ -67,17 +68,25 @@ if MYPY:  # pragma: no cover
     recommendations_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback,
-    models.NAMES.exploration,
-    models.NAMES.opportunity,
-    models.NAMES.recommendations,
-    models.NAMES.user
+    models.Names.FEEDBACK,
+    models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY,
+    models.Names.RECOMMENDATIONS,
+    models.Names.USER
 ])
 
 search_services = models.Registry.import_search_services()
 
 # TODO(msl): Test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed.
+
+
+TestCustArgDictType = Dict[
+    str,
+    Dict[str, Union[bool, Dict[str, Union[str, List[Dict[str, Union[str, Dict[
+        str, Union[str, List[List[float]]]]
+    ]]]]]]]
+]
 
 
 def count_at_least_editable_exploration_summaries(user_id: str) -> int:
@@ -2216,10 +2225,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         self.set_interaction_for_state(state2, 'MultipleChoiceInput')
         self.set_interaction_for_state(state3, 'ItemSelectionInput')
 
-        customization_args_dict1: Dict[
-            str,
-            Dict[str, Union[bool, Dict[str, Union[str, List[Dict[str, Any]]]]]]
-        ] = {
+        customization_args_dict1: TestCustArgDictType = {
             'highlightRegionsOnHover': {'value': True},
             'imageAndRegions': {
                 'value': {
@@ -3219,7 +3225,8 @@ written_translations:
 # types too, so to make the argument generalized for every type of values we
 # used Any type here.
 def _get_change_list(
-    state_name: str, property_name: str, new_value: Any
+    state_name: str,
+    property_name: str, new_value: change_domain.AcceptableChangeDictTypes
 ) -> List[exp_domain.ExplorationChange]:
     """Generates a change list for a single state change."""
     return [exp_domain.ExplorationChange({
@@ -5750,9 +5757,9 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
         populate_datastore()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_get_next_page_of_all_non_private_commits_with_invalid_max_age(
         self
     ) -> None:
@@ -5771,6 +5778,38 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
         # TODO(frederikcreemers@gmail.com): Test max_age here.
+
+    def test_raises_error_if_solution_is_provided_without_interaction_id(
+        self
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'test_id', 'title', 'Home')
+        exp_services.save_new_exploration('Test_user', exploration)
+
+        state_solution_dict: state_domain.SolutionDict = {
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>'
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+        change_list = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Home',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+            'new_value': state_solution_dict,
+        })
+        with self.assertRaisesRegex(
+            Exception,
+            'solution cannot exist with None interaction id.'
+        ):
+            exp_services.apply_change_list('test_id', [change_list])
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
@@ -6373,7 +6412,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(story_id, self.albert_id, topic_id)
-        topic_services.add_canonical_story(self.albert_id, topic_id, story_id)  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(self.albert_id, topic_id, story_id)
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -6616,7 +6655,7 @@ title: Old Title
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(story_id, user_id, topic_id)
-        topic_services.add_canonical_story(user_id, topic_id, story_id)  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(user_id, topic_id, story_id)
         change_list_story = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,

@@ -42,9 +42,9 @@ from extensions.objects.models import objects
 
 from typing import (
     Callable, Dict, List, Mapping, Optional, Sequence,
-    Set, Tuple, Union, cast
+    Set, Tuple, Union, cast, overload
 )
-from typing_extensions import Final, TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -58,7 +58,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -424,6 +424,451 @@ class ExplorationChange(change_domain.BaseChange):
         'delete_gadget', 'rename_gadget']
 
 
+class CreateNewExplorationCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_CREATE_NEW command.
+    """
+
+    category: str
+    title: str
+
+
+class AddExplorationStateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_ADD_STATE command.
+    """
+
+    state_name: str
+
+
+class DeleteExplorationStateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_DELETE_STATE command.
+    """
+
+    state_name: str
+
+
+class RenameExplorationStateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_RENAME_STATE command.
+    """
+
+    new_state_name: str
+    old_state_name: str
+
+
+class AddWrittenTranslationCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_ADD_WRITTEN_TRANSLATION command.
+    """
+
+    state_name: str
+    content_id: str
+    language_code: str
+    content_html: str
+    translation_html: str
+    data_format: str
+
+
+class MarkWrittenTranslationAsNeedingUpdateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE command.
+    """
+
+    content_id: str
+    language_code: str
+    state_name: str
+
+
+class MarkWrittenTranslationsAsNeedingUpdateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE command.
+    """
+
+    content_id: str
+    state_name: str
+
+
+class EditExpStatePropertyParamChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_PARAM_CHANGES as allowed value.
+    """
+
+    property_name: Literal['param_changes']
+    state_name: str
+    new_value: List[param_domain.ParamChangeDict]
+    old_value: List[param_domain.ParamChangeDict]
+
+
+class EditExpStatePropertyContentCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_CONTENT as allowed value.
+    """
+
+    property_name: Literal['content']
+    state_name: str
+    new_value: state_domain.SubtitledHtmlDict
+    old_value: Optional[state_domain.SubtitledHtmlDict]
+
+
+class EditExpStatePropertySolicitAnswerDetailsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_SOLICIT_ANSWER_DETAILS as allowed value.
+    """
+
+    property_name: Literal['solicit_answer_details']
+    state_name: str
+    new_value: bool
+    old_value: bool
+
+
+class EditExpStatePropertyCardIsCheckpointCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_CARD_IS_CHECKPOINT as allowed value.
+    """
+
+    property_name: Literal['card_is_checkpoint']
+    state_name: str
+    new_value: bool
+    old_value: bool
+
+
+class EditExpStatePropertyRecordedVoiceoversCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_RECORDED_VOICEOVERS as allowed value.
+    """
+
+    property_name: Literal['recorded_voiceovers']
+    state_name: str
+    new_value: state_domain.RecordedVoiceoversDict
+    old_value: state_domain.RecordedVoiceoversDict
+
+
+class EditExpStatePropertyWrittenTranslationsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_WRITTEN_TRANSLATIONS as allowed value.
+    """
+
+    property_name: Literal['written_translations']
+    state_name: str
+    new_value: state_domain.WrittenTranslationsDict
+    old_value: state_domain.WrittenTranslationsDict
+
+
+class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_ID as allowed value.
+    """
+
+    property_name: Literal['widget_id']
+    state_name: str
+    new_value: str
+    old_value: str
+
+
+class EditExpStatePropertyNextContentIdIndexCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_NEXT_CONTENT_ID_INDEX as allowed value.
+    """
+
+    property_name: Literal['next_content_id_index']
+    state_name: str
+    new_value: int
+    old_value: int
+
+
+class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_LINKED_SKILL_ID as allowed value.
+    """
+
+    property_name: Literal['linked_skill_id']
+    state_name: str
+    new_value: str
+    old_value: str
+
+
+class EditExpStatePropertyInteractionCustArgsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_CUST_ARGS as allowed value.
+    """
+
+    property_name: Literal['widget_customization_args']
+    state_name: str
+    new_value: state_domain.CustomizationArgsDictType
+    old_value: state_domain.CustomizationArgsDictType
+
+
+class EditExpStatePropertyInteractionStickyCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_STICKY as allowed value.
+    """
+
+    property_name: Literal['widget_sticky']
+    state_name: str
+    new_value: bool
+    old_value: bool
+
+
+class EditExpStatePropertyInteractionHandlersCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_HANDLERS as allowed value.
+    """
+
+    property_name: Literal['widget_handlers']
+    state_name: str
+    new_value: List[state_domain.AnswerGroupDict]
+    old_value: List[state_domain.AnswerGroupDict]
+
+
+class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_ANSWER_GROUPS as allowed value.
+    """
+
+    property_name: Literal['answer_groups']
+    state_name: str
+    new_value: List[state_domain.AnswerGroupDict]
+    old_value: List[state_domain.AnswerGroupDict]
+
+
+class EditExpStatePropertyInteractionDefaultOutcomeCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME as allowed value.
+    """
+
+    property_name: Literal['default_outcome']
+    state_name: str
+    new_value: state_domain.OutcomeDict
+    old_value: state_domain.OutcomeDict
+
+
+class EditExpStatePropertyInteractionHintsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_HINTS as allowed value.
+    """
+
+    property_name: Literal['hints']
+    state_name: str
+    new_value: List[state_domain.HintDict]
+    old_value: List[state_domain.HintDict]
+
+
+class EditExpStatePropertyInteractionSolutionCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_SOLUTION as allowed value.
+    """
+
+    property_name: Literal['solution']
+    state_name: str
+    new_value: state_domain.SolutionDict
+    old_value: state_domain.SolutionDict
+
+
+class EditExpStatePropertyUnclassifiedAnswersCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_UNCLASSIFIED_ANSWERS as allowed value.
+    """
+
+    property_name: Literal['confirmed_unclassified_answers']
+    state_name: str
+    new_value: List[state_domain.AnswerGroup]
+    old_value: List[state_domain.AnswerGroup]
+
+
+class EditExpStatePropertyContentIdsToAudioTranslationsDeprecatedCmd(
+    ExplorationChange
+):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED
+    as allowed value.
+    """
+
+    property_name: Literal['content_ids_to_audio_translations']
+    state_name: str
+    new_value: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+    old_value: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+
+
+class EditExplorationPropertyTitleCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'title' as allowed value.
+    """
+
+    property_name: Literal['title']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyCategoryCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'category' as allowed value.
+    """
+
+    property_name: Literal['category']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyObjectiveCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'objective' as allowed value.
+    """
+
+    property_name: Literal['objective']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyLanguageCodeCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'language_code' as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyTagsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'tags' as allowed value.
+    """
+
+    property_name: Literal['tags']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class EditExplorationPropertyBlurbCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'blurb' as allowed value.
+    """
+
+    property_name: Literal['blurb']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyAuthorNotesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'author_notes' as allowed value.
+    """
+
+    property_name: Literal['author_notes']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyParamSpecsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'param_specs' as allowed value.
+    """
+
+    property_name: Literal['param_specs']
+    new_value: Dict[str, param_domain.ParamSpecDict]
+    old_value: Dict[str, param_domain.ParamSpecDict]
+
+
+class EditExplorationPropertyParamChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'param_changes' as allowed value.
+    """
+
+    property_name: Literal['param_changes']
+    new_value: List[param_domain.ParamChangeDict]
+    old_value: List[param_domain.ParamChangeDict]
+
+
+class EditExplorationPropertyInitStateNameCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'init_state_name' as allowed value.
+    """
+
+    property_name: Literal['init_state_name']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyAutoTtsEnabledCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'auto_tts_enabled' as allowed value.
+    """
+
+    property_name: Literal['auto_tts_enabled']
+    new_value: bool
+    old_value: bool
+
+
+class EditExplorationPropertyCorrectnessFeedbackEnabledCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'correctness_feedback_enabled' as allowed value.
+    """
+
+    property_name: Literal['correctness_feedback_enabled']
+    new_value: bool
+    old_value: bool
+
+
+class EditExplorationPropertyEditsAllowedCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'edits_allowed' as allowed value.
+    """
+
+    property_name: Literal['edits_allowed']
+    new_value: bool
+    old_value: bool
+
+
+class MigrateStatesSchemaToLatestVersionCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class RevertExplorationCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_REVERT_COMMIT command.
+    """
+
+    version_number: int
+
+
 class TransientCheckpointUrlDict(TypedDict):
     """Dictionary representing the TransientCheckpointUrl object."""
 
@@ -548,11 +993,6 @@ class ExplorationCommitLogEntryDict(TypedDict):
 class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 
-    # Here, Any is used because argument `commit_cmds` can accept
-    # List of dictionaries that can contain arbitrary no of keys
-    # with different types of values like int, str, List[str], Dict
-    # and other types too. So, to make the argument generalized for
-    # every dictionary we used Any type here.
     def __init__(
         self,
         created_on: datetime.datetime,
@@ -809,6 +1249,14 @@ class VersionedExplorationStatesDict(TypedDict):
 
     states_schema_version: int
     states: Dict[str, state_domain.StateDict]
+
+
+class SerializableExplorationDict(ExplorationDict):
+    """Dictionary representing the serializable Exploration object."""
+
+    version: int
+    created_on: str
+    last_updated: str
 
 
 class Exploration(translation_domain.BaseTranslatableObject):
@@ -2078,6 +2526,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: str,
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> str: ...
+
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: List[str],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> List[str]: ...
+
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: List[List[str]],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> List[List[str]]: ...
+
         # Here we use MyPy ignore because MyPy expects a return value in
         # every condition when we define a return type but here we are
         # returning only in if-else conditions and we are not returning
@@ -2088,7 +2557,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             new_type: str,
             value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict]
-        ) -> Union[List[str], str]:
+        ) -> Union[List[List[str]], List[str], str]:
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -2130,28 +2599,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes its type as
-                # recursive, like if this method returns List[str] then MyPy
-                # assumes its type as List[List[str]]. So, because of this,
-                # MyPy throws an error. Thus to avoid the error, we used
-                # ignore here.
+                # Here we use cast because this 'elif' condition forces value
+                # to have type List[str].
+                set_of_content_ids = cast(List[str], value)
                 return [
-                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
+                    migrate_rule_inputs_and_answers(
                         'TranslatableHtmlContentId', html, choices
-                    ) for html in value
+                    ) for html in set_of_content_ids
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes its type as
-                # recursive, like if this method returns List[str] then MyPy
-                # assumes its type as List[List[str]]. So, because of this,
-                # MyPy throws an error. Thus to avoid the error, we used
-                # ignore here.
+                # Here we use cast because this 'elif' condition forces value
+                # to have type List[List[str]].
+                list_of_set_of_content_ids = cast(
+                    List[List[str]], value
+                )
                 return [
-                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
+                    migrate_rule_inputs_and_answers(
                         'SetOfTranslatableHtmlContentIds', html_set, choices
-                    ) for html_set in value
+                    ) for html_set in list_of_set_of_content_ids
                 ]
 
         for state_dict in states_dict.values():
@@ -3058,8 +3523,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 is not specified.
             Exception. The exploration schema version is not valid.
         """
-        # Here, cast is used to narrow down the return type of dict_from_yaml()
-        # from Dict[str, Any] to VersionedExplorationDict.
+        # Here we use cast because we are narrowing down the return type of
+        # dict_from_yaml() from Dict[str, Any] to VersionedExplorationDict.
         try:
             exploration_dict = cast(
                 VersionedExplorationDict,
@@ -3171,16 +3636,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str. The YAML representation of this exploration.
         """
         exp_dict = self.to_dict()
-        # The dictionary returned by `to_dict()` method is ExplorationDict
-        # and ExplorationDict does not contain `schema_version` key, but here
-        # we are defining a `schema_version` key which causes MyPy to throw
-        # error TypedDict has no key 'schema_version'. Thus to silent the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
+        # method is ExplorationDict and ExplorationDict does not contain
+        # `schema_version` key, but here we are defining a `schema_version` key
+        # which causes MyPy to throw error 'TypedDict has no key schema_version'
+        # thus to silence the error, we used ignore here.
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
-        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
+        # TypedDict.
         del exp_dict['id']  # type: ignore[misc]
 
         return utils.yaml_from_dict(exp_dict)
@@ -3221,7 +3687,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        exploration_dict = self.to_dict()
+        # Here we use MyPy ignore because to_dict() method returns a general
+        # dictionary representation of domain object (ExplorationDict) which
+        # does not contain properties like created_on and last_updated but
+        # MyPy expects exploration_dict, a dictionary which contains all the
+        # properties of domain object. That's why we are explicitly changing
+        # the type of exploration_dict here, which causes MyPy to throw an
+        # error. Thus, to silence the error, we added an ignore here.
+        exploration_dict: SerializableExplorationDict = self.to_dict()  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
         # parameter.
@@ -3230,19 +3703,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # files must add a version parameter to their files with the correct
         # version of this object. The line below must then be moved to
         # to_dict().
-        # The dictionary returned by `to_dict()` method is ExplorationDict
-        # and ExplorationDict does not contain `version`, `created_on` and
-        # `last_updated` keys, but here we are defining those keys which
-        # causes MyPy to throw error TypedDict has no `version` key. Thus
-        # to silent the error, we used ignore here.
-        exploration_dict['version'] = self.version  # type: ignore[misc]
+        exploration_dict['version'] = self.version
 
         if self.created_on:
-            exploration_dict['created_on'] = (  # type: ignore[misc]
+            exploration_dict['created_on'] = (
                 utils.convert_naive_datetime_to_string(self.created_on))
 
         if self.last_updated:
-            exploration_dict['last_updated'] = (  # type: ignore[misc]
+            exploration_dict['last_updated'] = (
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
         return json.dumps(exploration_dict)
