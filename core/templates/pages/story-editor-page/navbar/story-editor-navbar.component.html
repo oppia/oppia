@@ -120,7 +120,7 @@
           <i class="fas fa-pen navbar-tab-icon"></i>
           <span>Discard Changes</span>
         </div>
-        <div class="story-nav-dropdown-option">
+        <div class="story-nav-dropdown-option e2e-test-mobile-publish-button">
           <div *ngIf="!isStoryPublished()"
                (click)="publishStory()"
                [attr.disabled]="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
@@ -136,9 +136,9 @@
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
-        <div class="story-nav-dropdown-text"
-             [attr.disabled]="!isStorySaveable()"
-             (click)="saveChanges()">
+        <button class="story-nav-dropdown-text e2e-test-mobile-save-changes"
+                [disabled]="!isStorySaveable()"
+                (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
           </span>
@@ -148,10 +148,10 @@
           <span *ngIf="getChangeListLength() > 0">
             ({{ getChangeListLength() }})
           </span>
-        </div>
+        </button>
         <div class="story-nav-dropdown-icon"
              (click)="toggleStoryEditOptions()">
-          <i class="fa fa-caret-down"></i>
+          <i class="fa fa-caret-down e2e-test-mobile-changes-dropdown"></i>
         </div>
       </div>
     </div>
