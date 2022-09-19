@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,57 +18,43 @@
  * an entity.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CreateNewSubtopicModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component';
+import { CreateNewSkillModalService } from './create-new-skill-modal.service';
+import { TopicEditorRoutingService } from './topic-editor-routing.service';
+import { TopicEditorStateService } from './topic-editor-state.service';
 
-require('base-components/base-content.component.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-    'background-banner.component.ts');
-require(
-  'components/review-material-editor/review-material-editor.component.ts');
-require(
-  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class EntityCreationService {
+  constructor(
+    private ngbModal: NgbModal,
+    private topicEditorRoutingService: TopicEditorRoutingService,
+    private topicEditorStateService: TopicEditorStateService,
+    private createNewSkillModalService: CreateNewSkillModalService
+  ) {}
 
-require('components/entity-creation-services/skill-creation.service.ts');
-require('components/rubrics-editor/rubrics-editor.component.ts');
-require(
-  'pages/topics-and-skills-dashboard-page/modals/' +
-  'create-new-skill-modal.component.ts');
-require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
-require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-
-require('services/context.service.ts');
-require('services/image-local-storage.service.ts');
-require('pages/topic-editor-page/services/create-new-skill-modal.service');
-require('services/ngb-modal.service.ts');
-
-angular.module('oppia').factory('EntityCreationService', [
-  'CreateNewSkillModalService', 'NgbModal',
-  'TopicEditorRoutingService', 'TopicEditorStateService',
-  function(
-      CreateNewSkillModalService, NgbModal,
-      TopicEditorRoutingService, TopicEditorStateService) {
-    var createSubtopic = function(topic) {
-      NgbModal.open(CreateNewSubtopicModalComponent, {
-        backdrop: 'static',
-        windowClass: 'create-new-subtopic'
-      }).result.then(function(subtopicId) {
-        TopicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
-      }, function() {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
-    };
-
-    var createSkill = function() {
-      var topicId = TopicEditorStateService.getTopic().getId();
-      CreateNewSkillModalService.createNewSkill([topicId]);
-    };
-
-    return {
-      createSubtopic: createSubtopic,
-      createSkill: createSkill
-    };
+  createSubtopic(): void {
+    this.ngbModal.open(CreateNewSubtopicModalComponent, {
+      backdrop: 'static',
+      windowClass: 'create-new-subtopic'
+    }).result.then((subtopicId) => {
+      this.topicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
-]);
+
+  createSkill(): void {
+    let topicId = this.topicEditorStateService.getTopic().getId();
+    this.createNewSkillModalService.createNewSkill([topicId]);
+  }
+}
+
+angular.module('oppia').factory('EntityCreationService',
+  downgradeInjectable(EntityCreationService));
