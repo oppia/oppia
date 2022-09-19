@@ -36,6 +36,7 @@ from core.domain import question_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
+from core.domain import taskqueue_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -76,6 +77,15 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE: Final = ''
 # email.
 MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 
+SUGGESTION_TRANSLATE_CONTENT_HTML: Callable[
+    [suggestion_registry.SuggestionTranslateContent], str
+] = lambda suggestion: suggestion.change.translation_html
+
+SUGGESTION_ADD_QUESTION_HTML: Callable[
+    [suggestion_registry.SuggestionAddQuestion], str
+] = lambda suggestion: suggestion.change.question_dict[
+    'question_state_data']['content']['html']
+
 # A dictionary that maps the suggestion type to a lambda function, which is
 # used to retrieve the html content that corresponds to the suggestion's
 # emphasized text on the Contributor Dashboard. From a UI perspective, the
@@ -83,20 +93,9 @@ MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 # suggestion opportunities. For instance, for translation suggestions the
 # emphasized text is the translation. Similarly, for question suggestions the
 # emphasized text is the question being asked.
-SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[
-    str, Callable[[suggestion_registry.BaseSuggestion], str]
-] = {
-    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-        lambda suggestion: suggestion.change.translation_html),
-    # Here, change is of type BaseChange and all attributes on BaseChange are
-    # created dynamically except cmd, and the type of all dynamically created
-    # attributes are considered as string (str) type. So, question_dict
-    # is also considered as string type but here we are using it as a Dict
-    # type which causes MyPy throws an error. Thus to avoid the error, we
-    # used ignore here.
-    feconf.SUGGESTION_TYPE_ADD_QUESTION: (
-        lambda suggestion: suggestion.change.question_dict[
-            'question_state_data']['content']['html'])  # type: ignore[index]
+SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
+    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: SUGGESTION_TRANSLATE_CONTENT_HTML,
+    feconf.SUGGESTION_TYPE_ADD_QUESTION: SUGGESTION_ADD_QUESTION_HTML
 }
 
 
@@ -216,8 +215,9 @@ def create_suggestion(
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change['question_dict'], dict)
-        # Here, we are narrowing down the type from various Dict types that are
-        # present in AcceptableChangeDictTypes to QuestionDict type.
+        # Here we use cast because we are narrowing down the type from
+        # various Dict types that are present in AcceptableChangeDictTypes
+        # to QuestionDict type.
         question_dict = cast(
             question_domain.QuestionDict,
             change['question_dict']
@@ -2082,10 +2082,10 @@ def _create_translation_review_stats_from_model(
         translation_review_stats_model.reviewed_translations_count,
         translation_review_stats_model.reviewed_translation_word_count,
         translation_review_stats_model.accepted_translations_count,
+        translation_review_stats_model.accepted_translation_word_count,
         (
             translation_review_stats_model
             .accepted_translations_with_reviewer_edits_count),
-        translation_review_stats_model.accepted_translation_word_count,
         translation_review_stats_model.first_contribution_date,
         translation_review_stats_model.last_contribution_date
     )
@@ -2149,7 +2149,7 @@ def _create_question_review_stats_from_model(
     )
 
 
-def _get_all_translation_review_stats(
+def get_all_translation_review_stats(
     user_id: str
 ) -> List[suggestion_registry.TranslationReviewStats]:
     """Gets all TranslationReviewStatsModels corresponding to the supplied
@@ -2173,7 +2173,7 @@ def _get_all_translation_review_stats(
     ]
 
 
-def _get_all_question_contribution_stats(
+def get_all_question_contribution_stats(
     user_id: str
 ) -> List[suggestion_registry.QuestionContributionStats]:
     """Gets all QuestionContributionStatsModels corresponding to the supplied
@@ -2197,7 +2197,7 @@ def _get_all_question_contribution_stats(
     ]
 
 
-def _get_all_question_review_stats(
+def get_all_question_review_stats(
     user_id: str
 ) -> List[suggestion_registry.QuestionReviewStats]:
     """Gets all QuestionReviewStatsModels corresponding to the supplied
@@ -2236,9 +2236,9 @@ def get_all_contributor_stats(
     """
     translation_contribution_stats = get_all_translation_contribution_stats(
         user_id)
-    translation_review_stats = _get_all_translation_review_stats(user_id)
-    question_contribution_stats = _get_all_question_contribution_stats(user_id)
-    question_review_stats = _get_all_question_review_stats(user_id)
+    translation_review_stats = get_all_translation_review_stats(user_id)
+    question_contribution_stats = get_all_question_contribution_stats(user_id)
+    question_review_stats = get_all_question_review_stats(user_id)
 
     return suggestion_registry.ContributorStatsSummary(
         user_id,
@@ -2908,3 +2908,56 @@ def increment_question_review_stats(
         question_review_stat.accepted_questions_with_reviewer_edits_count += 1
     question_review_stat.last_contribution_date = (
         last_contribution_date.date())
+
+
+def enqueue_contributor_ranking_notification_email_task(
+    contributor_user_id: str, contribution_type: str,
+    contribution_sub_type: str, language_code: str, rank_name: str,
+) -> None:
+    """Adds a 'send feedback email' (instant) task into the task queue.
+    Attributes:
+        contributor_user_id: str. The ID of the contributor.
+        contribution_type: str. The type of the contribution i.e.
+            translation or question.
+        contribution_sub_type: str. The sub type of the contribution
+            i.e. submissions/acceptances/reviews/edits.
+        language_code: str. The language code of the suggestion.
+        rank_name: str. The name of the rank that the contributor achieved.
+
+    Raises:
+        Exception. The contribution type must be offered on the Contributor
+            Dashboard.
+        Exception. The contribution subtype must be offered on the Contributor
+            Dashboard.
+    """
+    # contributor_user_id is alrerady validated in the controller layer.
+    # TODO(#16062): Rank name should be valid to send notification emails.
+    if language_code not in [language['id'] for language in (
+            constants.SUPPORTED_AUDIO_LANGUAGES)]:
+        raise Exception(
+            'Not supported language code: %s' % language_code)
+    if contribution_type not in [
+        feconf.CONTRIBUTION_TYPE_TRANSLATION,
+        feconf.CONTRIBUTION_TYPE_QUESTION
+    ]:
+        raise Exception(
+            'Invalid contribution type: %s' % contribution_type)
+    if contribution_sub_type not in [
+        feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE,
+        feconf.CONTRIBUTION_SUBTYPE_REVIEW,
+        feconf.CONTRIBUTION_SUBTYPE_EDIT,
+    ]:
+        raise Exception(
+            'Invalid contribution subtype: %s' % contribution_sub_type)
+
+    payload = {
+        'contributor_user_id': contributor_user_id,
+        'contribution_type': contribution_type,
+        'contribution_sub_type': contribution_sub_type,
+        'language_code': language_code,
+        'rank_name': rank_name,
+    }
+
+    taskqueue_services.enqueue_task(
+        feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
+        payload, 0)

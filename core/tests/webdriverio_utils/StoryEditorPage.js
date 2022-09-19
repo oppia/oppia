@@ -31,6 +31,7 @@ var StoryEditorPage = function() {
   var commitMessageField = $('.e2e-test-commit-message-input');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var createChapterButton = $('.e2e-test-add-chapter-button');
+  var createChapterButtonMobile = $('.e2e-test-mobile-add-chapter');
   var newChapterTitleField = $('.e2e-test-new-chapter-title-field');
   var newChapterExplorationField = $('.e2e-test-chapter-exploration-input');
   var notesEditor = $('.e2e-test-story-notes-rte');
@@ -55,6 +56,7 @@ var StoryEditorPage = function() {
   var confirmDeleteChapterButton = $('.e2e-test-confirm-delete-chapter-button');
   var cancelChapterCreationButton = $(
     '.e2e-test-cancel-chapter-creation-button');
+  var saveStoryIcon = $('.e2e-test-mobile-options-base');
 
   /*
    * CHAPTER
@@ -132,7 +134,24 @@ var StoryEditorPage = function() {
   };
 
   this.publishStory = async function() {
-    await action.click('Publish Story Button', publishStoryButton);
+    let width = (await browser.getWindowSize()).width;
+
+    if (width < 1000) {
+      var anchorSelector = function() {
+        return $$('i');
+      };
+      let i = await anchorSelector();
+
+      await action.click('Mobile options', i[11]);
+
+      var publishSelector = function() {
+        return $$('.e2e-test-mobile-publish-button');
+      };
+      let publish = (await publishSelector())[0];
+      await action.click('Publish Story Mobile', publish);
+    } else {
+      await action.click('Publish Story Button', publishStoryButton);
+    }
   };
 
   this.unpublishStory = async function() {
@@ -156,9 +175,19 @@ var StoryEditorPage = function() {
 
   this.createNewChapter = async function(title, explorationId, imgPath) {
     await general.scrollToTop();
+
+    let width = (await browser.getWindowSize()).width;
+
+    if (width < 831) {
+      await action.click(
+        'Create chapter arrow takes too long to be clickable.',
+        createChapterButtonMobile);
+    }
+
     await action.click(
       'Create chapter button takes too long to be clickable.',
       createChapterButton);
+
     await action.setValue(
       'New chapter title field', newChapterTitleField, title);
     await action.setValue(
@@ -288,8 +317,18 @@ var StoryEditorPage = function() {
 
   this.returnToTopic = async function() {
     await general.scrollToTop();
-    await action.click('Return to topic button', returnToTopicButton);
     await waitFor.pageToFullyLoad();
+
+    let width = (await browser.getWindowSize()).width;
+    if (width < 1000) {
+      var topicButtonSelector = function() {
+        return $$('.e2e-test-mobile-back-to-topic');
+      };
+      var button = (await topicButtonSelector())[0];
+      await action.click('Return to topic button', button);
+    } else {
+      await action.click('Return to topic button', returnToTopicButton);
+    }
   };
 
   this.changeStoryDescription = async function(storyDescription) {
@@ -313,7 +352,19 @@ var StoryEditorPage = function() {
   };
 
   this.saveStory = async function(commitMessage) {
-    await action.click('Save Story Button', saveStoryButton);
+    let width = (await browser.getWindowSize()).width;
+
+    if (width < 1000) {
+      await action.click('Story Options', saveStoryIcon);
+      var buttonSelector = function() {
+        return $$('.e2e-test-mobile-save-changes');
+      };
+      var button = (await buttonSelector())[1];
+      await action.click('Save Draft Mobile', button);
+    } else {
+      await action.click('Save Story Button', saveStoryButton);
+    }
+
     await waitFor.visibilityOf(
       commitMessageField, 'Commit message modal takes too long to appear.');
     await commitMessageField.setValue(commitMessage);
@@ -323,11 +374,14 @@ var StoryEditorPage = function() {
       closeSaveModalButton,
       'Commit message modal takes too long to disappear.');
     await waitFor.pageToFullyLoad();
+
     // Wait for the "Save Draft" button to be reset.
-    await waitFor.visibilityOf(
-      saveStoryButton, 'Save Story Button taking too long to appear.');
-    await waitFor.textToBePresentInElement(
-      saveStoryButton, 'Save Draft', 'Story could not be saved.');
+    if (width > 1000) {
+      await waitFor.visibilityOf(
+        saveStoryButton, 'Save Story Button taking too long to appear.');
+      await waitFor.textToBePresentInElement(
+        saveStoryButton, 'Save Draft', 'Story could not be saved.');
+    }
   };
 
   this.expectSaveStoryDisabled = async function() {
