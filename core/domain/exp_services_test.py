@@ -7881,10 +7881,13 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                         {
                             'content_id': 'ca_choices_2',
                             'html': (
-                                '<oppia-noninteractive-math raw_latex-with'
-                                '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
-                                '..(x - a_n)&amp;quot;"></oppia-noninteractive-'
-                                'math>'
+                                '<oppia-noninteractive-math '
+                                'math_content-with-value=\'\{&amp;quot;'
+                                'raw_latex&amp;quot;: &amp;quot;(x - a_1)'
+                                '(x - a_2)(x - a_3)...(x\\ - a_n)&amp;quot;, '
+                                '&amp;quot;svg_filename&amp;quot;: &amp;quot;'
+                                'mathImg.svg&amp;quot;}\'\>'
+                                '</oppia-noninteractive-math>'
                             )
                         },
                         {

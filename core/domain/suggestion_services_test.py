@@ -3885,7 +3885,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-math></oppia-noninteractive-math> </p>'))
+                '<oppia-noninteractive-math math_content-with-value=\''
+                '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+                'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+                'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math><\p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -3911,8 +3914,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-image></oppia-noninteractive-image>'
-                '</p>'))
+                '<oppia-noninteractive-image alt-with-value=\'&amp;quot;'
+                'image&amp;quot;\' caption-with-value=\'\&amp;quot;&amp;'
+                'quot;\' filepath-with-value=\'&amp;quot;image.svg&amp;'
+                'quot;\'\></oppia-noninteractive-image></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -3937,7 +3942,9 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link> </p>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -3963,8 +3970,14 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link>'
-                '</p><oppia-noninteractive-link></oppia-noninteractive-link>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link></p>'
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -3990,8 +4003,14 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link>'
-                '</p><oppia-noninteractive-math></oppia-noninteractive-math>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link></p>'
+                '<oppia-noninteractive-math math_content-with-value=\''
+                '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+                'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+                'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,

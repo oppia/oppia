@@ -397,22 +397,22 @@ states:
         \ to arrange 2 balls.<br>There are\_6 ways to arrange 3 balls.<br><br>Let's\
         \ give these names. We will say F1 = 1, F2 = 2, F3 = 6. So, if you have n\
         \ balls (where n is 1, 2, 3, ...), then Fn is the number of ways to arrange\
-        \ them.<br></p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
+        \ them.<br></p><oppia-noninteractive-image alt-with-value=\"&amp;quot;image&amp;quot;\"\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;patterns_height_643_width_670.png&amp;quot;\"\
         ></oppia-noninteractive-image><p><br><br>Can you see a pattern here, or a\
         \ systematic way to count them? Let's have a look at the 3-ball case.<br><br>--------------------------------------------------------------------------------------------<br><br>First\
         \ you pick the ball on the left. This could be red, blue or yellow. There\
         \ are three cases to consider:<br><br>If the first ball is red, then there\
         \ are two balls left to arrange in the other two slots. And there are F2 ways\
-        \ to do this.</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
+        \ to do this.</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;image&amp;quot;\"\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;startRed_height_214_width_643.png&amp;quot;\"\
         ></oppia-noninteractive-image><p><br><br></p><p>If the first ball is blue,\
         \ then there are two balls left to ... hey, this is the same thing, it's just\
-        \ F2.</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
+        \ F2.</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;image&amp;quot;\"\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;startBlue_height_219_width_633.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\_</p><p><br>And, if the first ball is yellow,\
         \ then ... yada, yada, F2.<br></p><oppia-noninteractive-image alt-with-value=\"\
-        &amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
+        &amp;quot;image&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
         &amp;quot;startYellow_height_200_width_635.png&amp;quot;\"></oppia-noninteractive-image><p><br><br>So\
         \ the total number of ways to arrange 3 balls, F3, is equal to 3 * F2. And\
         \ all this works out correctly, because F2 = 2, and F3 = 3 * 2 = 6.<br><br>--------------------------------------------------------------------------------------------<br><br>Now,\
@@ -650,7 +650,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: "<oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"\
+      html: "<oppia-noninteractive-image alt-with-value=\"&amp;quot;image&amp;quot;\" caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3balls_height_312_width_328.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\xC2\_</p><p>Suppose you were given three\
         \ balls: one red, one blue, and one yellow -- and one day, you are idly playing\
@@ -803,7 +803,7 @@ states:
         \ three-character words, for example:<br><br>\_ \_ \_RBY<br><br>Means put\
         \ the red ball on the left, the blue ball in the middle, and the yellow ball\
         \ on the right, like this:</p><oppia-noninteractive-image alt-with-value=\"\
-        &amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
+        &amp;quot;image&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
         &amp;quot;RBY_height_196_width_551.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
         </p><p>Can you list all the ways you found?<br><br>\_ \_\_</p>"
     interaction:
@@ -1011,7 +1011,7 @@ states:
         \ more general pattern.<br><br>The most obvious small case is 1 ball! There's\
         \ one way to arrange one ball in a line.<br><br>How about 2 balls? How many\
         \ ways are there to arrange two balls, with different colours, in a line?</p><oppia-noninteractive-image\
-        \ alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ alt-with-value=\"&amp;quot;image&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;2balls_height_248_width_265.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\xC2\_</p>"
     interaction:

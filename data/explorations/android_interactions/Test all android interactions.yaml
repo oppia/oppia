@@ -112,7 +112,7 @@ states:
     content:
       content_id: content
       html: <p>Test exploration with all android specific interactions</p><oppia-noninteractive-image
-        alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        alt-with-value="&amp;quot;test&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
         filepath-with-value="&amp;quot;img_20210622_123005_efcgi87dk2_height_130_width_289.png&amp;quot;"></oppia-noninteractive-image>
     interaction:
       answer_groups: []
