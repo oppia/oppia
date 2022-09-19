@@ -1631,26 +1631,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if not self.states:
             raise utils.ValidationError('This exploration has no states.')
         for state_name, state in self.states.items():
-            for group_idx, group in enumerate(state.interaction.answer_groups):
-                # Check if tagged_skill_misconception_id is None.
-                if group.tagged_skill_misconception_id is not None:
-                    raise utils.ValidationError(
-                        'The outcome for answer group %s in state %s has '
-                        'tagged skill misconception id, which '
-                        'should be None' % (str(group_idx + 1), state_name)
-                    )
-
-                # Check if the answergroup has atleast one rulespec.
-                if len(group.rule_specs) == 0:
-                    raise utils.ValidationError(
-                        'The outcome for answer group %s in state %s has '
-                        'no rule specs, atleast one is required' % (
-                            str(group_idx + 1), state_name)
-                    )
             self._validate_state_name(state_name)
             state.validate(
                 self.param_specs,
-                allow_null_interaction=not strict)
+                allow_null_interaction=not strict,
+                validation_from_exploration = True)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in

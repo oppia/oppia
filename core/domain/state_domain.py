@@ -194,7 +194,8 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         interaction: base.BaseInteraction,
-        exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
+        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        validation_from_exploration: bool = False
     ) -> None:
         """Verifies that all rule classes are valid, and that the AnswerGroup
         only has one classifier rule.
@@ -217,6 +218,11 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 % self.rule_specs)
 
         if self.tagged_skill_misconception_id is not None:
+            if validation_from_exploration:
+                raise utils.ValidationError(
+                    'Expected tagged skill misconception id to be None, '
+                    'received %s' % self.tagged_skill_misconception_id)
+
             if not isinstance(self.tagged_skill_misconception_id, str):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
@@ -228,6 +234,10 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                     'Expected the format of tagged skill misconception id '
                     'to be <skill_id>-<misconception_id>, received %s'
                     % self.tagged_skill_misconception_id)
+
+        if len(self.rule_specs) == 0 and validation_from_exploration:
+            raise utils.ValidationError(
+                'There must be at least one rule for each answer group.')
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
             raise utils.ValidationError(
@@ -917,7 +927,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return outcomes
 
     def validate(
-        self, exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
+        self, exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        validation_from_exploration: bool = False
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -959,7 +970,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 'Terminal interactions must not have any answer groups.')
 
         for answer_group in self.answer_groups:
-            answer_group.validate(interaction, exp_param_specs_dict)
+            answer_group.validate(
+                interaction, exp_param_specs_dict, validation_from_exploration)
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -3210,7 +3222,8 @@ class State(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        allow_null_interaction: bool
+        allow_null_interaction: bool,
+        validation_from_exploration = False
     ) -> None:
         """Validates various properties of the State.
 
@@ -3239,7 +3252,8 @@ class State(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
-            self.interaction.validate(exp_param_specs_dict)
+            self.interaction.validate(
+                exp_param_specs_dict, validation_from_exploration)
 
         content_id_list = []
         content_id_list.append(self.content.content_id)
