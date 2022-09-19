@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import {ComponentFixture, waitForAsync, TestBed, tick, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import { ComponentFixture, waitForAsync, TestBed, tick, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ImageEditorComponent } from './image-editor.component';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { ContextService } from 'services/context.service';
@@ -2071,7 +2071,6 @@ describe('ImageEditor', () => {
       status: 500,
       statusText: 'Failed to upload image'
     });
-
 
     tick(100);
 
