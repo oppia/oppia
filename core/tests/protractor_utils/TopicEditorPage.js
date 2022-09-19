@@ -116,6 +116,7 @@ var TopicEditorPage = function() {
   var easyRubricDifficulty = element(
     by.css('.e2e-test-skill-difficulty-easy'));
   var storyTitleClassname = '.e2e-test-story-title';
+  var storiesDropdown = element(by.css('.e2e-test-story-dropdown'));
   var addNewDiagnosticTestSkillButton = element(
     by.css('.e2e-test-add-diagnostic-test-skill'));
   var diagnosticTestSkillSelector = element(
@@ -464,8 +465,14 @@ var TopicEditorPage = function() {
 
   this.createStory = async function(
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
-    await general.scrollToTop();
-    await action.click('Create Story Button', createStoryButton);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      await action.click('Story dropdown', storiesDropdown, true);
+      await action.click('Create Story Button', createStoryButton, true);
+    } else {
+      await general.scrollToTop();
+      await action.click('Create Story Button', createStoryButton);
+    }
 
     await action.sendKeys(
       'Create new story title', newStoryTitleField, storyTitle);

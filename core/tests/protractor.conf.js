@@ -8,6 +8,7 @@ var childProcess = require('child_process');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var exitCode = 0;
+var args = process.argv;
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -292,9 +293,17 @@ exports.config = {
       displaySpecDuration: true
     }));
 
-    // Set a wide enough window size for the navbar in the library pages to
-    // display fully.
-    browser.driver.manage().window().setSize(1285, 1000);
+    // eslint-disable-next-line eqeqeq
+    mobileViewportArg = process.env.MOBILE == 'true';
+
+    // eslint-disable-next-line eqeqeq
+    if (mobileViewportArg) {
+      browser.driver.manage().window().setSize(600, 1000);
+    } else {
+      // Set a wide enough window size for the navbar in the library pages to
+      // display fully.
+      browser.driver.manage().window().setSize(1285, 1000);
+    }
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';

@@ -137,7 +137,6 @@ var ExplorationEditorSettingsTab = function() {
       explorationLanguageInput, 'Language input takes too long to be visible.');
     await action.matSelect(
       'Exploration Language', explorationLanguageInput, language);
-    await action.click('Neutral element', neutralElement);
   };
 
   this.setObjective = async function(objective) {
@@ -145,7 +144,6 @@ var ExplorationEditorSettingsTab = function() {
       'Exploration Objective input', explorationObjectiveInput);
     await action.setValue(
       'Exploration Objective input', explorationObjectiveInput, objective);
-    await action.click('Neutral element', neutralElement);
   };
 
   this.setTitle = async function(title) {
