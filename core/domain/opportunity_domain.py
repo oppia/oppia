@@ -218,10 +218,6 @@ class ExplorationOpportunitySummary:
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)
 
-        for language_code, count in self.translation_counts.items():
-            if self.content_count == count:
-                allowed_language_codes.remove(language_code)
-
         if expected_set_of_all_languages != set(allowed_language_codes):
             raise utils.ValidationError(
                 'Expected set of all languages available in '

@@ -2189,15 +2189,16 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
     def test_get_image_filenames_from_exploration(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
+        exploration.add_states(['state1', 'state2', 'state3'])
+        state1 = exploration.states['state1']
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        exploration.add_states(['state1', 'state2', 'state3'])
-        state1 = exploration.states['state1']
         state2 = exploration.states['state2']
         state3 = exploration.states['state3']
         content1_dict: state_domain.SubtitledHtmlDict = {
-            'content_id': 'content_0',
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             'html': (
                 '<blockquote>Hello, this is state1</blockquote>'
                 '<oppia-noninteractive-image filepath-with-value='
@@ -2206,19 +2207,27 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 '</oppia-noninteractive-image>')
         }
         content2_dict: state_domain.SubtitledHtmlDict = {
-            'content_id': 'content_0',
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             'html': '<pre>Hello, this is state2</pre>'
         }
         content3_dict: state_domain.SubtitledHtmlDict = {
-            'content_id': 'content_0',
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             'html': '<p>Hello, this is state3</p>'
         }
         state1.update_content(
             state_domain.SubtitledHtml.from_dict(content1_dict))
+        state1.recorded_voiceovers.add_content_id_for_voiceover(
+            state1.content.content_id)
         state2.update_content(
             state_domain.SubtitledHtml.from_dict(content2_dict))
+        state2.recorded_voiceovers.add_content_id_for_voiceover(
+            state2.content.content_id)
         state3.update_content(
             state_domain.SubtitledHtml.from_dict(content3_dict))
+        state3.recorded_voiceovers.add_content_id_for_voiceover(
+            state3.content.content_id)
 
         self.set_interaction_for_state(
             state1, 'ImageClickInput', content_id_generator)
@@ -2249,7 +2258,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             str, Dict[str, Union[List[Dict[str, str]], bool]]
         ] = {
             'choices': {'value': [{
-                'content_id': 'ca_choices_0',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.CUSTOMIZATION_ARG,
+                    extra_prefix='choices'),
                 'html': (
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -2258,7 +2269,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
                 )
             }, {
-                'content_id': 'ca_choices_1',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.CUSTOMIZATION_ARG,
+                    extra_prefix='choices'),
                 'html': (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -2273,7 +2286,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             str, Dict[str, Union[List[Dict[str, str]], int]]
         ] = {
             'choices': {'value': [{
-                'content_id': 'ca_choices_0',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.CUSTOMIZATION_ARG,
+                    extra_prefix='choices'),
                 'html': (
                     '<p>This is value1 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -2282,7 +2297,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }, {
-                'content_id': 'ca_choices_1',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.CUSTOMIZATION_ARG,
+                    extra_prefix='choices'),
                 'html': (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -2291,7 +2308,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }, {
-                'content_id': 'ca_choices_2',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.CUSTOMIZATION_ARG,
+                    extra_prefix='choices'),
                 'html': (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -2309,15 +2328,18 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
         default_outcome1 = state_domain.Outcome(
             'state2', None, state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for state1</p>'),
-            False, [], None, None
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME),
+                '<p>Default outcome for state1</p>'
+            ), False, [], None, None
         )
         state1.update_interaction_default_outcome(default_outcome1)
 
         hint_list2 = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1',
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     (
                         '<p>Hello, this is html1 for state2</p>'
                         '<oppia-noninteractive-image filepath-with-value="'
@@ -2329,7 +2351,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             ),
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>Hello, this is html2 for state2</p>')
             ),
         ]
         state2.update_interaction_hints(hint_list2)
@@ -2337,7 +2361,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state_answer_group_list2 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1', None, state_domain.SubtitledHtml(
-                    'feedback_1', (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK), (
                         '<p>Outcome1 for state2</p><oppia-noninteractive-image'
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
@@ -2351,7 +2376,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         ), state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state3', None, state_domain.SubtitledHtml(
-                    'feedback_2', '<p>Outcome2 for state2</p>'),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                    '<p>Outcome2 for state2</p>'),
                 False, [], None, None),
             [
                 state_domain.RuleSpec('Equals', {'x': 0})
@@ -2362,7 +2389,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1', None, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Outcome for state3</p>'),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                    '<p>Outcome for state3</p>'),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -2397,6 +2426,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_answer_groups(state_answer_group_list2)
         state3.update_interaction_answer_groups(state_answer_group_list3)
 
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
         filenames = (
             exp_services.get_image_filenames_from_exploration(exploration))
         expected_output = ['s1ImagePath.png', 's1Content.png', 's2Choice1.png',
@@ -7622,12 +7653,9 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(updated_exp)
         # Ruling out the possibility of None for mypy type checking.
         assert updated_exp is not None
-        param_changes = updated_exp.init_state.param_changes[0].to_dict()
-        self.assertEqual(param_changes['name'], 'myParam')
-        self.assertEqual(param_changes['generator_id'], 'RandomSelector')
-        self.assertEqual(
-            param_changes['customization_args'],
-            {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
+        new_content_dict = updated_exp.init_state.content.to_dict()
+        self.assertEqual(new_content_dict['html'], '<p>New html value</p>')
+        self.assertEqual(new_content_dict['content_id'], 'content_0')
 
 
 class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
@@ -7932,7 +7960,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
-                'content': {
+                'content_0': {
                     'en': {
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
@@ -7940,7 +7968,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                         'duration_secs': 42.43
                     }
                 },
-                'default_outcome': {}
+                'default_outcome_1': {}
             }
         }
         change_list = [exp_domain.ExplorationChange({

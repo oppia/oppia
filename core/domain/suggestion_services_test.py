@@ -2366,6 +2366,16 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
+            exp_services.update_exploration(
+                self.owner_id, exp.id, [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': '<p>A content to translate.</p>'
+                    }
+                })], 'Changes content.')
 
         topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
@@ -2380,12 +2390,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
 
         return {
-            'cmd': 'add_translation',
-            'content_id': 'content',
+            'cmd': 'add_written_translation',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': '<p>A content to translate.</p>',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
 
     def test_update_translation_contribution_stats_without_language_codes(
@@ -2867,6 +2878,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         Returns:
             SuggestionAddQuestion. A new question suggestion.
         """
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change: Dict[
             str,
             Union[str, float, Dict[str, Union[
@@ -2876,11 +2888,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_2'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index
+                ),
                 'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
             'skill_id': skill_id,
@@ -3118,8 +3133,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         topic_id = self._create_topic(skill_id_1, skill_id_2)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_state_data = self._create_valid_question_data(
-            'default_state').to_dict()
+            'default_state', content_id_generator).to_dict()
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -3127,9 +3143,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
         suggestion_services.update_question_suggestion(
-            initial_suggestion.suggestion_id, 0.6, question_state_data)
+            initial_suggestion.suggestion_id, 0.6, question_state_data,
+            content_id_generator.next_content_id_index)
         suggestion_services.update_question_suggestion(
-            latest_suggestion.suggestion_id, 0.6, question_state_data)
+            latest_suggestion.suggestion_id, 0.6, question_state_data,
+            content_id_generator.next_content_id_index)
 
         # Actual action to update stats when reviewing.
         suggestion_services.update_question_review_stats(

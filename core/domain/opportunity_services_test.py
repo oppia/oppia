@@ -22,7 +22,7 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
+from core.domain import exp_domain, exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -389,10 +389,16 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 1)
+        self.assertEqual(translation_opportunities[0].content_count, 0)
 
+        exp = exp_fetchers.get_exploration_by_id('0')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exp.next_content_id_index)
         answer_group_dict_inputs_value: Dict[str, Union[str, List[str]]] = {
-            'contentId': 'rule_input_4',
+            'contentId': content_id_generator.generate(
+                translation_domain.ContentType.RULE,
+                extra_prefix='input'
+            ),
             'normalizedStrSet': ['Test']
         }
 
@@ -401,7 +407,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
                 'feedback': {
-                    'content_id': 'feedback_1',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK
+                    ),
                     'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
@@ -422,7 +430,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         hints_list = []
         hints_list.append({
             'hint_content': {
-                'content_id': 'hint_1',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.HINT
+                ),
                 'html': '<p>hint one</p>'
             },
         })
@@ -431,7 +441,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.SOLUTION
+                ),
                 'html': '<p>hello_world is a string</p>'
             },
         }
@@ -451,7 +463,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate(
+                                    translation_domain
+                                    .ContentType.CUSTOMIZATION_ARG,
+                                    extra_prefix='placeholder'
+                                ),
                                 'unicode_str': ''
                             }
                         },
@@ -483,7 +499,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 6)
+        self.assertEqual(translation_opportunities[0].content_count, 4)
 
     def test_completing_translation_removes_language_from_incomplete_language_codes( # pylint: disable=line-too-long
         self
@@ -505,11 +521,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
-        change_list_solution_dict: state_domain.SubtitledHtmlDict = {
-            'html': '<p><strong>Test content</strong></p>',
-            'content_id': 'content_0',
-        }
-
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -519,34 +530,30 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content_0',
                 }
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'End State',
-                'property_name': 'content',
-                'new_value': {
-                    'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content_3',
-                }
             })
         ]
         exp_services.update_exploration(
             self.owner_id, '0', change_list, 'commit message')
+
+        (
+            opportunity_services
+            .update_translation_opportunity_with_accepted_suggestion(
+                '0', 'hi'
+            )
+        )
 
         # get_translation_opportunities should no longer return the opportunity
         # after translation completion.
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
-        self.assertEqual(len(translation_opportunities), 1)
+        self.assertEqual(len(translation_opportunities), 0)
 
         # The translation opportunity should be returned after marking a
         # translation as stale.
         translation_needs_update_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
-            'state_name': 'Introduction',
-            'content_id': 'content_0',
-            'language_code': 'hi'
+            'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+            'content_id': 'content_0'
         })]
         exp_services.update_exploration(
             self.owner_id, '0', translation_needs_update_change_list,
