@@ -40,7 +40,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import question_models
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):
@@ -500,7 +500,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_models.QuestionSummaryModel.get(self.question_id))
         question_summary_model.delete()
         question_summary_model_with_none = (
-            question_models.QuestionSummaryModel.get(self.question_id, False))
+            question_models.QuestionSummaryModel.get(
+                self.question_id, strict=False
+            )
+        )
         self.assertIsNone(question_summary_model_with_none)
 
         question_services.delete_question(
@@ -541,9 +544,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         }
         change_list = [question_domain.QuestionChange(change_dict)]
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected a commit message, received none.'):
             question_services.update_question(
@@ -608,9 +611,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         assert_raises_context_manager = self.assertRaisesRegex(
             Exception, '\'str\' object has no attribute \'cmd\'')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         with logging_swap, assert_raises_context_manager:
             question_services.update_question(
                 self.editor_id, self.question_id, 'invalid_change_list',  # type: ignore[arg-type]

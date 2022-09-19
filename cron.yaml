@@ -26,6 +26,9 @@ cron:
 - description: weekly exploration search rank computation
   url: /cron/explorations/search_rank
   schedule: every wednesday 9:00
+- description: weekly blog post search computation
+  url: /cron/blog_posts/search_rank
+  schedule: every thursday 9:00
 - description: daily job to populate translation contribution stats
   url: /cron/suggestions/translation_contribution_stats
   schedule: every day 16:00

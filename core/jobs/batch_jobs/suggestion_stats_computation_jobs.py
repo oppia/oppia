@@ -48,7 +48,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (opportunity_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.opportunity, models.NAMES.suggestion
+    models.Names.OPPORTUNITY, models.Names.SUGGESTION
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -186,7 +186,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
 
         for suggestion in suggestions:
             key = (
-                suggestion_models.TranslationContributionStatsModel.generate_id(
+                suggestion_models
+                .TranslationContributionStatsModel.construct_id(
                     suggestion.language_code, suggestion.author_id, topic_id))
             try:
                 change = suggestion.change
@@ -269,10 +270,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             return translation_contributions_stats_model
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences of
-# stubs in Typeshed, MyPy assuming CombineFn class is of type Any. Thus to
-# avoid MyPy's error (Class cannot subclass 'CombineFn' (has type 'Any')),
-# we added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to assume
+# that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
+# subclass 'CombineFn' (has type 'Any')), we added an ignore here.
 class CombineStats(beam.CombineFn):  # type: ignore[misc]
     """CombineFn for combining the stats."""
 

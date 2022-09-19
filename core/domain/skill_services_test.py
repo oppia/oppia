@@ -33,7 +33,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
 from typing import Dict, List, Union
 from typing_extensions import Final
 
@@ -43,7 +42,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
 (skill_models, question_models) = models.Registry.import_models([
-    models.NAMES.skill, models.NAMES.question
+    models.Names.SKILL, models.Names.QUESTION
 ])
 
 SuggestionChangeDictType = Dict[
@@ -111,9 +110,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_contents,
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_apply_change_list_with_invalid_property_name(self) -> None:
         class MockSkillChange:
             def __init__(self, cmd: str, property_name: str) -> None:
@@ -124,6 +120,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'invalid_property_name')]
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(Exception, 'Invalid change dict.'):
             skill_services.apply_change_list(
                 self.SKILL_ID, invalid_skill_change_list, self.user_id_a)  # type: ignore[arg-type]
@@ -913,7 +912,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_models.SkillSummaryModel.get(self.SKILL_ID))
         skill_summary_model.delete()
         skill_summary_model_with_none = (
-            skill_models.SkillSummaryModel.get(self.SKILL_ID, False))
+            skill_models.SkillSummaryModel.get(self.SKILL_ID, strict=False))
         self.assertIsNone(skill_summary_model_with_none)
 
         skill_services.delete_skill(
@@ -1247,14 +1246,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_skill_dict['version'], 2)
 
         # Delete version and check that the two dicts are the same.
-        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
+        # TypedDict, thus we add an ignore.
         del orig_skill_dict['version']  # type: ignore[misc]
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
+        # TypedDict, thus we add an ignore.
         del new_skill_dict['version']  # type: ignore[misc]
         self.assertEqual(orig_skill_dict, new_skill_dict)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_cannot_update_skill_with_invalid_change_list(self) -> None:
         observed_log_messages = []
 
@@ -1266,6 +1265,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         assert_raises_context_manager = self.assertRaisesRegex(
             Exception, '\'str\' object has no attribute \'cmd\'')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         with logging_swap, assert_raises_context_manager:
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, 'invalid_change_list',  # type: ignore[arg-type]
@@ -1470,7 +1472,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
-        topic_services.save_new_topic(owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(owner_id, topic)
 
         self.assertEqual(
             skill_services.get_topic_names_with_given_skill_in_diagnostic_test(
