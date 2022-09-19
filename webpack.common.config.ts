@@ -21,9 +21,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WebpackRTLPlugin = require('webpack-rtl-plugin');
 var path = require('path');
-const webpack = require('webpack');
+var webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
-const analyticsConstants = require('./assets/analytics-constants.json');
+var analyticsConstants = require('./assets/analytics-constants.json');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
