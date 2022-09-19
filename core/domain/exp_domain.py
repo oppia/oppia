@@ -1631,6 +1631,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if not self.states:
             raise utils.ValidationError('This exploration has no states.')
         for state_name, state in self.states.items():
+            for group_idx, group in enumerate(state.interaction.answer_groups):
+                # Check if tagged_skill_misconception_id is None.
+                if group.tagged_skill_misconception_id is not None:
+                    raise utils.ValidationError(
+                        'The outcome for answer group %s in state %s has '
+                        'tagged skill misconception id, which '
+                        'should be None' % (str(group_idx + 1), state_name)
+                    )
+
+                # Check if the answergroup has atleast one rulespec.
+                if len(group.rule_specs) == 0:
+                    raise utils.ValidationError(
+                        'The outcome for answer group %s in state %s has '
+                        'no rule specs, atleast one is required' % (
+                            str(group_idx + 1), state_name)
+                    )
             self._validate_state_name(state_name)
             state.validate(
                 self.param_specs,
@@ -1825,14 +1841,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             'The parameter %s was used in an answer group, '
                             'but it does not exist in this exploration'
                             % param_change.name)
-
-                # Check if the answergroup has atleast one rulespec.
-                if len(group.rule_specs) == 0:
-                    raise utils.ValidationError(
-                        'The outcome for answer group %s in state %s has '
-                        'no rule specs, atleast one is required' % (
-                            str(group_idx + 1), state_name)
-                    )
 
         if strict:
             warnings_list = []

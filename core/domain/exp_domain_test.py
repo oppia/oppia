@@ -1492,6 +1492,28 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
         exploration.delete_state(new_state_name)
 
+        # # Test that `tagged_skill_misconception_id` should be None.
+        # interaction.answer_groups[0].tagged_skill_misconception_id = 'Not None'
+        # self._assert_validation_error(
+        #     exploration,
+        #     'The outcome for answer group 1 in state initname has '
+        #     'tagged skill misconception id, which '
+        #     'should be None'
+        # )
+        # interaction.answer_groups[0].tagged_skill_misconception_id = None
+        # # exploration.validate()
+
+        # Test answer group should have atleast one rule spec.
+        original_rule_specs = interaction.answer_groups[0].rule_specs
+        interaction.answer_groups[0].rule_specs = []
+        self._assert_validation_error(
+            exploration,
+            'The outcome for answer group 1 in state initname has '
+            'no rule specs, atleast one is required'
+        )
+        interaction.answer_groups[0].rule_specs = original_rule_specs
+        exploration.validate()
+
         # Validate InteractionInstance.
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
