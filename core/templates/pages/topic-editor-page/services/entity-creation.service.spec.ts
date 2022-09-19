@@ -37,8 +37,7 @@ class MockNgbModal {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Entity creation service', () => {
+describe('Entity creation service', () => {
   let topic: Topic;
   let topicObjectFactory: TopicObjectFactory;
   let topicEditorStateService: TopicEditorStateService;
