@@ -55,12 +55,11 @@ def run_beam_job(
     Raises:
         ValueError. Both name and class of the job are not specified.
     """
-    if job_class is None and job_name is None:
-        raise ValueError('Must specify the job class or name to run')
     if job_class is None:
-        # MyPy is wrong. We know job_name is not None in this branch because if
-        # it were, the ValueError above would have been raised.
-        job_class = jobs_registry.get_job_class_by_name(job_name) # type: ignore[arg-type]
+        if job_name:
+            job_class = jobs_registry.get_job_class_by_name(job_name)
+        else:
+            raise ValueError('Must specify the job class or name to run')
 
     run_synchronously = constants.EMULATOR_MODE
     run_model = jobs_manager.run_job(job_class, run_synchronously)
