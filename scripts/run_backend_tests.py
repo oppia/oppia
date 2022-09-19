@@ -443,7 +443,7 @@ def main(args=None):
             # a test file has been provided or has '_test.' in it which means
             # a path to a particular test or a method in a test file has been
             # provided. If the path provided does not exist, error is raised
-            # when we try to execute the tests. 
+            # when we try to execute the tests.
             if (
                     parsed_args.test_target.endswith('_test')
                     or '_test.' in parsed_args.test_target

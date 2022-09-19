@@ -660,18 +660,42 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         self.assertIn('(2 ERRORS, 0 FAILURES)', self.print_arr)
 
+    def test_individual_test_in_test_file_is_run_successfully(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
+        swap_check_coverage = self.swap(
+            run_backend_tests, 'check_coverage',
+            lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
+
+        args = [
+            '--test_target',
+            'scripts.new_test_file_test.NewTestFileTests.test_for_something',
+            '--generate_coverage_report'
+        ]
+        with self.swap_fix_third_party_imports, self.swap_execute_task:
+            with swap_check_coverage, self.swap_redis_server, self.print_swap:
+                with self.swap_cloud_datastore_emulator, swap_check_results:
+                    with self.swap_check_call:
+                        run_backend_tests.main(args=args) # type: ignore[no-untyped-call]
+
+        self.assertIn('All tests passed.', self.print_arr)
+        self.assertIn('Done!', self.print_arr)
+
     def test_all_test_pass_successfully_with_full_coverage(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
-        swapcheck_coverage = self.swap(
+        swap_check_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
         with self.swap_fix_third_party_imports, self.swap_execute_task:
-            with swapcheck_coverage, self.swap_redis_server, self.print_swap:
+            with swap_check_coverage, self.swap_redis_server, self.print_swap:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
                     with self.swap_check_call:
                         run_backend_tests.main( # type: ignore[no-untyped-call]
