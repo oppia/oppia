@@ -101,16 +101,12 @@ export class SkillEditorMainTabComponent implements OnInit {
   }
 
   hasLoadedSkill(): boolean {
-    this.skill = this.skillEditorStateService.getSkill();
     return this.skillEditorStateService.hasLoadedSkill();
   }
 
   ngOnInit(): void {
-    this.selectedTopic = null;
-    this.assignedSkillTopicData = null;
-    this.topicName = null;
-    this.subtopicName = null;
     this.pageTitleService.setNavbarTitleForMobileView('Skill Editor');
+    this.skill = this.skillEditorStateService.getSkill();
     // To ensure that the focus event function executes only after
     // all the functions in the main thread have executed,
     // $timeout is required.
