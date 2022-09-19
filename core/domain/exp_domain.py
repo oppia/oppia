@@ -2674,6 +2674,35 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v52_dict_to_v53_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from version 52 to 53. Version 53 adds
+        catchMisspellings customization arg to TextInput
+        interaction which allows creators to detect misspellings.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'TextInput':
+                customization_args = state_dict['interaction'][
+                    'customization_args']
+                customization_args.update({
+                    'catchMisspellings': {
+                        'value': False
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -2713,7 +2742,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 57
+    CURRENT_EXP_SCHEMA_VERSION = 58
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2987,6 +3016,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v57_dict_to_v58_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v57 exploration dict into a v58 exploration dict.
+        Version 58 adds a new customization arg to TextInput allowing
+        creators to catch misspellings.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v57.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v58.
+        """
+        exploration_dict['schema_version'] = 58
+
+        exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 53
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -3082,6 +3135,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v56_dict_to_v57_dict(
                 exploration_dict)
             exploration_schema_version = 57
+
+        if exploration_schema_version == 57:
+            exploration_dict = cls._convert_v57_dict_to_v58_dict(
+                exploration_dict)
+            exploration_schema_version = 58
 
         return exploration_dict
 
