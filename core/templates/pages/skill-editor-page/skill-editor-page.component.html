@@ -12,7 +12,8 @@
              placement="bottom"
              class="e2e-test-main-tab">
             <i class="fas fa-pen navbar-tab-icon"
-               [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
+               [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}">
+            </i>
           </a>
           <div [hidden]="!getWarningsCount()"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -40,7 +41,8 @@
              placement="bottom"
              aria-label="Questions">
             <i class="fas fa-book-open navbar-tab-icon"
-               [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'questions'}"></i>
+               [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'questions'}">
+            </i>
           </a>
         </li>
         <li class="navbar-tab icon nav-list-item"

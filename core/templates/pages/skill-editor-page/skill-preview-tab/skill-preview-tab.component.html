@@ -13,8 +13,9 @@
               <select [(ngModel)]="interactionFilter"
                       class="form-control"
                       (change)="applyFilters()">
-                <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS"
-                        [value]="interaction">{{ interaction }}</option>
+                <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS" [value]="interaction">
+                  {{ interaction }}
+                </option>
               </select>
             </div>
             <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item">
