@@ -113,6 +113,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'contributorDashboard',
     'coreEditorAndPlayerFeatures',
     'creatorDashboard',
+    'extensions',
     'embedding',
     'explorationFeedbackTab',
     'explorationHistoryTab',

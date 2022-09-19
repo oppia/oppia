@@ -136,12 +136,6 @@ describe('Embedding', function() {
     }];
 
     var playCountingExploration = async function(version) {
-      // Protractor's waitForAngularEnabled does not work well inside
-      // iframes. see: https://github.com/angular/protractor/issues/4678
-      // Current, work-around is to use browser.pause() before executing
-      // functions that require angular to be present inside the iframe.
-      // eslint-disable-next-line oppia/e2e-practices
-      await browser.pause(5000);
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText((
@@ -272,12 +266,6 @@ describe('Embedding', function() {
 
         await browser.switchToFrame(await $(
           '.e2e-test-embedded-exploration > iframe'));
-        // Protractor's waitForAngularEnabled does not work well inside
-        // iframes. see: https://github.com/angular/protractor/issues/4678
-        // Current, work-around is to use browser.pause() before executing
-        // functions that require angular to be present inside the iframe.
-        // eslint-disable-next-line oppia/e2e-practices
-        await browser.pause(5000);
         await waitFor.pageToFullyLoad();
 
         expect(await (await $(

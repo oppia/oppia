@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ describe('rich-text components', function() {
 
   it('should display correctly', async function() {
     await users.createAndLoginUser(
-      'user@richTextComponents.com', 'userRichTextComponents');
+      'user@richTextComponents.com', 'userRichTextComponent');
 
     await workflow.createExploration(true);
 
@@ -223,13 +223,13 @@ describe('Interactions', function() {
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'), true);
     var graphDictForInput = {
-      vertices: [[277, 77], [248, 179], [405, 144]]
+      vertices: [[-10, -50], [-39, 72], [118, 17]]
     };
     await explorationEditorMainTab.setInteraction(
       'GraphInput', graphDictForInput);
     var graphDictForResponse = {
       edges: [[0, 1], [1, 2], [0, 2]],
-      vertices: [[277, 77], [248, 179], [405, 144]]
+      vertices: [[-10, -50], [-39, 72], [118, 17]]
     };
     await explorationEditorMainTab.addResponse(
       'GraphInput', await forms.toRichText('Good job!'), 'MathExp',
@@ -310,13 +310,13 @@ describe('Interactions', function() {
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'), true);
     var graphDictForInput = {
-      vertices: [[277, 77], [248, 179], [405, 144]]
+      vertices: [[-10, -50], [-39, 72], [118, 17]]
     };
     await explorationEditorMainTab.setInteraction(
       'GraphInput', graphDictForInput);
     var graphDictForResponse = {
       edges: [[0, 1], [1, 2], [0, 2]],
-      vertices: [[277, 77], [248, 179], [405, 144]]
+      vertices: [[-10, -50], [-39, 72], [118, 17]]
     };
     await explorationEditorMainTab.addResponse(
       'GraphInput', await forms.toRichText('Good job!'), 'CodeRepl',

@@ -195,24 +195,11 @@ var urlRedirection = async function(url) {
 var numberOfElementsToBe = async function(
     elementSelector, elementName, number, childSelector = null) {
   await browser.waitUntil(async function() {
-    var element = childSelector ? await $(elementSelector).$$(
+    var element = childSelector ? await elementSelector.$$(
       childSelector) : await $$(elementSelector);
     return element.length === number;
   }, <div class='one two'></div>
   $('.one') $('.two')
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +
-    new Error().stack + '\n'
-  });
-};
-
-var numberOfChainedElementsToBe = async function(
-    parentSelector, childSelector, elementName, number) {
-  await browser.waitUntil(async function() {
-    var element = await $(parentSelector).$$(childSelector);
-    return element.length === number;
-  },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
     timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +
@@ -306,5 +293,4 @@ exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
 exports.numberOfElementsToBe = numberOfElementsToBe;
-exports.numberOfChainedElementsToBe = numberOfChainedElementsToBe;
 exports.clientSideRedirection = clientSideRedirection;

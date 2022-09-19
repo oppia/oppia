@@ -11,24 +11,10 @@ var args = process.argv;
 // is passed as 7th argument else it is passed as 6th argument.
 // eslint-disable-next-line eqeqeq
 var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
-var service = null;
+
 const drivers = {
   chrome: { version: chromeVersion },
 };
-var chromedriverPath =
-  './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
-
-if (process.env.GITHUB_ACTIONS) {
-  service = ['selenium-standalone', {
-    logPath: 'logs',
-    installArgs: { drivers },
-    args: { drivers }
-  }];
-} else {
-  service = ['chromedriver', {
-    chromedriverCustomPath: chromedriverPath
-  }];
-}
 
 // If video recorder is not running the ffmpeg process will be null.
 var ffmpegProcess = null;
@@ -263,7 +249,7 @@ exports.config = {
   // Define all options that are relevant for the WebdriverIO instance here
   //
   // Level of logging verbosity: trace | debug | info | warn | error | silent.
-  logLevel: 'error',
+  logLevel: 'warn',
 
   // Set a base URL in order to shorten url command calls. If your `url`
   // parameter starts with `/`, the base url gets prepended, not including
