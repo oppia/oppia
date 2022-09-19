@@ -29,7 +29,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummary domain."""
 
     def setUp(self) -> None:
-        super(ExplorationOpportunitySummaryDomainTests, self).setUp()
+        super().setUp()
         self.mock_supported_audio_languages = [{
             'id': 'en'
         }, {
@@ -104,7 +104,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             # Object with content_count as int passes the validation check.
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.content_count = -5
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected content_count to be a non-negative integer, '
                 'received -5'
@@ -138,7 +138,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 set(need_voice_artist_languages).isdisjoint(
                     assigned_voice_artist_languages))
 
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 re.escape(
                     'Expected voice_artist "needed" and "assigned" list of '
@@ -161,7 +161,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'invalid_language_code': 4
             }
             # Object with chapter_id as boolean fails the validation check.
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Invalid language_code: invalid_language_code'
             )
@@ -181,7 +181,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             }
             # Object with invalid language_code in translation_counts fails the
             # validation.
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected count for language_code hi to be a non-negative '
                 'integer, received -5'
@@ -203,7 +203,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             }
             # Object with invalid count value i.e, more than content_count
             # in translation_counts fails the validation.
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected translation count for language_code hi to be '
                 r'less than or equal to content_count\(5\), received 8'
@@ -223,7 +223,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'invalid_language_code']
             # Object with invalid language code inside
             # incomplete_translation_language_codes fails the validation.
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Invalid language_code: invalid_language_code'
             )
@@ -240,7 +240,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'invalid_language_code']
             # Object with invalid language code inside
             # language_codes_needing_voice_artists fails the validation.
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Invalid language_code: invalid_language_code'
             )
@@ -260,7 +260,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'invalid_language_code']
             # Object with invalid language code inside
             # language_codes_with_assigned_voice_artists fails the validation.
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Invalid language_code: invalid_language_code'
             )
@@ -277,7 +277,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.language_codes_needing_voice_artists = [
                 'en']
-            self._assert_validation_error( # type: ignore[no-untyped-call]
+            self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 re.escape(
                     'Expected set of all languages available in '
@@ -292,7 +292,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
     """Tests for the SkillOpportunity domain object."""
 
     def setUp(self) -> None:
-        super(SkillOpportunityDomainTest, self).setUp()
+        super().setUp()
         valid_skill_opportunity_dict: (
             opportunity_domain.SkillOpportunityDict
         ) = {
@@ -330,7 +330,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         # Object with question_count as int passes the validation check.
         self.valid_skill_opportunity.validate()
         self.valid_skill_opportunity.question_count = -5
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.valid_skill_opportunity,
             'Expected question_count to be a non-negative integer, '
             'received -5'

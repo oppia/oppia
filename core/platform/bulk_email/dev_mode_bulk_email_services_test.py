@@ -21,25 +21,20 @@ import logging
 from core.platform.bulk_email import dev_mode_bulk_email_services
 from core.tests import test_utils
 
-from typing import Any
-
 
 class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
     """Tests for mailchimp services."""
 
     def test_add_or_update_user_status(self) -> None:
         observed_log_messages = []
-        # We are using Any here because the following function mocks
-        # logging.info methods, whose stubs denote the type of args as Any.
-        # https://github.com/python/typeshed/blob/837b57fdd1a814237ef4b15f6ce19c701303aebb/stdlib/logging/__init__.pyi#L76
-        def _mock_logging_function(msg: str, *args: Any) -> None:
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_bulk_email_services.add_or_update_user_status(
                 'test@example.com', True)
-            self.assertItemsEqual( # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 observed_log_messages,
                 ['Updated status of email ID test@example.com\'s bulk email '
                  'preference in the service provider\'s db to True. Cannot '
@@ -48,7 +43,7 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages = []
             dev_mode_bulk_email_services.add_or_update_user_status(
                 'test@example.com', False)
-            self.assertItemsEqual( # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 observed_log_messages,
                 ['Updated status of email ID test@example.com\'s bulk email '
                  'preference in the service provider\'s db to False. Cannot '
@@ -56,17 +51,14 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
 
     def test_permanently_delete_user(self) -> None:
         observed_log_messages = []
-        # We are using Any here because the following function mocks
-        # logging.info methods, whose stubs denote the type of args as Any.
-        # https://github.com/python/typeshed/blob/837b57fdd1a814237ef4b15f6ce19c701303aebb/stdlib/logging/__init__.pyi#L76
-        def _mock_logging_function(msg: str, *args: Any) -> None:
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_bulk_email_services.permanently_delete_user_from_list(
                 'test@example.com')
-            self.assertItemsEqual( # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 observed_log_messages,
                 ['Email ID test@example.com permanently deleted from bulk '
                  'email provider\'s db. Cannot access API, since this is a '

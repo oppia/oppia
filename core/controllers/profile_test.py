@@ -33,7 +33,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class ProfilePageTests(test_utils.GenericTestBase):
@@ -328,7 +328,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE = 'Exploration title'
 
     def setUp(self):
-        super(PreferencesHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -955,7 +955,7 @@ class SignupTests(test_utils.GenericTestBase):
 class DeleteAccountPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(DeleteAccountPageTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
@@ -967,7 +967,7 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
 class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(BulkEmailWebhookEndpointTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.swap_secret = self.swap(
@@ -1051,7 +1051,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
 class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(DeleteAccountHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
@@ -1065,7 +1065,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
     GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
 
     def setUp(self):
-        super(ExportAccountHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
@@ -1256,7 +1256,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(SiteLanguageHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 

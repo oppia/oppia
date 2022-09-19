@@ -19,6 +19,7 @@
 import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { CustomSchema, SchemaDefaultValue } from 'services/schema-default-value.service';
 
 @Component({
   selector: 'schema-based-custom-editor',
@@ -38,12 +39,15 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SchemaBasedCustomEditorComponent
 implements ControlValueAccessor, Validator {
-  @Input() localValue: unknown;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() localValue!: SchemaDefaultValue;
+  @Input() schema!: CustomSchema;
+  @Input() form!: AbstractControl;
   @Output() localValueChange = new EventEmitter();
-  @Input() schema;
-  @Input() form;
-  onChange: (_: unknown) => void = () => {};
-  onTouch: () => void;
+  onChange: (_: SchemaDefaultValue) => void = () => {};
+  onTouch: () => void = () => {};
   onValidatorChange: () => void = () => {};
 
   // Implemented as a part of ControlValueAccessor interface.
@@ -52,12 +56,12 @@ implements ControlValueAccessor, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (_: unknown) => void): void {
+  registerOnChange(fn: (_: SchemaDefaultValue) => void): void {
     this.onChange = fn;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(obj: unknown): void {
+  writeValue(obj: SchemaDefaultValue): void {
     if (this.localValue === obj) {
       return;
     }
@@ -74,7 +78,7 @@ implements ControlValueAccessor, Validator {
     return {};
   }
 
-  updateValue(value: unknown): void {
+  updateValue(value: SchemaDefaultValue): void {
     this.localValueChange.emit(value);
     this.localValue = value;
     this.onChange(value);

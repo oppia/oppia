@@ -37,14 +37,14 @@ from core.tests import test_utils
 from proto_files import text_classifier_pb2
 from proto_files import training_job_response_payload_pb2
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
 
 
 class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
     """Test the handler for storing job result of training job."""
 
     def setUp(self):
-        super(TrainedClassifierHandlerTests, self).setUp()
+        super().setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
@@ -518,7 +518,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
     """Test the handler for fetching next training job."""
 
     def setUp(self):
-        super(NextJobHandlerTest, self).setUp()
+        super().setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'

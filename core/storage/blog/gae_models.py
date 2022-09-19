@@ -30,7 +30,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 (base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user])
+    models.Names.BASE_MODEL, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -76,7 +77,7 @@ class BlogPostModel(base_models.BaseModel):
     # post is a draft.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
-    # if the blog has never been published.
+    # if the blog post is not currently published.
     published_on = (
         datastore_services.DateTimeProperty(indexed=True))
 
@@ -249,7 +250,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     # post is a draft.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
-    # if the blog post has never been published.
+    # if the blog post is currently not published.
     published_on = (datastore_services.DateTimeProperty(indexed=True))
 
     @staticmethod

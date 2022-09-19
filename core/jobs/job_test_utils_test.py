@@ -31,7 +31,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
@@ -39,14 +39,14 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
     def test_assert_pcoll_empty_raises_immediately(self) -> None:
         # NOTE: Arbitrary operations that produce a non-empty PCollection.
         output = self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
-        with self.assertRaisesRegex(AssertionError, 'failed'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(AssertionError, 'failed'):
             self.assert_pcoll_empty(output)
 
     def test_assert_pcoll_equal_raises_immediately(self) -> None:
         # NOTE: Arbitrary operations that produce an empty PCollection.
         output = self.pipeline | beam.Create([]) | beam.Map(lambda x: x)
 
-        with self.assertRaisesRegex(AssertionError, 'failed'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(AssertionError, 'failed'):
             self.assert_pcoll_equal(output, [123])
 
     def test_assert_pcoll_empty_raises_runtime_error_when_called_twice(
@@ -57,9 +57,10 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_empty(output)
 
-        self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            RuntimeError, 'must be run in the pipeline context',
-            lambda: self.assert_pcoll_empty(output))
+        with self.assertRaisesRegex(
+            RuntimeError, 'must be run in the pipeline context'
+        ):
+            self.assert_pcoll_empty(output)
 
     def test_assert_pcoll_equal_raises_runtime_error_when_called_twice(
         self
@@ -69,9 +70,10 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [123])
 
-        self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            RuntimeError, 'must be run in the pipeline context',
-            lambda: self.assert_pcoll_equal(output, [123]))
+        with self.assertRaisesRegex(
+            RuntimeError, 'must be run in the pipeline context'
+        ):
+            self.assert_pcoll_equal(output, [123])
 
     def test_create_model_sets_date_properties(self) -> None:
         model = self.create_model(base_models.BaseModel)
@@ -86,11 +88,17 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
 
     def tearDown(self) -> None:
         self.JOB_CLASS.reset_mock()
-        super(JobTestBaseTests, self).tearDown()
+        super().tearDown()
 
     def test_run_job(self) -> None:
         self.run_job()
 
+        # TODO(#16049): Here we use MyPy ignore because the method
+        # 'assert_called' is accessed on 'run' function and currently
+        # MyPy does not support for extra attributes on functions of
+        # Callable types. So, once this 'assert_called' method is
+        # replaced with some more standard method, we can remove this
+        # todo from here.
         self.job.run.assert_called() # type: ignore[attr-defined]
 
     def test_put_multi(self) -> None:
@@ -104,6 +112,12 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
             self.assertIsNotNone(model)
 
     def test_job_output_is(self) -> None:
+        # TODO(#16049): Here we use MyPy ignore because the attribute
+        # 'return_value' is accessed on 'run' function and currently
+        # MyPy does not support for extra attributes on functions of
+        # Callable types. So, once this 'return_value' attribute is
+        # replaced with some more standard method, we can remove this
+        # todo from here.
         self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce a non-empty PCollection.
             self.pipeline | beam.Create([123]) | beam.Map(lambda x: x))
@@ -111,6 +125,12 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([123])
 
     def test_job_output_is_empty(self) -> None:
+        # TODO(#16049): Here we use MyPy ignore because the attribute
+        # 'return_value' is accessed on 'run' function and currently
+        # MyPy does not support for extra attributes on functions of
+        # Callable types. So, once this 'return_value' attribute is
+        # replaced with some more standard method, we can remove this
+        # todo from here.
         self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce an empty PCollection.
             self.pipeline | beam.Create([]) | beam.Map(lambda x: x))
@@ -212,6 +232,6 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
         self.assert_error_is_decorated(actual_msg, actual_msg)
 
     def test_does_not_decorate_message_with_non_beam_type(self) -> None:
-        with self.assertRaisesRegex(Exception, 'Error coming through!'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Error coming through!'):
             with job_test_utils.decorate_beam_errors():
                 raise Exception('Error coming through!')

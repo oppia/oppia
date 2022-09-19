@@ -25,8 +25,11 @@ import { PlaythroughIssue } from 'domain/statistics/PlaythroughIssueObjectFactor
   providedIn: 'root'
 })
 export class PlaythroughIssuesService {
-  explorationId: string = null;
-  explorationVersion: number = null;
+  // These properties are initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationId!: string;
+  explorationVersion!: number;
 
   constructor(
     private playthroughIssuesBackendApiService:

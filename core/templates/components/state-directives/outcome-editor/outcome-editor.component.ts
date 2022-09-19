@@ -16,7 +16,7 @@
  * @fileoverview Component for the outcome editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
@@ -27,6 +27,14 @@ import { Subscription } from 'rxjs';
 import { ExternalSaveService } from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+
+
+interface AddOutcomeModalResponse {
+  outcome: Outcome;
+}
 
 @Component({
   selector: 'oppia-outcome-editor',
@@ -37,6 +45,7 @@ export class OutcomeEditorComponent implements OnInit {
   EventEmitter<string[]> = new EventEmitter();
 
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveDestIfStuck: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
@@ -53,16 +62,33 @@ export class OutcomeEditorComponent implements OnInit {
   canAddPrerequisiteSkill: boolean = false;
   correctnessLabelEditorIsOpen: boolean = false;
   destinationEditorIsOpen: boolean = false;
+  destinationIfStuckEditorIsOpen: boolean = false;
   feedbackEditorIsOpen: boolean = false;
+  destIfStuckFeatEnabled: boolean = (
+    AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED);
+
+  onMobile: boolean = false;
+  resizeSubscription!: Subscription;
+  // The value of this variable should match the breapoint used in
+  // outcome-editor.component.html.
+  mobileBreakpoint: number = 500;
 
   constructor(
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
+    private ngbModal: NgbModal,
+    private changeDetectorRef: ChangeDetectorRef,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   isInQuestionMode(): boolean {
     return this.stateEditorService.isInQuestionMode();
+  }
+
+  isFeedbackLengthExceeded(): boolean {
+    // TODO(#13764): Edit this check after appropriate limits are found.
+    return (this.outcome.feedback._html.length > 10000);
   }
 
   isCorrectnessFeedbackEnabled(): boolean {
@@ -100,17 +126,23 @@ export class OutcomeEditorComponent implements OnInit {
         this.cancelThisDestinationEdit();
       }
     }
-  }
 
-  isFeedbackLengthExceeded(): boolean {
-    // TODO(#13764): Edit this check after appropriate limits are found.
-    return (this.outcome.feedback._html.length > 10000);
+    if (this.destinationIfStuckEditorIsOpen) {
+      this.saveThisIfStuckDestination();
+    }
   }
 
   isSelfLoop(outcome: Outcome): boolean {
     return Boolean (
       outcome &&
       outcome.dest === this.stateEditorService.getActiveStateName());
+  }
+
+  isSelfLoopDestStuck(outcome: Outcome): boolean {
+    return Boolean (
+      outcome &&
+      outcome.destIfReallyStuck === (
+        this.stateEditorService.getActiveStateName()));
   }
 
   getCurrentInteractionId(): string {
@@ -135,6 +167,26 @@ export class OutcomeEditorComponent implements OnInit {
     return this.isSelfLoopWithNoFeedback(tmpOutcome);
   }
 
+  openFeedbackEditorModal(): void {
+    if (this.isEditable) {
+      let modalRef = this.ngbModal.open(AddOutcomeModalComponent, {
+        backdrop: 'static',
+      });
+
+      let currentOutcome = cloneDeep(this.outcome);
+      modalRef.componentInstance.outcome = currentOutcome;
+
+      modalRef.result.then((result: AddOutcomeModalResponse): void => {
+        this.outcome = result.outcome;
+        this.saveThisFeedback(true);
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    }
+  }
+
   openFeedbackEditor(): void {
     if (this.isEditable) {
       this.feedbackEditorIsOpen = true;
@@ -144,6 +196,12 @@ export class OutcomeEditorComponent implements OnInit {
   openDestinationEditor(): void {
     if (this.isEditable) {
       this.destinationEditorIsOpen = true;
+    }
+  }
+
+  openDestinationIfStuckEditor(): void {
+    if (this.isEditable) {
+      this.destinationIfStuckEditorIsOpen = true;
     }
   }
 
@@ -187,6 +245,11 @@ export class OutcomeEditorComponent implements OnInit {
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
     if (!this.isSelfLoop(this.outcome)) {
       this.outcome.refresherExplorationId = null;
+    } else {
+      if (this.outcome.labelledAsCorrect) {
+        this.outcome.labelledAsCorrect = false;
+        this.onChangeCorrectnessLabel();
+      }
     }
     this.savedOutcome.refresherExplorationId = (
       this.outcome.refresherExplorationId);
@@ -194,6 +257,14 @@ export class OutcomeEditorComponent implements OnInit {
       this.outcome.missingPrerequisiteSkillId;
 
     this.saveDest.emit(this.savedOutcome);
+  }
+
+  saveThisIfStuckDestination(): void {
+    this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
+    this.destinationIfStuckEditorIsOpen = false;
+    this.savedOutcome.destIfReallyStuck = (
+      cloneDeep(this.outcome.destIfReallyStuck));
+    this.saveDestIfStuck.emit(this.savedOutcome);
   }
 
   onChangeCorrectnessLabel(): void {
@@ -218,6 +289,12 @@ export class OutcomeEditorComponent implements OnInit {
     this.destinationEditorIsOpen = false;
   }
 
+  cancelThisIfStuckDestinationEdit(): void {
+    this.outcome.destIfReallyStuck = (
+      cloneDeep(this.savedOutcome.destIfReallyStuck));
+    this.destinationIfStuckEditorIsOpen = false;
+  }
+
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.externalSaveService.onExternalSave.subscribe(
@@ -235,6 +312,14 @@ export class OutcomeEditorComponent implements OnInit {
     this.destinationEditorIsOpen = false;
     this.correctnessLabelEditorIsOpen = false;
     this.savedOutcome = cloneDeep(this.outcome);
+
+    this.onMobile = (
+      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+      .subscribe(event => {
+        this.onMobile = (
+          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+      });
   }
 
   ngOnDestroy(): void {

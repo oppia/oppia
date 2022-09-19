@@ -36,22 +36,29 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+from typing import Dict, List, Tuple, Union
+from typing_extensions import Final
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class ExplorationChangeTests(test_utils.GenericTestBase):
 
-    def test_exp_change_object_with_missing_cmd(self):
+    def test_exp_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             exp_domain.ExplorationChange({'invalid': 'data'})
 
-    def test_exp_change_object_with_invalid_cmd(self):
+    def test_exp_change_object_with_invalid_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             exp_domain.ExplorationChange({'cmd': 'invalid'})
 
-    def test_exp_change_object_with_deprecated_cmd(self):
+    def test_exp_change_object_with_deprecated_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.DeprecatedCommandError, 'Command clone is deprecated'):
             exp_domain.ExplorationChange({
@@ -60,7 +67,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
                 'old_value': 'old_value'
             })
 
-    def test_exp_change_object_with_deprecated_cmd_argument(self):
+    def test_exp_change_object_with_deprecated_cmd_argument(self) -> None:
         with self.assertRaisesRegex(
             utils.DeprecatedCommandError,
             'Value for property_name in cmd edit_state_property: '
@@ -72,7 +79,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
                 'new_value': 'foo',
             })
 
-    def test_exp_change_object_with_missing_attribute_in_cmd(self):
+    def test_exp_change_object_with_missing_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
@@ -83,7 +90,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
                 'old_value': 'old_value'
             })
 
-    def test_exp_change_object_with_extra_attribute_in_cmd(self):
+    def test_exp_change_object_with_extra_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
@@ -94,7 +101,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
                 'invalid': 'invalid'
             })
 
-    def test_exp_change_object_with_invalid_exploration_property(self):
+    def test_exp_change_object_with_invalid_exploration_property(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_exploration_property: '
@@ -106,7 +113,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
                 'new_value': 'new_value',
             })
 
-    def test_exp_change_object_with_invalid_state_property(self):
+    def test_exp_change_object_with_invalid_state_property(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_state_property: '
@@ -119,7 +126,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
                 'new_value': 'new_value',
             })
 
-    def test_exp_change_object_with_create_new(self):
+    def test_exp_change_object_with_create_new(self) -> None:
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': 'create_new',
             'category': 'category',
@@ -130,7 +137,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         self.assertEqual(exp_change_object.category, 'category')
         self.assertEqual(exp_change_object.title, 'title')
 
-    def test_exp_change_object_with_add_state(self):
+    def test_exp_change_object_with_add_state(self) -> None:
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'state_name',
@@ -139,7 +146,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         self.assertEqual(exp_change_object.cmd, 'add_state')
         self.assertEqual(exp_change_object.state_name, 'state_name')
 
-    def test_exp_change_object_with_rename_state(self):
+    def test_exp_change_object_with_rename_state(self) -> None:
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'old_state_name',
@@ -150,7 +157,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         self.assertEqual(exp_change_object.old_state_name, 'old_state_name')
         self.assertEqual(exp_change_object.new_state_name, 'new_state_name')
 
-    def test_exp_change_object_with_delete_state(self):
+    def test_exp_change_object_with_delete_state(self) -> None:
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'state_name',
@@ -159,7 +166,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         self.assertEqual(exp_change_object.cmd, 'delete_state')
         self.assertEqual(exp_change_object.state_name, 'state_name')
 
-    def test_exp_change_object_with_edit_state_property(self):
+    def test_exp_change_object_with_edit_state_property(self) -> None:
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'state_name': 'state_name',
@@ -174,7 +181,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         self.assertEqual(exp_change_object.new_value, 'new_value')
         self.assertEqual(exp_change_object.old_value, 'old_value')
 
-    def test_exp_change_object_with_edit_exploration_property(self):
+    def test_exp_change_object_with_edit_exploration_property(self) -> None:
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': 'edit_exploration_property',
             'property_name': 'title',
@@ -188,7 +195,8 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         self.assertEqual(exp_change_object.old_value, 'old_value')
 
     def test_exp_change_object_with_migrate_states_schema_to_latest_version(
-            self):
+        self
+    ) -> None:
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': 'migrate_states_schema_to_latest_version',
             'from_version': 'from_version',
@@ -200,7 +208,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         self.assertEqual(exp_change_object.from_version, 'from_version')
         self.assertEqual(exp_change_object.to_version, 'to_version')
 
-    def test_exp_change_object_with_revert_commit(self):
+    def test_exp_change_object_with_revert_commit(self) -> None:
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
             'version_number': 'version_number'
@@ -211,7 +219,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             exp_models.ExplorationModel.CMD_REVERT_COMMIT)
         self.assertEqual(exp_change_object.version_number, 'version_number')
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         exp_change_dict = {
             'cmd': 'create_new',
             'title': 'title',
@@ -224,19 +232,19 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
 class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration versions difference domain object."""
 
-    def setUp(self):
-        super(ExplorationVersionsDiffDomainUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.exp_id = 'exp_id1'
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
+        assets_list: List[Tuple[str, bytes]] = []
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
             assets_list)
         self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
 
-    def test_correct_creation_of_version_diffs(self):
+    def test_correct_creation_of_version_diffs(self) -> None:
         # Rename a state.
         self.exploration.rename_state('Home', 'Renamed state')
         change_list = [exp_domain.ExplorationChange({
@@ -359,21 +367,25 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
         self.exploration.version += 1
 
-    def test_cannot_create_exploration_change_with_invalid_change_dict(self):
+    def test_cannot_create_exploration_change_with_invalid_change_dict(
+        self
+    ) -> None:
         with self.assertRaisesRegex(
             Exception, 'Missing cmd key in change dict'):
             exp_domain.ExplorationChange({
                 'invalid_cmd': 'invalid'
             })
 
-    def test_cannot_create_exploration_change_with_invalid_cmd(self):
+    def test_cannot_create_exploration_change_with_invalid_cmd(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Command invalid_cmd is not allowed'):
             exp_domain.ExplorationChange({
                 'cmd': 'invalid_cmd'
             })
 
-    def test_cannot_create_exploration_change_with_invalid_state_property(self):
+    def test_cannot_create_exploration_change_with_invalid_state_property(
+        self
+    ) -> None:
         exp_change = exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -394,7 +406,8 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_cannot_create_exploration_change_with_invalid_exploration_property(
-            self):
+        self
+    ) -> None:
         exp_change = exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
@@ -412,7 +425,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
                 'new_value': ''
             })
 
-    def test_revert_exploration_commit(self):
+    def test_revert_exploration_commit(self) -> None:
         exp_change = exp_domain.ExplorationChange({
             'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
             'version_number': 1
@@ -430,7 +443,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
 class ExpVersionReferenceTests(test_utils.GenericTestBase):
 
-    def test_create_exp_version_reference_object(self):
+    def test_create_exp_version_reference_object(self) -> None:
         exp_version_reference = exp_domain.ExpVersionReference('exp_id', 1)
 
         self.assertEqual(
@@ -439,23 +452,29 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
                 'version': 1
             })
 
-    def test_validate_exp_version(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exp_version(self) -> None:
         with self.assertRaisesRegex(
             Exception,
             'Expected version to be an int, received invalid_version'):
-            exp_domain.ExpVersionReference('exp_id', 'invalid_version')
+            exp_domain.ExpVersionReference('exp_id', 'invalid_version')  # type: ignore[arg-type]
 
-    def test_validate_exp_id(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exp_id(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Expected exp_id to be a str, received 0'):
-            exp_domain.ExpVersionReference(0, 1)
+            exp_domain.ExpVersionReference(0, 1)  # type: ignore[arg-type]
 
 
 class TransientCheckpointUrlTests(test_utils.GenericTestBase):
     """Testing TransientCheckpointUrl domain object."""
 
     def setUp(self) -> None:
-        super(TransientCheckpointUrlTests, self).setUp()
+        super().setUp()
         self.transient_checkpoint_url = exp_domain.TransientCheckpointUrl(
             'exp_id', 'frcs_name', 1, 'mrrcs_name', 1)
 
@@ -477,7 +496,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             self.transient_checkpoint_url
             .most_recently_reached_checkpoint_exp_version, 1)
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         logged_out_learner_progress_dict = {
             'exploration_id': 'exploration_id',
             'furthest_reached_checkpoint_exp_version': 1,
@@ -496,49 +515,64 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             logged_out_learner_progress_object.to_dict(),
             logged_out_learner_progress_dict)
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_exploration_id_incorrect_type(self) -> None:
         self.transient_checkpoint_url.exploration_id = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected exploration_id to be a str'
         ):
             self.transient_checkpoint_url.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_furthest_reached_checkpoint_state_name_incorrect_type(
         self
     ) -> None:
         self.transient_checkpoint_url.furthest_reached_checkpoint_state_name = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected furthest_reached_checkpoint_state_name to be a str'
         ):
             self.transient_checkpoint_url.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_furthest_reached_checkpoint_exp_version_incorrect_type(
         self
     ) -> None:
         self.transient_checkpoint_url.furthest_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected furthest_reached_checkpoint_exp_version to be an int'
         ):
             self.transient_checkpoint_url.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_most_recently_reached_checkpoint_state_name_incorrect_type(
         self
     ) -> None:
         self.transient_checkpoint_url.most_recently_reached_checkpoint_state_name = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected most_recently_reached_checkpoint_state_name to be a str'
         ):
             self.transient_checkpoint_url.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_most_recently_reached_checkpoint_exp_version_incorrect_type(
         self
     ) -> None:
         self.transient_checkpoint_url.most_recently_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected most_recently_reached_checkpoint_exp_version to be an int'
         ):
@@ -548,8 +582,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
 class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
     """Test checkpoints validations in an exploration. """
 
-    def setUp(self):
-        super(ExplorationCheckpointsUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.exploration = (
             exp_domain.Exploration.create_default_exploration('eid'))
         self.new_state = state_domain.State.create_default_state(
@@ -569,7 +603,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         self.end_state.update_interaction_default_outcome(None)
 
-    def test_init_state_with_card_is_checkpoint_false_is_invalid(self):
+    def test_init_state_with_card_is_checkpoint_false_is_invalid(self) -> None:
         self.init_state.update_card_is_checkpoint(False)
         with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of first state to '
@@ -577,8 +611,10 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.exploration.validate(strict=True)
         self.init_state.update_card_is_checkpoint(True)
 
-    def test_end_state_with_card_is_checkpoint_true_is_invalid(self):
+    def test_end_state_with_card_is_checkpoint_true_is_invalid(self) -> None:
         default_outcome = self.init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
         default_outcome.dest = self.exploration.init_state_name
         self.init_state.update_interaction_default_outcome(default_outcome)
 
@@ -593,7 +629,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.exploration.validate(strict=True)
         self.end_state.update_card_is_checkpoint(False)
 
-    def test_init_state_checkpoint_with_end_exp_interaction_is_valid(self):
+    def test_init_state_checkpoint_with_end_exp_interaction_is_valid(
+        self
+    ) -> None:
         self.exploration.init_state_name = 'End'
         self.exploration.states = {
             self.exploration.init_state_name: self.end_state
@@ -605,7 +643,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         self.exploration.validate(strict=True)
         self.end_state.update_card_is_checkpoint(False)
 
-    def test_checkpoint_count_with_count_outside_range_is_invalid(self):
+    def test_checkpoint_count_with_count_outside_range_is_invalid(self) -> None:
         self.exploration.init_state_name = 'Introduction'
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -628,7 +666,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End': self.end_state
         }
 
-    def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
+    def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(
+        self
+    ) -> None:
         # Note: In the graphs below, states with the * symbol are checkpoints.
 
         # Exploration to test a checkpoint state which has no outcome.
@@ -1090,8 +1130,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
-    def setUp(self):
-        super(ExplorationDomainUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
                 'My name is Nikhil.', True)
@@ -1102,7 +1142,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
-    def test_validation(self):
+    def test_validation(self) -> None:
         """Test validation of explorations."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.init_state_name = ''
@@ -1164,6 +1204,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid exploration.
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
         default_outcome.dest = exploration.init_state_name
         init_state.update_interaction_default_outcome(default_outcome)
         init_state.update_card_is_checkpoint(True)
@@ -1176,33 +1218,36 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # default outcome must point to a valid state.
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
         default_outcome.dest = exploration.init_state_name
-        old_answer_groups = copy.deepcopy(init_state.interaction.answer_groups)
-        old_answer_groups.append({
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'dest_if_really_stuck': None,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
+        old_answer_groups: List[state_domain.AnswerGroupDict] = [
+            {
+                'outcome': {
+                    'dest': exploration.init_state_name,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
                 },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        })
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
 
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_group)
@@ -1223,15 +1268,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         default_outcome.dest_if_really_stuck = None
 
-        # Testing the default outcome does not direct stuck learner
-        # back to the same state.
-        default_outcome.dest_if_really_stuck = exploration.init_state_name
-        self._assert_validation_error(
-            exploration, 'The destination for a stuck learner '
-            'cannot be the same state.')
-
-        default_outcome.dest_if_really_stuck = None
-
         answer_group.outcome.dest = 'DEF'
         self._assert_validation_error(
             exploration, 'destination DEF is not a valid')
@@ -1242,10 +1278,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'The destination for the stuck learner '
             'XYZ is not a valid state')
 
-        answer_group.outcome.dest_if_really_stuck = exploration.init_state_name
-        self._assert_validation_error(
-            exploration, 'The destination for a stuck learner '
-            'cannot be the same state.')
         answer_group.outcome.dest_if_really_stuck = None
 
         # Restore a valid exploration.
@@ -1267,7 +1299,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'RuleSpec \'Contains\' is missing inputs')
 
-        rule_spec.inputs = 'Inputs string'
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected inputs to be a dict')
 
@@ -1314,6 +1349,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Validate Outcome.
         outcome = init_state.interaction.answer_groups[0].outcome
         destination = exploration.init_state_name
+
         outcome.dest = None
         self._assert_validation_error(
             exploration, 'Every outcome should have a destination.')
@@ -1321,7 +1357,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.dest = destination
 
         default_outcome = init_state.interaction.default_outcome
-        default_outcome.dest_if_really_stuck = 20
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
 
         self._assert_validation_error(
             exploration, 'Expected dest_if_really_stuck to be a string')
@@ -1329,7 +1371,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome.dest_if_really_stuck = None
 
         # Try setting the outcome destination to something other than a string.
-        outcome.dest = 15
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.dest = 15  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected outcome dest to be a string')
 
@@ -1338,7 +1383,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
         exploration.validate()
 
-        outcome.labelled_as_correct = 'hello'
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.labelled_as_correct = 'hello'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'The "labelled_as_correct" field should be a boolean')
 
@@ -1357,7 +1405,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Try setting the outcome destination if stuck to something other
         # than a string.
-        outcome.dest_if_really_stuck = 30
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected dest_if_really_stuck to be a string')
 
@@ -1380,12 +1431,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         outcome.dest = destination
-        outcome.param_changes = 'Changes'
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.param_changes = 'Changes'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected outcome param_changes to be a list')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         outcome.param_changes = [param_domain.ParamChange(
-            0, 'generator_id', {})]
+            0, 'generator_id', {})]  # type: ignore[arg-type]
         self._assert_validation_error(
             exploration,
             'Expected param_change name to be a string, received 0')
@@ -1393,7 +1450,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.param_changes = []
         exploration.validate()
 
-        outcome.refresher_exploration_id = 12345
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(
             exploration,
             'Expected outcome refresher_exploration_id to be a string')
@@ -1404,7 +1464,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.refresher_exploration_id = 'valid_string'
         exploration.validate()
 
-        outcome.missing_prerequisite_skill_id = 12345
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(
             exploration,
             'Expected outcome missing_prerequisite_skill_id to be a string')
@@ -1430,7 +1493,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state(new_state_name)
 
         # Validate InteractionInstance.
-        interaction.id = 15
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.id = 15  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected interaction id to be a string')
 
@@ -1452,11 +1518,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec.rule_type = 'Contains'
         exploration.validate()
 
-        interaction.customization_args = []
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.customization_args = []  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected customization args to be a dict')
 
-        interaction.customization_args = {15: ''}
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.customization_args = {15: ''}  # type: ignore[dict-item]
         self._assert_validation_error(
             exploration,
             (
@@ -1465,8 +1537,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             )
         )
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         interaction.customization_args = {
-            15: state_domain.InteractionCustomizationArg('', {
+            15: state_domain.InteractionCustomizationArg('', {  # type: ignore[dict-item, no-untyped-call]
                 'type': 'unicode'
             })
         }
@@ -1477,7 +1552,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
-        interaction.answer_groups = {}
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.answer_groups = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected answer groups to be a list')
 
@@ -1513,7 +1591,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(answer_groups)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -1521,6 +1599,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': 'hello_world is a string'
                 }
         }
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
@@ -1529,7 +1609,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Hint(s) must be specified if solution is specified'))
 
         init_state.update_interaction_solution(None)
-        interaction.hints = {}
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.hints = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected hints to be a list')
         interaction.hints = []
@@ -1552,7 +1636,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     })
             ],
             [],
-            1
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            1  # type: ignore[arg-type]
         )
         init_state.update_interaction_answer_groups([state_answer_group])
 
@@ -1586,7 +1673,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'to be <skill_id>-<misconception_id>, received '
             'invalid_tagged_skill_misconception_id')
 
-        init_state.interaction.answer_groups[0].rule_specs = {}
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        init_state.interaction.answer_groups[0].rule_specs = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
@@ -1614,7 +1704,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.language_code = 'en'
         exploration.validate()
 
-        exploration.param_specs = 'A string'
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.param_specs = 'A string'  # type: ignore[assignment]
         self._assert_validation_error(exploration, 'param_specs to be a dict')
 
         exploration.param_specs = {
@@ -1631,7 +1724,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
-    def test_tag_validation(self):
+    def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
@@ -1640,13 +1733,22 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(None)
         exploration.validate()
 
-        exploration.tags = 'this should be a list'
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.tags = 'this should be a list'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected \'tags\' to be a list')
 
-        exploration.tags = [123]
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.tags = [123]  # type: ignore[list-item]
         self._assert_validation_error(exploration, 'to be a string')
-        exploration.tags = ['abc', 123]
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.tags = ['abc', 123]  # type: ignore[list-item]
         self._assert_validation_error(exploration, 'to be a string')
 
         exploration.tags = ['']
@@ -1677,7 +1779,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()
 
-    def test_title_category_and_objective_validation(self):
+    def test_title_category_and_objective_validation(self) -> None:
         """Test that titles, categories and objectives are validated only in
         'strict' mode.
         """
@@ -1708,19 +1810,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.validate(strict=True)
 
-    def test_get_trainable_states_dict(self):
+    def test_get_trainable_states_dict(self) -> None:
         """Test the get_trainable_states_dict() method."""
         exp_id = 'exp_id1'
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
+        assets_list: List[Tuple[str, bytes]] = []
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
 
         exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=False)
+            exp_id, strict=True)
         old_states = exp_fetchers.get_exploration_from_model(
             exploration_model).states
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -1830,7 +1932,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
-    def test_get_languages_with_complete_translation(self):
+    def test_get_languages_with_complete_translation(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_languages_with_complete_translation(), [])
@@ -1852,7 +1954,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.get_languages_with_complete_translation(), ['hi'])
 
-    def test_get_translation_counts_with_no_needs_update(self):
+    def test_get_translation_counts_with_no_needs_update(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
@@ -1929,7 +2031,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 4})
 
-    def test_get_translation_counts_with_needs_update(self):
+    def test_get_translation_counts_with_needs_update(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
@@ -1971,7 +2073,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 1})
 
-    def test_get_translation_counts_with_translation_in_multiple_lang(self):
+    def test_get_translation_counts_with_translation_in_multiple_lang(
+        self
+    ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
@@ -2021,7 +2125,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'hi-en': 1
             })
 
-    def test_get_content_count(self):
+    def test_get_content_count(self) -> None:
         # Adds 1 to content count to exploration (content, default_outcome).
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(exploration.get_content_count(), 1)
@@ -2063,7 +2167,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Adds 1 to content count to exploration (hint_1).
         init_state.update_interaction_hints(hints_list)
 
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -2071,6 +2175,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         # Adds 1 to content count to exploration (solution).
@@ -2078,7 +2184,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exploration.get_content_count(), 6)
 
-    def test_get_metadata(self):
+    def test_get_metadata(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         actual_metadata_dict = exploration.get_metadata().to_dict()
         expected_metadata_dict = {
@@ -2101,7 +2207,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(actual_metadata_dict, expected_metadata_dict)
 
-    def test_get_content_with_correct_state_name_returns_html(self):
+    def test_get_content_with_correct_state_name_returns_html(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
@@ -2124,7 +2230,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.get_content_html(exploration.init_state_name, 'hint_1'),
             '<p>Changed hint one</p>')
 
-    def test_get_content_with_incorrect_state_name_raise_error(self):
+    def test_get_content_with_incorrect_state_name_raise_error(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
@@ -2144,7 +2250,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ValueError, 'State Invalid state does not exist'):
             exploration.get_content_html('Invalid state', 'hint_1')
 
-    def test_is_demo_property(self):
+    def test_is_demo_property(self) -> None:
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(demo.is_demo, True)
@@ -2155,7 +2261,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         notdemo2 = exp_domain.Exploration.create_default_exploration('abcd')
         self.assertEqual(notdemo2.is_demo, False)
 
-    def test_has_state_name(self):
+    def test_has_state_name(self) -> None:
         """Test for has_state_name."""
         demo = exp_domain.Exploration.create_default_exploration('0')
         state_names = list(demo.states.keys())
@@ -2163,13 +2269,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(demo.has_state_name('Introduction'), True)
         self.assertEqual(demo.has_state_name('Fake state name'), False)
 
-    def test_get_interaction_id_by_state_name(self):
+    def test_get_interaction_id_by_state_name(self) -> None:
         """Test for get_interaction_id_by_state_name."""
         demo = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             demo.get_interaction_id_by_state_name('Introduction'), None)
 
-    def test_exploration_export_import(self):
+    def test_exploration_export_import(self) -> None:
         """Test that to_dict and from_dict preserve all data within an
         exploration.
         """
@@ -2178,7 +2284,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exp_from_dict = exp_domain.Exploration.from_dict(demo_dict)
         self.assertEqual(exp_from_dict.to_dict(), demo_dict)
 
-    def test_interaction_with_none_id_is_not_terminal(self):
+    def test_interaction_with_none_id_is_not_terminal(self) -> None:
         """Test that an interaction with an id of None leads to is_terminal
         being false.
         """
@@ -2187,7 +2293,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = demo.states[feconf.DEFAULT_INIT_STATE_NAME]
         self.assertFalse(init_state.interaction.is_terminal)
 
-    def test_cannot_create_demo_exp_with_invalid_param_changes(self):
+    def test_cannot_create_demo_exp_with_invalid_param_changes(self) -> None:
         demo_exp = exp_domain.Exploration.create_default_exploration('0')
         demo_dict = demo_exp.to_dict()
         new_state = state_domain.State.create_default_state('new_state_name')
@@ -2209,166 +2315,209 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'declared in the exploration param_specs.'):
             exp_domain.Exploration.from_dict(demo_dict)
 
-    def test_validate_exploration_category(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_category(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.category = 1
+        exploration.category = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected category to be a string, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_objective(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_objective(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.objective = 1
+        exploration.objective = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected objective to be a string, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_blurb(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_blurb(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.blurb = 1
+        exploration.blurb = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected blurb to be a string, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_language_code(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_language_code(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.language_code = 1
+        exploration.language_code = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected language_code to be a string, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_author_notes(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_author_notes(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.author_notes = 1
+        exploration.author_notes = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected author_notes to be a string, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_states(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_states(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.states = 1
+        exploration.states = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected states to be a dict, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_outcome_dest(self):
+    def test_validate_exploration_outcome_dest(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.default_outcome is not None
         exploration.init_state.interaction.default_outcome.dest = None
         with self.assertRaisesRegex(
             Exception, 'Every outcome should have a destination.'):
             exploration.validate()
 
-    def test_validate_exploration_outcome_dest_type(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_outcome_dest_type(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.init_state.interaction.default_outcome.dest = 1
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.default_outcome is not None
+        exploration.init_state.interaction.default_outcome.dest = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected outcome dest to be a string, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_states_schema_version(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_states_schema_version(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.states_schema_version = None
+        exploration.states_schema_version = None  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'This exploration has no states schema version.'):
             exploration.validate()
 
-    def test_validate_exploration_auto_tts_enabled(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_auto_tts_enabled(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.auto_tts_enabled = 1
+        exploration.auto_tts_enabled = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_correctness_feedback_enabled(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_correctness_feedback_enabled(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.correctness_feedback_enabled = 1
+        exploration.correctness_feedback_enabled = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception,
             'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_edits_allowed(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_edits_allowed(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.edits_allowed = 1
+        exploration.edits_allowed = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception,
             'Expected edits_allowed to be a bool, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_param_specs(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_param_specs(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
         exploration.param_specs = {
-            1: param_domain.ParamSpec.from_dict(
+            1: param_domain.ParamSpec.from_dict(  # type: ignore[dict-item]
                 {'obj_type': 'UnicodeString'})
         }
         with self.assertRaisesRegex(
             Exception, 'Expected parameter name to be a string, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_param_changes_type(self):
+    def test_validate_exploration_param_changes_type(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.param_changes = 1
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+        exploration.param_changes = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected param_changes to be a list, received 1'):
             exploration.validate()
 
-    def test_validate_exploration_param_name(self):
+    def test_validate_exploration_param_name(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
@@ -2387,7 +2536,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'exploration'):
             exploration.validate()
 
-    def test_validate_exploration_reserved_param_name(self):
+    def test_validate_exploration_reserved_param_name(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
@@ -2406,7 +2555,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'reserved. Please choose a different name.'):
             exploration.validate()
 
-    def test_validate_exploration_is_non_self_loop(self):
+    def test_validate_exploration_is_non_self_loop(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
@@ -2429,7 +2578,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'exploration ID, but is not a self-loop.'):
             exploration.validate()
 
-    def test_validate_exploration_answer_group_parameter(self):
+    def test_validate_exploration_answer_group_parameter(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
@@ -2467,7 +2616,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'but it does not exist in this exploration'):
             exploration.validate()
 
-    def test_verify_all_states_reachable(self):
+    def test_verify_all_states_reachable(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'owner_id')
         exploration.validate()
@@ -2485,7 +2634,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'following states: Introduction'):
             exploration.validate(strict=True)
 
-    def test_update_init_state_name_with_invalid_state(self):
+    def test_update_init_state_name_with_invalid_state(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='title', category='category',
             objective='objective', end_state_name='End')
@@ -2498,7 +2647,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Invalid new initial state name: invalid_state;'):
             exploration.update_init_state_name('invalid_state')
 
-    def test_rename_state_with_invalid_state(self):
+    def test_rename_state_with_invalid_state(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='title', category='category',
             objective='objective', end_state_name='End')
@@ -2514,11 +2663,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'State invalid_state does not exist'):
             exploration.rename_state('invalid_state', 'new state name')
 
-    def test_default_outcome_is_labelled_incorrect_for_self_loop(self):
+    def test_default_outcome_is_labelled_incorrect_for_self_loop(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='title', category='category',
             objective='objective', end_state_name='End')
         exploration.validate(strict=True)
+        # Ruling out the possibility of None for mypy type checking.
+        assert (
+            exploration.init_state.interaction.default_outcome is not None
+        )
 
         (
             exploration.init_state.interaction.default_outcome
@@ -2534,7 +2687,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'correct but is a self-loop'):
             exploration.validate(strict=True)
 
-    def test_serialize_and_deserialize_returns_unchanged_exploration(self):
+    def test_serialize_and_deserialize_returns_unchanged_exploration(
+        self
+    ) -> None:
         """Checks that serializing and then deserializing a default exploration
         works as intended by leaving the exploration unchanged.
         """
@@ -2544,13 +2699,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
-    def test_get_all_translatable_content_for_exp(self):
+    def test_get_all_translatable_content_for_exp(self) -> None:
         """Get all translatable fields from exploration."""
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_content_dict = {
+        state_content_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
@@ -2587,7 +2742,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 )
             ),
         ]
-        state_solution_dict = {
+        state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
             'explanation': {
@@ -2595,7 +2750,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        state_interaction_cust_args = {
+        state_interaction_cust_args: Dict[
+            str, Dict[str, Union[Dict[str, str], int]]
+        ] = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -2613,6 +2770,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_answer_group)
         state.update_interaction_default_outcome(state_default_outcome)
         state.update_interaction_hints(state_hint_list)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -2638,8 +2797,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(ExplorationSummaryTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -2650,64 +2809,82 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.exp_summary.viewer_ids = ['viewer_id']
         self.exp_summary.contributor_ids = ['contributor_id']
 
-    def test_validation_passes_with_valid_properties(self):
+    def test_validation_passes_with_valid_properties(self) -> None:
         self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_title(self):
-        self.exp_summary.title = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_title(self) -> None:
+        self.exp_summary.title = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected title to be a string, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_category(self):
-        self.exp_summary.category = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_category(self) -> None:
+        self.exp_summary.category = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected category to be a string, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_objective(self):
-        self.exp_summary.objective = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_objective(self) -> None:
+        self.exp_summary.objective = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected objective to be a string, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_language_code(self):
-        self.exp_summary.language_code = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_language_code(self) -> None:
+        self.exp_summary.language_code = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language_code to be a string, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_unallowed_language_code(self):
+    def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.exp_summary.language_code = 'invalid'
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_tags(self):
-        self.exp_summary.tags = 'tags'
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_tags(self) -> None:
+        self.exp_summary.tags = 'tags'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected \'tags\' to be a list, received tags'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_tag_in_tags(self):
-        self.exp_summary.tags = ['tag', 2]
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_tag_in_tags(self) -> None:
+        self.exp_summary.tags = ['tag', 2]  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each tag in \'tags\' to be a string, received \'2\''):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_empty_tag_in_tags(self):
+    def test_validation_fails_with_empty_tag_in_tags(self) -> None:
         self.exp_summary.tags = ['', 'abc']
         with self.assertRaisesRegex(
             utils.ValidationError, 'Tags should be non-empty'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_unallowed_characters_in_tag(self):
+    def test_validation_fails_with_unallowed_characters_in_tag(self) -> None:
         self.exp_summary.tags = ['123', 'abc']
         with self.assertRaisesRegex(
             utils.ValidationError, (
@@ -2715,21 +2892,21 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
                 'letters and spaces, received \'123\'')):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_whitespace_in_tag_start(self):
+    def test_validation_fails_with_whitespace_in_tag_start(self) -> None:
         self.exp_summary.tags = [' ab', 'abc']
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \' ab\''):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_whitespace_in_tag_end(self):
+    def test_validation_fails_with_whitespace_in_tag_end(self) -> None:
         self.exp_summary.tags = ['ab ', 'abc']
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \'ab \''):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_adjacent_whitespace_in_tag(self):
+    def test_validation_fails_with_adjacent_whitespace_in_tag(self) -> None:
         self.exp_summary.tags = ['a   b', 'abc']
         with self.assertRaisesRegex(
             utils.ValidationError, (
@@ -2737,128 +2914,175 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
                 'be collapsed, received \'a   b\'')):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_duplicate_tags(self):
+    def test_validation_fails_with_duplicate_tags(self) -> None:
         self.exp_summary.tags = ['abc', 'abc', 'ab']
         with self.assertRaisesRegex(
             utils.ValidationError, 'Some tags duplicate each other'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_rating_type(self):
-        self.exp_summary.ratings = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_rating_type(self) -> None:
+        self.exp_summary.ratings = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected ratings to be a dict, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_rating_keys(self):
+    def test_validation_fails_with_invalid_rating_keys(self) -> None:
         self.exp_summary.ratings = {'1': 0, '10': 1}
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected ratings to have keys: 1, 2, 3, 4, 5, received 1, 10'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_value_type_for_ratings(self):
-        self.exp_summary.ratings = {'1': 0, '2': 'one', '3': 0, '4': 0, '5': 0}
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_value_type_for_ratings(self) -> None:
+        self.exp_summary.ratings = {'1': 0, '2': 'one', '3': 0, '4': 0, '5': 0}  # type: ignore[dict-item]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected value to be int, received one'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_value_for_ratings(self):
+    def test_validation_fails_with_invalid_value_for_ratings(self) -> None:
         self.exp_summary.ratings = {'1': 0, '2': -1, '3': 0, '4': 0, '5': 0}
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected value to be non-negative, received -1'):
             self.exp_summary.validate()
 
-    def test_validation_passes_with_int_scaled_average_rating(self):
+    def test_validation_passes_with_int_scaled_average_rating(self) -> None:
         self.exp_summary.scaled_average_rating = 1
         self.exp_summary.validate()
         self.assertEqual(self.exp_summary.scaled_average_rating, 1)
 
-    def test_validation_fails_with_invalid_scaled_average_rating(self):
-        self.exp_summary.scaled_average_rating = 'one'
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_scaled_average_rating(self) -> None:
+        self.exp_summary.scaled_average_rating = 'one'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected scaled_average_rating to be float, received one'
         ):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_status(self):
-        self.exp_summary.status = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_status(self) -> None:
+        self.exp_summary.status = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected status to be string, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_community_owned(self):
-        self.exp_summary.community_owned = '1'
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_community_owned(self) -> None:
+        self.exp_summary.community_owned = '1'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected community_owned to be bool, received 1'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_contributors_summary(self):
-        self.exp_summary.contributors_summary = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_contributors_summary(self) -> None:
+        self.exp_summary.contributors_summary = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected contributors_summary to be dict, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_owner_ids_type(self):
-        self.exp_summary.owner_ids = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_owner_ids_type(self) -> None:
+        self.exp_summary.owner_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected owner_ids to be list, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
-        self.exp_summary.owner_ids = ['1', 2, '3']
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_owner_id_in_owner_ids(self) -> None:
+        self.exp_summary.owner_ids = ['1', 2, '3']  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in owner_ids to be string, received 2'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_editor_ids_type(self):
-        self.exp_summary.editor_ids = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_editor_ids_type(self) -> None:
+        self.exp_summary.editor_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected editor_ids to be list, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_editor_id_in_editor_ids(self):
-        self.exp_summary.editor_ids = ['1', 2, '3']
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_editor_id_in_editor_ids(
+        self
+    ) -> None:
+        self.exp_summary.editor_ids = ['1', 2, '3']  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in editor_ids to be string, received 2'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_voice_artist_ids_type(self):
-        self.exp_summary.voice_artist_ids = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_voice_artist_ids_type(self) -> None:
+        self.exp_summary.voice_artist_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected voice_artist_ids to be list, received 0'):
             self.exp_summary.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_voice_artist_id_in_voice_artists_ids(
-            self):
-        self.exp_summary.voice_artist_ids = ['1', 2, '3']
+        self
+    ) -> None:
+        self.exp_summary.voice_artist_ids = ['1', 2, '3']  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in voice_artist_ids to be string, received 2'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_viewer_ids_type(self):
-        self.exp_summary.viewer_ids = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_viewer_ids_type(self) -> None:
+        self.exp_summary.viewer_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected viewer_ids to be list, received 0'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(self):
-        self.exp_summary.viewer_ids = ['1', 2, '3']
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(
+        self
+    ) -> None:
+        self.exp_summary.viewer_ids = ['1', 2, '3']  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in viewer_ids to be string, received 2'):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_duplicate_user_role(self):
+    def test_validation_fails_with_duplicate_user_role(self) -> None:
         self.exp_summary.owner_ids = ['1']
         self.exp_summary.editor_ids = ['2', '3']
         self.exp_summary.voice_artist_ids = ['4']
@@ -2870,27 +3094,34 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         ):
             self.exp_summary.validate()
 
-    def test_validation_fails_with_invalid_contributor_ids_type(self):
-        self.exp_summary.contributor_ids = 0
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_contributor_ids_type(self) -> None:
+        self.exp_summary.contributor_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected contributor_ids to be list, received 0'):
             self.exp_summary.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
-            self):
-        self.exp_summary.contributor_ids = ['1', 2, '3']
+        self
+    ) -> None:
+        self.exp_summary.contributor_ids = ['1', 2, '3']  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in contributor_ids to be string, received 2'):
             self.exp_summary.validate()
 
-    def test_is_private(self):
+    def test_is_private(self) -> None:
         self.assertTrue(self.exp_summary.is_private())
         self.exp_summary.status = constants.ACTIVITY_STATUS_PUBLIC
         self.assertFalse(self.exp_summary.is_private())
 
-    def test_is_solely_owned_by_user_one_owner(self):
+    def test_is_solely_owned_by_user_one_owner(self) -> None:
         self.assertTrue(self.exp_summary.is_solely_owned_by_user(self.owner_id))
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
         self.exp_summary.owner_ids = ['other_id']
@@ -2898,7 +3129,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             self.exp_summary.is_solely_owned_by_user(self.owner_id))
         self.assertTrue(self.exp_summary.is_solely_owned_by_user('other_id'))
 
-    def test_is_solely_owned_by_user_multiple_owners(self):
+    def test_is_solely_owned_by_user_multiple_owners(self) -> None:
         self.assertTrue(self.exp_summary.is_solely_owned_by_user(self.owner_id))
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
         self.exp_summary.owner_ids = [self.owner_id, 'other_id']
@@ -2906,7 +3137,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             self.exp_summary.is_solely_owned_by_user(self.owner_id))
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
 
-    def test_is_solely_owned_by_user_other_users(self):
+    def test_is_solely_owned_by_user_other_users(self) -> None:
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('editor_id'))
         self.assertFalse(
             self.exp_summary.is_solely_owned_by_user('voice_artist_id'))
@@ -2914,20 +3145,25 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.assertFalse(
             self.exp_summary.is_solely_owned_by_user('contributor_id'))
 
-    def test_add_new_contribution_for_user_adds_user_to_contributors(self):
+    def test_add_new_contribution_for_user_adds_user_to_contributors(
+        self
+    ) -> None:
         self.exp_summary.add_contribution_by_user('user_id')
         self.assertIn('user_id', self.exp_summary.contributors_summary)
         self.assertEqual(self.exp_summary.contributors_summary['user_id'], 1)
         self.assertIn('user_id', self.exp_summary.contributor_ids)
 
     def test_add_new_contribution_for_user_increases_score_in_contributors(
-            self):
+        self
+    ) -> None:
         self.exp_summary.add_contribution_by_user('user_id')
         self.exp_summary.add_contribution_by_user('user_id')
         self.assertIn('user_id', self.exp_summary.contributors_summary)
         self.assertEqual(self.exp_summary.contributors_summary['user_id'], 2)
 
-    def test_add_new_contribution_for_user_does_not_add_system_user(self):
+    def test_add_new_contribution_for_user_does_not_add_system_user(
+        self
+    ) -> None:
         self.exp_summary.add_contribution_by_user(
             feconf.SYSTEM_COMMITTER_ID)
         self.assertNotIn(
@@ -2939,7 +3175,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
-    YAML_CONTENT_INVALID_SCHEMA_VERSION = (
+    YAML_CONTENT_INVALID_SCHEMA_VERSION: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3084,9 +3320,9 @@ tags: []
 title: Title
 """)
 
-    EXP_ID = 'An exploration_id'
+    EXP_ID: Final = 'An exploration_id'
 
-    def test_creation_with_invalid_yaml_schema_version(self):
+    def test_creation_with_invalid_yaml_schema_version(self) -> None:
         """Test that a schema version that is too big is detected."""
         with self.assertRaisesRegex(
             Exception,
@@ -3095,7 +3331,7 @@ title: Title
             exp_domain.Exploration.from_yaml(
                 'bad_exp', self.YAML_CONTENT_INVALID_SCHEMA_VERSION)
 
-    def test_yaml_import_and_export(self):
+    def test_yaml_import_and_export(self) -> None:
         """Test the from_yaml() and to_yaml() methods."""
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='Title', category='Category')
@@ -3139,7 +3375,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     Exploration domain object class.
     """
 
-    def test_correct_states_schema_conversion_methods_exist(self):
+    def test_correct_states_schema_conversion_methods_exist(self) -> None:
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -3157,7 +3393,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
                 current_states_schema_version,
                 current_states_schema_version + 1)))
 
-    def test_correct_exploration_schema_conversion_methods_exist(self):
+    def test_correct_exploration_schema_conversion_methods_exist(self) -> None:
         """Test that the right exploration schema conversion methods exist."""
         current_exp_schema_version = (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
@@ -3179,7 +3415,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V46 = (
+    YAML_CONTENT_V46: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3324,7 +3560,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V47 = (
+    YAML_CONTENT_V47: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3469,7 +3705,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V48 = (
+    YAML_CONTENT_V48: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3614,7 +3850,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V49 = (
+    YAML_CONTENT_V49: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3761,7 +3997,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V50 = (
+    YAML_CONTENT_V50: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3911,7 +4147,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V51 = (
+    YAML_CONTENT_V51: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -4061,7 +4297,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V52 = (
+    YAML_CONTENT_V52: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -4211,7 +4447,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V53 = (
+    YAML_CONTENT_V53: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -4361,7 +4597,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V54 = (
+    YAML_CONTENT_V54: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -4500,7 +4736,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V55 = (
+    YAML_CONTENT_V55: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -4638,7 +4874,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V56 = (
+    YAML_CONTENT_V56: Final = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -4783,11 +5019,11 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V56
+    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V56
 
-    def test_load_from_v46_with_item_selection_input_interaction(self):
+    def test_load_from_v46_with_item_selection_input_interaction(self) -> None:
         """Tests the migration of ItemSelectionInput rule inputs."""
-        sample_yaml_content = (
+        sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -4906,7 +5142,7 @@ tags: []
 title: Title
 """)
 
-        latest_sample_yaml_content = (
+        latest_sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -4918,7 +5154,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5024,7 +5260,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5032,9 +5268,11 @@ title: Title
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-    def test_load_from_v46_with_drag_and_drop_sort_input_interaction(self):
+    def test_load_from_v46_with_drag_and_drop_sort_input_interaction(
+        self
+    ) -> None:
         """Tests the migration of DragAndDropSortInput rule inputs."""
-        sample_yaml_content = (
+        sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -5163,7 +5401,7 @@ tags: []
 title: Title
 """)
 
-        latest_sample_yaml_content = (
+        latest_sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -5175,7 +5413,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5291,7 +5529,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5299,9 +5537,11 @@ title: Title
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-    def test_load_from_v46_with_invalid_unicode_written_translations(self):
+    def test_load_from_v46_with_invalid_unicode_written_translations(
+        self
+    ) -> None:
         """Tests the migration of unicode written translations rule inputs."""
-        sample_yaml_content = (
+        sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -5392,7 +5632,7 @@ tags: []
 title: Title
 """)
 
-        latest_sample_yaml_content = (
+        latest_sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -5404,7 +5644,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5441,8 +5681,6 @@ states:
         ca_buttonText: {}
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -5453,8 +5691,6 @@ states:
             translation: hello
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        solution: {}
   END:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -5481,7 +5717,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5493,7 +5729,7 @@ title: Title
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
 
-    def test_convert_exploration_to_player_dict(self):
+    def test_convert_exploration_to_player_dict(self) -> None:
         exp_title = 'Title'
         second_state_name = 'first state'
 
@@ -5501,7 +5737,11 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'eid', title=exp_title, category='Category')
         exploration.add_states([second_state_name])
 
-        def _get_default_state_dict(content_str, dest_name, is_init_state):
+        def _get_default_state_dict(
+            content_str: str,
+            dest_name: str,
+            is_init_state: bool
+        ) -> state_domain.StateDict:
             """Gets the default state dict of the exploration."""
             return {
                 'linked_skill_id': None,
@@ -5569,7 +5809,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
 class StateOperationsUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
-    def test_delete_state(self):
+    def test_delete_state(self) -> None:
         """Test deletion of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.add_states(['first state'])
@@ -5580,7 +5820,16 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.delete_state(exploration.init_state_name)
 
         exploration.add_states(['second state'])
+
+        interaction = exploration.states['first state'].interaction
+
+        default_outcome_for_first_state = interaction.default_outcome
+        assert default_outcome_for_first_state is not None
+        default_outcome_for_first_state.dest_if_really_stuck = 'second state'
+
         exploration.delete_state('second state')
+        self.assertEqual(
+            default_outcome_for_first_state.dest_if_really_stuck, 'first state')
 
         with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
@@ -5589,7 +5838,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
 
-    def test_all_html_strings_are_collected(self):
+    def test_all_html_strings_are_collected(self) -> None:
 
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
@@ -5598,19 +5847,19 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state2 = exploration.states['state2']
         state3 = exploration.states['state3']
         state4 = exploration.states['state4']
-        content1_dict = {
+        content1_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<blockquote>Hello, this is state1</blockquote>'
         }
-        content2_dict = {
+        content2_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<pre>Hello, this is state2</pre>'
         }
-        content3_dict = {
+        content3_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>Hello, this is state3</p>'
         }
-        content4_dict = {
+        content4_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
             'html': '<p>Hello, this is state4</p>'
         }
@@ -5628,7 +5877,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(state3, 'ItemSelectionInput')
         self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
-        customization_args_dict1 = {
+        customization_args_dict1: Dict[
+            str, Dict[str, Union[Dict[str, str], int]]
+        ] = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -5637,7 +5888,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             },
             'rows': {'value': 1}
         }
-        customization_args_dict2 = {
+        customization_args_dict2: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {'value': [
                 {
                     'content_id': 'ca_choices_0',
@@ -5650,7 +5903,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             ]},
             'showChoicesInShuffledOrder': {'value': True}
         }
-        customization_args_dict3 = {
+        customization_args_dict3: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], int]]
+        ] = {
             'choices': {'value': [
                 {
                     'content_id': 'ca_choices_0',
@@ -5668,7 +5923,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 2}
         }
-        customization_args_dict4 = {
+        customization_args_dict4: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {'value': [
                 {
                     'content_id': 'ca_choices_0',
@@ -5708,8 +5965,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ]
         state2.update_interaction_hints(hint_list2)
 
-        solution_dict = {
-            'interaction_id': '',
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
             'explanation': {
@@ -5717,6 +5973,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
+        # Ruling out the possibility of None for mypy type checking.
+        assert state1.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state1.interaction.id, solution_dict)
         state1.update_interaction_solution(solution)
@@ -5815,7 +6073,9 @@ class ExplorationChangesMergeabilityUnitTests(
         test_utils.EmailTestBase):
     """Test methods related to exploration changes mergeability."""
 
-    def test_changes_are_mergeable_when_content_changes_do_not_conflict(self):
+    def test_changes_are_mergeable_when_content_changes_do_not_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -5829,6 +6089,7 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
 
+        test_dict: Dict[str, str] = {}
         # Making changes to properties except content.
         change_list_2 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
@@ -5840,7 +6101,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'old_value': {
                 'placeholder': {
                     'value': {
@@ -5876,7 +6137,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     }
                 }
             },
-            'old_value': {}
+            'old_value': test_dict
         })]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2, 'Changed Interaction.')
@@ -5947,7 +6208,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
-    def test_changes_are_not_mergeable_when_content_changes_conflict(self):
+    def test_changes_are_not_mergeable_when_content_changes_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -5991,7 +6254,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_mergeable_when_interaction_id_changes_do_not_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_mergeable_when_interaction_id_changes_do_not_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -6019,7 +6284,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             }],
             'state_name': 'Introduction',
-            'old_value': [],
+            'old_value': ['old_value'],
             'cmd': 'edit_state_property',
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
@@ -6066,6 +6331,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
+        test_dict: Dict[str, str] = {}
         # Changes to the properties affected by or affecting
         # interaction id and in interaction_id itself.
         change_list_3 = [exp_domain.ExplorationChange({
@@ -6075,7 +6341,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_id'
         }), exp_domain.ExplorationChange({
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction',
             'old_value': {
                 'rows': {
@@ -6112,7 +6378,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'state_name': 'Introduction',
-            'old_value': {},
+            'old_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         })]
@@ -6145,7 +6411,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'state_name': 'End',
             'cmd': 'edit_state_property',
-            'new_value': {},
+            'new_value': test_dict,
             'old_value': {
                 'recommendedExplorationIds': {
                     'value': []
@@ -6206,7 +6472,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'tagged_skill_misconception_id': None,
                 'training_data': []
             }],
-            'old_value': [],
+            'old_value': ['old_value'],
             'property_name': 'answer_groups'
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
@@ -6218,12 +6484,15 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_1_ID, 1, change_list_4)
         self.assertEqual(changes_are_mergeable_1, True)
 
-    def test_changes_are_not_mergeable_when_interaction_id_changes_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_not_mergeable_when_interaction_id_changes_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes to the properties affected by or affecting
         # interaction id and in interaction_id itself.
         change_list_2 = [exp_domain.ExplorationChange({
@@ -6233,7 +6502,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_id'
         }), exp_domain.ExplorationChange({
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction',
             'old_value': {
                 'rows': {
@@ -6270,7 +6539,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'state_name': 'Introduction',
-            'old_value': {},
+            'old_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         })]
@@ -6288,7 +6557,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_id'
         }), exp_domain.ExplorationChange({
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction',
             'old_value': {
                 'rows': {
@@ -6325,7 +6594,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'state_name': 'Introduction',
-            'old_value': {},
+            'old_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         })]
@@ -6334,12 +6603,15 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 1, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_mergeable_when_customization_args_changes_do_not_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_mergeable_when_customization_args_changes_do_not_conflict(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes in the properties which aren't affected by
         # customization args or doesn't affects customization_args.
         change_list = [exp_domain.ExplorationChange({
@@ -6362,7 +6634,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             }],
             'state_name': 'Introduction',
-            'old_value': [],
+            'old_value': ['old_value'],
             'cmd': 'edit_state_property',
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
@@ -6485,7 +6757,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
@@ -6525,7 +6797,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
-            'old_value': [],
+            'old_value': ['old_value'],
             'property_name': 'answer_groups',
             'new_value':
             [
@@ -6596,7 +6868,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End',
             'property_name': 'widget_customization_args',
             'cmd': 'edit_state_property',
-            'new_value': {}
+            'new_value': test_dict
         }), exp_domain.ExplorationChange({
             'old_value': 0,
             'state_name': 'End',
@@ -6610,7 +6882,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'new_value': 'ItemSelectionInput'
         }), exp_domain.ExplorationChange({
-            'old_value': {},
+            'old_value': test_dict,
             'state_name': 'End',
             'property_name': 'widget_customization_args',
             'cmd': 'edit_state_property',
@@ -6661,7 +6933,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'new_value': 5
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'End',
             'property_name': 'answer_groups',
             'cmd': 'edit_state_property',
@@ -6705,12 +6977,15 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_1_ID, 1, change_list_3)
         self.assertEqual(changes_are_mergeable_1, True)
 
-    def test_changes_are_not_mergeable_when_customization_args_changes_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_not_mergeable_when_customization_args_changes_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes in the properties which affected by or affecting
         # customization_args.
         change_list = [exp_domain.ExplorationChange({
@@ -6778,7 +7053,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
@@ -6818,7 +7093,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
-            'old_value': [],
+            'old_value': ['old_value'],
             'property_name': 'answer_groups',
             'new_value':
             [
@@ -6897,7 +7172,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_mergeable_when_answer_groups_changes_do_not_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_mergeable_when_answer_groups_changes_do_not_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -6913,7 +7190,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'rule_specs': [{
@@ -6943,7 +7220,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'hints',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
@@ -7286,6 +7563,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
+        test_dict: Dict[str, str] = {}
         # Changes to the properties related to the answer_groups
         # in the second state to check for mergeability.
         change_list_5 = [exp_domain.ExplorationChange({
@@ -7303,7 +7581,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End',
             'property_name': 'widget_customization_args',
             'cmd': 'edit_state_property',
-            'new_value': {}
+            'new_value': test_dict
         }), exp_domain.ExplorationChange({
             'old_value': 0,
             'state_name': 'End',
@@ -7317,7 +7595,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'new_value': 'ItemSelectionInput'
         }), exp_domain.ExplorationChange({
-            'old_value': {},
+            'old_value': test_dict,
             'state_name': 'End',
             'property_name': 'widget_customization_args',
             'cmd': 'edit_state_property',
@@ -7368,7 +7646,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'new_value': 5
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'End',
             'property_name': 'answer_groups',
             'cmd': 'edit_state_property',
@@ -7400,7 +7678,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_1_ID, 2, change_list_5)
         self.assertEqual(changes_are_mergeable_1, True)
 
-    def test_changes_are_not_mergeable_when_answer_groups_changes_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_not_mergeable_when_answer_groups_changes_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -7416,7 +7696,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'rule_specs': [{
@@ -7446,7 +7726,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'hints',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
@@ -7731,7 +8011,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_mergeable_when_solutions_changes_do_not_conflict(self):
+    def test_changes_are_mergeable_when_solutions_changes_do_not_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -7747,7 +8029,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'rule_specs': [{
@@ -7780,7 +8062,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'hints',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
@@ -8090,6 +8372,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
+        test_dict: Dict[str, str] = {}
         # Changes to the properties related to the solutions
         # in the second state to check for mergeability.
         change_list_4 = [exp_domain.ExplorationChange({
@@ -8104,7 +8387,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'value': []
                 }
             },
-            'new_value': {},
+            'new_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
             'state_name': 'End'
@@ -8138,7 +8421,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'next_content_id_index',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'new_value': [{
                 'outcome': {
                     'dest': 'End',
@@ -8165,7 +8448,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'answer_groups',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Hint 1. State 2.</p>',
@@ -8220,7 +8503,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_1_ID, 2, change_list_4)
         self.assertEqual(changes_are_mergeable_1, True)
 
-    def test_changes_are_not_mergeable_when_solutions_changes_conflict(self):
+    def test_changes_are_not_mergeable_when_solutions_changes_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -8236,7 +8521,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'rule_specs': [{
@@ -8269,7 +8554,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'hints',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
@@ -8515,7 +8800,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_mergeable_when_hints_changes_do_not_conflict(self):
+    def test_changes_are_mergeable_when_hints_changes_do_not_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -8531,7 +8818,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }],
             'property_name': 'hints',
             'cmd': 'edit_state_property',
-            'old_value': []
+            'old_value': ['old_value']
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': 2,
@@ -8557,6 +8844,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added Hint and Solution in Introduction state')
 
+        test_dict: Dict[str, str] = {}
         # Changes to all state propeties other than the hints.
         change_list_2 = [exp_domain.ExplorationChange({
             'property_name': 'content',
@@ -8611,7 +8899,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'value': 1
                 }
             },
-            'new_value': {}
+            'new_value': test_dict
         }), exp_domain.ExplorationChange({
             'property_name': 'solution',
             'state_name': 'Introduction',
@@ -8659,7 +8947,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'answer_groups',
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
-            'old_value': [],
+            'old_value': ['old_value'],
             'new_value': [{
                 'rule_specs': [{
                     'inputs': {
@@ -8827,7 +9115,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
-    def test_changes_are_not_mergeable_when_hints_changes_conflict(self):
+    def test_changes_are_not_mergeable_when_hints_changes_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -8843,7 +9133,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }],
             'property_name': 'hints',
             'cmd': 'edit_state_property',
-            'old_value': []
+            'old_value': ['old_value']
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': 2,
@@ -8979,12 +9269,15 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_mergeable_when_exploration_properties_changes_do_not_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_mergeable_when_exploration_properties_changes_do_not_conflict(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes to all the properties of both states other than
         # exploration properties i.e. title, category, objective etc.
         # Also included rename states changes to check that
@@ -9013,9 +9306,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ],
             'cmd': 'edit_state_property',
             'property_name': 'hints',
-            'old_value': [
-
-            ]
+            'old_value': ['old_value']
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': 2,
@@ -9030,7 +9321,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': 'TextInput'
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
-            'new_value': {},
+            'new_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
             'old_value': {
@@ -9104,9 +9395,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ],
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
-            'old_value': [
-
-            ]
+            'old_value': ['old_value']
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': {
@@ -9265,9 +9554,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'tags',
             'cmd': 'edit_exploration_property',
-            'old_value': [
-
-            ],
+            'old_value': ['old_value'],
             'new_value': [
                 'new'
             ]
@@ -9330,7 +9617,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 1, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
-    def test_changes_are_not_mergeable_when_exploration_properties_changes_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_not_mergeable_when_exploration_properties_changes_conflict(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -9361,9 +9650,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'tags',
             'cmd': 'edit_exploration_property',
-            'old_value': [
-
-            ],
+            'old_value': ['old_value'],
             'new_value': [
                 'new'
             ]
@@ -9406,9 +9693,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'tags',
             'cmd': 'edit_exploration_property',
-            'old_value': [
-
-            ],
+            'old_value': ['old_value'],
             'new_value': [
                 'new'
             ]
@@ -9428,7 +9713,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_mergeable_when_translations_changes_do_not_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_mergeable_when_translations_changes_do_not_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -9484,9 +9771,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'content_id': 'default_outcome',
                     'html': ''
                 },
-                'param_changes': [
-
-                ],
+                'param_changes': [],
                 'dest_if_really_stuck': None,
                 'dest': 'End'
             },
@@ -9508,9 +9793,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         }), exp_domain.ExplorationChange({
             'property_name': 'hints',
-            'old_value': [
-
-            ],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': [
@@ -9560,7 +9843,7 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_2 = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'rule_specs': [{
@@ -9767,7 +10050,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_3, True)
 
-    def test_changes_are_not_mergeable_when_translations_changes_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_not_mergeable_when_translations_changes_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -9778,7 +10063,7 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'new_value': [{
                 'rule_specs': [{
@@ -9880,9 +10165,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         }), exp_domain.ExplorationChange({
             'property_name': 'hints',
-            'old_value': [
-
-            ],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': [
@@ -10073,7 +10356,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_not_mergeable_1, False)
 
-    def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(self): # pylint: disable=line-too-long
+    def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -10153,7 +10438,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         }), exp_domain.ExplorationChange({
             'property_name': 'hints',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': [
@@ -10414,7 +10699,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 4, change_list_4)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_not_mergeable_when_voiceovers_changes_conflict(self):
+    def test_changes_are_not_mergeable_when_voiceovers_changes_conflict(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
@@ -10494,7 +10781,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         }), exp_domain.ExplorationChange({
             'property_name': 'hints',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': [
@@ -10659,12 +10946,15 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, False)
 
-    def test_changes_are_not_mergeable_when_state_added_or_deleted(self):
+    def test_changes_are_not_mergeable_when_state_added_or_deleted(
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes to the various properties of the first and
         # second state.
         change_list = [exp_domain.ExplorationChange({
@@ -10687,7 +10977,7 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': None,
@@ -10720,7 +11010,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': 2,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
             'new_value': [
@@ -10751,7 +11041,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ],
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'cmd': 'edit_state_property',
             'property_name': 'hints',
             'new_value': [
@@ -10900,7 +11190,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'param_changes': [],
                 'dest': 'End',
-                'dest_if_really_stuck': None,
+                'dest_if_really_stuck': 'End',
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',
@@ -10929,7 +11219,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': 'EndExploration',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
-            'old_value': {},
+            'old_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
             'new_value': {
@@ -10968,12 +11258,15 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_not_mergeable_when_frontend_version_exceeds_backend_version(self): # pylint: disable=line-too-long
+    def test_changes_are_not_mergeable_when_frontend_version_exceeds_backend_version(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes to the various properties of the first and
         # second state.
         change_list = [exp_domain.ExplorationChange({
@@ -10996,7 +11289,7 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': None,
@@ -11011,7 +11304,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': 2,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
             'new_value': [
@@ -11042,7 +11335,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ],
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'cmd': 'edit_state_property',
             'property_name': 'hints',
             'new_value': [
@@ -11086,7 +11379,8 @@ class ExplorationChangesMergeabilityUnitTests(
         self.assertEqual(changes_are_not_mergeable, False)
 
     def test_email_is_sent_to_admin_in_case_of_adding_deleting_state_changes(
-            self):
+        self
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
@@ -11097,6 +11391,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
             rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+            test_dict: Dict[str, str] = {}
             # Changes to the various properties of the first and
             # second state.
             change_list = [exp_domain.ExplorationChange({
@@ -11119,7 +11414,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'widget_customization_args',
-                'new_value': {},
+                'new_value': test_dict,
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
                 'old_value': None,
@@ -11152,7 +11447,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'new_value': 2,
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
-                'old_value': [],
+                'old_value': ['old_value'],
                 'cmd': 'edit_state_property',
                 'property_name': 'answer_groups',
                 'new_value': [
@@ -11183,7 +11478,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 ],
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
-                'old_value': [],
+                'old_value': ['old_value'],
                 'cmd': 'edit_state_property',
                 'property_name': 'hints',
                 'new_value': [
@@ -11338,7 +11633,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'new_value': 'EndExploration',
                 'state_name': 'End'
             }), exp_domain.ExplorationChange({
-                'old_value': {},
+                'old_value': test_dict,
                 'cmd': 'edit_state_property',
                 'property_name': 'widget_customization_args',
                 'new_value': {
@@ -11417,7 +11712,8 @@ class ExplorationChangesMergeabilityUnitTests(
             self.assertEqual(messages[0].html, expected_email_html_body)
 
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(
-            self):
+        self
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
@@ -11543,7 +11839,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
 class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
 
-    def _require_metadata_properties_to_be_synced(self):
+    def _require_metadata_properties_to_be_synced(self) -> None:
         """Raises error if there is a new metadata property in the Exploration
         object and it is not added in the ExplorationMetadata domain object.
 
@@ -11573,12 +11869,12 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 raise Exception(
                     'A new metadata property %s was added to the Exploration '
                     'domain object but not included in the '
-                    'ExplorationMetadata domain object. Please inlcude this '
+                    'ExplorationMetadata domain object. Please include this '
                     'new property in the ExplorationMetadata domain object '
                     'also.' % (metadata_property)
                 )
 
-    def test_exploration_metadata_gets_created(self):
+    def test_exploration_metadata_gets_created(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         exploration.update_param_specs({
             'ExampleParamOne': (
@@ -11642,7 +11938,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(actual_metadata_dict, expected_metadata_dict)
 
-    def test_metadata_properties_are_synced(self):
+    def test_metadata_properties_are_synced(self) -> None:
         self._require_metadata_properties_to_be_synced()
 
         swapped_metadata_properties = self.swap(
@@ -11679,7 +11975,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         error_message = (
             'A new metadata property %s was added to the Exploration '
             'domain object but not included in the '
-            'ExplorationMetadata domain object. Please inlcude this '
+            'ExplorationMetadata domain object. Please include this '
             'new property in the ExplorationMetadata domain object '
             'also.' % ('new_property')
         )
@@ -11691,7 +11987,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
 
 class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
-    def test_metadata_version_history_gets_created(self):
+    def test_metadata_version_history_gets_created(self) -> None:
         expected_dict = {
             'last_edited_version_number': 1,
             'last_edited_committer_id': 'user_1'
@@ -11700,8 +11996,8 @@ class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(expected_dict, actual_dict)
 
-    def test_metadata_version_history_gets_created_from_dict(self):
-        metadata_version_history_dict = {
+    def test_metadata_version_history_gets_created_from_dict(self) -> None:
+        metadata_version_history_dict: exp_domain.MetadataVersionHistoryDict = {
             'last_edited_version_number': 1,
             'last_edited_committer_id': 'user_1'
         }
@@ -11719,7 +12015,7 @@ class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
 class ExplorationVersionHistoryUnitTests(test_utils.GenericTestBase):
 
-    def test_exploration_version_history_gets_created(self):
+    def test_exploration_version_history_gets_created(self) -> None:
         state_version_history_dict = {
             'state 1': state_domain.StateVersionHistory(
                 1, 'state 1', 'user1'

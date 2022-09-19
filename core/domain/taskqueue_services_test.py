@@ -26,7 +26,7 @@ from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, Optional, Set
+from typing import Dict, Optional, Set
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -49,7 +49,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
                 self.y = 2
 
         arg1 = NonSerializableArgs()
-        serialization_exception = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        serialization_exception = self.assertRaisesRegex(
             ValueError,
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
@@ -65,7 +65,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         params: Dict[str, Set[str]] = {
             'param1': set()
         }
-        serialization_exception = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        serialization_exception = self.assertRaisesRegex(
             ValueError,
             'The params added to the email task call cannot be json serialized')
         with serialization_exception:
@@ -115,7 +115,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         def mock_create_http_task(
             queue_name: str,
             url: str,
-            payload: Optional[Dict[str, Any]] = None,
+            payload: Optional[Dict[str, str]] = None,
             scheduled_for: Optional[datetime.datetime] = None,
             task_name: Optional[str] = None
         ) -> None:

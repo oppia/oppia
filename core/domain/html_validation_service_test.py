@@ -29,13 +29,23 @@ from core.tests import test_utils
 
 import bs4
 
+from typing import Dict, List
+from typing_extensions import TypedDict
+
+
+class SvgDiagramTestCaseDict(TypedDict):
+    """Dict representing the test case SVG content Dictionary."""
+
+    html_content: str
+    expected_output: bool
+
 
 class ContentMigrationTests(test_utils.GenericTestBase):
     """Tests the function associated with the migration of html
     strings to valid RTE format.
     """
 
-    def test_wrap_with_siblings(self):
+    def test_wrap_with_siblings(self) -> None:
         test_cases = [{
             'html_content': (
                 '<p><i>hello</i></p> this is<i>test case1</i> for '
@@ -75,7 +85,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 
-    def test_validate_rte_format(self):
+    def test_validate_rte_format(self) -> None:
         test_cases_for_ckeditor = [
             (
                 '<pre>Hello this is <b> testing '
@@ -148,7 +158,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             actual_output_for_ckeditor, expected_output_for_ckeditor)
 
-    def test_validate_soup_for_rte(self):
+    def test_validate_soup_for_rte(self) -> None:
         test_cases_for_textangular = [
             (
                 '<p>Hello <b>this </b>is </p><p><br></p><p>test <b>case '
@@ -173,7 +183,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         ]
 
         expected_output_for_textangular = [False, True, False, True, True, True]
-        err_dict = {}
+        err_dict: Dict[str, List[str]] = {}
 
         for index, test_case in enumerate(test_cases_for_textangular):
             actual_output_for_textangular = (
@@ -213,7 +223,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 actual_output_for_ckeditor,
                 expected_output_for_ckeditor[index])
 
-    def test_validate_customization_args(self):
+    def test_validate_customization_args(self) -> None:
         test_cases = [(
             '<p><oppia-noninteractive-link text-with-value="&amp;quot;What is '
             'a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com&amp'
@@ -539,7 +549,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for key, expected in expected_output.items():
             self.assertEqual(set(actual_output[key]), set(expected))
 
-    def test_validate_customization_args_in_tag(self):
+    def test_validate_customization_args_in_tag(self) -> None:
         test_cases = [{
             'html_string': (
                 '<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
@@ -593,7 +603,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(actual_output, expected_output)
 
-    def test_svg_string_validation(self):
+    def test_svg_string_validation(self) -> None:
         # A Valid SVG string.
         valid_svg_string = (
             '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="'
@@ -640,7 +650,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.get_invalid_svg_tags_and_attrs(
                 invalid_svg_string), ([], ['path:keytimes']))
 
-    def test_svg_tag_without_xmlns_attribute(self):
+    def test_svg_tag_without_xmlns_attribute(self) -> None:
         # A valid SVG string with xmlns_attribute.
         valid_svg_string = (
             '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="'
@@ -663,7 +673,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.does_svg_tag_contains_xmlns_attribute(
                 invalid_svg_string))
 
-    def test_add_math_content_to_math_rte_components(self):
+    def test_add_math_content_to_math_rte_components(self) -> None:
         test_cases = [{
             'html_content': (
                 '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
@@ -748,7 +758,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[0]['html_content'])
 
-    def test_validate_math_tags_in_html(self):
+    def test_validate_math_tags_in_html(self) -> None:
         """Test that the validate_math_tags_in_html method validates an
         HTML string and returns all the invalid tags.
         """
@@ -781,7 +791,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for index, invalid_tag in enumerate(invalid_tags):
             self.assertEqual(str(invalid_tag), expected_invalid_tags[index])
 
-    def test_validate_math_tags_in_html_with_attribute_math_content(self):
+    def test_validate_math_tags_in_html_with_attribute_math_content(
+        self
+    ) -> None:
         """Test that the validate_math_tags_in_html_with_attribute_math_content
         method validates an HTML string and returns all the invalid tags.
         """
@@ -838,7 +850,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for invalid_tag in invalid_tags:
             self.assertIn(str(invalid_tag), expected_invalid_tags)
 
-    def test_extract_svg_filenames_in_math_rte_components(self):
+    def test_extract_svg_filenames_in_math_rte_components(self) -> None:
         """Test that the extract_svg_filenames_in_math_rte_components
         method extracts all the filenames from math rich-text components in
         html.
@@ -866,7 +878,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             extract_svg_filenames_in_math_rte_components(
                 html_string_with_no_filename), [])
 
-    def test_validate_svg_filenames_when_all_filenames_are_valid(self):
+    def test_validate_svg_filenames_when_all_filenames_are_valid(self) -> None:
         """Test the validate_svg_filenames_in_math_rich_text when valid
         filenames are present for each math rich-text components in html.
         """
@@ -893,7 +905,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1',
                 html_string_with_filename_having_filename), [])
 
-    def test_validate_svg_filenames_when_filenames_are_invalid(self):
+    def test_validate_svg_filenames_when_filenames_are_invalid(self) -> None:
         """Test the validate_svg_filenames_in_math_rich_text when
         filenames are present but invalid.
         """
@@ -924,7 +936,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;img2.'
                 'svg&amp;quot;}"></oppia-noninteractive-math>')])
 
-    def test_validate_svg_filenames_when_filenames_are_not_present(self):
+    def test_validate_svg_filenames_when_filenames_are_not_present(
+        self
+    ) -> None:
         """Test the validate_svg_filenames_in_math_rich_text when
         filenames are not present.
         """
@@ -955,7 +969,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
                 '&amp;quot;}"></oppia-noninteractive-math>')])
 
-    def test_validate_svg_filenames_format_when_all_filenames_are_valid(self):
+    def test_validate_svg_filenames_format_when_all_filenames_are_valid(
+        self
+    ) -> None:
         """Test the validate_svg_filenames_in_math_rich_text when valid
         filenames are present for each math rich-text components in html.
         """
@@ -976,7 +992,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             validate_math_content_attribute_in_html(
                 html_string_with_filename_having_valid_format), [])
 
-    def test_validate_svg_filenames_format_when_all_filenames_are_invalid(self):
+    def test_validate_svg_filenames_format_when_all_filenames_are_invalid(
+        self
+    ) -> None:
         """Test the validate_svg_filenames_in_math_rich_text when valid
         filenames are present for each math rich-text components in html.
         """
@@ -1025,11 +1043,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             expected_output
         )
 
-    def test_check_for_svgdiagram_component_in_html(self):
+    def test_check_for_svgdiagram_component_in_html(self) -> None:
         """Test that the check_for_svgdiagram_component_in_html method checks
         for math-tags in an HTML string and returns a boolean.
         """
-        test_cases = [{
+        test_cases: List[SvgDiagramTestCaseDict] = [{
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
                 'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
@@ -1053,7 +1071,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     test_case['html_content']),
                 test_case['expected_output'])
 
-    def test_parsable_as_xml(self):
+    def test_parsable_as_xml(self) -> None:
         invalid_xml = b'aDRjSzNS'
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
@@ -1062,7 +1080,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
-        invalid_xml = False
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        invalid_xml = False  # type: ignore[assignment]
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
@@ -1071,7 +1092,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.is_parsable_as_xml(valid_xml),
             True)
 
-    def test_convert_svg_diagram_tags_to_image_tags(self):
+    def test_convert_svg_diagram_tags_to_image_tags(self) -> None:
         test_cases = [{
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
@@ -1196,7 +1217,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     test_case['html_content']),
                 test_case['expected_output'])
 
-    def test_no_convertion_of_non_interactive_image_tags(self):
+    def test_no_convertion_of_non_interactive_image_tags(self) -> None:
         """Test that the convert_svg_diagram_tags_to_image_tags does not make
         any changes in already existing oppia-noninteractive image tags.
         """
@@ -1246,7 +1267,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     test_case['html_content']),
                 test_case['expected_output'])
 
-    def test_fix_incorrectly_encoded_chars_replaces_incorrect_encodings(self):
+    def test_fix_incorrectly_encoded_chars_replaces_incorrect_encodings(
+        self
+    ) -> None:
         test_cases = [
             {
                 'html_string': '<p>This is <span>testing &nbsp;</span></p>',

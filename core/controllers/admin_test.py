@@ -56,8 +56,8 @@ from core.tests import test_utils
     audit_models, blog_models, exp_models, opportunity_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.blog, models.NAMES.exploration,
-    models.NAMES.opportunity, models.NAMES.user
+    models.Names.AUDIT, models.Names.BLOG, models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY, models.Names.USER
 ])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -78,7 +78,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
-        super(AdminIntegrationTest, self).setUp()
+        super().setUp()
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1013,7 +1013,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy explorations."""
 
     def setUp(self):
-        super(GenerateDummyExplorationsTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_generate_count_greater_than_publish_count(self):
@@ -1133,7 +1133,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
-        super(AdminRoleHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -1393,7 +1393,7 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicManagerRoleHandler."""
 
     def setUp(self):
-        super(TopicManagerRoleHandlerTest, self).setUp()
+        super().setUp()
         self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
 
     def test_handler_with_invalid_username(self):
@@ -1539,7 +1539,7 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
     """Tests for BannedUsersHandler."""
 
     def setUp(self):
-        super(BannedUsersHandlerTest, self).setUp()
+        super().setUp()
         self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
 
     def test_mark_a_user_ban(self):
@@ -1695,7 +1695,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
-        super(DataExtractionQueryHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1838,6 +1838,19 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         self.assertEqual(result_collections, ['0'])
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        user_id_a = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )  # type: ignore[no-untyped-call]
+        blog_post = blog_services.create_new_blog_post(user_id_a)
+        change_dict = blog_services.BlogPostChangeDict = {
+            'title': 'Welcome to Oppia',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': 'Hello Blog Authors',
+            'tags': ['Math', 'Science']
+        }
+        blog_services.update_blog_post(blog_post.id, change_dict)
+        blog_services.publish_blog_post(blog_post.id)
+
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(
             '/adminhandler', {
@@ -1851,13 +1864,17 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         result_collections = search_services.search_collections(
             'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, [])
+        result_blog_posts = (
+            search_services.search_blog_post_summaries('Welcome', [], 2)[0]
+        )
+        self.assertEqual(result_blog_posts, [])
 
 
 class SendDummyMailTest(test_utils.GenericTestBase):
     """"Tests for sending test mails to admin."""
 
     def setUp(self):
-        super(SendDummyMailTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_send_dummy_mail(self):
@@ -1885,7 +1902,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     NEW_USERNAME = 'newUsername'
 
     def setUp(self):
-        super(UpdateUsernameHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.OLD_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
@@ -2040,7 +2057,7 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
     """Tests NumberOfDeletionRequestsHandler."""
 
     def setUp(self):
-        super(NumberOfDeletionRequestsHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
@@ -2062,7 +2079,7 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
     """Tests VerifyUserModelsDeletedHandler."""
 
     def setUp(self):
-        super(VerifyUserModelsDeletedHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.admin_user_id = (
@@ -2089,7 +2106,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
     """Tests DeleteUserHandler."""
 
     def setUp(self):
-        super(DeleteUserHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
@@ -2143,7 +2160,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     """Tests UpdateBlogPostHandler."""
 
     def setUp(self):
-        super(UpdateBlogPostHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
