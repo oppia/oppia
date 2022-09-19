@@ -1,8 +1,8 @@
 <div class="navbar-mobile-container">
-  <i class="fa fa-book show-mobile-navbar-icon" (click)="toggleMobileNavOptions()" aria-label="Mobile navbar options"></i>
+  <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" aria-label="Mobile navbar options"></i>
   <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
     <div class="exp-nav-dropdown-container">
-      <div class="exp-nav-dropdown-content" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <div class="exp-nav-dropdown-content e2e-test-mobile-options-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <a>
           <i class="material-icons">&#xE254;</i>
           Options
@@ -37,7 +37,7 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
             </a>
           </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'settings'}">
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-settings-button" [ngClass]="{'active': getActiveTabName() === 'settings'}">
             <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE8B8;</i>
@@ -117,7 +117,7 @@
           </div>
         </div>
 
-        <div class="exp-nav-dropdown-icon" id="discardButtonPopup" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <div class="exp-nav-dropdown-icon e2e-test-mobile-changes-dropdown" id="discardButtonPopup" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fa fa-caret-down"></i>
         </div>
 
@@ -127,7 +127,7 @@
             Discard
           </div>
           <div *ngIf="showPublishButton()" [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
-            <button type="button" class="btn btn-light"
+            <button type="button" class="btn btn-light e2e-test-mobile-publish-button"
                     [ngClass]="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
                     (click)="showPublishExplorationModal()"
                     [disabled]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
