@@ -38,6 +38,8 @@ import { ExplorationPlayerPageRoutingModule } from './exploration-player-page-ro
 import { ExplorationPlayerPageRootComponent } from './exploration-player-page-root.component';
 import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
 
+import 'third-party-imports/skulpt.import';
+
 @NgModule({
   imports: [
     CommonModule,
