@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 (base_models, skill_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.skill
+    models.Names.BASE_MODEL, models.Names.SKILL
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -182,10 +182,10 @@ class QuestionModel(base_models.VersionedModel):
             'The id generator for QuestionModel is producing too many '
             'collisions.')
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with VersionedModel.compute_models_to_commit(). Because
-    # argument `commit_message` of super class can accept Optional[str] but
-    # this method can only accept str.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with VersionedModel.compute_models_to_commit(). Because argument
+    # `commit_message` of super class can accept Optional[str] but this method
+    # can only accept str.
     def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,

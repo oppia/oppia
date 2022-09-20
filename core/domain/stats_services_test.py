@@ -39,7 +39,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 
 
 class StatisticsServicesTests(test_utils.GenericTestBase):
@@ -61,6 +61,17 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.exp_id, 'admin', title='Title 1', end_state_name='End',
             correctness_feedback_enabled=True)
+
+    def test_raises_error_if_playthrough_model_fetched_with_invalid_id_and_strict(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No PlaythroughModel exists for the playthrough_id: invalid_id'
+        ):
+            stats_services.get_playthrough_models_by_ids(
+                ['invalid_id'], strict=True
+            )
 
     def test_get_exploration_stats_with_new_exp_id(self) -> None:
         exploration_stats = stats_services.get_exploration_stats(
@@ -256,7 +267,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         """Tests that the update_stats returns if a state name is undefined."""
         # Here we use MyPy ignore because AggregatedStatsDict can only accept
         # Dict[str, int] but for testing purpose here we are providing str for
-        # one of the value which causes MyPy to throw a error. Thus to avoid
+        # one of the value which causes MyPy to throw an error. Thus to avoid
         # the error, we used ignore here.
         aggregated_stats: stats_domain.AggregatedStatsDict = {
             'num_starts': '1',  # type: ignore[typeddict-item]

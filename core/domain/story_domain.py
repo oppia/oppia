@@ -197,6 +197,196 @@ class StoryChange(change_domain.BaseChange):
     }]
 
 
+class CreateNewStoryCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_CREATE_NEW command.
+    """
+
+    title: str
+
+
+class MigrateSchemaToLatestVersionCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class UpdateStoryNodeOutlineStatusCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_OUTLINE_STATUS command.
+    """
+
+    node_id: str
+    old_value: bool
+    new_value: bool
+
+
+class DeleteStoryNodeCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_DELETE_STORY_NODE command.
+    """
+
+    node_id: str
+
+
+class AddStoryNodeCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_ADD_STORY_NODE command.
+    """
+
+    node_id: str
+    title: str
+
+
+class UpdateStoryContentsPropertyInitialNodeIdCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_CONTENTS_PROPERTY command with
+    INITIAL_NODE_ID as allowed value.
+    """
+
+    property_name: Literal['initial_node_id']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryContentsPropertyNodeCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_CONTENTS_PROPERTY command with
+    NODE as allowed value.
+    """
+
+    property_name: Literal['node']
+    new_value: int
+    old_value: int
+
+
+class UpdateStoryNodePropertyDestinationNodeIdsCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_DESTINATION_NODE_IDS as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['destination_node_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateStoryNodePropertyAcquiredSkillIdsCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['acquired_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateStoryNodePropertyPrerequisiteSkillIdsCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['prerequisite_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateStoryNodePropertyOutlineCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_OUTLINE as allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['outline']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyExplorationIdCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_EXPLORATION_ID as allowed
+    value.
+    """
+
+    node_id: str
+    property_name: Literal['exploration_id']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyTitleCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_TITLE as allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['title']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyDescriptionCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_DESCRIPTION as allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['description']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyThumbnailBGColorCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['thumbnail_bg_color']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyThumbnailFilenameCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_THUMBNAIL_FILENAME as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['thumbnail_filename']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryPropertyCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: str
+    old_value: str
+
+
 class StoryNodeDict(TypedDict):
     """Dictionary representing the StoryNode object."""
 
@@ -1113,12 +1303,13 @@ class Story:
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        # Here, to_dict() method returns a general dictionary representation of
-        # domain object which do not contain properties like created_on and
-        # last_updated but MyPy expecting story_dict a dictionary which
-        # contain all the properties of domain object. That's why we explicitly
-        # changing the type of story_dict here which causes MyPy to throw error,
-        # thus to silent the error we added an ignore here.
+        # Here we use MyPy ignore because to_dict() method returns a general
+        # dictionary representation of domain object (StoryDict) which does not
+        # contain properties like created_on and last_updated but MyPy expecting
+        # story_dict, a dictionary which contain all the properties of domain
+        # object. That's why we explicitly changing the type of story_dict,
+        # here which causes MyPy to throw an error. Thus, to silence the error,
+        # we added an ignore here.
         story_dict: SerializableStoryDict = self.to_dict()  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version

@@ -63,10 +63,9 @@ class BaseValueGenerator:
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
             '%s.html' % cls.__name__))
 
-    # Since child classes of BaseValueGenerator can use
-    # the 'generate_value' function with different types
-    # of arguments, 'args', 'kwargs' and return type
-    # are set to 'Any'.
+    # Here we use type Any because child classes of BaseValueGenerator can use
+    # the 'generate_value' function with different types of arguments, 'args',
+    # 'kwargs' and return type are set to 'Any'.
     def generate_value(
         self,
         *args: Any,

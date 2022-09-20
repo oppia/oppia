@@ -21,6 +21,7 @@ from __future__ import annotations
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
+from core.domain import learner_group_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -37,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (learner_group_models, user_models) = models.Registry.import_models(
-    [models.NAMES.learner_group, models.NAMES.user])
+    [models.Names.LEARNER_GROUP, models.Names.USER])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -272,18 +273,14 @@ def get_matching_learner_group_syllabus_to_add(
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 matching_topic_ids.extend(classroom['topic_ids'])
-        matching_topics_with_none: Sequence[
-            Optional[topic_domain.Topic]
-        ] = (
-            topic_fetchers.get_topics_by_ids(matching_topic_ids)
+        matching_topics: List[topic_domain.Topic] = (
+            topic_fetchers.get_topics_by_ids(matching_topic_ids, strict=True)
         )
     else:
-        matching_topics_with_none = topic_fetchers.get_all_topics()
+        matching_topics = topic_fetchers.get_all_topics()
 
     keyword = keyword.lower()
-    for topic in matching_topics_with_none:
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
+    for topic in matching_topics:
         if language_code not in (
             constants.DEFAULT_ADD_SYLLABUS_FILTER, topic.language_code
         ):
@@ -421,7 +418,7 @@ def get_matching_story_syllabus_item_dicts(
         )
     ]
     matching_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
-    stories = story_fetchers.get_stories_by_ids(story_ids)
+    stories = story_fetchers.get_stories_by_ids(story_ids, strict=True)
 
     matching_story_syllabus_item_dicts: List[
         story_domain.LearnerGroupSyllabusStorySummaryDict] = []
@@ -429,8 +426,6 @@ def get_matching_story_syllabus_item_dicts(
     for ind, story_summary in enumerate(matching_stories):
         if keyword is None or keyword in story_summary.title.lower():
             story = stories[ind]
-            # Ruling out the possibility of None for mypy type checking.
-            assert story is not None
             summary_dict = story_summary.to_dict()
             matching_story_syllabus_item_dicts.append({
                 'id': summary_dict['id'],
@@ -532,13 +527,14 @@ def remove_learners_from_learner_group(
         learner_group_model.update_timestamps()
         learner_group_model.put()
 
-    learner_grps_users_models = user_models.LearnerGroupsUserModel.get_multi(
-        user_ids)
+    learner_grps_users_models = (
+        learner_group_fetchers.get_learner_group_models_by_ids(
+            user_ids, strict=True
+        )
+    )
 
     models_to_put = []
     for learner_grps_user_model in learner_grps_users_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert learner_grps_user_model is not None
         learner_grps_user_model.learner_groups_user_details = [
             details for details in
             learner_grps_user_model.learner_groups_user_details
@@ -608,12 +604,13 @@ def remove_invited_learners_from_learner_group(
         learner_group_model.put()
 
     found_models = (
-        user_models.LearnerGroupsUserModel.get_multi(learner_ids))
+        learner_group_fetchers.get_learner_group_models_by_ids(
+            learner_ids, strict=True
+        )
+    )
 
     models_to_put = []
     for model in found_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         if group_id in model.invited_to_learner_groups_ids:
             model.invited_to_learner_groups_ids.remove(group_id)
             models_to_put.append(model)
@@ -703,8 +700,6 @@ def remove_story_reference_from_learner_groups(story_id: str) -> None:
 
     models_to_put = []
     for model in found_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         model.story_ids.remove(story_id)
         models_to_put.append(model)
 
@@ -737,8 +732,6 @@ def remove_subtopic_page_reference_from_learner_groups(
 
     models_to_put = []
     for model in found_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         model.subtopic_page_ids.remove(subtopic_page_id)
         models_to_put.append(model)
 

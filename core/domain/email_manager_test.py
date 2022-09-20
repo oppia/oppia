@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (email_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.email, models.NAMES.suggestion])
+    [models.Names.EMAIL, models.Names.SUGGESTION])
 
 
 class FailedMLTest(test_utils.EmailTestBase):
@@ -673,6 +673,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
     ) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            email_manager.SIGNUP_EMAIL_CONTENT.default_value, dict
+        )
         config_services.set_property(
             self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
                 'subject': (
@@ -6221,6 +6225,31 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
+
+    def test_without_language_code_email_not_sent_to_new_translation_reviewer(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The language_code cannot be None'
+        ):
+            with self.can_not_send_emails_ctx:
+                email_manager.send_email_to_new_contribution_reviewer(
+                    self.translation_reviewer_id,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+                )
+
+    def test_without_language_code_email_not_sent_to_removed_translation_reviewer(   # pylint: disable=line-too-long
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The language_code cannot be None'
+        ):
+            with self.can_not_send_emails_ctx:
+                email_manager.send_email_to_removed_contribution_reviewer(
+                    self.translation_reviewer_id,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
 
     def test_assign_translation_reviewer_email_for_invalid_review_category(
         self
