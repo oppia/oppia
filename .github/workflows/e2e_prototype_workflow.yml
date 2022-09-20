@@ -57,6 +57,7 @@ jobs:
       matrix:
         os: [ ubuntu-22.04 ]
     steps:
+      - uses: ./.github/actions/merge
       - name: download webpack
         uses: actions/download-artifact@v2
         with:
@@ -107,6 +108,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
     steps:
+      - uses: ./.github/actions/merge
       - name: download webpack
         uses: actions/download-artifact@v2
         with:
