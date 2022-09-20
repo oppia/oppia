@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root Component for about foundation page.
+ * @fileoverview Root Component for Android page.
  */
 
 import { Component } from '@angular/core';

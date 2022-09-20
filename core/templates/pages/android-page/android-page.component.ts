@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the about foundation page.
+ * @fileoverview Component for the Android page.
  */
 
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';

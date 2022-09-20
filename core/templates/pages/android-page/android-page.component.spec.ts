@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for about foundation page.
+ * @fileoverview Unit tests for Android page.
  */
 
 import { NO_ERRORS_SCHEMA, EventEmitter, ElementRef } from '@angular/core';

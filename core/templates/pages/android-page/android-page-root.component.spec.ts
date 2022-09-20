@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the about foundation page root component.
+ * @fileoverview Unit tests for the Android page root component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -24,7 +24,7 @@ import { PageHeadService } from 'services/page-head.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { AndroidPageRootComponent } from './android-page-root.component';
 
-describe('About foundation Page Root', () => {
+describe('Android Page Root', () => {
   let fixture: ComponentFixture<AndroidPageRootComponent>;
   let component: AndroidPageRootComponent;
   let pageHeadService: PageHeadService;

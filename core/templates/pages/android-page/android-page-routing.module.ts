@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Routing module for about foundation page.
+ * @fileoverview Routing module for Android page.
  */
 
 import { NgModule } from '@angular/core';
