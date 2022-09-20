@@ -32,7 +32,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import config_models
 
 (base_models, config_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.config
+    models.Names.BASE_MODEL, models.Names.CONFIG
 ])
 
 

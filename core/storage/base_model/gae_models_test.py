@@ -33,7 +33,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
@@ -222,6 +222,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
+        # Here we use cast because we are narrowing down the type from
+        # List[Optional[BaseModel]] to List[BaseModel].
         models_2_without_none = cast(
             List[base_models.BaseModel],
             base_models.BaseModel.get_multi(model_ids)
@@ -235,6 +237,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
+        # Here we use cast because we are narrowing down the type from
+        # List[Optional[BaseModel]] to List[BaseModel].
         models_3_without_none = cast(
             List[base_models.BaseModel],
             base_models.BaseModel.get_multi(model_ids)
@@ -654,18 +658,18 @@ class VersionedModelTests(test_utils.GenericTestBase):
             self
     ) -> None:
         model1 = TestVersionedModel(id='model_id1')
-        # TODO(#13528): Remove this test after the backend is fully
-        # type-annotated. Here ignore[assignment] is used to test method
-        # commit() for invalid SNAPSHOT_METADATA_CLASS.
+        # TODO(#13528): Here we use MyPy ignore because we remove this test
+        # after the backend is fully type-annotated. Here ignore[assignment]
+        # is used to test method commit() for invalid SNAPSHOT_METADATA_CLASS.
         model1.SNAPSHOT_METADATA_CLASS = None # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'No snapshot metadata class defined.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         model1 = TestVersionedModel(id='model_id1')
-        # TODO(#13528): Remove this test after the backend is fully
-        # type-annotated. Here ignore[assignment] is used to test method
-        # commit() for invalid SNAPSHOT_CONTENT_CLASS.
+        # TODO(#13528): Here we use MyPy ignore because we remove this test
+        # after the backend is fully type-annotated. Here ignore[assignment]
+        # is used to test method commit() for invalid SNAPSHOT_CONTENT_CLASS.
         model1.SNAPSHOT_CONTENT_CLASS = None # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'No snapshot content class defined.'):
@@ -674,17 +678,17 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegex(
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[arg-type] is used to test method
-            # commit() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. Here ignore[arg-type]
+            # is used to test method commit() for invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', {}) # type: ignore[arg-type]
 
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegex(
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[list-item] is used to test method
-            # commit() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. Here ignore[list-item]
+            # is used to test method commit() for invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]]) # type: ignore[list-item]
 
     def test_put_raises_not_implemented_error_for_versioned_models(
@@ -848,9 +852,10 @@ class VersionedModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             ValueError,
             'At least one version number is invalid'):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[list-item] is used to test method
-            # get_multi_versions() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. Here ignore[list-item]
+            # is used to test method get_multi_versions() for invalid input
+            # type.
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2]) # type: ignore[list-item]
 
 

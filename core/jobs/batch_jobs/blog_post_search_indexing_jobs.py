@@ -37,7 +37,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import blog_models
     from mypy_imports import search_services as platform_search_services
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 platform_search_services = models.Registry.import_search_services()
 
@@ -74,9 +74,10 @@ class IndexBlogPostsInSearchJob(base_jobs.JobBase):
         )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
 class IndexBlogPostSummaries(beam.DoFn): # type: ignore[misc]
     """DoFn to index blog post summaries."""
