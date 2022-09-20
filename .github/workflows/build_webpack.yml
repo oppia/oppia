@@ -51,8 +51,3 @@ jobs:
         with:
           name: built-webpack
           path: /home/runner/work/oppia/oppia/build
-      - name: download webpack
-        uses: actions/download-artifact@v2
-        with:
-          name: built-webpack
-          path: /home/runner/work/oppia/oppia/build
