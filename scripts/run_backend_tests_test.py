@@ -663,6 +663,16 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_individual_test_in_test_file_is_run_successfully(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
+
+        executed_tasks = []
+        test_target = (
+            'scripts.new_test_file_test.NewTestFileTests.test_for_something')
+        def mock_execute(tasks, *unused_args) -> None:
+            for task in tasks:
+                executed_tasks.append(task)
+
+        swap_execute_task = self.swap(
+            concurrent_task_utils, 'execute_tasks', mock_execute)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
@@ -670,17 +680,15 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
-        args = [
-            '--test_target',
-            'scripts.new_test_file_test.NewTestFileTests.test_for_something',
-            '--generate_coverage_report'
-        ]
-        with self.swap_fix_third_party_imports, self.swap_execute_task:
-            with swap_check_coverage, self.swap_redis_server, self.print_swap:
+        args = ['--test_target', test_target, '--generate_coverage_report']
+        with self.swap_fix_third_party_imports, self.print_swap:
+            with swap_check_coverage, self.swap_redis_server, swap_execute_task:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
                     with self.swap_check_call:
                         run_backend_tests.main(args=args) # type: ignore[no-untyped-call]
 
+        self.assertEqual(len(executed_tasks), 1)
+        self.assertEqual(executed_tasks[0].name, test_target)
         self.assertIn('All tests passed.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
 
