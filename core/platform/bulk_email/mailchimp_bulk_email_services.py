@@ -27,6 +27,8 @@ from core import feconf
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
+from typing import Optional
+
 
 def _get_subscriber_hash(email: str) -> str:
     """Returns Mailchimp subscriber hash from email.
@@ -49,23 +51,19 @@ def _get_subscriber_hash(email: str) -> str:
     return md5_hash.hexdigest()
 
 
-def _get_mailchimp_class() -> mailchimp3.MailChimp:
+def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     """Returns the mailchimp api class. This is separated into a separate
     function to facilitate testing.
 
     NOTE: No other functionalities should be added to this function.
 
     Returns:
-        Mailchimp. A mailchimp class instance with the API key and username
+        Mailchimp|None. A mailchimp class instance with the API key and username
         initialized.
     """
-    # The return value ignore pragma is required for this. This is
-    # because adding a Union[] type annotation to handle both None and
-    # mailchimp3.MailChimp causes errors where the return value is called
-    # (for eg: client.lists), since NoneType does not have an attribute lists.
     if not feconf.MAILCHIMP_API_KEY:
         logging.exception('Mailchimp API key is not available.')
-        return None # type: ignore[return-value]
+        return None
 
     if not feconf.MAILCHIMP_USERNAME:
         logging.exception('Mailchimp username is not set.')
@@ -78,11 +76,15 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
         mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
 
-def _create_user_in_mailchimp_db(user_email: str) -> bool:
+def _create_user_in_mailchimp_db(
+    client: mailchimp3.MailChimp, user_email: str
+) -> bool:
     """Creates a new user in the mailchimp database and handles the case where
     the user was permanently deleted from the database.
 
     Args:
+        client: mailchimp3.MailChimp. A mailchimp instance with the API key and
+            username initialized.
         user_email: str. Email ID of the user. Email is used to uniquely
             identify the user in the mailchimp DB.
 
@@ -99,7 +101,6 @@ def _create_user_in_mailchimp_db(user_email: str) -> bool:
         'email_address': user_email,
         'status': 'subscribed'
     }
-    client = _get_mailchimp_class()
 
     try:
         client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)
@@ -230,7 +231,7 @@ def add_or_update_user_status(
         if error_message['status'] == 404:
             if can_receive_email_updates:
                 user_creation_successful = _create_user_in_mailchimp_db(
-                    user_email)
+                    client, user_email)
                 if not user_creation_successful:
                     return False
         else:

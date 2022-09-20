@@ -26,6 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Sequence
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -33,16 +34,17 @@ if MYPY: # pragma: no cover
     from mypy_imports import email_models
     from mypy_imports import user_models  # pylint: disable=unused-import
 
-(base_models, email_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])
+(base_models, email_models, user_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER
+])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
-    SENDER_ID = 'sender_id'
-    RECIPIENT_ID = 'recipient_id'
-    NONEXISTENT_USER_ID = 'id_x'
+    SENDER_ID: Final = 'sender_id'
+    RECIPIENT_ID: Final = 'recipient_id'
+    NONEXISTENT_USER_ID: Final = 'id_x'
 
     def setUp(self) -> None:
         super().setUp()
@@ -174,9 +176,10 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'Expected datetime, received Not a datetime object of type '
             '<class \'str\'>'
         ):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[arg-type] is used to test method
-            # get_by_hash() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this
+            # test after the backend is fully type-annotated. Here
+            # ignore[arg-type] is used to test method get_by_hash()
+            # for invalid input type.
             email_models.SentEmailModel.get_by_hash(
                 'Email Hash',
                 sent_datetime_lower_bound='Not a datetime object') # type: ignore[arg-type]
@@ -202,8 +205,8 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the BulkEmailModel class."""
 
-    SENDER_ID = 'sender_id'
-    NONEXISTENT_USER_ID = 'id_x'
+    SENDER_ID: Final = 'sender_id'
+    NONEXISTENT_USER_ID: Final = 'id_x'
 
     def setUp(self) -> None:
         super().setUp()

@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -118,9 +118,10 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             def __init__(
                 self, model: Union[base_models.BaseModel, str]
             ) -> None:
-                # TODO(#13059): After we fully type the codebase we plan to get
-                # rid of the tests that intentionally test wrong inputs that we
-                # can normally catch by typing.
+                # TODO(#13059): Here we use MyPy ignore because after we
+                # fully type the codebase we plan to get rid of the tests
+                # that intentionally test wrong inputs that we can normally
+                # catch by typing.
                 super().__init__(123, model)  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(TypeError, 'must be a string'):
