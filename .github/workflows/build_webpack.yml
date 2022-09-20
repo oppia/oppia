@@ -1,0 +1,58 @@
+name: build_webpack
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  build_webpack:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
+      - name: Install chrome
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.install_chrome_for_ci
+      - name: Install ffmpeg
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: sudo apt install ffmpeg
+      - name: Build Webpack
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.build --prod_env
+      - name: Uploading webpack as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: built-webpack
+          path: /home/runner/work/oppia/oppia/build
+      - name: download webpack
+        uses: actions/download-artifact@v2
+        with:
+          name: built-webpack
+          path: /home/runner/work/oppia/oppia/build
