@@ -973,6 +973,9 @@ URLS = [
         r'%s' % feconf.FACILITATOR_DASHBOARD_HANDLER,
         learner_group.FacilitatorDashboardHandler),
     get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER,
+        learner_group.LearnerDashboardLearnerGroupsHandler),
+    get_redirect_route(
         r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
         learner_group.FacilitatorLearnerGroupViewHandler),
     get_redirect_route(

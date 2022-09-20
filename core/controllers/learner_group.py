@@ -827,3 +827,53 @@ class LearnerStoriesChaptersProgressHandler(base.BaseHandler):
                 user_id, story_ids))
 
         self.render_json(stories_chapters_progress)
+
+
+class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
+    """Handles fetching of learners groups on learner dashboard."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self):
+        """Handles GET requests for the fetching learner groups on learner dashboard."""
+
+        invited_to_learner_groups = (
+            learner_group_fetchers.get_invited_learner_groups_of_learner(
+                self.user_id)
+        )
+        invited_to_learner_groups_data = []
+        for learner_group in invited_to_learner_groups:
+            invited_to_learner_groups_data.append({
+                'id': learner_group.group_id,
+                'title': learner_group.title,
+                'description': learner_group.description,
+                'facilitator_usernames': user_services.get_usernames(
+                    learner_group.facilitator_user_ids),
+                'learners_count': len(learner_group.learner_user_ids)
+            })
+
+        learner_of_learner_groups = (
+            learner_group_fetchers.get_learner_groups_of_learner(
+                self.user_id)
+        )
+        learner_of_learner_groups_data = []
+        for learner_group in learner_of_learner_groups:
+            learner_of_learner_groups_data.append({
+                'id': learner_group.group_id,
+                'title': learner_group.title,
+                'description': learner_group.description,
+                'facilitator_usernames': user_services.get_usernames(
+                    learner_group.facilitator_user_ids),
+                'learners_count': len(learner_group.learner_user_ids)
+            })
+
+        self.render_json({
+            'learner_of_learner_groups': learner_of_learner_groups_data,
+            'invited_to_learner_groups': invited_to_learner_groups_data
+        })
