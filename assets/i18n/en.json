@@ -1,5 +1,4 @@
 {
-    "I18N_ANDROID_PAGE_TITLE": "Android | Oppia",
     "I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "About the Oppia Foundation",
     "I18N_ABOUT_FOUNDATION_PAGE_TITLE": "About the Oppia Foundation | Oppia",
     "I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Create an Exploration",
@@ -74,6 +73,7 @@
     "I18N_ADD_NEW_SYLLABUS_ITEMS": "New Syllabus Items",
     "I18N_ADD_SYLLABUS_DESCRIPTION_TEXT": "Add skills or stories to your syllabus to automatically send them to your learners.",
     "I18N_ADD_SYLLABUS_SEARCH_PLACEHOLDER": "Search eg. Story,  Physics, English",
+    "I18N_ANDROID_PAGE_TITLE": "Android | Oppia",
     "I18N_ASSIGNED_STORIES_AND_SKILLS": "Assigned Stories and Skills",
     "I18N_ASSIGNED_STORIES_AND_SKILLS_EMPTY_MESSAGE": "No stories or skills have been assigned to learners in this group.",
     "I18N_ATTRIBUTION_HTML_STEP_ONE": "Copy and paste the HTML",
