@@ -2057,7 +2057,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{MagicianNumber}}'
+            x: 10
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -2072,7 +2072,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{MagicianNumber}}'
+            x: 50
           rule_type: IsGreaterThan
         tagged_skill_misconception_id: null
         training_data: []
@@ -2087,7 +2087,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{MagicianNumber}}'
+            x: 5
           rule_type: IsLessThan
         tagged_skill_misconception_id: null
         training_data: []
@@ -2196,7 +2196,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{MagicianNumber}}'
+            x: 10
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -2211,7 +2211,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{MagicianNumber}}'
+            x: 5
           rule_type: IsLessThan
         tagged_skill_misconception_id: null
         training_data: []
@@ -2226,7 +2226,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{MagicianNumber}}'
+            x: 20
           rule_type: IsGreaterThan
         tagged_skill_misconception_id: null
         training_data: []
@@ -2556,7 +2556,7 @@ states:
         buttonText:
           value:
             content_id: ca_buttonText_0
-            unicode_str: I thought of a number!
+            unicode_str: Continue
       default_outcome:
         dest: Magician Guesses
         feedback:
@@ -2851,7 +2851,7 @@ states:
         buttonText:
           value:
             content_id: ca_buttonText_0
-            unicode_str: OK, I've thought of a number!
+            unicode_str: Continue
       default_outcome:
         dest: Magician Guesses
         feedback:
