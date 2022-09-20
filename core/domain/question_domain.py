@@ -801,7 +801,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
             if is_subtitled_unicode_spec:
                 # Default is a SubtitledHtml dict or SubtitleUnicode dict.
-                # Here use cast because in this 'if is_subtitled_unicode_spec'
+                # Here we use cast because in this if is_subtitled_unicode_spec
                 # clause, default_value can only be of SubtitledUnicodeDict
                 # type. So, to narrow down the type from various default_value
                 # types, we used cast here.
@@ -834,10 +834,10 @@ class Question(translation_domain.BaseTranslatableObject):
                         })
                 else:
                     # Default is a list of SubtitledHtml dict.
-                    # Here use cast because in this 'else' clause default_value
-                    # can only be of List[SubtitledHtmlDict] type. So, to narrow
-                    # down the type from various default_value types, we used
-                    # cast here.
+                    # Here we use cast because in this 'else' clause
+                    # default_value can only be of List[SubtitledHtmlDict]
+                    # type. So, to narrow down the type from various
+                    # default_value types, we used cast here.
                     new_subtitled_html_list_value.extend(
                         cast(
                             List[state_domain.SubtitledHtmlDict],
