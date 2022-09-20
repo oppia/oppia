@@ -3036,7 +3036,9 @@ def get_interaction_id_for_state(exp_id: str, state_name: str) -> Optional[str]:
         'There exist no state in the exploration with the given state name.')
 
 
-def regenerate_missing_stats_for_exploration(exp_id):
+def regenerate_missing_stats_for_exploration(
+    exp_id: str
+) -> Tuple[list[str], list[str], int, int]:
     """Regenerates missing ExplorationStats models and entries for all
     corresponding states in an exploration.
 
@@ -3044,7 +3046,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
         exp_id: str. The ID of the exp.
 
     Returns:
-        3-tuple(missing_exp_stats, missing_state_stats, num_valid_exp_stats,
+        4-tuple(missing_exp_stats, missing_state_stats, num_valid_exp_stats,
         num_valid_state_stats). where:
             missing_exp_stats: list(str). List of missing exploration stats.
             missing_state_stats: list(str). List of missing state stats.
@@ -3078,7 +3080,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
             exp_stats_for_version = (
                 stats_services.get_stats_for_new_exploration(
                     exp_id, version,
-                    exp_list[index].state_interaction_ids_dict.keys()))
+                    list(exp_list[index].state_interaction_ids_dict.keys())))
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 
@@ -3137,7 +3139,8 @@ def regenerate_missing_stats_for_exploration(exp_id):
         elif exp.version == 1:
             new_exploration_stats = (
                 stats_services.get_stats_for_new_exploration(
-                    exp_id, exp.version, exp.state_interaction_ids_dict.keys()))
+                    exp_id, exp.version,
+                    list(exp.state_interaction_ids_dict.keys())))
             stats_services.create_stats_model(new_exploration_stats)
             missing_exp_stats_indices.append(i)
             missing_exp_stats.append(
@@ -3153,7 +3156,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
                 new_exploration_stats = (
                     stats_services.get_stats_for_new_exploration(
                         exp_id, exp.version,
-                        exp.state_interaction_ids_dict.keys()))
+                        list(exp.state_interaction_ids_dict.keys())))
                 stats_services.create_stats_model(new_exploration_stats)
                 missing_exp_stats_indices.append(i)
                 missing_exp_stats.append(

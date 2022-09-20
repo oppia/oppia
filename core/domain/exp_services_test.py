@@ -60,6 +60,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
     from mypy_imports import opportunity_models
     from mypy_imports import recommendations_models
+    from mypy_imports import stats_models
     from mypy_imports import user_models
 
 (
@@ -74,7 +75,7 @@ if MYPY:  # pragma: no cover
     models.Names.EXPLORATION,
     models.Names.OPPORTUNITY,
     models.Names.RECOMMENDATIONS,
-    models.NAMES.STATISTICS,
+    models.Names.STATISTICS,
     models.Names.USER
 ])
 
@@ -9250,18 +9251,18 @@ title: Title
 class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
     """Test apply draft functions in exp_services."""
 
-    def _do_not_create_stats_models(self):
+    def _do_not_create_stats_models(self) -> None:
         """Returns a context manager which does not create new stats models."""
         return self.swap(stats_services, 'create_stats_model', lambda _: None)
 
-    def test_when_exp_and_state_stats_models_exist(self):
+    def test_when_exp_and_state_stats_models_exist(self) -> None:
         self.save_new_default_exploration('ID', 'owner_id')
 
         self.assertEqual(
             exp_services.regenerate_missing_stats_for_exploration('ID'), (
                 [], [], 1, 1))
 
-    def test_fail_to_fetch_exploration_snapshots(self):
+    def test_fail_to_fetch_exploration_snapshots(self) -> None:
         self.save_new_default_exploration('ID', 'owner_id')
         exp_snapshot_id = exp_models.ExplorationModel.get_snapshot_id('ID', 1)
         exp_snapshot = exp_models.ExplorationSnapshotMetadataModel.get_by_id(
@@ -9273,7 +9274,9 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_message):
             exp_services.regenerate_missing_stats_for_exploration('ID')
 
-    def test_handle_state_name_is_not_found_in_state_stats_mapping(self):
+    def test_handle_state_name_is_not_found_in_state_stats_mapping(
+        self
+    ) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, 'owner_id')
@@ -9302,7 +9305,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_message):
             exp_services.regenerate_missing_stats_for_exploration(exp_id)
 
-    def test_handle_missing_exp_stats_for_reverted_exp_version(self):
+    def test_handle_missing_exp_stats_for_reverted_exp_version(self) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, 'owner_id')
@@ -9342,7 +9345,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_handle_missing_state_stats_for_reverted_exp_version(self):
+    def test_handle_missing_state_stats_for_reverted_exp_version(self) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, 'owner_id')
@@ -9385,7 +9388,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_when_few_exp_stats_models_are_missing(self):
+    def test_when_few_exp_stats_models_are_missing(self) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, 'owner_id')
@@ -9432,7 +9435,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_when_v1_version_exp_stats_model_is_missing(self):
+    def test_when_v1_version_exp_stats_model_is_missing(self) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, 'owner_id')
@@ -9481,7 +9484,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_generate_exp_stats_when_revert_commit_is_present(self):
+    def test_generate_exp_stats_when_revert_commit_is_present(self) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, 'owner_id')
@@ -9524,7 +9527,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_when_all_exp_stats_models_are_missing(self):
+    def test_when_all_exp_stats_models_are_missing(self) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, owner_id)
@@ -9534,7 +9537,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             Exception, 'No ExplorationStatsModels found'):
             exp_services.regenerate_missing_stats_for_exploration('ID1')
 
-    def test_when_few_state_stats_models_are_missing(self):
+    def test_when_few_state_stats_models_are_missing(self) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, 'owner_id')
@@ -9583,7 +9586,9 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_when_few_state_stats_models_are_missing_for_old_exps(self):
+    def test_when_few_state_stats_models_are_missing_for_old_exps(
+        self
+    ) -> None:
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_valid_exploration(
