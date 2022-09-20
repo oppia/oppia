@@ -283,7 +283,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     }
 
     def test_incorrect_exp_change_object_raises_exception(self) -> None:
-        """Exploration change dictionary should have `cmd` attribute"""
+        """Exploration change dictionary should have `cmd` attribute."""
         incorrect_change_dict = {
             'state_name': 'Introduction',
             'content_id': 'content',
@@ -300,7 +300,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_tagged_skill_misconception_id_should_be_none(self) -> None:
         """The `tagged_skill_misconception_id` inside answer group should
-        be None otherwise the error will be raised
+        be None otherwise the error will be raised.
         """
         test_ans_groups = self.interaction_answer_groups.copy()
         test_change_dict = self.change_dict.copy()
@@ -322,7 +322,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_atleast_one_rule_spec_should_be_present(self) -> None:
         """Atleast one rule spec should be present inside the answer group
-        otherwise the error will be raised
+        otherwise the error will be raised.
         """
         test_ans_groups = self.interaction_answer_groups.copy()
         test_change_dict = self.change_dict.copy()
@@ -346,7 +346,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_destination_should_not_be_empty(self) -> None:
         """Destination node inside answer group should not be empty
-        otherwise the error will be raised
+        otherwise the error will be raised.
         """
         test_ans_groups = self.interaction_answer_groups.copy()
         test_change_dict = self.change_dict.copy()
@@ -367,7 +367,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     def test_when_labelled_as_correct_the_destination_should_not_be_state_itself( # pylint: disable=line-too-long
         self) -> None:
         """When the `labelled_as_correct` value of answer group is True
-        then the destination should not be the state itself
+        then the destination should not be the state itself.
         """
         test_ans_groups = self.interaction_answer_groups.copy()
         test_change_dict = self.change_dict.copy()
@@ -387,9 +387,9 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         domain_objects_validator.validate_exploration_change(
             test_change_dict)
 
-    def test_refresher_exploration_id_should_be_None(self) -> None:
+    def test_refresher_exploration_id_should_be_none(self) -> None:
         """Refresher exploration if inside answer group should be None
-        otherwise the error will be raised
+        otherwise the error will be raised.
         """
         test_ans_groups = self.interaction_answer_groups.copy()
         test_change_dict = self.change_dict.copy()
@@ -411,7 +411,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_default_outcome_destination_should_not_be_empty(self):
         """Default outcome destination should not be empty otherwise
-        the error will be raised
+        the error will be raised.
         """
         default_outcome = {
             'dest': '',

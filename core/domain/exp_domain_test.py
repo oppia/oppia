@@ -1669,8 +1669,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            'Expected the format of tagged skill misconception id '
-            'to be <skill_id>-<misconception_id>, received '
+            'Expected tagged skill misconception id to be None, received '
             'invalid_tagged_skill_misconception_id')
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
