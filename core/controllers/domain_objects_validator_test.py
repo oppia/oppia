@@ -297,6 +297,14 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         ):
             domain_objects_validator.validate_exploration_change(
                 incorrect_change_dict)
+        # Invalid cmd key which does not belong to exploration will
+        # raise an error.
+        incorrect_change_dict['cmd'] = 'Not valid'
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'The cmd key does not belong to exploration.'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                incorrect_change_dict)
 
     def test_tagged_skill_misconception_id_should_be_none(self) -> None:
         """The `tagged_skill_misconception_id` inside answer group should

@@ -306,11 +306,12 @@ def validate_exploration_change(exp_change_dict):
                     )
         elif (
             exp_change_dict['property_name'] ==
-            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
+            exp_change_dict['new_value'] is not None
         ):
             default_outcome = exp_change_dict['new_value']
             if default_outcome['dest'] == '':
                 raise base.BaseHandler.InvalidInputException(
-                        'The destination for the default outcome is not valid.'
-                    )
+                    'The destination for the default outcome is not valid.'
+                )
     return exp_domain.ExplorationChange.from_dict(exp_change_dict)
