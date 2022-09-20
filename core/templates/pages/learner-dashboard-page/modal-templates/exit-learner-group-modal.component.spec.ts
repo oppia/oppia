@@ -21,7 +21,6 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExitLearnerGroupModalComponent } from './exit-learner-group-modal.component';
 
@@ -38,7 +37,6 @@ class MockActiveModal {
 describe('Exit Learner Group Modal Component', function() {
   let component: ExitLearnerGroupModalComponent;
   let fixture: ComponentFixture<ExitLearnerGroupModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -55,7 +53,6 @@ describe('Exit Learner Group Modal Component', function() {
   }));
 
   beforeEach(() => {
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
     fixture = TestBed.createComponent(ExitLearnerGroupModalComponent);
     component = fixture.componentInstance;
 

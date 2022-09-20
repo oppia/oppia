@@ -841,7 +841,8 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
 
     @acl_decorators.can_access_learner_groups
     def get(self):
-        """Handles GET requests for the fetching learner groups on learner dashboard."""
+        """Handles GET requests for the fetching learner groups on learner
+        dashboard."""
 
         invited_to_learner_groups = (
             learner_group_fetchers.get_invited_learner_groups_of_learner(

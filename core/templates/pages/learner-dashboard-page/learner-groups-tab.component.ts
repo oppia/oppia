@@ -16,22 +16,20 @@
  * @fileoverview Component for learner groups tab in the Learner Dashboard page.
  */
 
-import constants from 'assets/constants';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-
-import './learner-groups-tab.component.css';
 import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DeclineInvitationModalComponent } from './modal-templates/decline-invitaiton-modal.component';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { ExitLearnerGroupModalComponent } from './modal-templates/exit-learner-group-modal.component';
+
+import './learner-groups-tab.component.css';
 
 
  @Component({
@@ -57,10 +55,10 @@ export class LearnerGroupsTabComponent {
   learnerOfLearnerGroups: ShortLearnerGroupSummary[] = [];
 
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
+    private learnerDashboardBackendApiService:
+      LearnerDashboardBackendApiService,
     private ngbModal: NgbModal,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
@@ -73,8 +71,6 @@ export class LearnerGroupsTabComponent {
             learnerDashboardLearnerGroups.learnerOfLearnerGroups);
           this.invitedToLearnerGroups = (
             learnerDashboardLearnerGroups.invitedToLearnerGroups);
-          console.log(this.learnerOfLearnerGroups);
-          console.log(this.invitedToLearnerGroups);
         }
       );
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
@@ -113,11 +109,12 @@ export class LearnerGroupsTabComponent {
 
   changeActiveSection(): void {
     this.setActiveSection.emit(
-      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS);
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS);
   }
 
   declineLearnerGroupInvitation(
-    learnerGroupSummary: ShortLearnerGroupSummary
+      learnerGroupSummary: ShortLearnerGroupSummary
   ): void {
     let modalRef = this.ngbModal.open(
       DeclineInvitationModalComponent,
@@ -143,7 +140,7 @@ export class LearnerGroupsTabComponent {
   }
 
   exitLearnerGroup(
-    learnerGroupSummary: ShortLearnerGroupSummary
+      learnerGroupSummary: ShortLearnerGroupSummary
   ): void {
     let modalRef = this.ngbModal.open(
       ExitLearnerGroupModalComponent,

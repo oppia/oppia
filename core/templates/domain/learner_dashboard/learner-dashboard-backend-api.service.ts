@@ -421,8 +421,8 @@ export class LearnerDashboardBackendApiService {
   Promise<LearnerDashboardLearnerGroups> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardLearnerGroupsBackendDict>(
-        '/learner_dashboard_learner_groups_handler').toPromise().then(dashboardData => {
-        console.log(dashboardData, "dashboardData");
+        '/learner_dashboard_learner_groups_handler'
+      ).toPromise().then(dashboardData => {
         resolve(
           {
             learnerOfLearnerGroups: (

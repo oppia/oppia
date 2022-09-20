@@ -21,7 +21,6 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { DeclineInvitationModalComponent } from './decline-invitaiton-modal.component';
 
@@ -38,7 +37,6 @@ class MockActiveModal {
 describe('Decline Invitations Modal Component', function() {
   let component: DeclineInvitationModalComponent;
   let fixture: ComponentFixture<DeclineInvitationModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -55,7 +53,6 @@ describe('Decline Invitations Modal Component', function() {
   }));
 
   beforeEach(() => {
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
     fixture = TestBed.createComponent(DeclineInvitationModalComponent);
     component = fixture.componentInstance;
 
