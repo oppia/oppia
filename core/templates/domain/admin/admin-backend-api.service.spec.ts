@@ -602,7 +602,59 @@ describe('Admin backend api service', () => {
     }
     ));
 
-  it('should regenerate topic related oppurtunities when' +
+  it('should populate exploration stats when calling' +
+      'populateExplorationStatsRegenerationCsvResultAsync', fakeAsync(() => {
+    let action = 'regenerate_missing_exploration_stats';
+    let expIdToRegenerate = '11';
+    let payload = {
+      action: action,
+      exp_id: expIdToRegenerate
+    };
+
+    abas.populateExplorationStatsRegenerationCsvResultAsync(
+      expIdToRegenerate
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to populate exploration stats when calling' +
+    'populateExplorationStatsRegenerationCsvResultAsync', fakeAsync(() => {
+    let action = 'regenerate_missing_exploration_stats';
+    let expIdToRegenerate = 'InvalidId';
+    let payload = {
+      action: action,
+      exp_id: expIdToRegenerate
+    };
+
+    abas.populateExplorationStatsRegenerationCsvResultAsync(
+      expIdToRegenerate
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }
+  ));
+
+  it('should regenerate topic related opportunities when' +
     'calling regenerateOpportunitiesRelatedToTopicAsync', fakeAsync(() => {
     let action = 'regenerate_topic_related_opportunities';
     let topicId = 'topic_1';
@@ -626,7 +678,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should fail to regenerate topic related oppurtunities when' +
+  it('should fail to regenerate topic related opportunities when' +
     'calling regenerateOpportunitiesRelatedToTopicAsync', fakeAsync(() => {
     let action = 'regenerate_topic_related_opportunities';
     let topicId = 'InvalidId';

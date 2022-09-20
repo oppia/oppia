@@ -58,6 +58,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_domain
@@ -3033,6 +3034,212 @@ def get_interaction_id_for_state(exp_id: str, state_name: str) -> Optional[str]:
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def regenerate_missing_stats_for_exploration(exp_id):
+    """Regenerates missing ExplorationStats models and entries for all
+    corresponding states in an exploration.
+
+    Args:
+        exp_id: str. The ID of the exp.
+
+    Returns:
+        3-tuple(missing_exp_stats, missing_state_stats, num_valid_exp_stats,
+        num_valid_state_stats). where:
+            missing_exp_stats: list(str). List of missing exploration stats.
+            missing_state_stats: list(str). List of missing state stats.
+            num_valid_exp_stats: int. Number of valid exploration stats.
+            num_valid_state_stats: int. Number of valid state stats.
+
+    Raises:
+        Exception. Fetching exploration versions failed.
+        Exception. No ExplorationStatsModels found.
+        Exception. Exploration snapshots contain invalid commit_cmds.
+        Exception. Exploration does not have a given state.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+    num_valid_state_stats = 0
+    num_valid_exp_stats = 0
+
+    exp_versions = list(range(1, exploration.version + 1))
+    missing_exp_stats_indices = []
+
+    exp_stats_list = stats_services.get_multiple_exploration_stats_by_version(
+        exp_id, exp_versions)
+
+    exp_list = (
+        exp_fetchers
+        .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+            exp_id, exp_versions))
+
+    if all(exp_stats is None for exp_stats in exp_stats_list):
+        for index, version in enumerate(exp_versions):
+            exp_stats_for_version = (
+                stats_services.get_stats_for_new_exploration(
+                    exp_id, version,
+                    exp_list[index].state_interaction_ids_dict.keys()))
+            stats_services.create_stats_model(exp_stats_for_version)
+        raise Exception('No ExplorationStatsModels found')
+
+    snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, exp_versions)
+    change_lists = []
+    for snapshot in snapshots:
+        try:
+            change_lists.append([
+                exp_domain.ExplorationChange(commit_cmd)
+                for commit_cmd in snapshot['commit_cmds']
+            ])
+        except utils.ValidationError as e:
+            raise Exception(
+                'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
+                % (exp_id, snapshot['commit_cmds'])) from e
+
+    missing_exp_stats = []
+    missing_state_stats = []
+
+    zipped_items = list(
+        zip(exp_stats_list, exp_list, change_lists))
+    revert_commit_cmd = exp_models.ExplorationModel.CMD_REVERT_COMMIT
+    for i, (exp_stats, exp, change_list) in enumerate(zipped_items):
+        revert_cmd = next(
+            (
+                change for change in change_list
+                if change.cmd == revert_commit_cmd
+            ), None)
+        revert_to_version = revert_cmd and revert_cmd.version_number
+        new_exp_version = None
+
+        if revert_to_version is not None:
+            exp_versions_diff = None
+            # We subtract 2 from revert_to_version to get the index of the
+            # previous exploration version because exp_stats_list and
+            # prev_exp start with version 1 in the 0th index.
+            prev_exp_version_index = revert_to_version - 2
+            prev_exp_stats = exp_stats_list[prev_exp_version_index]
+            prev_exp = exp_list[prev_exp_version_index]
+            new_exp_version = revert_to_version
+        else:
+            exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                change_list)
+            # We subtract 2 from exp.version to get the index of the
+            # previous exploration version because exp_stats_list and
+            # prev_exp start with version 1 in the 0th index.
+            prev_exp_version_index = exp.version - 2
+            prev_exp_stats = exp_stats_list[prev_exp_version_index]
+            prev_exp = exp_list[prev_exp_version_index]
+            new_exp_version = exp.version
+
+        # Fill missing Exploration-level stats.
+        if exp_stats:
+            num_valid_exp_stats += 1
+        elif exp.version == 1:
+            new_exploration_stats = (
+                stats_services.get_stats_for_new_exploration(
+                    exp_id, exp.version, exp.state_interaction_ids_dict.keys()))
+            stats_services.create_stats_model(new_exploration_stats)
+            missing_exp_stats_indices.append(i)
+            missing_exp_stats.append(
+                'ExplorationStats(exp_id=%r, exp_version=%r)'
+                % (exp_id, exp.version))
+            num_valid_state_stats += len(
+                new_exploration_stats.state_stats_mapping)
+            continue
+        else:
+            exp_stats = prev_exp_stats and prev_exp_stats.clone()
+
+            if exp_stats is None:
+                new_exploration_stats = (
+                    stats_services.get_stats_for_new_exploration(
+                        exp_id, exp.version,
+                        exp.state_interaction_ids_dict.keys()))
+                stats_services.create_stats_model(new_exploration_stats)
+                missing_exp_stats_indices.append(i)
+                missing_exp_stats.append(
+                    'ExplorationStats(exp_id=%r, exp_version=%r)'
+                    % (exp_id, exp.version))
+                num_valid_state_stats += len(
+                    new_exploration_stats.state_stats_mapping)
+                continue
+
+            if exp_versions_diff:
+                exp_stats = stats_services.advance_version_of_exp_stats(
+                    new_exp_version, exp_versions_diff, exp_stats, None,
+                    None)
+            else:
+                exp_stats.exp_version = exp.version
+            stats_services.create_stats_model(exp_stats)
+            missing_exp_stats_indices.append(i)
+            missing_exp_stats.append(
+                'ExplorationStats(exp_id=%r, exp_version=%r)'
+                % (exp_id, exp.version))
+
+        # Fill missing State-level stats.
+        state_stats_mapping = exp_stats.state_stats_mapping
+        for state_name in exp.state_interaction_ids_dict.keys():
+            if state_name in state_stats_mapping:
+                num_valid_state_stats += 1
+                continue
+
+            if exp_versions_diff:
+                prev_state_name = (
+                    exp_versions_diff.new_to_old_state_names.get(
+                        state_name, state_name))
+            else:
+                prev_state_name = state_name
+
+            try:
+                prev_interaction_id = (
+                    prev_exp.state_interaction_ids_dict[prev_state_name]
+                    if prev_state_name in prev_exp.state_interaction_ids_dict
+                    else None)
+                current_interaction_id = (
+                    exp.state_interaction_ids_dict[state_name])
+                # In early schema versions of ExplorationModel, the END
+                # card was a persistant, implicit state present in every
+                # exploration. The snapshots of these old explorations have
+                # since been migrated but they do not have corresponding state
+                # stats models for the END state. So for such versions, a
+                # default state stats model should be created.
+                if current_interaction_id != prev_interaction_id or (
+                        current_interaction_id == 'EndExploration' and
+                        prev_state_name == 'END'):
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default())
+                else:
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        prev_exp_stats.state_stats_mapping[
+                            prev_state_name].clone())
+                missing_state_stats.append(
+                    'StateStats(exp_id=%r, exp_version=%r, '
+                    'state_name=%r)' % (exp_id, exp.version, state_name))
+            except Exception as e:
+                raise Exception(
+                    'Exploration(id=%r, exp_version=%r) has no '
+                    'State(name=%r): %r' % (
+                        exp_id, exp_stats.exp_version, prev_state_name, {
+                            'added_state_names': (
+                                exp_versions_diff.added_state_names),
+                            'deleted_state_names': (
+                                exp_versions_diff.deleted_state_names),
+                            'new_to_old_state_names': (
+                                exp_versions_diff.new_to_old_state_names),
+                            'old_to_new_state_names': (
+                                exp_versions_diff.old_to_new_state_names),
+                            'prev_exp.states': (
+                                prev_exp.state_interaction_ids_dict.keys()),
+                            'prev_exp_stats': prev_exp_stats
+                        })) from e
+
+    for index, exp_stats in enumerate(exp_stats_list):
+        if index not in missing_exp_stats_indices:
+            stats_services.save_stats_model(exp_stats)
+
+    return (
+        missing_exp_stats, missing_state_stats,
+        num_valid_exp_stats, num_valid_state_stats
+    )
 
 
 def update_logged_out_user_progress(

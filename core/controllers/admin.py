@@ -92,7 +92,8 @@ class AdminHandler(base.BaseHandler):
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_feature_flag_rules',
-                        'rollback_exploration_to_safe_state'
+                        'rollback_exploration_to_safe_state',
+                        'regenerate_missing_exploration_stats'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -275,6 +276,20 @@ class AdminHandler(base.BaseHandler):
                         topic_id, delete_existing_opportunities=True))
                 result = {
                     'opportunities_count': opportunities_count
+                }
+            elif self.payload.get('action') == (
+                    'regenerate_missing_exploration_stats'):
+                exp_id = self.payload.get('exp_id')
+                (
+                    exp_stats, state_stats,
+                    num_valid_exp_stats, num_valid_state_stats
+                ) = exp_services.regenerate_missing_stats_for_exploration(
+                    exp_id)
+                result = {
+                    'missing_exp_stats': exp_stats,
+                    'missing_state_stats': state_stats,
+                    'num_valid_exp_stats': num_valid_exp_stats,
+                    'num_valid_state_stats': num_valid_state_stats
                 }
             elif action == 'rollback_exploration_to_safe_state':
                 exp_id = self.normalized_payload.get('exp_id')

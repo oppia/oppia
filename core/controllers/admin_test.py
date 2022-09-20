@@ -392,6 +392,32 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.assertLess(old_creation_time, new_creation_time)
 
+    def test_regenerate_missing_exploration_stats_action(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME, True)
+
+        self.save_new_default_exploration('ID', 'owner_id')
+
+        self.assertEqual(
+            exp_services.regenerate_missing_stats_for_exploration('ID'), (
+                [], [], 1, 1))
+
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'regenerate_missing_exploration_stats',
+                'exp_id': 'ID'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(
+            result, {
+                'missing_exp_stats': [],
+                'missing_state_stats': [],
+                'num_valid_exp_stats': 1,
+                'num_valid_state_stats': 1
+            })
+
     def test_rollback_exploration_to_safe_state_action(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
