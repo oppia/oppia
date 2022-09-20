@@ -179,8 +179,6 @@ NOT_FULLY_COVERED_FILES = [
     'extensions/interactions/RatioExpressionInput',
     'extensions/interactions/SetInput',
     'extensions/interactions/TextInput',
-    'extensions/interactions/base_test.py',
-    'extensions/interactions/base.py',
     'extensions/objects',
     'extensions/rich_text_components',
     'extensions/visualizations',

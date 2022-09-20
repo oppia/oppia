@@ -51,7 +51,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'For visualization SortedTiles, expected option names '
                 '[\'header\', \'use_percentages\']; received names []')):
-            sorted_tiles_instance.validate()  # type: ignore[no-untyped-call]
+            sorted_tiles_instance.validate()
 
     def test_visualization_class_with_invalid_option_value(self) -> None:
         sorted_tiles = visualization_registry.Registry.get_visualization_class(
@@ -65,7 +65,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'Expected bool, received invalid_value'):
-            sorted_tiles_instance.validate()  # type: ignore[no-untyped-call]
+            sorted_tiles_instance.validate()
 
     def test_visualization_class_with_invalid_addressed_info_is_supported_value(
         self
@@ -83,7 +83,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             Exception,
             'For visualization SortedTiles, expected a bool value for '
             'addressed_info_is_supported; received invalid_value'):
-            sorted_tiles_instance.validate()  # type: ignore[no-untyped-call]
+            sorted_tiles_instance.validate()
 
     def test_get_all_visualization_ids(self) -> None:
         visualization_ids = (

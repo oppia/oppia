@@ -42,7 +42,7 @@ class BaseVisualization:
         self.calculation_id = calculation_id
         self.addressed_info_is_supported = addressed_info_is_supported
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates a visualization object.
 
         This is only used in tests for the validity of interactions.
