@@ -58,6 +58,11 @@ jobs:
         os: [ ubuntu-22.04 ]
     needs: build_webpack
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: download webpack
         uses: actions/download-artifact@v2
@@ -110,6 +115,11 @@ jobs:
         os: [ubuntu-22.04]
     needs: build_webpack
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: download webpack
         uses: actions/download-artifact@v2
