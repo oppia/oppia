@@ -324,7 +324,7 @@ describe('State Responses Component', () => {
 
     component.ngOnInit();
 
-    expect(component.responseCardIsShown).toBe(false);
+    expect(component.responseCardIsShown).toBe(true);
     expect(component.enableSolicitAnswerDetailsFeature).toBe(true);
     expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
     expect(component.stateName).toBe('Hola');
