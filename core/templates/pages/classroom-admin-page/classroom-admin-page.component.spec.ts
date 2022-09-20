@@ -17,7 +17,6 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { toPublicName } from '@angular/compiler/src/i18n/serializers/xmb';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';

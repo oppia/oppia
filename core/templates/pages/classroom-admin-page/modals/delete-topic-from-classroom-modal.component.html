@@ -7,13 +7,13 @@
   </h3>
 </div>
 <div class="modal-body" *ngIf="prerequisiteTopics.length > 0">
-    <p>The following topics depends on {{ topicName }}.</p>
-    <ul *ngFor="let topic of prerequisiteTopics">
-        <li>
-            <strong>{{topic}}</strong>
-        </li>
-    </ul>
-    <p>Please fix the above topics, then try to perform this operation.</p>
+  <p>The following topics depends on {{ topicName }}.</p>
+  <ul *ngFor="let topic of prerequisiteTopics">
+    <li>
+      <strong>{{topic}}</strong>
+    </li>
+  </ul>
+  <p>Please fix the above topics, then try to perform this operation.</p>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary"
