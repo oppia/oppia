@@ -63,6 +63,9 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
       - uses: ./.github/actions/merge
       - name: download webpack
         uses: actions/download-artifact@v2
@@ -121,6 +124,9 @@ jobs:
           python-version: '3.7'
           architecture: 'x64'
       - uses: ./.github/actions/merge
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: download webpack
         uses: actions/download-artifact@v2
         with:
