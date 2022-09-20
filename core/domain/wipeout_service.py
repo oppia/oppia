@@ -65,11 +65,11 @@ if MYPY:  # pragma: no cover
     question_models, skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.app_feedback_report, models.NAMES.base_model,
-    models.NAMES.blog, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
+    models.Names.APP_FEEDBACK_REPORT, models.Names.BASE_MODEL,
+    models.Names.BLOG, models.Names.COLLECTION, models.Names.CONFIG,
+    models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.QUESTION,
+    models.Names.SKILL, models.Names.STORY, models.Names.SUBTOPIC,
+    models.Names.SUGGESTION, models.Names.TOPIC, models.Names.USER,
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -371,7 +371,7 @@ def _delete_models_with_delete_at_end_policy(user_id: str) -> None:
         user_id: str. The unique ID of the user that is being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.auth, models.NAMES.user]):
+            [models.Names.AUTH, models.Names.USER]):
         policy = model_class.get_deletion_policy()
         if policy == base_models.DELETION_POLICY.DELETE_AT_END:
             model_class.apply_deletion_policy(user_id)
@@ -392,12 +392,12 @@ def delete_user(
 
     auth_services.delete_external_auth_associations(user_id)
 
-    _delete_models(user_id, models.NAMES.auth)
-    _delete_models(user_id, models.NAMES.user)
+    _delete_models(user_id, models.Names.AUTH)
+    _delete_models(user_id, models.Names.USER)
     _pseudonymize_config_models(pending_deletion_request)
-    _delete_models(user_id, models.NAMES.feedback)
-    _delete_models(user_id, models.NAMES.improvements)
-    _delete_models(user_id, models.NAMES.suggestion)
+    _delete_models(user_id, models.Names.FEEDBACK)
+    _delete_models(user_id, models.Names.IMPROVEMENTS)
+    _delete_models(user_id, models.Names.SUGGESTION)
     if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
@@ -406,31 +406,31 @@ def delete_user(
         _pseudonymize_suggestion_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
-            models.NAMES.question,
+            models.Names.QUESTION,
             question_models.QuestionSnapshotMetadataModel,
             question_models.QuestionCommitLogEntryModel,
             'question_id')
         _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
-            models.NAMES.skill,
+            models.Names.SKILL,
             skill_models.SkillSnapshotMetadataModel,
             skill_models.SkillCommitLogEntryModel,
             'skill_id')
         _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
-            models.NAMES.story,
+            models.Names.STORY,
             story_models.StorySnapshotMetadataModel,
             story_models.StoryCommitLogEntryModel,
             'story_id')
         _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
-            models.NAMES.subtopic,
+            models.Names.SUBTOPIC,
             subtopic_models.SubtopicPageSnapshotMetadataModel,
             subtopic_models.SubtopicPageCommitLogEntryModel,
             'subtopic_page_id')
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
-            models.NAMES.exploration,
+            models.Names.EXPLORATION,
             exp_models.ExplorationSnapshotMetadataModel,
             exp_models.ExplorationRightsSnapshotMetadataModel,
             exp_models.ExplorationRightsSnapshotContentModel,
@@ -442,7 +442,7 @@ def delete_user(
             user_id, exp_models.ExpSummaryModel)
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
-            models.NAMES.collection,
+            models.Names.COLLECTION,
             collection_models.CollectionSnapshotMetadataModel,
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionRightsSnapshotContentModel,
@@ -454,7 +454,7 @@ def delete_user(
             user_id, collection_models.CollectionSummaryModel)
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
-            models.NAMES.topic,
+            models.Names.TOPIC,
             topic_models.TopicSnapshotMetadataModel,
             topic_models.TopicRightsSnapshotMetadataModel,
             topic_models.TopicRightsSnapshotContentModel,
@@ -464,8 +464,8 @@ def delete_user(
             ['manager_ids'])
         _pseudonymize_blog_post_models(pending_deletion_request)
         _pseudonymize_version_history_models(pending_deletion_request)
-    _delete_models(user_id, models.NAMES.email)
-    _delete_models(user_id, models.NAMES.learner_group)
+    _delete_models(user_id, models.Names.EMAIL)
+    _delete_models(user_id, models.Names.LEARNER_GROUP)
 
 
 def verify_user_deleted(
@@ -607,7 +607,7 @@ def remove_user_from_activities_with_associated_rights_models(
     collection_services.delete_collections(
         user_id, collections_to_be_deleted_ids, force_deletion=True)
 
-    topic_services.deassign_user_from_all_topics(  # type: ignore[no-untyped-call]
+    topic_services.deassign_user_from_all_topics(
         user_services.get_system_user(), user_id)
 
 
@@ -635,7 +635,7 @@ def _generate_entity_to_pseudonymized_ids_mapping(
 
 def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    entity_category: models.NAMES,
+    entity_category: models.Names,
     entity_ids: List[str]
 ) -> None:
     """Generate mapping from entity IDs to a single pseudonymized user ID.
@@ -643,7 +643,7 @@ def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to which to save the entity mappings.
-        entity_category: models.NAMES. The category of the models that
+        entity_category: models.Names. The category of the models that
             contain the entity IDs.
         entity_ids: list(str). List of entity IDs for which to generate new
             pseudonymous user IDs. The IDs are of entities (e.g. models in
@@ -663,7 +663,7 @@ def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
 
 def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    entity_category: models.NAMES,
+    entity_category: models.Names,
     entity_ids: List[str]
 ) -> None:
     """Save the entity mappings for some entity category into the pending
@@ -672,7 +672,7 @@ def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to which to save the entity mappings.
-        entity_category: models.NAMES. The category of the models that
+        entity_category: models.Names. The category of the models that
             contain the entity IDs.
         entity_ids: list(str). The IDs for which to generate the mappings.
     """
@@ -687,12 +687,12 @@ def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         save_pending_deletion_requests([pending_deletion_request])
 
 
-def _delete_models(user_id: str, module_name: models.NAMES) -> None:
+def _delete_models(user_id: str, module_name: models.Names) -> None:
     """Delete all the models from the given module, for a given user.
 
     Args:
         user_id: str. The id of the user to be deleted.
-        module_name: models.NAMES. The name of the module containing the models
+        module_name: models.Names. The name of the module containing the models
             that are being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes([module_name]):
@@ -706,7 +706,7 @@ def _delete_models(user_id: str, module_name: models.NAMES) -> None:
 # because we do not have commit_log_model classes for config_model classes.
 def _collect_and_save_entity_ids_from_snapshots_and_commits(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    activity_category: models.NAMES,
+    activity_category: models.Names,
     snapshot_metadata_model_classes: List[
         Type[base_models.BaseSnapshotMetadataModel]
     ],
@@ -721,7 +721,7 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to collect the entity IDs.
-        activity_category: models.NAMES. The category of the models that are
+        activity_category: models.Names. The category of the models that are
             that contain the entity IDs.
         snapshot_metadata_model_classes: list(class). The snapshot metadata
             model classes that contain the entity IDs.
@@ -806,7 +806,7 @@ def _pseudonymize_config_models(
     snapshot_metadata_models, _ = (
         _collect_and_save_entity_ids_from_snapshots_and_commits(
             pending_deletion_request,
-            models.NAMES.config,
+            models.Names.CONFIG,
             list(snapshot_model_classes),
             None,
             None
@@ -840,7 +840,7 @@ def _pseudonymize_config_models(
 
     config_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.config.value])
+            models.Names.CONFIG.value])
     for config_id, pseudonymized_id in config_ids_to_pids.items():
         config_related_models = [
             model for model in snapshot_metadata_models
@@ -858,7 +858,7 @@ def _pseudonymize_config_models(
 
 def _pseudonymize_activity_models_without_associated_rights_models(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    activity_category: models.NAMES,
+    activity_category: models.Names,
     snapshot_model_class: Type[base_models.BaseSnapshotMetadataModel],
     commit_log_model_class: Type[base_models.BaseCommitLogEntryModel],
     commit_log_model_field_name: str
@@ -876,7 +876,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to pseudonymize the models.
-        activity_category: models.NAMES. The category of the models that are
+        activity_category: models.Names. The category of the models that are
             being pseudonymized.
         snapshot_model_class: class. The metadata model class that is being
             pseudonymized.
@@ -954,7 +954,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
 
 def _pseudonymize_activity_models_with_associated_rights_models(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    activity_category: models.NAMES,
+    activity_category: models.Names,
     snapshot_metadata_model_class: Type[base_models.BaseSnapshotMetadataModel],
     rights_snapshot_metadata_model_class: Type[
         base_models.BaseSnapshotMetadataModel
@@ -973,7 +973,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
-        activity_category: models.NAMES. The category of the models that are
+        activity_category: models.Names. The category of the models that are
             being pseudonymized.
         snapshot_metadata_model_class:
             CollectionSnapshotMetadataModel|ExplorationSnapshotMetadataModel.
@@ -1239,7 +1239,7 @@ def _pseudonymize_app_feedback_report_models(
     # pseudonymizable_entity_mappings, using the same pseudonym for each entity
     # so that a user will have the same pseudonymized ID for each entity
     # referencing them.
-    entity_category = models.NAMES.app_feedback_report
+    entity_category = models.Names.APP_FEEDBACK_REPORT
     _save_pseudonymizable_entity_mappings_to_same_pseudonym(
         pending_deletion_request, entity_category, list(report_ids))
 
@@ -1266,7 +1266,7 @@ def _pseudonymize_app_feedback_report_models(
 
     report_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.app_feedback_report.value])
+            models.Names.APP_FEEDBACK_REPORT.value])
 
     for i in range(
             0, len(feedback_report_models),
@@ -1323,7 +1323,7 @@ def _pseudonymize_feedback_models(
     feedback_ids |= set(model.id for model in general_suggestion_models)
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.NAMES.feedback, list(feedback_ids))
+        pending_deletion_request, models.Names.FEEDBACK, list(feedback_ids))
 
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(
@@ -1379,7 +1379,7 @@ def _pseudonymize_feedback_models(
 
     feedback_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.feedback.value])
+            models.Names.FEEDBACK.value])
     for feedback_id, pseudonymized_id in feedback_ids_to_pids.items():
         feedback_related_models: List[base_models.BaseModel] = [
             model for model in feedback_thread_models
@@ -1425,7 +1425,7 @@ def _pseudonymize_suggestion_models(
     suggestion_ids = set(model.id for model in voiceover_application_models)
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.NAMES.suggestion, list(suggestion_ids))
+        pending_deletion_request, models.Names.SUGGESTION, list(suggestion_ids))
 
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(
@@ -1458,7 +1458,7 @@ def _pseudonymize_suggestion_models(
 
     suggestion_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.suggestion.value])
+            models.Names.SUGGESTION.value])
     for i in range(
             0,
             len(voiceover_application_models),
@@ -1504,7 +1504,7 @@ def _pseudonymize_blog_post_models(
     blog_post_ids |= {model.id for model in blog_post_summary_models}
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.NAMES.blog, list(blog_post_ids))
+        pending_deletion_request, models.Names.BLOG, list(blog_post_ids))
 
     # We want to remove the user ID from the list of editor ids on all the
     # blog post rights models related to the user.
@@ -1556,7 +1556,7 @@ def _pseudonymize_blog_post_models(
 
     blog_post_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.blog.value])
+            models.Names.BLOG.value])
     for blog_post_id, pseudonymized_id in blog_post_ids_to_pids.items():
         blog_posts_related_models = [
             model for model in itertools.chain(
@@ -1633,7 +1633,7 @@ def _pseudonymize_version_history_models(
 
     exp_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.exploration.value])
+            models.Names.EXPLORATION.value])
 
     for i in range(
             0,

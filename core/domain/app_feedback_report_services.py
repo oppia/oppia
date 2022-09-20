@@ -18,13 +18,16 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core import utils
 from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, cast
+from typing import Dict, List, Optional, Sequence, cast, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -32,31 +35,65 @@ if MYPY: # pragma: no cover
     from mypy_imports import transaction_services
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.Names.APP_FEEDBACK_REPORT])
 transaction_services = models.Registry.import_transaction_services()
 
 PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
 PLATFORM_WEB = app_feedback_report_constants.PLATFORM_CHOICE_WEB
 
 
+@overload
 def get_report_models(
-        report_ids: List[str]
-) -> List[Optional[app_feedback_report_models.AppFeedbackReportModel]]:
+    report_ids: List[str], *, strict: Literal[True]
+) -> List[app_feedback_report_models.AppFeedbackReportModel]: ...
+
+
+@overload
+def get_report_models(
+    report_ids: List[str]
+) -> List[Optional[app_feedback_report_models.AppFeedbackReportModel]]: ...
+
+
+@overload
+def get_report_models(
+    report_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[app_feedback_report_models.AppFeedbackReportModel]]: ...
+
+
+def get_report_models(
+    report_ids: List[str], strict: bool = False
+) -> Sequence[Optional[app_feedback_report_models.AppFeedbackReportModel]]:
     """Fetches and returns the AppFeedbackReportModels with the given ids.
 
     Args:
         report_ids: list(str). The ids for the models to fetch.
+        strict: bool. Whether to fail noisily if no report model with the given
+            ids exists in the datastore.
 
     Returns:
         list(AppFeedbackReportModel). A list of models that correspond to the
         requested reports.
+
+    Raises:
+        Exception. No AppFeedbackReportModel exists for the given id.
     """
-    return (
-        app_feedback_report_models.AppFeedbackReportModel.get_multi(report_ids))
+    report_models = (
+        app_feedback_report_models.AppFeedbackReportModel.get_multi(report_ids)
+    )
+
+    if strict:
+        for index, report_model in enumerate(report_models):
+            if report_model is None:
+                raise Exception(
+                    'No AppFeedbackReportModel exists for the id %s'
+                    % report_ids[index]
+                )
+
+    return report_models
 
 
 def create_report_from_json(
-        report_json: Dict[str, Any]
+    report_json: app_feedback_report_domain.AndroidFeedbackReportDict
 ) -> app_feedback_report_domain.AppFeedbackReport:
     """Creates an AppFeedbackReport domain object instance from the incoming
     JSON request.
@@ -67,7 +104,11 @@ def create_report_from_json(
     Returns:
         AppFeedbackReport. The domain object for an Android feedback report.
     """
-    return app_feedback_report_domain.AppFeedbackReport.from_dict(report_json)
+    return (
+        app_feedback_report_domain.AppFeedbackReport.from_submitted_feedback_dict(  # pylint: disable=line-too-long
+            report_json
+        )
+    )
 
 
 def store_incoming_report_stats(
@@ -101,8 +142,13 @@ def store_incoming_report_stats(
 
 
 @transaction_services.run_in_transaction_wrapper
-def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
-        ticket_id, platform, date, report_obj, delta):
+def _update_report_stats_model_in_transaction(
+    ticket_id: str,
+    platform: str,
+    date: datetime.datetime,
+    report_obj: app_feedback_report_domain.AppFeedbackReport,
+    delta: int
+) -> None:
     """Adds a new report's stats to the stats model for a specific ticket's
     stats. Note that this currently only supports Android reports.
 
@@ -115,7 +161,7 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
             report is added or removed from the model.
     """
     # The stats we want to aggregate on.
-    report_type = report_obj.user_supplied_feedback.report_type.name
+    report_type = report_obj.user_supplied_feedback.report_type.value
     country_locale_code = (
         report_obj.device_system_context.device_country_locale_code)
     entry_point_name = report_obj.app_context.entry_point.entry_point_name
@@ -125,8 +171,14 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
     # is only aggregated on Android reports.
     report_obj.device_system_context.__class__ = (
         app_feedback_report_domain.AndroidDeviceSystemContext)
-    sdk_version = str(report_obj.device_system_context.sdk_version)
-    version_name = report_obj.device_system_context.version_name
+    # Here we use cast because we are narrowing down the type from
+    # DeviceSystemContext to AndroidDeviceSystemContext.
+    android_device_system_context = cast(
+        app_feedback_report_domain.AndroidDeviceSystemContext,
+        report_obj.device_system_context
+    )
+    sdk_version = str(android_device_system_context.sdk_version)
+    version_name = android_device_system_context.version_name
 
     stats_id = (
         app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
@@ -136,32 +188,32 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
             stats_id))
 
     stats_parameter_names = (
-        app_feedback_report_constants.STATS_PARAMETER_NAMES)
+        app_feedback_report_constants.StatsParameterNames)
     if stats_model is None:
         assert delta > 0
         # Create new stats model entity. These are the individual report fields
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            stats_parameter_names.report_type.name: {
+            stats_parameter_names.REPORT_TYPE.value: {
                 report_type: 1
             },
-            stats_parameter_names.country_locale_code.name: {
+            stats_parameter_names.COUNTRY_LOCALE_CODE.value: {
                 country_locale_code: 1
             },
-            stats_parameter_names.entry_point_name.name: {
+            stats_parameter_names.ENTRY_POINT_NAME.value: {
                 entry_point_name: 1
             },
-            stats_parameter_names.text_language_code.name: {
+            stats_parameter_names.TEXT_LANGUAGE_CODE.value: {
                 text_language_code: 1
             },
-            stats_parameter_names.audio_language_code.name: {
+            stats_parameter_names.AUDIO_LANGUAGE_CODE.value: {
                 audio_language_code: 1
             },
-            stats_parameter_names.android_sdk_version.name: {
+            stats_parameter_names.ANDROID_SDK_VERSION.value: {
                 sdk_version: 1
             },
-            stats_parameter_names.version_name.name: {
+            stats_parameter_names.VERSION_NAME.value: {
                 version_name: 1
             }
         }
@@ -175,46 +227,46 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         stats_dict = stats_model.daily_param_stats
 
         stats_dict[
-            stats_parameter_names.report_type.name] = (
+            stats_parameter_names.REPORT_TYPE.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.report_type.name],
+                    stats_parameter_names.REPORT_TYPE.value],
                 report_type, delta))
         stats_dict[
-            stats_parameter_names.country_locale_code.name] = (
+            stats_parameter_names.COUNTRY_LOCALE_CODE.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.country_locale_code.name],
+                    stats_parameter_names.COUNTRY_LOCALE_CODE.value],
                 country_locale_code, delta))
         stats_dict[
-            stats_parameter_names.entry_point_name.name] = (
+            stats_parameter_names.ENTRY_POINT_NAME.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.entry_point_name.name],
+                    stats_parameter_names.ENTRY_POINT_NAME.value],
                 entry_point_name, delta))
         stats_dict[
-            stats_parameter_names.audio_language_code.name] = (
+            stats_parameter_names.AUDIO_LANGUAGE_CODE.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.audio_language_code.name],
+                    stats_parameter_names.AUDIO_LANGUAGE_CODE.value],
                 audio_language_code, delta))
         stats_dict[
-            stats_parameter_names.text_language_code.name] = (
+            stats_parameter_names.TEXT_LANGUAGE_CODE.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.text_language_code.name],
+                    stats_parameter_names.TEXT_LANGUAGE_CODE.value],
                 text_language_code, delta))
         stats_dict[
-            stats_parameter_names.android_sdk_version.name] = (
+            stats_parameter_names.ANDROID_SDK_VERSION.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.android_sdk_version.name],
+                    stats_parameter_names.ANDROID_SDK_VERSION.value],
                 sdk_version, delta))
         stats_dict[
-            stats_parameter_names.version_name.name] = (
+            stats_parameter_names.VERSION_NAME.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.version_name.name],
+                    stats_parameter_names.VERSION_NAME.value],
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
@@ -225,10 +277,10 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
 
 
 def calculate_new_stats_count_for_parameter(
-        current_stats_map: Dict[str, int],
-        current_value: str,
-        delta: int
-) -> Dict[Any, int]:
+    current_stats_map: Dict[str, int],
+    current_value: str,
+    delta: int
+) -> Dict[str, int]:
     """Helper to increment or initialize the stats count for a parameter.
 
     Args:
@@ -467,8 +519,12 @@ def scrub_single_app_feedback_report(
     report.scrubbed_by = scrubbed_by
     report.user_supplied_feedback.user_feedback_other_text_input = ''
     if report.platform == PLATFORM_ANDROID:
+        # Here we use cast because above 'if' condition forces app_context
+        # to be of type AndroidAppContext.
         report.app_context = cast(
-            app_feedback_report_domain.AndroidAppContext, report.app_context)
+            app_feedback_report_domain.AndroidAppContext,
+            report.app_context
+        )
         report.app_context.event_logs = []
         report.app_context.logcat_logs = []
     save_feedback_report_to_storage(report)
@@ -491,9 +547,15 @@ def save_feedback_report_to_storage(
 
     report.validate()
     user_supplied_feedback = report.user_supplied_feedback
+    # Here we use cast because this method is currently not implemented for
+    # web platform. So, to narrow down the type from DeviceSystemContext to
+    # AndroidDeviceSystemContext, we used cast here.
     device_system_context = cast(
         app_feedback_report_domain.AndroidDeviceSystemContext,
         report.device_system_context)
+    # Here we use cast because this method is currently not implemented
+    # for web platform. So, to narrow down the type from AppContext to
+    # AndroidAppContext, we used cast here.
     app_context = cast(
         app_feedback_report_domain.AndroidAppContext, report.app_context)
     entry_point = app_context.entry_point
@@ -530,8 +592,8 @@ def save_feedback_report_to_storage(
             report.report_id, report.platform,
             report.submitted_on_timestamp,
             report.local_timezone_offset_hrs,
-            user_supplied_feedback.report_type.name,
-            user_supplied_feedback.category.name,
+            user_supplied_feedback.report_type.value,
+            user_supplied_feedback.category.value,
             device_system_context.version_name,
             device_system_context.device_country_locale_code,
             device_system_context.sdk_version,
@@ -608,17 +670,13 @@ def reassign_ticket(
         old_ticket_obj = get_ticket_from_model(old_ticket_model)
         old_ticket_obj.reports.remove(report.report_id)
         if len(old_ticket_obj.reports) == 0:
-            # We are removing the only report associated with this ticket.
-            old_ticket_obj.newest_report_creation_timestamp = None # type: ignore[assignment]
+            old_ticket_obj.newest_report_creation_timestamp = None
         else:
             if old_ticket_obj.newest_report_creation_timestamp == (
                     report.submitted_on_timestamp):
                 # Update the newest report timestamp.
-                optional_report_models = get_report_models(
-                    old_ticket_obj.reports)
-                report_models = cast(
-                    List[app_feedback_report_models.AppFeedbackReportModel],
-                    optional_report_models)
+                report_models = get_report_models(
+                    old_ticket_obj.reports, strict=True)
                 latest_timestamp = report_models[0].submitted_on
                 for index in range(1, len(report_models)):
                     if report_models[index].submitted_on > (
@@ -641,8 +699,10 @@ def reassign_ticket(
             new_ticket_id))
     new_ticket_obj = get_ticket_from_model(new_ticket_model)
     new_ticket_obj.reports.append(report.report_id)
-    if report.submitted_on_timestamp > (
-            new_ticket_obj.newest_report_creation_timestamp):
+    if (new_ticket_obj.newest_report_creation_timestamp and
+        report.submitted_on_timestamp > (
+            new_ticket_obj.newest_report_creation_timestamp)
+    ):
         new_ticket_obj.newest_report_creation_timestamp = (
             report.submitted_on_timestamp)
     _save_ticket(new_ticket_obj)

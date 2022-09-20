@@ -88,7 +88,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         self.assertEqual(
             constants.constants.DEFAULT_SKILL_DIFFICULTY,
             constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
-                constants.constants.SKILL_DIFFICULTY_EASY])
+                constants.constants.SKILL_DIFFICULTY_MEDIUM])
 
     def test_constants_and_feconf_are_consistent(self) -> None:
         """Test if constants that are related are consistent between feconf and

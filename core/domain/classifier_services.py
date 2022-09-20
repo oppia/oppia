@@ -38,7 +38,21 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
+
+
+class JobInfoDict(TypedDict):
+    """Type for the job info dictionary."""
+
+    algorithm_id: str
+    interaction_id: str
+    exp_id: str
+    exp_version: int
+    next_scheduled_check_time: datetime.datetime
+    state_name: str
+    training_data: List[state_domain.TrainingDataDict]
+    status: str
+    algorithm_version: int
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -58,8 +72,6 @@ def generate_signature(
     Returns:
         str. The signature of the payload data.
     """
-    # Ruling out the possibility of Any other type for vm_id.
-    assert isinstance(vm_id, str)
     converted_vm_id = vm_id.encode('utf-8')
     if isinstance(message, str):
         message = message.encode('utf-8')
@@ -97,20 +109,6 @@ def verify_signature(
     if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True
-
-
-class JobInfoDict(TypedDict):
-    """Type for the job info dictionary."""
-
-    algorithm_id: str
-    interaction_id: str
-    exp_id: str
-    exp_version: int
-    next_scheduled_check_time: datetime.datetime
-    state_name: str
-    training_data: List[state_domain.TrainingDataDict]
-    status: str
-    algorithm_version: int
 
 
 def handle_trainable_states(
@@ -453,8 +451,8 @@ def fetch_next_job() -> Optional[classifier_domain.ClassifierTrainingJob]:
 # TODO(#15451): Add stubs for protobuf once we have enough type info regarding
 # protobuf's library. Because currently, the stubs in typeshed is not fully
 # type annotated yet and the main repository is also not type annotated yet.
-# The argument classifier_data_proto can accept instances of
-# `TextClassifierFrozenModel` class. But since we excluded
+# Here we use object because the argument classifier_data_proto can accept
+# instances of `TextClassifierFrozenModel` class. But since we excluded
 # proto_files/ from the static type annotations, this argument
 # is annotated as general object type.
 def store_classifier_data(job_id: str, classifier_data_proto: object) -> None:

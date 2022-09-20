@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (blog_models, user_models) = models.Registry.import_models(
-    [models.NAMES.blog, models.NAMES.user])
+    [models.Names.BLOG, models.Names.USER])
 
 
 @validation_decorators.AuditsExisting(blog_models.BlogPostModel)
@@ -89,10 +89,10 @@ class ValidateBlogPostModelDomainObjectsInstances(
         return base_validation.ValidationModes.STRICT
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(
     blog_models.BlogPostModel,
     blog_models.BlogPostSummaryModel)
