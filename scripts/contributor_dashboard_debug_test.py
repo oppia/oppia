@@ -39,7 +39,8 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 
 import requests
-from typing import Any, Dict, List
+from typing import Dict, List
+import webtest
 
 auth_services = models.Registry.import_auth_services()
 
@@ -49,7 +50,7 @@ class MockResponse:
     def __init__(
         self,
         ok: bool = True,
-        json: Dict[str, Any] | None = None,
+        json: Dict[str, str] | None = None,
         status_code: int = 200,
         reason: str = 'foo'
     ) -> None:
@@ -60,7 +61,7 @@ class MockResponse:
         self.status_code = status_code
         self.reason = reason
 
-    def json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, str]:
         """Get json dict or raise ValueError if json_dict not a dict."""
         if not isinstance(self.json_dict, dict):
             raise ValueError('Payload not JSON.')
@@ -123,9 +124,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self,
         method: str,
         url: str,
-        params: Dict[str, Any] | None = None,
-        headers: Dict[str, Any] | None = None
-    ) -> Any:
+        params: Dict[str, str] | None = None,
+        headers: Dict[str, str] | None = None
+    ) -> webtest.TestResponse:
         """Returns a mock response for the given request."""
         if method == 'GET':
             if url == '/session_begin':
@@ -143,7 +144,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         if method == 'PUT':
             return self.testapp.put(url, params=params, headers=headers)
 
-    def _mock_firebase_auth_create_user(self, **kwargs: Any) -> None:
+    def _mock_firebase_auth_create_user(self, **kwargs: str) -> None:
         """Mock for firebase_auth.create_user()."""
         email = kwargs['email']
         auth_id = self.get_auth_id_from_email(email)
@@ -290,7 +291,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.assertEqual(os.environ['USER_IS_ADMIN'], '1')
 
     def _mock_firebase_auth_sign_in(
-        self, _: str, **kwargs: Any
+        self, _: str, **kwargs: Dict[str, str]
     ) -> MockResponse:
         """Mock for the post request to FIREBASE_SIGN_IN_URL, where the response
         including the token information.

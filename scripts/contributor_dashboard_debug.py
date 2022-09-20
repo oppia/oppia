@@ -42,24 +42,26 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 
 import requests
-from typing import Any, Dict, Iterator, List
+from typing import Dict, Iterator, List
+from typing_extensions import Final
 
-FIREBASE_AUTH_EMULATOR_HOST = 'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT
-FIREBASE_SIGN_IN_URL = (
+FIREBASE_AUTH_EMULATOR_HOST: Final = (
+    'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT)
+FIREBASE_SIGN_IN_URL: Final = (
     'http://%s/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
     % FIREBASE_AUTH_EMULATOR_HOST)
 
-SUPER_ADMIN_EMAIL = feconf.ADMIN_EMAIL_ADDRESS
-SUPER_ADMIN_USERNAME = 'a'
-SUPER_ADMIN_ROLES = [
+SUPER_ADMIN_EMAIL: Final = feconf.ADMIN_EMAIL_ADDRESS
+SUPER_ADMIN_USERNAME: Final = 'a'
+SUPER_ADMIN_ROLES: Final = [
     feconf.ROLE_ID_CURRICULUM_ADMIN, feconf.ROLE_ID_TRANSLATION_ADMIN,
     feconf.ROLE_ID_QUESTION_ADMIN]
 
-CONTRIBUTOR_EMAIL = 'contributor@example.com'
-CONTRIBUTOR_USERNAME = 'b'
+CONTRIBUTOR_EMAIL: Final = 'contributor@example.com'
+CONTRIBUTOR_USERNAME: Final = 'b'
 
-CLASSROOM_NAME = 'math'
-CLASSROOM_URL_FRAGMENT = 'math'
+CLASSROOM_NAME: Final = 'math'
+CLASSROOM_URL_FRAGMENT: Final = 'math'
 
 
 class ContributorDashboardDebugInitializer:
@@ -161,15 +163,16 @@ class ContributorDashboardDebugInitializer:
 
     def _sign_in_with_email_and_password(
         self, email: str, password: str
-    ) -> Any:
+    ) -> str:
         """Signs in with email and password, and returns the token id."""
-        token_id = requests.post(
+        token_id = str(requests.post(
             FIREBASE_SIGN_IN_URL,
             params={'key': 'fake-api-key'},
             json={
                 'email': email,
                 'password': password
-        }).json()['idToken']
+            }
+        ).json()['idToken'])
 
         return token_id
 
@@ -247,8 +250,8 @@ class ContributorDashboardDebugInitializer:
             self,
             method: str,
             url: str,
-            params: Dict[str, Any] | None = None,
-            headers: Dict[str, Any] | None = None
+            params: Dict[str, str] | None = None,
+            headers: Dict[str, str] | None = None
         ) -> requests.Response:
         """Makes a request to the Oppia server."""
         if params is None:
