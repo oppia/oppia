@@ -143,66 +143,85 @@
 
             <div *ngFor="let topic of topicNameToPrerequisiteTopicNames | keyvalue"
                  class="topic-dependency-container">
-              <div>
-                <span class="topics-name">
-                  <strong>{{ topic.key }}</strong>
-                </span>
-
-                <div class="prerequisite-topics-container">
-                  <span *ngIf="topic.value.length === 0">
-                    <em>No prerequisites selected</em>
+              <div class="topic-and-prerequisites-tile">
+                <div>
+                  <span class="topics-name">
+                    <strong>{{ topic.key }}</strong>
                   </span>
-
-                  <div *ngIf="topic.value.length > 0">
-                    <ul class="prerequisite-topics"
-                         *ngFor="let prerequisiteTopic of topic.value">
-                      <li class="prerequisite-topic-name">
-                        {{ prerequisiteTopic }}
-                      </li>
-                    </ul>
+                  <div class="prerequisite-topics-container">
+                    <span *ngIf="topic.value.length === 0">
+                      <em>No prerequisites selected</em>
+                    </span>
+                    <div *ngIf="topic.value.length > 0">
+                      <mat-chip-list>
+                        <mat-chip *ngFor="let prerequisiteTopic of topic.value"
+                                  (removed)="modifyDependencyForTopic(topic.key, prerequisiteTopic)">
+                          {{ prerequisiteTopic }}
+                          <mat-icon matChipRemove
+                                    *ngIf="classroomEditorMode"
+                                    class="update-cross-icon">
+                            cancel
+                          </mat-icon>
+                        </mat-chip>
+                      </mat-chip-list>
+                    </div>
                   </div>
+                </div>
 
-                  <button *ngIf="classroomEditorMode"
-                          (click)="showDependencyGraphDropdown(topic.key)"
-                          mat-button matSuffix mat-icon-button
-                          aria-label="Edit topic dependencies">
-                    <mat-icon class="edit-topic-dependencies">edit</mat-icon>
+                <div ngbDropdown
+                    *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topic.key">
+                  <button ngbDropdownToggle mat-button
+                          (click)="getAvailablePrerequisiteTopicNamesForDropdown(topic.key)"
+                          class="dropdown-toggle prerequisite-dropdown-selector">
+                    Select Prerequisite
                   </button>
+
+                  <button (click)="closeDependencyGraphDropdown()"
+                          mat-button matSuffix mat-icon-button
+                          aria-label="Clear">
+                    <mat-icon matListIcon>close</mat-icon>
+                  </button>
+
+                  <ul ngbDropdownMenu
+                      class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu">
+                    <ng-container *ngFor="let topicName of eligibleTopicNames">
+                      <li ngbDropdownItem class="topic-dropdown-options"
+                          (click)="modifyDependencyForTopic(topic.key, topicName)">
+                        <span>{{ topicName }}</span>
+                      </li>
+                    </ng-container>
+                  </ul>
+                </div>
+                <p *ngIf="cyclicCheckError && currentTopicOnEdit === topic.key"
+                   class="oppia-warning-text cyclic-check-error">
+                  There is a cycle in the prerequisite dependencies.
+                  Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
+                  Please fix this error to save the changes.
+                </p>
+              </div>
+
+              <div *ngIf="classroomEditorMode">
+                <p *ngIf="editTopicOptionIsShown"
+                   class="fas fa-ellipsis-v topic-edit-box-icon"
+                   (click)="editDependency(topic.key)"
+                   attr.aria-label="Edit dependencies">
+                </p>
+                <div *ngIf="topicDependencyEditOptionIsShown && currentTopicOnEdit === topic.key"
+                     class="topic-edit-options">
+                  <div (click)="editPrerequisite()">
+                    <a class="topic-edit-options-edit">
+                      <i class="fa fa-pen"></i>
+                      <span>Add Prerequisites</span>
+                    </a>
+                  </div>
+                  <div (click)="deleteTopic(topic.key)">
+                    <a>
+                      <i class="fas fa-trash-alt"></i>
+                      <span>Delete the topic</span>
+                    </a>
+                  </div>
                 </div>
               </div>
-              <div ngbDropdown
-                   *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topic.key">
-                <button ngbDropdownToggle mat-button
-                        (click)="getAvailablePrerequisiteTopicNamesForDropdown(topic.key)"
-                        class="dropdown-toggle prerequisite-dropdown-selector">
-                  Select Prerequisite
-                </button>
-
-                <button (click)="closeDependencyGraphDropdown()"
-                        mat-button matSuffix mat-icon-button
-                        aria-label="Clear">
-                  <mat-icon matListIcon>close</mat-icon>
-                </button>
-
-                <ul ngbDropdownMenu
-                    class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu">
-                  <ng-container *ngFor="let topicName of eligibleTopicNames">
-                    <li ngbDropdownItem class="topic-dropdown-options"
-                        (click)="modifyDependencyForTopic(topic.key, topicName)">
-                      <span>{{topicName}}</span>
-                      <i class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"
-                          *ngIf="selectedTopics.indexOf(topicName) !== -1">
-                      </i>
-                    </li>
-                  </ng-container>
-                </ul>
-              </div>
-              <p *ngIf="cyclicCheckError && currentTopicOnEdit === topic.key"
-                 class="oppia-warning-text cyclic-check-error">
-                There is a cycle in the prerequisite dependencies.
-                Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
-                Please fix this error to save the changes.
-              </p>
             </div>
 
             <div *ngIf="classroomEditorMode">
@@ -270,7 +289,7 @@
 
 <style>
   .prerequisite-dropdown-selector {
-    margin-left: 22%;
+    margin-left: 25%;
   }
   .cyclic-check-error {
     margin: 0 10px;
@@ -324,8 +343,9 @@
     display: flex;
     justify-content: space-around;
   }
-  .topic-dependency-container:hover {
-    background: #eee;
+  .topic-dependency-container {
+    align-items: center;
+    display: flex;
   }
   :host /deep/ .oppia-save-classroom-spinning-button circle {
     stroke: #fff;
@@ -413,6 +433,53 @@
   .oppia-warning-text {
     color: #f00;
     font-size: 0.8em;
+    width: 500px
+  }
+  .topic-edit-box-icon {
+    cursor: pointer;
+  }
+  .topic-edit-options {
+    background-color: #fff;
+    border: 1px solid #000;
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    right: 100px;
+    width: min-content;
+    z-index: 1;
+  }
+  .topic-edit-options a {
+    display: block;
+    padding: 5px;
+    padding-left: 10px;
+    text-align: left;
+    text-decoration: none;
+    width: 100%;
+  }
+
+  .topic-edit-options div {
+    display: block;
+    width: 100%;
+  }
+
+  .topic-edit-options span {
+    padding-left: 8px;
+  }
+  .topic-primary-information-container {
+    height: 100%;
+    overflow: auto;
+  }
+  .topic-edit-options-edit {
+    border-bottom: 1px solid #000;
+    color: inherit;
+    text-decoration: none;
+  }
+  .topic-edit-options a:hover,
+  .topic-edit-options a:active,
+  .topic-edit-options a:visited {
+    background-color: #e6e6e6;
+    color: inherit;
+    text-decoration: none;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {

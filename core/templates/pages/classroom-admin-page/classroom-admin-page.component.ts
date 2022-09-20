@@ -24,6 +24,7 @@ import { AppConstants } from 'app.constants';
 import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
 import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
 import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
+import { DeleteTopicFromClassroomModalComponent } from './modals/delete-topic-from-classroom-modal.component';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -31,7 +32,6 @@ import cloneDeep from 'lodash/cloneDeep';
 interface TopicIdToPrerequisiteTopicIds {
   [topicId: string]: string[];
 }
-
 
 interface TopicNameToPrerequisiteTopicNames {
   [topicName: string]: string[];
@@ -96,10 +96,11 @@ export class ClassroomAdminPageComponent implements OnInit {
   topicsGraphIsCorrect = true;
   addNewTopicInputIsShown: boolean = false;
   topicWithGivenIdExists: boolean = true;
+  topicDependencyEditOptionIsShown: boolean = false;
+  editTopicOptionIsShown: boolean = true;
 
   dependencyGraphDropdownIsShown: boolean = false;
   currentTopicOnEdit!: string;
-  selectedTopics: string[] = [];
 
   getClassroomData(classroomId: string): void {
     if (this.classroomId === classroomId && this.classroomViewerMode) {
@@ -248,6 +249,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomUrlFragmentIsTooLong = false;
         this.classroomUrlFragmentIsValid = true;
         this.cyclicCheckError = false;
+        this.topicDependencyEditOptionIsShown = false;
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is
@@ -513,14 +515,71 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   closeDependencyGraphDropdown(): void {
     this.dependencyGraphDropdownIsShown = false;
+    this.editTopicOptionIsShown = true;
   }
 
-  getAvailablePrerequisiteTopicNamesForDropdown(topicName: string): void {
-    this.eligibleTopicNames = Object.keys(
+  getAvailablePrerequisiteTopicNamesForDropdown(givenTopicName: string): void {
+    let allTopicNames = Object.keys(
       this.topicNameToPrerequisiteTopicNames);
-    const index = this.eligibleTopicNames.indexOf(topicName);
-    this.eligibleTopicNames.splice(index, 1);
-    this.selectedTopics = this.topicNameToPrerequisiteTopicNames[topicName];
+    this.eligibleTopicNames = [];
+    let prerequisites = this.topicNameToPrerequisiteTopicNames[givenTopicName];
+
+    for (let topicName of allTopicNames) {
+      if (
+        topicName !== givenTopicName &&
+        prerequisites.indexOf(topicName) === -1
+      ) {
+        this.eligibleTopicNames.push(topicName);
+      }
+    }
+  }
+
+  editDependency(topicName: string): void {
+    if (this.topicDependencyEditOptionIsShown === false) {
+      this.topicDependencyEditOptionIsShown = true;
+      this.currentTopicOnEdit = topicName;
+    } else {
+      this.topicDependencyEditOptionIsShown = false;
+    }
+  }
+
+  editPrerequisite(): void {
+    this.topicDependencyEditOptionIsShown = false;
+    this.dependencyGraphDropdownIsShown = true;
+    this.editTopicOptionIsShown = false;
+  }
+
+  deleteTopic(topicNameToDelete: string): void {
+    let childTopicNodes = [];
+    for (let topicName in this.topicNameToPrerequisiteTopicNames) {
+      const prerequisites = this.topicNameToPrerequisiteTopicNames[topicName];
+
+      if (prerequisites.indexOf(topicNameToDelete) !== -1) {
+        childTopicNodes.push(topicName);
+      }
+    }
+
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(DeleteTopicFromClassroomModalComponent, {
+        backdrop: 'static'
+      });
+    modalRef.componentInstance.prerequisiteTopics = (
+      Object.values(childTopicNodes)
+    );
+    modalRef.componentInstance.topicName = topicNameToDelete;
+    modalRef.result.then(() => {
+      const topicId = this.getTopicIdFromTopicName(topicNameToDelete);
+      delete this.topicIdToPrerequisiteTopicIds[topicId];
+      delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
+
+      this.classroomDataIsChanged = true;
+      this.updatedClassroomDict.topicIdToPrerequisiteTopicIds = (
+        this.topicIdToPrerequisiteTopicIds);
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
+    });
   }
 }
 

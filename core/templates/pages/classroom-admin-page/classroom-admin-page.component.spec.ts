@@ -17,6 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { toPublicName } from '@angular/compiler/src/i18n/serializers/xmb';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
@@ -972,12 +973,152 @@ describe('Classroom Admin Page component ', () => {
       'Dummy topic 2': ['Dummy topic 1'],
       'Dummy topic 3': ['Dummy topic 2']
     };
-    component.selectedTopics = [];
 
     component.getAvailablePrerequisiteTopicNamesForDropdown('Dummy topic 2');
 
     expect(component.eligibleTopicNames).toEqual(
-      ['Dummy topic 1', 'Dummy topic 3']);
-    expect(component.selectedTopics).toEqual(['Dummy topic 1']);
+      ['Dummy topic 3']);
   });
+
+  it(
+    'should be able to show and remove edit and delete functionality box',
+    () => {
+      component.topicDependencyEditOptionIsShown = false;
+
+      component.editDependency('topicName');
+
+      expect(component.topicDependencyEditOptionIsShown).toBeTrue();
+
+      component.editDependency('topicName');
+
+      expect(component.topicDependencyEditOptionIsShown).toBeFalse();
+    });
+
+  it('should be able to edit prerequisites for a topic', () => {
+    component.topicDependencyEditOptionIsShown = true;
+    component.dependencyGraphDropdownIsShown = false;
+    component.editTopicOptionIsShown = true;
+
+    component.editPrerequisite();
+
+    expect(component.topicDependencyEditOptionIsShown).toBeFalse();
+    expect(component.dependencyGraphDropdownIsShown).toBeTrue();
+    expect(component.editTopicOptionIsShown).toBeFalse();
+  });
+
+  it(
+    'should be able to delete a topic from the classroom on modal confirmation',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.resolve()
+        } as NgbModalRef
+      );
+
+      component.topicIdsToTopicName = {
+        topicId1: 'Dummy topic 1',
+        topicId2: 'Dummy topic 2',
+        topicId3: 'Dummy topic 3'
+      };
+
+      component.topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2', 'topicId1']
+      };
+
+      component.topicNameToPrerequisiteTopicNames = {
+        'Dummy topic 1': [],
+        'Dummy topic 2': ['Dummy topic 1'],
+        'Dummy topic 3': ['Dummy topic 2', 'Dummy topic 1']
+      };
+
+      component.updatedClassroomDict = {
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: (
+          component.topicNameToPrerequisiteTopicNames)
+      };
+
+      const expectedTopicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1']
+      };
+
+      const expectedTopicNameToPrerequisiteTopicNames = {
+        'Dummy topic 1': [],
+        'Dummy topic 2': ['Dummy topic 1']
+      };
+
+      component.deleteTopic('Dummy topic 3');
+      tick();
+
+      expect(component.topicIdToPrerequisiteTopicIds).toEqual(
+        expectedTopicIdToPrerequisiteTopicIds);
+      expect(component.topicNameToPrerequisiteTopicNames).toEqual(
+        expectedTopicNameToPrerequisiteTopicNames);
+    }));
+
+  it(
+    'should be able to handle rejection handler on topic deletion modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.reject()
+        } as NgbModalRef
+      );
+
+      component.topicIdsToTopicName = {
+        topicId1: 'Dummy topic 1',
+        topicId2: 'Dummy topic 2',
+        topicId3: 'Dummy topic 3'
+      };
+
+      component.topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2', 'topicId1']
+      };
+
+      component.topicNameToPrerequisiteTopicNames = {
+        'Dummy topic 1': [],
+        'Dummy topic 2': ['Dummy topic 1'],
+        'Dummy topic 3': ['Dummy topic 2', 'Dummy topic 1']
+      };
+
+      component.updatedClassroomDict = {
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: (
+          component.topicNameToPrerequisiteTopicNames)
+      };
+
+      const expectedTopicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2', 'topicId1']
+      };
+
+      const expectedTopicNameToPrerequisiteTopicNames = {
+        'Dummy topic 1': [],
+        'Dummy topic 2': ['Dummy topic 1'],
+        'Dummy topic 3': ['Dummy topic 2', 'Dummy topic 1']
+      };
+
+      component.deleteTopic('Dummy topic 1');
+      tick();
+
+      expect(component.topicIdToPrerequisiteTopicIds).toEqual(
+        expectedTopicIdToPrerequisiteTopicIds);
+      expect(component.topicNameToPrerequisiteTopicNames).toEqual(
+        expectedTopicNameToPrerequisiteTopicNames);
+    }));
 });
