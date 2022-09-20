@@ -704,7 +704,7 @@
 	"I18N_LIBRARY_CATEGORIES_HISTORY": "Text displayed in a filter list of categories in the library page. - Name of the history category. See I18N_LIBRARY_ALL_CATEGORIES\n{{Identical|History}}",
 	"I18N_LIBRARY_CATEGORIES_HOBBIES": "Text displayed in a filter list of categories in the library page. - Name of the hobbies category. See I18N_LIBRARY_ALL_CATEGORIES\n{{Identical|Hobby}}",
 	"I18N_LIBRARY_CATEGORIES_INTERACTIVE_FICTION": "Text displayed in a filter list of categories in the library page. - Name of the interactive fiction category. See I18N_LIBRARY_ALL_CATEGORIES Fiction",
-	"I18N_LIBRARY_CATEGORIES_LANGUAGES": "Text displayed in a filter list of categories in the library page. - Name of the languanges category (not a filter for the language of the exploration). See I18N_LIBRARY_ALL_CATEGORIES\n{{Identical|Language}}",
+	"I18N_LIBRARY_CATEGORIES_LANGUAGES": "Text displayed in a filter list of categories in the library page. - Name of the languanges category (not a filter for the language of the exploration).\n\nSee also:\n* {{Msg-oppia|I18N LIBRARY ALL CATEGORIES}}\n{{Identical|Language}}",
 	"I18N_LIBRARY_CATEGORIES_LAW": "Text displayed in a filter list of categories in the library page. - Name of the law category. See I18N_LIBRARY_ALL_CATEGORIES\n{{Identical|Law}}",
 	"I18N_LIBRARY_CATEGORIES_LIFE_SKILLS": "Text displayed in a filter list of categories in the library page. - Name of the life skills category. See I18N_LIBRARY_ALL_CATEGORIES Skills",
 	"I18N_LIBRARY_CATEGORIES_MATHEMATICS": "Text displayed in a filter list of categories in the library page. - Name of the math category. See I18N_LIBRARY_ALL_CATEGORIES\n{{Identical|Math}}",

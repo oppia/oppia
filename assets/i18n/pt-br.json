@@ -441,7 +441,7 @@
 	"I18N_INTERACTIONS_IMAGE_CLICK_INSTRUCTION": "Clique na imagem",
 	"I18N_INTERACTIONS_IMAGE_CLICK_SELECT": "[Selecione uma imagem para exibir]",
 	"I18N_INTERACTIONS_ITEM_SELECTION_MORE": "Pode selecionar outras opções.",
-	"I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH": "{minChoiceNumber, plural, one{Por favor, selecione pelo menos uma opção.} other{Por favor, selecione pelo menos # opções.}}",
+	"I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH": "{minChoiceNumber, plural, one{Por favor, selecione todas as opções corretas.} other{Por favor, selecione pelo menos # opções.}}",
 	"I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE": "{maxAllowableSelectionCount, plural, one{Somente uma opção pode ser selecionada.} other{No máximo # opções podem ser selecionadas.}}",
 	"I18N_INTERACTIONS_MAP_INSTRUCTION": "Clique no mapa",
 	"I18N_INTERACTIONS_MAP_NARROW_INSTRUCTION": "Ver mapa",

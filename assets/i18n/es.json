@@ -202,6 +202,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4": "Además, exploraciones publicadas y colecciones que no tienen otros dueños se convertirán en propiedad comunitaria.",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_5": "Si tiene cualesquiera preguntas o preocupaciones sobre el proceso de eliminar la cuenta, por favor envía un correo electrónico a <strong>privacy@oppia.org</strong>.",
 	"I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO": "Esto te tomará a una página donde puedes eliminar tu cuenta de Oppia.",
+	"I18N_DEST_IF_STUCK_INFO_TOOLTIP": "Ahora puede especificar una nueva tarjeta en la que puede guiar a los alumnos a través de los conceptos utilizados en la pregunta, ¡si realmente se atascan!",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Arrastra una imagen a esta área",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Subir un archivo",
 	"I18N_DONATE_PAGE_BREADCRUMB": "Donar",
