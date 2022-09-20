@@ -81,6 +81,10 @@ export class SplashPageComponent implements OnInit {
     this.windowRef.nativeWindow.location.href = this.classroomUrl;
   }
 
+  onClickAccessAndroidButton(): void {
+    this.windowRef.nativeWindow.location.href = '/android';
+  }
+
   onClickStartContributingButton(): void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
     this.windowRef.nativeWindow.location.href = '/volunteer';

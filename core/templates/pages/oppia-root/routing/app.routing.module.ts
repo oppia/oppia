@@ -37,6 +37,11 @@ const routes: Route[] = [
       .then(m => m.AboutFoundationPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,
+    loadChildren: () => import('pages/android-page/android-page.module')
+      .then(m => m.AndroidPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import(

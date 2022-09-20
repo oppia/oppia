@@ -33,6 +33,26 @@ import { SplashPageComponent } from './splash-page.component';
 import { of } from 'rxjs';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
+class MockWindowRef {
+  _window = {
+    location: {
+      _href: '',
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      replace: (val: string) => {}
+    },
+    gtag: () => {}
+  };
+
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
 class MockI18nLanguageCodeService {
   codeChangeEventEmitter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
@@ -54,6 +74,7 @@ describe('Splash Page', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
+  let mockWindowRef = new MockWindowRef();
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [SplashPageComponent, MockTranslatePipe],
@@ -73,14 +94,7 @@ describe('Splash Page', () => {
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              location: {
-                href: ''
-              },
-              gtag: () => {}
-            }
-          }
+          useValue: mockWindowRef
         }
       ]
     }).compileComponents();
@@ -114,6 +128,14 @@ describe('Splash Page', () => {
     component.onClickBrowseLessonsButton();
     expect(siteAnalyticsService.registerClickBrowseLessonsButtonEvent)
       .toHaveBeenCalled();
+  });
+
+  it('should direct users to the android page on click', function() {
+    expect(mockWindowRef.nativeWindow.location.href).not.toEqual('/android');
+
+    component.onClickAccessAndroidButton();
+
+    expect(mockWindowRef.nativeWindow.location.href).toEqual('/android');
   });
 
   it('should record analytics when Start Contributing is clicked', function() {
