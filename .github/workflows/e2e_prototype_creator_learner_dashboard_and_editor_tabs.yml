@@ -9,13 +9,18 @@ on:
       - develop
       - release-*
 jobs:
-  e2e_protoype_workflow:
-    needs: build_webpack
+  e2e_prototype_creator_learner_dashboard_and_editor_tabs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
       - name: download webpack
         uses: actions/download-artifact@v2
         with:

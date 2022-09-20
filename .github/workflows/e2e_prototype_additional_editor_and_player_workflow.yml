@@ -9,57 +9,59 @@ on:
       - develop
       - release-*
 jobs:
-  e2e_additional_editor_and_player:
-    needs: build_webpack
+  e2e_prototype_additional_editor_and_player:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
     steps:
-        - name: download webpack
-          uses: actions/download-artifact@v2
-          with:
-            name: built-webpack
-            path: /home/runner/work/oppia/oppia/build
-        - name: Run Additional Editor E2E Test
-          if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeatures" --prod_env
-          env:
-            VIDEO_RECORDING_IS_ENABLED: 0
-        - name: Run Additional Editor Modals E2E Test
-          if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeaturesModals" --prod_env
-          env:
-            VIDEO_RECORDING_IS_ENABLED: 0
-        - name: Run Additional Player E2E Test
-          if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
-          env:
-            VIDEO_RECORDING_IS_ENABLED: 0
-        - name: Uploading webdriverio-video as Artifacts
-          if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
-          uses: actions/upload-artifact@v2
-          with:
-            name: webdriverio-video
-            path: /home/runner/work/oppia/webdriverio-video
-        - name: Uploading webdriverio screenshots as Artifacts
-          if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
-          uses: actions/upload-artifact@v2
-          with:
-            name: webdriverio-screenshots
-            path: /home/runner/work/oppia/webdriverio-screenshots
-        - name: Uploading webpack bundles as an artifact
-          if: ${{ failure() }}
-          uses: actions/upload-artifact@v2
-          with:
-            name: webpack-bundles
-            path: /home/runner/work/oppia/oppia/build
-        - name: Report failure if failed on oppia/oppia develop branch
-          if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-          uses: ./.github/actions/send-webhook-notification
-          with:
-            message: "An E2E test failed on the upstream develop branch."
-            webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-
-
-
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      - name: download webpack
+        uses: actions/download-artifact@v2
+        with:
+          name: built-webpack
+          path: /home/runner/work/oppia/oppia/build
+      - name: Run Additional Editor E2E Test
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeatures" --prod_env
+        env:
+          VIDEO_RECORDING_IS_ENABLED: 0
+      - name: Run Additional Editor Modals E2E Test
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeaturesModals" --prod_env
+        env:
+          VIDEO_RECORDING_IS_ENABLED: 0
+      - name: Run Additional Player E2E Test
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
+        env:
+          VIDEO_RECORDING_IS_ENABLED: 0
+      - name: Uploading webdriverio-video as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webdriverio-video
+          path: /home/runner/work/oppia/webdriverio-video
+      - name: Uploading webdriverio screenshots as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webdriverio-screenshots
+          path: /home/runner/work/oppia/webdriverio-screenshots
+      - name: Uploading webpack bundles as an artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webpack-bundles
+          path: /home/runner/work/oppia/oppia/build
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "An E2E test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
