@@ -23,8 +23,8 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, TypeVar
-from typing_extensions import Final, Literal
+from typing import Dict, List, Optional, Sequence, TypeVar
+from typing_extensions import Final, Literal, TypedDict
 
 SELF_REPORT_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_REPORT_MODEL', bound='AppFeedbackReportModel'
@@ -37,7 +37,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user
+    models.Names.BASE_MODEL, models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -48,26 +48,41 @@ PLATFORM_CHOICES: Final = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES: Final = PLATFORM_CHOICES
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class ReportInfoDict(TypedDict):
+    """Type for the report_info dictionary."""
+
+    user_feedback_selected_items: List[str]
+    user_feedback_other_text_input: str
+    build_fingerprint: str
+    event_logs: List[str]
+    logcat_logs: List[str]
+    package_version_code: int
+    language_locale_code: str
+    entry_point_info: Dict[str, str]
+    text_size: str
+    only_allows_wifi_download_and_update: bool
+    automatically_update_topics: bool
+    is_curriculum_admin: bool
+    android_device_language_locale_code: str
+    account_is_profile_admin: bool
+    network_type: str
+
 
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
+class FilterFieldNames(enum.Enum):
     """Enum for the model field names that can be filtered"""
 
-    platform = 'platform' # pylint: disable=invalid-name
-    report_type = 'report_type' # pylint: disable=invalid-name
-    entry_point = 'entry_point' # pylint: disable=invalid-name
-    submitted_on = 'submitted_on' # pylint: disable=invalid-name
-    android_device_model = 'android_device_model' # pylint: disable=invalid-name
-    android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
-    text_language_code = 'text_language_code' # pylint: disable=invalid-name
-    audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
-    platform_version = 'platform_version' # pylint: disable=invalid-name
-    android_device_country_locale_code = 'android_device_country_locale_code' # pylint: disable=invalid-name
+    PLATFORM = 'platform'
+    REPORT_TYPE = 'report_type'
+    ENTRY_POINT = 'entry_point'
+    SUBMITTED_ON = 'submitted_on'
+    ANDROID_DEVICE_MODEL = 'android_device_model'
+    ANDROID_SDK_VERSION = 'android_sdk_version'
+    TEXT_LANGUAGE_CODE = 'text_language_code'
+    AUDIO_LANGUAGE_CODE = 'audio_language_code'
+    PLATFORM_VERSION = 'platform_version'
+    ANDROID_DEVICE_COUNTRY_LOCALE_CODE = 'android_device_country_locale_code'
 
 
 # An ID used for stats model entities tracking all unticketed reports.
@@ -196,8 +211,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
         entry_point_subtopic_id: Optional[str],
         text_language_code: str,
         audio_language_code: str,
-        android_report_info: Optional[Dict[str, Any]],
-        web_report_info: Optional[Dict[str, Any]]
+        android_report_info: Optional[ReportInfoDict],
+        web_report_info: Optional[ReportInfoDict]
     ) -> str:
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
@@ -333,7 +348,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_filter_options_for_field(
-        cls, filter_field: FILTER_FIELD_NAMES
+        cls, filter_field: FilterFieldNames
     ) -> List[str]:
         """Fetches values that can be used to filter reports by.
 
@@ -344,28 +359,28 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             list(str). The possible values that the field name can have.
         """
-        query = cls.query(projection=[filter_field.name], distinct=True)
+        query = cls.query(projection=[filter_field.value], distinct=True)
         filter_values = []
-        if filter_field == FILTER_FIELD_NAMES.report_type:
+        if filter_field == FilterFieldNames.REPORT_TYPE:
             filter_values = [model.report_type for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.platform:
+        elif filter_field == FilterFieldNames.PLATFORM:
             filter_values = [model.platform for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.entry_point:
+        elif filter_field == FilterFieldNames.ENTRY_POINT:
             filter_values = [model.entry_point for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.submitted_on:
+        elif filter_field == FilterFieldNames.SUBMITTED_ON:
             filter_values = [model.submitted_on.date() for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.android_device_model:
+        elif filter_field == FilterFieldNames.ANDROID_DEVICE_MODEL:
             filter_values = [model.android_device_model for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.android_sdk_version:
+        elif filter_field == FilterFieldNames.ANDROID_SDK_VERSION:
             filter_values = [model.android_sdk_version for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.text_language_code:
+        elif filter_field == FilterFieldNames.TEXT_LANGUAGE_CODE:
             filter_values = [model.text_language_code for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.audio_language_code:
+        elif filter_field == FilterFieldNames.AUDIO_LANGUAGE_CODE:
             filter_values = [model.audio_language_code for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.platform_version:
+        elif filter_field == FilterFieldNames.PLATFORM_VERSION:
             filter_values = [model.platform_version for model in query]
         elif filter_field == (
-                FILTER_FIELD_NAMES.android_device_country_locale_code):
+                FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE):
             filter_values = [
                 model.android_device_country_locale_code for model in query]
         else:

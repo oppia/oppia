@@ -34,7 +34,7 @@ from core.domain import stats_services
 from core.domain import user_domain
 from core.domain import user_services
 
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 from typing_extensions import TypedDict
 
 
@@ -254,15 +254,23 @@ def get_learner_collection_dict_by_id(
         next_exploration_id = collection.first_exploration_id
         completed_exp_ids = []
 
-    # Here, the return type of 'to_dict' method is CollectionDict but for
-    # implementation purpose we are assigning LearnerCollectionDict which
-    # is inherited from CollectionDict. So, due to the difference in types
-    # MyPY throws an error. Thus to avoid the error, we used ignore here.
-    collection_dict: LearnerCollectionDict = collection.to_dict()  # type: ignore[assignment]
-    # Here, expression has type List[CollectionNodeDict] but for implementation
-    # purpose we are assigning List[LearnerCollectionNodeDict]. So, due the
-    # difference in types MyPY throws an error. Thus to avoid the error, we
-    # used ignore here.
+    # Here we use cast because the return type of 'to_dict' method
+    # is CollectionDict but here we need a different dictionary
+    # that contains 'playthrough_dict' key. So, we have defined a
+    # LearnerCollectionDict which is inherited from CollectionDict
+    # and assigned it to collection_dict. So, due to this difference
+    # in types, MyPy throws an error. Thus to avoid the error,
+    # we used cast here.
+    collection_dict: LearnerCollectionDict = cast(
+        LearnerCollectionDict, collection.to_dict()
+    )
+    # Here we use MyPy ignore because the expression has type List[
+    # CollectionNodeDict] but here we need a list of those dictionaries
+    # that can contain both 'exploration_summary' key and CollectionNodeDict's
+    # key. So, we have defined LearnerCollectionNodeDict and assigned
+    # its list type to the collection_dict['nodes']. So, due to this
+    # difference in types, MyPy throws an error. Thus, to avoid the error,
+    # we used ignore here.
     collection_dict['nodes'] = [
         node.to_dict() for node in collection.nodes]  # type: ignore[misc]
 

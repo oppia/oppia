@@ -47,7 +47,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 BASE_MODEL_ID_PATTERN: str = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS: Final = datetime.timedelta(seconds=1)
@@ -63,10 +63,10 @@ class ValidationModes(enum.Enum):
     NON_STRICT = 'non_strict'
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class ValidateDeletedModel(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether models marked for deletion are stale.
 
@@ -95,10 +95,10 @@ class ValidateDeletedModel(beam.DoFn):  # type: ignore[misc]
             yield base_validation_errors.ModelExpiredError(cloned_entity)
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateBaseModelId(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate model ids.
@@ -137,10 +137,10 @@ class ValidateBaseModelId(beam.DoFn):  # type: ignore[misc]
                 cloned_entity, self._pattern)
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidatePostCommitStatus(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate post_commit_status."""
@@ -164,10 +164,10 @@ class ValidatePostCommitStatus(beam.DoFn):  # type: ignore[misc]
             yield base_validation_errors.InvalidCommitStatusError(cloned_entity)
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidatePostCommitIsPrivate(beam.DoFn):  # type: ignore[misc]
     """DoFn to check if post_commit_status is private when
@@ -203,10 +203,10 @@ class ValidatePostCommitIsPrivate(beam.DoFn):  # type: ignore[misc]
             )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidatePostCommitIsPublic(beam.DoFn):  # type: ignore[misc]
     """DoFn to check if post_commit_status is public when
@@ -241,10 +241,10 @@ class ValidatePostCommitIsPublic(beam.DoFn):  # type: ignore[misc]
             )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether created_on and last_updated timestamps are valid.
@@ -284,10 +284,10 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
                 cloned_entity)
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelDomainObjectInstances(
     beam.DoFn, Generic[ModelInstanceType]  # type: ignore[misc]
@@ -296,9 +296,9 @@ class ValidateModelDomainObjectInstances(
     domain object for model.
     """
 
-    # Here, return type is annotated as `Any` type because in child classes
-    # this method can be redefined with domain objects as return type. So,
-    # to allow every domain object as return type, we used Any here.
+    # Here we use type Any because in child classes this method can be
+    # redefined with domain objects as return type. So, to allow every
+    # domain object as return type, we used Any here.
     def _get_model_domain_object_instance(
         self, unused_item: ModelInstanceType
     ) -> Any:
@@ -367,10 +367,10 @@ class ValidateModelDomainObjectInstances(
                 entity, str(e))
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # type: ignore[misc]
     """DoFn to validate schema of commit commands in commit_cmds dict.
 
@@ -444,10 +444,10 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
                     entity, commit_cmd_dict, str(e))
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(
     base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
 class ValidateCommitType(beam.DoFn):  # type: ignore[misc]

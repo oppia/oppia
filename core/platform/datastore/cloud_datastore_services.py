@@ -145,7 +145,7 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
-# Here Any is used in the type annotation because it mimics the types defined in
+# Here we use type Any because it mimics the types defined in
 # the stubs for this library.
 def query_everything(**kwargs: Dict[str, Any]) -> Query:
     """Returns a query that targets every single entity in the datastore.

@@ -27,7 +27,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
 
 (base_models, opportunity_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.opportunity
+    models.Names.BASE_MODEL, models.Names.OPPORTUNITY
 ])
 
 
