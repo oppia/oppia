@@ -1104,7 +1104,7 @@ def get_sample_answers(
     exploration_id: str,
     exploration_version: int,
     state_name: str
-) -> List[Optional[str]]:
+) -> List[stats_domain.AcceptableAnswerTypes]:
     """Fetches a list of sample answers that were submitted to the specified
     exploration state (at the given version of the exploration).
 

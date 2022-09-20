@@ -48,36 +48,65 @@ from core import utils
 from core.domain import exp_domain
 from core.domain import stats_domain
 
-CLASSIFICATION_CATEGORIES = frozenset([
+from typing import Dict, FrozenSet, Iterable, List, Optional
+from typing_extensions import TypedDict
+
+CLASSIFICATION_CATEGORIES: FrozenSet[str] = frozenset([
     exp_domain.EXPLICIT_CLASSIFICATION,
     exp_domain.TRAINING_DATA_CLASSIFICATION,
     exp_domain.STATISTICAL_CLASSIFICATION,
     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
 ])
 
-UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES = frozenset([
+UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES: FrozenSet[str] = frozenset([
     exp_domain.STATISTICAL_CLASSIFICATION,
     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
 ])
 
 
+class AnswersWithFrequencyDict(TypedDict):
+    """Type for the dictionary representation of answers with frequencies."""
+
+    answer: stats_domain.AcceptableAnswerTypes
+    frequency: int
+
+
+class ClassificationResultsDict(TypedDict):
+    """Type for the dictionary representation of classification_results dict."""
+
+    classification_categorization: str
+    frequency: int
+
+
+class AnswersWithClassificationDict(TypedDict):
+    """Type for the dictionary representation of answers with classification."""
+
+    answer: stats_domain.AcceptableAnswerTypes
+    classification_categorization: str
+
+
 class HashableAnswer:
     """Wraps answer with object that can be placed into sets and dicts."""
 
-    def __init__(self, answer):
+    def __init__(self, answer: stats_domain.AcceptableAnswerTypes) -> None:
         self.answer = answer
-        self.hashable_answer = utils.get_hashable_value(answer)
+        self.hashable_answer: stats_domain.AcceptableAnswerTypes = (
+            utils.get_hashable_value(answer)
+        )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.hashable_answer)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, HashableAnswer):
             return self.hashable_answer == other.hashable_answer
         return False
 
 
-def _get_top_answers_by_frequency(answers, limit=None):
+def _get_top_answers_by_frequency(
+    answers: Iterable[stats_domain.AcceptableAnswerTypes],
+    limit: Optional[int] = None
+) -> stats_domain.AnswerFrequencyList:
     """Computes the number of occurrences of each answer, keeping only the top
     limit answers, and returns an AnswerFrequencyList.
 
@@ -99,7 +128,9 @@ def _get_top_answers_by_frequency(answers, limit=None):
 
 
 def _get_top_unresolved_answers_by_frequency(
-        answers_with_classification, limit=None):
+    answers_with_classification: Iterable[AnswersWithClassificationDict],
+    limit: Optional[int] = None
+) -> stats_domain.AnswerFrequencyList:
     """Computes the list of unresolved answers by keeping track of their latest
     classification categorization and then computes the occurrences of each
     unresolved answer, keeping only limit answers, and returns an
@@ -117,7 +148,9 @@ def _get_top_unresolved_answers_by_frequency(
         stats_domain.AnswerFrequencyList. A list of the top "limit"
         unresolved answers.
     """
-    classification_results_dict = {}
+    classification_results_dict: Dict[
+        HashableAnswer, ClassificationResultsDict
+    ] = {}
 
     # The list of answers is sorted according to the time of answer submission.
     # Thus following loop goes through the list and aggregates the most recent
@@ -133,7 +166,7 @@ def _get_top_unresolved_answers_by_frequency(
             'frequency': frequency + 1
         }
 
-    unresolved_answers_with_frequency_list = [{
+    unresolved_answers_with_frequency_list: List[AnswersWithFrequencyDict] = [{
         'answer': ans.answer,
         'frequency': val['frequency']
     } for ans, val in classification_results_dict.items() if val[
@@ -157,11 +190,13 @@ class BaseCalculation:
     """
 
     @property
-    def id(self):
+    def id(self) -> str:
         """The name of the class."""
         return self.__class__.__name__
 
-    def calculate_from_state_answers_dict(self, state_answers_dict):
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Perform calculation on a single StateAnswers entity. This is run in
         the context of a batch MapReduce job.
 
@@ -177,15 +212,46 @@ class AnswerFrequencies(BaseCalculation):
     submitted).
     """
 
-    def calculate_from_state_answers_dict(self, state_answers_dict):
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each answer, and returns a list
         of dicts; each dict has keys 'answer' and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
+
+        Args:
+            state_answers_dict: dict. A dict containing state answers and
+                exploration information such as:
+                * exploration_id: id of the exploration.
+                * exploration_version: Specific version of the exploration or
+                    VERSION_ALL is used if answers are aggregated across
+                    multiple versions.
+                * state_name: Name of the state.
+                * interaction_id: id of the interaction.
+                * submitted_answer_list: A list of submitted answers.
+                    NOTE: The answers in this list must be sorted in
+                    chronological order of their submission.
+
+        Returns:
+            stats_domain.StateAnswersCalcOutput. A calculation output object
+            containing the answers' frequencies.
+
+        Raises:
+            Exception. Answers of linear interactions should not be present
+                while calculating the answers' frequencies.
         """
         answer_dicts = state_answers_dict['submitted_answer_list']
+        answer_list = []
+        for answer_dict in answer_dicts:
+            if answer_dict['answer'] is None:
+                raise Exception(
+                    'Answers of linear interactions should not be present while'
+                    ' calculating the answers\' frequencies.'
+                )
+            answer_list.append(answer_dict['answer'])
         answer_frequency_list = (
-            _get_top_answers_by_frequency(d['answer'] for d in answer_dicts))
+            _get_top_answers_by_frequency(answer_list))
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -198,16 +264,47 @@ class AnswerFrequencies(BaseCalculation):
 class Top5AnswerFrequencies(BaseCalculation):
     """Calculation for the top 5 answers, by frequency."""
 
-    def calculate_from_state_answers_dict(self, state_answers_dict):
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each answer, keeping only the
         top 5 answers, and returns a list of dicts; each dict has keys 'answer'
         and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
+
+        Args:
+            state_answers_dict: dict. A dict containing state answers and
+                exploration information such as:
+                * exploration_id: id of the exploration.
+                * exploration_version: Specific version of the exploration or
+                    VERSION_ALL is used if answers are aggregated across
+                    multiple versions.
+                * state_name: Name of the state.
+                * interaction_id: id of the interaction.
+                * submitted_answer_list: A list of submitted answers.
+                    NOTE: The answers in this list must be sorted in
+                    chronological order of their submission.
+
+        Returns:
+            stats_domain.StateAnswersCalcOutput. A calculation output object
+            containing the top 5 answers, by frequency.
+
+        Raises:
+            Exception. Answers of linear interactions should not be present
+                while calculating the top 5 answers, by frequency.
         """
         answer_dicts = state_answers_dict['submitted_answer_list']
+        answer_list = []
+        for answer_dict in answer_dicts:
+            if answer_dict['answer'] is None:
+                raise Exception(
+                    'Answers of linear interactions should not be present while'
+                    ' calculating the top 5 answers, by frequency.'
+                )
+            answer_list.append(answer_dict['answer'])
         answer_frequency_list = _get_top_answers_by_frequency(
-            (d['answer'] for d in answer_dicts), limit=5)
+            answer_list, limit=5)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -220,16 +317,47 @@ class Top5AnswerFrequencies(BaseCalculation):
 class Top10AnswerFrequencies(BaseCalculation):
     """Calculation for the top 10 answers, by frequency."""
 
-    def calculate_from_state_answers_dict(self, state_answers_dict):
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each answer, keeping only the
         top 10 answers, and returns a list of dicts; each dict has keys 'answer'
         and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
+
+        Args:
+            state_answers_dict: dict. A dict containing state answers and
+                exploration information such as:
+                * exploration_id: id of the exploration.
+                * exploration_version: Specific version of the exploration or
+                    VERSION_ALL is used if answers are aggragated across
+                    multiple versions.
+                * state_name: Name of the state.
+                * interaction_id: id of the interaction.
+                * submitted_answer_list: A list of submitted answers.
+                    NOTE: The answers in this list must be sorted in
+                    chronological order of their submission.
+
+        Returns:
+            stats_domain.StateAnswersCalcOutput. A calculation output object
+            containing the top 10 answers, by frequency.
+
+        Raises:
+            Exception. Answers of linear interactions should not be present
+                while calculating the top 10 answers, by frequency.
         """
         answer_dicts = state_answers_dict['submitted_answer_list']
+        answer_list = []
+        for answer_dict in answer_dicts:
+            if answer_dict['answer'] is None:
+                raise Exception(
+                    'Answers of linear interactions should not be present while'
+                    ' calculating the top 10 answers, by frequency.'
+                )
+            answer_list.append(answer_dict['answer'])
         answer_frequency_list = _get_top_answers_by_frequency(
-            (d['answer'] for d in answer_dicts), limit=10)
+            answer_list, limit=10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -245,16 +373,47 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
     SetOfUnicodeString).
     """
 
-    def calculate_from_state_answers_dict(self, state_answers_dict):
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each individual answer across
         all given answer sets, keeping only the top 10. Returns a list of dicts;
         each dict has keys 'answer' and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
+
+        Args:
+            state_answers_dict: dict. A dict containing state answers and
+                exploration information such as:
+                * exploration_id: id of the exploration.
+                * exploration_version: Specific version of the exploration or
+                    VERSION_ALL is used if answers are aggragated across
+                    multiple versions.
+                * state_name: Name of the state.
+                * interaction_id: id of the interaction.
+                * submitted_answer_list: A list of submitted answers.
+                    NOTE: The answers in this list must be sorted in
+                    chronological order of their submission.
+
+        Returns:
+            stats_domain.StateAnswersCalcOutput. A calculation output object
+            containing the commonly submitted answers, by frequency.
+
+        Raises:
+            Exception. Answers of linear interactions should not be present
+                while calculating the commonly submitted answers' frequencies.
         """
         answer_dicts = state_answers_dict['submitted_answer_list']
+        answer_list = []
+        for answer_dict in answer_dicts:
+            if answer_dict['answer'] is None:
+                raise Exception(
+                    'Answers of linear interactions should not be present while'
+                    ' calculating the commonly submitted answers\' frequencies.'
+                )
+            answer_list.append(answer_dict['answer'])
         answer_frequency_list = _get_top_answers_by_frequency(
-            itertools.chain.from_iterable(d['answer'] for d in answer_dicts),
+            itertools.chain.from_iterable(answer_list),
             limit=10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -272,20 +431,54 @@ class TopAnswersByCategorization(BaseCalculation):
     frequency.
     """
 
-    def calculate_from_state_answers_dict(self, state_answers_dict):
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each answer, split into groups
         based on the number of classification categories.
 
         This method is run from within the context of a MapReduce job.
+
+        Args:
+            state_answers_dict: dict. A dict containing state answers and
+                exploration information such as:
+                * exploration_id: id of the exploration.
+                * exploration_version: Specific version of the exploration or
+                    VERSION_ALL is used if answers are aggragated across
+                    multiple versions.
+                * state_name: Name of the state.
+                * interaction_id: id of the interaction.
+                * submitted_answer_list: A list of submitted answers.
+                    NOTE: The answers in this list must be sorted in
+                    chronological order of their submission.
+
+        Returns:
+            stats_domain.StateAnswersCalcOutput. A calculation output object
+            containing the top answers by categorization.
+
+        Raises:
+            Exception. Answers of linear interactions should not be present
+                while calculating the top submitted answers.
         """
         grouped_submitted_answer_dicts = itertools.groupby(
             state_answers_dict['submitted_answer_list'],
             operator.itemgetter('classification_categorization'))
-        submitted_answers_by_categorization = collections.defaultdict(list)
+        submitted_answers_by_categorization: Dict[
+            str, List[stats_domain.AcceptableAnswerTypes]
+        ] = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
             if category in CLASSIFICATION_CATEGORIES:
+                answer_list = []
+                for answer_dict in answer_dicts:
+                    if answer_dict['answer'] is None:
+                        raise Exception(
+                            'Answers of linear interactions should not be'
+                            ' present while calculating the top submitted'
+                            ' answers.'
+                        )
+                    answer_list.append(answer_dict['answer'])
                 submitted_answers_by_categorization[category].extend(
-                    d['answer'] for d in answer_dicts)
+                    answer_list)
 
         categorized_answer_frequency_lists = (
             stats_domain.CategorizedAnswerFrequencyLists({
@@ -307,7 +500,9 @@ class TopNUnresolvedAnswersByFrequency(BaseCalculation):
     in descending order of frequency.
     """
 
-    def calculate_from_state_answers_dict(self, state_answers_dict):
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Filters unresolved answers and then computes the number of
         occurrences of each unresolved answer.
 
@@ -330,12 +525,24 @@ class TopNUnresolvedAnswersByFrequency(BaseCalculation):
             stats_domain.StateAnswersCalcOutput. A calculation output object
             containing the list of top unresolved answers, in descending
             order of frequency (up to at most limit answers).
+
+        Raises:
+            Exception. Answers of linear interactions should not be present
+                while calculating the top unresolved answers, by frequency.
         """
-        answers_with_classification = [{
-            'answer': ans['answer'],
-            'classification_categorization': (
-                ans['classification_categorization'])
-        } for ans in state_answers_dict['submitted_answer_list']]
+        answers_with_classification: List[AnswersWithClassificationDict] = []
+
+        for ans in state_answers_dict['submitted_answer_list']:
+            if ans['answer'] is None:
+                raise Exception(
+                    'Answers of linear interactions should not be present while'
+                    ' calculating the top unresolved answers, by frequency.'
+                )
+            answers_with_classification.append({
+                'answer': ans['answer'],
+                'classification_categorization': (
+                    ans['classification_categorization'])
+            })
 
         unresolved_answers = _get_top_unresolved_answers_by_frequency(
             answers_with_classification,
