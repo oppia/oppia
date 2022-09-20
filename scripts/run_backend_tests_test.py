@@ -667,7 +667,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         executed_tasks = []
         test_target = (
             'scripts.new_test_file_test.NewTestFileTests.test_for_something')
-        def mock_execute(tasks, *unused_args) -> None:
+        def mock_execute(tasks: Any, *unused_args: Any) -> None:
             for task in tasks:
                 executed_tasks.append(task)
 
