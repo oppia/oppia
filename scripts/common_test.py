@@ -26,11 +26,13 @@ import os
 import re
 import shutil
 import socketserver
+import ssl
 import stat
 import subprocess
 import sys
 import tempfile
 import time
+from urllib import request as urlrequest
 
 from core import constants
 from core import utils
@@ -161,7 +163,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_getcwd() -> str:
             return 'invalid'
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        with getcwd_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with getcwd_swap, self.assertRaisesRegex(
             Exception, 'Please run this script from the oppia/ directory.'):
             common.require_cwd_to_be_oppia()
 
@@ -298,7 +300,7 @@ class CommonTests(test_utils.GenericTestBase):
             return b'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: There is no existing remote alias for the url3, url4 repo.'
         ):
@@ -317,7 +319,7 @@ class CommonTests(test_utils.GenericTestBase):
             return b'invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with check_output_swap, self.assertRaisesRegex(
             Exception, 'ERROR: This script should be run from a clean branch.'
         ):
             common.verify_local_repo_is_clean()
@@ -363,7 +365,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_get_current_release_version_number_with_invalid_branch(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid branch name: invalid-branch.'):
             common.get_current_release_version_number('invalid-branch')
 
@@ -445,7 +447,7 @@ class CommonTests(test_utils.GenericTestBase):
             return b'On branch invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: This script can only be run from the "test" branch.'
         ):
@@ -630,7 +632,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_getpass(prompt: str) -> None:  # pylint: disable=unused-argument
             return None
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with getpass_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with getpass_swap, self.assertRaisesRegex(
             Exception,
             'No personal access token provided, please set up a personal '
             'access token at https://github.com/settings/tokens and re-run '
@@ -733,7 +735,7 @@ class CommonTests(test_utils.GenericTestBase):
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         with get_issues_swap, get_label_swap, open_tab_swap:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, (
                     'There are PRs for current release which do not '
                     'have a \'%s\' label. Please ensure that '
@@ -785,7 +787,7 @@ class CommonTests(test_utils.GenericTestBase):
         with utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
         ):
             common.inplace_replace_file(
@@ -811,7 +813,7 @@ class CommonTests(test_utils.GenericTestBase):
             raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             re.escape('Exception raised from compile()')
         ), compile_swap:
@@ -968,7 +970,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_write_stdout_safe_with_oserror(self) -> None:
         write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))
-        with write_swap, self.assertRaisesRegex(OSError, 'OS error'):  # type: ignore[no-untyped-call]
+        with write_swap, self.assertRaisesRegex(OSError, 'OS error'):
             common.write_stdout_safe('test')
 
     def test_write_stdout_safe_with_unsupportedoperation(self) -> None:
@@ -982,3 +984,134 @@ class CommonTests(test_utils.GenericTestBase):
         with write_swap, stdout_write_swap:
             common.write_stdout_safe('test')
         self.assertEqual(mock_stdout.getvalue(), 'test')
+
+    def _assert_ssl_context_matches_default(
+        self, context: ssl.SSLContext
+    ) -> None:
+        """Assert that an SSL context matches the default one.
+
+        If we create two default SSL contexts, they will evaluate as unequal
+        even though they are the same for our purposes. Therefore, this function
+        checks that the provided context has the same important security
+        properties as the default.
+
+        Args:
+            context: SSLContext. The context to compare.
+
+        Raises:
+            AssertionError. Raised if the contexts differ in any of their
+                important attributes or behaviors.
+        """
+        default_context = ssl.create_default_context()
+        for attribute in (
+            'verify_flags', 'verify_mode', 'protocol',
+            'hostname_checks_common_name', 'options', 'minimum_version',
+            'maximum_version', 'check_hostname'
+        ):
+            self.assertEqual(
+                getattr(context, attribute),
+                getattr(default_context, attribute)
+            )
+        for method in ('get_ca_certs', 'get_ciphers'):
+            self.assertEqual(
+                getattr(context, method)(),
+                getattr(default_context, method)()
+            )
+
+    def test_url_retrieve_with_successful_https_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'buffer')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve('https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_with_successful_https_works_on_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 2)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                if len(attempts) == 1:
+                    raise ssl.SSLError()
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve('https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_runs_out_of_attempts(self) -> None:
+        attempts = []
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(
+            url: str, context: ssl.SSLContext
+        ) -> io.BufferedIOBase:
+            attempts.append(url)
+            self.assertLessEqual(len(attempts), 2)
+            self.assertEqual(url, 'https://example.com')
+            self._assert_ssl_context_matches_default(context)
+            raise ssl.SSLError('test_error')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap:
+            with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
+                common.url_retrieve('https://example.com', 'test_path')
+
+    def test_url_retrieve_https_check_fails(self) -> None:
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
+            raise AssertionError('urlopen() should not be called')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap:
+            with self.assertRaisesRegex(
+                Exception, 'The URL http://example.com should use HTTPS.'
+            ):
+                common.url_retrieve('http://example.com', 'test_path')
+
+    def test_url_retrieve_with_successful_http_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve(
+                    'https://example.com', output_path, enforce_https=False)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')

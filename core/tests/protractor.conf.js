@@ -8,6 +8,7 @@ var childProcess = require('child_process');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var exitCode = 0;
+var args = process.argv;
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -20,45 +21,6 @@ var suites = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
-
-    additionalEditorFeatures: [
-      'protractor_desktop/additionalEditorFeatures.js'
-    ],
-
-    additionalEditorFeaturesModals: [
-      'protractor_desktop/additionalEditorFeaturesModals.js'
-    ],
-
-    additionalPlayerFeatures: [
-      'protractor_desktop/additionalPlayerFeatures.js'
-    ],
-
-    adminPage: [
-      'protractor_desktop/adminTabFeatures.js'
-    ],
-
-    blogDashboard: [
-      'protractor_desktop/blogDashboard.js'
-    ],
-
-    classroomPage: [
-      'protractor_desktop/classroomPage.js'
-    ],
-
-    classroomPageFileUploadFeatures: [
-      'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
-
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
-    ],
-
-    coreEditorAndPlayerFeatures: [
-      'protractor_desktop/coreEditorAndPlayerFeatures.js'
-    ],
 
     embedding: [
       'protractor_desktop/embedding.js'
@@ -104,45 +66,13 @@ var suites = {
       'protractor/libraryFlow.js'
     ],
 
-    navigation: [
-      'protractor_desktop/navigation.js'
-    ],
-
     playVoiceovers: [
       'protractor_desktop/playVoiceovers.js'
-    ],
-
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
     ],
 
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
     ],
-
-    topicAndStoryEditor: [
-      'protractor_desktop/topicAndStoryEditor.js'
-    ],
-
-    topicAndStoryEditorFileUploadFeatures: [
-      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
-    ],
-
-    topicsAndSkillsDashboard: [
-      'protractor_desktop/topicsAndSkillsDashboard.js'
-    ],
-
-    skillEditor: [
-      'protractor_desktop/skillEditor.js'
-    ],
-
-    topicAndStoryViewer: [
-      'protractor_desktop/topicAndStoryViewer.js'
-    ],
-
-    wipeout: [
-      'protractor_desktop/wipeout.js',
-    ]
   };
 
 // A reference configuration file.
@@ -335,8 +265,7 @@ exports.config = {
           }
         },
       });
-    }
-    else {
+    } else {
       console.log(
         'Videos will not be recorded for this suite either because videos' +
         ' have been disabled for it (using environment variables) or' +
@@ -364,9 +293,17 @@ exports.config = {
       displaySpecDuration: true
     }));
 
-    // Set a wide enough window size for the navbar in the library pages to
-    // display fully.
-    browser.driver.manage().window().setSize(1285, 1000);
+    // eslint-disable-next-line eqeqeq
+    mobileViewportArg = process.env.MOBILE == 'true';
+
+    // eslint-disable-next-line eqeqeq
+    if (mobileViewportArg) {
+      browser.driver.manage().window().setSize(600, 1000);
+    } else {
+      // Set a wide enough window size for the navbar in the library pages to
+      // display fully.
+      browser.driver.manage().window().setSize(1285, 1000);
+    }
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';

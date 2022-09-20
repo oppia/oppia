@@ -22,7 +22,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerGroupBackendApiService } from
   './learner-group-backend-api.service';
+import { LearnerGroupAllLearnersInfo } from
+  './learner-group-all-learners-info.model';
 import { LearnerGroupData } from './learner-group.model';
+import { LearnerGroupUserInfo } from './learner-group-user-info.model';
 
 describe('Learner Group Backend API Service', () => {
   var learnerGroupBackendApiService: LearnerGroupBackendApiService;
@@ -33,8 +36,8 @@ describe('Learner Group Backend API Service', () => {
     title: 'title',
     description: 'description',
     facilitator_usernames: ['facilitator1'],
-    student_usernames: [],
-    invited_student_usernames: ['student1', 'student2'],
+    learner_usernames: [],
+    invited_learner_usernames: ['learner1', 'learner2'],
     subtopic_page_ids: ['subtopic_id_1'],
     story_ids: ['story_id_1']
   };
@@ -61,7 +64,7 @@ describe('Learner Group Backend API Service', () => {
     const LEARNER_GROUP_CREATION_URL = '/create_learner_group_handler';
 
     learnerGroupBackendApiService.createNewLearnerGroupAsync(
-      'title', 'description', ['student1', 'student2'],
+      'title', 'description', ['learner1', 'learner2'],
       ['subtopic_id_1'], ['story_id_1']).then(successHandler, failHandler);
 
     var req = httpTestingController.expectOne(LEARNER_GROUP_CREATION_URL);
@@ -87,8 +90,8 @@ describe('Learner Group Backend API Service', () => {
       title: 'updated title',
       description: 'updated description',
       facilitator_usernames: ['facilitator1'],
-      student_usernames: [],
-      invited_student_usernames: ['student1', 'student2'],
+      learner_usernames: [],
+      invited_learner_usernames: ['learner1', 'learner2'],
       subtopic_page_ids: ['subtopic_id_1'],
       story_ids: ['story_id_1']
     };
@@ -123,8 +126,8 @@ describe('Learner Group Backend API Service', () => {
         title: 'updated title',
         description: 'updated description',
         facilitator_usernames: ['facilitator2'],
-        student_usernames: [],
-        invited_student_usernames: ['student1', 'student2'],
+        learner_usernames: [],
+        invited_learner_usernames: ['learner1', 'learner2'],
         subtopic_page_ids: ['subtopic_id_1'],
         story_ids: ['story_id_1']
       };
@@ -249,4 +252,105 @@ describe('Learner Group Backend API Service', () => {
       expect(failHandler).toHaveBeenCalledWith(401);
     })
   );
+
+  it('should successfully search new learner to add', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    const SEARCH_LEARNER_URL = (
+      '/learner_group_search_learner_handler?username=username1&' +
+      'learner_group_id=groupId'
+    );
+    const sampleUserInfo = {
+      username: 'username1',
+      profile_picture_data_url: 'profile_picture_url1',
+      error: ''
+    };
+
+    learnerGroupBackendApiService.searchNewLearnerToAddAsync(
+      'groupId', 'username1').then(successHandler, failHandler);
+
+    var req = httpTestingController.expectOne(SEARCH_LEARNER_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfo);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      LearnerGroupUserInfo.createFromBackendDict(
+        sampleUserInfo));
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch learners info', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    const allLearnersInfo = {
+      learners_info: [{
+        username: 'username1',
+        profile_picture_data_url: 'picture',
+        error: ''
+      }],
+      invited_learners_info: [{
+        username: 'username2',
+        profile_picture_data_url: 'picture2',
+        error: ''
+      }]
+    };
+
+    const LEARNER_GROUP_LEARNER_INFO_GET_URL = (
+      '/learner_group_learners_info_handler/groupId'
+    );
+
+    learnerGroupBackendApiService.fetchLearnersInfoAsync(
+      'groupId').then(successHandler, failHandler);
+
+    var req = httpTestingController.expectOne(
+      LEARNER_GROUP_LEARNER_INFO_GET_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(allLearnersInfo);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      LearnerGroupAllLearnersInfo.createFromBackendDict(
+        allLearnersInfo));
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully update learner group invites', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    const sampleLearnerGroupData = {
+      id: 'groupId',
+      title: 'updated title',
+      description: 'updated description',
+      facilitator_usernames: ['facilitator2'],
+      learner_usernames: ['learner1'],
+      invited_learner_usernames: ['learner2'],
+      subtopic_page_ids: ['subtopic_id_1'],
+      story_ids: ['story_id_1']
+    };
+
+    const LEARNER_GROUP_LEARNER_INVITES_GET_URL = (
+      '/learner_group_learner_invitation_handler/groupId'
+    );
+
+    learnerGroupBackendApiService.updateLearnerGroupInviteAsync(
+      'groupId', 'learner1', true, true).then(successHandler, failHandler);
+
+    var req = httpTestingController.expectOne(
+      LEARNER_GROUP_LEARNER_INVITES_GET_URL);
+    expect(req.request.method).toEqual('PUT');
+    req.flush(sampleLearnerGroupData);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      LearnerGroupData.createFromBackendDict(
+        sampleLearnerGroupData));
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

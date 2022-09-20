@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core.jobs import base_jobs
 from core.jobs import job_utils
 from core.jobs.io import ndb_io
@@ -26,11 +28,13 @@ from core.platform import models
 
 import apache_beam as beam
 
+from typing import Union
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class FindDuplicateBlogPostTitlesJob(base_jobs.JobBase):
@@ -109,14 +113,21 @@ class FindDuplicateBlogPostSummaryUrlsJob(base_jobs.JobBase):
         )
 
 
-class GetModelsWithDuplicatePropertyValues(beam.PTransform):
-    """Helper class to retrive models with duplicate properties."""
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
+class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[misc]
+    """Helper class to retrieve models with duplicate properties."""
 
     def __init__(self, property_name: str) -> None:
-        super(GetModelsWithDuplicatePropertyValues, self).__init__()
+        super().__init__()
         self.property_name = property_name
 
-    def expand(self, blog_model_pcoll):
+    def expand(
+        self, blog_model_pcoll: beam.PCollection[blog_models.BlogPostModel]
+    ) -> beam.PCollection[blog_models.BlogPostModel]:
         return (
             blog_model_pcoll
             | 'Discard models with empty property value' >> (
@@ -128,10 +139,12 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):
             | 'Discard %s key' % self.property_name >> (
                 beam.Values()) # pylint: disable=no-value-for-parameter
             | 'Discard models with unique %s' % self.property_name >> (
-                beam.Filter(lambda models: len(models) > 1))
+                beam.Filter(lambda models: len(list(models)) > 1))
         )
 
-    def get_property_value(self, model):
+    def get_property_value(
+        self, model: blog_models.BlogPostModel
+    ) -> Union[str, bool, datetime.datetime]:
         """Returns value of the given property of model
 
         Args:
@@ -140,4 +153,10 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):
         Returns:
             value. The value of the property of model.
         """
-        return job_utils.get_model_property(model, self.property_name)
+        property_value: Union[
+            str, bool, datetime.datetime
+        ] = job_utils.get_model_property(model, self.property_name)
+        # Here, we are narrowing down the type from Any to all the possible
+        # types of a BlogPostModel's property.
+        assert isinstance(property_value, (str, bool, datetime.datetime))
+        return property_value

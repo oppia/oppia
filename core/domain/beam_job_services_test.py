@@ -37,7 +37,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import beam_job_models
 
-(beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
+(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 
 class NoOpJob(base_jobs.JobBase):
@@ -51,14 +51,14 @@ class BeamJobServicesTests(test_utils.TestBase):
 
     def test_gets_jobs_from_registry(self) -> None:
         beam_jobs = beam_job_services.get_beam_jobs()
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             [j.name for j in beam_jobs], jobs_registry.get_all_job_names())
 
 
 class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(BeamJobRunServicesTests, self).setUp()
+        super().setUp()
         self._id_iter = (str(i) for i in itertools.count())
 
     def create_beam_job_run_model(
@@ -142,7 +142,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             run.to_dict())
 
     def test_run_beam_job_without_args_raises_an_exception(self) -> None:
-        with self.assertRaisesRegex(ValueError, 'Must specify the job'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'Must specify the job'):
             beam_job_services.run_beam_job()
 
     def test_cancel_beam_job(self) -> None:
@@ -159,9 +159,10 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def test_cancel_beam_job_which_does_not_exist_raises_an_error(self) -> None:
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
-            self.assertRaisesRegex( # type: ignore[no-untyped-call]
-                ValueError, 'No such job',
-                lambda: beam_job_services.cancel_beam_job('123'))
+            with self.assertRaisesRegex(
+                ValueError, 'No such job'
+            ):
+                beam_job_services.cancel_beam_job('123')
 
     def test_cancel_beam_job_which_has_no_dataflow_job_id_raises_an_error(
         self
@@ -171,9 +172,10 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         model.put()
 
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
-            self.assertRaisesRegex( # type: ignore[no-untyped-call]
-                ValueError, 'cannot be cancelled',
-                lambda: beam_job_services.cancel_beam_job(model.id))
+            with self.assertRaisesRegex(
+                ValueError, 'cannot be cancelled'
+            ):
+                beam_job_services.cancel_beam_job(model.id)
 
     def test_get_beam_job_runs(self) -> None:
         beam_job_run_models = [
@@ -385,7 +387,7 @@ class GetBeamJobRunResultTests(test_utils.GenericTestBase):
 
         beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
 
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             beam_job_run_result.stdout.split('\n'), ['abc', 'def'])
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             beam_job_run_result.stderr.split('\n'), ['123', '456'])

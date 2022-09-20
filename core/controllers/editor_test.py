@@ -44,14 +44,14 @@ from core.platform import models
 from core.tests import test_utils
 
 (exp_models, user_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.user, models.NAMES.statistics])
+    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS])
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
-        super(BaseEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -114,7 +114,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
 class EditorTests(BaseEditorControllerTests):
 
     def setUp(self):
-        super(EditorTests, self).setUp()
+        super().setUp()
         exp_services.load_demo('0')
 
         rights_manager.release_ownership_of_exploration(
@@ -842,7 +842,7 @@ written_translations:
 class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationSnapshotsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
@@ -898,7 +898,7 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationStatisticsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
@@ -949,7 +949,7 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StartedTutorialEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_record_user_saw_tutorial(self):
@@ -979,7 +979,7 @@ class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(TopUnresolvedAnswersHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -1002,7 +1002,7 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateInteractionStatsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
@@ -1203,7 +1203,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
 
     def setUp(self):
         """Create exploration with two versions."""
-        super(VersioningIntegrationTest, self).setUp()
+        super().setUp()
 
         exp_services.load_demo(self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
@@ -1234,6 +1234,13 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (
                 feconf.EDITOR_URL_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
             expected_status_int=404)
+
+    def test_check_revert_valid(self):
+        """Test if an old exploration version is valid."""
+        reader_dict = self.get_json(
+            '/createhandler/check_revert_valid/%s/%s' % (self.EXP_ID, 1))
+        self.assertTrue(reader_dict['valid'])
+        self.assertIsNone(reader_dict['details'])
 
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
@@ -2237,7 +2244,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
     EXP_ID = 'eid'
 
     def setUp(self):
-        super(ModeratorEmailsTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -2404,7 +2411,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id1'
 
     def setUp(self):
-        super(FetchIssuesPlaythroughHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -2564,7 +2571,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id1'
 
     def setUp(self):
-        super(ResolveIssueHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -2773,7 +2780,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             exploration_id=self.EXP_ID3).put()
 
     def setUp(self):
-        super(EditorAutosaveTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self._create_explorations_for_tests()
@@ -3061,7 +3068,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def setUp(self):
-        super(LearnerAnswerInfoHandlerTests, self).setUp()
+        super().setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(self.exp_id, self.owner_id)

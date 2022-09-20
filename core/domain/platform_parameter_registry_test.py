@@ -41,7 +41,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     """Tests for the platform parameter Registry."""
 
     def setUp(self) -> None:
-        super(PlatformParameterRegistryTests, self).setUp()
+        super().setUp()
 
         self.original_param_registry = registry.Registry.parameter_registry
         registry.Registry.parameter_registry.clear()
@@ -53,7 +53,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             parameter_names)
 
     def tearDown(self) -> None:
-        super(PlatformParameterRegistryTests, self).tearDown()
+        super().tearDown()
 
         registry.Registry.parameter_registry = self.original_param_registry
 
@@ -92,18 +92,18 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             """Enum for data type."""
 
             INVALID = 'invalid'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unsupported data type \'invalid\''):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             registry.Registry.create_platform_parameter(
                 ParamNames.PARAMETER_A, 'test', DataType.INVALID)  # type: ignore[arg-type]
 
     def test_create_platform_parameter_with_the_same_name_failure(self) -> None:
         param_name = 'parameter_a'
         self._create_example_parameter_with_name(param_name)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Parameter with name %s already exists' % param_name):
             self._create_example_parameter_with_name(param_name)
 
@@ -141,7 +141,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
 
     def test_get_non_existing_parameter_failure(self) -> None:
-        with self.assertRaisesRegex(Exception, 'not found'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'not found'):
             registry.Registry.get_platform_parameter('parameter_a')
 
     def test_get_all_parameter_names(self) -> None:
@@ -223,7 +223,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         param = registry.Registry.get_platform_parameter(parameter_name)
         param.validate()
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected string'):
             registry.Registry.update_platform_parameter(
                 parameter_name,
@@ -249,7 +249,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
             'environments.'):
@@ -277,7 +277,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
             'environments.'):
@@ -305,7 +305,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in test stage cannot be enabled in production '
             'environment.'):

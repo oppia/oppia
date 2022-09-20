@@ -32,7 +32,7 @@ from core.domain import change_domain
 from core.domain import subtopic_page_domain
 
 from typing import List, Optional
-from typing_extensions import TypedDict
+from typing_extensions import Literal, TypedDict
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
@@ -292,6 +292,313 @@ class TopicChange(change_domain.BaseChange):
     }]
 
 
+class CreateNewTopicCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_CREATE_NEW command.
+    """
+
+    name: str
+
+
+class AddSubtopicCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_ADD_SUBTOPIC command.
+    """
+
+    title: str
+    subtopic_id: int
+    url_fragment: str
+
+
+class DeleteSubtopicCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_DELETE_SUBTOPIC command.
+    """
+
+    subtopic_id: int
+
+
+class AddCanonicalStoryCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_ADD_CANONICAL_STORY command.
+    """
+
+    story_id: str
+
+
+class DeleteCanonicalStoryCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_DELETE_CANONICAL_STORY command.
+    """
+
+    story_id: str
+
+
+class RearrangeCanonicalStoryCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_REARRANGE_CANONICAL_STORY command.
+    """
+
+    from_index: int
+    to_index: int
+
+
+class AddAdditionalStoryCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_ADD_ADDITIONAL_STORY command.
+    """
+
+    story_id: str
+
+
+class DeleteAdditionalStoryCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_DELETE_ADDITIONAL_STORY command.
+    """
+
+    story_id: str
+
+
+class PublishStoryCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_PUBLISH_STORY command.
+    """
+
+    story_id: str
+
+
+class UnpublishStoryCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UNPUBLISH_STORY command.
+    """
+
+    story_id: str
+
+
+class AddUncategorizedSkillIdCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_ADD_UNCATEGORIZED_SKILL_ID command.
+    """
+
+    new_uncategorized_skill_id: str
+
+
+class RemoveUncategorizedSkillIdCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_REMOVE_UNCATEGORIZED_SKILL_ID command.
+    """
+
+    uncategorized_skill_id: str
+
+
+class MoveSkillIdToSubtopicCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_MOVE_SKILL_ID_TO_SUBTOPIC command.
+    """
+
+    old_subtopic_id: int
+    new_subtopic_id: int
+    skill_id: str
+
+
+class RearrangeSkillInSubtopicCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_REARRANGE_SKILL_IN_SUBTOPIC command.
+    """
+
+    subtopic_id: int
+    from_index: int
+    to_index: int
+
+
+class RearrangeSubtopicCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_REARRANGE_SUBTOPIC command.
+    """
+
+    from_index: int
+    to_index: int
+
+
+class RemoveSkillIdFromSubtopicCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC command.
+    """
+
+    subtopic_id: int
+    skill_id: str
+
+
+class UpdateSubtopicPropertyCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_SUBTOPIC_PROPERTY command.
+    """
+
+    subtopic_id: int
+    property_name: str
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyNameCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_NAME as allowed value.
+    """
+
+    property_name: Literal['name']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyAbbreviatedNameCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_ABBREVIATED_NAME as allowed value.
+    """
+
+    property_name: Literal['abbreviated_name']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyDescriptionCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_DESCRIPTION as allowed value.
+    """
+
+    property_name: Literal['description']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyCanonicalStoryReferencesCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES
+    as allowed value.
+    """
+
+    property_name: Literal['canonical_story_references']
+    new_value: List[StoryReference]
+    old_value: List[StoryReference]
+
+
+class UpdateTopicPropertyAdditionalStoryReferencesCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES
+    as allowed value.
+    """
+
+    property_name: Literal['additional_story_references']
+    new_value: List[StoryReference]
+    old_value: List[StoryReference]
+
+
+class UpdateTopicPropertyLanguageCodeCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyThumbnailFilenameCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_THUMBNAIL_FILENAME as
+    allowed value.
+    """
+
+    property_name: Literal['thumbnail_filename']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyThumbnailBGColorCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_THUMBNAIL_BG_COLOR as
+    allowed value.
+    """
+
+    property_name: Literal['thumbnail_bg_color']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyUrlFragmentCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_URL_FRAGMENT as allowed value.
+    """
+
+    property_name: Literal['url_fragment']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyMetaTagContentCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_META_TAG_CONTENT as allowed value.
+    """
+
+    property_name: Literal['meta_tag_content']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyPracticeTabIsDisplayedCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED
+    as allowed value.
+    """
+
+    property_name: Literal['practice_tab_is_displayed']
+    new_value: bool
+    old_value: bool
+
+
+class UpdateTopicPropertyTitleFragmentForWebCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB
+    as allowed value.
+    """
+
+    property_name: Literal['page_title_fragment_for_web']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertySkillIdsForDiagnosticTestCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+    as allowed value.
+    """
+
+    property_name: Literal['skill_ids_for_diagnostic_test']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class MigrateSubtopicSchemaToLatestVersionCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: int
+    to_version: int
+
+
 class TopicRightsChange(change_domain.BaseChange):
     """Domain object for changes made to a topic rights object.
 
@@ -303,6 +610,56 @@ class TopicRightsChange(change_domain.BaseChange):
     """
 
     ALLOWED_COMMANDS = feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
+
+
+class CreateNewTopicRightsCmd(TopicRightsChange):
+    """Class representing the TopicRightsChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class ChangeRoleTopicRightsCmd(TopicRightsChange):
+    """Class representing the TopicRightsChange's
+    CMD_CHANGE_ROLE command.
+    """
+
+    assignee_id: str
+    new_value: str
+    old_value: str
+
+
+class RemoveManagerRoleCmd(TopicRightsChange):
+    """Class representing the TopicRightsChange's
+    CMD_REMOVE_MANAGER_ROLE command.
+    """
+
+    removed_user_id: str
+
+
+class PublishTopicCmd(TopicRightsChange):
+    """Class representing the TopicRightsChange's
+    CMD_PUBLISH_TOPIC command.
+    """
+
+    pass
+
+
+class UnpublishTopicCmd(TopicRightsChange):
+    """Class representing the TopicRightsChange's
+    CMD_UNPUBLISH_TOPIC command.
+    """
+
+    pass
+
+
+class DeleteCommitTopicRightsCmd(TopicRightsChange):
+    """Class representing the TopicRightsChange's
+    CMD_DELETE_COMMIT command.
+    """
+
+    pass
 
 
 class StoryReferenceDict(TypedDict):
@@ -1203,11 +1560,6 @@ class Topic:
                 ' are not associated with the topic.' %
                 skill_ids_for_diagnostic_that_are_not_in_topic)
 
-        if len(self.skill_ids_for_diagnostic_test) > 3:
-            raise utils.ValidationError(
-                'The skill_ids_for_diagnostic_test field should contain at '
-                'most 3 skill_ids.')
-
         if strict:
             if len(self.subtopics) == 0:
                 raise utils.ValidationError(
@@ -1217,6 +1569,18 @@ class Topic:
             raise utils.ValidationError(
                 'Subtopic url fragments are not unique across '
                 'subtopics in the topic')
+
+        if (
+            strict and
+            len(self.skill_ids_for_diagnostic_test) == 0
+        ):
+            raise utils.ValidationError(
+                'The skill_ids_for_diagnostic_test field should not be empty.')
+
+        if len(self.skill_ids_for_diagnostic_test) > 3:
+            raise utils.ValidationError(
+                'The skill_ids_for_diagnostic_test field should contain at '
+                'most 3 skill_ids.')
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
@@ -1867,8 +2231,8 @@ class TopicSummaryDict(TypedDict):
     subtopic_count: int
     total_skill_count: int
     total_published_node_count: int
-    thumbnail_filename: str
-    thumbnail_bg_color: str
+    thumbnail_filename: Optional[str]
+    thumbnail_bg_color: Optional[str]
     topic_model_created_on: float
     topic_model_last_updated: float
 
@@ -1890,8 +2254,8 @@ class TopicSummary:
         subtopic_count: int,
         total_skill_count: int,
         total_published_node_count: int,
-        thumbnail_filename: str,
-        thumbnail_bg_color: str,
+        thumbnail_filename: Optional[str],
+        thumbnail_bg_color: Optional[str],
         url_fragment: str,
         topic_model_created_on: datetime.datetime,
         topic_model_last_updated: datetime.datetime
@@ -1916,8 +2280,11 @@ class TopicSummary:
                 (including those that are uncategorized).
             total_published_node_count: int. The total number of chapters
                 that are published and associated with the stories of the topic.
-            thumbnail_filename: str. The filename for the topic thumbnail.
-            thumbnail_bg_color: str. The background color for the thumbnail.
+            thumbnail_filename: str|None. The filename for the topic thumbnail,
+                or None if no filename is provided.
+            thumbnail_bg_color: str|None. The background color for the
+                thumbnail, or None if no background color provided for
+                the thumbnail.
             url_fragment: str. The url fragment of the topic.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
@@ -1964,7 +2331,8 @@ class TopicSummary:
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
 
-        utils.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if self.thumbnail_filename is not None:
+            utils.require_valid_thumbnail_filename(self.thumbnail_filename)
         if (
                 self.thumbnail_bg_color is not None and not (
                     Topic.require_valid_thumbnail_bg_color(

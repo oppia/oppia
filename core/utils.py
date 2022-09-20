@@ -42,8 +42,8 @@ import certifi
 import yaml
 
 from typing import ( # isort:skip
-    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
-    TextIO, Tuple, TypeVar, Union, overload)
+    Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
+    Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
 from typing_extensions import Literal # isort:skip
 
 
@@ -114,7 +114,7 @@ def open_file(
     mode: Union[TextModeTypes, BinaryModeTypes],
     encoding: Union[str, None] = 'utf-8',
     newline: Union[str, None] = None
-) -> IO[Any]:
+) -> Union[BinaryIO, TextIO]:
     """Open file and return a corresponding file object.
 
     Args:
@@ -129,13 +129,40 @@ def open_file(
     Raises:
         FileNotFoundError. The file cannot be found.
     """
-    file = open(filename, mode, encoding=encoding, newline=newline)
+    # Here we use cast because we are narrowing down the type from IO[Any]
+    # to Union[BinaryIO, TextIO].
+    file = cast(
+        Union[BinaryIO, TextIO],
+        open(filename, mode, encoding=encoding, newline=newline)
+    )
     return file
 
 
+@overload
+def get_file_contents(filepath: str) -> str: ...
+
+
+@overload
 def get_file_contents(
-        filepath: str, raw_bytes: bool = False, mode: str = 'r'
-) -> bytes:
+    filepath: str, *, mode: str = 'r'
+) -> str: ...
+
+
+@overload
+def get_file_contents(
+    filepath: str, *, raw_bytes: Literal[False], mode: str = 'r'
+) -> str: ...
+
+
+@overload
+def get_file_contents(
+    filepath: str, *, raw_bytes: Literal[True], mode: str = 'r'
+) -> bytes: ...
+
+
+def get_file_contents(
+    filepath: str, raw_bytes: bool = False, mode: str = 'r'
+) -> Union[str, bytes]:
     """Gets the contents of a file, given a relative filepath
     from oppia.
 
@@ -145,8 +172,9 @@ def get_file_contents(
         mode: str. File opening mode, default is in read mode.
 
     Returns:
-        *. Either the raw_bytes stream if the flag is set or the
-        decoded stream in utf-8 format.
+        Union[str, bytes]. Either the raw_bytes stream ( bytes type ) if
+        the raw_bytes is True or the decoded stream ( string type ) in
+        utf-8 format if raw_bytes is False.
     """
     if raw_bytes:
         mode = 'rb'
@@ -156,12 +184,15 @@ def get_file_contents(
 
     with open(
         filepath, mode, encoding=encoding) as f:
-        return f.read() # type: ignore[no-any-return]
+        file_contents = f.read()
+        # Ruling out the possibility of Any other type for mypy type checking.
+        assert isinstance(file_contents, (str, bytes))
+        return file_contents
 
 
 def get_exploration_components_from_dir(
         dir_path: str
-) -> Tuple[bytes, List[Tuple[str, bytes]]]:
+) -> Tuple[str, List[Tuple[str, bytes]]]:
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
@@ -253,8 +284,9 @@ def to_ascii(input_string: str) -> str:
     return normalized_string.encode('ascii', 'ignore').decode('ascii')
 
 
-# This function accepts general structured yaml string, hence Any type has to be
-# used here for the type of returned dictionary.
+# Here we use type Any because this function accepts general structured
+# yaml string, hence Any type has to be used here for the type of returned
+# dictionary.
 def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
     """Gets the dict representation of a YAML string.
 
@@ -277,7 +309,9 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         raise InvalidInputException(e) from e
 
 
-def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
+# Here we use type Any because we want to accept both Dict and TypedDict
+# types of values here.
+def yaml_from_dict(dictionary: Mapping[str, Any], width: int = 80) -> str:
     """Gets the YAML representation of a dict.
 
     Args:
@@ -288,15 +322,15 @@ def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
     Returns:
         str. Converted yaml of the passed dictionary.
     """
-    # The type ignore is needed, because typestubs define the return type
-    # of 'dump' as 'Any' which is wrong.
-    return yaml.dump( # type: ignore[no-any-return]
+    yaml_str: str = yaml.dump(
         dictionary, allow_unicode=True, width=width
     )
+    return yaml_str
 
 
-# Here obj has a recursive structure. The list element or dictionary value
-# could recursively be the same structure, hence we use Any as their types.
+# Here we use type Any because here obj has a recursive structure. The list
+# element or dictionary value could recursively be the same structure, hence
+# we use Any as their types.
 def recursively_remove_key(
         obj: Union[Dict[str, Any], List[Any]], key_to_remove: str
 ) -> None:
@@ -491,8 +525,7 @@ class JSONEncoderForHTML(json.JSONEncoder):
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
     def iterencode(self, o: str, _one_shot: bool = False) -> Iterator[str]:
-        chunks = super(
-            JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
+        chunks = super().iterencode(o, _one_shot=_one_shot)
         for chunk in chunks:
             yield chunk.replace('&', '\\u0026').replace(
                 '<', '\\u003c').replace('>', '\\u003e')
@@ -952,10 +985,11 @@ def get_hex_color_for_category(category: str) -> str:
     Returns:
         str. Color assigned to that category.
     """
-    return ( # type: ignore[no-any-return]
+    color: str = (
         constants.CATEGORIES_TO_COLORS[category]
         if category in constants.CATEGORIES_TO_COLORS
         else constants.DEFAULT_COLOR)
+    return color
 
 
 def get_thumbnail_icon_url_for_category(category: str) -> str:
@@ -1017,7 +1051,8 @@ def get_supported_audio_language_description(language_code: str) -> str:
     """
     for language in constants.SUPPORTED_AUDIO_LANGUAGES:
         if language['id'] == language_code:
-            return language['description'] # type: ignore[no-any-return]
+            description: str = language['description']
+            return description
     raise Exception('Unsupported audio language code: %s' % language_code)
 
 
@@ -1071,6 +1106,45 @@ def unescape_encoded_uri_component(escaped_string: str) -> str:
     return urllib.parse.unquote(escaped_string)
 
 
+def get_formatted_query_string(escaped_string: str) -> str:
+    """Returns a formatted query string that can be used to perform search
+    operations from escaped query string in url.
+
+    Args:
+        escaped_string: str. Query string that is encoded with
+            encodeURIComponent.
+
+    Returns:
+        str. Formatted query string which can be directly used to perform
+        search.
+    """
+    query_string = unescape_encoded_uri_component(escaped_string)
+    # Remove all punctuation from the query string, and replace it with
+    # spaces. See http://stackoverflow.com/a/266162 and
+    # http://stackoverflow.com/a/11693937
+    remove_punctuation_map = dict(
+        (ord(char), None) for char in string.punctuation)
+    return query_string.translate(remove_punctuation_map)
+
+
+def convert_filter_parameter_string_into_list(filter_string: str) -> List[str]:
+    """Converts the filter parameter string into a list of applied filter
+    values. Filter string should be in the following form:
+    ("Algebra" OR "Math" OR "Geometry"), ("hi" OR "en"), ("Fractions")
+
+    Args:
+        filter_string: str. The filter parameter string.
+
+    Returns:
+        list(str). The list of strings.
+    """
+    # The 2 and -2 account for the '("" and '")' characters at the beginning and
+    # end.
+    return (
+        filter_string[2:-2].split('" OR "') if filter_string else []
+    )
+
+
 def snake_case_to_camel_case(snake_str: str) -> str:
     """Converts a string in snake_case to camelCase.
 
@@ -1101,10 +1175,10 @@ def get_asset_dir_prefix() -> str:
     return asset_dir_prefix
 
 
-# As mentioned in the documentation, `value` can have any general type which
-# a JSON object can represent, hence its type is chosen as Any. Since we
-# recursively convert this general json object into tuple or sorted tuple,
-# the return type will also be of type Any.
+# Here we use type Any because as mentioned in the documentation, `value` can
+# have any general type which a JSON object can represent, hence its type is
+# chosen as Any. Since we recursively convert this general json object into
+# tuple or sorted tuple, the return type will also be of type Any.
 def get_hashable_value(value: Any) -> Any:
     """This function returns a hashable version of the input JSON-like value.
 
@@ -1171,8 +1245,11 @@ def compute_list_difference(list_a: List[str], list_b: List[str]) -> List[str]:
     return list(sorted(set(list_a) - set(list_b)))
 
 
-# Ignoring type-arg because error thrown is 'Missing type parameters for generic
-# type "OrderedDict"' but here we don't need to specify this.
+# Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
+# in MyPy settings and this flag does not allow generic types to be defined
+# without type parameters, but here to count the order elements, we are
+# inheriting from OrderedDict type without providing type parameters which
+# cause MyPy to throw an error. Thus, to avoid the error, we used ignore here.
 class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
     """Counter that remembers the order elements are first encountered."""
 
@@ -1275,7 +1352,7 @@ def quoted(s: str) -> str:
     return json.dumps(s)
 
 
-def url_open(source_url: str) -> str:
+def url_open(source_url: str) -> urllib.request._UrlopenRet:
     """Opens a URL and returns the response.
 
     Args:
@@ -1287,6 +1364,4 @@ def url_open(source_url: str) -> str:
     # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
     # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
-    # The type ignore is needed, because typestubs define the return type
-    # of 'urlopen' as 'Any' which is wrong.
-    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
+    return urllib.request.urlopen(source_url, context=context)

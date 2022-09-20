@@ -35,7 +35,7 @@ import psutil
 @contextlib.contextmanager
 def managed_process(
         command_args, human_readable_name='Process', shell=False,
-        timeout_secs=60, **popen_kwargs):
+        timeout_secs=60, raise_on_nonzero_exit=True, **popen_kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -54,13 +54,17 @@ def managed_process(
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
+        raise_on_nonzero_exit: bool. If True, raise an Exception when the
+            managed process has a nonzero exit code. If False, no Exception is
+            raised, and it is the caller's responsibility to handle the error.
         **popen_kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
         psutil.Process. The process managed by the context manager.
 
     Raises:
-        Exception. The process exited unexpectedly.
+        Exception. The process exited unexpectedly (only raised if
+            raise_on_nonzero_exit is True).
     """
     get_proc_info = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
@@ -115,7 +119,10 @@ def managed_process(
         # Note that negative values indicate termination by a signal: SIGTERM,
         # SIGINT, etc. Also, exit code 143 indicates that the process received
         # a SIGTERM from the OS, and it succeeded in gracefully terminating.
-        if exit_code is not None and exit_code > 0 and exit_code != 143:
+        if (
+            exit_code is not None and exit_code > 0 and exit_code != 143
+            and raise_on_nonzero_exit
+        ):
             raise Exception(
                 'Process %s exited unexpectedly with exit code %s' %
                 (proc_name, exit_code))
@@ -608,7 +615,7 @@ def managed_webdriver_server(chrome_version=None):
 @contextlib.contextmanager
 def managed_protractor_server(
         suite_name='full', dev_mode=True, debug_mode=False,
-        sharding_instances=1, **kwargs):
+        sharding_instances=1, mobile=False, **kwargs):
     """Returns context manager to start/stop the Protractor server gracefully.
 
     Args:
@@ -620,6 +627,7 @@ def managed_protractor_server(
             debugging mode:
             https://www.protractortest.org/#/debugging#disabled-control-flow.
         sharding_instances: int. How many sharding instances to be running.
+        mobile: bool. Whether to run e2e test in the mobile viewport.
         **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
 
     Yields:
@@ -630,6 +638,11 @@ def managed_protractor_server(
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
+
+    if mobile:
+        os.environ['MOBILE'] = 'true'
+    else:
+        os.environ['MOBILE'] = 'false'
 
     protractor_args = [
         common.NODE_BIN_PATH,
@@ -655,15 +668,19 @@ def managed_protractor_server(
     # constants, so there is no risk of a shell-injection attack.
     managed_protractor_proc = managed_process(
         protractor_args, human_readable_name='Protractor Server', shell=True,
-        **kwargs)
-    with managed_protractor_proc as proc:
-        yield proc
+        raise_on_nonzero_exit=False, **kwargs)
+
+    try:
+        with managed_protractor_proc as proc:
+            yield proc
+    finally:
+        del os.environ['MOBILE']
 
 
 @contextlib.contextmanager
 def managed_webdriverio_server(
         suite_name='full', dev_mode=True, debug_mode=False,
-        sharding_instances=1, chrome_version=None, **kwargs):
+        sharding_instances=1, chrome_version=None, mobile=False, **kwargs):
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
     Args:
@@ -679,6 +696,7 @@ def managed_webdriverio_server(
             on. If None, then the currently-installed version of Google Chrome
             is used instead.
         **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
+        mobile: bool. Whether to run the webdriverio tests in mobile mode.
 
     Yields:
         psutil.Process. The webdriverio process.
@@ -692,10 +710,10 @@ def managed_webdriverio_server(
     if chrome_version is None:
         chrome_version = get_chrome_verison()
 
-    subprocess.check_call([
-        common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'update',
-        '--versions.chrome', chrome_version,
-    ])
+    if mobile:
+        os.environ['MOBILE'] = 'true'
+    else:
+        os.environ['MOBILE'] = 'false'
 
     webdriverio_args = [
         common.NPX_BIN_PATH,
@@ -722,7 +740,10 @@ def managed_webdriverio_server(
     # constants, so there is no risk of a shell-injection attack.
     managed_webdriverio_proc = managed_process(
         webdriverio_args, human_readable_name='WebdriverIO Server', shell=True,
-        **kwargs)
+        raise_on_nonzero_exit=False, **kwargs)
 
-    with managed_webdriverio_proc as proc:
-        yield proc
+    try:
+        with managed_webdriverio_proc as proc:
+            yield proc
+    finally:
+        del os.environ['MOBILE']

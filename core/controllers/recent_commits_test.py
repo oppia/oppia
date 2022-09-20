@@ -22,14 +22,14 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
     """Test the RecentCommitsHandler class."""
 
     def setUp(self):
-        super(RecentCommitsHandlerUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
 

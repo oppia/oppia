@@ -25,7 +25,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 class ModelCanonicalNameMismatchError(base_validation_errors.BaseAuditError):
@@ -35,4 +35,4 @@ class ModelCanonicalNameMismatchError(base_validation_errors.BaseAuditError):
         message = (
             'Entity name %s in lowercase does not match '
             'canonical name %s' % (model.name, model.canonical_name))
-        super(ModelCanonicalNameMismatchError, self).__init__(message, model)
+        super().__init__(message, model)

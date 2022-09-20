@@ -42,7 +42,7 @@ CMD_RELEASE_OWNERSHIP = feconf.CMD_RELEASE_OWNERSHIP
 CMD_UPDATE_FIRST_PUBLISHED_MSEC = feconf.CMD_UPDATE_FIRST_PUBLISHED_MSEC
 
 ACTIVITY_STATUS_PRIVATE: str = constants.ACTIVITY_STATUS_PRIVATE
-ACTIVITY_STATUS_PUBLIC = constants.ACTIVITY_STATUS_PUBLIC
+ACTIVITY_STATUS_PUBLIC: str = constants.ACTIVITY_STATUS_PUBLIC
 
 ROLE_OWNER = feconf.ROLE_OWNER
 ROLE_EDITOR = feconf.ROLE_EDITOR
@@ -85,7 +85,7 @@ class ActivityRights:
         cloned_from: Optional[str] = None,
         status: str = ACTIVITY_STATUS_PRIVATE,
         viewable_if_private: bool = False,
-        first_published_msec: Optional[str] = None
+        first_published_msec: Optional[float] = None
     ) -> None:
         self.id = exploration_id
         self.owner_ids = owner_ids
@@ -240,7 +240,7 @@ class ActivityRights:
         Returns:
             bool. Whether activity is published.
         """
-        return bool(self.status == ACTIVITY_STATUS_PUBLIC)
+        return self.status == ACTIVITY_STATUS_PUBLIC
 
     def is_private(self) -> bool:
         """Checks whether activity is private.
@@ -248,7 +248,7 @@ class ActivityRights:
         Returns:
             bool. Whether activity is private.
         """
-        return bool(self.status == ACTIVITY_STATUS_PRIVATE)
+        return self.status == ACTIVITY_STATUS_PRIVATE
 
     def is_solely_owned_by_user(self, user_id: str) -> bool:
         """Checks whether the activity is solely owned by the user.
@@ -330,6 +330,76 @@ class ExplorationRightsChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
 
 
+class CreateNewExplorationRightsCmd(ExplorationRightsChange):
+    """Class representing the ExplorationRightsChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class ChangeRoleExplorationRightsCmd(ExplorationRightsChange):
+    """Class representing the ExplorationRightsChange's
+    CMD_CHANGE_ROLE command.
+    """
+
+    assignee_id: str
+    old_role: str
+    new_role: str
+
+
+class RemoveRoleExplorationRightsCmd(ExplorationRightsChange):
+    """Class representing the ExplorationRightsChange's
+    CMD_REMOVE_ROLE command.
+    """
+
+    removed_user_id: str
+    old_role: str
+
+
+class ChangePrivateViewabilityExplorationRightsCmd(ExplorationRightsChange):
+    """Class representing the ExplorationRightsChange's
+    CMD_CHANGE_PRIVATE_VIEWABILITY command.
+    """
+
+    old_viewable_if_private: bool
+    new_viewable_if_private: bool
+
+
+class ReleaseOwnershipExplorationRightsCmd(ExplorationRightsChange):
+    """Class representing the ExplorationRightsChange's
+    CMD_RELEASE_OWNERSHIP command.
+    """
+
+    pass
+
+
+class UpdateFirstPublishedMsecExplorationRightsCmd(ExplorationRightsChange):
+    """Class representing the ExplorationRightsChange's
+    CMD_UPDATE_FIRST_PUBLISHED_MSEC command.
+    """
+
+    old_first_published_msec: float
+    new_first_published_msec: float
+
+
+class DeleteCommitExplorationRightsCmd(ExplorationRightsChange):
+    """Class representing the ExplorationRightsChange's
+    CMD_DELETE_COMMIT command.
+    """
+
+    pass
+
+
+class ChangeExplorationStatus(ExplorationRightsChange):
+    """Class representing the ExplorationRightsChange's
+    CMD_CHANGE_EXPLORATION_STATUS command.
+    """
+
+    old_status: str
+    new_Status: str
+
+
 class CollectionRightsChange(change_domain.BaseChange):
     """Domain object class for an collection rights change.
 
@@ -347,3 +417,73 @@ class CollectionRightsChange(change_domain.BaseChange):
     """
 
     ALLOWED_COMMANDS = feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+
+
+class CreateNewCollectionRightsCmd(CollectionRightsChange):
+    """Class representing the CollectionRightsChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class ChangeRoleCollectionRightsCmd(CollectionRightsChange):
+    """Class representing the CollectionRightsChange's
+    CMD_CHANGE_ROLE command.
+    """
+
+    assignee_id: str
+    old_role: str
+    new_role: str
+
+
+class RemoveRoleCollectionRightsCmd(CollectionRightsChange):
+    """Class representing the CollectionRightsChange's
+    CMD_REMOVE_ROLE command.
+    """
+
+    removed_user_id: str
+    old_role: str
+
+
+class ChangePrivateViewabilityCollectionRightsCmd(CollectionRightsChange):
+    """Class representing the CollectionRightsChange's
+    CMD_CHANGE_PRIVATE_VIEWABILITY command.
+    """
+
+    old_viewable_if_private: str
+    new_viewable_if_private: str
+
+
+class ReleaseOwnershipCollectionRightsCmd(CollectionRightsChange):
+    """Class representing the CollectionRightsChange's
+    CMD_RELEASE_OWNERSHIP command.
+    """
+
+    pass
+
+
+class UpdateFirstPublishedMsecCollectionRightsCmd(CollectionRightsChange):
+    """Class representing the CollectionRightsChange's
+    CMD_UPDATE_FIRST_PUBLISHED_MSEC command.
+    """
+
+    old_first_published_msec: float
+    new_first_published_msec: float
+
+
+class DeleteCommitCollectionRightsCmd(CollectionRightsChange):
+    """Class representing the CollectionRightsChange's
+    CMD_DELETE_COMMIT command.
+    """
+
+    pass
+
+
+class ChangeCollectionStatus(CollectionRightsChange):
+    """Class representing the CollectionRightsChange's
+    CMD_CHANGE_EXPLORATION_STATUS command.
+    """
+
+    old_status: str
+    new_Status: str

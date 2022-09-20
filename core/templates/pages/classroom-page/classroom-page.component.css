@@ -6,8 +6,8 @@
 .oppia-classroom-search-container {
   background-color: #d7d7d7;
   bottom: 0;
-  margin-left: -22.5vw;
-  margin-right: -22.5vw;
+  margin-left: -12.5vw;
+  margin-right: -12.5vw;
   padding-bottom: 10px;
   position: absolute;
   width: 100vw;
@@ -43,7 +43,7 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 55vw;
+  width: 75vw;
 }
 
 .oppia-classroom-search-container .initial-help-text {
@@ -68,12 +68,16 @@
 
 .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
   display: grid;
-  gap: 24px;
   grid-template-columns: 210px 210px 210px;
   justify-content: center;
   margin-top: 40px;
   overflow-y: auto;
   padding-bottom: 18vh;
+  row-gap: 24px;
+}
+
+.oppia-topic-summary-tile {
+  margin: 0 12px;
 }
 
 .oppia-classroom-viewer-container .classroom-name {
@@ -91,7 +95,7 @@
 .oppia-classroom-banner-img {
   height: auto;
   max-width: 400px;
-  width: 20vw;
+  width: 15vw;
 }
 classroom-page .oppia-classroom-page-subheading-text {
   font-size: 1em;
@@ -108,16 +112,16 @@ classroom-page .oppia-classroom-page-subheading-text {
 
   .oppia-classroom-viewer-container,
   .oppia-classroom-search-section {
-    width: 60vw;
+    width: 75vw;
   }
 
   .oppia-classroom-search-container {
     margin-bottom: -54px;
-    margin-left: -20vw;
+    margin-left: -12.5vw;
   }
 }
 
-@media (max-width: 850px) {
+@media (max-width: 880px) {
   .oppia-classroom-viewer-container .classroom-header {
     margin-top: -3vh;
   }
@@ -140,8 +144,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 
   .oppia-classroom-search-container {
-    margin-left: -10vw;
-    padding-bottom: 27px;
+    padding-bottom: 12vw;
   }
 
   .classroom-page-help-text {
@@ -149,7 +152,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 
   .oppia-classroom-viewer-container .oppia-classroom-banner {
-    margin-left: 15vw;
+    margin-left: 12.5vw;
     margin-top: -7vh;
     width: 50vw;
   }
@@ -159,7 +162,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
     grid-template-columns: 150px 150px 150px;
     margin-top: 5vh;
-    padding-bottom: 120px;
+    padding-bottom: 140px;
   }
 }
 

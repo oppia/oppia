@@ -18,10 +18,6 @@
  */
 
 export default {
-  // Whether to allow custom event reporting to Google Analytics.
-  // Mock gtag function is used when disabled.
-  "CAN_SEND_ANALYTICS_EVENTS": false,
-
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
@@ -73,6 +69,12 @@ export default {
     "Biology", "Business", "Chemistry", "Economics", "English", "Geography",
     "History", "Mathematics", "Medicine", "Music", "Physics", "Programming",
     "Reading", "Statistics"],
+
+  // These classrooms are shown in the add learner group syllabus filters.
+  "SEARCH_DROPDOWN_CLASSROOMS": ["math"],
+
+  // These types are shown in the add learner group syllabus filters.
+  "SEARCH_DROPDOWN_TYPES": ["Skill", "Story"],
 
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
@@ -4946,7 +4948,7 @@ export default {
   },
 
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
-  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "link", "math", "skillreview"],
+  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
   // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
   "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
@@ -5864,7 +5866,7 @@ export default {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "DEFAULT_SKILL_DIFFICULTY": 0.3,
+  "DEFAULT_SKILL_DIFFICULTY": 0.6,
 
   "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
 
@@ -5895,6 +5897,8 @@ export default {
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
+
+  "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 2,
 
   "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
 
@@ -5999,10 +6003,6 @@ export default {
       }
     }
   },
-
-  // Data required for Google Analytics.
-  "ANALYTICS_ID": "",
-  "SITE_NAME_FOR_ANALYTICS": "",
 
   // Data required for Firebase authentication.
   //
@@ -6748,5 +6748,14 @@ export default {
   "ASSET_TYPE_IMAGE": "image",
   "ASSET_TYPE_THUMBNAIL": "thumbnail",
 
-  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico"
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
+
+  "CAN_FETCH_VERSION_HISTORY_DATA": false,
+  "METADATA_PROPERTIES": [
+    "title", "category", "objective", "language_code", "tags", "blurb",
+    "author_notes", "states_schema_version", "init_state_name", "param_specs",
+    "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
+    "edits_allowed"
+  ],
+  "NON_METADATA_PROPERTIES": ["id", "states"]
 } as const;

@@ -43,7 +43,7 @@ IGNORED_FILE_SUFFIXES: Final = ['.pyc', '.DS_Store']
 RTE_THUMBNAIL_HEIGHT_PX: Final = 16
 RTE_THUMBNAIL_WIDTH_PX: Final = 16
 
-# Here, we used object because every type is inherited from object class.
+# Here we use object because every type is inherited from object class.
 _COMPONENT_CONFIG_SCHEMA: List[Tuple[str, Type[object]]] = [
     ('backend_id', str),
     ('category', str),
@@ -105,11 +105,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     self.assertEqual(ca_spec['default_value'], '')
                 else:
                     obj_class = (
-                        object_registry.Registry.get_object_class_by_type(  # type: ignore[no-untyped-call]
+                        object_registry.Registry.get_object_class_by_type(
                             ca_spec['schema']['obj_type']))
                     self.assertEqual(
                         ca_spec['default_value'],
-                        obj_class.normalize(ca_spec['default_value']))
+                        obj_class.normalize(ca_spec['default_value']))  # type: ignore[no-untyped-call]
 
     def _listdir_omit_ignored(self, directory: str) -> List[str]:
         """List all files and directories within 'directory', omitting the ones

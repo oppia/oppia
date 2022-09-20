@@ -61,10 +61,18 @@ var getAttribute = async function(elementName, element, attribute) {
   return await element.getAttribute(attribute);
 };
 
+var getValue = async function(elementName, element) {
+  await waitFor.presenceOf(
+    element, `${elementName} is not present for getValue()`);
+  return await element.getValue();
+};
+
 var select = async function(selectorName, selectorElement, optionToSelect) {
-  await click(selectorName, selectorElement);
-  var optionElement = await selectorElement.$(`option=${optionToSelect}`);
-  await click(`${optionToSelect} in ${selectorName}`, optionElement);
+  await waitFor.visibilityOf(
+    selectorElement,
+    `${selectorName} is not visible to select ${optionToSelect}`
+  );
+  await selectorElement.selectByVisibleText(optionToSelect);
 };
 
 var matSelect = async function(selectorName, selectorElement, optionToSelect) {
@@ -106,6 +114,7 @@ exports.clear = clear;
 exports.click = click;
 exports.getText = getText;
 exports.getAttribute = getAttribute;
+exports.getValue = getValue;
 exports.select = select;
 exports.select2 = select2;
 exports.matSelect = matSelect;

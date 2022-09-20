@@ -23,13 +23,14 @@ from core.domain import email_manager
 from core.domain import user_query_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 def _get_user_query_from_model(
@@ -60,6 +61,18 @@ def _get_user_query_from_model(
         user_query_model.created_on,
         user_query_model.deleted,
     )
+
+
+@overload
+def get_user_query(
+    query_id: str, *, strict: Literal[True] = ...
+) -> user_query_domain.UserQuery: ...
+
+
+@overload
+def get_user_query(
+    query_id: str, *, strict: Literal[False] = ...
+) -> Optional[user_query_domain.UserQuery]: ...
 
 
 def get_user_query(
@@ -167,8 +180,6 @@ def archive_user_query(user_query_id: str) -> None:
         user_query_id: str. The ID of the user query to delete.
     """
     user_query = get_user_query(user_query_id, strict=True)
-    # Ruling out the possibility of None for mypy type checking.
-    assert user_query is not None
     user_query.archive()
     _save_user_query(user_query)
 
@@ -190,8 +201,6 @@ def send_email_to_qualified_users(
         max_recipients: int. Maximum number of recipients send emails to.
     """
     user_query = get_user_query(query_id, strict=True)
-    # Ruling out the possibility of None for mypy type checking.
-    assert user_query is not None
     recipient_ids = user_query.user_ids
 
     if max_recipients:

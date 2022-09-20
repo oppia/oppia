@@ -42,13 +42,6 @@
         </picture>
         <div class="oppia-editor-card-section-container">
           <div class="oppia-editor-card-section oppia-mobile-collapsible-card-content">
-            <button type="button"
-                    class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
-                    (click)="deleteInteraction()"
-                    *ngIf="editabilityService.isEditable()">
-              <i class="material-icons mat-18">&#xE5CD;</i>
-            </button>
-
             <div *ngIf="hasLoaded"
                  class="e2e-test-interaction"
                  [ngClass]="{'oppia-editable-section': editabilityService.isEditable() && !interactionIsDisabled}">
@@ -63,6 +56,12 @@
                 </oppia-interaction-display>
               </div>
             </div>
+            <button type="button"
+                    class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
+                    (click)="deleteInteraction()"
+                    *ngIf="editabilityService.isEditable()">
+              <i class="material-icons mat-18">&#xE5CD;</i>
+            </button>
           </div>
         </div>
       </div>
@@ -71,24 +70,28 @@
 </mat-card>
 
 <style>
+  .oppia-editable-section {
+    width: -webkit-fill-available;
+  }
+
+  .oppia-editor-card-with-avatar {
+    margin-top: 40px;
+  }
   .oppia-exp-interaction-card-header {
     font-size: 18px;
     margin: 0;
-    padding: 15px 30px 0;
   }
 
   .oppia-exp-interaction-card-header-container {
+    align-content: center;
+    align-items: center;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
+    padding: 15px 20px;
   }
 
   .oppia-add-interaction-button-container {
     padding: 20px 30px;
-  }
-
-  .oppia-exp-interaction-card-header-container i {
-    margin: 1.5rem 2rem;
   }
 
   .oppia-exp-interaction-container {
@@ -108,12 +111,20 @@
   }
 
   .oppia-editor-card-section {
+    display: flex;
     min-height: 80px;
   }
 
   @media screen and (max-width: 768px) {
+    .oppia-delete-interaction-button {
+      height: 25px;
+      padding: 0;
+      right: 0;
+      top: 2px;
+      width: 25px;
+    }
+
     .oppia-exp-interaction-card-header {
-      font-size: 16px;
       padding: 0;
     }
 
@@ -123,6 +134,11 @@
 
     .oppia-exp-interaction-card-header-container {
       background-color: #fff;
+      padding: 0;
+    }
+
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
     }
   }
 </style>

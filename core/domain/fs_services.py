@@ -112,7 +112,7 @@ class GcsFileSystem(GeneralFileSystem):
 
     def __init__(self, entity_name: str, entity_id: str) -> None:
         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-        super(GcsFileSystem, self).__init__(entity_name, entity_id)
+        super().__init__(entity_name, entity_id)
 
     def _get_gcs_file_url(self, filepath: str) -> str:
         """Returns the constructed GCS file URL.
@@ -337,10 +337,10 @@ def save_original_and_compressed_versions_of_image(
 
 # TODO(#15451): Add stubs for protobuf once we have enough info regarding
 # protobuf's library.
-# The argument classifier_data_proto can accept instances of
-# `TextClassifierFrozenModel` class. But since, we excluded
-# proto_files/ from the static type annotations. This argument
-# is annotated as general object type.
+# Here we use object because the argument classifier_data_proto can accept
+# instances of `TextClassifierFrozenModel` class. But since we excluded
+# proto_files/ from the static type annotations, this argument is annotated
+# as general object type.
 def save_classifier_data(
     exp_id: str,
     job_id: str,
@@ -357,9 +357,11 @@ def save_classifier_data(
     filepath = '%s-classifier-data.pb.xz' % (job_id)
     fs = GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
     content = utils.compress_to_zlib(
-        # Here, classifier_data_proto is of general object type and general
-        # objects do not contain any extra methods and properties. Thus to
-        # avoid MyPy error, we added an [attr-defined] ignore statement.
+        # Here we use MyPy ignore because classifier_data_proto is of general
+        # object type and general objects do not contain any extra methods and
+        # properties but for implementation we are accessing 'SerializeToString'
+        # method on classifier_data_proto which causes MyPy to throw an error.
+        # Thus to avoid the error, we added an [attr-defined] ignore statement.
         classifier_data_proto.SerializeToString())  # type: ignore[attr-defined]
     fs.commit(
         filepath, content, mimetype='application/octet-stream')

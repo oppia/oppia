@@ -243,6 +243,7 @@ class AdminHandler(base.BaseHandler):
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
+                search_services.clear_blog_post_summaries_search_index()
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':
@@ -480,11 +481,11 @@ class AdminHandler(base.BaseHandler):
                     1, topic_id_1))
             # These explorations were chosen since they pass the validations
             # for published stories.
-            self._reload_exploration('15')
+            self._reload_exploration('6')
             self._reload_exploration('25')
             self._reload_exploration('13')
             exp_services.update_exploration(
-                self.user_id, '15', [exp_domain.ExplorationChange({
+                self.user_id, '6', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'correctness_feedback_enabled',
                     'new_value': True
@@ -507,7 +508,7 @@ class AdminHandler(base.BaseHandler):
                 topic_id_1, 'help-jamie-win-arcade')
 
             story_node_dicts = [{
-                'exp_id': '15',
+                'exp_id': '6',
                 'title': 'What are the place values?',
                 'description': 'Jaime learns the place value of each digit ' +
                                'in a big number.'

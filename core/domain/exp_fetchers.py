@@ -44,7 +44,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user
+    models.Names.EXPLORATION, models.Names.USER
 ])
 datastore_services = models.Registry.import_datastore_services()
 
@@ -88,7 +88,7 @@ def _migrate_states_schema(
 
     while (states_schema_version <
            feconf.CURRENT_STATE_SCHEMA_VERSION):
-        exp_domain.Exploration.update_states_from_model(  # type: ignore[no-untyped-call]
+        exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states,
             states_schema_version, init_state_name)
         states_schema_version += 1
@@ -150,7 +150,7 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
             states_to_interaction_id_mapping[state_name] = (
                 exploration_model.states[state_name]['interaction']['id'])
         versioned_exp_interaction_ids_mapping.append(
-            exp_domain.VersionedExplorationInteractionIdsMapping(  # type: ignore[no-untyped-call]
+            exp_domain.VersionedExplorationInteractionIdsMapping(
                 exploration_model.version,
                 states_to_interaction_id_mapping))
 
@@ -196,7 +196,7 @@ def get_exploration_from_model(
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_states_schema(versioned_exploration_states, init_state_name)
 
-    return exp_domain.Exploration(  # type: ignore[no-untyped-call]
+    return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
@@ -256,7 +256,7 @@ def get_exploration_summary_by_id(
 
 
 def get_exploration_summaries_from_models(
-    exp_summary_models: List[exp_models.ExpSummaryModel]
+    exp_summary_models: Sequence[exp_models.ExpSummaryModel]
 ) -> Dict[str, exp_domain.ExplorationSummary]:
     """Returns a dict with ExplorationSummary domain objects as values,
     keyed by their exploration id.
@@ -577,7 +577,7 @@ def get_logged_out_user_progress(
     if logged_out_user_progress_model is None:
         return None
 
-    return exp_domain.TransientCheckpointUrl(  # type: ignore[no-untyped-call]
+    return exp_domain.TransientCheckpointUrl(
         logged_out_user_progress_model.exploration_id,
         logged_out_user_progress_model.furthest_reached_checkpoint_state_name,
         logged_out_user_progress_model.furthest_reached_checkpoint_exp_version,
@@ -585,4 +585,42 @@ def get_logged_out_user_progress(
             most_recently_reached_checkpoint_state_name,
         logged_out_user_progress_model.
             most_recently_reached_checkpoint_exp_version
+    )
+
+
+def get_exploration_version_history(
+    exp_id: str, exp_version: int
+) -> Optional[exp_domain.ExplorationVersionHistory]:
+    """Returns an ExplorationVersionHistory domain object by fetching the
+    ExplorationVersionHistoryModel for the given exploration id and version.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        exp_version: int. The version number of the exploration.
+
+    Returns:
+        ExplorationVersionHistory. The exploration version history domain
+        object for the ExplorationVersionHistoryModel corresponding to the
+        given exploration id and version.
+    """
+    version_history_model_id = (
+        exp_models.ExplorationVersionHistoryModel.get_instance_id(
+            exp_id, exp_version
+        )
+    )
+    version_history_model = (
+        exp_models.ExplorationVersionHistoryModel.get(
+            version_history_model_id, strict=False
+        )
+    )
+
+    if version_history_model is None:
+        return None
+
+    return exp_domain.ExplorationVersionHistory(
+        exp_id, exp_version,
+        version_history_model.state_version_history,
+        version_history_model.metadata_last_edited_version_number,
+        version_history_model.metadata_last_edited_committer_id,
+        version_history_model.committer_ids
     )

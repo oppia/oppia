@@ -43,10 +43,12 @@ import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashb
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -60,6 +62,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     SharedComponentsModule,
     DynamicContentModule,
     FormsModule,
+    MatProgressSpinnerModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
@@ -106,6 +109,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'

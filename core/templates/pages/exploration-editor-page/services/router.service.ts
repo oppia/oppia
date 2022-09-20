@@ -140,6 +140,10 @@ export class RouterService {
           '/gui/' + this.explorationInitStateNameService.savedMemento);
       }
     }
+
+    // Fire an event to center the Graph in the
+    // Editor Tabs, Translation Tab, History Tab.
+    this.centerGraphEventEmitter.emit();
   }
 
   _doNavigationWithState(path: string, pathType: string): void {
@@ -153,11 +157,14 @@ export class RouterService {
             clearInterval(waitForStatesToLoad);
             if (this.explorationStatesService.hasState(putativeStateName)) {
               this.stateEditorService.setActiveStateName(putativeStateName);
-              if (pathType === this.SLUG_GUI) {
+              // We need to check this._activeTabName because the user may have
+              // navigated to a different tab before the states finish loading.
+              // In such a case, we should not switch back to the editor main
+              // tab.
+              if (pathType === this.SLUG_GUI &&
+                  this._activeTabName === this.TABS.MAIN.name) {
                 this.windowRef.nativeWindow.location.hash = path;
                 this.stateEditorRefreshService.onRefreshStateEditor.emit();
-                // Fire an event to center the Graph in the Editor.
-                this.centerGraphEventEmitter.emit();
               }
             } else {
               this._changeTab(
@@ -304,7 +311,7 @@ export class RouterService {
     return this.refreshTranslationTabEventEmitter;
   }
 
-  get onRefreshVersionHistory(): EventEmitter<void> {
+  get onRefreshVersionHistory(): EventEmitter<void | {forceRefresh: boolean}> {
     return this.refreshVersionHistoryEventEmitter;
   }
 }

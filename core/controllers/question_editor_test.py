@@ -30,14 +30,14 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseQuestionEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -387,7 +387,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 
     def setUp(self):
         """Completes the setup for QuestionSkillLinkHandlerTest."""
-        super(QuestionSkillLinkHandlerTest, self).setUp()
+        super().setUp()
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id, self.admin_id, description='Skill Description')

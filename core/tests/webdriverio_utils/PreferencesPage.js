@@ -24,7 +24,7 @@ var workflow = require('../webdriverio_utils/workflow.js');
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
-  var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+  var creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
   var customProfilePhoto = $('.e2e-test-custom-photo');
   var deleteAccountButton = $('.e2e-test-delete-account-button');
   var editorRoleEmailsCheckbox = $('.e2e-test-editor-role-email-checkbox');
@@ -39,6 +39,7 @@ var PreferencesPage = function() {
   var profilePhotoClickable = $('.e2e-test-photo-clickable');
   var profilePhotoCropper = $('.e2e-test-photo-crop .cropper-container');
   var profilePhotoUploadError = $('.e2e-test-upload-error');
+  var subscription = $('.e2e-test-subscription-name');
   var subscriptionsSelector = function() {
     return $$('.e2e-test-subscription-name');
   };
@@ -141,10 +142,10 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedFirstSubscriptionToBe = async function(name) {
-    var subscriptions = await subscriptionsSelector();
     await waitFor.visibilityOf(
-      subscriptions[0],
-      'subscriptions[0] taking too long to appear.');
+      subscription,
+      'subscription taking too long to appear.');
+    var subscriptions = await subscriptionsSelector();
     expect(await subscriptions[0].getText()).toMatch(name);
   };
 
@@ -200,7 +201,7 @@ var PreferencesPage = function() {
 
   this.selectCreatorDashboard = async function() {
     await action.click(
-      'Creator Dashboard radio', createrDashboardRadio);
+      'Creator Dashboard radio', creatorDashboardRadio);
     await saveNewChanges('Creator Dashboard Option');
   };
 

@@ -33,7 +33,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
 (question_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.question, models.NAMES.skill])
+    [models.Names.QUESTION, models.Names.SKILL])
 
 
 QuestionAndSkillDescriptionsType = Tuple[
@@ -134,7 +134,7 @@ def get_question_from_model(
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_state_schema(versioned_question_state)
 
-    return question_domain.Question(  # type: ignore[no-untyped-call]
+    return question_domain.Question(
         question_model.id,
         state_domain.State.from_dict(versioned_question_state['state']),
         versioned_question_state['state_schema_version'],
@@ -175,6 +175,6 @@ def _migrate_state_schema(
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
-        question_domain.Question.update_state_from_model(  # type: ignore[no-untyped-call]
+        question_domain.Question.update_state_from_model(
             versioned_question_state, state_schema_version)
         state_schema_version += 1

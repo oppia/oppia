@@ -41,7 +41,7 @@
             <nav class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
                  role="navigation"
                  headroom>
-              <div class="navbar-container">
+              <div class="navbar-container" dir="auto">
                 <div class="oppia-base-content-pre-logo-container">
                   <ng-content select="navbar-pre-logo-action"></ng-content>
                 </div>
@@ -59,7 +59,7 @@
 
             <div class="oppia-top-of-page-padding"></div>
             <div class="navbar-mobile-container" *ngIf="isBottomNavbarShown()">
-              <i class="fa fa-book show-mobile-navbar-icon"
+              <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options-base"
                  (click)="toggleMobileNavOptions()"
                  aria-label="Mobile navbar options">
               </i>

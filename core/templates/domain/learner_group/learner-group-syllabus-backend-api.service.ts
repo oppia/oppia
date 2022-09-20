@@ -25,13 +25,33 @@ import { UrlInterpolationService }
   from 'domain/utilities/url-interpolation.service';
 import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict }
   from './learner-group-syllabus.model';
+import { LearnerGroupUserProgress, LearnerGroupUserProgressBackendDict } from './learner-group-user-progress.model';
 
+interface SyllabusFilterDetails {
+  description: string;
+  itemsName: string;
+  masterList: {
+    id: string;
+    text: string;
+  }[];
+  selection: string;
+  defaultValue: string;
+  summary: string;
+}
 
-interface LearnerGroupSyllabusFilter {
+export interface SyllabusSelectionDetails {
+  [key: string]: SyllabusFilterDetails;
+  types: SyllabusFilterDetails;
+  categories: SyllabusFilterDetails;
+  languageCodes: SyllabusFilterDetails;
+}
+
+export interface LearnerGroupSyllabusFilter {
   keyword: string;
   type: string;
   category: string;
   languageCode: string;
+  learnerGroupId: string;
 }
 
 @Injectable({
@@ -44,23 +64,17 @@ export class LearnerGroupSyllabusBackendApiService {
   ) {}
 
   async searchNewSyllabusItemsAsync(
-      learnerGroupId: string,
       syllabusFilter: LearnerGroupSyllabusFilter
   ): Promise<LearnerGroupSyllabus> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = (
-        this.urlInterpolationService.interpolateUrl(
-          '/learner_group_search_syllabus_handler/<learner_group_id>', {
-            learner_group_id: learnerGroupId
-          }
-        )
-      );
+      const learnerGroupUrl = '/learner_group_search_syllabus_handler';
 
       const filterData = {
         search_keyword: syllabusFilter.keyword,
         search_type: syllabusFilter.type,
         search_category: syllabusFilter.category,
-        search_language_code: syllabusFilter.languageCode
+        search_language_code: syllabusFilter.languageCode,
+        learner_group_id: syllabusFilter.learnerGroupId
       };
 
       this.http.get<LearnerGroupSyllabusBackendDict>(
@@ -69,6 +83,56 @@ export class LearnerGroupSyllabusBackendApiService {
         }
       ).toPromise().then(matchingSyllabus => {
         resolve(LearnerGroupSyllabus.createFromBackendDict(matchingSyllabus));
+      });
+    });
+  }
+
+  async fetchLearnersProgressInAssignedSyllabus(
+      learnerGroupId: string,
+      learnerUsernames: string[]
+  ): Promise<LearnerGroupUserProgress[]> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_user_progress_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+
+      this.http.get<LearnerGroupUserProgressBackendDict[]>(
+        learnerGroupUrl, {
+          params: {
+            learner_usernames: JSON.stringify(learnerUsernames)
+          }
+        }).toPromise().then(usersProgressInfo => {
+        resolve(
+          usersProgressInfo.map(
+            progressInfo => LearnerGroupUserProgress.createFromBackendDict(
+              progressInfo)
+          )
+        );
+      });
+    });
+  }
+
+  async fetchLearnerGroupSyllabus(
+      learnerGroupId: string
+  ): Promise<LearnerGroupSyllabus> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_syllabus_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+
+      this.http.get<LearnerGroupSyllabusBackendDict>(
+        learnerGroupUrl).toPromise().then(syllabusInfo => {
+        resolve(
+          LearnerGroupSyllabus.createFromBackendDict(syllabusInfo)
+        );
       });
     });
   }

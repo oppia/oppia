@@ -1,8 +1,18 @@
 <div class="oppia-translate-text-header-container">
   <div class="oppia-translate-text-header">
     <div class="oppia-opportunities-details">
-      <div class="oppia-opportunities-subheading">{{ subheading }}</div>
-      <div class="oppia-opportunities-heading">{{ heading }}</div>
+      <div class="oppia-opportunities-subheading">
+        {{ subheading }}
+      </div>
+      <div class="oppia-mobile-opportunities-subheading">
+        {{ subheading | wrapTextWithEllipsis : 35 }}
+      </div>
+      <div class="oppia-opportunities-heading">
+        {{ heading }}
+      </div>
+      <div class="oppia-mobile-opportunities-heading">
+        {{ heading | wrapTextWithEllipsis : 25 }}
+      </div>
     </div>
     <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" attr.aria-label="Close">
       <span aria-hidden="true">&times;</span>
@@ -26,13 +36,17 @@
       <strong>Please translate the given {{ activeContentType }} in {{ languageDescription }}:</strong>
       <a class="oppia-skip-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">skip</a>
     </div>
-    <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
+    <div *ngIf="!loadingData && !uploadingTranslation"
+         class="oppia-text-to-translate-container"
+         [ngClass]="isContentExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
+         #contentContainer>
       <!-- textToTranslate contains the html content of an exploration state -->
       <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
                                 [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
                                 (click)="onContentClick($event)"
                                 [rteString]="textToTranslate"
-                                class="oppia-rte-editor">
+                                class="oppia-rte-editor"
+                                #contentPanel>
       </oppia-rte-output-display>
       <div *ngIf="isSetOfStringDataFormat()">
         <strong>{{ activeRuleDescription }}</strong>
@@ -43,32 +57,46 @@
         </ul>
       </div>
     </div>
+    <div class="oppia-collapse-content"
+         *ngIf="isContentOverflowing"
+         (click)="toggleExpansionState(expansionTabType.CONTENT)">
+      {{ isContentExpanded ? textWhenExpanded : textWhenContracted }}
+    </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
       <div class="e2e-test-state-translation-editor">
         <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
-        <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
-                             [schema]="HTML_SCHEMA"
-                             [localValue]="activeWrittenTranslation"
-                             (localValueChange)="updateHtml($event)">
-        </schema-based-editor>
-        <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'"
-                             [schema]="UNICODE_SCHEMA"
-                             [localValue]="activeWrittenTranslation"
-                             (localValueChange)="updateHtml($event)">
-        </schema-based-editor>
-        <div *ngIf="editorIsShown && isSetOfStringDataFormat() && isActiveLanguageReviewer" class="oppia-rules-to-translate-container">
-          <strong>Please add a translation per answer choice.</strong>
-          <p class="oppia-rules-translation-tip">
-            Because these answer choices will be matched against a learner's input, we want to be extra careful with the translations so as to not block a learner's progress in a lesson.
-          </p>
-          <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
+        <div class="oppia-editor-container"
+             [ngClass]="isTranslationExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
+             #translationContainer>
+          <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
+                               [schema]="HTML_SCHEMA"
                                [localValue]="activeWrittenTranslation"
-                               (localValueChange)="updateHtml($event)">
+                               (localValueChange)="updateHtml($event)"
+                               #oppiaRTE>
           </schema-based-editor>
+          <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'"
+                               [schema]="UNICODE_SCHEMA"
+                               [localValue]="activeWrittenTranslation"
+                               (localValueChange)="updateHtml($event)"
+                               #oppiaRTE>
+          </schema-based-editor>
+          <div *ngIf="editorIsShown && isSetOfStringDataFormat()"
+               class="oppia-rules-to-translate-container">
+            <strong>Please add a translation per answer choice.</strong>
+            <p class="oppia-rules-translation-tip">
+              Because these answer choices will be matched against a learner's input, we want to be extra careful with the translations so as to not block a learner's progress in a lesson.
+            </p>
+            <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
+                                 [localValue]="activeWrittenTranslation"
+                                 (localValueChange)="updateHtml($event)">
+            </schema-based-editor>
+          </div>
         </div>
-        <strong *ngIf="editorIsShown && isSetOfStringDataFormat() && !isActiveLanguageReviewer">
-          Sorry! Currently, only translation reviewers are allowed to submit translations for rules.
-        </strong>
+        <div class="oppia-collapse-content"
+             (click)="toggleExpansionState(expansionTabType(TRANSLATION))"
+             *ngIf="isTranslationOverflowing">
+          {{ isTranslationExpanded ? textWhenExpanded : textWhenContracted }}
+        </div>
       </div>
     </div>
     <div class="oppia-translation-error-section">
@@ -99,23 +127,53 @@
     </div>
   </div>
 </div>
-<div class="modal-footer">
-  <button class="btn btn-default" (click)="close()">Cancel</button>
+<div class="oppia-translate-modal-footer modal-footer">
+  <button class="btn btn-default"
+          (click)="close()">
+    Cancel
+  </button>
   <button class="btn btn-success oppia-go-back-button"
           [disabled]="!hasPreviousTranslations()"
-          (click)="returnToPreviousTranslation()">Go Back
+          (click)="returnToPreviousTranslation()">
+    Go Back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button"
-          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted() || (isSetOfStringDataFormat() && !isActiveLanguageReviewer)"
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
           (click)="suggestTranslatedText()">
     <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
-    <span [hidden]="uploadingTranslation || moreAvailable">Save and close</span>
-    <span [hidden]="uploadingTranslation || !moreAvailable">Save and translate another</span>
+    <span [hidden]="uploadingTranslation || moreAvailable">
+      Save and close
+    </span>
+    <span [hidden]="uploadingTranslation || !moreAvailable">
+      Save and translate another
+    </span>
   </button>
 </div>
 <style>
+  .oppia-collapse-content {
+    display: none;
+  }
+  .oppia-translate-modal-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .oppia-translate-text-header-container .oppia-opportunities-heading {
+      display: block;
+    }
+    .oppia-translate-text-header-container .oppia-mobile-opportunities-heading {
+      display: none;
+    }
   .oppia-translate-text-header-container .oppia-opportunities-subheading {
     color: #009688;
+    display: block;
+    font-size: 14px;
+    height: 40%;
+    width: 100%;
+  }
+  .oppia-translate-text-header-container .oppia-mobile-opportunities-subheading {
+    color: #009688;
+    display: none;
     font-size: 14px;
     height: 40%;
     width: 100%;
@@ -162,6 +220,7 @@
   .oppia-text-to-translate-container {
     border: 1px solid #ccc;
     margin: 15px 0;
+    margin-bottom: 0;
     padding: 20px;
   }
   .oppia-rules-to-translate-container {
@@ -185,13 +244,6 @@
     position: absolute;
     right: 20px;
     top: 12px;
-  }
-  .oppia-go-back-button {
-    min-width: 150px;
-  }
-
-  .oppia-upload-translated-text-button {
-    min-width: 200px;
   }
   .oppia-rte-editor-focused:focus > p {
     outline: solid 2px #009688;
@@ -225,5 +277,64 @@
   }
   .oppia-translation-error-section {
     color: red;
+  }
+
+  @media screen and (max-width: 700px) {
+    .oppia-container-expanded {
+      height: fit-content;
+      max-height: none;
+      overflow-y: hidden;
+    }
+    .oppia-container-contracted {
+      max-height: 30vh;
+      overflow-y: scroll;
+    }
+    .oppia-collapse-content {
+      background-color: #016a5d;
+      color: white;
+      cursor: pointer;
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin: auto;
+      padding: 5px 10px;
+      position: relative;
+      text-align: center;
+      text-transform: uppercase;
+      top: -13px;
+      width: 85px;
+    }
+    .oppia-translate-text-header-container .oppia-opportunities-heading {
+      display: none;
+    }
+    .oppia-translate-text-header-container .oppia-mobile-opportunities-heading {
+      display: block;
+      font-size: 18px;
+    }
+    .oppia-translatable-text-section {
+      font-size: 16px;
+    }
+    .oppia-text-to-translate-container {
+      font-size: 16px;
+    }
+  }
+
+  @media screen and (max-width: 370px) {
+    .oppia-translate-text-header-container .oppia-opportunities-subheading {
+      display: none;
+    }
+    .oppia-translate-text-header-container .oppia-mobile-opportunities-subheading {
+      display: block;
+    }
+  }
+
+  @media screen and (max-width: 330px) {
+    .oppia-translate-modal-footer {
+      align-items: flex-end;
+      flex-direction: column;
+    }
+    .oppia-translate-modal-footer button {
+      margin: 5px;
+    }
   }
 </style>

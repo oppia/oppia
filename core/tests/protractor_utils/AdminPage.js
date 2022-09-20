@@ -17,7 +17,6 @@
  * tests.
  */
 
-const { element } = require('protractor');
 var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
@@ -70,6 +69,8 @@ var AdminPage = function() {
   var addFeatureRuleButtonLocator = by.css(
     '.e2e-test-feature-add-rule-button');
   var valueSelectorLocator = by.css('.e2e-test-value-selector');
+  var serverModeSelectorLocator = by.css(
+    '.e2e-test-server-mode-selector');
   var addConditionButtonLocator = by.css(
     '.e2e-test-add-condition-button');
   var rolesResultRowsElements = element.all(
@@ -131,7 +132,13 @@ var AdminPage = function() {
   }
 
   var _switchToRolesTab = async function() {
-    await action.click('Admin roles tab button', adminRolesTab);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 711) {
+      // TODO(#15562): Add proper mobile navigation after this has been fixed.
+      await browser.get('/admin#/roles');
+    } else {
+      await action.click('Admin roles tab button', adminRolesTab);
+    }
 
     expect(await adminRolesTab.getAttribute('class')).toMatch('active');
     await waitFor.visibilityOf(
@@ -187,6 +194,21 @@ var AdminPage = function() {
     return null;
   };
 
+  // Remove this method after the end_chapter_celebration feature flag
+  // is deprecated.
+  this.getEndChapterCelebrationFeatureElement = async function() {
+    var count = await featureFlagElements.count();
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements.get(i);
+      if ((await elem.element(featureNameLocator).getText()) ===
+          'end_chapter_celebration') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   this.removeAllRulesOfFeature = async function(featureElement) {
     while (!await featureElement.isElementPresent(noRuleIndicatorLocator)) {
       await action.click(
@@ -232,10 +254,49 @@ var AdminPage = function() {
     await this.saveChangeOfFeature(featureElement);
   };
 
+  // Remove this method after the end_chapter_celebration feature flag
+  // is deprecated.
+  this.enableFeatureForProd = async function(featureElement) {
+    await this.removeAllRulesOfFeature(featureElement);
+
+    await action.click(
+      'Add feature rule button',
+      featureElement
+        .element(addFeatureRuleButtonLocator)
+    );
+
+    await action.sendKeys(
+      'Rule value selector',
+      featureElement
+        .element(valueSelectorLocator),
+      'Enabled');
+
+    await action.click(
+      'Add condition button',
+      featureElement
+        .element(addConditionButtonLocator)
+    );
+
+    await action.sendKeys(
+      'Server mode selector',
+      featureElement.element(serverModeSelectorLocator),
+      'prod');
+
+    await this.saveChangeOfFeature(featureElement);
+  };
+
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();
-    await action.click('Config Tab', configTab);
+    let width = (await browser.manage().window().getSize()).width;
+
+    if (width < 711) {
+      // TODO(#15562): Add proper mobile navigation after this has been fixed.
+      await browser.get('admin#/config');
+    } else {
+      await action.click('Config Tab', configTab);
+    }
+
     await waitFor.elementToBeClickable(saveAllConfigs);
 
     var results = [];

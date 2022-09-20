@@ -19,7 +19,7 @@ from __future__ import annotations
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -27,7 +27,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 (base_models, user_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user])
+    models.Names.BASE_MODEL, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -159,14 +160,12 @@ class SkillModel(base_models.VersionedModel):
             skill.superseding_skill_id is not None and (
                 len(skill.superseding_skill_id) > 0))]
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -181,7 +180,8 @@ class SkillModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message, for
+                unpublished skills, it may be equal to None.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:

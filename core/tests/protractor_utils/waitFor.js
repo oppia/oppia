@@ -33,8 +33,9 @@ var loadingMessage = element(by.css('.e2e-test-loading-message'));
 
 var alertToBePresent = async function() {
   await browser.wait(
-    until.alertIsPresent(), DEFAULT_WAIT_TIME_MSECS,
-    'Alert box took too long to appear.');
+    until.alertIsPresent(),
+    DEFAULT_WAIT_TIME_MSECS,
+    'Alert box took too long to appear.\n' + new Error().stack + '\n');
 };
 
 /**
@@ -43,7 +44,9 @@ var alertToBePresent = async function() {
  */
 var elementToBeClickable = async function(element, errorMessage) {
   await browser.wait(
-    until.elementToBeClickable(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
+    until.elementToBeClickable(element),
+    DEFAULT_WAIT_TIME_MSECS,
+    errorMessage + '\n' + new Error().stack + '\n');
 };
 
 /**
@@ -54,7 +57,8 @@ var elementToBeClickable = async function(element, errorMessage) {
 var invisibilityOf = async function(element, errorMessage) {
   await browser.wait(
     await until.invisibilityOf(element),
-    DEFAULT_WAIT_TIME_MSECS, errorMessage);
+    DEFAULT_WAIT_TIME_MSECS,
+    errorMessage + '\n' + new Error().stack + '\n');
 };
 
 /**
@@ -67,8 +71,9 @@ var pageToFullyLoad = async function() {
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('.e2e-test-loading-fullpage'));
   await browser.driver.wait(
-    until.invisibilityOf(loadingMessage), 15000,
-    'Page takes more than 15 secs to load');
+    until.invisibilityOf(loadingMessage),
+    15000,
+    'Page takes more than 15 secs to load\n' + new Error().stack + '\n');
 };
 
 /**
@@ -79,8 +84,9 @@ var pageToFullyLoad = async function() {
  */
 var textToBePresentInElement = async function(element, text, errorMessage) {
   await browser.wait(
-    until.textToBePresentInElement(element, text), DEFAULT_WAIT_TIME_MSECS,
-    errorMessage);
+    until.textToBePresentInElement(element, text),
+    DEFAULT_WAIT_TIME_MSECS,
+    errorMessage + '\n' + new Error().stack + '\n');
 };
 
 /**
@@ -91,7 +97,8 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
 var presenceOf = async function(element, errorMessage) {
   await browser.wait(
     await until.presenceOf(element),
-    DEFAULT_WAIT_TIME_MSECS, errorMessage);
+    DEFAULT_WAIT_TIME_MSECS,
+    errorMessage + '\n' + new Error().stack + '\n');
 };
 
 /**
@@ -102,7 +109,8 @@ var presenceOf = async function(element, errorMessage) {
 var visibilityOf = async function(element, errorMessage) {
   await browser.wait(
     await until.visibilityOf(element),
-    DEFAULT_WAIT_TIME_MSECS, errorMessage);
+    DEFAULT_WAIT_TIME_MSECS,
+    errorMessage + '\n' + new Error().stack + '\n');
 };
 
 /**
@@ -115,23 +123,29 @@ var visibilityOf = async function(element, errorMessage) {
 var elementAttributeToBe = async function(
     element, attribute, value, errorMessage
 ) {
-  await browser.wait(async function() {
-    return await element.getAttribute(attribute) === value;
-  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+  await browser.wait(
+    async function() {
+      return await element.getAttribute(attribute) === value;
+    },
+    DEFAULT_WAIT_TIME_MSECS,
+    errorMessage + '\n' + new Error().stack + '\n');
 };
 
 /**
 * Wait for new tab is opened
 */
 var newTabToBeCreated = async function(errorMessage, urlToMatch) {
-  await browser.wait(async function() {
-    var handles = await browser.driver.getAllWindowHandles();
-    await browser.waitForAngularEnabled(false);
-    await browser.switchTo().window(await handles.pop());
-    var url = await browser.getCurrentUrl();
-    await browser.waitForAngularEnabled(true);
-    return await url.match(urlToMatch);
-  }, DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB, errorMessage);
+  await browser.wait(
+    async function() {
+      var handles = await browser.driver.getAllWindowHandles();
+      await browser.waitForAngularEnabled(false);
+      await browser.switchTo().window(await handles.pop());
+      var url = await browser.getCurrentUrl();
+      await browser.waitForAngularEnabled(true);
+      return await url.match(urlToMatch);
+    },
+    DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
+    errorMessage + '\n' + new Error().stack + '\n');
 };
 
 /**
@@ -140,7 +154,9 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
 var urlRedirection = async function(url) {
   // Checks that the current URL matches the expected text.
   await browser.wait(
-    until.urlIs(url), DEFAULT_WAIT_TIME_MSECS, 'URL redirection took too long');
+    until.urlIs(url),
+    DEFAULT_WAIT_TIME_MSECS,
+    'URL redirection took too long\n' + new Error().stack + '\n');
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {
@@ -159,13 +175,6 @@ var visibilityOfSuccessToast = async function(errorMessage) {
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
-var fadeInToComplete = async function(element, errorMessage) {
-  await visibilityOf(element, 'Editor taking too long to appear');
-  await browser.driver.wait(async function() {
-    return await element.getCssValue('opacity') === '1';
-  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
-};
-
 var modalPopupToAppear = async function() {
   await visibilityOf(
     element(by.css('.modal-body')), 'Modal taking too long to appear.');
@@ -178,7 +187,9 @@ var fileToBeDownloaded = async function(filename) {
   var name = Constants.DOWNLOAD_PATH + '/' + filename;
   await browser.driver.wait(function() {
     return fs.existsSync(name);
-  }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
+  },
+  DEFAULT_WAIT_TIME_MSECS,
+  'File was not downloaded!\n' + new Error().stack + '\n');
 };
 
 var clientSideRedirection = async function(
@@ -222,7 +233,6 @@ exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
-exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.clientSideRedirection = clientSideRedirection;

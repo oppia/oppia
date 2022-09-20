@@ -23,7 +23,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
 import { AnswerChoice, StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -38,7 +38,6 @@ import { AlertsService } from 'services/alerts.service';
 import { StateNextContentIdIndexService } from '../state-editor-properties-services/state-next-content-id-index.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -48,13 +47,6 @@ import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { EditabilityService } from 'services/editability.service';
 
-interface ValueEvent {
-  evt: {
-    stopPropagation: Function;
-  };
-
-  index: number;
-}
 
 @Component({
   selector: 'oppia-state-responses',
@@ -63,7 +55,9 @@ interface ValueEvent {
 export class StateResponsesComponent implements OnInit, OnDestroy {
   @Input() addState: (value: string) => void;
   @Output() onResponsesInitialized = new EventEmitter<void>();
-  @Output() onSaveInteractionAnswerGroups = new EventEmitter<unknown>();
+  @Output() onSaveInteractionAnswerGroups = (
+    new EventEmitter<AnswerGroup[] | AnswerGroup>());
+
   @Output() onSaveInteractionDefaultOutcome = new EventEmitter<Outcome>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
   @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
@@ -80,7 +74,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   inapplicableSkillMisconceptionIds: string[];
   activeEditOption: boolean;
   misconceptionsBySkill: object;
-  answerGroups: AnswerGroup[];
+  answerGroups: AnswerGroup[] = [];
   defaultOutcome: Outcome;
   activeAnswerGroupIndex: number;
   SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean;
@@ -101,7 +95,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private answerGroupObjectFactory: AnswerGroupObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionsService: WindowDimensionsService,
     private convertToPlainText: ConvertToPlainTextPipe,
     private parameterizeRuleDescription: ParameterizeRuleDescriptionPipe,
     private truncate: TruncatePipe,
@@ -141,7 +134,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  suppressDefaultAnswerGroupWarnings(): boolean {
+  suppressDefaultAnswerGroup(): boolean {
     let interactionId = this.getCurrentInteractionId();
     let answerGroups = this.responsesService.getAnswerGroups();
     // This array contains the text of each of the possible answers
@@ -351,17 +344,17 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteAnswerGroup(value: ValueEvent): void {
+  deleteAnswerGroup(evt: Event, index: number): void {
     // Prevent clicking on the delete button from also toggling the
     // display state of the answer group.
-    value.evt.stopPropagation();
+    evt.stopPropagation();
 
     this.alertsService.clearWarnings();
     this.ngbModal.open(DeleteAnswerGroupModalComponent, {
       backdrop: true,
     }).result.then(() => {
       this.responsesService.deleteAnswerGroup(
-        value.index, (newAnswerGroups) => {
+        index, (newAnswerGroups) => {
           this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
           this.refreshWarnings.emit();
         });
@@ -396,7 +389,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     }
   }
 
-  saveTaggedMisconception(misconceptionId: string, skillId: string): void {
+  saveTaggedMisconception(taggedMisconception: TaggedMisconception): void {
+    const { skillId, misconceptionId } = taggedMisconception;
     this.responsesService.updateActiveAnswerGroup({
       taggedSkillMisconceptionId: skillId + '-' + misconceptionId
     } as AnswerGroup, (newAnswerGroups) => {
@@ -408,7 +402,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   saveActiveAnswerGroupFeedback(updatedOutcome: Outcome): void {
     this.responsesService.updateActiveAnswerGroup({
       feedback: updatedOutcome.feedback
-    } as unknown as AnswerGroup, (newAnswerGroups) => {
+    }, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });
@@ -420,6 +414,15 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       refresherExplorationId: updatedOutcome.refresherExplorationId,
       missingPrerequisiteSkillId:
         updatedOutcome.missingPrerequisiteSkillId
+    }, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+      this.refreshWarnings.emit();
+    });
+  }
+
+  saveActiveAnswerGroupDestIfStuck(updatedOutcome: Outcome): void {
+    this.responsesService.updateActiveAnswerGroup({
+      destIfReallyStuck: updatedOutcome.destIfReallyStuck,
     } as unknown as AnswerGroup, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
@@ -430,7 +433,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       updatedOutcome: Outcome): void {
     this.responsesService.updateActiveAnswerGroup({
       labelledAsCorrect: updatedOutcome.labelledAsCorrect
-    } as unknown as AnswerGroup, (newAnswerGroups) => {
+    }, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });
@@ -465,6 +468,14 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     });
   }
 
+  saveDefaultOutcomeDestIfStuck(updatedOutcome: Outcome): void {
+    this.responsesService.updateDefaultOutcome({
+      destIfReallyStuck: updatedOutcome.destIfReallyStuck
+    } as Outcome, (newDefaultOutcome) => {
+      this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+    });
+  }
+
   saveDefaultOutcomeCorrectnessLabel(
       updatedOutcome: Outcome): void {
     this.responsesService.updateDefaultOutcome({
@@ -480,7 +491,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   summarizeAnswerGroup(
       answerGroup: AnswerGroup, interactionId: string,
-      answerChoices: AnswerChoice[], shortenRule: unknown): string {
+      answerChoices: AnswerChoice[], shortenRule: boolean
+  ): string {
     let summary = '';
     let outcome = answerGroup.outcome;
     let hasFeedback = outcome.hasNonemptyFeedback();
@@ -509,7 +521,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   summarizeDefaultOutcome(
       defaultOutcome: Outcome, interactionId: string,
-      answerGroupCount: number, shortenRule: unknown): string {
+      answerGroupCount: number, shortenRule: boolean
+  ): string {
     if (!defaultOutcome) {
       return '';
     }
@@ -548,7 +561,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.responseCardIsShown = !this.responseCardIsShown;
   }
 
-  getUnaddressedMisconceptionNames(): unknown[] {
+  getUnaddressedMisconceptionNames(): string[] {
     let answerGroups = this.responsesService.getAnswerGroups();
     let taggedSkillMisconceptionIds = {};
     for (let i = 0; i < answerGroups.length; i++) {
@@ -631,8 +644,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
       AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
-    this.responseCardIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.responseCardIsShown = true;
     this.stateName = this.stateEditorService.getActiveStateName();
     this.enableSolicitAnswerDetailsFeature = (
       AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);

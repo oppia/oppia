@@ -19,6 +19,9 @@
   position: relative;
   text-align: left;
 }
+.oppia-topic-title {
+  visibility: hidden;
+}
 .oppia-subtopic-title {
   color: #00645c;
   font-family: Capriola, Roboto, Arial, sans-serif;
@@ -85,23 +88,39 @@
   width: 200px;
 }
 
-@media(max-width: 600px) {
+@media screen and (max-width: 600px) {
   .oppia-subtopic-viewer-container {
     padding-top: 80px;
   }
 
-  .oppia-subtopic-title {
-    font-size: 2em;
+  .oppia-topic-title {
+    color: #00645c;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 1.5rem;
     margin-left: 25px;
+    margin-top: 25px;
     padding-right: 25px;
     padding-top: 20px;
+    text-align: left;
+    visibility: visible;
+  }
+
+  .oppia-subtopic-title {
+    font-size: 2rem;
+    margin-left: 25px;
+    padding-right: 25px;
   }
 
   .oppia-page-contents-viewer {
     font-size: 1.2em;
-    margin-left: 25px;
-    margin-right: 25px;
+    margin-left: 10px;
+    margin-right: 10px;
     padding: 30px 20px;
     width: calc(100% - 50px);
+  }
+
+  .oppia-subtopic-viewer-container-card {
+    padding-left: 18px;
+    padding-right: 18px;
   }
 }

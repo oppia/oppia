@@ -33,7 +33,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     subtopic_id: int = 1
 
     def setUp(self) -> None:
-        super(SubtopicPageDomainUnitTests, self).setUp()
+        super().setUp()
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.topic_id))
@@ -111,22 +111,22 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.subtopic_page.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_subtopic_topic_id_validation(self) -> None:
         self.subtopic_page.topic_id = 1  # type: ignore[assignment]
         self._assert_subtopic_validation_error(
             'Expected topic_id to be a string'
         )
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_language_code_validation(self) -> None:
         self.subtopic_page.language_code = 0  # type: ignore[assignment]
         self._assert_subtopic_validation_error(
@@ -260,28 +260,28 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 'subtopic_id': 'subtopic_id'
             })
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_version_number(self) -> None:
         self.subtopic_page.version = 'invalid_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected version number to be an int'):
             self.subtopic_page.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_page_contents_schema_version_type(self) -> None:
         self.subtopic_page.page_contents_schema_version = 'invalid_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Expected page contents schema version to be an integer'):
             self.subtopic_page.validate()
 
     def test_validate_page_contents_schema_version(self) -> None:
         self.subtopic_page.page_contents_schema_version = 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Expected page contents schema version to be %s'
             % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
@@ -290,7 +290,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
 
 class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
-        super(SubtopicPageContentsDomainUnitTests, self).setUp()
+        super().setUp()
         self.subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents
             .create_default_subtopic_page_contents())
@@ -361,19 +361,19 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
 class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
     def test_subtopic_page_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             subtopic_page_domain.SubtopicPageChange({'invalid': 'data'})
 
     def test_subtopic_page_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             subtopic_page_domain.SubtopicPageChange({'cmd': 'invalid'})
 
     def test_subtopic_page_change_object_with_missing_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
@@ -385,7 +385,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
     def test_subtopic_page_change_object_with_extra_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             subtopic_page_domain.SubtopicPageChange({
@@ -398,7 +398,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_page_property: '
                 'invalid is not allowed')):
@@ -462,7 +462,7 @@ class SubtopicPageSummaryTests(test_utils.GenericTestBase):
     SUBTOPIC_MASTERY = 0.5
 
     def setUp(self) -> None:
-        super(SubtopicPageSummaryTests, self).setUp()
+        super().setUp()
 
         self.subtopic_page_summary = subtopic_page_domain.SubtopicPageSummary(
             self.SUBTOPIC_ID, self.SUBTOPIC_TITLE, self.TOPIC_ID,

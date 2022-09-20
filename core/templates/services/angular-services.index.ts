@@ -22,7 +22,7 @@ import { ExternalRteSaveService } from './external-rte-save.service';
 import { ExternalSaveService } from './external-save.service';
 import { PlatformFeatureService } from './platform-feature.service';
 import { QuestionValidationService } from './question-validation.service';
-import { MockCsrfTokenService, RequestInterceptor } from './request-interceptor.service';
+import { RequestInterceptor } from './request-interceptor.service';
 import { EventBusService } from 'app-events/event-bus.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
@@ -100,7 +100,7 @@ import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/l
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { TeacherDashboardBackendApiService } from 'domain/learner_group/teacher-dashboard-backend-api.service';
+import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -112,6 +112,7 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
+import { PracticeSessionsBackendApiService } from 'pages/practice-session-page/practice-session-backend-api.service';
 import { ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
@@ -135,7 +136,6 @@ import { StoryUpdateService } from 'domain/story/story-update.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -226,6 +226,7 @@ import { SolutionValidityService } from 'pages/exploration-editor-page/editor-ta
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { CheckRevertService } from 'pages/exploration-editor-page/history-tab/services/check-revert.service';
 import { VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
@@ -247,6 +248,7 @@ import { AnswerClassificationService } from 'pages/exploration-player-page/servi
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
 import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
@@ -418,10 +420,15 @@ import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { VersionHistoryBackendApiService } from 'pages/exploration-editor-page/services/version-history-backend-api.service';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import { YamlService } from './yaml.service';
 import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
+import { ExplorationSaveService } from 'pages/exploration-editor-page/services/exploration-save.service';
+import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
+import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
+import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -460,6 +467,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BrowserCheckerService', BrowserCheckerService],
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
   ['CapitalizePipe', CapitalizePipe],
+  ['CheckpointCelebrationUtilityService', CheckpointCelebrationUtilityService],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['CkEditorInitializerService', CkEditorInitializerService],
   ['ClassifierDataBackendApiService', ClassifierDataBackendApiService],
@@ -655,7 +663,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['MessengerService', MessengerService],
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
-  ['MockCsrfTokenService', MockCsrfTokenService],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
   ['MultipleChoiceInputRulesService', MultipleChoiceInputRulesService],
   ['MultipleChoiceInputValidationService',
@@ -811,11 +818,11 @@ export const angularServices: [string, Type<{}>][] = [
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
   ['SubtopicValidationService', SubtopicValidationService],
   ['SuggestionModalService', SuggestionModalService],
-  ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
   ['SvgFileFetcherBackendApiService', SvgFileFetcherBackendApiService],
   ['SvgSanitizerService', SvgSanitizerService],
-  ['TeacherDashboardBackendApiService', TeacherDashboardBackendApiService],
+  ['FacilitatorDashboardBackendApiService',
+    FacilitatorDashboardBackendApiService],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
   ['TextInputTokenizer', TextInputTokenizer],
@@ -860,6 +867,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
+  ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
+  ['CheckRevertService', CheckRevertService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],
@@ -875,5 +884,11 @@ export const angularServices: [string, Type<{}>][] = [
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
   ['NumberConversionService', NumberConversionService],
   ['ParameterMetadataService', ParameterMetadataService],
-  ['ExplorationWarningsService', ExplorationWarningsService]
+  ['ExplorationWarningsService', ExplorationWarningsService],
+  ['PracticeSessionsBackendApiService', PracticeSessionsBackendApiService],
+  ['ExplorationSaveService', ExplorationSaveService],
+  ['ExplorationAutomaticTextToSpeechService',
+    ExplorationAutomaticTextToSpeechService],
+  ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
+  ['CompareVersionsService', CompareVersionsService]
 ];
