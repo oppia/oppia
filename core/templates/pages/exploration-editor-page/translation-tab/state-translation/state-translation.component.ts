@@ -549,7 +549,7 @@ angular.module('oppia').component('stateTranslation', {
         updateTranslatedContent();
       };
 
-      var updateTranslatedContent = function() {
+      const updateTranslatedContent = function() {
         if (!TranslationTabActiveModeService.isVoiceoverModeActive()) {
           $scope.activeTranslatedContent = (
             EntityTranslationsService.entityTranslation.getWrittenTranslation(

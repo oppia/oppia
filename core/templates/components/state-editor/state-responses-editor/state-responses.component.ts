@@ -341,7 +341,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       }
     }, () => {
       this.alertsService.clearWarnings();
-      this.generateContentIdService.revertUnusedConetentIdIndex();
+      this.generateContentIdService.revertUnusedContentIdIndex();
     });
   }
 

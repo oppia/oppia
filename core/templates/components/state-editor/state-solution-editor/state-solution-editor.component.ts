@@ -202,7 +202,7 @@ export class StateSolutionEditorComponent implements OnInit {
         }
       }
     }, () => {
-      this.generateContentIdService.revertUnusedConetentIdIndex();
+      this.generateContentIdService.revertUnusedContentIdIndex();
       this.alertsService.clearWarnings();
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

@@ -308,7 +308,7 @@ export class ExtractImageFilenamesFromModelService {
       ).imageAndRegions.value.imagePath);
       filenamesInState.push(filename);
     }
-    let allHtmlOfState = state.getAllHTMLs();
+    let allHtmlOfState = state.getAllHTMLStrings();
     return [
       ...filenamesInState,
       ...this._extractFilenamesFromHtmlList(allHtmlOfState)

@@ -214,7 +214,7 @@ export class StateInteractionEditorComponent
         () => {
           this.stateInteractionIdService.restoreFromMemento();
           this.stateCustomizationArgsService.restoreFromMemento();
-          this.generateContentIdService.revertUnusedConetentIdIndex();
+          this.generateContentIdService.revertUnusedContentIdIndex();
         });
     }
   }

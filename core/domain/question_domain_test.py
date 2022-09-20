@@ -965,6 +965,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
+        self.question_state_dict['written_translations'] = {
+            'translations_mapping': {
+                'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
+            }
+        }
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1123,7 +1128,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v35_to_v36(self) -> None:
-
         # Here we use MyPy ignore because we are defining WrittenTranslationDict
         # and WrittenTranslationDict do not accept 'html' key, because the
         # latest version of WrittenTranslation does not have any `html`
@@ -1131,18 +1135,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        self.question_state_dict[
-            'written_translations']['translations_mapping'] = {
-            'temp_id_1': {
-                'en': {
-                    'html': 'html_body_1'
-                }
-            },
-            # Here we use MyPy ignore because we are defining an older version
-            # WrittenTranslationDict which contain 'html' key.
-            'temp_id_2': {
-                'en': {
-                    'html': 'html_body_2'
+        self.question_state_dict['written_translations'] = {
+            'translations_mapping': {
+                'temp_id_1': {
+                    'en': {
+                        'html': 'html_body_1'
+                    }
+                },
+                # Here we use MyPy ignore because we are defining an older
+                # version WrittenTranslationDict which contain 'html' key.
+                'temp_id_2': {
+                    'en': {
+                        'html': 'html_body_2'
+                    }
                 }
             }
         }
@@ -1494,8 +1499,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question_state_dict['interaction']['customization_args'] = {}
         self.question_state_dict[
             'recorded_voiceovers']['voiceovers_mapping'] = {}
-        self.question_state_dict[
-            'written_translations']['translations_mapping'] = {}
+        self.question_state_dict['written_translations'] = {
+            'translations_mapping': {}
+        }
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1573,7 +1579,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_question_state_dict_conversion_from_v40_to_v41(self) -> None:
         self.question_state_dict['written_translations'] = {
-            'translation_mapping': {}
+            'translations_mapping': {}
         }
         self.question_state_dict['interaction']['id'] = 'TextInput'
         self.question_state_dict['interaction']['answer_groups'] = [{
@@ -1928,9 +1934,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state']['card_is_checkpoint'], False)
 
     def test_question_state_dict_conversion_from_v44_to_v45(self) -> None:
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
-
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
         del self.question_state_dict['linked_skill_id']  # type: ignore[misc]
@@ -2103,8 +2106,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             ])
 
     def test_question_state_dict_conversion_from_v50_to_v51(self) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
+            question_domain.Question.create_default_question_state(
+                content_id_generator
+            ).to_dict())
 
         # Here we use MyPy ignore because we are defining AnswerGroupDict
         # and while defining AnswerGroupDict MyPy expects that all keys
@@ -2143,8 +2149,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
 
     def test_question_state_dict_conversion_from_v51_to_v52(self) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
+            question_domain.Question.create_default_question_state(
+                content_id_generator
+            ).to_dict())
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,

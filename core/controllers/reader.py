@@ -414,6 +414,9 @@ class ExplorationHandler(base.BaseHandler):
 
 
 class EntityTranslationHandler(base.BaseHandler):
+    """The handler to fetch translations for a given entity in a given
+    language.
+    """
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'entity_type': {

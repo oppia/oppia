@@ -88,7 +88,7 @@ export class GenerateContentIdService {
     return this._getNextStateId(prefix);
   }
 
-  revertUnusedConetentIdIndex(): void {
+  revertUnusedContentIdIndex(): void {
     this.revertUnusedIndexes();
   }
 }

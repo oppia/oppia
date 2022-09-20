@@ -79,7 +79,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
     }
   }
 
-  onSelectLanguage(newLanguageCode: string): string {
+  onSelectLanguage(newLanguageCode: string): void {
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(
         SwitchContentLanguageRefreshRequiredModalComponent);
@@ -96,7 +96,6 @@ export class ContentLanguageSelectorComponent implements OnInit {
         this.playerTranscriptService.getCard(0).getStateName());
     }
     this.changeDetectorRef.detectChanges();
-    return this.selectedLanguageCode;
   }
 
   shouldDisplaySelector(): boolean {

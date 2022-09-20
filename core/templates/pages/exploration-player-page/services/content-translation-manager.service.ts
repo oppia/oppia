@@ -65,17 +65,17 @@ export class ContentTranslationManagerService {
   ) {}
 
   fetchAndDisplayTranslations(languageCode: string): void {
-    let modalRef = null;
-    setTimeout(() => {
-      modalRef = this.ngbModal.open(TranslationsFetchingMessageModalComponent, {
+    let modalRef = this.ngbModal.open(
+      TranslationsFetchingMessageModalComponent, {
         backdrop: 'static',
-      });
-    }, 0);
+      }
+    );
     this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
       this.entityId,
       this.entityType,
       this.version,
-      languageCode).then((entityTranslation) => {
+      languageCode
+    ).then((entityTranslation) => {
       this.languageCodeToEntityTranslations[languageCode] = entityTranslation;
       this.displayTranslations(languageCode);
       modalRef.close();

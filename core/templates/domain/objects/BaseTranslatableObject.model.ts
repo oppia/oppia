@@ -106,7 +106,7 @@ export class BaseTranslatableObject {
     return translatableFields;
   }
 
-  getAllHTMLs(): string[] {
+  getAllHTMLStrings(): string[] {
     return this.getAllContents().filter((content) => {
       return content instanceof SubtitledHtml;
     }).map((content) => {
