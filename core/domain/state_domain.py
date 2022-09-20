@@ -988,8 +988,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         )
         if len(recc_exp_ids) > 3:
             raise utils.ValidationError(
-                'The End interaction should not have recommended '
-                'explorations more than 3'
+                'The End interaction should not have more than 3 '
+                'recommended explorations.'
             )
 
     def _set_lower_and_upper_bounds(
@@ -2082,39 +2082,22 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # an exploration because as of now(16 Sept 2022) the data related
         # to Question model is not yet fixed.
         if validation_from_exploration:
-            # Validation for Continue interaction.
             if self.id == 'Continue':
                 self._validate_continue_input()
-
-            # Validation for EndExploration interaction.
             elif self.id == 'EndExploration':
                 self._validate_end_exploration_input()
-
-            # Validation for NumericInput interaction.
             elif self.id == 'NumericInput':
                 self._validate_numeric_input()
-
-            # Validation for FractionInput interaction.
             elif self.id == 'FractionInput':
                 self._validate_fraction_input()
-
-            # Validation for NumberWithUnits interaction.
             elif self.id == 'NumberWithUnits':
                 self._validate_number_with_units_input()
-
-            # Validation for MultipleChoiceInput interaction.
             elif self.id == 'MultipleChoiceInput':
                 self._validate_multi_choice_input()
-
-            # Validation for ItemSelectionInput interaction.
             elif self.id == 'ItemSelectionInput':
                 self._validate_item_selec_input()
-
-            # Validation for DragAndDropSortInput interaction.
             elif self.id == 'DragAndDropSortInput':
                 self._validate_drag_and_drop_input()
-
-            # Validation for TextInput interaction.
             elif self.id == 'TextInput':
                 self._validate_text_input()
 
