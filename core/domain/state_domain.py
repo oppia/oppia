@@ -195,7 +195,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self,
         interaction: base.BaseInteraction,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        validation_from_exploration: bool = False
+        validation_from_exploration: bool=False
     ) -> None:
         """Verifies that all rule classes are valid, and that the AnswerGroup
         only has one classifier rule.
@@ -205,6 +205,8 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
+            validation_from_exploration: bool. Whether the validation is called
+                from the exploration.
 
         Raises:
             ValidationError. One or more attributes of the AnswerGroup are
@@ -928,7 +930,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     def validate(
         self, exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        validation_from_exploration: bool = False
+        validation_from_exploration: bool=False
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -937,6 +939,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 the exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property(obj_type).
                 Is used to validate AnswerGroup objects.
+            validation_from_exploration: bool. Whether the validation is called
+                from the exploration.
 
         Raises:
             ValidationError. One or more attributes of the InteractionInstance
@@ -3223,7 +3227,7 @@ class State(translation_domain.BaseTranslatableObject):
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         allow_null_interaction: bool,
-        validation_from_exploration = False
+        validation_from_exploration: bool=False
     ) -> None:
         """Validates various properties of the State.
 
@@ -3235,6 +3239,8 @@ class State(translation_domain.BaseTranslatableObject):
                 question.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
+            validation_from_exploration: bool. Whether the validation is called
+                from the exploration.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.

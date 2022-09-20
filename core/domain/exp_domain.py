@@ -1635,7 +1635,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict,
-                validation_from_exploration = True)
+                validation_from_exploration=True)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in
@@ -1792,7 +1792,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The default outcome for state %s has a refresher '
                         'exploration ID, but is not a self-loop.' % state_name)
 
-            for group_idx, group in enumerate(interaction.answer_groups):
+            for group in interaction.answer_groups:
                 # Check group destinations.
                 if group.outcome.dest not in all_state_names:
                     raise utils.ValidationError(

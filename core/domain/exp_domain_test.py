@@ -1645,7 +1645,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            'Expected tagged skill misconception id to be a str, received 1')
+            'Expected tagged skill misconception id to be None, received 1')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -1685,8 +1685,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         first_answer_group.rule_specs = []
         self._assert_validation_error(
             exploration,
-            'There must be at least one rule or training data for each'
-            ' answer group.')
+            'There must be at least one rule for each answer group.')
 
         exploration.states = {
             exploration.init_state_name: (
