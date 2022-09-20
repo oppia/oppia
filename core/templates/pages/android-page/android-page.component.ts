@@ -84,8 +84,8 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   constructor(
     private pageTitleService: PageTitleService,
-    private urlInterpolationService: UrlInterpolationService,
     private translateService: TranslateService,
+    private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
