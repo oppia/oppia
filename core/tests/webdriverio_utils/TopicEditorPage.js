@@ -467,8 +467,15 @@ var TopicEditorPage = function() {
 
   this.createStory = async function(
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
-    await general.scrollToTop();
-    await action.click('Create Story Button', createStoryButton);
+    let width = (await browser.getWindowSize()).width;
+    if (width < 831) {
+      var storiesDropdown = $('.e2e-test-story-dropdown');
+      await action.click('Story dropdown', storiesDropdown);
+      await action.click('Create Story Button', createStoryButton);
+    } else {
+      await general.scrollToTop();
+      await action.click('Create Story Button', createStoryButton);
+    }
 
     await action.setValue(
       'Create new story title', newStoryTitleField, storyTitle);
