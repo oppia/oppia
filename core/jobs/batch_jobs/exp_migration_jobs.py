@@ -209,20 +209,15 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """Generates new translation models for the given exploration
         model.
         """
-        try:
-            with datastore_services.get_ndb_context():
-                new_model = translation_models.EntityTranslationsModel.create_new(
-                    exp_translation_model.entity_type,
-                    exp_translation_model.entity_id,
-                    exp_translation_model.entity_version + 1,
-                    exp_translation_model.language_code,
-                    exp_translation_model.translations
-                )
-
-                datastore_services.update_timestamps_multi([new_model])
-        except Exception as e:
-            logging.exception(e)
-            return result.Err((exp_translation_model.entity_id, e))
+        with datastore_services.get_ndb_context():
+            new_model = translation_models.EntityTranslationsModel.create_new(
+                exp_translation_model.entity_type,
+                exp_translation_model.entity_id,
+                exp_translation_model.entity_version + 1,
+                exp_translation_model.language_code,
+                exp_translation_model.translations
+            )
+            datastore_services.update_timestamps_multi([new_model])
 
         return result.Ok(new_model)
 

@@ -27,10 +27,10 @@ import { EntityTranslationBackendApiService } from 'pages/exploration-editor-pag
   providedIn: 'root'
 })
 export class EntityTranslationsService {
-  private entityId: string;
-  private entityType: string;
-  private entityVersion: number;
-  public entityTranslation: EntityTranslation;
+  private entityId: string = null;
+  private entityType: string = null;
+  private entityVersion: number = null;
+  public entityTranslation: EntityTranslation = null;
   constructor(
     private entityTranslationBackendApiService: (
       EntityTranslationBackendApiService)

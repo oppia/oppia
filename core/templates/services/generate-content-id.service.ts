@@ -30,6 +30,11 @@ export class GenerateContentIdService {
   getNextIndex: () => number;
   revertUnusedIndexes: () => void;
 
+  constructor() {
+    this.getNextIndex = null;
+    this.revertUnusedIndexes = null;
+  }
+
   init(getNextIndex: () => number, revertUnusedIndexes: () => void): void {
     this.getNextIndex = getNextIndex;
     this.revertUnusedIndexes = revertUnusedIndexes;

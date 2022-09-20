@@ -60,6 +60,7 @@ export class Rule extends BaseTranslatableObject {
       // BaseTranslatableObject having dict structure with contentId
       // as a key.
       if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+        // @ts-ignore
         translatableFields.push(ruleInput);
       }
     });

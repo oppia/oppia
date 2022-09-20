@@ -52,9 +52,9 @@ export class ContentTranslationManagerService {
   private languageCodeToEntityTranslations: LanguageCodeToEntityTranslations = (
     {});
 
-  entityType: string;
-  entityId: string;
-  version: number;
+  private entityType: string = null;
+  private entityId: string = null;
+  private version: number = null;
 
   constructor(
     private ngbModal: NgbModal,

@@ -410,19 +410,19 @@ class MigrateExplorationJobTests(
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-        translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            exp_model.id,
-            exp_model.version,
-            'hi',
-            {}
-        ).put()
+        for i in range(2):
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.TranslatableEntityType.EXPLORATION.value,
+                exp_model.id,
+                exp_model.version - i,
+                'hi',
+                {}
+            ).put()
 
         all_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch())
 
-        self.assertEqual(
-            len(all_translation_models), 1)
+        self.assertEqual(len(all_translation_models), 2)
 
         owner_action = user_services.get_user_actions_info(
             feconf.SYSTEM_COMMITTER_ID)
@@ -482,9 +482,9 @@ class MigrateExplorationJobTests(
         all_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch())
 
-        self.assertEqual(len(all_translation_models), 2)
+        self.assertEqual(len(all_translation_models), 3)
         self.assertEqual(
-            [m.entity_version for m in all_translation_models], [1, 2])
+            [m.entity_version for m in all_translation_models], [0, 1, 2])
 
 
 # Exploration migration backend tests with BEAM jobs involves creating and
