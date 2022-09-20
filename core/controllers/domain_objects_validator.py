@@ -263,8 +263,11 @@ def validate_exploration_change(exp_change_dict):
         command['name'] for command in
         exp_domain.ExplorationChange.ALLOWED_COMMANDS
     ]
-    if exp_change_dict['cmd'] in exp_change_commands:
-        exp_domain.ExplorationChange(exp_change_dict)
+    if exp_change_dict['cmd'] not in exp_change_commands:
+        raise base.BaseHandler.InvalidInputException(
+            'The cmd key does not belong to exploration.'
+        )
+
     # Validate state properties.
     if exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
         if (
@@ -310,5 +313,4 @@ def validate_exploration_change(exp_change_dict):
                 raise base.BaseHandler.InvalidInputException(
                         'The destination for the default outcome is not valid.'
                     )
-
     return exp_domain.ExplorationChange.from_dict(exp_change_dict)
