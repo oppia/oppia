@@ -4121,12 +4121,23 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_multiple_choice_input_interaction(
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
-        """
+        """Fixes MultipleChoiceInput interaction for the following cases -
+        - No answer choice should appear in more than one rule else the
+        latter rule will be removed
+        - Answer choices should be non-empty and unique else will be fixed
+        accordingly
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
         """
         selected_equals_choices = []
         empty_ans_groups = []
         answer_groups = state_dict['interaction']['answer_groups']
-        # No answer choice should appear in more than one answer group.
+        # No answer choice should appear in more than one rule.
         for answer_group in answer_groups:
             unwanted_rule = []
             for rule_spec in answer_group['rule_specs']:
@@ -4141,10 +4152,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             rule_spec['inputs']['x'])
             for ele in unwanted_rule:
                 answer_group['rule_specs'].remove(ele)
-
             if len(answer_group['rule_specs']) == 0:
                 empty_ans_groups.append(answer_group)
-
         # Removal of empty answer group.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
@@ -4154,11 +4163,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args'][
                 'choices']['value']
         )
-
         cls._choices_should_be_unique_and_non_empty(
             choices, answer_groups)
+
+        # Removal of duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
+
         state_dict['interaction']['customization_args']['choices'][
             'value'] = choices
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -4167,7 +4178,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_item_selection_input_interaction(
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
-        """
+        """Fixes ItemSelectionInput interaction for the following cases -
+        - `Equals` rule should have value between min and max number
+        of selections else the rule will be removed
+        - Minimum number of selections should be no greater than
+        maximum number of selections else we will simply swap the values
+        - There should be enough choices to have minimum number of selections
+        else the minimum value will be set to 1
+        - All choices should be unique and non-empty else will be handled
+        accordingly
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
         """
         min_value = (
             state_dict['interaction']['customization_args']
@@ -4181,19 +4207,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args'][
                 'choices']['value']
         )
-
-        # None of the answer groups should be same.
         answer_groups = state_dict['interaction']['answer_groups']
-
-        answer_groups = cls._item_selec_no_ans_group_should_be_same(
-            answer_groups)
 
         empty_ans_groups = []
         for answer_group in answer_groups:
             invalid_rules = []
             for rule_spec in answer_group['rule_specs']:
-                # `==` should have between min and max
-                # number of selections.
+                # `Equals` should have between min and max number of selections.
                 if rule_spec['rule_type'] == 'Equals':
                     rule_value = rule_spec['inputs']['x']
                     if (
@@ -4214,21 +4234,25 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             if len(answer_group['rule_specs']) == 0:
                 empty_ans_groups.append(answer_group)
-
         # Removal of empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
-        # Min no of selec should be no greater than max num.
+        # Minimum number of selections should be no greater than maximum
+        # number of selections.
         if min_value > max_value:
             min_value, max_value = max_value, min_value
 
-        # There should be enough choice to have min num of selec.
+        # There should be enough choices to have minimum number
+        # of selections.
         if len(choices) < min_value:
             min_value = 1
 
+        # All choices should be unique and empty.
         cls._choices_should_be_unique_and_non_empty(
             choices, answer_groups, True)
+
+        # Rules should not be duplicate.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         state_dict['interaction']['customization_args'][
