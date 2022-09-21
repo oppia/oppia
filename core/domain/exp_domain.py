@@ -243,6 +243,56 @@ def clean_math_expression(math_expression: str) -> str:
     return math_expression
 
 
+def escape_html(unescaped_html_data: str) -> str:
+    """This functions escapes an unescaped HTML string.
+
+    Args:
+        unescaped_html_data: str. Unescaped HTML string to be escaped.
+
+    Returns:
+        str. Escaped HTML string.
+    """
+    # Replace list to escape html strings.
+    replace_list_for_escaping = [
+        ('&', '&amp;'),
+        ('"', '&quot;'),
+        ('\'', '&#39;'),
+        ('<', '&lt;'),
+        ('>', '&gt;')
+    ]
+    escaped_html_data = unescaped_html_data
+    for replace_tuple in replace_list_for_escaping:
+        escaped_html_data = escaped_html_data.replace(
+            replace_tuple[0], replace_tuple[1])
+
+    return escaped_html_data
+
+
+def unescape_html(escaped_html_data: str) -> str:
+    """This function unescapes an escaped HTML string.
+
+    Args:
+        escaped_html_data: str. Escaped HTML string to be unescaped.
+
+    Returns:
+        str. Unescaped HTML string.
+    """
+    # Replace list to unescape html strings.
+    replace_list_for_unescaping = [
+        ('&quot;', '"'),
+        ('&#39;', '\''),
+        ('&lt;', '<'),
+        ('&gt;', '>'),
+        ('&amp;', '&')
+    ]
+    unescaped_html_data = escaped_html_data
+    for replace_tuple in replace_list_for_unescaping:
+        unescaped_html_data = unescaped_html_data.replace(
+            replace_tuple[0], replace_tuple[1])
+
+    return unescaped_html_data
+
+
 class MetadataVersionHistoryDict(TypedDict):
     """Dictionary representing MetadataVersionHistory object."""
 
@@ -4256,7 +4306,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                                 if contain_rule_string in rule_value:
                                     invalid_rules.append(rule_spec)
                     seen_strings_startswith.append(rule_values)
-                elif rule_spec.rule_type == 'Equals':
+                elif rule_spec['rule_type'] == 'Equals':
                     # `Contains` should always come after `Equals` rule
                     # where the contains rule strings is a substring
                     # of the `Equals` rule string.
@@ -4338,9 +4388,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # ################################################.
     # Fix validation errors for exploration state RTE.
     # ################################################.
-
     @classmethod
-    def _fix_rte(cls, html):
+    def _fix_rte_tags(
+        cls, html: str,
+        is_tags_nested_inside_tabs_or_collapsible: bool=False
+    ):
         """Handles all the invalid RTE tags, performs the following
             - `oppia-noninteractive-image`
                 - If `alt-with-value` attribute not in the image tag,
@@ -4354,6 +4406,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             - `oppia-noninteractive-skillreview`
                 - If `text-with-value` attribute is not present or empty or
                 None, removes the tag
+                - If `skill_id-with-value` attribute is not present or empty or
+                None, removes the tag
             - `oppia-noninteractive-math`
                 - If `math_content-with-value` attribute not in math tag,
                 removes the tag
@@ -4364,10 +4418,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 introduce them to the tag and assign 0 to them
                 - If `autoplay-with-value` is not present or is not boolean,
                 introduce it to the tag and assign `false` to them
-                - If `video_id-with-value` is not present, removes the tag
+                - If `video_id-with-value` is not present or empty, removes
+                the tag
+                - If `start-with-value` > `end-with-value`, set both to '0'
             - `oppia-noninteractive-link`
                 - If `text-with-value` or `url-with-value` is not present,
-                removes the tag
+                or is empty simply removes the tag
+            - `oppia-noninteractive-tabs` and `oppia-noninteractive-collapsible`
+                - If these tags are nested inside tabs and collapsible tag, we
+                will simply remove the tag
+
+        Args:
+            html: str. The RTE tags.
         """
         empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
         soup = bs4.BeautifulSoup(html, 'html.parser')
@@ -4453,7 +4515,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             else:
                 if tag['math_content-with-value'] in empty_values:
                     tag.decompose()
-                math_content_json = html_validation_service.unescape_html(
+                math_content_json = unescape_html(
                     tag['math_content-with-value'])
                 math_content_list = json.loads(math_content_json)
 
@@ -4463,6 +4525,86 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     tag.decompose()
                 elif math_content_list['raw_latex'].strip() in empty_values:
                     tag.decompose()
+
+        if is_tags_nested_inside_tabs_or_collapsible:
+            tabs_tags = soup.find_all('oppia-noninteractive-tabs')
+            if len(tabs_tags) > 0:
+                for tabs_tag in tabs_tags:
+                    tabs_tag.decompose()
+            collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
+            if len(collapsible_tags) > 0:
+                for collapsible_tag in collapsible_tags:
+                    collapsible_tag.decompose()
+
+        return str(soup).replace('<br/>', '<br>')
+
+    @classmethod
+    def _fix_tabs_and_collapsible_tags(cls, html: str):
+        """Fixes all tabs and collapsible tags, performs the following -
+        - `oppia-noninteractive-tabs`
+            - If no `tab_contents-with-value` attribute, tag will be removed
+            - If `tab_contents-with-value` is empty then the tag will be removed
+        - `oppia-noninteractive-collapsible`
+            - If no `content-with-value` attribute, tag will be removed
+            - If `content-with-value` is empty then the tag will be removed
+            - If no `heading-with-value` attribute, tag will be removed
+            - If `heading-with-value` is empty then the tag will be removed
+
+        Args:
+            html: str. The RTE tags.
+        """
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+        tabs_tags = soup.find_all('oppia-noninteractive-tabs')
+        for tag in tabs_tags:
+            if tag.has_attr('tab_contents-with-value'):
+                tab_content_json = unescape_html(
+                    tag['tab_contents-with-value'])
+
+                tab_content_list = json.loads(tab_content_json)
+
+                if len(tab_content_list) == 0:
+                    tag.decompose()
+                for tab_content in tab_content_list:
+                    tab_content['content'] = cls._fix_rte_tags(
+                        tab_content['content'],
+                        is_tags_nested_inside_tabs_or_collapsible=True
+                    )
+                tab_content_json = json.dumps(tab_content_list)
+                tag['tab_contents-with-value'] = escape_html(tab_content_json)
+            else:
+                tag.decompose()
+
+        collapsibles_tags = soup.find_all(
+            'oppia-noninteractive-collapsible')
+        for tag in collapsibles_tags:
+            if tag.has_attr('content-with-value'):
+                collapsible_content_json = (
+                    unescape_html(tag['content-with-value'])
+                )
+                collapsible_content_list = json.loads(
+                    collapsible_content_json)
+                if len(collapsible_content_list) == 0:
+                    tag.decompose()
+
+                collapsible_content_list = cls._fix_rte_tags(
+                    collapsible_content_list,
+                    is_tags_nested_inside_tabs_or_collapsible=True
+                )
+                collapsible_content_json = json.dumps(collapsible_content_list)
+                tag['content-with-value'] = escape_html(
+                    collapsible_content_json)
+            else:
+                tag.decompose()
+
+            if tag.has_attr('heading-with-value'):
+                collapsible_heading_json = (
+                    unescape_html(tag['heading-with-value']))
+                collapsible_heading_list = json.loads(
+                    collapsible_heading_json)
+                if len(collapsible_heading_list) == 0:
+                    tag.decompose()
+            else:
+                tag.decompose()
 
         return str(soup).replace('<br/>', '<br>')
 
@@ -4481,9 +4623,23 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
         for state in states_dict.values():
+            # Fix tags for state content.
             html = state['content']['html']
-        # Add for translations and tabs collapsible and check the RTE
-            state['content']['html'] = cls._fix_rte(html)
+            state['content']['html'] = cls._fix_rte_tags(html)
+            state['content']['html'] = cls._fix_tabs_and_collapsible_tags(html)
+            # Fix tags for written translations.
+            written_translations = state['written_translations'][
+                'translations_mapping']
+            for language_code_to_written_translation in (
+                written_translations.values()):
+                for translation in (
+                    language_code_to_written_translation.values()):
+                    translation['translation'] = cls._fix_rte_tags(
+                        translation['translation'])
+                    translation['translation'] = (
+                        cls._fix_tabs_and_collapsible_tags(
+                            translation['translation'])
+                    )
 
         return states_dict
 
