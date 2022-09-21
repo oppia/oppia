@@ -38,7 +38,7 @@ var customizeInteraction = async function(elem, customLetters) {
 
 var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    elem.$(
+    await elem.$(
       '<oppia-interactive-math-equation-input>').isExisting()
   ).toBe(true);
   // Testing editor's value in default state.

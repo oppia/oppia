@@ -21,35 +21,6 @@ var suites = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
-
-    embedding: [
-      'protractor_desktop/embedding.js'
-    ],
-
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
-    ],
-
-    explorationFeedbackTab: [
-      'protractor_desktop/explorationFeedbackTab.js'
-    ],
-
-    explorationHistoryTab: [
-      'protractor_desktop/explorationHistoryTab.js'
-    ],
-
-    explorationStatisticsTab: [
-      'protractor_desktop/explorationStatisticsTab.js'
-    ],
-
-    explorationTranslationTab: [
-      'protractor_desktop/explorationTranslationTab.js'
-    ],
-
-    extensions: [
-      'protractor_desktop/extensions.js'
-    ],
-
     featureGating: [
       'protractor/featureGatingFlow.js'
     ],

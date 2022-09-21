@@ -42,6 +42,9 @@ var AdminPage = function() {
   var featuresTab = $('.e2e-test-admin-features-tab');
   var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
   var progressSpinner = $('.e2e-test-progress-spinner');
+  var reloadCollectionButtonsSelector = function() {
+    return $$('.e2e-test-reload-collection-button');
+  };
   var removeRuleButtonLocator = '.e2e-test-remove-rule-button';
   var reloadCollectionButtonsSelector = function() {
     return $$('.e2e-test-reload-collection-button');

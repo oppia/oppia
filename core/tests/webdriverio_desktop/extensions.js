@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,20 +16,20 @@
  * @fileoverview End-to-end tests for rich-text components and interactions.
  */
 
-var action = require('../protractor_utils/action.js');
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var interactions = require('../../../extensions/interactions/protractor.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
-var action = require('../protractor_utils/action.js');
+var action = require('../webdriverio_utils/action.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var interactions = require('../../../extensions/interactions/webdriverio.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
+var action = require('../webdriverio_utils/action.js');
 
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('rich-text components', function() {
   var explorationEditorPage = null;
@@ -44,7 +44,7 @@ describe('rich-text components', function() {
 
   it('should display correctly', async function() {
     await users.createAndLoginUser(
-      'user@richTextComponents.com', 'userRichTextComponents');
+      'user@richTextComponents.com', 'userRichTextComponent');
 
     await workflow.createExploration(true);
 
@@ -148,11 +148,11 @@ describe('Interactions', function() {
 
         // Delete any leftover rules that may remain from previous tests of the
         // same interaction, so they won't interfere with the current test.
-        var deleteResponseButton = element(by.css(
-          '.e2e-test-delete-response'));
-        var confirmDeleteResponseButton = element(by.css(
-          '.e2e-test-confirm-delete-response'));
-        if (await deleteResponseButton.isPresent()) {
+        var deleteResponseButton = $(
+          '.e2e-test-delete-response');
+        var confirmDeleteResponseButton = $(
+          '.e2e-test-confirm-delete-response');
+        if (await deleteResponseButton.isExisting()) {
           await action.click('Delete Response button', deleteResponseButton);
           await action.click(
             'Confirm Delete Response button', confirmDeleteResponseButton);
@@ -185,12 +185,11 @@ describe('Interactions', function() {
             await forms.toRichText('no'));
         }
         // Dismiss conversation help card.
-        var clearHelpcardButton = element(by.css(
-          '.e2e-test-close-help-card-button'));
-        var helpCard = element(
-          by.css('.e2e-test-conversation-skin-help-card'));
-        var isPresent = await clearHelpcardButton.isPresent();
-        if (isPresent) {
+        var clearHelpcardButton = $(
+          '.e2e-test-close-help-card-button');
+        var helpCard = $('.e2e-test-conversation-skin-help-card');
+        var isExisting = await clearHelpcardButton.isExisting();
+        if (isExisting) {
           await action.click('Clear Helper Button', clearHelpcardButton);
           await waitFor.invisibilityOf(
             helpCard, 'Help Card takes too long to disappear.');
@@ -224,13 +223,13 @@ describe('Interactions', function() {
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'), true);
     var graphDictForInput = {
-      vertices: [[277, 77], [248, 179], [405, 144]]
+      vertices: [[-10, -50], [-39, 72], [118, 17]]
     };
     await explorationEditorMainTab.setInteraction(
       'GraphInput', graphDictForInput);
     var graphDictForResponse = {
       edges: [[0, 1], [1, 2], [0, 2]],
-      vertices: [[277, 77], [248, 179], [405, 144]]
+      vertices: [[-10, -50], [-39, 72], [118, 17]]
     };
     await explorationEditorMainTab.addResponse(
       'GraphInput', await forms.toRichText('Good job!'), 'MathExp',
@@ -311,13 +310,13 @@ describe('Interactions', function() {
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'), true);
     var graphDictForInput = {
-      vertices: [[277, 77], [248, 179], [405, 144]]
+      vertices: [[-10, -50], [-39, 72], [118, 17]]
     };
     await explorationEditorMainTab.setInteraction(
       'GraphInput', graphDictForInput);
     var graphDictForResponse = {
       edges: [[0, 1], [1, 2], [0, 2]],
-      vertices: [[277, 77], [248, 179], [405, 144]]
+      vertices: [[-10, -50], [-39, 72], [118, 17]]
     };
     await explorationEditorMainTab.addResponse(
       'GraphInput', await forms.toRichText('Good job!'), 'CodeRepl',
