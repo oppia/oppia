@@ -3428,85 +3428,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return rule_value_f
 
     @classmethod
-    def _text_interaction_contains_rule_should_come_after(
-        cls,
-        answer_groups: List[state_domain.AnswerGroup]
-    ) -> None:
-        """In TextInput interaction `contains` rule should always come
-        after any other rule where the `contains` string is a substring
-        of the other rule's string. Otherwise the other rule will become
-        redundant and will never be match
-
-        Args:
-            answer_groups: List[state_domain.AnswerGroup]. The list of answer
-                groups of a state.
-        """
-        seen_strings_contains = []
-        empty_ans_groups = []
-        for answer_group in answer_groups:
-            invalid_rules = []
-            for rule_spec in answer_group['rule_specs']:
-
-                if rule_spec['rule_type'] == 'Contains':
-                    seen_strings_contains.append(
-                        rule_spec['inputs']['x']['normalizedStrSet'])
-                else:
-                    rule_values = rule_spec['inputs']['x']['normalizedStrSet']
-                    for contain_ele in seen_strings_contains:
-                        for item in contain_ele:
-                            for ele in rule_values:
-                                if item in ele:
-                                    invalid_rules.append(rule_spec)
-            for invalid_rule in invalid_rules:
-                answer_group['rule_specs'].remove(invalid_rule)
-
-            if len(answer_group['rule_specs']) == 0:
-                empty_ans_groups.append(answer_group)
-
-        # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-    @classmethod
-    def _text_interaction_starts_with_rule_should_come_after(
-        cls,
-        answer_groups: List[state_domain.AnswerGroup]
-    ) -> None:
-        """In TextInput interaction `starts-with` rule should always come
-        after any other rule where a `starts-with` string is a prefix of
-        the other rule's string. Otherwise the other rule will become
-        redundant and will never be match
-
-        Args:
-            answer_groups: List[state_domain.AnswerGroup]. The list of answer
-                groups of a state.
-        """
-        seen_strings_startswith = []
-        empty_ans_groups = []
-        for answer_group in answer_groups:
-            invalid_rules = []
-            for rule_spec in answer_group['rule_specs']:
-                if rule_spec['rule_type'] == 'StartsWith':
-                    seen_strings_startswith.append(
-                        rule_spec['inputs']['x']['normalizedStrSet'])
-                else:
-                    rule_values = rule_spec['inputs']['x']['normalizedStrSet']
-                    for start_with_ele in seen_strings_startswith:
-                        for item in start_with_ele:
-                            for ele in rule_values:
-                                if ele.startswith(item):
-                                    invalid_rules.append(rule_spec)
-            for invalid_rule in invalid_rules:
-                answer_group['rule_specs'].remove(invalid_rule)
-
-            if len(answer_group['rule_specs']) == 0:
-                empty_ans_groups.append(answer_group)
-
-        # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-    @classmethod
     def _remove_duplicate_rules_inside_answer_groups(
         cls, answer_groups: List[state_domain.AnswerGroup], state_name: str):
         """Removes the duplicate rules present inside the answer groups. This
@@ -4159,7 +4080,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         invalid_rules = []
         ele_x_at_y_rules = []
         off_by_one_rules = []
-        # Remove duplicate rules
+        # Remove duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         for answer_group in answer_groups:
@@ -4259,9 +4180,38 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_text_input_interaction(
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
-        """
+        """Fixes the TextInput interaction with following checks -
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+        - Text input height shoule be >= 1 and <= 10 else we will replace with
+        10
+        - `Contains` should always come after another `Contains` rule where
+        the first contains rule strings is a substring of the other contains
+        rule strings
+        - `StartsWith` rule should always come after another `StartsWith` rule
+        where the first starts-with string is the prefix of the other
+        starts-with string
+        - `Contains` should always come after `StartsWith` rule where the
+        contains rule strings is a substring of the `StartsWith` rule string
+        - `Contains` should always come after `Equals` rule where the contains
+        rule strings is a substring of the `Equals` rule string
+        - `Contains` should always come after `Equals` rule where the contains
+        rule strings is a substring of the `Equals` rule string
+        - `Startswith` should always come after the `Equals` rule where a
+        `starts-with` string is a prefix of the `Equals` rule's string.
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
         """
         answer_groups = state_dict['interaction']['answer_groups']
+        seen_strings_contains = []
+        seen_strings_startswith = []
+        invalid_rules = []
+        # Remove duplicate rules.
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
         # Text input height shoule be >= 1 and <= 10.
         rows_value = int(
             state_dict['interaction']['customization_args'][
@@ -4270,15 +4220,72 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if rows_value < 1 or rows_value > 10:
             state_dict['interaction']['customization_args'][
                 'rows']['value'] = 10
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+                rule_values = rule_spec['inputs']['x']['normalizedStrSet']
+                if rule_spec['rule_type'] == 'Contains':
+                    # `Contains` should always come after another
+                    # `Contains` rule where the first contains rule
+                    # strings is a substring of the other contains
+                    # rule strings.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    invalid_rules.append(rule_spec)
+                    seen_strings_contains.append(rule_values)
+                elif rule_spec['rule_type'] == 'StartsWith':
+                    # `StartsWith` rule should always come after another
+                    # `StartsWith` rule where the first starts-with string
+                    # is the prefix of the other starts-with string.
+                    for start_with_rule_ele in seen_strings_startswith:
+                        for start_with_rule_string in start_with_rule_ele:
+                            for rule_value in rule_values:
+                                if rule_value.startswith(
+                                    start_with_rule_string):
+                                    invalid_rules.append(rule_spec)
+                    # `Contains` should always come after `StartsWith` rule
+                    # where the contains rule strings is a substring
+                    # of the `StartsWith` rule string.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    invalid_rules.append(rule_spec)
+                    seen_strings_startswith.append(rule_values)
+                elif rule_spec.rule_type == 'Equals':
+                    # `Contains` should always come after `Equals` rule
+                    # where the contains rule strings is a substring
+                    # of the `Equals` rule string.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    invalid_rules.append(rule_spec)
+                    # `Startswith` should always come after the `Equals`
+                    # rule where a `starts-with` string is a prefix of the
+                    # `Equals` rule's string.
+                    for start_with_rule_ele in seen_strings_startswith:
+                        for start_with_rule_string in start_with_rule_ele:
+                            for rule_value in rule_values:
+                                if rule_value.startswith(
+                                    start_with_rule_string):
+                                    invalid_rules.append(rule_spec)
 
-        cls._text_interaction_contains_rule_should_come_after(
-            answer_groups)
+        empty_ans_groups = []
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
 
-        cls._text_interaction_starts_with_rule_should_come_after(
-            answer_groups)
+                if len(answer_group['rule_specs']) == 0:
+                    empty_ans_groups.append(answer_group)
 
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
+        # Removal of empty answer groups.
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
         state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
