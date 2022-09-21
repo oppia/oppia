@@ -293,7 +293,7 @@
   justify-content: center;
 }
 
-.save-progress-btn-box:hover + .oppia-lesson-info-card .save-progress-btn-tooltip {
+.oppia-lesson-info-card .save-progress-btn-box:hover + .oppia-lesson-info-card .save-progress-btn-tooltip {
   display: block;
 }
 
