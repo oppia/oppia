@@ -3306,126 +3306,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             answer_groups.remove(empty_ans_group)
 
     @classmethod
-    def _equals_should_come_before_idx_rule(
-        cls, answer_groups: List[state_domain.AnswerGroup]
-    ) -> None:
-        """Performs the following -
-            - Inside DragAndDrop interaction the `Equals` rule should always
-            come before `HasElementXAtPositionY` where the element `X` is
-            present at position `Y` inside `Equals` rule otherwise the rule will
-            never going to match, this helper functions simply removes the
-            `Equals` rules as it will never going to match
-            - Rule `IsEqualToOrdering` having empty values is removed
-
-        Args:
-            answer_groups: List[state_domain.AnswerGroup]. The answer group.
-        """
-        ele_x_at_y_rules = []
-        rules_to_remove = []
-        for answer_group in answer_groups:
-            for rule_spec in answer_group['rule_specs']:
-                if rule_spec['rule_type'] == 'HasElementXAtPositionY':
-                    element = rule_spec['inputs']['x']
-                    position = rule_spec['inputs']['y']
-                    ele_x_at_y_rules.append(
-                        {'element': element, 'position': position}
-                    )
-
-                if rule_spec['rule_type'] == 'IsEqualToOrdering':
-                    if len(rule_spec['inputs']['x']) <= 0:
-                        rules_to_remove.append(rule_spec)
-                        continue
-                    for ele in ele_x_at_y_rules:
-                        ele_position = ele['position']
-                        ele_element = ele['element']
-                        rule_choice = rule_spec['inputs']['x'][
-                            ele_position - 1]
-
-                        if len(rule_choice) == 0:
-                            rules_to_remove.append(rule_spec)
-                            continue
-
-                        elif (
-                            len(rule_choice) == 1 and
-                            rule_choice[0] == ele_element
-                        ):
-                            rules_to_remove.append(rule_spec)
-
-                        else:
-                            for choice in rule_choice:
-                                if choice == ele_element:
-                                    rules_to_remove.append(rule_spec)
-
-        empty_ans_groups = []
-        for rule_to_remove in rules_to_remove:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    if rule_to_remove == rule_spec:
-                        answer_group['rule_specs'].remove(rule_to_remove)
-
-                if len(answer_group['rule_specs']) == 0:
-                    empty_ans_groups.append(answer_group)
-
-        # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-    @classmethod
-    def _equals_should_come_before_misplace_by_one_rule(
-        cls, answer_groups: List[state_domain.AnswerGroup]
-    ) -> None:
-        """Inside DragAndDrop interaction the `Equals` rule should always come
-        before `IsEqualToOrderingWithOneItemAtIncorrectPosition` otherwise the
-        rule will never going to match, this helper functions simply removes
-        the `Equals` rules as it will never going to match
-
-        Args:
-            answer_groups: List[state_domain.AnswerGroup]. The answer group.
-        """
-        off_by_one_rules = []
-        rules_to_remove = []
-        for answer_group in answer_groups:
-            for rule_spec in answer_group['rule_specs']:
-                if (
-                        rule_spec['rule_type'] ==
-                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-                ):
-                    off_by_one_rules.append(
-                        rule_spec['inputs']['x']
-                    )
-
-                if rule_spec['rule_type'] == 'IsEqualToOrdering':
-                    item_to_layer_idx = {}
-                    for layer_idx, layer in enumerate(
-                        rule_spec['inputs']['x']
-                    ):
-                        for item in layer:
-                            item_to_layer_idx[item] = layer_idx
-
-                    for ele in off_by_one_rules:
-                        wrong_positions = 0
-                        for layer_idx, layer in enumerate(ele):
-                            for item in layer:
-                                if layer_idx != item_to_layer_idx[item]:
-                                    wrong_positions += 1
-                        if wrong_positions <= 1:
-                            rules_to_remove.append(rule_spec)
-
-        empty_ans_groups = []
-        for rule_to_remove in rules_to_remove:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    if rule_to_remove == rule_spec:
-                        answer_group['rule_specs'].remove(rule_to_remove)
-
-                if len(answer_group['rule_specs']) == 0:
-                    empty_ans_groups.append(answer_group)
-
-        # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-    @classmethod
     def _set_lower_and_upper_bounds(
         cls, range_var, lower_bound, upper_bound,
         lb_inclusive, ub_inclusive
@@ -3629,7 +3509,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _remove_duplicate_rules_inside_answer_groups(
         cls, answer_groups: List[state_domain.AnswerGroup], state_name: str):
-        """
+        """Removes the duplicate rules present inside the answer groups. This
+        will simply removes the rule which do not point to another state
+        to avoid state disconnection. If both of them do not point to different
+        state we will simply remove the later one
+
+        Args:
+            answer_groups: List[state_domain.AnswerGroup]. The answer groups
+                present inside the state.
+            state_name: str. The state name.
         """
         rules_to_remove_with_diff_dest_node = []
         rules_to_remove_with_try_again_dest_node = []
@@ -3714,7 +3602,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_continue_interaction(
         cls, state_dict: state_domain.StateDict, language_code: str
     ) -> None:
-        """
+        """Fixes Continue interaction where the length of the text value
+        is more than 20. We simply replace them with the word `Continue`
+        according to the language code
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary.
+            language_code: str. The language code of the exploration.
         """
         # Text should have a max-length of 20.
         text_value = state_dict['interaction'][
@@ -3794,7 +3688,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_end_interaction(cls, state_dict: state_domain.StateDict) -> None:
-        """
+        """Fixes the End exploration interaction where the recommended
+        explorations are more than 3. We simply slice them till the
+        length 3.
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary.
         """
         # Should be at most 3 recommended explorations.
         recc_exp_ids = state_dict['interaction'][
@@ -4227,7 +4126,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_drag_and_drop_input_interaction(
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
-        """
+        """Fixes the DragAndDropInput interaction with following checks -
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+        - Multiple items cannot be in the same place iff the setting is
+        turned off. Rule will simply be removed
+        - `IsEqualToOrderingWithOneItemAtIncorrectPosition` rule should
+        not be present when `multiple items at same place` setting
+        is turned off. Rule will simply be removed
+        - In `HasElementXBeforeElementY` rule, `X` value should not be
+        equal to `Y` value. Rule will simply be removed
+        - Rule `IsEqualToOrdering` having empty values is removed
+        - The `Equals` rule should always come before `HasElementXAtPositionY`
+        where the element `X` is present at position `Y` inside `Equals`
+        rule otherwise the rule will never going to match. We will simply remove
+        the `Equals` rule as it will never going to match
+        - The `Equals` rule should always come before
+        `IsEqualToOrderingWithOneItemAtIncorrectPosition` otherwise the
+        rule will never going to match. We will simply remove
+        the `Equals` rule as it will never going to match
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
         """
         answer_groups = state_dict['interaction']['answer_groups']
         multi_item_value = (
@@ -4235,27 +4157,87 @@ class Exploration(translation_domain.BaseTranslatableObject):
             ['allowMultipleItemsInSamePosition']['value']
         )
         invalid_rules = []
+        ele_x_at_y_rules = []
+        off_by_one_rules = []
+        # Remove duplicate rules
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
         for answer_group in answer_groups:
             for rule_spec in answer_group['rule_specs']:
-                # Multi items in same place iff setting on.
+                # Multiple items cannot be in the same place iff the
+                # setting is turned off.
                 if not multi_item_value:
                     for ele in rule_spec['inputs']['x']:
                         if len(ele) > 1:
                             invalid_rules.append(rule_spec)
 
-                # == +/- 1 no option if multi item set off.
-                if not multi_item_value:
-                    if rule_spec['rule_type'] == (
-                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
-                        invalid_rules.append(rule_spec)
-
-                # Validates for a < b, a should not be the same as b.
                 if (
+                    rule_spec['rule_type'] ==
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                ):
+                    # `IsEqualToOrderingWithOneItemAtIncorrectPosition`
+                    # rule should not be present when `multiple items at same
+                    # place` setting is turned off.
+                    if not multi_item_value:
+                        invalid_rules.append(rule_spec)
+                    off_by_one_rules.append(
+                        rule_spec['inputs']['x']
+                    )
+
+                # In `HasElementXBeforeElementY` rule, `X` value
+                # should not be equal to `Y` value.
+                elif (
                     rule_spec['rule_type'] ==
                     'HasElementXBeforeElementY' and rule_spec[
                         'inputs']['x'] == rule_spec['inputs']['y']
                 ):
                     invalid_rules.append(rule_spec)
+
+                elif rule_spec['rule_type'] == 'HasElementXAtPositionY':
+                    element = rule_spec['inputs']['x']
+                    position = rule_spec['inputs']['y']
+                    ele_x_at_y_rules.append(
+                        {'element': element, 'position': position}
+                    )
+
+                elif rule_spec['rule_type'] == 'IsEqualToOrdering':
+                    # `IsEqualToOrdering` rule should not have empty values.
+                    if len(rule_spec['inputs']['x']) <= 0:
+                        invalid_rules.append(rule_spec)
+                    else:
+                        # `IsEqualToOrdering` rule should always come before
+                        # `HasElementXAtPositionY` where element `X` is present
+                        # at position `Y` in `IsEqualToOrdering` rule.
+                        for ele in ele_x_at_y_rules:
+                            ele_position = ele['position']
+                            ele_element = ele['element']
+                            rule_choice = rule_spec['inputs']['x'][
+                                ele_position - 1]
+
+                            if len(rule_choice) == 0:
+                                invalid_rules.append(rule_spec)
+                            else:
+                                for choice in rule_choice:
+                                    if choice == ele_element:
+                                        invalid_rules.append(rule_spec)
+
+                        # `IsEqualToOrdering` should always come before
+                        # `IsEqualToOrderingWithOneItemAtIncorrectPosition` when
+                        # they are off by one value.
+                        item_to_layer_idx = {}
+                        for layer_idx, layer in enumerate(
+                            rule_spec['inputs']['x']):
+                            for item in layer:
+                                item_to_layer_idx[item] = layer_idx
+
+                        for ele in off_by_one_rules:
+                            wrong_positions = 0
+                            for layer_idx, layer in enumerate(ele):
+                                for item in layer:
+                                    if layer_idx != item_to_layer_idx[item]:
+                                        wrong_positions += 1
+                            if wrong_positions <= 1:
+                                invalid_rules.append(rule_spec)
 
         empty_ans_groups = []
         for invalid_rule in invalid_rules:
@@ -4271,20 +4253,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
-        # `==` should come before idx(a) == b if it satisfies
-        # that condition.
-        cls._equals_should_come_before_idx_rule(
-            answer_groups)
-
-        # `==` should come before == +/- 1 if they are off by
-        # at most 1 value.
-        cls._equals_should_come_before_misplace_by_one_rule(
-            answer_groups)
-
         state_dict['interaction']['answer_groups'] = answer_groups
-
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
 
     @classmethod
     def _fix_text_input_interaction(
@@ -4804,6 +4773,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return exploration_dict
 
+    @classmethod
     def _convert_v56_dict_to_v57_dict(
         cls, exploration_dict: VersionedExplorationDict
     ) -> VersionedExplorationDict:
