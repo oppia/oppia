@@ -4131,7 +4131,8 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         })
         state.update_next_content_id_index(2)
         # Here, state is a State domain object and it is created using

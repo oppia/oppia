@@ -47,14 +47,14 @@ export class InteractiveTextInputComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() placeholderWithValue!: string;
   @Input() rowsWithValue!: string;
-  @Input() catchMisspellingsWithValue!: string;
+  @Input() catchMisspellingsWithValue: string = '';
   @Input() savedSolution!: TextInputAnswer;
   @Input() labelForFocusTarget!: string;
   answer!: TextInputAnswer;
   placeholder!: string;
   schema!: TextInputSchema;
   rows!: number;
-  catchMisspellings!: boolean;
+  catchMisspellings: boolean = false;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
