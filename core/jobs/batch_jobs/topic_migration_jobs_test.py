@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -240,7 +240,10 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         )
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
+            )
         ])
 
         migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)

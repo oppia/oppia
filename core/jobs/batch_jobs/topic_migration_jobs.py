@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -246,6 +246,10 @@ class MigrateTopicJob(base_jobs.JobBase):
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+        )
+
+        transformed_topic_objects_list = (
+            topic_objects_list
             | 'Remove unmigrated topics' >> beam.Filter(
                 lambda x: len(x['topic_changes']) > 0 and len(x['topic']) > 0)
             | 'Reorganize the topic objects' >> beam.Map(lambda objects: {
@@ -254,17 +258,29 @@ class MigrateTopicJob(base_jobs.JobBase):
                     'topic': objects['topic'][0],
                     'topic_changes': objects['topic_changes']
                 })
+
+        )
+
+        already_migrated_job_run_results = (
+            topic_objects_list
+            | 'Remove migrated jobs' >> beam.Filter(
+                lambda x: (
+                        len(x['topic_changes']) == 0 and len(x['topic']) > 0
+                ))
+            | 'Transform previously migrated topics into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOPIC PREVIOUSLY MIGRATED'))
         )
 
         topic_objects_list_job_run_results = (
-            topic_objects_list
+            transformed_topic_objects_list
             | 'Transform topic objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'TOPIC MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
-            topic_objects_list
+            transformed_topic_objects_list
             | 'Delete topic from cache' >> beam.Map(
                 lambda topic_object: self._delete_topic_from_cache(
                     topic_object['topic']))
@@ -273,7 +289,7 @@ class MigrateTopicJob(base_jobs.JobBase):
         )
 
         topic_models_to_put = (
-            topic_objects_list
+            transformed_topic_objects_list
             | 'Generate topic models to put' >> beam.FlatMap(
                 lambda topic_objects: self._update_topic(
                     topic_objects['topic_model'],
@@ -283,7 +299,7 @@ class MigrateTopicJob(base_jobs.JobBase):
         )
 
         topic_summary_model_to_put = (
-            topic_objects_list
+            transformed_topic_objects_list
             | 'Generate topic summary to put' >> beam.Map(
                 lambda topic_objects: self._update_topic_summary(
                     topic_objects['topic'],
@@ -301,6 +317,7 @@ class MigrateTopicJob(base_jobs.JobBase):
             (
                 cache_deletion_job_run_results,
                 migrated_topic_job_run_results,
+                already_migrated_job_run_results,
                 topic_objects_list_job_run_results
             )
             | beam.Flatten()
