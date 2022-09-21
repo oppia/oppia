@@ -20,32 +20,28 @@
             <object-editor [modalId]="modalId"
                            [objType]="'SetOfTranslatableHtmlContentIds'"
                            [initArgs]="{choices: ruleDescriptionChoices}"
-                           [(ngModel)]="rule.inputs[item.varName]"
-                           [ngModelOptions]="{standalone: true}">
+                           [(value)]="rule.inputs[item.varName]">
             </object-editor>
           </span>
           <span *ngIf="item.type == 'dropdown'" class="text-dark">
             <object-editor [modalId]="modalId"
                            [objType]="'ListOfSetsOfTranslatableHtmlContentIds'"
                            [initArgs]="{choices: ruleDescriptionChoices}"
-                           [(ngModel)]="rule.inputs[item.varName]"
-                           [ngModelOptions]="{standalone: true}">
+                           [(value)]="rule.inputs[item.varName]">
             </object-editor>
           </span>
           <span *ngIf="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
             <object-editor [modalId]="modalId"
                            [objType]="'TranslatableHtmlContentId'"
                            [initArgs]="{choices: ruleDescriptionChoices}"
-                           [(ngModel)]="rule.inputs[item.varName]"
-                           [ngModelOptions]="{standalone: true}">
+                           [(value)]="rule.inputs[item.varName]">
             </object-editor>
           </span>
           <span *ngIf="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
             <object-editor [modalId]="modalId"
                            [objType]="'DragAndDropPositiveInt'"
                            [initArgs]="{choices: ruleDescriptionChoices}"
-                           [(ngModel)]="rule.inputs[item.varName]"
-                           [ngModelOptions]="{standalone: true}">
+                           [(value)]="rule.inputs[item.varName]">
             </object-editor>
           </span>
           <span *ngIf="item.type != 'select' &&
@@ -58,8 +54,7 @@
                            [objType]="item.type"
                            [isEditable]="isEditable"
                            [alwaysEditable]="true"
-                           [(ngModel)]="rule.inputs[item.varName]"
-                           [ngModelOptions]="{standalone: true}"
+                           [(value)]="rule.inputs[item.varName]"
                            class="text-dark">
             </object-editor>
           </span>

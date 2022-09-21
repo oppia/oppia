@@ -72,9 +72,9 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected generator ID to be a string'
         ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             param_domain.ParamChange(
                 'abc',
                 123,  # type: ignore[arg-type]
@@ -95,9 +95,9 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected a dict'
         ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()  # type: ignore[arg-type]
 
         # Raise an error because the param_change name is not a string.
@@ -105,9 +105,9 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected param_change name to be a string, received'
         ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             param_domain.ParamChange(
                 3,  # type: ignore[arg-type]
                 'Copier',
@@ -118,9 +118,9 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         # strings.
         with self.assertRaisesRegex(
             Exception, 'Invalid parameter change customization_arg name:'):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             customization_args_dict = {1: '1'}
             param_domain.ParamChange(
                 'abc', 'Copier', customization_args_dict  # type: ignore[arg-type]
