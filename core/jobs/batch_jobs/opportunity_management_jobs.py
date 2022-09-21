@@ -208,10 +208,17 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             # We are using itertools.chain.from_iterable to flatten
             # question_skill_links from a 2D list into a 1D list.
             | 'Flatten skill and question_skill_links' >> beam.Map(
-                lambda object: {
-                    'skill': list(object['skill'][0])[0],
-                    'question_skill_links': list(itertools.chain.from_iterable(
-                        object['question_skill_links']))
+                lambda skill_and_question_skill_links_object: {
+                    'skill': list(
+                        skill_and_question_skill_links_object['skill'][0]
+                    )[0],
+                    'question_skill_links': list(
+                        itertools.chain.from_iterable(
+                            skill_and_question_skill_links_object[
+                                'question_skill_links'
+                            ]
+                        )
+                    )
                 }
             )
         )
@@ -219,10 +226,12 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
         opportunities_results = (
             skills_with_question_counts
             | beam.Map(
-                lambda object:
+                lambda skills_with_question_counts_object:
                     self._create_skill_opportunity_model(
-                        object['skill'],
-                        object['question_skill_links']
+                        skills_with_question_counts_object['skill'],
+                        skills_with_question_counts_object[
+                            'question_skill_links'
+                        ]
             ))
         )
 

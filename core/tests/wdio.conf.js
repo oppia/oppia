@@ -333,10 +333,17 @@ exports.config = {
         console.log(`ffmpeg exited with code ${code}`);
       });
     }
-    // Set a wide enough window size for the navbar in the library pages to
-    // display fully.
-    browser.setWindowSize(1285, 1000);
+    // eslint-disable-next-line eqeqeq
+    mobileViewportArg = process.env.MOBILE == 'true';
 
+    // eslint-disable-next-line eqeqeq
+    if (mobileViewportArg) {
+      browser.setWindowSize(600, 1000);
+    } else {
+      // Set a wide enough window size for the navbar in the library pages to
+      // display fully.
+      browser.setWindowSize(1285, 1000);
+    }
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';

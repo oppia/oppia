@@ -97,6 +97,10 @@ _PARSER.add_argument(
     '--source_maps',
     help='Build webpack with source maps.',
     action='store_true')
+_PARSER.add_argument(
+    '--mobile',
+    help='Run e2e test in mobile viewport.',
+    action='store_true')
 
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
@@ -143,6 +147,10 @@ SUITES_STILL_IN_PROTRACTOR = [
     'library',
     'playVoiceovers',
     'publication',
+]
+
+MOBILE_SUITES = [
+    'contributorDashboard'
 ]
 
 
@@ -259,6 +267,13 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
+        if (args.mobile) and (args.suite not in MOBILE_SUITES):
+            print(
+                f'The {args.suite} suite should not be run ' +
+                'in the mobile viewport'
+                )
+            sys.exit(1)
+
         if args.suite == 'full':
             stack.enter_context(servers.managed_webdriver_server(
                 chrome_version=args.chrome_driver_version))
@@ -269,6 +284,7 @@ def run_tests(args):
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
                 sharding_instances=args.sharding_instances,
+                mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
             print('WebdriverIO suites are starting to run')
@@ -278,6 +294,7 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
                 sharding_instances=args.sharding_instances,
+                mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
         elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
@@ -287,6 +304,7 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
                 sharding_instances=args.sharding_instances,
+                mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
             print(
@@ -303,6 +321,7 @@ def run_tests(args):
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
                 sharding_instances=args.sharding_instances,
+                mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
             print(
