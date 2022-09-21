@@ -3330,50 +3330,50 @@ class Exploration(translation_domain.BaseTranslatableObject):
         range_var['ub_inclusive'] = ub_inclusive
 
     @classmethod
-    def _is_enclosed_by(cls, range_compare_to, range_compare_with) -> bool:
+    def _is_enclosed_by(cls, range_compare_for, range_compare_with) -> bool:
         """Helper function for NumericInput and FractionInput interaction,
         Checks whether the ranges of rules enclosed or not
 
         Args:
-            range_compare_to: dict[str, Any]. To keep track of each rule's
+            range_compare_for: dict[str, Any]. It represents the variable for
+                which we have to check the range. It keeps track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive, It represents the variable for
-                which we have to check the range.
-            range_compare_with: dict[str, Any]. To keep track of other rule's
+                lb inclusive, ub inclusive.
+            range_compare_with: dict[str, Any]. It is the variable to which the
+                range is compared. It keeps track of other rule's
                 ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive, It is the variable to which the
-                range is compared.
+                lb inclusive, ub inclusive.
 
         Returns:
             is_enclosed: bool. Returns True if both rule's ranges are enclosed.
         """
         if (
             range_compare_with['lower_bound'] is None or
-            range_compare_to['lower_bound'] is None or
+            range_compare_for['lower_bound'] is None or
             range_compare_with['upper_bound'] is None or
-            range_compare_to['upper_bound'] is None
+            range_compare_for['upper_bound'] is None
         ):
             return False
         lb_satisfied = (
-            range_compare_with['lower_bound'] < range_compare_to[
+            range_compare_with['lower_bound'] < range_compare_for[
                 'lower_bound'] or
             (
-                range_compare_with['lower_bound'] == range_compare_to[
+                range_compare_with['lower_bound'] == range_compare_for[
                     'lower_bound'] and
                 (
-                    not range_compare_to['lb_inclusive'] or
+                    not range_compare_for['lb_inclusive'] or
                     range_compare_with['lb_inclusive']
                 )
             )
         )
         ub_satisfied = (
-            range_compare_with['upper_bound'] > range_compare_to[
+            range_compare_with['upper_bound'] > range_compare_for[
                 'upper_bound'] or
             (
-                range_compare_with['upper_bound'] == range_compare_to[
+                range_compare_with['upper_bound'] == range_compare_for[
                     'upper_bound'] and
                 (
-                    not range_compare_to['ub_inclusive'] or
+                    not range_compare_for['ub_inclusive'] or
                     range_compare_with['ub_inclusive']
                 )
             )
@@ -3407,7 +3407,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _get_rule_value_of_fraction_interaction(
         cls, rule_spec: state_domain.RuleSpec
     ) -> float:
-        """Return rule value of the rule_spec of FractionInput interaction
+        """Return rule value of the rule_spec of FractionInput interaction so
+        that we can keep track of rule's range
 
         Args:
             rule_spec: (state_domain.RuleSpec). Rule spec of an answer group.
@@ -3630,6 +3631,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
         """Fixes NumericInput interaction for the following cases -
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
         - The rule should not match previous rules solution means it should
         not be in the range of previous rules solution otherwise the later
         answer group will be redundant and will never be matched. Simply the
@@ -3641,8 +3644,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         converted to positive value
         - `a` should not be greater than `b` in `IsInclusivelyBetween` rule else
         we will simply swap them
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
 
         Args:
             state_dict: state_domain.StateDict. The state dictionary that needs
@@ -3654,6 +3655,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         upper_infinity = float('inf')
         invalid_rules = []
         ranges = []
+        # Remove duplicate rules.
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
         # All rules should have solutions that do not match
         # previous rules' solutions.
         for ans_group_index, answer_group in enumerate(answer_groups):
@@ -3770,8 +3774,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
         state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
@@ -3799,6 +3801,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         ranges = []
         invalid_rules = []
         matched_denominator_list = []
+        # Remove duplicate rules.
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
         for ans_group_index, answer_group in enumerate(answer_groups):
             for rule_spec_index, rule_spec in enumerate(
                 answer_group['rule_specs']):
@@ -3893,8 +3898,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
         state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
@@ -3902,12 +3905,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
         """Fixes MultipleChoiceInput interaction for the following cases -
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
         - No answer choice should appear in more than one rule else the
         latter rule will be removed
         - Answer choices should be non-empty and unique else will be fixed
         accordingly
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
 
         Args:
             state_dict: state_domain.StateDict. The state dictionary that needs
@@ -3917,6 +3920,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         selected_equals_choices = []
         empty_ans_groups = []
         answer_groups = state_dict['interaction']['answer_groups']
+        # Removal of duplicate rules.
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
         # No answer choice should appear in more than one rule.
         for answer_group in answer_groups:
             unwanted_rule = []
@@ -3946,10 +3952,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls._choices_should_be_unique_and_non_empty(
             choices, answer_groups)
 
-        # Removal of duplicate rules.
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
-
         state_dict['interaction']['customization_args']['choices'][
             'value'] = choices
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -3959,6 +3961,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
         """Fixes ItemSelectionInput interaction for the following cases -
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
         - `Equals` rule should have value between min and max number
         of selections else the rule will be removed
         - Minimum number of selections should be no greater than
@@ -3967,8 +3971,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         else the minimum value will be set to 1
         - All choices should be unique and non-empty else will be handled
         accordingly
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
 
         Args:
             state_dict: state_domain.StateDict. The state dictionary that needs
@@ -3988,6 +3990,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'choices']['value']
         )
         answer_groups = state_dict['interaction']['answer_groups']
+
+        # Rules should not be duplicate.
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
 
         empty_ans_groups = []
         for answer_group in answer_groups:
@@ -4032,9 +4038,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls._choices_should_be_unique_and_non_empty(
             choices, answer_groups, True)
 
-        # Rules should not be duplicate.
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
         state_dict['interaction']['customization_args'][
             'minAllowableSelectionCount']['value'] = min_value
         state_dict['interaction']['customization_args'][
