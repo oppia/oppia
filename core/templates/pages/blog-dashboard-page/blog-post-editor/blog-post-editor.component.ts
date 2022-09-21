@@ -337,9 +337,7 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   isPublishButtonDisabled(): boolean {
-    if (
-      this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0
-    ) {
+    if (this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0) {
       return true;
     } else if (this.newChangesAreMade) {
       return false;
