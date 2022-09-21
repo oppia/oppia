@@ -3209,6 +3209,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
+    # ########################################################.
+    # Fix validation errors for exploration state interaction.
+    # ########################################################.
     @classmethod
     def _choices_should_be_unique_and_non_empty(
         cls, choices: List[str],
@@ -3348,7 +3351,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     ) -> None:
         """Performs the following -
             - Inside DragAndDrop interaction the `Equals` rule should always
-            come before `HasElementXAtPositionY` otherwise the rule will
+            come before `HasElementXAtPositionY` where the element `X` is
+            present at position `Y` inside `Equals` rule otherwise the rule will
             never going to match, this helper functions simply removes the
             `Equals` rules as it will never going to match
             - Rule `IsEqualToOrdering` having empty values is removed
@@ -3560,16 +3564,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
         )
 
     @classmethod
-    def _numeric_ans_group_should_not_be_subset(
+    def _numeric_interaction_rules_range_should_not_intersect(
         cls, answer_groups: List[state_domain.AnswerGroup]
     ) -> None:
-        """An answer group should not be a subset of another answer group in
-        NumericInput interaction otherwise the later answer group will be
-        redundant and will never be matched. Simply the invalid rule will be
-        removed and if only one rule is present then the complete answer group
-        is removed. As this interaction is only for the numeric values, all
-        the values present inside the rule should not be string, the rule will
-        be considered as invalid
+        """Helper function for NumericInput interaction where rule should
+        not match previous rules solution or should not be
+        in the range of previous rules solution otherwise the later answer
+        group will be redundant and will never be matched. Simply the invalid
+        rule will be removed and if only one rule is present then the complete
+        answer group is removed.
+        As this interaction is only for the numeric values, all string values
+        will be considered as invalid and will be removed
 
         Args:
             answer_groups: List[state_domain.AnswerGroup]. The answer group.
@@ -3695,11 +3700,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         rule_value_f = rule_spec['inputs']['f']
         if rule_value_f['wholeNumber'] == 0:
-            rule_value_f = float(
-                rule_value_f['numerator'] / rule_value_f['denominator']
-            )
+            rule_value_f = rule_value_f['numerator'] / rule_value_f[
+                'denominator']
         else:
-            rule_value_f = float(
+            rule_value_f = (
                 rule_value_f['wholeNumber'] +
                 rule_value_f['numerator'] / rule_value_f['denominator']
             )
@@ -4086,34 +4090,150 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_numeric_input_interaction(
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
-        """
+        """Fixes NumericInput interaction for the following cases -
+        - The rule should not match previous rules solution means it should
+        not be in the range of previous rules solution otherwise the later
+        answer group will be redundant and will never be matched. Simply the
+        invalid rule will be removed and if only one rule is present then the
+        complete answer group is removed
+        - As this interaction is only for the numeric values, all string values
+        will be considered as invalid and will be removed
+        - `tol` value in `IsWithinTolerance` rule must be positive else will be
+        converted to positive value
+        - `a` should not be greater than `b` in `IsInclusivelyBetween` rule else
+        we will simply swap them
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
         """
         answer_groups = state_dict['interaction']['answer_groups']
-        # Each answer group should not be a subset of any answer
-        # group that comes before it.
-        cls._numeric_ans_group_should_not_be_subset(answer_groups)
-        for answer_group in answer_groups:
-            for rule_spec in answer_group['rule_specs']:
-                # For x in [a-b, a+b], b must be a positive value.
-                if rule_spec['rule_type'] == 'IsWithinTolerance':
-                    tol = rule_spec['inputs']['tol']
-                    if tol <= 0:
-                        rule_spec['inputs']['tol'] = abs(tol)
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        invalid_rules = []
+        ranges = []
+        # All rules should have solutions that do not match
+        # previous rules' solutions.
+        for ans_group_index, answer_group in enumerate(answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group['rule_specs']):
+                range_var = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+                if rule_spec['rule_type'] == 'IsLessThanOrEqualTo':
+                    try:
+                        rule_value = float(rule_spec['inputs']['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var, lower_infinity,
+                            rule_value, False, True
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
 
-                # For x in [a, b], a must not be greater than b.
-                if rule_spec['rule_type'] == 'IsInclusivelyBetween':
-                    if (
-                        rule_spec['inputs']['a'] > rule_spec[
-                            'inputs']['b']
-                    ):
-                        rule_spec['inputs']['a'], rule_spec[
-                            'inputs']['b'] = rule_spec['inputs'][
-                                'b'], rule_spec['inputs']['a']
+                elif rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
+                    try:
+                        rule_value = float(rule_spec['inputs']['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, True, False
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
 
-        state_dict['interaction']['answer_groups'] = answer_groups
+                elif rule_spec['rule_type'] == 'Equals':
+                    try:
+                        rule_value = float(rule_spec['inputs']['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            rule_value, True, True
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                elif rule_spec['rule_type'] == 'IsLessThan':
+                    try:
+                        rule_value = float(rule_spec['inputs']['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var, lower_infinity,
+                            rule_value, False, False
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                elif rule_spec['rule_type'] == 'IsWithinTolerance':
+                    try:
+                        rule_value_x = rule_spec['inputs']['x']
+                        rule_value_tol = rule_spec['inputs']['tol']
+                        # For x in [a-b, a+b], b must be a positive value.
+                        if rule_value_tol <= 0:
+                            rule_spec['inputs']['tol'] = abs(rule_value_tol)
+                        rule_value_x = float(rule_value_x)
+                        rule_value_tol = float(rule_value_tol)
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value_x - rule_value_tol,
+                            rule_value_x + rule_value_tol, True, True
+                        )
+                    except Exception:
+                        pass
+
+                elif rule_spec['rule_type'] == 'IsGreaterThan':
+                    try:
+                        rule_value = float(rule_spec['inputs']['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, False, False
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                elif rule_spec['rule_type'] == 'IsInclusivelyBetween':
+                    try:
+                        rule_value_a = rule_spec['inputs']['a']
+                        rule_value_b = rule_spec['inputs']['b']
+                        # For x in [a, b], a must not be greater than b.
+                        if rule_value_a > rule_value_b:
+                            rule_value_a, rule_value_b = (
+                                rule_value_b, rule_value_a)
+                        rule_value_a = float(rule_value_a)
+                        rule_value_b = float(rule_value_b)
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value_a,
+                            rule_value_b, True, True
+                        )
+                    except Exception:
+                        pass
+
+                for range_ele in ranges:
+                    if cls._is_enclosed_by(range_var, range_ele):
+                        invalid_rules.append(rule_spec)
+                ranges.append(range_var)
+
+        # Removing all the invalid rules.
+        empty_ans_groups = []
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if len(answer_group['rule_specs']) == 0:
+                    empty_ans_groups.append(answer_group)
+
+        # Removal of empty answer groups.
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
+        state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
     def _fix_fraction_input_interaction(
@@ -4129,10 +4249,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 answer_groups
             )
         )
-        state_dict['interaction']['answer_groups'] = answer_groups
-
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
+        state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
     def _fix_multiple_choice_input_interaction(
@@ -4174,12 +4293,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         cls._choices_should_be_unique_and_non_empty(
             choices, answer_groups)
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
         state_dict['interaction']['customization_args']['choices'][
             'value'] = choices
         state_dict['interaction']['answer_groups'] = answer_groups
-
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
 
     @classmethod
     def _fix_item_selection_input_interaction(
@@ -4245,18 +4363,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if len(choices) < min_value:
             min_value = 1
 
+        cls._choices_should_be_unique_and_non_empty(
+            choices, answer_groups, True)
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
         state_dict['interaction']['customization_args'][
             'minAllowableSelectionCount']['value'] = min_value
         state_dict['interaction']['customization_args'][
             'maxAllowableSelectionCount']['value'] = max_value
-        cls._choices_should_be_unique_and_non_empty(
-            choices, answer_groups, True)
         state_dict['interaction']['customization_args']['choices'][
             'value'] = choices
         state_dict['interaction']['answer_groups'] = answer_groups
-
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
 
     @classmethod
     def _fix_drag_and_drop_input_interaction(
@@ -4343,14 +4460,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls._text_interaction_starts_with_rule_should_come_after(
             answer_groups)
 
-        state_dict['interaction']['answer_groups'] = answer_groups
-
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
+        state_dict['interaction']['answer_groups'] = answer_groups
 
-    # ########################################################.
-    # Fix validation errors for exploration state interaction.
-    # ########################################################.
     @classmethod
     def _update_general_state_interaction(
         cls, states_dict: Dict[str, state_domain.StateDict],
