@@ -293,7 +293,7 @@
   justify-content: center;
 }
 
-.save-progress-btn-box:hover + .save-progress-btn-tooltip {
+.save-progress-btn-box:hover + .save-progress-btn-container .save-progress-btn-tooltip {
   display: block;
 }
 
