@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: built-webpack
-          path: /home/runner/work/oppia
+          path: /home/runner/work/oppia/oppia/build
   e2e_prototype_additional_editor_and_player:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -67,6 +67,17 @@ jobs:
         name: Check if PR is low-risk
         uses: ./.github/actions/check-if-pr-is-low-risk
       - uses: ./.github/actions/merge
+      - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: /home/runner/work/oppia/yarn_cache
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
       - name: download webpack
         uses: actions/download-artifact@v2
         with:
@@ -124,6 +135,17 @@ jobs:
           python-version: '3.7'
           architecture: 'x64'
       - uses: ./.github/actions/merge
+      - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: /home/runner/work/oppia/yarn_cache
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
       - id: check-risk
         name: Check if PR is low-risk
         uses: ./.github/actions/check-if-pr-is-low-risk
@@ -131,7 +153,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: built-webpack
-          path: /home/runner/work/oppia
+          path: /home/runner/work/oppia/oppia/build
       - name: Run Creator Dashboard E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="creatorDashboard" --prod_env
