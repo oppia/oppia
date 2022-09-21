@@ -1,0 +1,185 @@
+<div class="oppia-android-page-container">
+  <div class="oppia-android-page">
+    <div class="oppia-android-page-hero-container">
+      <div class="oppia-android-main-text-container">
+        <div class="oppia-android-main-body">
+          <div class="oppia-android-main-text oppia-android-text-color">
+            <img class="oppia-android-logo" src="/assets/images/logo/48x48_logo_mint.svg" alt="">
+            <span>ppia’s Android App—<br>
+              &nbsp;&nbsp;available for download.
+            </span>
+          </div>
+          <div class="oppia-android-beta-description-container">
+            <p class="oppia-android-beta-description">
+              A beta version of the Android app is now available in <strong>English</strong>,<br>
+              <strong>Brazilian</strong>,
+              <strong>Portuguese</strong>, and
+              <strong> Swahili</strong>. The app is free, and no<br>
+              subscription is needed.
+            </p>
+            <p class="oppia-android-support-text">
+              We support all Android versions going back to Lollipop (Android 5).
+            </p>
+            <a [href]="ANDROID_APP_URL" target="_blank" rel="noopener">
+              <img class="oppia-android-google-play-logo"
+                   src="/assets/images/android/android-landing-google-play.svg"
+                   alt="">
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-android-hero-image-container">
+        <img class="oppia-android-hero-image" src="/assets/images/android/android-landing-0.svg" alt="">
+      </div>
+    </div>
+
+    <div class="oppia-mobile-only oppia-android-features">
+      <span class="oppia-android-features-main-text">
+        Education<br>
+        for everyone.
+      </span>
+      <div class="oppia-android-key-feature-image-container">
+        <img *ngIf="featuresShown === 1" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
+        <img *ngIf="featuresShown === 2 || featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+        <img *ngIf="featuresShown >= 4" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="">
+      </div>
+      <div class="oppia-android-key-feature-container">
+        <div class="oppia-android-key-feature-description">
+          <div *ngIf="featuresShown === 1" [@fadeIn] class="oppia-android-key-feature">
+            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn through engaging stories</div>
+            <div class="oppia-android-key-feature-subtext">And try our helpful hints to guide you along</div>
+          </div>
+          <div *ngIf="featuresShown === 2" [@fadeIn] class="oppia-android-key-feature">
+            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn anytime, anywhere</div>
+            <div class="oppia-android-key-feature-subtext">Play lessons even without an Internet connection.</div>
+          </div>
+          <div *ngIf="featuresShown === 3" [@fadeIn] class="oppia-android-key-feature">
+            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn in your language</div>
+            <div class="oppia-android-key-feature-subtext">
+              For now, the app is available in <strong>English</strong>, <strong>Brazilian</strong><br>
+              <strong>Portuguese</strong>, and
+              <strong> Swahili</strong>.<br>
+              <br>
+              More languages will be added soon!
+            </div>
+          </div>
+          <div *ngIf="featuresShown === 4" [@fadeIn] class="oppia-android-key-feature">
+            <div class="oppia-android-key-feature-text oppia-android-text-color">Switch between learners</div>
+            <div class="oppia-android-key-feature-subtext">Create and maintain up to 10 profiles on one device.</div>
+          </div>
+        </div>
+        <div class="oppia-android-carousel-item-container">
+          <div class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 1}" (click)="changeFeaturesShown(1)"></div>
+          <div class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 2}" (click)="changeFeaturesShown(2)"></div>
+          <div class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 3}" (click)="changeFeaturesShown(3)"></div>
+          <div class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 4}" (click)="changeFeaturesShown(4)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div #featuresMainText class="oppia-web-only oppia-android-empty-div"></div>
+    <div class="oppia-android-features oppia-web-only" [ngClass]="{ 'oppia-android-features-sticky': !androidUpdatesSectionIsSeen }">
+      <span *ngIf="featuresMainTextIsSeen" [@delayedFadeIn] class="oppia-android-features-main-text">
+        Education<br>
+        for everyone.
+      </span>
+      <div class="oppia-android-key-feature-container">
+        <div class="oppia-android-key-feature-description">
+          <div *ngIf="featuresShown > 0" [@fadeIn] class="oppia-android-key-feature">
+            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn through engaging stories</div>
+            <div class="oppia-android-key-feature-subtext">And try our helpful hints to guide you along</div>
+          </div>
+          <div *ngIf="featuresShown > 1" [@fadeIn] class="oppia-android-key-feature">
+            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn anytime, anywhere</div>
+            <div class="oppia-android-key-feature-subtext">Play lessons even without an Internet connection.</div>
+          </div>
+          <div *ngIf="featuresShown > 2" [@fadeIn] class="oppia-android-key-feature">
+            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn in your language</div>
+            <div class="oppia-android-key-feature-subtext">
+              For now, the app is available in <strong>English</strong>, <strong>Brazilian</strong><br>
+              <strong>Portuguese</strong>, and
+              <strong> Swahili</strong>.<br>
+              <br>
+              More languages will be added soon!
+            </div>
+          </div>
+          <div *ngIf="featuresShown > 3" [@fadeIn] class="oppia-android-key-feature">
+            <div class="oppia-android-key-feature-text oppia-android-text-color">Switch between learners</div>
+            <div class="oppia-android-key-feature-subtext">Create and maintain up to 10 profiles on one device.</div>
+          </div>
+        </div>
+        <div class="oppia-android-key-feature-image-container oppia-web-only">
+          <img *ngIf="featuresShown === 1" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
+          <img *ngIf="featuresShown === 2 || featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+          <img *ngIf="featuresShown >= 4" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!androidUpdatesSectionIsSeen" class="oppia-web-only">
+      <div #feature1 class="oppia-android-empty-div"></div>
+      <div class="oppia-android-empty-div"></div>
+      <div #feature2 class="oppia-android-empty-div"></div>
+      <div class="oppia-android-empty-div"></div>
+      <div #feature3 class="oppia-android-empty-div"></div>
+      <div class="oppia-android-empty-div"></div>
+      <div #feature4 class="oppia-android-empty-div"></div>
+      <div class="oppia-android-empty-div"></div>
+    </div>
+    <div #androidUpdatesSection class="oppia-android-app-updates-container oppia-android-app-updates-background">
+      <div *ngIf="false" class="d-flex">
+        <div class="oppia-android-updates-text-container">
+          <div class="oppia-android-updates-main-text">
+            Want updates on<br>
+            Oppia and the app?
+          </div>
+          <div class="oppia-android-sub-text oppia-android-updates-sub-text">
+            And want to hear when the app is available<br>
+            in your language? <span class="oppia-android-bold-text">We'll notify you!</span>
+          </div>
+        </div>
+        <div class="oppia-android-updates-input-container">
+          <div>
+            <div class="oppia-android-updates-input-label">
+              Email address
+              <span class="oppia-android-updates-asterisk-color">*</span>
+            </div>
+            <input class="oppia-android-updates-input"
+                   type="text"
+                   [(ngModel)]="emailAddress"
+                   [ngModelOptions]="{standalone: true}"
+                   required="true">
+          </div>
+          <div class="oppia-android-updates-input-padding">
+            <div class="oppia-android-updates-input-label">Name</div>
+            <input class="oppia-android-updates-input"
+                   type="text"
+                   [(ngModel)]="name"
+                   [ngModelOptions]="{standalone: true}"
+                   required="true">
+          </div>
+          <div class="oppia-android-updates-input-padding">
+            <input class="oppia-android-updates-checkbox" type="checkbox">
+            <span class="oppia-android-updates-checkbox-label">
+              You confirm that you are over the age of 18 or that you have consent
+              and approval from your legal parent or guardian.
+              <span class="oppia-android-updates-asterisk-color">*</span>
+            </span>
+          </div>
+          <div class="oppia-android-updates-input-padding text-center">
+            <button class="btn oppia-android-updates-button">Notify Me</button>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-android-speech-bubble">
+        <div class="oppia-android-speech-bubble-text">
+          Let us know at <strong class="oppia-android-bold-text">android@oppia.org</strong><br>if you have any feedback.
+        </div>
+      </div>
+      <div>
+        <img class="oppia-android-avatar-img" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+      </div>
+    </div>
+    <div class="oppia-android-app-updates-background oppia-android-otter-help-container">
+    </div>
+  </div>
+</div>
