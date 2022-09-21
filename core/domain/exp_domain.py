@@ -3306,46 +3306,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             answer_groups.remove(empty_ans_group)
 
     @classmethod
-    def _item_selec_no_ans_group_should_be_same(
-        cls, answer_groups: List[state_domain.AnswerGroup]
-    ) -> List[state_domain.AnswerGroup]:
-        """No answer group should be same in ItemSelectionInput interaction,
-        Specefically checks for `Equals` rule spec if there are similar
-        rules then removes the later one
-
-        Args:
-            answer_groups: List[state_domain.AnswerGroup]. The answer group.
-
-        Returns:
-            List[state_domain.AnswerGroup]. The modified answer group.
-        """
-        equals_rule_values = []
-        equals_rule_to_remove = []
-        empty_ans_groups = []
-        for answer_group in answer_groups:
-            for rule_spec in answer_group['rule_specs']:
-                if rule_spec['rule_type'] == 'Equals':
-                    rule_spec_x = rule_spec['inputs']['x']
-                    if rule_spec_x in equals_rule_values:
-                        equals_rule_to_remove.append(rule_spec)
-                    else:
-                        equals_rule_values.append(rule_spec_x)
-
-        for rule_to_remove in equals_rule_to_remove:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    if rule_spec == rule_to_remove:
-                        answer_group['rule_specs'].remove(rule_spec)
-                if len(answer_group['rule_specs']) == 0:
-                    empty_ans_groups.append(answer_group)
-
-        # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-        return answer_groups
-
-    @classmethod
     def _equals_should_come_before_idx_rule(
         cls, answer_groups: List[state_domain.AnswerGroup]
     ) -> None:
