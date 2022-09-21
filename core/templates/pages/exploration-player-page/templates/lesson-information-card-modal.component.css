@@ -287,8 +287,14 @@
 }
 
 .oppia-lesson-info-card .save-progress-btn-container {
+  align-items: center;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+}
+
+.save-progress-btn-box:hover + .save-progress-btn-tooltip {
+  display: block;
 }
 
 .oppia-lesson-info-card .save-progress-btn {
@@ -300,6 +306,10 @@
   height: 40px;
   margin: 5px 0;
   width: 170px;
+}
+
+.oppia-lesson-info-card .save-progress-btn-tooltip {
+  display: none;
 }
 
 .progress-bar-label-text {

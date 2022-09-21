@@ -948,6 +948,7 @@
     "I18N_RESTART_EXPLORATION_BUTTON": "Restart lesson",
     "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Review Test",
     "I18N_REVIEW_TEST_PAGE_TITLE": "Review Test: <[storyName]> - Oppia",
+    "I18N_SAVE_BUTTON_ALERT_TOOLTIP": "Progress cannot be saved if you haven’t reached the first checkpoint.",
     "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1": "Your learning progress will be automatically saved if you have an account.",
     "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "Already have an account? ",
     "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3": "Use the link below to save progress for 72 hours.",

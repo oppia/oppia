@@ -42,12 +42,19 @@
           {{ translatedCongratulatoryCheckpointMessage }}
         </p>
         <div class="save-progress-btn-container">
-          <button type="button"
-                  class="btn btn-secondary save-progress-btn"
-                  *ngIf="!userIsLoggedIn"
-                  (click)="saveLoggedOutProgress()">
-            {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
-          </button>
+          <div class="save-progress-btn-box">
+            <button type="button"
+                    class="btn btn-secondary save-progress-btn"
+                    *ngIf="(!userIsLoggedIn && checkpointCount>1)"
+                    [ngClass]="{'disabled oppia-disabled-link': checkpointStatusArray[0] === 'in-progress'}"
+                    (click)="saveLoggedOutProgress()">
+              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
+            </button>
+          </div>
+          <div  *ngIf="checkpointStatusArray[0] === 'in-progress'"
+                class="save-progress-btn-tooltip alert alert-danger">
+            {{ 'I18N_SAVE_BUTTON_ALERT_TOOLTIP' | translate }}
+          </div>
         </div>
         <p *ngIf="explorationIsPrivate"
            class="private-card-info">
