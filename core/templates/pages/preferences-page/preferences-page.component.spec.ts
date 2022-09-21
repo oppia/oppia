@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { EmailPreferencesBackendDict, PreferencesBackendDict, ProfilePictureDataBackendDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
+import { EmailPreferencesBackendDict, NonEmailPreferencesBackendDict, ProfilePictureDataBackendDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferencesPageComponent } from './preferences-page.component';
@@ -55,17 +55,20 @@ describe('Preferences Page Component', () => {
     }]
   };
 
-  let preferencesData: PreferencesBackendDict = {
+  let emailPreferences: EmailPreferencesBackendDict = {
+    can_receive_email_updates: true,
+    can_receive_editor_role_email: true,
+    can_receive_feedback_message_email: false,
+    can_receive_subscription_email: true,
+  };
+
+  let preferencesData: NonEmailPreferencesBackendDict = {
     preferred_language_codes: ['en'],
     preferred_site_language_code: 'en',
     preferred_audio_language_code: 'en',
     default_dashboard: 'creator',
     user_bio: 'test user bio',
     subject_interests: '',
-    can_receive_email_updates: true,
-    can_receive_editor_role_email: true,
-    can_receive_feedback_message_email: false,
-    can_receive_subscription_email: true,
   };
 
   class MockWindowRef {
@@ -84,16 +87,21 @@ describe('Preferences Page Component', () => {
   }
 
   class MockUserBackendApiService {
-    async getPreferencesAsync(): Promise<PreferencesBackendDict> {
+    async getPreferencesAsync(): Promise<NonEmailPreferencesBackendDict> {
       return Promise.resolve(preferencesData);
     }
 
     async updatePreferencesDataAsync(
         updateType: string,
-        data: boolean | string | string[] | EmailPreferencesBackendDict
-    ): Promise<UpdatePreferencesResponse> {
+        data: string | string[]
+    ): Promise<NonEmailPreferencesBackendDict> {
       return Promise.resolve({
-        bulk_email_signup_message_should_be_shown: false
+        preferred_language_codes: ['en'],
+        preferred_site_language_code: 'en',
+        preferred_audio_language_code: 'en',
+        default_dashboard: 'creator',
+        user_bio: 'test user bio',
+        subject_interests: '',
       });
     }
 
@@ -112,6 +120,19 @@ describe('Preferences Page Component', () => {
           creator_username: 'creator',
           creator_impact: 0
         }]
+      });
+    }
+
+    async getEmailPreferencesAsync(
+    ): Promise<EmailPreferencesBackendDict> {
+      return Promise.resolve(emailPreferences);
+    }
+
+    async updateEmailPreferencesAsync(
+        data: EmailPreferencesBackendDict
+    ): Promise<UpdatePreferencesResponse> {
+      return Promise.resolve({
+        bulk_email_signup_message_should_be_shown: false
       });
     }
   }
@@ -198,13 +219,13 @@ describe('Preferences Page Component', () => {
     expect(componentInstance.defaultDashboard).toEqual(
       preferencesData.default_dashboard);
     expect(componentInstance.canReceiveEmailUpdates).toEqual(
-      preferencesData.can_receive_email_updates);
+      emailPreferences.can_receive_email_updates);
     expect(componentInstance.canReceiveEditorRoleEmail).toEqual(
-      preferencesData.can_receive_editor_role_email);
+      emailPreferences.can_receive_editor_role_email);
     expect(componentInstance.canReceiveSubscriptionEmail).toEqual(
-      preferencesData.can_receive_subscription_email);
+      emailPreferences.can_receive_subscription_email);
     expect(componentInstance.canReceiveFeedbackMessageEmail).toEqual(
-      preferencesData.can_receive_feedback_message_email);
+      emailPreferences.can_receive_feedback_message_email);
     expect(componentInstance.preferredSiteLanguageCode).toEqual(
       preferencesData.preferred_site_language_code);
     expect(componentInstance.subscriptionList).toEqual(
@@ -268,7 +289,7 @@ describe('Preferences Page Component', () => {
     }));
 
     it('should save email preferences', fakeAsync(() => {
-      spyOn(mockUserBackendApiService, 'updatePreferencesDataAsync')
+      spyOn(mockUserBackendApiService, 'updateEmailPreferencesAsync')
         .and.returnValue(
           Promise.resolve({
             bulk_email_signup_message_should_be_shown: true

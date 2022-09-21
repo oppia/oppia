@@ -24,7 +24,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { PreferencesBackendDict, ProfilePictureDataBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
+import { EmailPreferencesBackendDict, NonEmailPreferencesBackendDict, ProfilePictureDataBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
   let userBackendApiService: UserBackendApiService;
@@ -204,7 +204,7 @@ describe('User Backend Api Service', () => {
       subscription_list: []
     };
     userBackendApiService.getPreferencesProfilePictureDataUrlAsync().then(
-      PreferencesProfilePictureDataUrl => {
+      (PreferencesProfilePictureDataUrl) => {
         expect(PreferencesProfilePictureDataUrl).toEqual(
           samplePreferencesProfilePictureData
         );
@@ -218,18 +218,55 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
+  it('should return email preferences data', fakeAsync(() => {
+    let sampleEmailPreferencesData: EmailPreferencesBackendDict = {
+      can_receive_email_updates: true,
+      can_receive_editor_role_email: true,
+      can_receive_feedback_message_email: true,
+      can_receive_subscription_email: true,
+    };
+    userBackendApiService.getEmailPreferencesAsync().then(
+      (emailPreferences) => {
+        expect(emailPreferences).toEqual(
+          sampleEmailPreferencesData
+        );
+      }
+    );
+    const req = httpTestingController.expectOne(
+      '/preferenceshandler/email_preferences');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleEmailPreferencesData);
+
+    flushMicrotasks();
+  }));
+
+  it('should update email preferences', fakeAsync(() => {
+    let sampleEmailPreferencesData: EmailPreferencesBackendDict = {
+      can_receive_email_updates: true,
+      can_receive_editor_role_email: false,
+      can_receive_feedback_message_email: false,
+      can_receive_subscription_email: false,
+    };
+    userBackendApiService.updateEmailPreferencesAsync(
+      sampleEmailPreferencesData
+    );
+    const req = httpTestingController.expectOne(
+      '/preferenceshandler/email_preferences'
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush(sampleEmailPreferencesData);
+
+    flushMicrotasks();
+  }));
+
   it('should return user preferences data', fakeAsync(() => {
-    let samplePreferencesData: PreferencesBackendDict = {
+    let samplePreferencesData: NonEmailPreferencesBackendDict = {
       preferred_language_codes: ['en', 'hi'],
       preferred_site_language_code: 'en',
       preferred_audio_language_code: 'en',
       default_dashboard: 'learner',
       user_bio: '',
       subject_interests: '',
-      can_receive_email_updates: true,
-      can_receive_editor_role_email: true,
-      can_receive_feedback_message_email: true,
-      can_receive_subscription_email: true,
     };
     userBackendApiService.getPreferencesAsync().then((preferencesData) => {
       expect(preferencesData).toEqual(samplePreferencesData);

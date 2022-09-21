@@ -55,6 +55,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'PreferenceHandler',
     'PreferencesHandler',
     'ProfilePictureDataUrlHandler',
+    'EmailPreferencesHandler',
     'ProfilePage',
     'QuestionCountDataHandler',
     'QuestionCreationHandler',

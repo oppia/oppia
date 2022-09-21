@@ -1008,6 +1008,7 @@ PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
+EMAIL_PREFFERENCES = '/preferenceshandler/email_preferences'
 PREFERENCES_PROFILE_PICTURE_DATA_URL = (
     '/preferenceshandler/profile_picture_data')
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'

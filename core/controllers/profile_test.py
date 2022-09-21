@@ -638,7 +638,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         payload = {
-            'update_type': 'email_preferences',
             'data': {
                 'can_receive_email_updates': True,
                 'can_receive_editor_role_email': True,
@@ -649,7 +648,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
         # Allow all emails.
         self.put_json(
-            '/preferenceshandler/data', payload, csrf_token=csrf_token)
+            '/preferenceshandler/email_preferences',
+            payload,
+            csrf_token=csrf_token
+        )
 
         email_preferences = user_services.get_email_preferences(editor_id)
         self.assertTrue(email_preferences.can_receive_email_updates)
@@ -658,7 +660,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertTrue(email_preferences.can_receive_subscription_email)
 
         payload = {
-            'update_type': 'email_preferences',
             'data': {
                 'can_receive_email_updates': False,
                 'can_receive_editor_role_email': False,
@@ -669,7 +670,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
         # Disallow all emails.
         self.put_json(
-            '/preferenceshandler/data', payload, csrf_token=csrf_token)
+            '/preferenceshandler/email_preferences',
+            payload,
+            csrf_token=csrf_token
+        )
 
         email_preferences = user_services.get_email_preferences(editor_id)
         self.assertFalse(email_preferences.can_receive_email_updates)

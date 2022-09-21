@@ -34,7 +34,7 @@ export interface EmailPreferencesBackendDict {
   'can_receive_subscription_email': boolean;
 }
 
-interface NonEmailPreferencesBackendDict {
+export interface NonEmailPreferencesBackendDict {
   'preferred_language_codes': string[];
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
@@ -48,18 +48,6 @@ export interface ProfilePictureDataBackendDict {
   'subscription_list': SubscriptionSummary[];
 }
 
-// The following type is an intersection of EmailPreferencesBackendDict
-// and NonEmailPreferencesbackendDict and hence will have all the properties
-// of both the interfaces.
-// Note: Intersection in TypeScript is used differently compared to set theory,
-// the latter implies that the type will include only the properties that are
-// are the same in both the interfaces whereas the former includes all the
-// properties from both the interfaces. For more information, check
-// https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#intersection-types
-export type PreferencesBackendDict = (
-  NonEmailPreferencesBackendDict &
-  EmailPreferencesBackendDict
-);
 
 export interface UpdatePreferencesResponse {
   'bulk_email_signup_message_should_be_shown': boolean;
@@ -88,6 +76,8 @@ export class UserBackendApiService {
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private PREFERENCES_PROFILE_PICTURE_DATA_URL = (
     '/preferenceshandler/profile_picture_data');
+
+  private EMAIL_PREFFERENCES = '/preferenceshandler/email_preferences';
 
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
@@ -142,9 +132,10 @@ export class UserBackendApiService {
     }).toPromise();
   }
 
-  async getPreferencesAsync(): Promise<PreferencesBackendDict> {
-    return this.http.get<PreferencesBackendDict>(this.PREFERENCES_DATA_URL)
-      .toPromise();
+  async getPreferencesAsync():
+    Promise<NonEmailPreferencesBackendDict> {
+    return this.http.get<NonEmailPreferencesBackendDict>(
+      this.PREFERENCES_DATA_URL).toPromise();
   }
 
   async getPreferencesProfilePictureDataUrlAsync():
@@ -153,14 +144,22 @@ export class UserBackendApiService {
       this.PREFERENCES_PROFILE_PICTURE_DATA_URL).toPromise();
   }
 
+  async getEmailPreferencesAsync():
+    Promise<EmailPreferencesBackendDict> {
+    return this.http.get<EmailPreferencesBackendDict>(
+      this.EMAIL_PREFFERENCES).toPromise();
+  }
+
   async updatePreferencesDataAsync(
       updateType: string,
-      data: boolean | string | string[] | EmailPreferencesBackendDict
-  ): Promise<UpdatePreferencesResponse> {
-    return this.http.put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
-      update_type: updateType,
-      data: data
-    }).toPromise();
+      data: boolean | string | string[]
+  ): Promise<NonEmailPreferencesBackendDict> {
+    return this.http.put<NonEmailPreferencesBackendDict>(
+      this.PREFERENCES_DATA_URL, {
+        update_type: updateType,
+        data: data
+      }
+    ).toPromise();
   }
 
   async updatePreferencesProfilePictureDataUrlAsync(
@@ -168,6 +167,16 @@ export class UserBackendApiService {
   ): Promise<ProfilePictureDataBackendDict> {
     return this.http.put<ProfilePictureDataBackendDict>(
       this.PREFERENCES_PROFILE_PICTURE_DATA_URL, {
+        data: data
+      }
+    ).toPromise();
+  }
+
+  async updateEmailPreferencesAsync(
+      data: boolean | EmailPreferencesBackendDict
+  ): Promise<UpdatePreferencesResponse> {
+    return this.http.put<UpdatePreferencesResponse>(
+      this.EMAIL_PREFFERENCES, {
         data: data
       }
     ).toPromise();

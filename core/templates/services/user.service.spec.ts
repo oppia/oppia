@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserService } from 'services/user.service';
 import { UrlService } from './contextual/url.service';
-import { PreferencesBackendDict, UserBackendApiService } from './user-backend-api.service';
+import { NonEmailPreferencesBackendDict, UserBackendApiService } from './user-backend-api.service';
 
 class MockWindowRef {
   _window = {
@@ -393,7 +393,7 @@ describe('User Api Service', () => {
     spyOn(userBackendApiService, 'getPreferencesAsync').and.returnValue(
       Promise.resolve({
         default_dashboard: defaultDashboard
-      } as PreferencesBackendDict));
+      } as NonEmailPreferencesBackendDict));
     userService.getUserPreferredDashboardAsync().then(preferredDashboard => {
       expect(preferredDashboard).toEqual(defaultDashboard);
     });

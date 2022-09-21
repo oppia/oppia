@@ -517,6 +517,8 @@ URLS = [
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
+        feconf.EMAIL_PREFFERENCES, profile.EmailPreferencesHandler),
+    get_redirect_route(
         feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL,
         profile.ProfilePictureDataUrlHandler),
     get_redirect_route(

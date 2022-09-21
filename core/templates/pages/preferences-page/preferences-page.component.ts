@@ -96,18 +96,13 @@ export class PreferencesPageComponent {
 
   private _saveDataItem(
       updateType: string,
-      data: string | string[] | EmailPreferencesBackendDict
+      data: string | string[]
   ): void {
     this.preventPageUnloadEventService.addListener();
     this.userBackendApiService.updatePreferencesDataAsync(
-      updateType, data).then((returnData) => {
+      updateType, data).then(() => {
       this.preventPageUnloadEventService.removeListener();
-      if (returnData.bulk_email_signup_message_should_be_shown) {
-        this.canReceiveEmailUpdates = false;
-        this.showEmailSignupLink = true;
-      } else {
-        this.alertsService.addInfoMessage('Saved!', 1000);
-      }
+      this.alertsService.addInfoMessage('Saved!', 1000);
     });
   }
 
@@ -136,6 +131,29 @@ export class PreferencesPageComponent {
       'preferred_audio_language_code', preferredAudioLanguageCode);
   }
 
+  savePreferredLanguageCodes(preferredLanguageCodes: string[]): void {
+    this._saveDataItem('preferred_language_codes', preferredLanguageCodes);
+  }
+
+  saveDefaultDashboard(defaultDashboard: string): void {
+    this._saveDataItem('default_dashboard', defaultDashboard);
+  }
+
+
+  private _saveEmailPreferences(
+      data: EmailPreferencesBackendDict
+  ): void {
+    this.preventPageUnloadEventService.addListener();
+    this.userBackendApiService.updateEmailPreferencesAsync(
+      data).then((returnData) => {
+      this.preventPageUnloadEventService.removeListener();
+      if (returnData.bulk_email_signup_message_should_be_shown) {
+        this.canReceiveEmailUpdates = false;
+        this.showEmailSignupLink = true;
+      }
+    });
+  }
+
   saveEmailPreferences(
       canReceiveEmailUpdates: boolean, canReceiveEditorRoleEmail: boolean,
       canReceiveFeedbackMessageEmail: boolean,
@@ -147,16 +165,9 @@ export class PreferencesPageComponent {
         canReceiveFeedbackMessageEmail),
       can_receive_subscription_email: canReceiveSubscriptionEmail
     };
-    this._saveDataItem('email_preferences', data);
+    this._saveEmailPreferences(data);
   }
 
-  savePreferredLanguageCodes(preferredLanguageCodes: string[]): void {
-    this._saveDataItem('preferred_language_codes', preferredLanguageCodes);
-  }
-
-  saveDefaultDashboard(defaultDashboard: string): void {
-    this._saveDataItem('default_dashboard', defaultDashboard);
-  }
 
   showUsernamePopover(creatorUsername: string): string {
     // The popover on the subscription card is only shown if the length
@@ -220,6 +231,25 @@ export class PreferencesPageComponent {
       this.profilePictureDataUrl = decodeURIComponent(
         data.profile_picture_data_url);
       this.subscriptionList = data.subscription_list;
+      this.subscriptionList.forEach((subscription) => {
+        subscription.creator_picture_data_url = (
+          decodeURIComponent(subscription.creator_picture_data_url));
+      });
+    });
+
+
+    let emailPreferencesPromise = (
+      this.userBackendApiService.getEmailPreferencesAsync());
+
+    emailPreferencesPromise.then((data) => {
+      this.canReceiveEmailUpdates = data.can_receive_email_updates;
+      this.canReceiveEditorRoleEmail = (
+        data.can_receive_editor_role_email);
+      this.canReceiveFeedbackMessageEmail = (
+        data.can_receive_feedback_message_email);
+      this.canReceiveSubscriptionEmail = (
+        data.can_receive_subscription_email);
+      this.hasPageLoaded = true;
     });
 
 
@@ -230,25 +260,19 @@ export class PreferencesPageComponent {
       this.subjectInterests = data.subject_interests;
       this.preferredLanguageCodes = data.preferred_language_codes;
       this.defaultDashboard = data.default_dashboard;
-      this.canReceiveEmailUpdates = data.can_receive_email_updates;
-      this.canReceiveEditorRoleEmail =
-        data.can_receive_editor_role_email;
-      this.canReceiveSubscriptionEmail =
-        data.can_receive_subscription_email;
-      this.canReceiveFeedbackMessageEmail = (
-        data.can_receive_feedback_message_email);
       this.preferredSiteLanguageCode =
         data.preferred_site_language_code;
       this.preferredAudioLanguageCode =
         data.preferred_audio_language_code;
-      this.subscriptionList.forEach((subscription) => {
-        subscription.creator_picture_data_url = (
-          decodeURIComponent(subscription.creator_picture_data_url));
-      });
       this.hasPageLoaded = true;
     });
 
-    Promise.all([userInfoPromise, preferencesPromise]).then(() => {
+    Promise.all([
+      userInfoPromise,
+      preferencesPromise,
+      preferencesProfilePictureDataUrlPromise,
+      emailPreferencesPromise
+    ]).then(() => {
       this.loaderService.hideLoadingScreen();
     });
 

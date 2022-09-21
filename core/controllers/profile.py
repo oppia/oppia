@@ -148,6 +148,49 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
         self.render_json({})
 
 
+class EmailPreferencesHandler(base.BaseHandler):
+    """Handles requests for the email preferences."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_manage_own_account
+    def get(self):
+        """Handles GET requests."""
+        user_email_preferences = user_services.get_email_preferences(
+            self.user_id)
+        self.values.update({
+            'can_receive_email_updates': (
+                user_email_preferences.can_receive_email_updates),
+            'can_receive_editor_role_email': (
+                user_email_preferences.can_receive_editor_role_email),
+            'can_receive_feedback_message_email': (
+                user_email_preferences.can_receive_feedback_message_email),
+            'can_receive_subscription_email': (
+                user_email_preferences.can_receive_subscription_email)
+        })
+        self.render_json(self.values)
+
+    @acl_decorators.can_manage_own_account
+    def put(self):
+        """Handles PUT requests."""
+        data = self.payload.get('data')
+        bulk_email_signup_message_should_be_shown = False
+
+        bulk_email_signup_message_should_be_shown = (
+            user_services.update_email_preferences(
+                self.user_id, data['can_receive_email_updates'],
+                data['can_receive_editor_role_email'],
+                data['can_receive_feedback_message_email'],
+                data['can_receive_subscription_email']
+            )
+        )
+
+        self.render_json({
+            'bulk_email_signup_message_should_be_shown': (
+                bulk_email_signup_message_should_be_shown)
+        })
+
+
 class ProfilePictureDataUrlHandler(base.BaseHandler):
     """Handles requests for the profile picture data url."""
 
@@ -199,8 +242,6 @@ class PreferencesHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
-        user_email_preferences = user_services.get_email_preferences(
-            self.user_id)
 
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
@@ -212,15 +253,7 @@ class PreferencesHandler(base.BaseHandler):
                 user_settings.preferred_translation_language_code),
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
-            'subject_interests': user_settings.subject_interests,
-            'can_receive_email_updates': (
-                user_email_preferences.can_receive_email_updates),
-            'can_receive_editor_role_email': (
-                user_email_preferences.can_receive_editor_role_email),
-            'can_receive_feedback_message_email': (
-                user_email_preferences.can_receive_feedback_message_email),
-            'can_receive_subscription_email': (
-                user_email_preferences.can_receive_subscription_email)
+            'subject_interests': user_settings.subject_interests
         })
         self.render_json(self.values)
 
@@ -229,7 +262,8 @@ class PreferencesHandler(base.BaseHandler):
         """Handles PUT requests."""
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
-        bulk_email_signup_message_should_be_shown = False
+        user_settings = user_services.get_user_settings(self.user_id)
+
         if update_type == 'user_bio':
             if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
                 raise self.InvalidInputException(
@@ -252,20 +286,21 @@ class PreferencesHandler(base.BaseHandler):
                 self.user_id, data)
         elif update_type == 'default_dashboard':
             user_services.update_user_default_dashboard(self.user_id, data)
-        elif update_type == 'email_preferences':
-            bulk_email_signup_message_should_be_shown = (
-                user_services.update_email_preferences(
-                    self.user_id, data['can_receive_email_updates'],
-                    data['can_receive_editor_role_email'],
-                    data['can_receive_feedback_message_email'],
-                    data['can_receive_subscription_email']))
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
 
         self.render_json({
-            'bulk_email_signup_message_should_be_shown': (
-                bulk_email_signup_message_should_be_shown)
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'preferred_translation_language_code': (
+                user_settings.preferred_translation_language_code),
+            'default_dashboard': user_settings.default_dashboard,
+            'user_bio': user_settings.user_bio,
+            'subject_interests': user_settings.subject_interests
         })
 
 
