@@ -1032,6 +1032,10 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn('--suite full', program_args)
         self.assertIn('--params.devMode=True', program_args)
 
+    def test_managed_webdriverio_mobile(self):
+        with servers.managed_webdriverio_server(mobile=True):
+            self.assertEqual(os.getenv('MOBILE'), 'true')
+
     def test_managed_webdriverio_with_explicit_args(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 

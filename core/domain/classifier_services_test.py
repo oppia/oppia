@@ -676,12 +676,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
         vm_id = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        message = 'test message'
-        # TODO(#13059): After we fully type the codebase, convert message
-        # to bytes and remove assertion from the main file for the same.
+        message = b'test message'
         signature = classifier_services.generate_signature(
             secret.encode('utf-8'),
-            message,  # type: ignore[arg-type]
+            message,
             vm_id)
         expected_signature = (
             '9c2f9f607c0eefc2b8ba153bad9331843a6efc71c82e690f5f0341bbc38b7fa7')

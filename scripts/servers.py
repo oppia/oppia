@@ -615,7 +615,7 @@ def managed_webdriver_server(chrome_version=None):
 @contextlib.contextmanager
 def managed_webdriverio_server(
         suite_name='full', dev_mode=True, debug_mode=False,
-        sharding_instances=1, chrome_version=None, **kwargs):
+        sharding_instances=1, chrome_version=None, mobile=False, **kwargs):
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
     Args:
@@ -631,6 +631,7 @@ def managed_webdriverio_server(
             on. If None, then the currently-installed version of Google Chrome
             is used instead.
         **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
+        mobile: bool. Whether to run the webdriverio tests in mobile mode.
 
     Yields:
         psutil.Process. The webdriverio process.
@@ -643,6 +644,11 @@ def managed_webdriverio_server(
 
     if chrome_version is None:
         chrome_version = get_chrome_verison()
+
+    if mobile:
+        os.environ['MOBILE'] = 'true'
+    else:
+        os.environ['MOBILE'] = 'false'
 
     webdriverio_args = [
         common.NPX_BIN_PATH,
@@ -671,5 +677,8 @@ def managed_webdriverio_server(
         webdriverio_args, human_readable_name='WebdriverIO Server', shell=True,
         raise_on_nonzero_exit=False, **kwargs)
 
-    with managed_webdriverio_proc as proc:
-        yield proc
+    try:
+        with managed_webdriverio_proc as proc:
+            yield proc
+    finally:
+        del os.environ['MOBILE']

@@ -97,6 +97,10 @@ _PARSER.add_argument(
     '--source_maps',
     help='Build webpack with source maps.',
     action='store_true')
+_PARSER.add_argument(
+    '--mobile',
+    help='Run e2e test in mobile viewport.',
+    action='store_true')
 
 
 def is_oppia_server_already_running():
@@ -218,6 +222,7 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
                 sharding_instances=args.sharding_instances,
+                mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
         print(
