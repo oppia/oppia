@@ -4482,7 +4482,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state in states_dict.values():
             html = state['content']['html']
-        # Add for translations and check the RTE
+        # Add for translations and tabs collapsible and check the RTE
             state['content']['html'] = cls._fix_rte(html)
 
         return states_dict

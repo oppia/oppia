@@ -70,6 +70,7 @@ def _migrate_states_schema(
             - states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
         init_state_name: str. Name of initial state.
+        language_code: str. The language code of the exploration.
 
     Raises:
         Exception. The given states_schema_version is invalid.
