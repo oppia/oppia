@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: built-webpack
-          path: /home/runner/work/oppia/oppia/build
+          path: /home/runner/work/oppia
   e2e_prototype_additional_editor_and_player:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -71,7 +71,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: built-webpack
-          path: /home/runner/work/oppia/oppia/build
+          path: /home/runner/work/oppia
       - name: Run Additional Editor E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeatures" --prod_env
@@ -131,7 +131,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: built-webpack
-          path: /home/runner/work/oppia/oppia/build
+          path: /home/runner/work/oppia
       - name: Run Creator Dashboard E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="creatorDashboard" --prod_env
