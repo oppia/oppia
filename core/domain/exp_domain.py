@@ -3588,124 +3588,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return rule_value_f
 
     @classmethod
-    def _fraction_interaction_rules_range_should_not_intersect(
-        cls, answer_groups: List[state_domain.AnswerGroup]
-    ) -> List[state_domain.AnswerGroup]:
-        """Helper function for FractionInput interaction where rule should
-        not match previous rules solution or should not be
-        in the range of previous rules solution otherwise the later answer
-        group will be redundant and will never be matched. Simply the invalid
-        rule will be removed and if only one rule is present then the complete
-        answer group is removed
-
-        Args:
-            answer_groups: List[state_domain.AnswerGroup]. The answer group.
-
-        Returns:
-            List[state_domain.AnswerGroup]. The modified answer group.
-        """
-        lower_infinity = float('-inf')
-        upper_infinity = float('inf')
-        ranges = []
-        invalid_rules = []
-        matched_denominator_list = []
-        for ans_group_index, answer_group in enumerate(answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group['rule_specs']):
-                range_var = {
-                    'ans_group_index': int(ans_group_index),
-                    'rule_spec_index': int(rule_spec_index),
-                    'lower_bound': None,
-                    'upper_bound': None,
-                    'lb_inclusive': False,
-                    'ub_inclusive': False
-                }
-                matched_denominator = {
-                    'ans_group_index': int(ans_group_index),
-                    'rule_spec_index': int(rule_spec_index),
-                    'denominator': 0
-                }
-
-                if rule_spec['rule_type'] in (
-                    'IsEquivalentTo', 'IsExactlyEqualTo',
-                    'IsEquivalentToAndInSimplestForm'
-                ):
-                    rule_value_f = cls._get_rule_value_of_fraction_interaction(
-                        rule_spec)
-                    cls._set_lower_and_upper_bounds(
-                        range_var, rule_value_f,
-                        rule_value_f, True, True
-                    )
-
-                if rule_spec['rule_type'] == 'IsGreaterThan':
-                    rule_value_f = (
-                        cls._get_rule_value_of_fraction_interaction(rule_spec)
-                    )
-
-                    cls._set_lower_and_upper_bounds(
-                        range_var, rule_value_f,
-                        upper_infinity, False, False
-                    )
-
-                if rule_spec['rule_type'] == 'IsLessThan':
-                    rule_value_f = (
-                        cls._get_rule_value_of_fraction_interaction(rule_spec)
-                    )
-
-                    cls._set_lower_and_upper_bounds(
-                        range_var, lower_infinity,
-                        rule_value_f, False, False
-                    )
-
-                if rule_spec['rule_type'] == 'HasDenominatorEqualTo':
-                    try:
-                        rule_value_x = int(rule_spec['inputs']['x'])
-                        matched_denominator['denominator'] = rule_value_x
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                for range_ele in ranges:
-                    if cls._is_enclosed_by(range_var, range_ele):
-                        earlier_rule = answer_groups[range_ele[
-                            'ans_group_index']]['rule_specs'][
-                                range_ele['rule_spec_index']]
-
-                        if cls._should_check_range_criteria(
-                            earlier_rule, rule_spec
-                        ):
-                            invalid_rules.append(rule_spec)
-
-                for den in matched_denominator_list:
-                    if (
-                        rule_spec['rule_type'] ==
-                        'HasFractionalPartExactlyEqualTo'
-                    ):
-                        if (
-                            den['denominator'] ==
-                            rule_spec['inputs']['f']['denominator']
-                        ):
-                            invalid_rules.append(rule_spec)
-
-                ranges.append(range_var)
-                matched_denominator_list.append(matched_denominator)
-
-        empty_ans_groups = []
-        for invalid_rule in invalid_rules:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    if rule_spec == invalid_rule:
-                        answer_group['rule_specs'].remove(rule_spec)
-
-                if len(answer_group['rule_specs']) == 0:
-                    empty_ans_groups.append(answer_group)
-
-        # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-        return answer_groups
-
-    @classmethod
     def _text_interaction_contains_rule_should_come_after(
         cls,
         answer_groups: List[state_domain.AnswerGroup]
@@ -4116,16 +3998,121 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_fraction_input_interaction(
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
-        """
+        """Fixes FractionInput interaction where rule should not match previous
+        rules solution means it should not be in the range of previous rules
+        solution otherwise the later answer group will be redundant and will
+        never be matched. Simply the invalid rule will be removed and if only
+        one rule is present then the complete answer group is removed.
+        The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
         """
         # All rules should have solutions that do not match
         # previous rules' solutions.
         answer_groups = state_dict['interaction']['answer_groups']
-        answer_groups = (
-            cls._fraction_interaction_rules_range_should_not_intersect(
-                answer_groups
-            )
-        )
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        ranges = []
+        invalid_rules = []
+        matched_denominator_list = []
+        for ans_group_index, answer_group in enumerate(answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group['rule_specs']):
+                range_var = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+                matched_denominator = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'denominator': 0
+                }
+
+                if rule_spec['rule_type'] in (
+                    'IsEquivalentTo', 'IsExactlyEqualTo',
+                    'IsEquivalentToAndInSimplestForm'
+                ):
+                    rule_value_f = cls._get_rule_value_of_fraction_interaction(
+                        rule_spec)
+                    cls._set_lower_and_upper_bounds(
+                        range_var, rule_value_f,
+                        rule_value_f, True, True
+                    )
+
+                if rule_spec['rule_type'] == 'IsGreaterThan':
+                    rule_value_f = (
+                        cls._get_rule_value_of_fraction_interaction(rule_spec)
+                    )
+
+                    cls._set_lower_and_upper_bounds(
+                        range_var, rule_value_f,
+                        upper_infinity, False, False
+                    )
+
+                if rule_spec['rule_type'] == 'IsLessThan':
+                    rule_value_f = (
+                        cls._get_rule_value_of_fraction_interaction(rule_spec)
+                    )
+
+                    cls._set_lower_and_upper_bounds(
+                        range_var, lower_infinity,
+                        rule_value_f, False, False
+                    )
+
+                if rule_spec['rule_type'] == 'HasDenominatorEqualTo':
+                    try:
+                        rule_value_x = int(rule_spec['inputs']['x'])
+                        matched_denominator['denominator'] = rule_value_x
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                for range_ele in ranges:
+                    if cls._is_enclosed_by(range_var, range_ele):
+                        earlier_rule = answer_groups[range_ele[
+                            'ans_group_index']]['rule_specs'][
+                                range_ele['rule_spec_index']]
+
+                        if cls._should_check_range_criteria(
+                            earlier_rule, rule_spec
+                        ):
+                            invalid_rules.append(rule_spec)
+
+                for den in matched_denominator_list:
+                    if (
+                        rule_spec['rule_type'] ==
+                        'HasFractionalPartExactlyEqualTo'
+                    ):
+                        if (
+                            den['denominator'] ==
+                            rule_spec['inputs']['f']['denominator']
+                        ):
+                            invalid_rules.append(rule_spec)
+
+                ranges.append(range_var)
+                matched_denominator_list.append(matched_denominator)
+
+        empty_ans_groups = []
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if len(answer_group['rule_specs']) == 0:
+                    empty_ans_groups.append(answer_group)
+
+        # Removal of empty answer groups.
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         state_dict['interaction']['answer_groups'] = answer_groups
