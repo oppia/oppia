@@ -12,9 +12,8 @@ var args = process.argv;
 // eslint-disable-next-line eqeqeq
 var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 
-const drivers = {
-  chrome: { version: chromeVersion },
-};
+var chromedriverPath =
+'./node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // If video recorder is not running the ffmpeg process will be null.
 var ffmpegProcess = null;
@@ -270,7 +269,10 @@ exports.config = {
   // They enhance your test setup with almost no effort. Unlike plugins,
   // they don't add newcommands. Instead, they hook themselves up into
   // the test process.
-  services: [service],
+  services: [
+    ['chromedriver', {
+      chromedriverCustomPath: chromedriverPath
+    }]],
 
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber

@@ -20,7 +20,6 @@
 var until = require('wdio-wait-for');
 var fs = require('fs');
 var Constants = require('./WebdriverioConstants');
-const { default: $ } = require('webdriverio/build/commands/browser/$');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
 // server since the mobile tests are run on a real
@@ -198,8 +197,7 @@ var numberOfElementsToBe = async function(
     var element = childSelector ? await elementSelector.$$(
       childSelector) : await $$(elementSelector);
     return element.length === number;
-  }, <div class='one two'></div>
-  $('.one') $('.two')
+  },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
     timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +

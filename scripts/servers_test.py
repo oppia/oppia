@@ -999,61 +999,6 @@ class ManagedProcessTests(test_utils.TestBase):
             '%s %s start --versions.chrome 1.2.3 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
-    def test_managed_protractor_with_invalid_sharding_instances(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
-            self.exit_stack.enter_context(
-                servers.managed_protractor_server(sharding_instances=0))
-
-        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
-            self.exit_stack.enter_context(
-                servers.managed_protractor_server(sharding_instances=-1))
-
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 0)
-
-    def test_managed_protractor(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        self.exit_stack.enter_context(servers.managed_protractor_server())
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-        program_args = popen_calls[0].program_args
-        self.assertIn(
-            '%s --unhandled-rejections=strict %s %s' % (
-                common.NODE_BIN_PATH, common.PROTRACTOR_BIN_PATH,
-                common.PROTRACTOR_CONFIG_FILE_PATH),
-            program_args)
-        self.assertNotIn('--inspect-brk', program_args)
-        self.assertIn('--params.devMode=True', program_args)
-        self.assertIn('--suite full', program_args)
-
-    def test_managed_protractor_with_explicit_args(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        self.exit_stack.enter_context(servers.managed_protractor_server(
-            suite_name='abc', sharding_instances=3, debug_mode=True,
-            dev_mode=False, stdout=subprocess.PIPE))
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
-        program_args = popen_calls[0].program_args
-        # From debug_mode=True.
-        self.assertIn('--inspect-brk', program_args)
-        # From sharding_instances=3.
-        self.assertIn('--capabilities.shardTestFiles=True', program_args)
-        self.assertIn('--capabilities.maxInstances=3', program_args)
-        # From dev_mode=True.
-        self.assertIn('--params.devMode=False', program_args)
-        # From suite='full'.
-        self.assertIn('--suite abc', program_args)
-
     def test_managed_webdriverio_with_invalid_sharding_instances(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
