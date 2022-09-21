@@ -171,21 +171,17 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   updateLocalTitleValue(): void {
-    if (this.blogPostData) {
-      this.blogPostUpdateService.setBlogPostTitle(
-        this.blogPostData, this.title);
-      this.newChangesAreMade = true;
-      this.blogDashboardPageService.setNavTitle(
-        this.lastChangesWerePublished, this.title);
-      this.preventPageUnloadEventService.addListener();
-    }
+    this.blogPostUpdateService.setBlogPostTitle(
+      this.blogPostData, this.title);
+    this.newChangesAreMade = true;
+    this.blogDashboardPageService.setNavTitle(
+      this.lastChangesWerePublished, this.title);
+    this.preventPageUnloadEventService.addListener();
   }
 
   cancelEdit(): void {
-    if (this.blogPostData) {
-      if (this.blogPostData.content.length > 0) {
-        this.contentEditorIsActive = false;
-      }
+    if (this.blogPostData.content.length > 0) {
+      this.contentEditorIsActive = false;
     }
   }
 
@@ -197,101 +193,91 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   updateContentValue(): void {
-    if (this.blogPostData) {
-      this.blogPostUpdateService.setBlogPostContent(
-        this.blogPostData, this.localEditedContent);
-      if (this.blogPostData.content.length > 0) {
-        this.contentEditorIsActive = false;
-      }
-      this.newChangesAreMade = true;
-      this.preventPageUnloadEventService.addListener();
+    this.blogPostUpdateService.setBlogPostContent(
+      this.blogPostData, this.localEditedContent);
+    if (this.blogPostData.content.length > 0) {
+      this.contentEditorIsActive = false;
     }
+    this.newChangesAreMade = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   saveDraft(): void {
-    if (this.blogPostData) {
-      let issues = this.blogPostData.validate();
-      if (issues.length === 0) {
-        this.updateBlogPostData(false);
-      } else {
-        this.alertsService.addWarning(
-          'Please fix the errors.'
-        );
-      }
-    }
-  }
-
-  publishBlogPost(): void {
-    if (this.blogPostData) {
-      let issues = this.blogPostData.prepublishValidate(this.maxAllowedTags);
-      if (issues.length === 0) {
-        this.blogDashboardPageService.blogPostAction = (
-          BlogDashboardPageConstants.BLOG_POST_ACTIONS.PUBLISH);
-        this.ngbModal.open(BlogPostActionConfirmationModalComponent, {
-          backdrop: 'static',
-          keyboard: false,
-        }).result.then(() => {
-          this.updateBlogPostData(true);
-        }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-        });
-      }
-    }
-  }
-
-  updateBlogPostData(isBlogPostPublished: boolean): void {
-    if (this.blogPostData) {
-      this.blogPostUpdateService.setBlogPostTags(
-        this.blogPostData, this.blogPostData.tags);
-      let changeDict = this.blogPostUpdateService.getBlogPostChangeDict();
-      this.blogPostEditorBackendService.updateBlogPostDataAsync(
-        this.blogPostId, isBlogPostPublished, changeDict).then(
-        () => {
-          if (isBlogPostPublished) {
-            this.alertsService.addSuccessMessage(
-              'Blog Post Saved and Published Successfully.'
-            );
-            this.lastChangesWerePublished = true;
-          } else {
-            this.alertsService.addSuccessMessage(
-              'Blog Post Saved Successfully.');
-            this.lastChangesWerePublished = false;
-          }
-          this.newChangesAreMade = false;
-          this.blogDashboardPageService.setNavTitle(
-            this.lastChangesWerePublished, this.title);
-          this.preventPageUnloadEventService.removeListener();
-        }, (errorResponse) => {
-          this.alertsService.addWarning(
-            `Failed to save Blog Post. Internal Error: ${errorResponse}`);
-        }
+    let issues = this.blogPostData.validate();
+    if (issues.length === 0) {
+      this.updateBlogPostData(false);
+    } else {
+      this.alertsService.addWarning(
+        'Please fix the errors.'
       );
     }
   }
 
-  postImageDataToServer(): void {
-    if (this.blogPostData) {
-      let imagesData = this.imageLocalStorageService.getStoredImagesData();
-      this.blogPostUpdateService.setBlogPostThumbnail(
-        this.blogPostData, imagesData);
-      this.blogPostEditorBackendService.postThumbnailDataAsync(
-        this.blogPostId, imagesData).then(
-        () => {
-          if (this.windowIsNarrow) {
-            this.blogDashboardPageService.imageUploaderIsNarrow = true;
-          }
-          this.alertsService.addSuccessMessage(
-            'Thumbnail Saved Successfully.');
-        }, (errorResponse) => {
-          this.alertsService.addWarning(
-            `Failed to save thumbnail data. Internal Error: ${errorResponse}`
-          );
-          this.imageLocalStorageService.flushStoredImagesData();
-          this.thumbnailDataUrl = '';
-        });
+  publishBlogPost(): void {
+    let issues = this.blogPostData.prepublishValidate(this.maxAllowedTags);
+    if (issues.length === 0) {
+      this.blogDashboardPageService.blogPostAction = (
+        BlogDashboardPageConstants.BLOG_POST_ACTIONS.PUBLISH);
+      this.ngbModal.open(BlogPostActionConfirmationModalComponent, {
+        backdrop: 'static',
+        keyboard: false,
+      }).result.then(() => {
+        this.updateBlogPostData(true);
+      }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+      });
     }
+  }
+
+  updateBlogPostData(isBlogPostPublished: boolean): void {
+    this.blogPostUpdateService.setBlogPostTags(
+      this.blogPostData, this.blogPostData.tags);
+    let changeDict = this.blogPostUpdateService.getBlogPostChangeDict();
+    this.blogPostEditorBackendService.updateBlogPostDataAsync(
+      this.blogPostId, isBlogPostPublished, changeDict).then(
+      () => {
+        if (isBlogPostPublished) {
+          this.alertsService.addSuccessMessage(
+            'Blog Post Saved and Published Successfully.'
+          );
+          this.lastChangesWerePublished = true;
+        } else {
+          this.alertsService.addSuccessMessage(
+            'Blog Post Saved Successfully.');
+          this.lastChangesWerePublished = false;
+        }
+        this.newChangesAreMade = false;
+        this.blogDashboardPageService.setNavTitle(
+          this.lastChangesWerePublished, this.title);
+        this.preventPageUnloadEventService.removeListener();
+      }, (errorResponse) => {
+        this.alertsService.addWarning(
+          `Failed to save Blog Post. Internal Error: ${errorResponse}`);
+      }
+    );
+  }
+
+  postImageDataToServer(): void {
+    let imagesData = this.imageLocalStorageService.getStoredImagesData();
+    this.blogPostUpdateService.setBlogPostThumbnail(
+      this.blogPostData, imagesData);
+    this.blogPostEditorBackendService.postThumbnailDataAsync(
+      this.blogPostId, imagesData).then(
+      () => {
+        if (this.windowIsNarrow) {
+          this.blogDashboardPageService.imageUploaderIsNarrow = true;
+        }
+        this.alertsService.addSuccessMessage(
+          'Thumbnail Saved Successfully.');
+      }, (errorResponse) => {
+        this.alertsService.addWarning(
+          `Failed to save thumbnail data. Internal Error: ${errorResponse}`
+        );
+        this.imageLocalStorageService.flushStoredImagesData();
+        this.thumbnailDataUrl = '';
+      });
   }
 
   deleteBlogPost(): void {
@@ -309,15 +295,13 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   onTagChange(tag: string): void {
-    if (this.blogPostData) {
-      if ((this.blogPostData.tags).includes(tag)) {
-        this.blogPostData.removeTag(tag);
-      } else if ((this.blogPostData.tags).length < this.maxAllowedTags) {
-        this.blogPostData.addTag(tag);
-      }
-      this.newChangesAreMade = true;
-      this.preventPageUnloadEventService.addListener();
+    if ((this.blogPostData.tags).includes(tag)) {
+      this.blogPostData.removeTag(tag);
+    } else if ((this.blogPostData.tags).length < this.maxAllowedTags) {
+      this.blogPostData.addTag(tag);
     }
+    this.newChangesAreMade = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   showuploadThumbnailModal(): void {
@@ -344,29 +328,25 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   showPreview(): void {
-    if (this.blogPostData) {
-      this.blogDashboardPageService.blogPostData = this.blogPostData;
-      this.blogDashboardPageService.authorPictureUrl = (
-        this.authorProfilePictureUrl);
-      this.ngbModal.open(BlogCardPreviewModalComponent, {
-        backdrop: 'static'
-      });
-    }
+    this.blogDashboardPageService.blogPostData = this.blogPostData;
+    this.blogDashboardPageService.authorPictureUrl = (
+      this.authorProfilePictureUrl);
+    this.ngbModal.open(BlogCardPreviewModalComponent, {
+      backdrop: 'static'
+    });
   }
 
   isPublishButtonDisabled(): boolean {
-    if (this.blogPostData) {
-      if (
-        this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0
-      ) {
-        return true;
-      } else if (this.newChangesAreMade) {
-        return false;
-      } else if (!this.lastChangesWerePublished) {
-        return false;
-      } else {
-        return true;
-      }
+    if (
+      this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0
+    ) {
+      return true;
+    } else if (this.newChangesAreMade) {
+      return false;
+    } else if (!this.lastChangesWerePublished) {
+      return false;
+    } else {
+      return true;
     }
   }
 }
