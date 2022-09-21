@@ -58,6 +58,25 @@ EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
     'scripts/'
 ]
 
+ALLOWED_TYPE_IGNORE_ERROR_CODES = [
+    'attr-defined',
+    'union-attr',
+    'arg-type',
+    'call-overload',
+    'override',
+    'return',
+    'assignment',
+    'list-item',
+    'dict-item',
+    'typeddict-item',
+    'func-returns-value',
+    'misc',
+    'type-arg',
+    'no-untyped-def',
+    'no-untyped-call',
+    'no-any-return'
+]
+
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1966,6 +1985,14 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
             ' remove it.',
             'redundant-type-comment',
             'No corresponding \'type: ignore\' is found for the comment.'
+        ),
+        'C0050': (
+            'Please avoid the usage of \'type: ignore[%s]\' as it is not'
+            ' allowed in the codebase. Instead fix the code implementation'
+            ' so that the MyPy error is suppressed. For more information, visit'
+            ' : https://mypy.readthedocs.io/en/latest/error_code_list.html',
+            'prohibited-type-ignore-used',
+            'Only a limited number of type ignores are allowed in the codebase.'
         )
     }
 
@@ -2017,10 +2044,20 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
 
                     comment_line_number = line_num
 
-                if re.search(r'(\s*type:\s*ignore)', line):
-                    if 'type: ignore[no-untyped-call]' in line:
+                if re.search(r'(\s*type:\s*ignore\[)', line):
+                    error_code = re.search(
+                        r'(s*type:\s*ignore)\[([a-z-]*)\]', line
+                    ).group(2)
+                    if error_code == 'no-untyped-call':
                         continue
-                    if (
+                    if error_code not in ALLOWED_TYPE_IGNORE_ERROR_CODES:
+                        self.add_message(
+                            'prohibited-type-ignore-used',
+                            line=line_num,
+                            args=(error_code,),
+                            node=node
+                        )
+                    elif (
                         type_ignore_comment_present and
                         line_num <= (
                             comment_line_number +
