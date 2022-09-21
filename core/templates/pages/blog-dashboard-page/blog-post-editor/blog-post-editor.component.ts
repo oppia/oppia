@@ -224,9 +224,9 @@ export class BlogPostEditorComponent implements OnInit {
       }).result.then(() => {
         this.updateBlogPostData(true);
       }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     }
   }
