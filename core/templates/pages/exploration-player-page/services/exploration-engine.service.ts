@@ -541,6 +541,22 @@ export class ExplorationEngineService {
     questionHtml = questionHtml + this._getRandomSuffix();
     nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
 
+    // Check if the answer is only misspelled and close
+    // to the correct answer. Only to be checked if the
+    // interaction is TextInput.
+    let oldInteractionId = oldStateCard.getInteraction().id;
+
+    // Work => let catchMisspellingsFeatOn = oldStateCard.getInteraction().customizationArgs;
+    
+    if(oldInteractionId === "TextInput") {
+      var answerIsOnlyMisspelled = this.answerClassificationService.
+    isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
+      if (answerIsOnlyMisspelled) {
+        // Change the feedbackHtml.
+        feedbackHtml = "Oops you misspelled. Mind correcting it?"
+      }
+    }
+
     let nextCard = StateCard.createNewCard(
       this.nextStateName, questionHtml, nextInteractionHtml,
       this.exploration.getInteraction(this.nextStateName),

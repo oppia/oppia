@@ -185,6 +185,54 @@ export class AnswerClassificationService {
     return answerClassificationResult;
   }
 
+  hasMaxEditDistanceThree(answer: string, correctAnswer: string) {
+    const normalizedAnswer = answer.toLowerCase();
+    const normalizedCorrectAnswer = correctAnswer.toLowerCase();
+    if (normalizedCorrectAnswer === normalizedAnswer) {
+      return true;
+    }
+    var editDistance = [];
+    for (var i = 0; i <= normalizedCorrectAnswer.length; i++) {
+      editDistance.push([i]);
+    }
+    for (var j = 1; j <= normalizedAnswer.length; j++) {
+      editDistance[0].push(j);
+    }
+    for (var i = 1; i <= normalizedCorrectAnswer.length; i++) {
+      for (var j = 1; j <= normalizedAnswer.length; j++) {
+        if (normalizedCorrectAnswer.charAt(i - 1) === normalizedAnswer.charAt(j - 1)) {
+          editDistance[i][j] = editDistance[i - 1][j - 1];
+        } else {
+          editDistance[i][j] = Math.min(
+            editDistance[i - 1][j - 1], editDistance[i][j - 1],
+            editDistance[i - 1][j]) + 1;
+        }
+      }
+    }
+    return editDistance[normalizedCorrectAnswer.length][normalizedAnswer.length] <= 3;
+  };
+
+  isAnswerOnlyMisspelled(
+      interactionInOldState: Interaction,
+      answer: string
+    ): boolean {
+    var answerIsMisspelled = false;
+    const answerGroups = interactionInOldState.answerGroups;
+    // for (var i = 0; i < answerGroups.length; ++i) {
+    //   const answerGroup = answerGroups[i];
+      // if (answerGroup.outcome.labelledAsCorrect) {
+        // var correctAnswer = answerGroup.outcome.;
+        if (this.hasMaxEditDistanceThree(
+          answer,
+          "lalala"
+        )) {
+          answerIsMisspelled = true;
+        }
+      // }
+    // }
+    return answerIsMisspelled;
+  }
+
   isClassifiedExplicitlyOrGoesToNewState(
       stateName: string, state: State, answer: InteractionAnswer,
       interactionRulesService: InteractionRulesService): boolean {
