@@ -3169,11 +3169,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Update general state validations.
         states_dict = cls._update_general_state(states_dict)
 
-        # Update general state interaction validations.
+        # Update state interaction validations.
         states_dict = cls._update_general_state_interaction(
             states_dict, language_code)
 
-        # Update general state RTE validations.
+        # Update state RTE validations.
         states_dict = cls._update_general_state_rte(states_dict)
 
         return states_dict
@@ -4503,7 +4503,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state in states_dict.values():
             html = state['content']['html']
-            
+        # Add for translations and check the RTE
             state['content']['html'] = cls._fix_rte(html)
 
         return states_dict
@@ -4532,6 +4532,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             current_states_schema_version: int. The current states
                 schema version.
             init_state_name: str. Name of initial state.
+            language_code: str. The language code of the exploration.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -4830,8 +4831,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_v57_dict_to_v58_dict(
         cls, exploration_dict: VersionedExplorationDict
     ) -> VersionedExplorationDict:
-        """Converts a v56 exploration dict into a v57 exploration dict.
-        Version 57 corrects exploration validation errors which are categorized
+        """Converts a v57 exploration dict into a v58 exploration dict.
+        Version 58 corrects exploration validation errors which are categorized
         as General State Validation, General Interaction Validation
         and General RTE Validation.
 
