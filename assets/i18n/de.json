@@ -142,6 +142,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_1": "Themen und Vorschläge",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Übersicht",
 	"I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO": "Dies bringt dich zu einer Seite, wo du dein Oppia-Konto löschen kanst.",
+	"I18N_DEST_IF_STUCK_INFO_TOOLTIP": "Du kannst jetzt eine neue Karte angeben, auf der du die Lernenden durch die in der Frage verwendeten Konzepte führen kannst, wenn sie wirklich nicht weiterkommen!",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Ein Bild in diesem Bereich ablegen",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Eine Datei hochladen",
 	"I18N_DONATE_PAGE_BREADCRUMB": "Spenden",
