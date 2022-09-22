@@ -29,6 +29,7 @@ export class AndroidPageRootComponent {
   androidPageIsEnabled = (
     this.platformFeatureService.status.AndroidPage.isEnabled
   );
+
   constructor(
     private pageHeadService: PageHeadService,
     private platformFeatureService: PlatformFeatureService

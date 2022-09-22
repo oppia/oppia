@@ -32,6 +32,7 @@ export class SocialButtonsComponent {
   androidAppButtonIsShown = (
     this.platformFeatureService.status.AndroidPage.isEnabled
   );
+
   constructor(private platformFeatureService: PlatformFeatureService) {}
 }
 
