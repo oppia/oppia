@@ -36,6 +36,12 @@ export class AccessValidationBackendApiService {
   RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_release_coordinator_page');
 
+  BLOG_HOME_PAGE_ACCESS_VALIDATOR = (
+    '/access_validation_handler/can_access_blog_home_page');
+
+  BLOG_POST_PAGE_ACCESS_VALIDATOR = (
+    '/access_validation_handler/can_access_blog_post_page');
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -47,6 +53,21 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(this.CLASSROOM_PAGE_ACCESS_VALIDATOR, {
       params: {
         classroom_url_fragment: classroomUrlFragment
+      }
+    }).toPromise();
+  }
+
+  validateAccessToBlogHomePage(): Promise<void> {
+    return this.http.get<void>(
+      this.BLOG_HOME_PAGE_ACCESS_VALIDATOR).toPromise();
+  }
+
+  validateAccessToBlogPostPage(
+      blogPostPageUrlFragment: string
+  ): Promise<void> {
+    return this.http.get<void>(this.BLOG_POST_PAGE_ACCESS_VALIDATOR, {
+      params: {
+        blog_post_url_fragment: blogPostPageUrlFragment
       }
     }).toPromise();
   }
