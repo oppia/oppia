@@ -857,10 +857,22 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                     )
                 )
                 raise e
-            math_content_dict = {
-                'raw_latex': normalized_raw_latex,
-                'svg_filename': ''
-            }
+            if math_tag.has_attr('svg_filename-with-value'):
+                svg_filename = (
+                    json.loads(unescape_html(
+                        math_tag['svg_filename-with-value'])))
+                normalized_svg_filename = (
+                    objects.UnicodeString.normalize(svg_filename))  # type: ignore[no-untyped-call]
+                math_content_dict = {
+                    'raw_latex': normalized_raw_latex,
+                    'svg_filename': normalized_svg_filename
+                }
+                del math_tag['svg_filename-with-value']
+            else:
+                math_content_dict = {
+                    'raw_latex': normalized_raw_latex,
+                    'svg_filename': ''
+                }
             # Normalize and validate the value before adding to the math
             # tag.
             normalized_math_content_dict = (

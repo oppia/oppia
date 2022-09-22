@@ -1974,11 +1974,18 @@ def validate_rte_tags(
             raise utils.ValidationError(
                 'Image tag does not have \'alt-with-value\' attribute.'
             )
-        if len(tag['alt-with-value'].strip()) < 5:
-            raise utils.ValidationError(
-                'Image tag \'alt-with-value\' attribute should not '
-                'be less than 5.'
-            )
+        if '&quot;' in tag['alt-with-value']:
+            if len(tag['alt-with-value'].strip().split('&quot;')[1]) < 5:
+                raise utils.ValidationError(
+                    'Image tag \'alt-with-value\' attribute should not '
+                    'be less than 5.'
+                )
+        else:
+            if len(tag['alt-with-value'].strip()) < 5:
+                raise utils.ValidationError(
+                    'Image tag \'alt-with-value\' attribute should not '
+                    'be less than 5.'
+                )
         if not tag.has_attr('caption-with-value'):
             raise utils.ValidationError(
                 'Image tag does not have \'caption-with-value\' attribute.'
