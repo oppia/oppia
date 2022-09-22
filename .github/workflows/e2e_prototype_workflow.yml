@@ -51,74 +51,7 @@ jobs:
         with:
           name: built-webpack
           path: /home/runner/work/oppia/oppia/build
-  e2e_prototype_additional_editor_and_player:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-22.04 ]
-    needs: build_webpack
-    steps:
-      - uses: actions/checkout@v2
-      - id: check-risk
-        name: Check if PR is low-risk
-        uses: ./.github/actions/check-if-pr-is-low-risk
-      - uses: ./.github/actions/merge
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/yarn_cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: download webpack
-        uses: actions/download-artifact@v2
-        with:
-          name: built-webpack
-          path: /home/runner/work/oppia
-      - name: Run Additional Editor E2E Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeatures" --prod_env
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run Additional Editor Modals E2E Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeaturesModals" --prod_env
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run Additional Player E2E Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Uploading webdriverio-video as Artifacts
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: webdriverio-video
-          path: /home/runner/work/oppia/webdriverio-video
-      - name: Uploading webdriverio screenshots as Artifacts
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: webdriverio-screenshots
-          path: /home/runner/work/oppia/webdriverio-screenshots
-      - name: Uploading webpack bundles as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: webpack-bundles
-          path: /home/runner/work/oppia/oppia/build
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "An E2E test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  e2e_prototype_creator_learner_dashboard_and_editor_tabs:
+  e2e_user_features_and_library:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -126,6 +59,10 @@ jobs:
     needs: build_webpack
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v2
@@ -138,32 +75,39 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
       - id: check-risk
         name: Check if PR is low-risk
         uses: ./.github/actions/check-if-pr-is-low-risk
-      - name: download webpack
+      - name: Install chrome
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.install_chrome_for_ci
+      - name: Install ffmpeg
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: sudo apt install ffmpeg
+      - name: Download webpack artifact
         uses: actions/download-artifact@v2
         with:
           name: built-webpack
           path: /home/runner/work/oppia/oppia/build
-      - name: Run Creator Dashboard E2E Test
+      - name: Run Library E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="creatorDashboard" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run Improvements Tab E2E Test
+      - name: Run e2e preferences test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationImprovementsTab" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run Feedback Tab E2E Test
+      - name: Run e2e subscriptions test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationFeedbackTab" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run Learner Dashboard E2E Test
+      - name: Run e2e wipeout test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading protractor-video as Artifacts
