@@ -1987,10 +1987,11 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
             'No corresponding \'type: ignore\' is found for the comment.'
         ),
         'C0050': (
-            'Please avoid the usage of \'type: ignore[%s]\' as it is not'
-            ' allowed in the codebase. Instead fix the code implementation'
-            ' so that the MyPy error is suppressed. For more information, visit'
-            ' : https://mypy.readthedocs.io/en/latest/error_code_list.html',
+            'Please avoid the usage of \'type: ignore[%s]\' as it is'
+            ' not allowed in the codebase. Instead try to fix the code'
+            ' implementation so that the MyPy error is suppressed. For'
+            ' more information, visit :'
+            ' https://mypy.readthedocs.io/en/latest/error_code_list.html',
             'prohibited-type-ignore-used',
             'Only a limited number of type ignores are allowed in the codebase.'
         )
@@ -2045,19 +2046,28 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                     comment_line_number = line_num
 
                 if re.search(r'(\s*type:\s*ignore\[)', line):
-                    error_code = re.search(
-                        r'(s*type:\s*ignore)\[([a-z-]*)\]', line
+                    prohibited_error_code_present = False
+
+                    error_codes = re.search(
+                        r'(\s*type:\s*ignore)\[([a-z-\s\,]*)\]', line
                     ).group(2)
-                    if error_code == 'no-untyped-call':
+
+                    encountered_error_codes = []
+                    for error_code in error_codes.split(','):
+                        error_code = error_code.strip()
+                        if error_code not in ALLOWED_TYPE_IGNORE_ERROR_CODES:
+                            prohibited_error_code_present = True
+                            self.add_message(
+                                'prohibited-type-ignore-used',
+                                line=line_num,
+                                args=(error_code,),
+                                node=node
+                            )
+                        encountered_error_codes.append(error_code)
+
+                    if ['no-untyped-call'] == encountered_error_codes:
                         continue
-                    if error_code not in ALLOWED_TYPE_IGNORE_ERROR_CODES:
-                        self.add_message(
-                            'prohibited-type-ignore-used',
-                            line=line_num,
-                            args=(error_code,),
-                            node=node
-                        )
-                    elif (
+                    if (
                         type_ignore_comment_present and
                         line_num <= (
                             comment_line_number +
@@ -2066,7 +2076,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                     ):
                         type_ignore_comment_present = False
                         no_of_type_ignore_comments = 0
-                    else:
+                    elif not prohibited_error_code_present:
                         self.add_message(
                             'mypy-ignore-used', line=line_num, node=node
                         )

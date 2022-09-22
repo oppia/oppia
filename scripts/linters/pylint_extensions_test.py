@@ -2478,6 +2478,41 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
+    def test_raises_error_if_prohibited_type_ignore_is_used_in_combined_form(
+        self
+    ):
+        node_with_prohibited_type_ignore_in_combined_form = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                suggestion.change.new_value = (  # type: ignore[arg-type, no-untyped-call, truthy-bool] pylint: disable=line-too-long
+                    new_content
+                ) #@
+                """
+            )
+        node_with_prohibited_type_ignore_in_combined_form.file = filename
+
+        message = testutils.Message(
+            msg_id='prohibited-type-ignore-used',
+            line=2,
+            node=node_with_prohibited_type_ignore_in_combined_form,
+            args=('truthy-bool',)
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_module(
+                node_with_prohibited_type_ignore_in_combined_form
+            )
+        temp_file.close()
+
     def test_extra_type_ignore_comment_used_in_a_module_raises_error(self):
         node_function_with_extra_comment = astroid.scoped_nodes.Module(
             name='test',
