@@ -3363,10 +3363,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
-            if len(answer_group['rule_specs']) == 0:
+            if (
+                len(answer_group['rule_specs']) == 0 and
+                answer_group not in empty_ans_groups
+            ):
                 empty_ans_groups.append(answer_group)
 
-        for empty_ans_group in set(empty_ans_groups):
+        for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
     @classmethod
@@ -3590,7 +3593,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     empty_ans_groups.append(answer_group)
 
         # Remove empty answer groups.
-        for empty_ans_group in set(empty_ans_groups):
+        for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
     @classmethod
@@ -3840,11 +3843,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec == invalid_rule:
                         answer_group['rule_specs'].remove(rule_spec)
 
-                if len(answer_group['rule_specs']) == 0:
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         # Removal of empty answer groups.
-        for empty_ans_group in set(empty_ans_groups):
+        for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -3933,14 +3939,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
 
                 for range_ele in ranges:
-                    if cls._is_enclosed_by(range_var, range_ele):
-                        earlier_rule = answer_groups[range_ele[
-                            'ans_group_index']]['rule_specs'][
-                                range_ele['rule_spec_index']]
-
-                        if cls._should_check_range_criteria(
-                            earlier_rule, rule_spec
-                        ):
+                    earlier_rule = answer_groups[range_ele[
+                        'ans_group_index']]['rule_specs'][
+                            range_ele['rule_spec_index']]
+                    if cls._should_check_range_criteria(
+                        earlier_rule, rule_spec
+                    ):
+                        if cls._is_enclosed_by(range_var, range_ele):
                             invalid_rules.append(rule_spec)
 
                 for den in matched_denominator_list:
@@ -3964,11 +3969,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec == invalid_rule:
                         answer_group['rule_specs'].remove(rule_spec)
 
-                if len(answer_group['rule_specs']) == 0:
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         # Removal of empty answer groups.
-        for empty_ans_group in set(empty_ans_groups):
+        for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -4011,10 +4019,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             rule_spec['inputs']['x'])
             for ele in unwanted_rule:
                 answer_group['rule_specs'].remove(ele)
-            if len(answer_group['rule_specs']) == 0:
+            if (
+                len(answer_group['rule_specs']) == 0 and
+                answer_group not in empty_ans_groups
+            ):
                 empty_ans_groups.append(answer_group)
         # Removal of empty answer group.
-        for empty_ans_group in set(empty_ans_groups):
+        for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
         # Answer choices should be non-empty and unique.
@@ -4091,10 +4102,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
 
-            if len(answer_group['rule_specs']) == 0:
+            if (
+                len(answer_group['rule_specs']) == 0 and
+                answer_group not in empty_ans_groups
+            ):
                 empty_ans_groups.append(answer_group)
         # Removal of empty answer groups.
-        for empty_ans_group in set(empty_ans_groups):
+        for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
         # Minimum number of selections should be no greater than maximum
@@ -4243,11 +4257,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec == invalid_rule:
                         answer_group['rule_specs'].remove(rule_spec)
 
-                if len(answer_group['rule_specs']) == 0:
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         # Removal of empty answer groups.
-        for empty_ans_group in set(empty_ans_groups):
+        for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -4355,11 +4372,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec == invalid_rule:
                         answer_group['rule_specs'].remove(rule_spec)
 
-                if len(answer_group['rule_specs']) == 0:
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         # Removal of empty answer groups.
-        for empty_ans_group in set(empty_ans_groups):
+        for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['answer_groups'] = answer_groups
