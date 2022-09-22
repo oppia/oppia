@@ -285,13 +285,15 @@ def get_storage_model_module_names() -> Iterator[models.Names]:
         yield name
 
 
-def get_storage_model_classes() -> Iterator[base_models.BaseModel]:
+def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
     """Get all model classes in storage."""
     for module_name in get_storage_model_module_names():
         (module,) = models.Registry.import_models([module_name])
         for member_name, member_obj in inspect.getmembers(module):
             if inspect.isclass(member_obj):
-                clazz: base_models.BaseModel = getattr(module, member_name)
+                clazz: Type[base_models.BaseModel] = getattr(
+                    module, member_name
+                )
                 all_base_classes = [
                     base_class.__name__ for base_class in inspect.getmro(
                         clazz)]

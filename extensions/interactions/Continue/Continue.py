@@ -20,27 +20,33 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class Continue(base.BaseInteraction):
     """Interaction that takes the form of a simple 'Continue' button."""
 
-    name = 'Continue Button'
-    description = 'A simple \'go to next state\' button.'
-    display_mode = base.DISPLAY_MODE_INLINE
-    _dependency_ids = []
-    is_linear = True
-    instructions = None
-    narrow_instructions = None
-    needs_summary = False
-    default_outcome_heading = 'When the button is clicked'
+    name: str = 'Continue Button'
+    description: str = 'A simple \'go to next state\' button.'
+    display_mode: str = base.DISPLAY_MODE_INLINE
+    _dependency_ids: List[str] = []
+    is_linear: bool = True
+    instructions: Optional[str] = None
+    narrow_instructions: Optional[str] = None
+    needs_summary: bool = False
+    default_outcome_heading: str = 'When the button is clicked'
     # Linear interactions are not supposed to have a solution.
-    can_have_solution = False
+    can_have_solution: bool = False
     # The Continue button is added to the progress nav, but is handled
     # separately from the generic Submit button because the text on it can
     # change depending on the customization args.
-    show_generic_submit_button = False
+    show_generic_submit_button: bool = False
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'buttonText',
         'description': 'Button label',
         'schema': {
@@ -48,7 +54,7 @@ class Continue(base.BaseInteraction):
             'obj_type': 'SubtitledUnicode'
         },
         'default_value': {
-            'content_id': None,
+            'content_id': '',
             'unicode_str': 'Continue'
         },
     }]

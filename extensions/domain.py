@@ -24,11 +24,15 @@ from typing_extensions import TypedDict
 MYPY = False
 if MYPY: # pragma: no cover
     from core.domain import state_domain
+    from extensions.interactions.GraphInput import GraphInput
+    from extensions.interactions.ImageClickInput import ImageClickInput
 
     AllowedDefaultValueTypes = Union[
         str,
-        int,
+        float,
+        Dict[str, Union[str, List[ImageClickInput.LabeledRegionDict]]],
         state_domain.SubtitledUnicodeDict,
+        GraphInput.GraphDict,
         List[state_domain.SubtitledHtmlDict],
         None
     ]

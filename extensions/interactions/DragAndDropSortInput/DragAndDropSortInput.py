@@ -17,23 +17,29 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class DragAndDropSortInput(base.BaseInteraction):
     """Interaction for Drag and Drop Sorting."""
 
-    name = 'Drag And Drop Sort'
-    description = 'Allows learners to drag and drop items for sorting.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = False
-    _dependency_ids = []
-    answer_type = 'ListOfSetsOfTranslatableHtmlContentIds'
-    instructions = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
-    narrow_instructions = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
-    needs_summary = True
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Drag And Drop Sort'
+    description: str = 'Allows learners to drag and drop items for sorting.'
+    display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable: bool = False
+    _dependency_ids: List[str] = []
+    answer_type: str = 'ListOfSetsOfTranslatableHtmlContentIds'
+    instructions: str = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
+    narrow_instructions: str = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
+    needs_summary: bool = True
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'choices',
         'description': 'Items for drag and drop',
         'schema': {
@@ -66,7 +72,7 @@ class DragAndDropSortInput(base.BaseInteraction):
             }
         },
         'default_value': [{
-            'content_id': None,
+            'content_id': '',
             'html': ''
         }],
     }, {
@@ -78,4 +84,4 @@ class DragAndDropSortInput(base.BaseInteraction):
         'default_value': False
     }]
 
-    _answer_visualization_specs = []
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = []
