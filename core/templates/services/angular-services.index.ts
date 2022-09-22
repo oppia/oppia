@@ -429,6 +429,7 @@ import { ExplorationSaveService } from 'pages/exploration-editor-page/services/e
 import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
+import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -890,5 +891,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationAutomaticTextToSpeechService',
     ExplorationAutomaticTextToSpeechService],
   ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
-  ['CompareVersionsService', CompareVersionsService]
+  ['CompareVersionsService', CompareVersionsService],
+  ['EntityCreationService', EntityCreationService]
 ];
