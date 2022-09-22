@@ -1,0 +1,120 @@
+# Use latest version of Ubuntu that supports python 2
+FROM ubuntu:18.04
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV TZ "UTC"
+ENV DOCKER_CONTAINER True
+SHELL ["/bin/bash", "-c"]
+
+# Basic setup
+RUN apt-get update && \
+    apt-get install -y sudo && \
+    apt-get install -y vim && \
+    apt-get install -y wget && \
+    apt-get install -y nodejs && \
+    apt-get install -y npm && \
+    apt-get install -y yes && \
+    apt install -y tzdata && \
+    apt install -y tree && \
+    apt install -y python-pip && \
+    apt-get install -y make && \
+    apt-get install -y build-essential && \
+    apt-get install -y libssl-dev && \
+    apt-get install -y zlib1g-dev && \
+    apt-get install -y libbz2-dev && \
+    apt-get install -y libreadline-dev && \
+    apt-get install -y libsqlite3-dev && \
+    apt-get install -y wget && \
+    apt-get install -y llvm && \
+    apt-get install -y libncursesw5-dev && \
+    apt-get install -y xz-utils && \
+    apt-get install -y tk-dev && \
+    apt-get install -y libxml2-dev && \
+    apt-get install -y libxmlsec1-dev && \
+    apt-get install -y libffi-dev && \
+    apt-get install -y liblzma-dev && \
+    apt-get clean
+
+# Install python3.7.14
+RUN : \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        software-properties-common \
+    && add-apt-repository -y ppa:deadsnakes \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3.7-venv \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && :
+
+RUN python3.7 -m venv /home/opensource/venv
+ENV PATH=/home/opensource/venv/bin:$PATH
+
+# Fix certificate issues
+RUN apt-get update && \
+    apt-get -y install ca-certificates-java && \
+    apt-get clean && \
+    update-ca-certificates -f
+
+# Setup JAVA_HOME
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+ENV PATH $PATH:$JAVA_HOME/bin
+RUN export JAVA_HOME
+
+# Install dumb-init (Signal handling of SIGINT/SIGTERM/SIGKILL and all other unhandled signals)
+# When a process is executed in a Docker container, it is given a PID of 1. Linux kernels give
+# special permissions to the process with a PID of 1. In particular, if the process does not handle
+# a specific signal, then it will not respond to that signal. Unhandled signals for processes of
+# PID other than 1 are set to the default response for the signal. So, we install dumb-init as a
+# reliable process for the Linux kernel to give special permissions to. dumb-init then executes all
+# other processes as child processes (PID other than 1), such that their unhandled signals are
+# automatically handled as expected.
+RUN wget https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64.deb
+RUN dpkg -i dumb-init_*.deb
+ENTRYPOINT ["dumb-init"]
+
+# Download Google Chrome
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt install -y ./google-chrome-stable_current_amd64.deb
+
+WORKDIR /home/opensource/oppia
+
+COPY ./ /home/opensource/oppia/
+RUN yes | bash /home/opensource/oppia/scripts/install_prerequisites.sh
+
+# Note: Attempts to grant file permissions to the docker user.
+# # Allow docker to have sudo privileges
+# RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
+# # Ensure sudo group users are not 
+# # asked for a password when using 
+# # sudo command by ammending sudoers file
+# RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
+# /etc/sudoers
+# USER docker
+
+# Grant read and write permissions to the /home/opensource/ directory
+RUN chmod -R o-rwx /home/opensource/*
+RUN chown :1000 /home/opensource/ && \
+    chmod -R 775 /home/opensource/ && \
+    chmod g+s /home/opensource/
+
+RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
+# # Ensure sudo group users are not 
+# # asked for a password when using 
+# # sudo command by ammending sudoers file
+# RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
+# /etc/sudoers
+USER docker
+
+# RUN addgroup --gid 1000 dockergrp
+# # add user to the docker group
+# RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker dockergrp
+# USER docker
+
+# Warning: The below steps will not work unless permission are granted to the /home/opensource/ directory.
+# Install python dependencies and for backend tests and check coverage.
+# RUN source /home/opensource/venv/bin/activate && \
+#    pip install wheel==0.35.0 pyyaml setuptools coverage configparser pip-tools && \
+#    python -m scripts.install_third_party_libs
+
+# RUN rm -r /home/opensource/oppia/*
