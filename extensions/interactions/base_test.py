@@ -38,7 +38,7 @@ from core.tests import test_utils
 from extensions import domain
 from extensions.interactions import base
 
-from typing import List, Set
+from typing import Dict, List, Set
 from typing_extensions import Final
 
 # File names ending in any of these suffixes will be ignored when checking the
@@ -318,7 +318,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
         # In the following part, we generate the html_field_types_to_rule_specs
         # dict based on the values in the rule_descriptions.json file.
-        generated_html_field_types_dict = (
+        generated_html_field_types_dict: Dict[
+            str, Dict[str, Dict[str, Dict[str, Dict[str, Set[str]]]]]
+        ] = (
             collections.defaultdict(lambda: collections.defaultdict(
                 lambda: collections.defaultdict(lambda: collections.defaultdict(
                     lambda: collections.defaultdict(set))))))

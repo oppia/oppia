@@ -71,7 +71,7 @@ class AnswerVisualizationSpecsDict(TypedDict):
     """Dictionary representing the _answer_visualization_specs variable."""
 
     id: str
-    options: Dict[str, Union[str, List[str], bool]]
+    options: models.OptionsDictType
     calculation_id: str
     addressed_info_is_supported: bool
 

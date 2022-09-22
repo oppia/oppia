@@ -158,7 +158,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/voice_artist_test.py',
     'extensions/objects',
     'extensions/rich_text_components',
-    'extensions/visualizations',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',
     'scripts/concurrent_task_utils.py',
