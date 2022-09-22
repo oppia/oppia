@@ -31,10 +31,10 @@ import { TopicEditorStateService } from './topic-editor-state.service';
 })
 export class EntityCreationService {
   constructor(
+    private createNewSkillModalService: CreateNewSkillModalService,
     private ngbModal: NgbModal,
     private topicEditorRoutingService: TopicEditorRoutingService,
-    private topicEditorStateService: TopicEditorStateService,
-    private createNewSkillModalService: CreateNewSkillModalService
+    private topicEditorStateService: TopicEditorStateService
   ) {}
 
   createSubtopic(): void {

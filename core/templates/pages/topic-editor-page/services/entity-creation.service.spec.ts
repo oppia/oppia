@@ -30,7 +30,7 @@ import { CreateNewSubtopicModalComponent } from '../modal-templates/create-new-s
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockNgbModal {
-  open() {
+  open(): { result: Promise<string> } {
     return {
       result: Promise.resolve('1')
     };
