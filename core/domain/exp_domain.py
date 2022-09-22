@@ -3220,11 +3220,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         states_dict = cls._update_general_state(states_dict)
 
         # Update state interaction validations.
-        states_dict = cls._update_general_state_interaction(
+        states_dict = cls._update_state_interaction(
             states_dict, language_code)
 
         # Update state RTE validations.
-        states_dict = cls._update_general_state_rte(states_dict)
+        states_dict = cls._update_state_rte(states_dict)
 
         return states_dict
 
@@ -3316,30 +3316,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for choice_to_remove in choices_to_remove:
             choices.remove(choice_to_remove)
 
-        # Remove rules of ItemSelection interaction whose choice
-        # has been deleted.
-        if is_item_selection_interaction:
-            empty_ans_groups = []
-            for answer_group in answer_groups:
-                invalid_rules = []
-                for rule_spec in answer_group['rule_specs']:
-                    rule_values = rule_spec['inputs']['x']
-                    check = any(
-                        item in rule_values for item in
-                        invalid_choices_content_ids
-                    )
-                    if check:
-                        invalid_rules.append(rule_spec)
-                for invalid_rule in invalid_rules:
-                    answer_group['rule_specs'].remove(invalid_rule)
-                if len(answer_group['rule_specs']) == 0:
-                    empty_ans_groups.append(answer_group)
-
-            for empty_ans_group in empty_ans_groups:
-                answer_groups.remove(empty_ans_group)
-
-        # Remove rules of MultipleChoice interaction whose choice
-        # has been deleted.
+        # Remove rules whose choice has been deleted.
         empty_ans_groups = []
         for answer_group in answer_groups:
             invalid_rules = []
@@ -3347,6 +3324,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if rule_spec['rule_type'] == 'Equals':
                     if rule_spec['inputs']['x'] in invalid_choices_index:
                         invalid_rules.append(rule_spec)
+                    if is_item_selection_interaction:
+                        rule_values = rule_spec['inputs']['x']
+                        check = any(
+                            item in rule_values for item in
+                            invalid_choices_content_ids
+                        )
+                        if check:
+                            invalid_rules.append(rule_spec)
+
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
             if len(answer_group['rule_specs']) == 0:
@@ -4342,7 +4328,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
-    def _update_general_state_interaction(
+    def _update_state_interaction(
         cls, states_dict: Dict[str, state_domain.StateDict],
         language_code: str
     ) -> Dict[str, state_domain.StateDict]:
@@ -4609,7 +4595,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return str(soup).replace('<br/>', '<br>')
 
     @classmethod
-    def _update_general_state_rte(
+    def _update_state_rte(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
         """Update the state RTE content and translations
