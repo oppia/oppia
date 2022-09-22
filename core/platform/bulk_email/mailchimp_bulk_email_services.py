@@ -23,11 +23,14 @@ import hashlib
 import logging
 
 from core import feconf
+from core.platform import models
 
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
 from typing import Optional
+
+secrets_services = models.Registry.import_secrets_services()
 
 
 def _get_subscriber_hash(email: str) -> str:
@@ -61,7 +64,8 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
         Mailchimp|None. A mailchimp class instance with the API key and username
         initialized.
     """
-    if not feconf.MAILCHIMP_API_KEY:
+    mailchimp_api_key = secrets_services.get_secret('MAILCHIMP_API_KEY')
+    if not mailchimp_api_key:
         logging.exception('Mailchimp API key is not available.')
         return None
 
@@ -73,7 +77,7 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     # username and hence cannot be tested directly. The mailchimp functions are
     # tested with a mock class.
     return mailchimp3.MailChimp(    # pragma: no cover
-        mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
+        mc_api=mailchimp_api_key, mc_user=feconf.MAILCHIMP_USERNAME)
 
 
 def _create_user_in_mailchimp_db(

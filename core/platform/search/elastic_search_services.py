@@ -22,10 +22,13 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import search_services
+from core.platform import models
 
 import elasticsearch
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+
+secrets_services = models.Registry.import_secrets_services()
 
 # A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError
@@ -36,7 +39,7 @@ ES = elasticsearch.Elasticsearch(
     if feconf.ES_CLOUD_ID is None else None,
     cloud_id=feconf.ES_CLOUD_ID,
     http_auth=(
-        (feconf.ES_USERNAME, feconf.ES_PASSWORD)
+        (feconf.ES_USERNAME, secrets_services.get_secret('ES_PASSWORD'))
         if feconf.ES_CLOUD_ID else None), timeout=30)
 
 

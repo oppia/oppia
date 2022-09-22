@@ -53,7 +53,7 @@ firebase-admin==5.2.0
     # via -r requirements.in
 future==0.18.2
     # via -r requirements.in
-google-api-core[grpc,grpcgcp]==1.31.2
+google-api-core[grpc,grpcgcp]==1.33.1
     # via
     #   firebase-admin
     #   google-api-python-client
@@ -70,6 +70,7 @@ google-api-core[grpc,grpcgcp]==1.31.2
     #   google-cloud-logging
     #   google-cloud-pubsub
     #   google-cloud-recommendations-ai
+    #   google-cloud-secret-manager
     #   google-cloud-spanner
     #   google-cloud-storage
     #   google-cloud-tasks
@@ -136,6 +137,8 @@ google-cloud-pubsublite==1.3.0
     # via apache-beam
 google-cloud-recommendations-ai==0.2.0
     # via apache-beam
+google-cloud-secret-manager==2.12.4
+    # via -r requirements.in
 google-cloud-spanner==1.19.1
     # via apache-beam
 google-cloud-storage==2.1.0
@@ -156,7 +159,7 @@ google-resumable-media==1.3.3
     # via
     #   google-cloud-bigquery
     #   google-cloud-storage
-googleapis-common-protos[grpc]==1.52.0
+googleapis-common-protos[grpc]==1.56.4
     # via
     #   google-api-core
     #   google-cloud-audit-log
@@ -165,11 +168,12 @@ googleapis-common-protos[grpc]==1.52.0
     #   proto-google-cloud-datastore-v1
 googledatastore==7.0.2
     # via -r requirements.in
-grpc-google-iam-v1==0.12.3
+grpc-google-iam-v1==0.12.4
     # via
     #   google-cloud-bigtable
     #   google-cloud-logging
     #   google-cloud-pubsub
+    #   google-cloud-secret-manager
     #   google-cloud-spanner
     #   google-cloud-tasks
 grpcio==1.43.0
@@ -187,7 +191,9 @@ grpcio-gcp==0.2.2
     #   apache-beam
     #   google-api-core
 grpcio-status==1.43.0
-    # via google-cloud-pubsublite
+    # via
+    #   google-api-core
+    #   google-cloud-pubsublite
 gunicorn==20.1.0
     # via -r requirements.in
 hdfs==2.6.0
@@ -241,7 +247,6 @@ overrides==6.1.0
 packaging==20.4
     # via
     #   bleach
-    #   google-api-core
     #   google-cloud-appengine-logging
     #   pytest
 pillow==9.0.1
@@ -250,7 +255,7 @@ pluggy==0.13.1
     # via pytest
 proto-google-cloud-datastore-v1==0.90.4
     # via googledatastore
-proto-plus==1.18.1
+proto-plus==1.22.1
     # via
     #   apache-beam
     #   google-cloud-appengine-logging
@@ -261,13 +266,15 @@ proto-plus==1.18.1
     #   google-cloud-logging
     #   google-cloud-pubsub
     #   google-cloud-recommendations-ai
+    #   google-cloud-secret-manager
     #   google-cloud-tasks
     #   google-cloud-translate
-protobuf==3.15.0
+protobuf==3.20.2
     # via
     #   apache-beam
     #   google-api-core
     #   google-cloud-audit-log
+    #   google-cloud-secret-manager
     #   google-cloud-storage
     #   googleapis-common-protos
     #   grpcio-status
@@ -307,7 +314,6 @@ pytz==2021.3
     # via
     #   apache-beam
     #   fastavro
-    #   google-api-core
     #   google-cloud-dlp
     #   google-cloud-firestore
     #   google-cloud-ndb
@@ -348,7 +354,6 @@ six==1.16.0
     #   -r requirements.in
     #   bleach
     #   fasteners
-    #   google-api-core
     #   google-api-python-client
     #   google-apitools
     #   google-auth
@@ -361,7 +366,6 @@ six==1.16.0
     #   html5lib
     #   oauth2client
     #   packaging
-    #   protobuf
     #   pymemcache
     #   python-dateutil
     #   requests-mock

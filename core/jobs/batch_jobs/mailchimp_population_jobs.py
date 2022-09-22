@@ -41,6 +41,7 @@ if MYPY: # pragma: no cover
 (config_models, user_models) = models.Registry.import_models([
     models.Names.CONFIG, models.Names.USER
 ])
+secrets_services = models.Registry.import_secrets_services()
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -90,7 +91,9 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
     # username and hence cannot be tested directly. The mailchimp functions are
     # tested with a mock class.
     return mailchimp3.MailChimp(    # pragma: no cover
-        mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
+        mc_api=secrets_services.get_secret('MAILCHIMP_API_KEY'),
+        mc_user=feconf.MAILCHIMP_USERNAME
+    )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of

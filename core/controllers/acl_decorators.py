@@ -44,8 +44,11 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 
-from typing import Any, Callable # isort: skip
+from typing import Any, Callable
+
+secrets_services = models.Registry.import_secrets_services()
 
 
 def _redirect_based_on_return_type(
@@ -115,10 +118,10 @@ def is_source_mailchimp(handler):
         Returns:
             *. The return value of the decorated function.
         """
-        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
+        if secrets_services.get_secret('MAILCHIMP_WEBHOOK_SECRET') is None:
             raise self.PageNotFoundException
 
-        if secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
+        if secret != secrets_services.get_secret('MAILCHIMP_WEBHOOK_SECRET'):
             logging.error(
                 'Invalid Mailchimp webhook request received with secret: %s'
                 % secret)

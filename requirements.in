@@ -17,6 +17,7 @@ google-auth==1.35.0
 google-cloud-dataflow-client==0.3.1
 google-cloud-logging==3.0.0
 google-cloud-ndb==1.11.1
+google-cloud-secret-manager==2.12.4
 google-cloud-tasks==2.7.2
 google-cloud-translate==3.6.1
 gunicorn==20.1.0

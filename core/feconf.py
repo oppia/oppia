@@ -533,27 +533,19 @@ EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
 EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
-# with the Mailgun API key.
-MAILGUN_API_KEY = None
-# If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
 # Audience ID of the mailing list for Oppia in Mailchimp.
 MAILCHIMP_AUDIENCE_ID = None
-# Mailchimp API Key.
-MAILCHIMP_API_KEY = None
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
-# Mailchimp secret, used to authenticate webhook requests.
-MAILCHIMP_WEBHOOK_SECRET = None
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
 ES_CLOUD_ID = None
 ES_USERNAME = None
-ES_PASSWORD = None
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the

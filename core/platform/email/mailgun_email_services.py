@@ -23,20 +23,23 @@ import urllib
 
 from core import feconf
 from core import utils
+from core.platform import models
 
 from typing import Dict, List, Optional, Union
 
+secrets_services = models.Registry.import_secrets_services()
+
 
 def send_email_to_recipients(
-        sender_email: str,
-        recipient_emails: List[str],
-        subject: str,
-        plaintext_body: str,
-        html_body: str,
-        bcc: Optional[List[str]] = None,
-        reply_to: Optional[str] = None,
-        recipient_variables: Optional[
-            Dict[str, Dict[str, Union[str, float]]]] = None
+    sender_email: str,
+    recipient_emails: List[str],
+    subject: str,
+    plaintext_body: str,
+    html_body: str,
+    bcc: Optional[List[str]] = None,
+    reply_to: Optional[str] = None,
+    recipient_variables: Optional[
+        Dict[str, Dict[str, Union[str, float]]]] = None
 ) -> bool:
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.
@@ -77,7 +80,8 @@ def send_email_to_recipients(
     Returns:
         bool. Whether the emails are sent successfully.
     """
-    if not feconf.MAILGUN_API_KEY:
+    mailgun_api_key = secrets_services.get_secret('MAILGUN_API_KEY')
+    if not mailgun_api_key:
         raise Exception('Mailgun API key is not available.')
 
     if not feconf.MAILGUN_DOMAIN_NAME:
@@ -114,7 +118,7 @@ def send_email_to_recipients(
         # the MAILGUN_API_KEY to bytes, then decode the returned bytes back
         # to string.
         base64_mailgun_api_key = base64.b64encode(
-            b'api:%b' % feconf.MAILGUN_API_KEY.encode('utf-8')
+            b'api:%b' % mailgun_api_key.encode('utf-8')
         ).strip().decode('utf-8')
         auth_str = 'Basic %s' % base64_mailgun_api_key
         header = {'Authorization': auth_str}

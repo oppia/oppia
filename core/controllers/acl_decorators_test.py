@@ -48,10 +48,12 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
+from core.platform import models
 
 import webapp2
 import webtest
 
+secrets_services = models.Registry.import_secrets_services()
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
     """Tests for open access decorator."""
@@ -135,7 +137,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
     def test_error_when_given_webhook_secret_is_invalid(self):
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', value=self.secret)
+            secrets_services, 'get_secret', self.secret)
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
@@ -152,8 +154,8 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_no_error_when_given_webhook_secret_is_valid(self):
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        mailchimp_swap = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', self.secret)
+        mailchimp_swap = self.swap_to_always_return(
+            secrets_services, 'get_secret', self.secret)
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
