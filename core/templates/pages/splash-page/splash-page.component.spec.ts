@@ -32,6 +32,7 @@ import { UserService } from 'services/user.service';
 import { SplashPageComponent } from './splash-page.component';
 import { of } from 'rxjs';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockWindowRef {
   _window = {
@@ -234,5 +235,24 @@ describe('Splash Page', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.isWindowNarrow).toBe(true);
+  });
+
+  it('should show android button if the feature is enabled', () => {
+    let platformFeatureService = TestBed.inject(PlatformFeatureService);
+    const featureSpy = (
+      spyOnProperty(platformFeatureService, 'status', 'get').and.callThrough());
+    const component = TestBed.createComponent(SplashPageComponent);
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeFalse();
+
+    featureSpy.and.returnValue(
+      {
+        AndroidPage: {
+          isEnabled: true
+        }
+      }
+    );
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

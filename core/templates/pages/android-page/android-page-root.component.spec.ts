@@ -20,6 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { AndroidPageRootComponent } from './android-page-root.component';
@@ -53,12 +54,41 @@ describe('Android Page Root', () => {
   });
 
   it('should initialize', () => {
+    let platformFeatureService = TestBed.inject(PlatformFeatureService);
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+      {
+        AndroidPage: {
+          isEnabled: true
+        }
+      }
+    );
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
+    expect(component.androidPageIsEnabled).toBeTrue();
 
     component.ngOnInit();
 
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.META);
+  });
+
+  it('should show android page if it is enabled', () => {
+    let platformFeatureService = TestBed.inject(PlatformFeatureService);
+    const featureSpy = (
+      spyOnProperty(platformFeatureService, 'status', 'get').and.callThrough());
+    const component = TestBed.createComponent(AndroidPageRootComponent);
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeFalse();
+
+    featureSpy.and.returnValue(
+      {
+        AndroidPage: {
+          isEnabled: true
+        }
+      }
+    );
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

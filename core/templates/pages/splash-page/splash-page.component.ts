@@ -27,6 +27,7 @@ import { UserService } from 'services/user.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './splash-page.component.css';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
 export interface Testimonial {
@@ -53,6 +54,9 @@ export class SplashPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
   testimonials: Testimonial[] = [];
   userIsLoggedIn: boolean = false;
+  androidPageIsEnabled: boolean = (
+    this.platformFeatureService.status.AndroidPage.isEnabled
+  );
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -62,6 +66,7 @@ export class SplashPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
+    private platformFeatureService: PlatformFeatureService,
   ) {}
 
   getStaticImageUrl(imagePath: string): string {

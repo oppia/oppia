@@ -26,6 +26,7 @@ export enum FeatureNames {
   DummyFeature = 'dummy_feature',
   EndChapterCelebration = 'end_chapter_celebration',
   CheckpointCelebration = 'checkpoint_celebration',
+  AndroidPage = 'android_page',
 }
 
 export interface FeatureStatusSummaryBackendDict {
