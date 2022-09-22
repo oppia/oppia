@@ -395,13 +395,14 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             state_with_errored_values = []
             html = state.content.html
             soup = bs4.BeautifulSoup(html, 'html.parser')
-            for tag in soup.find_all():
-                if tag.name not in (
-                    'p',
-                    'oppia-noninteractive-image',
-                    'oppia-noninteractive-math',
-                    'oppia-noninteractive-skillreview'):
-                    state_with_errored_values.append(tag)
+            for tag in soup.find_all('oppia-noninteractive-video'):
+                state_with_errored_values.append(tag)
+            for tag in soup.find_all('oppia-noninteractive-link'):
+                state_with_errored_values.append(tag)
+            for tag in soup.find_all('oppia-noninteractive-tabs'):
+                state_with_errored_values.append(tag)
+            for tag in soup.find_all('oppia-noninteractive-collapsible'):
+                state_with_errored_values.append(tag)
             if len(state_with_errored_values) > 0:
                 errored_values.append(
                     {
