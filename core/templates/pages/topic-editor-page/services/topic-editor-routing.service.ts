@@ -40,10 +40,7 @@ export class TopicEditorRoutingService {
     private windowRef: WindowRef,
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService
-  ) {
-    let currentHash: string = this.windowRef.nativeWindow.location.hash;
-    this._changeTab(currentHash.substring(1, currentHash.length));
-  }
+  ) {}
 
   private _changeTab(newHash: string) {
     if (newHash === '') {
