@@ -32,15 +32,19 @@ class TopicViewerPage(base.BaseHandler):
     """Renders the topic viewer page."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'story': {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'topic_url_fragment': {
             'schema': {
                 'type': 'basestring'
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
