@@ -238,13 +238,6 @@ describe('Customize Interaction Modal Component', () => {
       .returnValue([]);
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
-
-    spyOn(component, 'getTitle').and
-      .returnValue('End Exploration');
-
-    expect(document.getElementsByClassName('form-control display-inline')).toBe(undefined);
-
-    expect(document.getElementsByClassName('form-control display-inline')).toEqual([new (): HTMLAllCollection, prototype: HTMLAllCollection]);
   });
 
   it('should open intreaction when user click on it', () => {
