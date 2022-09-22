@@ -350,7 +350,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{numcoins}}'
+            x: 0
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -396,7 +396,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{numcoins}}'
+            x: 0
           rule_type: IsGreaterThan
         tagged_skill_misconception_id: null
         training_data: []
@@ -411,7 +411,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{numcoins}}'
+            x: 0
           rule_type: IsLessThan
         tagged_skill_misconception_id: null
         training_data: []

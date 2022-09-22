@@ -374,16 +374,16 @@ class DraftUpgradeUtil:
                     written_translations = exp_change.new_value
                     for translations in (
                         written_translations.translations_mapping.values()):
-                            for written_translation in translations.values():
-                                written_translation.translation = (
-                                    exp_domain.Exploration.fix_rte_tags(
+                        for written_translation in translations.values():
+                            written_translation.translation = (
+                                exp_domain.Exploration.fix_rte_tags(
+                                written_translation.translation)
+                            )
+                            written_translation.translation = (
+                                exp_domain.Exploration.
+                                fix_tabs_and_collapsible_tags(
                                     written_translation.translation)
-                                )
-                                written_translation.translation = (
-                                    exp_domain.Exploration.
-                                    fix_tabs_and_collapsible_tags(
-                                        written_translation.translation)
-                                )
+                            )
         return draft_change_list
 
     @classmethod

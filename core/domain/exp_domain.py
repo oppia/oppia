@@ -23,7 +23,6 @@ should therefore be independent of the specific storage models used.
 
 from __future__ import annotations
 
-import bs4
 import collections
 import copy
 import datetime
@@ -41,9 +40,10 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
+import bs4
 from typing import (
     Callable, Dict, List, Mapping, Optional, Sequence,
-    Set, Tuple, Union, cast, overload, Any
+    Set, Tuple, Union, cast, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 
@@ -681,8 +681,8 @@ class EditExpStatePropertyInteractionHandlersCmd(ExplorationChange):
 
     property_name: Literal['widget_handlers']
     state_name: str
-    new_value: List[state_domain.AnswerGroupDict]
-    old_value: List[state_domain.AnswerGroupDict]
+    new_value: List[state_domain.AnswerGroupDictDict]
+    old_value: List[state_domain.AnswerGroupDictDict]
 
 
 class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
@@ -693,8 +693,8 @@ class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
 
     property_name: Literal['answer_groups']
     state_name: str
-    new_value: List[state_domain.AnswerGroupDict]
-    old_value: List[state_domain.AnswerGroupDict]
+    new_value: List[state_domain.AnswerGroupDictDict]
+    old_value: List[state_domain.AnswerGroupDictDict]
 
 
 class EditExpStatePropertyInteractionDefaultOutcomeCmd(ExplorationChange):
@@ -741,8 +741,8 @@ class EditExpStatePropertyUnclassifiedAnswersCmd(ExplorationChange):
 
     property_name: Literal['confirmed_unclassified_answers']
     state_name: str
-    new_value: List[state_domain.AnswerGroup]
-    old_value: List[state_domain.AnswerGroup]
+    new_value: List[state_domain.AnswerGroupDict]
+    old_value: List[state_domain.AnswerGroupDict]
 
 
 class EditExpStatePropertyContentIdsToAudioTranslationsDeprecatedCmd(
@@ -1310,6 +1310,29 @@ class SerializableExplorationDict(ExplorationDict):
     last_updated: str
 
 
+class RangeVariable(TypedDict):
+    """Dictionary representing the range variable for the NumericInput
+    interaction
+    """
+
+    ans_group_index: int
+    rule_spec_index: int
+    lower_bound: None
+    upper_bound: None
+    lb_inclusive: bool
+    ub_inclusive: bool
+
+
+class MatchedDenominator(TypedDict):
+    """Dictionary representing the matched denominator variable for the
+    FractionInput interaction
+    """
+
+    ans_group_index: int
+    rule_spec_index: int
+    denominator: int
+
+
 class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
@@ -1536,7 +1559,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             idict = sdict['interaction']
             interaction_answer_groups = [
-                state_domain.AnswerGroup.from_dict(group)
+                state_domain.AnswerGroupDict.from_dict(group)
                 for group in idict['answer_groups']]
 
             default_outcome = (
@@ -3095,7 +3118,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _remove_unwanted_content_ids_from_translations_and_voiceovers(
         cls, state_dict: state_domain.StateDict):
-        """
+        """Helper function to remove the content IDs from the translations
+        and voiceovers which are deleted from the state
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary.
         """
         interaction = state_dict['interaction']
         content_id_list = [state_dict['content']['content_id']]
@@ -3182,6 +3209,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         conversion we removed some interaction rules and thus also some parts of
         the exploration that had its content IDs, but then the content IDs in
         translations and voiceovers were not updated.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
@@ -3264,9 +3292,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # ########################################################.
     @classmethod
     def _choices_should_be_unique_and_non_empty(
-        cls, choices: List[str],
-        answer_groups: List[state_domain.AnswerGroup],
-        is_item_selection_interaction = False
+        cls, choices: List[state_domain.SubtitledHtmlDict],
+        answer_groups: List[state_domain.AnswerGroupDict],
+        is_item_selection_interaction: bool=False
     ) -> None:
         """Handles choices present in the ItemSelectionInput or
         in MultipleChoiceInput interactions, implements the following -
@@ -3277,15 +3305,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
             - Remove the rules whose choices has been deleted
 
         Args:
-            choices: List[str]. A list of choices.
-            answer_groups: List[state_domain.AnswerGroup]. The list of answer
-            groups.
+            choices: List[state_domain.SubtitledHtmlDict]. A list of choices.
+            answer_groups: List[state_domain.AnswerGroupDict]. The list of
+                answer groups.
             is_item_selection_interaction: bool. If the answer group belongs
-            to ItemSelectionInput interaction or not.
+                to ItemSelectionInput interaction or not.
         """
-        empty_choices = []
-        seen_choices = []
-        choices_to_remove = []
+        empty_choices: List[state_domain.SubtitledHtmlDict] = []
+        seen_choices: List[state_domain.SubtitledHtmlDict] = []
+        choices_to_remove: List[state_domain.SubtitledHtmlDict] = []
         invalid_choices_index = []
         invalid_choices_content_ids = []
         for choice in choices:
@@ -3338,13 +3366,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if len(answer_group['rule_specs']) == 0:
                 empty_ans_groups.append(answer_group)
 
-        for empty_ans_group in empty_ans_groups:
+        for empty_ans_group in set(empty_ans_groups):
             answer_groups.remove(empty_ans_group)
 
     @classmethod
     def _set_lower_and_upper_bounds(
-        cls, range_var, lower_bound, upper_bound,
-        lb_inclusive, ub_inclusive
+        cls,
+        range_var: RangeVariable,
+        lower_bound: float,
+        upper_bound: float,
+        lb_inclusive: bool,
+        ub_inclusive: bool
     ) -> None:
         """Helper function for NumericInput and FractionInput interaction,
         Sets the lower and upper bounds for the range_var, mainly
@@ -3424,8 +3456,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         rule type
 
         Args:
-            earlier_rule: state_domain.RuleSpec. Previous rule.
-            later_rule: state_domain.RuleSpec. Current rule.
+            earlier_rule: state_domain.RuleSpecDict. Previous rule.
+            later_rule: state_domain.RuleSpecDict. Current rule.
 
         Returns:
             bool. Returns True if the rules passes the range criteria check.
@@ -3441,39 +3473,43 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _get_rule_value_of_fraction_interaction(
-        cls, rule_spec: state_domain.RuleSpec
+        cls,
+        rule_spec: state_domain.RuleSpecDict
     ) -> float:
         """Return rule value of the rule_spec of FractionInput interaction so
         that we can keep track of rule's range
 
         Args:
-            rule_spec: (state_domain.RuleSpec). Rule spec of an answer group.
+            rule_spec: state_domain.RuleSpecDict. Rule spec of an answer group.
 
         Returns:
             rule_value_f: float. The value of the rule spec.
         """
         rule_value_f = rule_spec['inputs']['f']
         if rule_value_f['wholeNumber'] == 0:
-            rule_value_f = rule_value_f['numerator'] / rule_value_f[
-                'denominator']
+            rule_value_f = float(rule_value_f['numerator']/rule_value_f[
+                'denominator'])
         else:
-            rule_value_f = (
+            rule_value_f = float(
                 rule_value_f['wholeNumber'] +
-                rule_value_f['numerator'] / rule_value_f['denominator']
+                rule_value_f['numerator']/rule_value_f['denominator']
             )
 
         return rule_value_f
 
     @classmethod
     def _remove_duplicate_rules_inside_answer_groups(
-        cls, answer_groups: List[state_domain.AnswerGroup], state_name: str):
+        cls,
+        answer_groups: List[state_domain.AnswerGroupDict],
+        state_name: str
+    ) -> None:
         """Removes the duplicate rules present inside the answer groups. This
         will simply removes the rule which do not point to another state
         to avoid state disconnection. If both of them do not point to different
         state we will simply remove the later one
 
         Args:
-            answer_groups: List[state_domain.AnswerGroup]. The answer groups
+            answer_groups: List[state_domain.AnswerGroupDict]. The answer groups
                 present inside the state.
             state_name: str. The state name.
         """
@@ -3554,7 +3590,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     empty_ans_groups.append(answer_group)
 
         # Remove empty answer groups.
-        for empty_ans_group in empty_ans_groups:
+        for empty_ans_group in set(empty_ans_groups):
             answer_groups.remove(empty_ans_group)
 
     @classmethod
@@ -3691,7 +3727,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
         invalid_rules = []
-        ranges = []
+        ranges: List[RangeVariable] = []
         # Remove duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -3808,7 +3844,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     empty_ans_groups.append(answer_group)
 
         # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
+        for empty_ans_group in set(empty_ans_groups):
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -3932,7 +3968,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     empty_ans_groups.append(answer_group)
 
         # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
+        for empty_ans_group in set(empty_ans_groups):
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -3978,7 +4014,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if len(answer_group['rule_specs']) == 0:
                 empty_ans_groups.append(answer_group)
         # Removal of empty answer group.
-        for empty_ans_group in empty_ans_groups:
+        for empty_ans_group in set(empty_ans_groups):
             answer_groups.remove(empty_ans_group)
 
         # Answer choices should be non-empty and unique.
@@ -4058,7 +4094,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if len(answer_group['rule_specs']) == 0:
                 empty_ans_groups.append(answer_group)
         # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
+        for empty_ans_group in set(empty_ans_groups):
             answer_groups.remove(empty_ans_group)
 
         # Minimum number of selections should be no greater than maximum
@@ -4211,7 +4247,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     empty_ans_groups.append(answer_group)
 
         # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
+        for empty_ans_group in set(empty_ans_groups):
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -4323,7 +4359,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     empty_ans_groups.append(answer_group)
 
         # Removal of empty answer groups.
-        for empty_ans_group in empty_ans_groups:
+        for empty_ans_group in set(empty_ans_groups):
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -4342,7 +4378,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             language_code: str. The language code of the exploration.
 
         Returns:
-            dict. The converted state dictionary.
+            states_dict: Dict[str, state_domain.StateDict]. The converted
+            state dictionary.
         """
         for state_name, state_dict in states_dict.items():
             if state_dict['interaction']['id'] == 'Continue':
@@ -4417,6 +4454,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             html: str. The RTE tags.
+            is_tags_nested_inside_tabs_or_collapsible: bool. If the tag is
+                present inside the tabs or collapsible tag.
+
+        Returns:
+            str. Returns the updated html value.
         """
         empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
         soup = bs4.BeautifulSoup(html, 'html.parser')
