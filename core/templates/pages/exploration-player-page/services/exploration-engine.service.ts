@@ -546,13 +546,14 @@ export class ExplorationEngineService {
     // interaction is TextInput.
     let oldInteractionId = oldStateCard.getInteraction().id;
 
-    // Work => let catchMisspellingsFeatOn = oldStateCard.getInteraction().customizationArgs;
+    // Work => let catchMisspellingsFeatOn = oldStateCard.getInteraction().customizationArgs.
     
     if(oldInteractionId === "TextInput") {
       var answerIsOnlyMisspelled = this.answerClassificationService.
     isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
       if (answerIsOnlyMisspelled) {
         // Change the feedbackHtml.
+        // !TODO: Add in object of responses (To be internationalized).
         feedbackHtml = "Oops you misspelled. Mind correcting it?"
       }
     }

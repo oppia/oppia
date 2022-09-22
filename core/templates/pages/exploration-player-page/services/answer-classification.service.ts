@@ -218,18 +218,21 @@ export class AnswerClassificationService {
     ): boolean {
     var answerIsMisspelled = false;
     const answerGroups = interactionInOldState.answerGroups;
-    // for (var i = 0; i < answerGroups.length; ++i) {
-    //   const answerGroup = answerGroups[i];
-      // if (answerGroup.outcome.labelledAsCorrect) {
-        // var correctAnswer = answerGroup.outcome.;
-        if (this.hasMaxEditDistanceThree(
-          answer,
-          "lalala"
-        )) {
-          answerIsMisspelled = true;
+    for (var i = 0; i < answerGroups.length; ++i) {
+      const answerGroup = answerGroups[i];
+      for (var j = 0; j < answerGroup.rules.length; ++j) {
+        const rule = answerGroup.rules[j];
+        for (var k = 0; k < rule.inputs.length; ++k) {
+          var correctAnswer = rule.inputs[k];
+          if (this.hasMaxEditDistanceThree(
+            answer,
+            correctAnswer.toString()
+          )) {
+            return true;
+          }
         }
-      // }
-    // }
+      }
+    }
     return answerIsMisspelled;
   }
 
