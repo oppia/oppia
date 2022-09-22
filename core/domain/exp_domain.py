@@ -681,8 +681,8 @@ class EditExpStatePropertyInteractionHandlersCmd(ExplorationChange):
 
     property_name: Literal['widget_handlers']
     state_name: str
-    new_value: List[state_domain.AnswerGroupDictDict]
-    old_value: List[state_domain.AnswerGroupDictDict]
+    new_value: List[state_domain.AnswerGroupDict]
+    old_value: List[state_domain.AnswerGroupDict]
 
 
 class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
@@ -693,8 +693,8 @@ class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
 
     property_name: Literal['answer_groups']
     state_name: str
-    new_value: List[state_domain.AnswerGroupDictDict]
-    old_value: List[state_domain.AnswerGroupDictDict]
+    new_value: List[state_domain.AnswerGroupDict]
+    old_value: List[state_domain.AnswerGroupDict]
 
 
 class EditExpStatePropertyInteractionDefaultOutcomeCmd(ExplorationChange):
@@ -741,8 +741,8 @@ class EditExpStatePropertyUnclassifiedAnswersCmd(ExplorationChange):
 
     property_name: Literal['confirmed_unclassified_answers']
     state_name: str
-    new_value: List[state_domain.AnswerGroupDict]
-    old_value: List[state_domain.AnswerGroupDict]
+    new_value: List[state_domain.AnswerGroup]
+    old_value: List[state_domain.AnswerGroup]
 
 
 class EditExpStatePropertyContentIdsToAudioTranslationsDeprecatedCmd(
@@ -1559,7 +1559,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             idict = sdict['interaction']
             interaction_answer_groups = [
-                state_domain.AnswerGroupDict.from_dict(group)
+                state_domain.AnswerGroup.from_dict(group)
                 for group in idict['answer_groups']]
 
             default_outcome = (
