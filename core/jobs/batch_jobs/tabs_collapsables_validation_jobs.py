@@ -18,8 +18,11 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain, html_validation_service
+import json
+
+from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import html_validation_service
 from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -346,7 +349,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                             states_with_errored_values
                         )
                     )
-                except:
+                except Exception:
                     states_with_errored_values.append(
                         'No content attr in collapsible tag'
                     )
@@ -361,7 +364,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     if len(collapsible_heading_list) == 0:
                         states_with_errored_values.append(
                             'collapsible heading empty')
-                except:
+                except Exception:
                     states_with_errored_values.append(
                         'No heading attr in collapsible tag'
                     )

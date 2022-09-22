@@ -34,7 +34,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models
 
 (exp_models, opportunity_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.opportunity])
+    [models.Names.EXPLORATION, models.Names.OPPORTUNITY])
 
 
 class TabsCollapsablesValidationJobTest(job_test_utils.JobTestBase):
