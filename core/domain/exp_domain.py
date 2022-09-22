@@ -3557,6 +3557,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
+    @classmethod
     def _fix_continue_interaction(
         cls, state_dict: state_domain.StateDict, language_code: str
     ) -> None:
