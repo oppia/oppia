@@ -313,6 +313,80 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
+    def _convert_states_v52_dict_to_v53_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts from version 52 to 53. Version 53 fixes general
+        state, interaction and rte data. This will update the drafts
+        for state and RTE part but won't be able to do for interaction.
+        The `ExplorationChange` object for interaction is divided into
+        further properties and we won't be able to collect enough info
+        to update the draft.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
+        """
+        for exp_change in draft_change_list:
+            if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                if (
+                    exp_change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+                ):
+                    answer_groups = exp_change.new_value
+                    for answer_group in answer_groups:
+                        if (
+                            answer_group.tagged_skill_misconception_id
+                            is not None
+                        ):
+                            answer_group.tagged_skill_misconception_id = None
+                        if len(answer_group.rule_specs) == 0:
+                            answer_groups.remove(answer_group)
+                        if (
+                            answer_group.outcome.labelled_as_correct is True and
+                            answer_group.outcome.dest == exp_change.state_name
+                        ):
+                            answer_group.outcome.labelled_as_correct = False
+                        if (
+                            answer_group.outcome.refresher_exploration_id
+                            is not None
+                        ):
+                            answer_group.outcome.refresher_exploration_id = None
+                elif exp_change.property_name == (
+                    exp_domain.STATE_PROPERTY_CONTENT):
+                    exp_change.new_value.html = (
+                        exp_domain.Exploration.fix_rte_tags(
+                        exp_change.new_value.html)
+                    )
+                    exp_change.new_value.html = (
+                        exp_domain.Exploration.fix_tabs_and_collapsible_tags(
+                        exp_change.new_value.html)
+                    )
+                elif exp_change.property_name == (
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                    written_translations = exp_change.new_value
+                    for translations in (
+                        written_translations.translations_mapping.values()):
+                            for written_translation in translations.values():
+                                written_translation.translation = (
+                                    exp_domain.Exploration.fix_rte_tags(
+                                    written_translation.translation)
+                                )
+                                written_translation.translation = (
+                                    exp_domain.Exploration.
+                                    fix_tabs_and_collapsible_tags(
+                                        written_translation.translation)
+                                )
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v51_dict_to_v52_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:

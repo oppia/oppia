@@ -4389,7 +4389,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # Fix validation errors for exploration state RTE.
     # ################################################.
     @classmethod
-    def _fix_rte_tags(
+    def fix_rte_tags(
         cls, html: str,
         is_tags_nested_inside_tabs_or_collapsible: bool=False
     ):
@@ -4539,7 +4539,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return str(soup).replace('<br/>', '<br>')
 
     @classmethod
-    def _fix_tabs_and_collapsible_tags(cls, html: str):
+    def fix_tabs_and_collapsible_tags(cls, html: str):
         """Fixes all tabs and collapsible tags, performs the following -
         - `oppia-noninteractive-tabs`
             - If no `tab_contents-with-value` attribute, tag will be removed
@@ -4565,7 +4565,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if len(tab_content_list) == 0:
                     tag.decompose()
                 for tab_content in tab_content_list:
-                    tab_content['content'] = cls._fix_rte_tags(
+                    tab_content['content'] = cls.fix_rte_tags(
                         tab_content['content'],
                         is_tags_nested_inside_tabs_or_collapsible=True
                     )
@@ -4586,7 +4586,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if len(collapsible_content_list) == 0:
                     tag.decompose()
 
-                collapsible_content_list = cls._fix_rte_tags(
+                collapsible_content_list = cls.fix_rte_tags(
                     collapsible_content_list,
                     is_tags_nested_inside_tabs_or_collapsible=True
                 )
@@ -4625,8 +4625,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for state in states_dict.values():
             # Fix tags for state content.
             html = state['content']['html']
-            state['content']['html'] = cls._fix_rte_tags(html)
-            state['content']['html'] = cls._fix_tabs_and_collapsible_tags(html)
+            state['content']['html'] = cls.fix_rte_tags(html)
+            state['content']['html'] = cls.fix_tabs_and_collapsible_tags(html)
             # Fix tags for written translations.
             written_translations = state['written_translations'][
                 'translations_mapping']
@@ -4634,10 +4634,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 written_translations.values()):
                 for translation in (
                     language_code_to_written_translation.values()):
-                    translation['translation'] = cls._fix_rte_tags(
+                    translation['translation'] = cls.fix_rte_tags(
                         translation['translation'])
                     translation['translation'] = (
-                        cls._fix_tabs_and_collapsible_tags(
+                        cls.fix_tabs_and_collapsible_tags(
                             translation['translation'])
                     )
 
