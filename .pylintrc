@@ -88,6 +88,22 @@ disallowed-functions-and-replacements-regex=
 
 [SIMILARITIES]
 
+allowed-type-ignore-error-codes=attr-defined,
+        union-attr,
+        call-overload,
+        override,
+        return,
+        assignment,
+        list-item,
+        dict-item,
+        typeddict-item,
+        func-returns-value,
+        misc,
+        type-arg,
+        no-untyped-def,
+        no-untyped-call,
+        no-any-return
+
 ignore-imports=yes
 
 [MESSAGES CONTROL]

@@ -2378,6 +2378,24 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.TypeIgnoreCommentChecker)
         self.checker_test_object.setup_method()
+        self.checker_test_object.checker.config.allowed_type_ignore_error_codes = [  # pylint: disable=line-too-long
+                'attr-defined',
+                'union-attr',
+                'arg-type',
+                'call-overload',
+                'override',
+                'return',
+                'assignment',
+                'list-item',
+                'dict-item',
+                'typeddict-item',
+                'func-returns-value',
+                'misc',
+                'type-arg',
+                'no-untyped-def',
+                'no-untyped-call',
+                'no-any-return'
+        ]
 
     def test_type_ignore_used_without_comment_raises_error(self):
         node_function_with_type_ignore_only = astroid.scoped_nodes.Module(
@@ -2510,6 +2528,39 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_module(
                 node_with_prohibited_type_ignore_in_combined_form
+            )
+        temp_file.close()
+
+        node_with_multiple_prohibited_type_ignore_in_combined_form = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                suggestion.change.new_value = (  # type: ignore[return-none, no-untyped-call, truthy-bool] pylint: disable=line-too-long
+                    new_content
+                ) #@
+                """
+            )
+        node_with_multiple_prohibited_type_ignore_in_combined_form.file = (
+            filename)
+
+        message = testutils.Message(
+            msg_id='prohibited-type-ignore-used',
+            line=2,
+            node=node_with_multiple_prohibited_type_ignore_in_combined_form,
+            args=('return-none', 'truthy-bool')
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_module(
+                node_with_multiple_prohibited_type_ignore_in_combined_form
             )
         temp_file.close()
 

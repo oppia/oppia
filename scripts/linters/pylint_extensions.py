@@ -58,25 +58,6 @@ EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
     'scripts/'
 ]
 
-ALLOWED_TYPE_IGNORE_ERROR_CODES = [
-    'attr-defined',
-    'union-attr',
-    'arg-type',
-    'call-overload',
-    'override',
-    'return',
-    'assignment',
-    'list-item',
-    'dict-item',
-    'typeddict-item',
-    'func-returns-value',
-    'misc',
-    'type-arg',
-    'no-untyped-def',
-    'no-untyped-call',
-    'no-any-return'
-]
-
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1997,6 +1978,17 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         )
     }
 
+    options = (
+        (
+            'allowed-type-ignore-error-codes',
+                {
+                    'default': [],
+                    'type': 'csv', 'metavar': '<comma separated list>',
+                    'help': 'List of allowed MyPy type ignore error codes.'
+                }
+        ),
+    )
+
     def visit_module(self, node):
         """Visit a module to ensure that there is a comment for each MyPy
         type ignore.
@@ -2053,18 +2045,26 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                     ).group(2)
 
                     encountered_error_codes = []
+                    encountered_prohibited_error_codes = []
                     for error_code in error_codes.split(','):
                         error_code = error_code.strip()
-                        if error_code not in ALLOWED_TYPE_IGNORE_ERROR_CODES:
+                        if (
+                            error_code not in
+                            self.config.allowed_type_ignore_error_codes
+                        ):
                             prohibited_error_code_present = True
-                            self.add_message(
-                                'prohibited-type-ignore-used',
-                                line=line_num,
-                                args=(error_code,),
-                                node=node
+                            encountered_prohibited_error_codes.append(
+                                error_code
                             )
                         encountered_error_codes.append(error_code)
 
+                    if prohibited_error_code_present:
+                        self.add_message(
+                            'prohibited-type-ignore-used',
+                            line=line_num,
+                            args=tuple(encountered_prohibited_error_codes),
+                            node=node
+                        )
                     if ['no-untyped-call'] == encountered_error_codes:
                         continue
                     if (
