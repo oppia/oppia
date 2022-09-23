@@ -28,6 +28,10 @@ import elasticsearch
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import secrets_services
+
 secrets_services = models.Registry.import_secrets_services()
 
 # A timeout of 30 seconds is needed to avoid calls to

@@ -44,6 +44,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_identity_services
     from mypy_imports import email_models
+    from mypy_imports import secrets_services
     from mypy_imports import suggestion_models
     from mypy_imports import transaction_services
 

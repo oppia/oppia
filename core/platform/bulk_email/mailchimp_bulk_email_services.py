@@ -30,6 +30,10 @@ from mailchimp3 import mailchimpclient
 
 from typing import Optional
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import secrets_services
+
 secrets_services = models.Registry.import_secrets_services()
 
 

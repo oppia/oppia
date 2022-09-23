@@ -27,6 +27,10 @@ from core.platform import models
 
 from typing import Dict, List, Optional, Union
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import secrets_services
+
 secrets_services = models.Registry.import_secrets_services()
 
 

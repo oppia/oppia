@@ -36,6 +36,7 @@ from typing import Iterable, List
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
+    from mypy_imports import secrets_services
     from mypy_imports import user_models
 
 (config_models, user_models) = models.Registry.import_models([
