@@ -85,7 +85,8 @@ def send_email_to_recipients(
     Returns:
         bool. Whether the emails are sent successfully.
     """
-    mailgun_api_key = secrets_services.get_secret('MAILGUN_API_KEY')
+    mailgun_api_key: Optional[str] = secrets_services.get_secret(
+        'MAILGUN_API_KEY')
     if not mailgun_api_key:
         logging.exception('Cloud Secret Manager is not working.')
         mailgun_api_key = feconf.MAILGUN_API_KEY

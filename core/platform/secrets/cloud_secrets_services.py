@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 
 from google.cloud import secretmanager
@@ -36,5 +38,8 @@ def get_secret(name: str) -> str:
     """
     secret_name = (
         f'projects/{feconf.OPPIA_PROJECT_ID}/secrets/{name}/versions/latest')
-    response = CLIENT.get_secret(request={'name': secret_name})
+    response = CLIENT.access_secret_version(request={'name': secret_name})
+    logging.info(response)
+    logging.info(response.payload)
+    logging.info(response.payload.data)
     return response.payload.data.decode('utf-8')

@@ -32,7 +32,7 @@ import mailchimp3
 from mailchimp3 import mailchimpclient
 import result
 
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -92,7 +92,8 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
     # The following is a class initialized in the library with the API key and
     # username and hence cannot be tested directly. The mailchimp functions are
     # tested with a mock class.
-    mailchimp_api_key = secrets_services.get_secret('MAILCHIMP_API_KEY')
+    mailchimp_api_key: Optional[str] = secrets_services.get_secret(
+        'MAILCHIMP_API_KEY')
     if not mailchimp_api_key:
         logging.exception('Cloud Secret Manager is not working.')
         mailchimp_api_key = feconf.MAILCHIMP_API_KEY

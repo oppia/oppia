@@ -68,7 +68,8 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
         Mailchimp|None. A mailchimp class instance with the API key and username
         initialized.
     """
-    mailchimp_api_key = secrets_services.get_secret('MAILCHIMP_API_KEY')
+    mailchimp_api_key: Optional[str] = secrets_services.get_secret(
+        'MAILCHIMP_API_KEY')
     if not mailchimp_api_key:
         logging.exception('Cloud Secret Manager is not working.')
         mailchimp_api_key = feconf.MAILCHIMP_API_KEY

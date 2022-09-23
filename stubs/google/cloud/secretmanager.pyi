@@ -3,9 +3,11 @@ from typing import Dict
 class SecretPayload:
     data: bytes
 
-class Secret:
+class AccessSecretVersionResponse:
     payload: SecretPayload
 
 class SecretManagerServiceClient:
 
-    def get_secret(self, request: Dict[str, str]) -> Secret: ...
+    def access_secret_version(
+        self, request: Dict[str, str]
+    ) -> AccessSecretVersionResponse: ...
