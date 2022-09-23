@@ -81,6 +81,7 @@ ATTRS_WHITELIST: Final = {
     'li': [],
     'ol': [],
     'p': [],
+    'h1': [],
     'pre': [],
     'span': [],
     'strong': [],
