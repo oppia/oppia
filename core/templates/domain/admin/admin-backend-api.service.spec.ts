@@ -626,7 +626,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should fail to regenerate topic related opportunities when' +
+  it('should fail to regenerate topic related oppurtunities when' +
     'calling regenerateOpportunitiesRelatedToTopicAsync', fakeAsync(() => {
     let action = 'regenerate_topic_related_opportunities';
     let topicId = 'InvalidId';
