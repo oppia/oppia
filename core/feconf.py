@@ -1081,7 +1081,8 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
-LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = '/learner_dashboard_learner_groups_handler'
+LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
+    '/learner_dashboard_learner_groups_handler')
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'

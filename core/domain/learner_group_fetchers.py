@@ -175,14 +175,15 @@ def can_multi_learners_share_progress(
 def get_invited_learner_groups_of_learner(
     user_id: str
 ) -> List[learner_group_domain.LearnerGroup]:
-    """Returns a list of learner groups that the given learner has been invited to join.
+    """Returns a list of learner groups that the given learner has been
+    invited to join.
 
     Args:
         user_id: str. The id of the learner.
 
     Returns:
-        list(LearnerGroup). A list of learner groups that the given learner has been
-        invited to join.
+        list(LearnerGroup). A list of learner groups that the given learner
+        has been invited to join.
     """
     learner_grp_models = (
         learner_group_models.LearnerGroupModel.get_by_invited_learner_user_id(
@@ -206,7 +207,8 @@ def get_learner_groups_of_learner(
         user_id: str. The id of the learner.
 
     Returns:
-        list(LearnerGroup). A list of learner groups that the given learner is part of.
+        list(LearnerGroup). A list of learner groups that the given learner
+        is part of.
     """
     learner_grp_models = (
         learner_group_models.LearnerGroupModel.get_by_learner_user_id(user_id))

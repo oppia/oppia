@@ -842,7 +842,8 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests for the fetching learner groups on learner
-        dashboard."""
+        dashboard.
+        """
 
         invited_to_learner_groups = (
             learner_group_fetchers.get_invited_learner_groups_of_learner(
@@ -879,9 +880,11 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
             'invited_to_learner_groups': invited_to_learner_groups_data
         })
 
+
 class LearnerGroupsFeatureStatusHandler(base.BaseHandler):
     """The handler for checking whether the learner groups feature is
-    enabled."""
+    enabled.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

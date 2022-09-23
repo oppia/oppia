@@ -288,7 +288,9 @@ class LearnerGroupModel(base_models.BaseModel):
         cls.put_multi(learner_group_models_to_put)
 
     @classmethod
-    def get_by_facilitator_id(cls, facilitator_id: str) -> Sequence[LearnerGroupModel]:
+    def get_by_facilitator_id(
+        cls, facilitator_id: str
+    ) -> Sequence[LearnerGroupModel]:
         """Returns a list of all LearnerGroupModels that have the given
         facilitator id.
 
@@ -318,8 +320,9 @@ class LearnerGroupModel(base_models.BaseModel):
             learner_user_id: str. The id of the learner.
 
         Returns:
-            list(LearnerGroupModel)|None. A list of all LearnerGroupModels that the
-            given learner is part of or None if no such learner group models exist.
+            list(LearnerGroupModel)|None. A list of all LearnerGroupModels that
+            the given learner is part of or None if no such learner group
+            models exist.
         """
         found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
             datastore_services.any_of(
@@ -336,13 +339,13 @@ class LearnerGroupModel(base_models.BaseModel):
         learner user id.
 
         Args:
-            invited_learner_user_id: str. The id of the learner invited to join the
-                groups.
+            invited_learner_user_id: str. The id of the learner invited to
+                join the groups.
 
         Returns:
             list(LearnerGroupModel)|None. A list of all LearnerGroupModels that
-            the given learner is being invited to join or None if no such learner
-            group models exist.
+            the given learner is being invited to join or None if no such
+            learner group models exist.
         """
         found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
             datastore_services.any_of(
