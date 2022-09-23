@@ -44,6 +44,7 @@ import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 interface UiConfig {
   (): UiConfig;
@@ -67,12 +68,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     OnDestroy, OnInit {
   @Input() uiConfig: UiConfig;
   @Input() value;
-  @Input() headersEnabled = false;
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
   currentValue: string;
   connectedToInternet = true;
+  headersEnabled = false;
+  windowIsNarrow = false;
   componentsThatRequireInternet: string[] = [];
   subscriptions: Subscription;
   // A RegExp for matching rich text components.
@@ -85,6 +87,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
+    private windowDimensionsService: WindowDimensionsService,
     private elementRef: ElementRef,
     private internetConnectivityService: InternetConnectivityService
   ) {
@@ -193,7 +196,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
             'Blockquote', '-',
             'Indent', '-',
             'Outdent',
-            'Format',
+            'Format'
           ]
         },
         {
@@ -275,7 +278,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         this.contextService.isExplorationLinkedToStory() &&
               AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
                 componentDefn.id) === -1);
-      if (!(hideComplexExtensionFlag || notSupportedOnAndroidFlag)) {
+      var InvalidForBlogPostEditor = (
+        this.contextService.isInBlogPostEditorPage() &&
+        AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR.indexOf(
+          componentDefn.id) !== -1);
+      if (!(
+        hideComplexExtensionFlag || notSupportedOnAndroidFlag || InvalidForBlogPostEditor // eslint-disable-line max-len
+      )) {
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
       }
@@ -335,6 +344,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       });
     }
     buttonNames.pop();
+
+    // Enable format headers in CKE editor for blog post editor rte.
+    this.headersEnabled = this.contextService.isInBlogPostEditorPage();
 
     // Add external plugins.
     CKEDITOR.plugins.addExternal(
@@ -433,9 +445,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
       if (!this.headersEnabled) {
         // TODO(#12882): Remove the use of jQuery.
-        $('.cke_combo_button')
+        $('.cke_combo__format')
           .css('display', 'none');
       }
+
       if (!this.internetConnectivityService.isOnline()) {
         this.connectedToInternet = false;
         this.disableRTEicons();
