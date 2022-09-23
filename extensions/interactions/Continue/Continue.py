@@ -57,9 +57,11 @@ class Continue(base.BaseInteraction):
     @classmethod
     def to_android_continue_proto(cls, default_outcome, customization_args):
         """Creates a ContinueInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustomizationArgs. The domain object.
+
         Returns:
             ContinueInstanceDto. The proto object.
         """
@@ -69,19 +71,21 @@ class Continue(base.BaseInteraction):
         )
 
         return state_pb2.ContinueInstanceDto(
-            customization_args = customization_args_proto,
-            default_outcome = outcome_proto
+            customization_args=customization_args_proto,
+            default_outcome=outcome_proto
         )
 
     @classmethod
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgsDto proto object
         for ContinueInstanceDto.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The proto object.
         """

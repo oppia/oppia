@@ -69,6 +69,7 @@ class EndExploration(base.BaseInteraction):
     @classmethod
     def to_android_end_exploration_proto(cls):
         """Creates a EndExplorationInstanceDto proto object.
+
         Returns:
             EndExplorationInstanceDto. The proto object.
         """

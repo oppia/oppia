@@ -64,11 +64,13 @@ class NumericInput(base.BaseInteraction):
             cls, default_outcome, solution, hints, answer_groups
     ):
         """Creates a NumericInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             solution: Solution. The domain object.
             hints: Hint. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             NumericInputInstanceDto. The proto object.
         """
@@ -88,9 +90,11 @@ class NumericInput(base.BaseInteraction):
     def _convert_solution_to_proto(cls, solution):
         """Creates a SolutionDto proto object
         for NumericInputInstanceDto.
+
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
+
         Returns:
             SolutionDto. The proto object.
         """
@@ -107,9 +111,11 @@ class NumericInput(base.BaseInteraction):
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroupDto proto object
         for NumericInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroupDto). The proto object list.
         """
@@ -131,8 +137,10 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object list.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -191,8 +199,10 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _convert_equals_rule_spec_to_proto(cls, inputs):
         """Creates a EqualsSpecDto proto object.
+
         Args:
             inputs: dict. The input dict.
+
         Returns:
             EqualsSpecDto. The proto object.
         """
@@ -207,8 +217,10 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _convert_is_less_than_rule_spec_to_proto(cls, inputs):
         """Creates a IsLessThanSpecDto proto object.
+
         Args:
             inputs: dict. The input dict.
+
         Returns:
             IsLessThanSpecDto. The proto object.
         """
@@ -223,8 +235,10 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _convert_is_greater_than_rule_spec_to_proto(cls, inputs):
         """Creates a IsGreaterThanSpecDto proto object.
+
         Args:
             inputs: dict. The input dict.
+
         Returns:
             IsGreaterThanSpecDto. The proto object.
         """
@@ -241,8 +255,10 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _convert_is_less_than_or_equal_rule_spec_to_proto(cls, inputs):
         """Creates a IsLessThanOrEqualToSpecDto proto object.
+
         Args:
             inputs: dict. The input dict.
+
         Returns:
             IsLessThanOrEqualToSpecDto. The proto object.
         """
@@ -259,8 +275,10 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _convert_is_greater_than_or_equal_rule_spec_to_proto(cls, inputs):
         """Creates a IsGreaterThanOrEqualToSpecDto proto object.
+
         Args:
             inputs: dict. The input dict.
+
         Returns:
             IsGreaterThanOrEqualToSpecDto. The proto object.
         """
@@ -277,8 +295,10 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _convert_is_inclusively_between_rule_spec_to_proto(cls, inputs):
         """Creates a IsInclusivelyBetweenSpecDto proto object.
+
         Args:
             inputs: dict. The input dict.
+
         Returns:
             IsInclusivelyBetweenSpecDto. The proto object.
         """
@@ -299,8 +319,10 @@ class NumericInput(base.BaseInteraction):
     @classmethod
     def _convert_is_within_tolerance_rule_spec_to_proto(cls, inputs):
         """Creates a IsWithinToleranceSpecDto proto object.
+
         Args:
             inputs: dict. The input dict.
+
         Returns:
             IsWithinToleranceSpecDto. The proto object.
         """

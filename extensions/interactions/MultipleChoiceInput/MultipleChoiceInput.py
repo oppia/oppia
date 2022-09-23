@@ -88,11 +88,13 @@ class MultipleChoiceInput(base.BaseInteraction):
             cls, default_outcome, customization_args, hints, answer_groups
     ):
         """Creates a MultipleChoiceInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
             hints: Hint. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             MultipleChoiceInputInstanceDto. The proto object.
         """
@@ -114,11 +116,13 @@ class MultipleChoiceInput(base.BaseInteraction):
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgsDto proto object
         for MultipleChoiceInputInstanceDto.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The proto object.
         """
@@ -135,9 +139,11 @@ class MultipleChoiceInput(base.BaseInteraction):
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroupDto proto object
         for MultipleChoiceInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroupDto). The proto object list.
         """
@@ -159,8 +165,10 @@ class MultipleChoiceInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -191,8 +199,10 @@ class MultipleChoiceInput(base.BaseInteraction):
     @classmethod
     def _convert_equals_rule_spec_to_proto(cls, equal):
         """Creates a proto object for EqualsSpecDto.
+
         Args:
             equal: int. The input to match with.
+
         Returns:
             EqualsSpecDto. The proto object.
         """

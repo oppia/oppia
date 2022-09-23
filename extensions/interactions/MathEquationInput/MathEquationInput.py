@@ -61,12 +61,14 @@ class MathEquationInput(base.BaseInteraction):
             answer_groups
     ):
         """Creates a MathEquationInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
             hints: Hint. The domain object.
             solution: Solution. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             MathEquationInputInstanceDto. The proto object.
         """
@@ -90,11 +92,13 @@ class MathEquationInput(base.BaseInteraction):
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgsDto proto object
         for MathEquationInputInstanceDto.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The proto object.
         """
@@ -113,9 +117,11 @@ class MathEquationInput(base.BaseInteraction):
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroupDto proto object
         for MathEquationInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroupDto). The proto object list.
         """
@@ -137,8 +143,10 @@ class MathEquationInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -149,8 +157,7 @@ class MathEquationInput(base.BaseInteraction):
                 cls._convert_matches_exactly_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
             'MatchesUpToTrivialManipulations': (
-                cls._convert_matches_up_to_trivial_manipulation_rule_spec_to_proto
-            # pylint: disable=line-too-long
+                cls._convert_matches_up_to_trivial_manipulation_rule_spec_to_proto  # pylint: disable=line-too-long
             )
         }
 
@@ -186,8 +193,10 @@ class MathEquationInput(base.BaseInteraction):
     @classmethod
     def _convert_matches_exactly_rule_spec_to_proto(cls, inputs):
         """Creates a proto object for MatchesExactlyWithSpecDto.
+
         Args:
             inputs: dict. The input items.
+
         Returns:
             MatchesExactlyWithSpecDto. The proto object.
         """
@@ -201,8 +210,10 @@ class MathEquationInput(base.BaseInteraction):
     @classmethod
     def _convert_is_equivalent_rule_spec_to_proto(cls, inputs):
         """Creates a proto object for IsEquivalentToSpecDto.
+
         Args:
             inputs: dict. The input items.
+
         Returns:
             IsEquivalentToSpecDto. The proto object.
         """
@@ -217,8 +228,10 @@ class MathEquationInput(base.BaseInteraction):
             cls, inputs
     ):
         """Creates a proto object for MatchesUpToTrivialManipulationsSpecDto.
+
         Args:
             inputs: dict. The input items.
+
         Returns:
             MatchesUpToTrivialManipulationsSpecDto. The proto object.
         """
@@ -232,9 +245,11 @@ class MathEquationInput(base.BaseInteraction):
     def _convert_solution_to_proto(cls, solution):
         """Creates a SolutionDto proto object
         for MathEquationInputInstanceDto.
+
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
+
         Returns:
             SolutionDto. The proto object.
         """

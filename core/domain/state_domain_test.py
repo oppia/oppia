@@ -38,10 +38,9 @@ from core.domain import translatable_object_registry
 from core.domain import translation_domain
 from core.tests import test_utils
 from extensions.interactions import base
+from proto_files import state_pb2
 
 from typing import Dict, List, Optional, Tuple, Type, Union
-
-from proto_files import state_pb2
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):

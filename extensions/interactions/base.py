@@ -304,8 +304,10 @@ class BaseInteraction:
 
     def get_hint_proto_list(self, hints):
         """Gets the list of HintDto proto for given hints domain object list.
+
         Args:
             hints: list(Hint). List of hints.
+
         Returns:
             list(HintDto). The list of HintDto proto object.
         """

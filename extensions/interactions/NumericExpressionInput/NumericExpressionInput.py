@@ -61,12 +61,14 @@ class NumericExpressionInput(base.BaseInteraction):
             answer_groups
     ):
         """Creates a NumericExpressionInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
             hints: Hint. The domain object.
             solution: Solution. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             NumericExpressionInputInstanceDto. The proto object.
         """
@@ -90,11 +92,13 @@ class NumericExpressionInput(base.BaseInteraction):
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgs proto object
         for NumericExpressionInputInstanceDto.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The proto object.
         """
@@ -113,9 +117,11 @@ class NumericExpressionInput(base.BaseInteraction):
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroup proto object
         for NumericExpressionInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroup). The proto object list.
         """
@@ -137,8 +143,10 @@ class NumericExpressionInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -149,8 +157,7 @@ class NumericExpressionInput(base.BaseInteraction):
                 cls._convert_matches_exactly_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
             'MatchesUpToTrivialManipulations': (
-                cls._convert_matches_up_to_trivial_manipulation_rule_spec_to_proto
-            # pylint: disable=line-too-long
+                cls._convert_matches_up_to_trivial_manipulation_rule_spec_to_proto  # pylint: disable=line-too-long
             )
         }
 
@@ -186,8 +193,10 @@ class NumericExpressionInput(base.BaseInteraction):
     @classmethod
     def _convert_matches_exactly_rule_spec_to_proto(cls, numeric_expression):
         """Creates a proto object for MatchesExactlyWithSpecDto.
+
         Args:
             numeric_expression: str. The numeric expression.
+
         Returns:
             MatchesExactlyWithSpecDto. The proto object.
         """
@@ -200,8 +209,10 @@ class NumericExpressionInput(base.BaseInteraction):
     @classmethod
     def _convert_is_equivalent_rule_spec_to_proto(cls, numeric_expression):
         """Creates a proto object for IsEquivalentToSpecDto.
+
         Args:
             numeric_expression: str. The numeric expression.
+
         Returns:
             IsEquivalentToSpecDto. The proto object.
         """
@@ -216,8 +227,10 @@ class NumericExpressionInput(base.BaseInteraction):
             cls, numeric_expression
     ):
         """Creates a proto object for MatchesUpToTrivialManipulationsSpecDto.
+
         Args:
             numeric_expression: str. The numeric expression.
+
         Returns:
             MatchesUpToTrivialManipulationsSpecDto. The proto object.
         """
@@ -230,10 +243,12 @@ class NumericExpressionInput(base.BaseInteraction):
     @classmethod
     def _convert_solution_to_proto(cls, solution):
         """Creates a Solution proto object
-        for NumericExpressionInputInstanceDto.
+            for NumericExpressionInputInstanceDto.
+
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
+
         Returns:
             SolutionDto. The proto object.
         """

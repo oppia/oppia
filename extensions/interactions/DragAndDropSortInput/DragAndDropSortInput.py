@@ -21,6 +21,7 @@ from proto_files import state_pb2
 
 RULE_SPEC_DTO = state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto
 
+
 class DragAndDropSortInput(base.BaseInteraction):
     """Interaction for Drag and Drop Sorting."""
 
@@ -89,12 +90,14 @@ class DragAndDropSortInput(base.BaseInteraction):
             solution, hints, answer_groups
     ):
         """Creates a DragAndDropSortInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
             solution: Solution. The domain object.
             hints: Hint. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             DragAndDropSortInputInstanceDto. The proto object.
         """
@@ -117,9 +120,11 @@ class DragAndDropSortInput(base.BaseInteraction):
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroupDto proto object
         for DragAndDropSortInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroupDto). The proto object list.
         """
@@ -141,8 +146,10 @@ class DragAndDropSortInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -188,14 +195,15 @@ class DragAndDropSortInput(base.BaseInteraction):
     @classmethod
     def _convert_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsEqualToOrderingSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsEqualToOrderingSpecDto. The proto object.
         """
         return RULE_SPEC_DTO.IsEqualToOrderingSpecDto(
-            input=cls._convert_list_of_set_of_translatable_html_content_ids_to_proto(
-                # pylint: disable=line-too-long
+            input=cls._convert_list_of_set_of_translatable_html_content_ids_to_proto(# pylint: disable=line-too-long
                 input_dict['x'])
         )
 
@@ -203,24 +211,26 @@ class DragAndDropSortInput(base.BaseInteraction):
     def _convert_equal_one_incorrect_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object
         for IsEqualToOrderingWithOneItemAtIncorrectPositionSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsEqualToOrderingWithOneItemAtIncorrectPositionSpecDto.
             The proto object.
         """
-        return RULE_SPEC_DTO.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecDto(
-            # pylint: disable=line-too-long
-            input=cls._convert_list_of_set_of_translatable_html_content_ids_to_proto(
-                # pylint: disable=line-too-long
+        return RULE_SPEC_DTO.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecDto( # pylint: disable=line-too-long
+            input=cls._convert_list_of_set_of_translatable_html_content_ids_to_proto( # pylint: disable=line-too-long
                 input_dict['x'])
         )
 
     @classmethod
     def _convert_has_element_x_at_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsEqualToOrderingSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsEqualToOrderingSpecDto. The proto object.
         """
@@ -233,8 +243,10 @@ class DragAndDropSortInput(base.BaseInteraction):
     @classmethod
     def _convert_has_element_x_before_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsEqualToOrderingSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsEqualToOrderingSpecDto. The proto object.
         """
@@ -250,9 +262,11 @@ class DragAndDropSortInput(base.BaseInteraction):
     def _convert_solution_to_proto(cls, solution):
         """Creates a Solution proto object
         for DragAndDropSortInputInstanceDto.
+
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
+
         Returns:
             SolutionDto. The proto object.
         """
@@ -262,8 +276,7 @@ class DragAndDropSortInput(base.BaseInteraction):
                 state_pb2.DragAndDropSortInputInstanceDto.SolutionDto(
                     base_solution=solution.to_android_solution_proto(),
                     correct_answer=(
-                        cls._convert_list_of_set_of_translatable_html_content_ids_to_proto(
-                            # pylint: disable=line-too-long
+                        cls._convert_list_of_set_of_translatable_html_content_ids_to_proto( # pylint: disable=line-too-long
                             solution.correct_answer)
                     )
                 )
@@ -276,9 +289,11 @@ class DragAndDropSortInput(base.BaseInteraction):
             cls, correct_answer
     ):
         """Creates a ListOfSetsOfTranslatableHtmlContentIdsDto proto object.
+
         Args:
             correct_answer: list(list(str)). A list of set
                 of TranslatableHtmlContentId.
+
         Returns:
             ListOfSetsOfTranslatableHtmlContentIdsDto. The proto object.
         """
@@ -297,9 +312,11 @@ class DragAndDropSortInput(base.BaseInteraction):
             cls, set_of_content_id
     ):
         """Creates a SetOfTranslatableHtmlContentIdsDto proto object.
+
         Args:
             set_of_content_id: list(str). A list of
                 TranslatableHtmlContentId.
+
         Returns:
             SetOfTranslatableHtmlContentIdsDto. The proto object.
         """
@@ -318,9 +335,11 @@ class DragAndDropSortInput(base.BaseInteraction):
             cls, translatable_html_content_id
     ):
         """Creates a TranslatableHtmlContentIdDto proto object.
+
         Args:
             translatable_html_content_id: str. A
                 TranslatableHtml content id.
+
         Returns:
             TranslatableHtmlContentIdDto. The proto object.
         """
@@ -332,11 +351,13 @@ class DragAndDropSortInput(base.BaseInteraction):
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgsDto proto object
             for DragAndDropSortInputInstance.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The CustomizationArgsDto proto object.
         """

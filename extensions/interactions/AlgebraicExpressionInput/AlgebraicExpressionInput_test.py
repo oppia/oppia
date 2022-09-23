@@ -18,8 +18,10 @@
 
 from __future__ import annotations
 
-from core.domain import interaction_registry, state_domain
+from core.domain import interaction_registry
+from core.domain import state_domain
 from core.tests import test_utils
+
 from extensions.interactions.AlgebraicExpressionInput import AlgebraicExpressionInput # pylint: disable=unused-import, line-too-long # isort: skip
 
 

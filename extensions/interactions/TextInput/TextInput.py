@@ -98,12 +98,14 @@ class TextInput(base.BaseInteraction):
             solution, hints, answer_groups
     ):
         """Creates a TextInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
             solution: Solution. The domain object.
             hints: Hint. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             TextInputInstanceDto. The proto object.
         """
@@ -127,9 +129,11 @@ class TextInput(base.BaseInteraction):
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroupDto proto object
         for TextInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroupDto). The proto object list.
         """
@@ -151,8 +155,10 @@ class TextInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -191,8 +197,10 @@ class TextInput(base.BaseInteraction):
     @classmethod
     def _convert_equals_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for EqualsSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             EqualsSpecDto. The proto object.
         """
@@ -206,8 +214,10 @@ class TextInput(base.BaseInteraction):
     @classmethod
     def _convert_starts_with_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for StartsWithSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             StartsWithSpecDto. The proto object.
         """
@@ -221,8 +231,10 @@ class TextInput(base.BaseInteraction):
     @classmethod
     def _to_contains_proto(cls, input_dict):
         """Creates a proto object for ContainsSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             ContainsSpecDto. The proto object.
         """
@@ -236,8 +248,10 @@ class TextInput(base.BaseInteraction):
     @classmethod
     def _convert_fuzzy_equals_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for FuzzyEqualsSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             FuzzyEqualsSpecDto. The proto object.
         """
@@ -253,8 +267,10 @@ class TextInput(base.BaseInteraction):
             cls, input_dict
     ):
         """Creates a TranslatableHtmlContentIdDto proto object.
+
         Args:
             input_dict: str. A TranslatableHtml content id.
+
         Returns:
             TranslatableHtmlContentIdDto. The proto object.
         """
@@ -269,9 +285,11 @@ class TextInput(base.BaseInteraction):
     def _convert_solution_to_proto(cls, solution):
         """Creates a SolutionDto proto object
         for TextInputInstanceDto.
+
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
+
         Returns:
             SolutionDto. The proto object.
         """
@@ -288,11 +306,13 @@ class TextInput(base.BaseInteraction):
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgsDto proto object
         for TextInputInstance.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The proto object.
         """

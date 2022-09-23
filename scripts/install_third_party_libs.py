@@ -62,7 +62,8 @@ PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
 # Path of the buf executable.
 BUF_DIR = os.path.join(
     common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
-PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')# A dictionary where key represents the path of the proto file and its value
+PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
+# A dictionary where key represents the path of the proto file and its value
 # represents whether buf needs to generate its JS/TS file.
 PROTO_FILE_COMPILATION_REQS = {
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'): True,
@@ -221,6 +222,7 @@ def move_all_proto_files_to_third_party():
             str(os.path.join(
                 common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR,
                 os.path.basename(proto_filename.absolute()))))
+
 
 def main() -> None:
     """Install third-party libraries for Oppia."""

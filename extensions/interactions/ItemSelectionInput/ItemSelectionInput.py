@@ -25,6 +25,7 @@ from proto_files import state_pb2
 
 RULE_SPEC_DTO = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
+
 class ItemSelectionInput(base.BaseInteraction):
     """Interaction for item selection input."""
 
@@ -104,11 +105,13 @@ class ItemSelectionInput(base.BaseInteraction):
             cls, default_outcome, customization_args, hints, answer_groups
     ):
         """Creates a ItemSelectionInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
             hints: Hint. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             ItemSelectionInputInstanceDto. The proto object.
         """
@@ -130,11 +133,13 @@ class ItemSelectionInput(base.BaseInteraction):
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgsDto proto object
         for ItemSelectionInputInstanceDto.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The proto object.
         """
@@ -157,9 +162,11 @@ class ItemSelectionInput(base.BaseInteraction):
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroupDto proto object
         for ItemSelectionInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroupDto). The proto object list.
         """
@@ -181,8 +188,10 @@ class ItemSelectionInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -195,8 +204,7 @@ class ItemSelectionInput(base.BaseInteraction):
             'IsProperSubsetOf': (
                 cls._convert_is_proper_subset_of_rule_spec_to_proto),
             'DoesNotContainAtLeastOneOf': (
-                cls._convert_does_not_contains_at_least_one_of_rule_spec_to_proto),
-            # pylint: disable=line-too-long
+                cls._convert_does_not_contains_at_least_one_of_rule_spec_to_proto),  # pylint: disable=line-too-long
         }
 
         rule_type_to_proto_mapping = {
@@ -229,8 +237,10 @@ class ItemSelectionInput(base.BaseInteraction):
     @classmethod
     def _convert_equals_rule_spec_to_proto(cls, choice_list):
         """Creates a proto object for EqualsSpecDto.
+
         Args:
             choice_list: list(str). Choice list to select from.
+
         Returns:
             EqualsSpecDto. The proto object.
         """
@@ -242,8 +252,10 @@ class ItemSelectionInput(base.BaseInteraction):
     @classmethod
     def _convert_contains_at_least_one_of_rule_spec_to_proto(cls, choice_list):
         """Creates a proto object for ContainsAtLeastOneOfSpecDto.
+
         Args:
             choice_list: list(str). Choice list to select from.
+
         Returns:
             ContainsAtLeastOneOfSpecDto. The proto object.
         """
@@ -255,8 +267,10 @@ class ItemSelectionInput(base.BaseInteraction):
     @classmethod
     def _convert_is_proper_subset_of_rule_spec_to_proto(cls, choice_list):
         """Creates a proto object for IsProperSubsetOfSpecDto.
+
         Args:
             choice_list: list(str). Choice list to select from.
+
         Returns:
             IsProperSubsetOfSpecDto. The proto object.
         """
@@ -270,8 +284,10 @@ class ItemSelectionInput(base.BaseInteraction):
             cls, choice_list
     ):
         """Creates a proto object for DoesNotContainAtLeastOneOfSpecDto.
+
         Args:
             choice_list: list(str). Choice list to select from.
+
         Returns:
             DoesNotContainAtLeastOneOfSpecDto. The proto object.
         """
@@ -285,9 +301,11 @@ class ItemSelectionInput(base.BaseInteraction):
             cls, set_of_content_id
     ):
         """Creates a SetOfTranslatableHtmlContentIdsDto proto object.
+
         Args:
             set_of_content_id: list(str). A list of
                 TranslatableHtmlContentId.
+
         Returns:
             SetOfTranslatableHtmlContentIdsDto. The proto object.
         """
@@ -306,9 +324,11 @@ class ItemSelectionInput(base.BaseInteraction):
             cls, translatable_html_content_id
     ):
         """Creates a TranslatableHtmlContentIdDto proto object.
+
         Args:
             translatable_html_content_id: str. A
                 TranslatableHtml content id.
+
         Returns:
             TranslatableHtmlContentIdDto. The proto object.
         """

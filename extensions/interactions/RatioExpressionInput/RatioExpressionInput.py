@@ -74,12 +74,14 @@ class RatioExpressionInput(base.BaseInteraction):
             solution, hints, answer_groups
     ):
         """Creates a RatioExpressionInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
             solution: Solution. The domain object.
             hints: Hint. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             RatioExpressionInputInstanceDto. The proto object.
         """
@@ -104,9 +106,11 @@ class RatioExpressionInput(base.BaseInteraction):
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroupDto proto object
         for RatioExpressionInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroupDto). The proto object list.
         """
@@ -128,8 +132,10 @@ class RatioExpressionInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object list.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -174,8 +180,10 @@ class RatioExpressionInput(base.BaseInteraction):
     @classmethod
     def _convert_equals_rule_spec_to_proto(cls, input_dict):
         """Creates a EqualsSpecDto proto object.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             EqualsSpecDto. The proto object.
         """
@@ -188,8 +196,10 @@ class RatioExpressionInput(base.BaseInteraction):
     @classmethod
     def _convert_is_equivalent_rule_spec_to_proto(cls, input_dict):
         """Creates a IsEquivalentSpecDto proto object.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsEquivalentSpecDto. The proto object.
         """
@@ -204,8 +214,10 @@ class RatioExpressionInput(base.BaseInteraction):
             cls, input_dict
     ):
         """Creates a HasNumberOfTermsEqualToSpecDto proto object.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             HasNumberOfTermsEqualToSpecDto. The proto object.
         """
@@ -222,8 +234,10 @@ class RatioExpressionInput(base.BaseInteraction):
             cls, input_dict
     ):
         """Creates a HasSpecificTermEqualToSpecDto proto object.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             HasSpecificTermEqualToSpecDto. The proto object.
         """
@@ -240,9 +254,11 @@ class RatioExpressionInput(base.BaseInteraction):
     def _convert_solution_to_proto(cls, solution):
         """Creates a Solution proto object
             for RatioExpressionInputInstanceDto.
+
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
+
         Returns:
             SolutionDto. The proto object.
         """
@@ -263,8 +279,10 @@ class RatioExpressionInput(base.BaseInteraction):
     @classmethod
     def _to_ratio_expression_proto(cls, ratio_list):
         """Creates a RatioExpressionDto proto object.
+
         Args:
             ratio_list: list(int). The list of ratios.
+
         Returns:
             RatioExpressionDto. The proto object.
         """
@@ -274,11 +292,13 @@ class RatioExpressionInput(base.BaseInteraction):
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgsDto proto object
         for RatioExpressionInputInstance.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The proto object.
         """

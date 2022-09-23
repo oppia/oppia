@@ -33,6 +33,8 @@ from core.domain import customization_args_util
 from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
+from proto_files import languages_pb2
+from proto_files import state_pb2
 
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast, overload
@@ -43,7 +45,6 @@ from core.domain import html_cleaner  # pylint: disable=invalid-import-from # is
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
-from proto_files import state_pb2, languages_pb2
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3395,6 +3396,7 @@ class TranslatableItem:
     @classmethod
     def to_written_translatable_text_proto(cls, translation):
         """Creates a WrittenTranslatableText proto object.
+
         Args:
             translation: str. The translated content.
 
@@ -3406,6 +3408,7 @@ class TranslatableItem:
     @classmethod
     def to_written_translatable_set_proto(cls, translations):
         """Creates a SetOfWrittenTranslatableText proto object.
+
         Args:
             translations: list(str). The translated content.
 

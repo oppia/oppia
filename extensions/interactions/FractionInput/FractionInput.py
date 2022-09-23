@@ -89,12 +89,14 @@ class FractionInput(base.BaseInteraction):
             answer_groups
     ):
         """Creates a FractionInputInstanceDto proto object.
+
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
             hints: Hint. The domain object.
             solution: Solution. The domain object.
             answer_groups: AnswerGroups. The domain object.
+
         Returns:
             FractionInputInstanceDto. The proto object.
         """
@@ -119,11 +121,13 @@ class FractionInput(base.BaseInteraction):
     def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgsDto proto object
         for FractionInputInstance.
+
         Args:
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+
         Returns:
             CustomizationArgsDto. The proto object.
         """
@@ -146,9 +150,11 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_solution_to_proto(cls, solution):
         """Creates a SolutionDto proto object for FractionInputInstanceDto.
+
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
+
         Returns:
             SolutionDto. The proto object.
         """
@@ -165,9 +171,11 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroupDto proto object for FractionInputInstanceDto.
+
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
+
         Returns:
             list(AnswerGroupDto). The proto object list.
         """
@@ -189,8 +197,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_fraction_to_proto(cls, fraction):
         """Creates a FractionDto proto object.
+
         Args:
             fraction: dict. The fraction domain dict.
+
         Returns:
             FractionDto. The proto object.
         """
@@ -205,8 +215,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpecDto proto object.
+
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
+
         Returns:
             list(RuleSpecDto). The proto object list.
         """
@@ -217,8 +229,7 @@ class FractionInput(base.BaseInteraction):
                 cls._convert_is_exactly_equal_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
             'IsEquivalentToAndInSimplestForm': (
-                cls._convert_is_equivalent_to_and_in_simplest_form_rule_spec_to_proto),
-            # pylint: disable=line-too-long
+                cls._convert_is_equivalent_to_and_in_simplest_form_rule_spec_to_proto), # pylint: disable=line-too-long
             'IsLessThan': cls._convert_is_less_than_rule_spec_to_proto,
             'IsGreaterThan': (
                 cls._convert_is_greater_than_rule_spec_to_proto),
@@ -231,8 +242,7 @@ class FractionInput(base.BaseInteraction):
             'HasNoFractionalPart': (
                 cls._convert_has_no_fractional_part_rule_spec_to_proto),
             'HasFractionalPartExactlyEqualTo': (
-                cls._convert_has_fractional_part_exactly_equal_rule_spec_to_proto)
-            # pylint: disable=line-too-long
+                cls._convert_has_fractional_part_exactly_equal_rule_spec_to_proto)   # pylint: disable=line-too-long
         }
         rule_type_to_proto_mapping = {
             'IsExactlyEqualTo': lambda x: (
@@ -283,8 +293,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_is_exactly_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsExactlyEqualToSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsExactlyEqualToSpecDto. The proto object.
         """
@@ -295,8 +307,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_is_equivalent_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsEquivalentToSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsEquivalentToSpecDto. The proto object.
         """
@@ -309,8 +323,10 @@ class FractionInput(base.BaseInteraction):
             cls, input_dict
     ):
         """Creates a proto object for IsEquivalentToAndInSimplestFormSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsEquivalentToAndInSimplestFormSpecDto. The proto object.
         """
@@ -321,8 +337,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_is_less_than_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsLessThanSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsLessThanSpecDto. The proto object.
         """
@@ -333,8 +351,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_is_greater_than_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for IsGreaterThanSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             IsGreaterThanSpecDto. The proto object.
         """
@@ -345,8 +365,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_has_numerator_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for HasNumeratorEqualToSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             HasNumeratorEqualToSpecDto. The proto object.
         """
@@ -359,8 +381,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_has_denominator_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for HasDenominatorEqualToSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             HasDenominatorEqualToSpecDto. The proto object.
         """
@@ -373,8 +397,10 @@ class FractionInput(base.BaseInteraction):
     @classmethod
     def _convert_has_integer_part_equal_rule_spec_to_proto(cls, input_dict):
         """Creates a proto object for HasIntegerPartEqualToSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             HasIntegerPartEqualToSpecDto. The proto object.
         """
@@ -385,11 +411,13 @@ class FractionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_has_no_fractional_part_rule_spec_to_proto(cls,
-                                                           input_dict):  # pylint: disable=unused-argument
+    def _convert_has_no_fractional_part_rule_spec_to_proto(
+            cls, input_dict):  # pylint: disable=unused-argument
         """Creates a proto object for HasNoFractionalPartSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             HasNoFractionalPartSpecDto. The proto object.
         """
@@ -400,8 +428,10 @@ class FractionInput(base.BaseInteraction):
             cls, input_dict
     ):
         """Creates a proto object for HasFractionalPartExactlyEqualToSpecDto.
+
         Args:
             input_dict: dict. The rule dict.
+
         Returns:
             HasFractionalPartExactlyEqualToSpecDto. The proto object.
         """
