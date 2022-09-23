@@ -24,14 +24,15 @@ import { AnswerClassificationResult } from 'domain/classifier/answer-classificat
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AppService } from 'services/app.service';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionAnswer, TextInputAnswer } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { InteractionRuleInputs, TextInputRuleInputs } from 'interactions/rule-input-defs';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 
 export interface InteractionRulesService {
   [ruleName: string]: (
@@ -44,6 +45,7 @@ export class AnswerClassificationService {
       private alertsService: AlertsService,
       private appService: AppService,
       private interactionSpecsService: InteractionSpecsService,
+      private nws: NormalizeWhitespacePipe,
       private predictionAlgorithmRegistryService:
         PredictionAlgorithmRegistryService,
       private stateClassifierMappingService: StateClassifierMappingService) {}
@@ -185,32 +187,40 @@ export class AnswerClassificationService {
     return answerClassificationResult;
   }
 
-  hasMaxEditDistanceThree(answer: string, correctAnswer: string) {
-    const normalizedAnswer = answer.toLowerCase();
-    const normalizedCorrectAnswer = correctAnswer.toLowerCase();
-    if (normalizedCorrectAnswer === normalizedAnswer) {
-      return true;
-    }
-    var editDistance = [];
-    for (var i = 0; i <= normalizedCorrectAnswer.length; i++) {
-      editDistance.push([i]);
-    }
-    for (var j = 1; j <= normalizedAnswer.length; j++) {
-      editDistance[0].push(j);
-    }
-    for (var i = 1; i <= normalizedCorrectAnswer.length; i++) {
-      for (var j = 1; j <= normalizedAnswer.length; j++) {
-        if (normalizedCorrectAnswer.charAt(i - 1) === normalizedAnswer.charAt(j - 1)) {
-          editDistance[i][j] = editDistance[i - 1][j - 1];
-        } else {
-          editDistance[i][j] = Math.min(
-            editDistance[i - 1][j - 1], editDistance[i][j - 1],
-            editDistance[i - 1][j]) + 1;
+  checkForMisspellings(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
+    const normalizedAnswer = this.nws.transform(answer).toLowerCase();
+    const normalizedInput = inputs.x.normalizedStrSet.map(
+      input => this.nws.transform(input).toLowerCase());
+
+    const hasEditDistanceEqualToTwo = (
+        inputString: string, matchString: string) => {
+      if (inputString === matchString) {
+        return true;
+      }
+      var editDistance = [];
+      for (var i = 0; i <= inputString.length; i++) {
+        editDistance.push([i]);
+      }
+      for (var j = 1; j <= matchString.length; j++) {
+        editDistance[0].push(j);
+      }
+      for (var i = 1; i <= inputString.length; i++) {
+        for (var j = 1; j <= matchString.length; j++) {
+          if (inputString.charAt(i - 1) === matchString.charAt(j - 1)) {
+            editDistance[i][j] = editDistance[i - 1][j - 1];
+          } else {
+            editDistance[i][j] = Math.min(
+              editDistance[i - 1][j - 1], editDistance[i][j - 1],
+              editDistance[i - 1][j]) + 1;
+          }
         }
       }
-    }
-    return editDistance[normalizedCorrectAnswer.length][normalizedAnswer.length] <= 3;
-  };
+      return editDistance[inputString.length][matchString.length] <= 2;
+    };
+
+    return normalizedInput.some(
+      input => hasEditDistanceEqualToTwo(input, normalizedAnswer));
+  }
 
   isAnswerOnlyMisspelled(
       interactionInOldState: Interaction,
@@ -220,13 +230,12 @@ export class AnswerClassificationService {
     const answerGroups = interactionInOldState.answerGroups;
     for (var i = 0; i < answerGroups.length; ++i) {
       const answerGroup = answerGroups[i];
-      for (var j = 0; j < answerGroup.rules.length; ++j) {
-        const rule = answerGroup.rules[j];
-        for (var k = 0; k < rule.inputs.length; ++k) {
-          var correctAnswer = rule.inputs[k];
-          if (this.hasMaxEditDistanceThree(
+      if (answerGroup.outcome.labelledAsCorrect) {
+        for (var j = 0; j < answerGroup.rules.length; ++j) {
+          const ruleInputs = answerGroup.rules[j].inputs;
+          if (this.checkForMisspellings(
             answer,
-            correctAnswer.toString()
+            ruleInputs as any
           )) {
             return true;
           }
