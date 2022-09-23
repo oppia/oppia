@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import base64
+import logging
 import urllib
 
 from core import feconf
@@ -86,7 +87,10 @@ def send_email_to_recipients(
     """
     mailgun_api_key = secrets_services.get_secret('MAILGUN_API_KEY')
     if not mailgun_api_key:
-        raise Exception('Mailgun API key is not available.')
+        logging.exception('Cloud Secret Manager is not working.')
+        mailgun_api_key = feconf.MAILGUN_API_KEY
+        if not mailgun_api_key:
+            raise Exception('Mailgun API key is not available.')
 
     if not feconf.MAILGUN_DOMAIN_NAME:
         raise Exception('Mailgun domain name is not set.')

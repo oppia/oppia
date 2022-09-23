@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import ast
+import logging
 
 from core import feconf
 from core.jobs import base_jobs
@@ -91,8 +92,13 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
     # The following is a class initialized in the library with the API key and
     # username and hence cannot be tested directly. The mailchimp functions are
     # tested with a mock class.
+    mailchimp_api_key = secrets_services.get_secret('MAILCHIMP_API_KEY')
+    if not mailchimp_api_key:
+        logging.exception('Cloud Secret Manager is not working.')
+        mailchimp_api_key = feconf.MAILCHIMP_API_KEY
+
     return mailchimp3.MailChimp(    # pragma: no cover
-        mc_api=secrets_services.get_secret('MAILCHIMP_API_KEY'),
+        mc_api=mailchimp_api_key,
         mc_user=feconf.MAILCHIMP_USERNAME
     )
 

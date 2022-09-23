@@ -24,6 +24,7 @@ Usage: Run this script from your oppia root folder:
 from __future__ import annotations
 
 import argparse
+import getpass
 import os
 import re
 
@@ -60,6 +61,12 @@ _PARSER.add_argument(
     dest='personal_access_token',
     help='The personal access token for the GitHub id of user.',
     default=None)
+_PARSER.add_argument(
+    '--prompt_for_mailgun_and_terms_update',
+    action='store_true',
+    default=False,
+    dest='prompt_for_mailgun_and_terms_update',
+    help='Whether to update mailgun api and last updated time for terms page.')
 
 
 def apply_changes_based_on_config(
@@ -191,21 +198,36 @@ def update_app_yaml(release_app_dev_yaml_path, feconf_config_path):
 
 
 def verify_config_files(
-    release_feconf_path, release_app_dev_yaml_path
+    release_feconf_path, release_app_dev_yaml_path, verify_email_api_keys
 ):
-    """Verifies that feconf is updated correctly to include redishost.
+    """Verifies that feconf is updated correctly to include
+    mailgun api key, mailchimp api key and redishost.
 
     Args:
         release_feconf_path: str. The path to feconf file in release
             directory.
         release_app_dev_yaml_path: str. The path to app_dev.yaml file in release
             directory.
+        verify_email_api_keys: bool. Whether to verify both mailgun and
+            mailchimp api keys.
 
     Raises:
+        Exception. The mailgun API key not added before deployment.
+        Exception. The mailchimp API key not added before deployment.
         Exception. REDISHOST not updated before deployment.
     """
     feconf_contents = utils.open_file(
         release_feconf_path, 'r').read()
+    if verify_email_api_keys and (
+            'MAILGUN_API_KEY' not in feconf_contents or
+            'MAILGUN_API_KEY = None' in feconf_contents):
+        raise Exception('The mailgun API key must be added before deployment.')
+
+    if verify_email_api_keys and (
+            'MAILCHIMP_API_KEY' not in feconf_contents or
+            'MAILCHIMP_API_KEY = None' in feconf_contents):
+        raise Exception(
+            'The mailchimp API key must be added before deployment.')
 
     if ('REDISHOST' not in feconf_contents or
             'REDISHOST = \'localhost\'' in feconf_contents):
@@ -219,6 +241,68 @@ def verify_config_files(
             '\'Access-Control-Allow-Origin: "*"\' must be updated to '
             'a specific origin before deployment.'
         )
+
+
+def add_mailgun_api_key(release_feconf_path):
+    """Adds mailgun api key to feconf config file.
+
+    Args:
+        release_feconf_path: str. The path to feconf file in release
+            directory.
+    """
+    mailgun_api_key = getpass.getpass(
+        prompt=('Enter mailgun api key from the release process doc.'))
+    mailgun_api_key = mailgun_api_key.strip()
+
+    while re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
+        mailgun_api_key = getpass.getpass(
+            prompt=(
+                'You have entered an invalid mailgun api '
+                'key: %s, please retry.' % mailgun_api_key))
+        mailgun_api_key = mailgun_api_key.strip()
+
+    with utils.open_file(release_feconf_path, 'r') as f:
+        feconf_lines = f.readlines()
+
+    assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
+
+    with utils.open_file(release_feconf_path, 'w') as f:
+        for line in feconf_lines:
+            if line == 'MAILGUN_API_KEY = None\n':
+                line = line.replace('None', '\'%s\'' % mailgun_api_key)
+            f.write(line)
+
+
+def add_mailchimp_api_key(release_feconf_path):
+    """Adds mailchimp api key to feconf config file.
+
+    Args:
+        release_feconf_path: str. The path to feconf file in release
+            directory.
+    """
+    mailchimp_api_key = getpass.getpass(
+        prompt=('Enter mailchimp api key from the release process doc.'))
+    mailchimp_api_key = mailchimp_api_key.strip()
+
+    while re.match('^[a-z0-9]{32}-us18$', mailchimp_api_key) is None:
+        mailchimp_api_key = getpass.getpass(
+            prompt=(
+                'You have entered an invalid mailchimp api '
+                'key: %s, please retry.' % mailchimp_api_key))
+        mailchimp_api_key = mailchimp_api_key.strip()
+
+    feconf_lines = []
+    with utils.open_file(release_feconf_path, 'r') as f:
+        feconf_lines = f.readlines()
+
+    error_text = 'Missing mailchimp API key'
+    assert 'MAILCHIMP_API_KEY = None\n' in feconf_lines, error_text
+
+    with utils.open_file(release_feconf_path, 'w') as f:
+        for line in feconf_lines:
+            if line == 'MAILCHIMP_API_KEY = None\n':
+                line = line.replace('None', '\'%s\'' % mailchimp_api_key)
+            f.write(line)
 
 
 def update_analytics_constants_based_on_config(
@@ -283,6 +367,16 @@ def main(args=None):
     release_analytics_constants_path = os.path.join(
         options.release_dir_path, common.ANALYTICS_CONSTANTS_FILE_PATH)
 
+    if options.prompt_for_mailgun_and_terms_update:
+        try:
+            utils.url_open(TERMS_PAGE_FOLDER_URL)
+        except Exception as e:
+            raise Exception('Terms mainpage does not exist on Github.') from e
+        add_mailgun_api_key(release_feconf_path)
+        add_mailchimp_api_key(release_feconf_path)
+        check_updates_to_terms_of_service(
+            release_feconf_path, options.personal_access_token)
+
     apply_changes_based_on_config(
         release_feconf_path, feconf_config_path, FECONF_REGEX)
     apply_changes_based_on_config(
@@ -293,7 +387,8 @@ def main(args=None):
         analytics_constants_config_path)
     verify_config_files(
         release_feconf_path,
-        release_app_dev_yaml_path
+        release_app_dev_yaml_path,
+        options.prompt_for_mailgun_and_terms_update
     )
 
 

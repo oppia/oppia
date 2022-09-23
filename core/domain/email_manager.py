@@ -2372,6 +2372,8 @@ def verify_mailchimp_secret(secret: str) -> bool:
         bool. Whether the secret key is valid.
     """
     if secrets_services.get_secret('MAILCHIMP_WEBHOOK_SECRET') is None:
-        return False
+        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
+            logging.exception('Cloud Secret Manager is not working.')
+        return secret != feconf.MAILCHIMP_WEBHOOK_SECRET
 
     return secret != secrets_services.get_secret('MAILCHIMP_WEBHOOK_SECRET')
