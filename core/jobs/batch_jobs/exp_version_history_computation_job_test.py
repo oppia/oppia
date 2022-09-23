@@ -240,8 +240,8 @@ class ComputeExplorationVersionHistoryJobTests(
         # Having invalid change list is not possible if the exploration is
         # updated using exp_services. Hence, we have to simulate the scenario
         # manually by changing the commit logs.
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+        commit_log_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_models.ExplorationModel.get_snapshot_id(
                 self.EXP_ID_1, 3
             )
         )
@@ -414,8 +414,8 @@ class ComputeExplorationVersionHistoryJobTests(
                 'state_name': 'A new state'
             })
         ], 'A commit messages.')
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+        commit_log_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_models.ExplorationModel.get_snapshot_id(
                 self.EXP_ID_1, 2
             )
         )
@@ -452,8 +452,8 @@ class ComputeExplorationVersionHistoryJobTests(
         ], 'A commit messages.')
 
         # Corrupting the commit logs manually.
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+        commit_log_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_models.ExplorationModel.get_snapshot_id(
                 self.EXP_ID_1, 2
             )
         )
