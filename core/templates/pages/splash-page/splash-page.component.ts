@@ -25,9 +25,9 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './splash-page.component.css';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
 export interface Testimonial {
