@@ -4554,7 +4554,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             else:
                 if (
                     tag['text-with-value'].strip() in empty_values or
-                    tag['url-with-value'] in empty_values
+                    tag['url-with-value'].strip() in empty_values
                 ):
                     tag.decompose()
 
