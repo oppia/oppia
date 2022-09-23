@@ -297,6 +297,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'dev_mode': True,
+                    'mobile': False,
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': False,
@@ -308,8 +309,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'full',
-                    'dev_mode': True,
                     'chrome_version': None,
+                    'dev_mode': True,
+                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -366,6 +368,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': False,
+                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -375,10 +378,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'full',
-                    'dev_mode': True,
                     'chrome_version': None,
+                    'dev_mode': True,
                     'sharding_instances': 3,
                     'debug_mode': False,
+                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -532,6 +536,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'dev_mode': True,
+                    'mobile': False,
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': False,
@@ -543,8 +548,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'full',
-                    'dev_mode': True,
                     'chrome_version': None,
+                    'dev_mode': True,
+                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -589,6 +595,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 {
                     'dev_mode': True,
                     'suite_name': 'full',
+                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': True,
                     'stdout': subprocess.PIPE,
@@ -599,8 +606,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'full',
-                    'dev_mode': True,
                     'chrome_version': None,
+                    'dev_mode': True,
+                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': True,
                     'stdout': subprocess.PIPE,
@@ -646,6 +654,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 {
                     'dev_mode': True,
                     'suite_name': 'full',
+                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -656,8 +665,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'full',
-                    'dev_mode': True,
                     'chrome_version': CHROME_DRIVER_VERSION,
+                    'dev_mode': True,
+                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -701,8 +711,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[
                 {
-                    'dev_mode': True,
                     'suite_name': 'library',
+                    'dev_mode': True,
+                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -745,8 +756,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'collections',
-                    'dev_mode': True,
                     'chrome_version': None,
+                    'dev_mode': True,
+                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -816,3 +828,30 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(SystemExit, '1'):
             run_e2e_tests.main(args=['--suite', 'never'])
+
+    def test_do_not_run_with_test_non_mobile_suite_in_mobile_mode(self):
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'install_third_party_libraries', lambda _: None,
+            expected_args=[(False,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            expected_args=[(True,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_dev_appserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_redis_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            flake_checker, 'check_if_on_ci', lambda: True))
+
+        with self.assertRaisesRegex(SystemExit, '^1$'):
+            run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
