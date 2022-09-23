@@ -674,3 +674,74 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
             )
             | beam.Flatten()
         )
+
+
+class RegenerateMissingExplorationStatsModelsJob(base_jobs.JobBase):
+    """Job that regenerates missing exploration stats models."""
+
+    @staticmethod
+    def _regenerate_stats_models(
+        exp_id: str,
+        unused_exp_model: exp_models.ExplorationModel
+    ) -> result.Result[
+        Tuple[str, exp_domain.Exploration],
+        Tuple[str, Exception]
+    ]:
+        """Regenerates missing exploration stats models.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+            unused_exp_model: ExplorationModel. Exploration model.
+
+        Returns:
+            Result((str, Exploration), (str, Exception)). Result containing
+            tuple that consists of exploration ID and either Exploration object
+            or Exception. Exploration object is returned when the regeneration
+            was successful and Exception is returned otherwise.
+        """
+        results = None
+        try:
+            results = exp_services.regenerate_missing_stats_for_exploration(exp_id)
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((exp_id, e))
+
+        return result.Ok((exp_id, results))
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the stats regeneration.
+
+        Returns:
+            PCollection. A PCollection of results from the stats regeneration.
+        """
+
+        unmigrated_exploration_models = (
+            self.pipeline
+            | 'Get all non-deleted exploration models' >> (
+                ndb_io.GetModels(
+                    exp_models.ExplorationModel.get_all(
+                        include_deleted=False)))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda exp_model: exp_model.id)
+            # TODO(#15871): This filter should be removed after the explorations
+            # are fixed and it is possible to migrate them.
+            | 'Remove broken exploration' >> beam.Filter(
+                lambda id_and_exp: id_and_exp[0] not in (
+                    'umPkwp0L1M0-', '670bU6d9JGBh'))
+        )
+
+        regenerated_stats_results = (
+            unmigrated_exploration_models
+            | 'Transform and migrate model' >> beam.MapTuple( # pylint: disable=no-value-for-parameter
+                self._regenerate_stats_models)
+        )
+
+        regenerated_stats_job_run_results = (
+            regenerated_stats_results
+            | 'Generate results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
+        )
+
+        return regenerated_stats_job_run_results

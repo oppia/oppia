@@ -195,37 +195,6 @@
 </mat-card>
 
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Regenerate missing exploration stats:</h3>
-  <div class="oppia-query-form">
-    <form class="form" (submit)="regenerateMissingExplorationStats()">
-      <div class="form-group row">
-        <label class="w-100">Comma separated exploration IDs:</label>
-        <textarea type="text"
-                  [(ngModel)]="explorationIdsForRegeneratingMissingStats"
-                  [ngModelOptions]="{standalone: true}"
-                  cols="40"
-                  rows="5"
-                  required="true">
-        </textarea>
-      </div>
-      <div class="form-group row">
-        <input type="submit" value="Regenerate">
-        <a *ngIf="csvUri" [href]="csvUri" [download]="csvFilename">
-          <input type="button" value="Download CSV output">
-        </a>
-        <input *ngIf="csvUri"
-               type="button"
-               (click)="resetExplorationStatsRegenerationUtilityCsvRows()"
-               value="Reset CSV data">
-      </div>
-    </form>
-    <pre *ngIf="missingExplorationStatsRegenerationMessage">
-      {{ missingExplorationStatsRegenerationMessage }}
-    </pre>
-  </div>
-</mat-card>
-
-<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Grant super admin privileges to Firebase account</h3>
   <p>The chosen user will be forcibly logged out.</p>
   <p>This operation is idempotent.</p>

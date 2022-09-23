@@ -41,8 +41,15 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
 
-(exp_models, opportunity_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.OPPORTUNITY])
+(
+    exp_models,
+    opportunity_models,
+    stats_models
+) = models.Registry.import_models([
+    models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY,
+    models.Names.STATISTICS
+])
 
 
 # Exploration migration backend tests with BEAM jobs involves creating and
@@ -453,3 +460,73 @@ class AuditExplorationMigrationJobTests(
 
         self.assertEqual(
             updated_opp_summary.to_dict(), expected_opp_summary_dict)
+
+
+class RegenerateMissingExplorationStatsModelsJobTests(
+    job_test_utils.JobTestBase,
+    test_utils.GenericTestBase
+):
+    """Tests for the RegenerateExplorationStatsJob."""
+
+    JOB_CLASS = exp_migration_jobs.RegenerateMissingExplorationStatsModelsJob
+
+    NEW_EXP_ID = 'exp_1'
+    EXP_TITLE = 'title'
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_job_regenerates_missing_stats_models(self) -> None:
+        exp_id = 'ID1'
+        owner_id = 'owner_id'
+        self.save_new_default_exploration(exp_id, 'owner_id')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 1'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 3'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 4'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 5'
+            })], 'Changed title.')
+        stats_models.ExplorationStatsModel.get_model(exp_id, 2).delete()
+        stats_models.ExplorationStatsModel.get_model(exp_id, 4).delete()
+
+        self.assertIsNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
+        self.assertIsNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1')
+        ])
+
+        self.assertIsNotNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
+        self.assertIsNotNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        )

@@ -150,14 +150,6 @@ export interface AdminPageData {
   featureFlags: PlatformParameter[];
 }
 
-
-export interface PopulateStatsResult {
-  'missing_exp_stats': number[];
-  'missing_state_stats': number[];
-  'num_valid_exp_stats': number;
-  'num_valid_state_stats': number;
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -312,25 +304,6 @@ export class AdminBackendApiService {
   async clearSearchIndexAsync(): Promise<void> {
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL);
-  }
-
-  async populateExplorationStatsRegenerationCsvResultAsync(
-      expIdToRegenerate: string
-  ): Promise<PopulateStatsResult> {
-    let action = 'regenerate_missing_exploration_stats';
-    let payload = {
-      exp_id: expIdToRegenerate
-    };
-    return new Promise((resolve, reject) => {
-      this.http.post<PopulateStatsResult>(
-        AdminPageConstants.ADMIN_HANDLER_URL,
-        { action, ...payload }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
   }
 
   async regenerateOpportunitiesRelatedToTopicAsync(
