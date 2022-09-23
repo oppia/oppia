@@ -701,7 +701,9 @@ class RegenerateMissingExplorationStatsModelsJob(base_jobs.JobBase):
         """
         results = None
         try:
-            results = exp_services.regenerate_missing_stats_for_exploration(exp_id)
+            results = exp_services.regenerate_missing_stats_for_exploration(
+                exp_id
+            )
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_id, e))

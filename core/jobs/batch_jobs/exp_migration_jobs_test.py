@@ -510,14 +510,14 @@ class RegenerateMissingExplorationStatsModelsJobTests(
                 'property_name': 'title',
                 'new_value': 'New title 5'
             })], 'Changed title.')
-        stats_models.ExplorationStatsModel.get_model(exp_id, 2).delete()
-        stats_models.ExplorationStatsModel.get_model(exp_id, 4).delete()
+        stats_models.ExplorationStatsModel.get_model(exp_id, 2).delete() # type: ignore[attr-defined]
+        stats_models.ExplorationStatsModel.get_model(exp_id, 4).delete() # type: ignore[attr-defined]
 
         self.assertIsNone(
-            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2) # type: ignore[attr-defined]
         )
         self.assertIsNone(
-            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4) # type: ignore[attr-defined]
         )
 
         self.assert_job_output_is([
@@ -525,8 +525,8 @@ class RegenerateMissingExplorationStatsModelsJobTests(
         ])
 
         self.assertIsNotNone(
-            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2) # type: ignore[attr-defined]
         )
         self.assertIsNotNone(
-            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4) # type: ignore[attr-defined]
         )

@@ -3105,12 +3105,11 @@ def regenerate_missing_stats_for_exploration(
         zip(exp_stats_list, exp_list, change_lists))
     revert_commit_cmd = exp_models.ExplorationModel.CMD_REVERT_COMMIT
     for i, (exp_stats, exp, change_list) in enumerate(zipped_items):
-        revert_cmd = next(
+        revert_to_version = next(
             (
-                change for change in change_list
+                int(change.version_number) for change in change_list
                 if change.cmd == revert_commit_cmd
             ), None)
-        revert_to_version = revert_cmd and revert_cmd.version_number
         new_exp_version = None
 
         if revert_to_version is not None:
@@ -3208,11 +3207,11 @@ def regenerate_missing_stats_for_exploration(
                 if current_interaction_id != prev_interaction_id or (
                         current_interaction_id == 'EndExploration' and
                         prev_state_name == 'END'):
-                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                    exp_stats_list[i].state_stats_mapping[state_name] = ( # type: ignore[union-attr]
                         stats_domain.StateStats.create_default())
                 else:
-                    exp_stats_list[i].state_stats_mapping[state_name] = (
-                        prev_exp_stats.state_stats_mapping[
+                    exp_stats_list[i].state_stats_mapping[state_name] = ( # type: ignore[union-attr]
+                        prev_exp_stats.state_stats_mapping[ # type: ignore[union-attr]
                             prev_state_name].clone())
                 missing_state_stats.append(
                     'StateStats(exp_id=%r, exp_version=%r, '
@@ -3223,13 +3222,13 @@ def regenerate_missing_stats_for_exploration(
                     'State(name=%r): %r' % (
                         exp_id, exp_stats.exp_version, prev_state_name, {
                             'added_state_names': (
-                                exp_versions_diff.added_state_names),
+                                exp_versions_diff.added_state_names), # type: ignore[union-attr]
                             'deleted_state_names': (
-                                exp_versions_diff.deleted_state_names),
+                                exp_versions_diff.deleted_state_names), # type: ignore[union-attr]
                             'new_to_old_state_names': (
-                                exp_versions_diff.new_to_old_state_names),
+                                exp_versions_diff.new_to_old_state_names), # type: ignore[union-attr]
                             'old_to_new_state_names': (
-                                exp_versions_diff.old_to_new_state_names),
+                                exp_versions_diff.old_to_new_state_names), # type: ignore[union-attr]
                             'prev_exp.states': (
                                 prev_exp.state_interaction_ids_dict.keys()),
                             'prev_exp_stats': prev_exp_stats
@@ -3237,7 +3236,7 @@ def regenerate_missing_stats_for_exploration(
 
     for index, exp_stats in enumerate(exp_stats_list):
         if index not in missing_exp_stats_indices:
-            stats_services.save_stats_model(exp_stats)
+            stats_services.save_stats_model(exp_stats) # type: ignore[arg-type]
 
     return (
         missing_exp_stats, missing_state_stats,
