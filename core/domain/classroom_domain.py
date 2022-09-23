@@ -43,6 +43,6 @@ class Classroom:
         """
         self.name = name
         self.url_fragment = url_fragment
-        self.topic_ids = topic_ids
+        self.topic_ids = topic_ids  # type: ignore[arg-type, no-return, no-untyped-call]
         self.course_details = course_details
         self.topic_list_intro = topic_list_intro
