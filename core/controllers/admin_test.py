@@ -155,7 +155,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             self.post_json(
                 '/adminhandler', {
                     'action': 'reload_exploration',
-                    'exploration_id': '2'
+                    'exploration_id': '3'
                 }, csrf_token=csrf_token)
 
         self.logout()

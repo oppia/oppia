@@ -5260,7 +5260,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 52
+states_schema_version: 53
 tags: []
 title: Title
 """)
@@ -5529,7 +5529,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 52
+states_schema_version: 53
 tags: []
 title: Title
 """)
@@ -5717,7 +5717,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 52
+states_schema_version: 53
 tags: []
 title: Title
 """)
