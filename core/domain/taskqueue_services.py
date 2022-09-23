@@ -69,7 +69,7 @@ FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: Final = (
     'remove_user_from_rights_models')
 
 
-# Here we used type Any because in defer() function '*args' points to the
+# Here we use type Any because in defer() function '*args' points to the
 # positional arguments of any other function and those arguments can be of
 # type str, list, int and other types too. Similarly, '**kwargs' points to
 # the keyword arguments of any other function and those can also accept
@@ -115,7 +115,7 @@ def defer(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
 
 
-# Here we used type Any because the argument 'params' can accept payload
+# Here we use type Any because the argument 'params' can accept payload
 # dictionaries which can hold the values of type string, set, int and
 # other types too.
 def enqueue_task(url: str, params: Dict[str, Any], countdown: int) -> None:
