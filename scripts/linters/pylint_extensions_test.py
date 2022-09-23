@@ -2457,9 +2457,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
-        node_with_prohibited_type_ignore_error_code = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
+        node_with_prohibited_type_ignore_error_code = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
         )
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
