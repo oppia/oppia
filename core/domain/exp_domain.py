@@ -4673,9 +4673,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state in states_dict.values():
             # Fix tags for state content.
+            # Fix tags for state content.
             html = state['content']['html']
-            state['content']['html'] = cls.fix_rte_tags(html)
-            state['content']['html'] = cls.fix_tabs_and_collapsible_tags(html)
+            html = cls.fix_rte_tags(html)
+            html = cls.fix_tabs_and_collapsible_tags(html)
+            state['content']['html'] = html
             # Fix tags for written translations.
             written_translations = state['written_translations'][
                 'translations_mapping']
@@ -4683,13 +4685,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 written_translations.values()):
                 for translation in (
                     language_code_to_written_translation.values()):
-                    translation['translation'] = cls.fix_rte_tags(
+                    fixed_translation = cls.fix_rte_tags(
                         translation['translation'])
-                    translation['translation'] = (
+                    fixed_translation = (
                         cls.fix_tabs_and_collapsible_tags(
-                            translation['translation'])
+                            fixed_translation)
                     )
-
+                    translation['translation'] = fixed_translation
         return states_dict
 
     @classmethod
