@@ -35,6 +35,10 @@ interface DeleteLearnerGroupBackendResponse {
   success: boolean;
 }
 
+interface LearnerGroupFeatureIsEnabledBackendDict {
+  feature_is_enabled: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -209,6 +213,22 @@ export class LearnerGroupBackendApiService {
         resolve(LearnerGroupData.createFromBackendDict(response));
       });
     });
+  }
+
+  async _getLearnerGroupFeatureActivationStatusAsync():
+  Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = '/learner_groups_feature_status_handler';
+      this.http.get<LearnerGroupFeatureIsEnabledBackendDict>(
+        learnerGroupUrl).toPromise().then(response => {
+        resolve(response.feature_is_enabled);
+      });
+    });
+  }
+
+  async isLearnerGroupFeatureEnabledAsync():
+  Promise<boolean> {
+    return this._getLearnerGroupFeatureActivationStatusAsync();
   }
 }
 

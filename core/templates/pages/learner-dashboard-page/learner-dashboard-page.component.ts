@@ -48,6 +48,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
 
 import './learner-dashboard-page.component.css';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 
 
 @Component({
@@ -154,6 +155,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   progressImageUrl: string = '';
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
+  LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -170,7 +172,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private translateService: TranslateService,
-    private pageTitleService: PageTitleService
+    private pageTitleService: PageTitleService,
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -229,11 +232,19 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       }
     );
 
+    let learnerGroupFeatureIsEnabledPromise = (
+      this.learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync()
+    );
+    learnerGroupFeatureIsEnabledPromise.then(featureIsEnabled => {
+      this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
+    });
+
     this.fetchFeedbackUpdates();
 
     Promise.all([
       userInfoPromise,
-      dashboardTopicAndStoriesDataPromise
+      dashboardTopicAndStoriesDataPromise,
+      learnerGroupFeatureIsEnabledPromise
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();

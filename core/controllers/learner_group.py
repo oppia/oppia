@@ -878,3 +878,21 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
             'learner_of_learner_groups': learner_of_learner_groups_data,
             'invited_to_learner_groups': invited_to_learner_groups_data
         })
+
+class LearnerGroupsFeatureStatusHandler(base.BaseHandler):
+    """The handler for checking whether the learner groups feature is
+    enabled."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        self.render_json({
+            'feature_is_enabled': (
+                config_domain.LEARNER_GROUPS_ARE_ENABLED.value)
+        })

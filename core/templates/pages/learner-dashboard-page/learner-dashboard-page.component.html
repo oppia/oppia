@@ -27,6 +27,7 @@
         </h4>
         <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-learner-groups-section" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS}"
+            *ngIf="LEARNER_GROUP_FEATURE_IS_ENABLED"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS)"
             (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS)" >
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS | translate"></span>
@@ -135,7 +136,7 @@
                               [activeSubsection]="activeSubsection">
           </oppia-progress-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS && LEARNER_GROUP_FEATURE_IS_ENABLED">
           <oppia-learner-groups-tab [username]="username"
                                     (setActiveSection)="setActiveSection($event)">
           </oppia-learner-groups-tab>
