@@ -2426,8 +2426,8 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
-    def test_raises_error_if_prohibited_type_ignore_is_used(self):
-        node_with_prohibited_type_ignore = astroid.scoped_nodes.Module(
+    def test_raises_error_if_prohibited_error_code_is_used(self):
+        node_with_prohibited_error_code = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
@@ -2442,22 +2442,22 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 ) #@
                 """
             )
-        node_with_prohibited_type_ignore.file = filename
+        node_with_prohibited_error_code.file = filename
 
         message = testutils.Message(
             msg_id='prohibited-type-ignore-used',
             line=2,
-            node=node_with_prohibited_type_ignore,
+            node=node_with_prohibited_error_code,
             args=('some-new-ignore',)
         )
 
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_module(
-                node_with_prohibited_type_ignore
+                node_with_prohibited_error_code
             )
         temp_file.close()
 
-        node_with_extra_prohibited_type_ignore = astroid.scoped_nodes.Module(
+        node_with_prohibited_type_ignore_error_code = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
@@ -2468,7 +2468,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""
                 # Here we use MyPy ignore because ...
-                suggestion.change.new_value = (   # type: ignore[attr-defined]
+                suggestion.change.new_value = (  # type: ignore[attr-defined]
                     new_content
                 )
 
@@ -2477,29 +2477,29 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 )
 
                 # Here we use MyPy ignore because ...
-                func_only_accept_str('hi')   # type: ignore[attr-defined]
+                func_only_accept_str('hi')  # type: ignore[attr-defined]
 
                 #@
                 """
             )
-        node_with_extra_prohibited_type_ignore.file = filename
+        node_with_prohibited_type_ignore_error_code.file = filename
 
         message = testutils.Message(
             msg_id='prohibited-type-ignore-used',
             line=7,
-            node=node_with_extra_prohibited_type_ignore,
+            node=node_with_prohibited_type_ignore_error_code,
             args=('truthy-bool',)
         )
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_module(
-                node_with_extra_prohibited_type_ignore
+                node_with_prohibited_type_ignore_error_code
             )
         temp_file.close()
 
-    def test_raises_error_if_prohibited_type_ignore_is_used_in_combined_form(
+    def test_raises_error_if_prohibited_error_code_is_used_in_combined_form(
         self
     ):
-        node_with_prohibited_type_ignore_in_combined_form = (
+        node_with_prohibited_error_code_in_combined_form = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'
@@ -2516,22 +2516,22 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 ) #@
                 """
             )
-        node_with_prohibited_type_ignore_in_combined_form.file = filename
+        node_with_prohibited_error_code_in_combined_form.file = filename
 
         message = testutils.Message(
             msg_id='prohibited-type-ignore-used',
             line=2,
-            node=node_with_prohibited_type_ignore_in_combined_form,
+            node=node_with_prohibited_error_code_in_combined_form,
             args=('truthy-bool',)
         )
 
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_module(
-                node_with_prohibited_type_ignore_in_combined_form
+                node_with_prohibited_error_code_in_combined_form
             )
         temp_file.close()
 
-        node_with_multiple_prohibited_type_ignore_in_combined_form = (
+        node_with_multiple_prohibited_error_code_in_combined_form = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'
@@ -2548,19 +2548,19 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 ) #@
                 """
             )
-        node_with_multiple_prohibited_type_ignore_in_combined_form.file = (
+        node_with_multiple_prohibited_error_code_in_combined_form.file = (
             filename)
 
         message = testutils.Message(
             msg_id='prohibited-type-ignore-used',
             line=2,
-            node=node_with_multiple_prohibited_type_ignore_in_combined_form,
+            node=node_with_multiple_prohibited_error_code_in_combined_form,
             args=('return-none', 'truthy-bool')
         )
 
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_module(
-                node_with_multiple_prohibited_type_ignore_in_combined_form
+                node_with_multiple_prohibited_error_code_in_combined_form
             )
         temp_file.close()
 
