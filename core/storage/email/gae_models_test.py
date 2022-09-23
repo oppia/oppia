@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models  # pylint: disable=unused-import
 
 (base_models, email_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.email, models.NAMES.user
+    models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER
 ])
 
 
@@ -176,9 +176,10 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'Expected datetime, received Not a datetime object of type '
             '<class \'str\'>'
         ):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[arg-type] is used to test method
-            # get_by_hash() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this
+            # test after the backend is fully type-annotated. Here
+            # ignore[arg-type] is used to test method get_by_hash()
+            # for invalid input type.
             email_models.SentEmailModel.get_by_hash(
                 'Email Hash',
                 sent_datetime_lower_bound='Not a datetime object') # type: ignore[arg-type]

@@ -36,7 +36,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 def _migrate_subtopics_to_latest_schema(
@@ -248,23 +248,55 @@ def get_topic_by_id(
             return None
 
 
+@overload
+def get_topics_by_ids(
+    topic_ids: List[str], *, strict: Literal[True]
+) -> List[topic_domain.Topic]: ...
+
+
+@overload
 def get_topics_by_ids(
     topic_ids: List[str]
-) -> List[Optional[topic_domain.Topic]]:
+) -> List[Optional[topic_domain.Topic]]: ...
+
+
+@overload
+def get_topics_by_ids(
+    topic_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[topic_domain.Topic]]: ...
+
+
+def get_topics_by_ids(
+    topic_ids: List[str], strict: bool = False
+) -> Sequence[Optional[topic_domain.Topic]]:
     """Returns a list of topics matching the IDs provided.
 
     Args:
         topic_ids: list(str). List of IDs to get topics for.
+        strict: bool. Whether to fail noisily if no topic model exists
+            with a given ID exists in the datastore.
 
     Returns:
         list(Topic|None). The list of topics corresponding to given ids
         (with None in place of topic ids corresponding to deleted topics).
+
+    Raises:
+        Exception. No topic model exists for the given topic_id.
     """
     all_topic_models: List[Optional[topic_models.TopicModel]] = (
-        topic_models.TopicModel.get_multi(topic_ids))
-    topics: List[Optional[topic_domain.Topic]] = [
-        get_topic_from_model(topic_model) if topic_model is not None else None
-        for topic_model in all_topic_models]
+        topic_models.TopicModel.get_multi(topic_ids)
+    )
+    topics: List[Optional[topic_domain.Topic]] = []
+    for index, topic_model in enumerate(all_topic_models):
+        if topic_model is None:
+            if strict:
+                raise Exception(
+                    'No topic model exists for the topic_id: %s'
+                    % topic_ids[index]
+                )
+            topics.append(topic_model)
+        if topic_model is not None:
+            topics.append(get_topic_from_model(topic_model))
     return topics
 
 
@@ -605,15 +637,12 @@ def get_canonical_story_dicts(
     """
     canonical_story_ids: List[str] = topic.get_canonical_story_ids(
         include_only_published=True)
-    canonical_story_summaries: List[Optional[story_domain.StorySummary]] = [
+    canonical_story_summaries: List[story_domain.StorySummary] = [
         story_fetchers.get_story_summary_by_id(
             canonical_story_id) for canonical_story_id
         in canonical_story_ids]
     canonical_story_dicts = []
     for story_summary in canonical_story_summaries:
-        # Ruling out the possibility of None for mypy type checking.
-        assert story_summary is not None
-
         pending_and_all_nodes_in_story = (
             story_fetchers.get_pending_and_all_nodes_in_story(
                 user_id, story_summary.id))
@@ -622,13 +651,14 @@ def get_canonical_story_dicts(
         pending_node_titles = [node.title for node in pending_nodes]
         completed_node_titles = utils.compute_list_difference(
             story_summary.node_titles, pending_node_titles)
-        # Here, the return type of 'to_human_readable_dict()' method is
-        # HumanReadableStorySummaryDict which does not have topic_url_fragment,
-        # story_is_published and other keys. To overcome this missing keys
-        # issues, we defined a CannonicalStoryDict and assigned it to the
-        # `story_summary_dict`. Due this a conflict in type assignment is
-        # raised which cause MyPy to throw `Incompatible types in assignment`
-        # error. Thus to avoid error, we used ignore here.
+        # Here we use MyPy ignore because the return type of
+        # 'to_human_readable_dict()' method is HumanReadableStorySummaryDict
+        # which do not contain topic_url_fragment, story_is_published and
+        # other keys. To overcome this missing keys issue, we have defined
+        # a CannonicalStoryDict and assigned it to the `story_summary_dict`.
+        # So, due to this a conflict in type assignment is raised which cause
+        # MyPy to throw `Incompatible types in assignment` error. Thus, to
+        # avoid the error, we used ignore here.
         story_summary_dict: CannonicalStoryDict = (
             story_summary.to_human_readable_dict()  # type: ignore[assignment]
         )

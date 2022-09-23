@@ -28,7 +28,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -123,10 +123,10 @@ class SubtopicPageModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with VersionedModel.compute_models_to_commit(). Because
-    # argument `commit_message` of super class can accept Optional[str] but
-    # this method can only accept str.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with VersionedModel.compute_models_to_commit(). Because argument
+    # `commit_message` of super class can accept Optional[str] but this method
+    # can only accept str.
     def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,

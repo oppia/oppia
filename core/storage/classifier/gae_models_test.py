@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
 
 (base_models, classifier_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.classifier
+    models.Names.BASE_MODEL, models.Names.CLASSIFIER
 ])
 
 

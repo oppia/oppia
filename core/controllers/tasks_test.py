@@ -31,9 +31,9 @@ from core.platform import models
 from core.tests import test_utils
 
 (job_models, email_models) = models.Registry.import_models(
-    [models.NAMES.job, models.NAMES.email])
+    [models.Names.JOB, models.Names.EMAIL])
 (feedback_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.suggestion])
+    [models.Names.FEEDBACK, models.Names.SUGGESTION])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -213,6 +213,50 @@ class TasksTests(test_utils.EmailTestBase):
                     'nks!\n- The Oppia Team\n\nYou can change your'
                     ' email preferences via the Preferences page.')
                 self.assertEqual(messages[0].body, expected_message)
+
+    def test_email_is_sent_when_contributor_achieves_a_new_rank(self):
+        """Tests ContributorDashboardAchievementEmailHandler functionality."""
+
+        user_id = self.user_id_a
+        user_services.update_email_preferences(
+            user_id, True, False, False, False)
+
+        with self.can_send_emails_ctx:
+            payload = {
+                'contributor_user_id': user_id,
+                'contribution_type': feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                'contribution_sub_type': (
+                    feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE),
+                'language_code': 'hi',
+                'rank_name': 'Initial Contributor',
+            }
+            taskqueue_services.enqueue_task(
+                feconf
+                .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
+                payload, 0)
+            self.process_and_flush_pending_tasks()
+
+            # Check that user A received message.
+            messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+            # Check that user A received correct message.
+            expected_email_subject = 'Oppia Translator Rank Achievement!'
+            expected_email_html_body = (
+                'Hi userA,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the Initial Contributor rank for submitting translations in '
+                'हिन्दी (Hindi). Your efforts help Oppia grow better every '
+                'day and support students around the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="http://localhost:8181/contributor-dashboard">'
+                'Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'The Oppia Contributor Dashboard Team')
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].subject, expected_email_subject)
 
     def test_instant_feedback_reply_email(self):
         """Tests Instant feedback message handler."""

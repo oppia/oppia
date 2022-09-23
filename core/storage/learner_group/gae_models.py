@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -106,8 +106,8 @@ class LearnerGroupModel(base_models.BaseModel):
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with signature of super class's get_new_id() method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with signature of super class's get_new_id() method.
     @classmethod
     def get_new_id(cls) -> str:  # type: ignore[override]
         """Generates an ID for a new LearnerGroupModel.
