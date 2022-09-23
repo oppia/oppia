@@ -1614,9 +1614,10 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
-        content_html_list = [question_state_dict['content']['html']]
+        for question_dict in question_state_dict.values():
+            content_html_list = [question_dict['content']['html']]
 
-        for html_content in content_html_list:
+            for html_content in content_html_list:
                 soup = bs4.BeautifulSoup(html_content, 'html.parser')
                 links = soup.find_all('oppia-noninteractive-link')
 
