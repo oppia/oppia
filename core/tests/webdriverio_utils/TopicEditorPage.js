@@ -85,6 +85,12 @@ var TopicEditorPage = function() {
   var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
   var saveTopicButton = $('.e2e-test-save-topic-button');
   var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
+  var addNewDiagnosticTestSkillButton = $(
+    '.e2e-test-add-diagnostic-test-skill');
+  var diagnosticTestSkillSelector = $(
+    '.e2e-test-diagnostic-test-skill-selector');
+  var removeDiagnosticTestButtonElement = $(
+    '.e2e-test-remove-skill-from-diagnostic-test');
   var storyListItemsSelector = function() {
     return $$('.e2e-test-story-list-item');
   };
@@ -264,12 +270,10 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     await action.click('RTE input', subtopicPageContentButton);
-    // The cke buttons classes are dynamically alloted and hence we cannot
-    // a class name to select a particular button. Also using chain selectors
-    // is returning a non interactable element hence we are explicitly using
-    // the dynamically alloted id of the button to select the button.
+    // The cke buttons classes are dynamically alloted so we cannot
+    // add class name starting with 'e2e' to them.
     // eslint-disable-next-line oppia/e2e-practices
-    var conceptCardButton = $('#cke_124');
+    var conceptCardButton = $('.cke_button*=Insert Concept Card Link');
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = $(
       `.e2e-test-rte-skill-selector-item=${skillName}`);
@@ -354,6 +358,16 @@ var TopicEditorPage = function() {
         'Uncategorized Skill Text', uncategorizedSkill);
       expect(skillDescriptions[i]).toEqual(text);
     }
+  };
+
+  this.addDiagnosticTestSkill = async function(skillId) {
+    await action.click(
+      'Add new diagnostic test', addNewDiagnosticTestSkillButton);
+    await action.select(
+      'New skill selector', diagnosticTestSkillSelector, skillId);
+    await waitFor.visibilityOf(
+      removeDiagnosticTestButtonElement,
+      'Diagnostic test skill removal button takes too long to appear.');
   };
 
   this.getTargetMoveSkill = async function(
@@ -453,8 +467,15 @@ var TopicEditorPage = function() {
 
   this.createStory = async function(
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
-    await general.scrollToTop();
-    await action.click('Create Story Button', createStoryButton);
+    let width = (await browser.getWindowSize()).width;
+    if (width < 831) {
+      var storiesDropdown = $('.e2e-test-story-dropdown');
+      await action.click('Story dropdown', storiesDropdown);
+      await action.click('Create Story Button', createStoryButton);
+    } else {
+      await general.scrollToTop();
+      await action.click('Create Story Button', createStoryButton);
+    }
 
     await action.setValue(
       'Create new story title', newStoryTitleField, storyTitle);

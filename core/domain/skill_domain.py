@@ -28,7 +28,7 @@ from core.domain import change_domain
 from core.domain import state_domain
 
 from typing import Callable, Dict, List, Optional
-from typing_extensions import Final, TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -206,6 +206,212 @@ class SkillChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class CreateNewSkillCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class AddSkillMisconceptionCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_ADD_SKILL_MISCONCEPTION command.
+    """
+
+    new_misconception_dict: MisconceptionDict
+
+
+class DeleteSkillMisconceptionCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_DELETE_SKILL_MISCONCEPTION command.
+    """
+
+    misconception_id: int
+
+
+class AddPrerequisiteSkillCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_ADD_PREREQUISITE_SKILL command.
+    """
+
+    skill_id: str
+
+
+class DeletePrerequisiteSkillCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_DELETE_PREREQUISITE_SKILL command.
+    """
+
+    skill_id: str
+
+
+class UpdateRubricsCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_RUBRICS command.
+    """
+
+    difficulty: str
+    explanations: List[str]
+
+
+class UpdateSkillMisconceptionPropertyNameCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command with
+    SKILL_MISCONCEPTIONS_PROPERTY_NAME as allowed value.
+    """
+
+    misconception_id: int
+    property_name: Literal['name']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillMisconceptionPropertyNotesCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command with
+    SKILL_MISCONCEPTIONS_PROPERTY_NOTES as allowed value.
+    """
+
+    misconception_id: int
+    property_name: Literal['notes']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillMisconceptionPropertyFeedbackCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command with
+    SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK as allowed value.
+    """
+
+    misconception_id: int
+    property_name: Literal['feedback']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillMisconceptionPropertyMustBeAddressedCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command with
+    SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED as allowed value.
+    """
+
+    misconception_id: int
+    property_name: Literal['must_be_addressed']
+    new_value: bool
+    old_value: bool
+
+
+class UpdateSkillPropertyDescriptionCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_DESCRIPTION as allowed value.
+    """
+
+    property_name: Literal['description']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillPropertyLanguageCodeCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillPropertySupersedingSkillIdCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_SUPERSEDING_SKILL_ID as
+    allowed value.
+    """
+
+    property_name: Literal['superseding_skill_id']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillPropertyAllQuestionsMergedCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_ALL_QUESTIONS_MERGED as
+    allowed value.
+    """
+
+    property_name: Literal['all_questions_merged']
+    new_value: bool
+    old_value: bool
+
+
+class UpdateSkillPropertyPrerequisiteSkillIdsCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_PREREQUISITE_SKILL_IDS as
+    allowed value.
+    """
+
+    property_name: Literal['prerequisite_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateSkillContentsPropertyExplanationCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_CONTENTS_PROPERTY command
+    with SKILL_CONTENTS_PROPERTY_EXPLANATION as
+    allowed value.
+    """
+
+    property_name: Literal['explanation']
+    new_value: state_domain.SubtitledHtmlDict
+    old_value: state_domain.SubtitledHtmlDict
+
+
+class UpdateSkillContentsPropertyWorkedExamplesCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_CONTENTS_PROPERTY command
+    with SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES
+    as allowed value.
+    """
+
+    property_name: Literal['worked_examples']
+    new_value: List[WorkedExampleDict]
+    old_value: List[WorkedExampleDict]
+
+
+class MigrateContentsSchemaToLatestVersionCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class MigrateMisconceptionsSchemaToLatestVersionCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class MigrateRubricsSchemaToLatestVersionCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
 
 
 class MisconceptionDict(TypedDict):
@@ -668,6 +874,13 @@ class SkillDict(TypedDict):
     prerequisite_skill_ids: List[str]
 
 
+class SerializableSkillDict(SkillDict):
+    """Dictionary representing the serializable Skill object."""
+
+    created_on: str
+    last_updated: str
+
+
 class Skill:
     """Domain object for an Oppia Skill."""
 
@@ -944,7 +1157,14 @@ class Skill:
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        skill_dict = self.to_dict()
+        # Here we use MyPy ignore because to_dict() method returns a general
+        # dictionary representation of domain object (SkillDict) which
+        # does not contain properties like created_on and last_updated but
+        # MyPy expects skill_dict, a dictionary which contains all the
+        # properties of domain object. That's why we are explicitly changing
+        # the type of skill_dict, here which causes MyPy to throw an
+        # error. Thus, to silence the error, we added an ignore here.
+        skill_dict: SerializableSkillDict = self.to_dict()  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
         # parameter.
@@ -955,17 +1175,12 @@ class Skill:
         # to_dict().
         skill_dict['version'] = self.version
 
-        # The dictionary returned by `to_dict()` method is SkillDict, and
-        # SkillDict does not contain `created_on` and `last_updated` keys.
-        # But below we are defining those keys which causes MyPy to throw
-        # error `TypedDict "SkillDict" has no key 'created_on'`. Thus to
-        # avoid the error, we used ignore here.
         if self.created_on:
-            skill_dict['created_on'] = utils.convert_naive_datetime_to_string(  # type: ignore[misc]
+            skill_dict['created_on'] = utils.convert_naive_datetime_to_string(
                 self.created_on)
 
         if self.last_updated:
-            skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(  # type: ignore[misc]
+            skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
         return json.dumps(skill_dict)
@@ -1123,7 +1338,7 @@ class Skill:
         skill_contents_dict['explanation']['html'] = conversion_fn(
             skill_contents_dict['explanation']['html'])
         skill_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.  # type: ignore[no-untyped-call]
+            state_domain.WrittenTranslations.
             convert_html_in_written_translations(
                 skill_contents_dict['written_translations'], conversion_fn))
 
@@ -1339,12 +1554,15 @@ class Skill:
         Returns:
             dict. The converted rubric_dict.
         """
-        # Here, rubric_dict is a dictionary of type RubricDict and RubricDict
-        # does not contain `explanation` key, but below we are accessing that
-        # `explanation` key which causes MyPy to throw error `TypedDict
-        # "RubricDict" has no key 'explanation'`. Thus to avoid the error,
-        # we used ignore statement here.
+        # Here we use MyPy ignore because in convert functions, we allow less
+        # strict typing because here we are working with previous versions of
+        # the domain object and in previous versions of the domain object there
+        # are some fields that are discontinued in the latest domain object
+        # (eg. explanation). So, while accessing these discontinued fields MyPy
+        # throws an error. Thus, to avoid the error, we used ignore here.
         explanation = rubric_dict['explanation']  # type: ignore[misc]
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
+        # TypedDict.
         del rubric_dict['explanation']  # type: ignore[misc]
         rubric_dict['explanations'] = [explanation]
         return rubric_dict
@@ -1561,13 +1779,13 @@ class Skill:
         recorded_voiceovers = self.skill_contents.recorded_voiceovers
 
         for content_id in content_ids_to_delete:
-            recorded_voiceovers.delete_content_id_for_voiceover(content_id)  # type: ignore[no-untyped-call]
-            written_translations.delete_content_id_for_translation(  # type: ignore[no-untyped-call]
+            recorded_voiceovers.delete_content_id_for_voiceover(content_id)
+            written_translations.delete_content_id_for_translation(
                 content_id)
 
         for content_id in content_ids_to_add:
-            recorded_voiceovers.add_content_id_for_voiceover(content_id)  # type: ignore[no-untyped-call]
-            written_translations.add_content_id_for_translation(content_id)  # type: ignore[no-untyped-call]
+            recorded_voiceovers.add_content_id_for_voiceover(content_id)
+            written_translations.add_content_id_for_translation(content_id)
 
     def _find_misconception_index(self, misconception_id: int) -> Optional[int]:
         """Returns the index of the misconception with the given misconception
@@ -1994,7 +2212,7 @@ class TopicAssignment:
             topic_name: str. The name of the topic.
             topic_version: int. The current version of the topic to which the
                 skill is assigned.
-            subtopic_id: str or None. The id of the subtopic to which the skill
+            subtopic_id: int or None. The id of the subtopic to which the skill
                 is assigned, or None if the skill is not assigned to any
                 subtopic.
         """

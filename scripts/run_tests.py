@@ -69,5 +69,5 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     print('SUCCESS    All frontend, backend and end-to-end tests passed!')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

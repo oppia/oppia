@@ -34,7 +34,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class RatingServicesTests(test_utils.GenericTestBase):
@@ -47,7 +47,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
     def test_rating_assignation(self) -> None:
         """Check ratings are correctly assigned to an exploration."""
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             self.EXP_ID,
             exp_domain.Exploration.create_default_exploration(self.EXP_ID))
 
@@ -96,7 +96,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
         time_allowed_for_computation = datetime.timedelta(seconds=10)
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             self.EXP_ID,
             exp_domain.Exploration.create_default_exploration(self.EXP_ID))
 
@@ -123,10 +123,10 @@ class RatingServicesTests(test_utils.GenericTestBase):
         exp_id_a: Final = 'exp_id_A'
         exp_id_b: Final = 'exp_id_B'
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             exp_id_a,
             exp_domain.Exploration.create_default_exploration(exp_id_a))
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             exp_id_b,
             exp_domain.Exploration.create_default_exploration(exp_id_b))
 
@@ -175,18 +175,18 @@ class RatingServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             ValueError, 'Expected the rating to be an integer, received 2'
             ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, '2')  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(
             ValueError, 'Expected the rating to be an integer, received aaa'
             ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, 'aaa')  # type: ignore[arg-type]
 
@@ -235,7 +235,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
             'get_exploration_summary_by_id',
             _mock_get_exploration_summary_by_id
         ):
-            exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+            exp_services.save_new_exploration(
                 'exp_id_a',
                 exp_domain.Exploration.create_default_exploration('exp_id_a'))
 

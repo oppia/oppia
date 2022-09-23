@@ -38,7 +38,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
@@ -90,16 +90,16 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
-        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
             'a-story')
         story_services.save_new_story(self.owner_id, story)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -418,7 +418,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 self.applicant_id, 'Testing rejection')
 
     def test_get_text_to_create_voiceover_application(self) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -438,7 +438,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     def test_get_text_to_create_voiceover_application_in_diff_language(
         self
     ) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

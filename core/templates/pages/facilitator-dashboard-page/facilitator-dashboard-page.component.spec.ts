@@ -54,7 +54,7 @@ describe('FacilitatorDashboardPageComponent', () => {
     title: 'group title',
     description: 'group description',
     facilitator_usernames: ['facilitator1'],
-    students_count: 4
+    learners_count: 4
   };
   const shortLearnerGroupSummary = (
     ShortLearnerGroupSummary.createFromBackendDict(

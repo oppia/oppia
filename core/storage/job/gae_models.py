@@ -21,24 +21,25 @@ from __future__ import annotations
 from core.platform import models
 
 from typing import Dict, Sequence
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
 
 # These are the possible status codes for a job.
-STATUS_CODE_NEW = 'new'
-STATUS_CODE_QUEUED = 'queued'
-STATUS_CODE_STARTED = 'started'
-STATUS_CODE_COMPLETED = 'completed'
-STATUS_CODE_FAILED = 'failed'
-STATUS_CODE_CANCELED = 'canceled'
+STATUS_CODE_NEW: Final = 'new'
+STATUS_CODE_QUEUED: Final = 'queued'
+STATUS_CODE_STARTED: Final = 'started'
+STATUS_CODE_COMPLETED: Final = 'completed'
+STATUS_CODE_FAILED: Final = 'failed'
+STATUS_CODE_CANCELED: Final = 'canceled'
 
 
 class JobModel(base_models.BaseModel):

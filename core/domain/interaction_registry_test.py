@@ -148,9 +148,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         all_specs = interaction_registry.Registry.get_all_specs()
         ca_names_in_schema = []
 
-        # Here we used Any because values in schema dictionary can be of type
-        # str, int, List, Dict and other types too. So to make it generalized
-        # for every type of value we used Any here.
+        # Here we use type Any because values in schema dictionary can
+        # be of type str, int, List, Dict and other types too. So to make
+        # it generalized for every type of value we used Any here.
         def traverse_schema_to_find_names(schema: Dict[str, Any]) -> None:
             """Recursively traverses the schema to find all name fields.
             Recursion is required because names can be nested within
@@ -186,9 +186,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         """
         all_specs = interaction_registry.Registry.get_all_specs()
 
-        # Here we used Any because argument 'value' can accept default_value
-        # of CustomizationArgSpecsDict and here default_value can be of type
-        # List[str], str, int, and other types too.
+        # Here we use type Any because values in schema dictionary can
+        # be of type str, int, List, Dict and other types too. So to make
+        # it generalized for every type of value we used Any here.
         def traverse_schema_to_find_and_validate_subtitled_content(
             value: Any, schema: Dict[str, Any]
         ) -> None:
@@ -236,3 +236,11 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                 interaction_registry.Registry
                 .get_all_specs_for_state_schema_version(10)
             )
+
+    def test_get_interaction_by_id_raises_error_for_none_interaction_id(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'No interaction exists for the None interaction_id.'
+        ):
+            interaction_registry.Registry.get_interaction_by_id(None)

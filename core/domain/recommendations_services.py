@@ -24,6 +24,7 @@ import io
 import json
 
 from core import feconf
+from core.domain import exp_domain
 from core.domain import rights_domain
 from core.platform import models
 
@@ -32,11 +33,12 @@ from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
     from mypy_imports import recommendations_models
 
-(exp_models, recommendations_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.recommendations])
+(recommendations_models,) = models.Registry.import_models([
+    models.Names.RECOMMENDATIONS
+])
+
 
 # pylint: disable=line-too-long, single-line-pragma
 DEFAULT_TOPIC_SIMILARITIES_STRING: Final = (
@@ -116,10 +118,10 @@ def get_topic_similarities_dict() -> Dict[str, Dict[str, float]]:
     if topic_similarities_entity is None:
         topic_similarities_entity = create_default_topic_similarities()
 
-    # TODO(#15610): The return type of json.loads() method is Dict[str, Any]
-    # but from the implementation we know it only returns the values of
-    # type Dict[str, Dict[str, float]. So to narrow down the type from
-    # Dict[str, Any], we used cast here.
+    # TODO(#15610): Here we use cast because the return type of json.loads()
+    # method is Dict[str, Any] but from the implementation we know it only
+    # returns the values of type Dict[str, Dict[str, float]. So to narrow down
+    # the type from Dict[str, Any], we used cast here.
     return cast(
         Dict[str, Dict[str, float]],
         json.loads(topic_similarities_entity.content)
@@ -133,21 +135,20 @@ def save_topic_similarities(
     changed entity.
     """
 
-    topic_similarities_entity = (
+    retrieved_topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
             recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
-    if topic_similarities_entity is None:
-        topic_similarities_entity = (
-            recommendations_models.TopicSimilaritiesModel(
-                id=recommendations_models.TOPIC_SIMILARITIES_ID,
-                content=json.dumps(topic_similarities)))
-    else:
-        topic_similarities_entity.content = json.dumps(topic_similarities)
+    topic_similarities_entity = (
+        retrieved_topic_similarities_entity
+        if retrieved_topic_similarities_entity is not None
+        else recommendations_models.TopicSimilaritiesModel(
+            id=recommendations_models.TOPIC_SIMILARITIES_ID
+        )
+    )
+    topic_similarities_entity.content = json.dumps(topic_similarities)
     topic_similarities_entity.update_timestamps()
     topic_similarities_entity.put()
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert topic_similarities_entity is not None
     return topic_similarities_entity
 
 
@@ -304,8 +305,8 @@ def update_topic_similarities(csv_data: str) -> None:
 
 
 def get_item_similarity(
-    reference_exp_summary: exp_models.ExpSummaryModel,
-    compared_exp_summary: exp_models.ExpSummaryModel
+    reference_exp_summary: exp_domain.ExplorationSummary,
+    compared_exp_summary: exp_domain.ExplorationSummary
 ) -> float:
     """Returns the ranking of compared_exp to reference_exp as a
     recommendation. This returns a value between 0.0 to 10.0. A higher value
@@ -317,10 +318,10 @@ def get_item_similarity(
     returns 0.0 if compared_exp is private.
 
     Args:
-        reference_exp_summary: ExpSummaryModel. The reference exploration
+        reference_exp_summary: ExplorationSummary. The reference exploration
             summary. The similarity score says how similar is
             the compared summary to this summary.
-        compared_exp_summary: ExpSummaryModel. The compared exploration
+        compared_exp_summary: ExplorationSummary. The compared exploration
             summary. The similarity score says how similar is this summary to
             the reference summary.
 

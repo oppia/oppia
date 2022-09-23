@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
 (base_models, subtopic_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.subtopic])
+    models.Names.BASE_MODEL, models.Names.SUBTOPIC])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
@@ -95,10 +95,10 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'other-subtopic-url')]
         topic.next_subtopic_id = 3
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
-        topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.admin_id, topic)
 
         # Publish the topic and its stories.
-        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id) # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
     def test_get_subtopic_page_from_model(self) -> None:
         subtopic_page_model = subtopic_models.SubtopicPageModel.get(
@@ -645,37 +645,55 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_multi_users_subtopic_pages_progress(self) -> None:
         degree_of_mastery = 0.5
-        student_id_1 = 'student_1'
-        student_id_2 = 'student_2'
+        learner_id_1 = 'learner_1'
+        learner_id_2 = 'learner_2'
 
-        # Add some subtopic progress for the student.
-        skill_services.create_user_skill_mastery( # type: ignore[no-untyped-call]
-            student_id_1, 'skill_id_1', degree_of_mastery
+        # Add some subtopic progress for the learner.
+        skill_services.create_user_skill_mastery(
+            learner_id_1, 'skill_id_1', degree_of_mastery
         )
 
         subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
         progress = (
             subtopic_page_services.get_multi_users_subtopic_pages_progress(
-                [student_id_1, student_id_2], [subtopic_page_id]
+                [learner_id_1, learner_id_2], [subtopic_page_id]
             )
         )
 
-        student_1_progress = progress[student_id_1]
-        student_2_progress = progress[student_id_2]
+        learner_1_progress = progress[learner_id_1]
+        learner_2_progress = progress[learner_id_2]
 
-        self.assertEqual(len(student_1_progress), 1)
-        self.assertEqual(len(student_2_progress), 1)
-        self.assertEqual(student_1_progress[0]['subtopic_id'], 1)
+        self.assertEqual(len(learner_1_progress), 1)
+        self.assertEqual(len(learner_2_progress), 1)
+        self.assertEqual(learner_1_progress[0]['subtopic_id'], 1)
         self.assertEqual(
-            student_1_progress[0]['subtopic_title'], 'Naming Numbers'
+            learner_1_progress[0]['subtopic_title'], 'Naming Numbers'
         )
         self.assertEqual(
-            student_1_progress[0]['parent_topic_id'], self.TOPIC_ID_1
+            learner_1_progress[0]['parent_topic_id'], self.TOPIC_ID_1
         )
         self.assertEqual(
-            student_1_progress[0]['parent_topic_name'], 'Place Values'
+            learner_1_progress[0]['parent_topic_name'], 'Place Values'
         )
         self.assertEqual(
-            student_1_progress[0]['subtopic_mastery'], degree_of_mastery
+            learner_1_progress[0]['subtopic_mastery'], degree_of_mastery
         )
-        self.assertIsNone(student_2_progress[0]['subtopic_mastery'])
+        self.assertIsNone(learner_2_progress[0]['subtopic_mastery'])
+
+    def test_get_learner_group_syllabus_subtopic_page_summaries(self) -> None:
+        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+        expected_summaries = [{
+            'subtopic_id': 1,
+            'subtopic_title': 'Naming Numbers',
+            'parent_topic_id': self.TOPIC_ID_1,
+            'parent_topic_name': 'Place Values',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color':
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            'subtopic_mastery': None
+        }]
+        summaries = (
+            subtopic_page_services
+                .get_learner_group_syllabus_subtopic_page_summaries(
+                    [subtopic_page_id]))
+        self.assertEqual(summaries, expected_summaries)

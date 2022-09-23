@@ -44,7 +44,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (collection_models, user_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.user
+    models.Names.COLLECTION, models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -309,10 +309,11 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save collection'):
-            # The argument `change_list` of update_collection method can only
-            # accept values of type List[Dict[]], but here for testing purposes
-            # we are providing None which causes MyPy to throw incompatible
-            # argument type error. Thus to avoid the error, we used ignore here.
+            # Here we use MyPy ignore because the argument `change_list`
+            # of update_collection method can only accept values of type
+            # List[Dict[]], but here for testing purposes we are providing
+            # None which causes MyPy to throw incompatible argument type
+            # error. Thus to avoid the error, we used ignore here.
             collection_services.update_collection(
                 self.owner_id, 'collection_id', None, 'commit message')  # type: ignore[arg-type]
 
@@ -2109,6 +2110,42 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
 
         self._check_contributors_summary(
             self.COLLECTION_0_ID, {self.albert_id: 1})
+
+    def test_raises_error_when_collection_provided_with_no_last_updated_data(
+        self
+    ) -> None:
+        self.save_new_valid_collection('test_id', self.albert_id)
+        collection = collection_services.get_collection_by_id('test_id')
+        collection.last_updated = None
+
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_by_id', collection
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No data available for when the collection was last_updated.'
+            ):
+                collection_services.regenerate_collection_and_contributors_summaries(  # pylint: disable=line-too-long
+                    'test_id'
+                )
+
+    def test_raises_error_when_collection_provided_with_no_created_on_data(
+        self
+    ) -> None:
+        self.save_new_valid_collection('test_id', self.albert_id)
+        collection = collection_services.get_collection_by_id('test_id')
+        collection.created_on = None
+
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_by_id', collection
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No data available for when the collection was created.'
+            ):
+                collection_services.regenerate_collection_and_contributors_summaries(  # pylint: disable=line-too-long
+                    'test_id'
+                )
 
 
 class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):

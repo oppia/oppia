@@ -3759,6 +3759,105 @@ def can_update_suggestion(handler):
     return test_can_update_suggestion
 
 
+def can_fetch_contributor_dashboard_stats(handler):
+    """Decorator to check whether the current user can fetch contributor
+    dashboard stats.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+        if the user can fetch stats.
+
+    Raises:
+        NotLoggedInException. The user is not logged in.
+        UnauthorizedUserException. The user does not have credentials to
+            fetch stats for the given username.
+    """
+    def test_can_fetch_contributor_dashboard_stats(
+            self, contribution_type, contribution_subtype, username, **kwargs):
+        """Returns a handler to test whether stats can be fetched based
+        on the logged in user.
+
+        Args:
+            contribution_type: str. The type of the contribution that the stats
+                are requested.
+            contribution_subtype: str. The subtype of the contribution that the
+                stats are requested.
+            username: str. The provided username.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            function. The handler for fetching stats.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                fetch stats for the given username.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if user_services.get_username(self.user_id) != username:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'The user %s is not allowed to fetch the stats of other '
+                'users.' % (user_services.get_username(self.user_id)))
+
+        return handler(
+            self, contribution_type, contribution_subtype, username, **kwargs)
+
+    test_can_fetch_contributor_dashboard_stats.__wrapped__ = True
+    return test_can_fetch_contributor_dashboard_stats
+
+
+def can_fetch_all_contributor_dashboard_stats(handler):
+    """Decorator to check whether the current user can fetch contributor
+    dashboard stats.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+        if the user can fetch stats.
+
+    Raises:
+        NotLoggedInException. The user is not logged in.
+        UnauthorizedUserException. The user does not have credentials to
+            fetch stats for the given username.
+    """
+    def test_can_fetch_all_contributor_dashboard_stats(
+            self, username, **kwargs):
+        """Returns a handler to test whether stats can be fetched based
+        on the logged in user.
+
+        Args:
+            username: str. The provided username.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            function. The handler for fetching stats.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                fetch stats for the given username.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if user_services.get_username(self.user_id) != username:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'The user %s is not allowed to fetch the stats of other '
+                'users.' % (user_services.get_username(self.user_id)))
+
+        return handler(self, username, **kwargs)
+
+    test_can_fetch_all_contributor_dashboard_stats.__wrapped__ = True
+    return test_can_fetch_all_contributor_dashboard_stats
+
+
 def is_from_oppia_android(handler):
     """Decorator to check whether the request was sent from Oppia Android.
 

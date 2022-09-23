@@ -33,6 +33,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -51,9 +52,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (auth_models, user_models, audit_models) = (models.Registry.import_models([
-    models.NAMES.auth,
-    models.NAMES.user,
-    models.NAMES.audit
+    models.Names.AUTH,
+    models.Names.USER,
+    models.Names.AUDIT
 ]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
@@ -256,9 +257,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_update_user_settings_for_invalid_display_alias_raises_error(
         self
     ) -> None:
@@ -272,6 +270,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         self.modifiable_new_user_data.user_id = user_id
         self.modifiable_new_user_data.pin = None
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         for display_alias, error_msg in bad_display_aliases_with_expected_error:
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 self.modifiable_new_user_data.display_alias = display_alias  # type: ignore[assignment]
@@ -294,11 +295,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(user_settings.display_alias, display_alias)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing. In this test, only some part
-    # should be removed. Because we are testing the correct email
-    # format for which we have to provide the string type value.
     def test_create_new_user_with_invalid_emails_raises_exception(self) -> None:
         bad_email_addresses_with_expected_error_message = [
             ('@', 'Invalid email address: @'),
@@ -314,6 +310,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 )
             )
         ]
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 user_services.create_new_user('auth_id', email)  # type: ignore[arg-type]
@@ -2171,6 +2170,67 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_audit_model.old_username, 'oldUsername')
         self.assertEqual(user_audit_model.new_username, 'newUsername')
 
+    def test_raises_error_if_none_destination_is_provided_for_checkpoint(
+        self
+    ) -> None:
+        state = state_domain.State.create_default_state('state_1')
+        state_answer_group: List[state_domain.AnswerGroup] = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    None, None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_id('TextInput')
+        state.update_interaction_answer_groups(state_answer_group)
+        states = {'Introduction': state}
+
+        with self.assertRaisesRegex(
+            Exception,
+            'States with a null destination can never be a checkpoint.'
+        ):
+            user_services.get_checkpoints_in_order('Introduction', states)
+
+        state_answer_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'destination', None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_answer_groups(state_answer_group)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.default_outcome is not None
+        state.interaction.default_outcome.dest = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'States with a null destination can never be a checkpoint'
+        ):
+            user_services.get_checkpoints_in_order('Introduction', states)
+
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""
@@ -2339,7 +2399,7 @@ title: Title
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
         self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
@@ -2373,7 +2433,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # Second checkpoint reached.
@@ -2416,7 +2476,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             False)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # First checkpoint reached again.
@@ -2443,7 +2503,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 4.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -2499,7 +2559,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 2.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -2570,7 +2630,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test all owners and editors of exploration after publication have
@@ -2582,7 +2642,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
@@ -2620,7 +2680,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that commit to unpublished exploration does not update
         # contribution time.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.admin_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
@@ -2647,7 +2707,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -2658,7 +2718,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that after an exploration is published, all contributors have
         # updated first contribution time.
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -2672,7 +2732,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.EXP_ID, self.admin_id, end_state_name='End')
         rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test that contribution time is not given to an editor that has not
@@ -2686,7 +2746,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
 
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.owner, self.EXP_ID)
         rights_manager.unpublish_exploration(self.owner, self.EXP_ID)
 
@@ -2704,7 +2764,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test all owners and editors of collection after publication have
@@ -3024,15 +3084,15 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self) -> None:
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
             user_services.update_subject_interests(self.user_id, 'not a list')  # type: ignore[arg-type]
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
             user_services.update_subject_interests(self.user_id, [1, 2, 3])  # type: ignore[list-item]
 
@@ -3160,7 +3220,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3171,7 +3231,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(editor_settings.last_edited_an_exploration)
 
     def test_last_exp_edit_time_gets_updated(self) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3196,7 +3256,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(previous_last_edited_an_exploration)
 
         # The editor edits the exploration 13 hours after it was created.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3991,6 +4051,15 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.get_contributor_usernames(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
+
+    def test_raise_error_if_no_language_code_provided_with_translation_category(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'The language_code cannot be None'):
+            user_services.get_contributor_usernames(
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+            )
 
     def test_get_contributor_usernames_in_voiceover_category_returns_correctly(
         self

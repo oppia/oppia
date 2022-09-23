@@ -53,18 +53,17 @@ var GraphEditor = function(graphInputContainer) {
       '.e2e-test-Add-Node-button');
     await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
-    await browser.moveToElement(graphInputContainer, xOffset, yOffset);
-    await browser.positionClick();
+    await graphInputContainer.click({x: xOffset, y: yOffset});
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = await graphInputContainer.$(
       '.e2e-test-Add-Edge-button');
     await action.click('Add Edge Button', addEdgeButton);
-    await browser.moveToElement(vertexElement(vertexIndex1));
-    await browser.buttonDown();
-    await browser.moveToElement(vertexElement(vertexIndex2));
-    await browser.buttonUp();
+    var vertexElement1 = await vertexElement(vertexIndex1);
+    var vertexElement2 = await vertexElement(vertexIndex2);
+
+    await vertexElement1.dragAndDrop(vertexElement2);
   };
 
   return {
@@ -90,7 +89,7 @@ var GraphEditor = function(graphInputContainer) {
       await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await action.click(`Vertex Element ${i}`, vertexElement(i));
+        await action.click(`Vertex Element ${i}`, await vertexElement(i));
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -100,14 +99,15 @@ var GraphEditor = function(graphInputContainer) {
         // Expecting total no. of vertices on the graph matches with the given
         // dict's vertices.
         for (var i = 0; i < nodeCoordinatesList.length; i++) {
-          expect(await vertexElement(i).isDisplayed()).toBe(true);
+          var graphVertexElement = await vertexElement(i);
+          expect(await graphVertexElement.isDisplayed()).toBe(true);
         }
       }
       if (edgesList) {
         var allEdgesElement = await $$('.e2e-test-graph-edge');
         // Expecting total no. of edges on the graph matches with the given
         // dict's edges.
-        expect(await allEdgesElement.length).toEqual(edgesList.length);
+        expect(allEdgesElement.length).toEqual(edgesList.length);
       }
     }
   };
@@ -199,13 +199,13 @@ var RichTextEditor = async function(elem) {
   await rteElements[0].click();
 
   var _appendContentText = async function(text) {
-    await rteElements[0].setValue(text);
+    await rteElements[0].addValue(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
-      elem.$('.' + buttonName),
+      elem.$(buttonName),
       'Toolbar button takes too long to be clickable.');
-    await elem.$('.' + buttonName).click();
+    await elem.$(buttonName).click();
   };
   var _clearContent = async function() {
     expect(
@@ -226,37 +226,37 @@ var RichTextEditor = async function(elem) {
       await _appendContentText(text);
     },
     appendBoldText: async function(text) {
-      await _clickToolbarButton('cke_button__bold');
+      await _clickToolbarButton('.cke_button__bold');
       await _appendContentText(text);
-      await _clickToolbarButton('cke_button__bold');
+      await _clickToolbarButton('.cke_button__bold');
     },
     appendItalicText: async function(text) {
-      await _clickToolbarButton('cke_button__italic');
+      await _clickToolbarButton('.cke_button__italic');
       await _appendContentText(text);
-      await _clickToolbarButton('cke_button__italic');
+      await _clickToolbarButton('.cke_button__italic');
     },
     appendOrderedList: async function(textArray) {
       await _appendContentText('\n');
-      await _clickToolbarButton('cke_button__numberedlist');
+      await _clickToolbarButton('.cke_button__numberedlist');
       for (var i = 0; i < textArray.length; i++) {
         await _appendContentText(textArray[i] + '\n');
       }
-      await _clickToolbarButton('cke_button__numberedlist');
+      await _clickToolbarButton('.cke_button__numberedlist');
     },
     appendUnorderedList: async function(textArray) {
       await _appendContentText('\n');
-      await _clickToolbarButton('cke_button__bulletedlist');
+      await _clickToolbarButton('.cke_button__bulletedlist');
       for (var i = 0; i < textArray.length; i++) {
         await _appendContentText(textArray[i] + '\n');
       }
-      await _clickToolbarButton('cke_button__bulletedlist');
+      await _clickToolbarButton('.cke_button__bulletedlist');
     },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: async function(componentName) {
       await _clickToolbarButton(
-        'cke_button__oppia' + componentName.toLowerCase());
+        '.cke_button__oppia' + componentName.toLowerCase());
 
       var modalDialogElements = await modalDialogElementsSelector();
       var modalDialogLength = modalDialogElements.length;
@@ -282,14 +282,14 @@ var RichTextEditor = async function(elem) {
           'Video', 'Image', 'Collapsible', 'Tabs'
         ].includes(componentName)) {
         // RteElementFirst can be found in beginning of RichTextEditor function.
-        await action.setValue(
+        await action.addValue(
           'First RTE Element',
           rteElements[0],
-          'PageDown');
+          'ArrowDown');
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      await action.setValue(
+      await action.addValue(
         'First RTE Element',
         rteElements[0],
         ['Control', 'End']);
@@ -323,9 +323,13 @@ var UnicodeEditor = function(elem) {
 };
 
 var AutocompleteDropdownEditor = function(elem) {
-  var containerLocator = '.select2-container';
-  var searchInputLocator = '.select2-search input';
-  var dropdownElement = '.select2-dropdown';
+  var containerLocator = '.e2e-test-exploration-category-dropdown';
+  var searchInputLocator = '.mat-select-search-input.mat-input-element';
+  var categorySelectorChoice = '.e2e-test-exploration-category-selector-choice';
+  var searchInputLocatorTextElement = function(text) {
+    return $$(`.e2e-test-exploration-category-selector-choice=${text}`);
+  };
+
   return {
     setValue: async function(text) {
       await action.click('Container Element', elem.$(containerLocator));
@@ -333,14 +337,20 @@ var AutocompleteDropdownEditor = function(elem) {
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
+
       await action.setValue(
-        'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
-        text + '\n');
+        'Dropdown Element Search', $(searchInputLocator), text);
+
+      var searchInputLocatorTextOption = await searchInputLocatorTextElement(
+        text)[0];
+      await action.click(
+        'Dropdown Element Select',
+        searchInputLocatorTextOption);
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await action.click('Container Element', await elem.$(containerLocator));
-      var actualOptions = await dropdownElement.$$('<li>').map(
+      await action.click(
+        'Container Element', await elem.$(containerLocator));
+      var actualOptions = await $$(categorySelectorChoice).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
         }
@@ -349,7 +359,7 @@ var AutocompleteDropdownEditor = function(elem) {
       // Re-close the dropdown.
       await action.setValue(
         'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
+        $(searchInputLocator),
         '\n');
     }
   };
@@ -544,7 +554,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     // Remove comments introduced by angular for bindings using replace.
     expect(
       (
-        await arrayOfElems[arrayPointer].getAttribute('innerHTML')
+        await arrayOfElems[arrayPointer].getHTML(false)
       ).replace(/<!--[^>]*-->/g, '').trim()
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
@@ -626,9 +636,6 @@ var toRichText = async function(text) {
  * loads more divs.
  */
 var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
-  var lineContentElements = elem.$$('.CodeMirror-line');
-  var lineNumberElements = elem.$$('.CodeMirror-linenumber');
-  var scrollBarElements = $$('.CodeMirror-vscrollbar');
   var codeMirrorLineNumberLocator = '.CodeMirror-linenumber';
   var codeMirrorLineBackgroundLocator = '.CodeMirror-linebackground';
   // The number of lines to scroll between reading different sections of
@@ -654,11 +661,12 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     var prevScrollTop = -1;
     var actualDiffDict = {};
     var scrollBarWebElement = null;
+    var scrollBarElements = await $$('.CodeMirror-vscrollbar');
     if (codeMirrorPaneToScroll === 'first') {
-      scrollBarWebElement = await scrollBarElements[0];
+      scrollBarWebElement = scrollBarElements[0];
     } else {
       var lastElement = scrollBarElements.length - 1;
-      scrollBarWebElement = await scrollBarElements[lastElement];
+      scrollBarWebElement = scrollBarElements[lastElement];
     }
     while (true) {
       // This is used to match and scroll the text in codemirror to a point
@@ -667,26 +675,34 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       await browser.execute(
         '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
         '().scrollTop(' + String(scrollTo) + ');');
-      var lineHeight = await elem.element(
+      var lineHeight = await elem.$(
         codeMirrorLineNumberLocator).getAttribute('clientHeight');
-      var currentScrollTop = await browser.execute(
-        'return $(arguments[0]).scrollTop;', scrollBarWebElement);
+      var currentScrollTop = await scrollBarWebElement.scrollIntoView();
       if (currentScrollTop === prevScrollTop) {
         break;
       } else {
         prevScrollTop = currentScrollTop;
       }
-      var lineDivElements = elem.$$('./div');
 
-      var totalCount = await lineNumberElements.count();
+      var numberOfElements = Object.keys(compareDict).length;
+      await waitFor.numberOfElementsToBe(
+        elem,
+        'Line Number Elements',
+        numberOfElements,
+        '.CodeMirror-linenumber');
+      var lineNumberElements = await elem.$$('.CodeMirror-linenumber');
+      var totalCount = lineNumberElements.length;
       for (var i = 0; i < totalCount; i++) {
-        var lineNumberElement = await lineNumberElements[i];
+        var lineNumberElement = lineNumberElements[i];
+        await waitFor.elementToBeClickable(lineNumberElement);
         var lineNumber = await lineNumberElement.getText();
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
-        var lineDivElement = await lineDivElements[i];
-        var lineElement = await lineContentElements[i];
+        var lineDivElements = await elem.$$('./div');
+        var lineDivElement = lineDivElements[i];
+        var lineContentElements = await elem.$$('.CodeMirror-line');
+        var lineElement = lineContentElements[i];
         var isHighlighted = await lineDivElement.$(
           codeMirrorLineBackgroundLocator).isExisting();
         var text = await lineElement.getText();
@@ -747,7 +763,7 @@ var CodeStringEditor = function(elem) {
     setValue: async function(code) {
       var stringEditorTextArea = await elem.$('textarea');
       await action.clear('String Editor Text Area', stringEditorTextArea);
-      await action.setValue(
+      await action.addValue(
         'String Editor Text Area',
         stringEditorTextArea,
         code);

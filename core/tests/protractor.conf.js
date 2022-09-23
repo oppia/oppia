@@ -8,6 +8,7 @@ var childProcess = require('child_process');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var exitCode = 0;
+var args = process.argv;
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -20,58 +21,6 @@ var suites = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
-
-    additionalEditorFeatures: [
-      'protractor_desktop/additionalEditorFeatures.js'
-    ],
-
-    additionalEditorFeaturesModals: [
-      'protractor_desktop/additionalEditorFeaturesModals.js'
-    ],
-
-    additionalPlayerFeatures: [
-      'protractor_desktop/additionalPlayerFeatures.js'
-    ],
-
-    adminPage: [
-      'protractor_desktop/adminTabFeatures.js'
-    ],
-
-    coreEditorAndPlayerFeatures: [
-      'protractor_desktop/coreEditorAndPlayerFeatures.js'
-    ],
-
-    embedding: [
-      'protractor_desktop/embedding.js'
-    ],
-
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
-    ],
-
-    explorationFeedbackTab: [
-      'protractor_desktop/explorationFeedbackTab.js'
-    ],
-
-    explorationHistoryTab: [
-      'protractor_desktop/explorationHistoryTab.js'
-    ],
-
-    explorationStatisticsTab: [
-      'protractor_desktop/explorationStatisticsTab.js'
-    ],
-
-    explorationTranslationTab: [
-      'protractor_desktop/explorationTranslationTab.js'
-    ],
-
-    extensions: [
-      'protractor_desktop/extensions.js'
-    ],
-
     featureGating: [
       'protractor/featureGatingFlow.js'
     ],
@@ -315,9 +264,17 @@ exports.config = {
       displaySpecDuration: true
     }));
 
-    // Set a wide enough window size for the navbar in the library pages to
-    // display fully.
-    browser.driver.manage().window().setSize(1285, 1000);
+    // eslint-disable-next-line eqeqeq
+    mobileViewportArg = process.env.MOBILE == 'true';
+
+    // eslint-disable-next-line eqeqeq
+    if (mobileViewportArg) {
+      browser.driver.manage().window().setSize(600, 1000);
+    } else {
+      // Set a wide enough window size for the navbar in the library pages to
+      // display fully.
+      browser.driver.manage().window().setSize(1285, 1000);
+    }
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';

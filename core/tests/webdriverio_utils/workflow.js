@@ -120,11 +120,21 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
-  await waitFor.elementToBeClickable(
-    $('.e2e-test-publish-exploration'));
-  await $('.e2e-test-publish-exploration').isDisplayed();
-  var testPublishExploration = $('.e2e-test-publish-exploration');
-  await action.click('Test Publish Exploration', testPublishExploration);
+  var publishButton = $('.e2e-test-publish-exploration');
+  var publishButtonMobile = $('.e2e-test-mobile-publish-button');
+
+  let width = (await browser.getWindowSize()).width;
+  if (width > 768) {
+    await waitFor.elementToBeClickable(publishButton);
+    await publishButton.isDisplayed();
+    await action.click('Test Publish Exploration', publishButton);
+  } else {
+    var changesOptions = $('.e2e-test-mobile-changes-dropdown');
+    await action.click('Changes options', changesOptions);
+    await publishButtonMobile.isDisplayed();
+    await action.click('Publish button mobile', publishButtonMobile);
+  }
+
   var prePublicationButtonElem = $('.e2e-test-confirm-pre-publication');
   await action.click(
     'Pre Publication Button Element', prePublicationButtonElem);
@@ -209,6 +219,53 @@ var createAndPublishTwoCardExploration = async function(
   await publishExploration();
 };
 
+var createAndPublishExplorationWithAdditionalCheckpoints = async function(
+    title, category, objective, language, welcomeModalIsShown,
+    correctnessFeedbackIsEnabled) {
+  await createExploration(welcomeModalIsShown);
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await explorationEditorMainTab.setContent(await forms.toRichText('card 1'));
+  await explorationEditorMainTab.setInteraction('Continue');
+  var responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('second card', true, null);
+  await explorationEditorMainTab.moveToState('second card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 2'), true);
+  await explorationEditorMainTab.enableCheckpointForCurrentState();
+  await explorationEditorMainTab.setInteraction('Continue');
+  responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('third card', true, null);
+  await explorationEditorMainTab.moveToState('third card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 3'), true);
+  await explorationEditorMainTab.enableCheckpointForCurrentState();
+  await explorationEditorMainTab.setInteraction('Continue');
+  responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('fourth card', true, null);
+  await explorationEditorMainTab.moveToState('fourth card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 4'), true);
+  await explorationEditorMainTab.setInteraction('EndExploration');
+
+  var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  await explorationEditorPage.navigateToSettingsTab();
+  await explorationEditorSettingsTab.setTitle(title);
+  await explorationEditorSettingsTab.setCategory(category);
+  await explorationEditorSettingsTab.setObjective(objective);
+  if (language) {
+    await explorationEditorSettingsTab.setLanguage(language);
+  }
+  if (!correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.disableCorrectnessFeedback();
+  }
+  await explorationEditorPage.saveChanges();
+  await publishExploration();
+};
+
 // ---- Role management (state editor settings tab) ----
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
@@ -219,8 +276,7 @@ var _addExplorationRole = async function(roleName, username) {
     'Username input',
     $('.e2e-test-role-username'),
     username);
-  await action.select(
-    'Role select', $('.e2e-test-role-select'), roleName);
+  await action.matSelect('Role select', $('.e2e-test-role-select'), roleName);
   await action.click(
     'Save role', $('.e2e-test-save-role'));
 };
@@ -251,7 +307,7 @@ var addExplorationPlaytester = async function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = async function(roleName) {
-  var explorationRoleNameLocator = '.e2e-test-role-' + roleName + '-name';
+  var explorationRoleNameLocator = '.e2e-test-' + roleName + '-role-names';
   return await $$(explorationRoleNameLocator).map(async function(elem) {
     return await elem.getText();
   });
@@ -327,7 +383,7 @@ var createQuestion = async function() {
   await skillEditorPage.moveToQuestionsTab();
   await skillEditorPage.clickCreateQuestionButton();
   await explorationEditorMainTab.setContent(
-    await forms.toRichText('Question 1'));
+    await forms.toRichText('Question 1'), true);
   await explorationEditorMainTab.setInteraction(
     'TextInput', 'Placeholder', 5);
   await explorationEditorMainTab.addResponse(
@@ -357,6 +413,8 @@ exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
 exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
+exports.createAndPublishExplorationWithAdditionalCheckpoints = (
+  createAndPublishExplorationWithAdditionalCheckpoints);
 
 exports.canAddRolesToUsers = canAddRolesToUsers;
 exports.isExplorationCommunityOwned = isExplorationCommunityOwned;

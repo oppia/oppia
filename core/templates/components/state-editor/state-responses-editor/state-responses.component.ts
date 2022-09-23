@@ -23,7 +23,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
 import { AnswerChoice, StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -38,7 +38,6 @@ import { AlertsService } from 'services/alerts.service';
 import { StateNextContentIdIndexService } from '../state-editor-properties-services/state-next-content-id-index.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -96,7 +95,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private answerGroupObjectFactory: AnswerGroupObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionsService: WindowDimensionsService,
     private convertToPlainText: ConvertToPlainTextPipe,
     private parameterizeRuleDescription: ParameterizeRuleDescriptionPipe,
     private truncate: TruncatePipe,
@@ -136,7 +134,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  suppressDefaultAnswerGroupWarnings(): boolean {
+  suppressDefaultAnswerGroup(): boolean {
     let interactionId = this.getCurrentInteractionId();
     let answerGroups = this.responsesService.getAnswerGroups();
     // This array contains the text of each of the possible answers
@@ -391,7 +389,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     }
   }
 
-  saveTaggedMisconception(misconceptionId: string, skillId: string): void {
+  saveTaggedMisconception(taggedMisconception: TaggedMisconception): void {
+    const { skillId, misconceptionId } = taggedMisconception;
     this.responsesService.updateActiveAnswerGroup({
       taggedSkillMisconceptionId: skillId + '-' + misconceptionId
     } as AnswerGroup, (newAnswerGroups) => {
@@ -416,6 +415,15 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       missingPrerequisiteSkillId:
         updatedOutcome.missingPrerequisiteSkillId
     }, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+      this.refreshWarnings.emit();
+    });
+  }
+
+  saveActiveAnswerGroupDestIfStuck(updatedOutcome: Outcome): void {
+    this.responsesService.updateActiveAnswerGroup({
+      destIfReallyStuck: updatedOutcome.destIfReallyStuck,
+    } as unknown as AnswerGroup, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });
@@ -455,6 +463,14 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       refresherExplorationId: updatedOutcome.refresherExplorationId,
       missingPrerequisiteSkillId:
         updatedOutcome.missingPrerequisiteSkillId
+    } as Outcome, (newDefaultOutcome) => {
+      this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+    });
+  }
+
+  saveDefaultOutcomeDestIfStuck(updatedOutcome: Outcome): void {
+    this.responsesService.updateDefaultOutcome({
+      destIfReallyStuck: updatedOutcome.destIfReallyStuck
     } as Outcome, (newDefaultOutcome) => {
       this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
     });
@@ -628,8 +644,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
       AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
-    this.responseCardIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.responseCardIsShown = true;
     this.stateName = this.stateEditorService.getActiveStateName();
     this.enableSolicitAnswerDetailsFeature = (
       AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
