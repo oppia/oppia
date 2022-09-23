@@ -30,7 +30,7 @@ export interface BlogPostBackendDict {
   'published_on'?: string;
 }
 export class BlogPostData {
-  _id: string | null;
+  _id: string;
   _authorName: string;
   _title: string;
   _content: string;

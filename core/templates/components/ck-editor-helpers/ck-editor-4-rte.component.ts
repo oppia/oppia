@@ -44,7 +44,6 @@ import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { Subscription } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 interface UiConfig {
   (): UiConfig;
@@ -87,7 +86,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
-    private windowDimensionsService: WindowDimensionsService,
     private elementRef: ElementRef,
     private internetConnectivityService: InternetConnectivityService
   ) {
@@ -196,7 +194,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
             'Blockquote', '-',
             'Indent', '-',
             'Outdent',
-            'Format'
+            'Format',
           ]
         },
         {
@@ -428,6 +426,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       $('.cke_combo_button')
         .css('height', '29px')
         .css('width', '62px')
+        .css('margin-right', '25px')
         .on('click', () => {
           // Timeout is required to ensure that the format dropdown
           // has been initialized and the iframe has been loaded into DOM.

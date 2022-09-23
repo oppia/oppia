@@ -247,7 +247,7 @@ export default {
       "default_value": 0
     }, {
       "name": "autoplay",
-      "description": "Autoplay this video once the <[contentType]> has loaded?",
+      "description": "Autoplay this video once the question has loaded?",
       "schema": {
         "type": "bool"
       },

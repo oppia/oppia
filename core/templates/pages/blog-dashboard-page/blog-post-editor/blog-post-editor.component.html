@@ -90,8 +90,6 @@
           </em>
         </span>
       </div>
-      <i class="my-auto mx-2 oppia-editor-edit-icon fas fa-pen oppia-pencil-icon">
-      </i>
     </div>
     <div class="blog-post-content d-flex mt-2" [ngClass]="{'flex-column': windowIsNarrow}">
       <div class="title-heading col-sm-2 mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left' : 'text-center'">
@@ -152,8 +150,6 @@
           </div>
         </div>
       </div>
-      <i *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="my-auto mx-2 oppia-editor-edit-icon fas fa-pen oppia-pencil-icon">
-      </i>
     </div>
   </mat-card>
   <mat-card class="editor-profile-card col-sm-2" [ngClass]=" windowIsNarrow ? 'buttons-container' : 'mr-auto'">
@@ -184,7 +180,7 @@
               aria-label="List that showns issues preventing to save blog post as draft"
               class="w-100">
           <button mat-button class="w-100 mx-auto my-2 e2e-test-save-as-draft-button"
-                  [disabled]="(blogPostData.validate().length > 0) || !newChangesAreMade"                  
+                  [disabled]="(blogPostData.validate().length > 0) || !newChangesAreMade"
                   (click)="saveDraft()"
                   aria-label="Save blog post as draft."
                   [ngClass]="{'small-screen-button': windowIsNarrow}">

@@ -211,6 +211,7 @@ export class BlogPostEditorComponent implements OnInit {
       this.alertsService.addWarning(
         'Please fix the errors.'
       );
+      this.saveInProgress = false;
     }
   }
 
@@ -228,7 +229,7 @@ export class BlogPostEditorComponent implements OnInit {
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+        this.publishingInProgress = false;
       });
     }
   }
@@ -260,6 +261,7 @@ export class BlogPostEditorComponent implements OnInit {
         this.alertsService.addWarning(
           `Failed to save Blog Post. Internal Error: ${errorResponse}`);
         this.saveInProgress = false;
+        this.publishingInProgress = false;
       }
     );
   }
