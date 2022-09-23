@@ -167,7 +167,8 @@
         "scripts.run_portserver_test",
         "scripts.third_party_size_check_test",
         "core.platform.transactions.cloud_transaction_services_test",
-        "core.platform.datastore.cloud_datastore_services_test"
+        "core.platform.datastore.cloud_datastore_services_test",
+        "core.jobs.io.cache_io_test"
     ],
     "3": [
         "core.controllers.incoming_app_feedback_report_test",
