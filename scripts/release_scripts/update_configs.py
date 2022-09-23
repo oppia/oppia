@@ -24,7 +24,6 @@ Usage: Run this script from your oppia root folder:
 from __future__ import annotations
 
 import argparse
-import getpass
 import os
 import re
 

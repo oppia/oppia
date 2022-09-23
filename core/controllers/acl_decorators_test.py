@@ -47,13 +47,14 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-from core.tests import test_utils
 from core.platform import models
+from core.tests import test_utils
 
 import webapp2
 import webtest
 
 secrets_services = models.Registry.import_secrets_services()
+
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
     """Tests for open access decorator."""

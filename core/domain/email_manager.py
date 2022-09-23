@@ -53,6 +53,7 @@ if MYPY: # pragma: no cover
 ])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
+secrets_services = models.Registry.import_secrets_services()
 
 
 NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
@@ -2358,3 +2359,18 @@ def send_not_mergeable_change_list_to_admin_for_review(
         email_body = email_body_template % (
             exp_id, change_list_dict, frontend_version, backend_version)
         send_mail_to_admin(email_subject, email_body)
+
+
+def verify_mailchimp_secret(secret: str) -> bool:
+    """Verifies the secret key for the mailchimp webhook.
+
+    Args:
+        secret: str. The secret key provided by the mailchimp webhook.
+
+    Returns:
+        bool. Whether the secret key is valid.
+    """
+    if secrets_services.get_secret('MAILCHIMP_WEBHOOK_SECRET') is None:
+        return False
+
+    return secret != secrets_services.get_secret('MAILCHIMP_WEBHOOK_SECRET')

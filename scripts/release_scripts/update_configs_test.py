@@ -179,8 +179,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
         with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        update_configs.verify_config_files(
-            temp_feconf_path, temp_app_yaml.name, False)
+        update_configs.verify_config_files(temp_feconf_path, temp_app_yaml.name)
 
     def test_feconf_verification_with_redishost_absent(self):
         temp_feconf_path = tempfile.NamedTemporaryFile().name
@@ -202,7 +201,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             Exception, 'REDISHOST must be updated before deployment.'
         ):
             update_configs.verify_config_files(
-                temp_feconf_path, temp_app_yaml.name, True)
+                temp_feconf_path, temp_app_yaml.name)
 
     def test_app_yaml_verification_with_wildcard_header_present(self):
         temp_feconf_path = tempfile.NamedTemporaryFile().name
@@ -236,7 +235,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             r'a specific origin before deployment.'
         ):
             update_configs.verify_config_files(
-                temp_feconf_path, temp_app_yaml_path, True)
+                temp_feconf_path, temp_app_yaml_path)
 
     def test_update_app_yaml_correctly_updates(self):
         temp_feconf_config_path = tempfile.NamedTemporaryFile().name
@@ -363,13 +362,13 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with self.url_open_swap, check_updates_swap, apply_changes_swap:
             with verify_config_files_swap, update_app_yaml_swap:
                 with update_analytics_constants_based_on_config_swap:
-                     update_configs.main(
-                         args=[
-                             '--release_dir_path', 'test-release-dir',
-                             '--deploy_data_path', 'test-deploy-dir',
-                             '--personal_access_token', 'test-token',
-                         ]
-                     )
+                    update_configs.main(
+                        args=[
+                            '--release_dir_path', 'test-release-dir',
+                            '--deploy_data_path', 'test-deploy-dir',
+                            '--personal_access_token', 'test-token',
+                        ]
+                    )
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls_without_prompt_for_feconf_and_terms_update(self):
