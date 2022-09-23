@@ -100,6 +100,7 @@ allowed-type-ignore-error-codes=attr-defined,
         func-returns-value,
         misc,
         arg-type,
+        type-arg,
         no-untyped-def,
         no-untyped-call,
         no-any-return
