@@ -2725,8 +2725,8 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
 class EditorAutosaveTest(BaseEditorControllerTests):
     """Test the handling of editor autosave actions."""
 
-    EXP_ID0 = '0'
     EXP_ID1 = '1'
+    EXP_ID2 = '2'
     EXP_ID3 = '3'
     # 30 days into the future.
     NEWER_DATETIME = datetime.datetime.utcnow() + datetime.timedelta(30)
@@ -2753,7 +2753,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
         exploration.add_states(['State A'])
         exploration.states['State A'].update_interaction_id('TextInput')
-        self.save_new_valid_exploration(self.EXP_ID0, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID2, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID3, self.owner_id)
 
     def _create_exp_user_data_model_objects_for_tests(self):
@@ -2767,8 +2767,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             draft_change_list_exp_version=1,
             draft_change_list_id=1).put()
         user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, self.EXP_ID0), user_id=self.owner_id,
-            exploration_id=self.EXP_ID0,
+            id='%s.%s' % (self.owner_id, self.EXP_ID2), user_id=self.owner_id,
+            exploration_id=self.EXP_ID2,
             draft_change_list=self.DRAFT_CHANGELIST,
             draft_change_list_last_updated=self.OLDER_DATETIME,
             draft_change_list_exp_version=1,
@@ -2791,7 +2791,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
     def test_exploration_loaded_with_draft_applied(self):
         response = self.get_json(
-            '/createhandler/data/%s' % self.EXP_ID0,
+            '/createhandler/data/%s' % self.EXP_ID2,
             params={'apply_draft': True})
         # Title updated because change list was applied.
         self.assertEqual(response['title'], 'Updated title')
@@ -2802,12 +2802,12 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
     def test_exploration_loaded_without_draft_when_draft_version_invalid(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.owner_id, self.EXP_ID0))
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
         exp_user_data.draft_change_list_exp_version = 20
         exp_user_data.update_timestamps()
         exp_user_data.put()
         response = self.get_json(
-            '/createhandler/data/%s' % self.EXP_ID0,
+            '/createhandler/data/%s' % self.EXP_ID2,
             params={'apply_draft': True})
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
@@ -2879,18 +2879,18 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
     def test_draft_not_updated_validation_error(self):
         self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID0, {
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.DRAFT_CHANGELIST,
                 'version': 1,
             }, csrf_token=self.csrf_token)
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID0, {
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.INVALID_CHANGELIST,
                 'version': 2,
             }, csrf_token=self.csrf_token,
             expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.owner_id, self.EXP_ID0))
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
         # ID is incremented the first time but not the second.
@@ -2905,10 +2905,10 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             'version': 1,
         }
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID0, payload,
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.owner_id, self.EXP_ID0))
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertTrue(response['is_version_of_draft_valid'])
@@ -2922,7 +2922,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         }
 
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.owner_id, self.EXP_ID0))
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertNotEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
@@ -2935,13 +2935,13 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
         with get_voiceover_swap:
             response = self.put_json(
-                '/createhandler/autosave_draft/%s' % self.EXP_ID0,
+                '/createhandler/autosave_draft/%s' % self.EXP_ID2,
                 payload,
                 csrf_token=self.csrf_token,
                 expected_status_int=400
             )
             exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-                '%s.%s' % (self.owner_id, self.EXP_ID0))
+                '%s.%s' % (self.owner_id, self.EXP_ID2))
             self.assertNotEqual(
                 exp_user_data.draft_change_list, self.NEW_CHANGELIST)
             self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
@@ -2960,10 +2960,10 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             'version': 10,
         }
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID0, payload,
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.owner_id, self.EXP_ID0))
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
@@ -2972,10 +2972,10 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
     def test_discard_draft(self):
         self.post_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID0, {},
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {},
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.owner_id, self.EXP_ID0))
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)

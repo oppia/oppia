@@ -243,56 +243,6 @@ def clean_math_expression(math_expression: str) -> str:
     return math_expression
 
 
-def escape_html(unescaped_html_data: str) -> str:
-    """This functions escapes an unescaped HTML string.
-
-    Args:
-        unescaped_html_data: str. Unescaped HTML string to be escaped.
-
-    Returns:
-        str. Escaped HTML string.
-    """
-    # Replace list to escape html strings.
-    replace_list_for_escaping = [
-        ('&', '&amp;'),
-        ('"', '&quot;'),
-        ('\'', '&#39;'),
-        ('<', '&lt;'),
-        ('>', '&gt;')
-    ]
-    escaped_html_data = unescaped_html_data
-    for replace_tuple in replace_list_for_escaping:
-        escaped_html_data = escaped_html_data.replace(
-            replace_tuple[0], replace_tuple[1])
-
-    return escaped_html_data
-
-
-def unescape_html(escaped_html_data: str) -> str:
-    """This function unescapes an escaped HTML string.
-
-    Args:
-        escaped_html_data: str. Escaped HTML string to be unescaped.
-
-    Returns:
-        str. Unescaped HTML string.
-    """
-    # Replace list to unescape html strings.
-    replace_list_for_unescaping = [
-        ('&quot;', '"'),
-        ('&#39;', '\''),
-        ('&lt;', '<'),
-        ('&gt;', '>'),
-        ('&amp;', '&')
-    ]
-    unescaped_html_data = escaped_html_data
-    for replace_tuple in replace_list_for_unescaping:
-        unescaped_html_data = unescaped_html_data.replace(
-            replace_tuple[0], replace_tuple[1])
-
-    return unescaped_html_data
-
-
 class MetadataVersionHistoryDict(TypedDict):
     """Dictionary representing MetadataVersionHistory object."""
 
@@ -4191,9 +4141,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     # place` setting is turned off.
                     if not multi_item_value:
                         invalid_rules.append(rule_spec)
-                    off_by_one_rules.append(
-                        rule_spec['inputs']['x']
-                    )
+                    else:
+                        off_by_one_rules.append(
+                            rule_spec['inputs']['x']
+                        )
 
                 # In `HasElementXBeforeElementY` rule, `X` value
                 # should not be equal to `Y` value.
@@ -4564,7 +4515,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             else:
                 if tag['math_content-with-value'] in empty_values:
                     tag.decompose()
-                math_content_json = unescape_html(
+                math_content_json = utils.unescape_html(
                     tag['math_content-with-value'])
                 math_content_list = json.loads(math_content_json)
 
@@ -4606,7 +4557,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
         for tag in tabs_tags:
             if tag.has_attr('tab_contents-with-value'):
-                tab_content_json = unescape_html(
+                tab_content_json = utils.unescape_html(
                     tag['tab_contents-with-value'])
 
                 tab_content_list = json.loads(tab_content_json)
@@ -4619,7 +4570,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         is_tags_nested_inside_tabs_or_collapsible=True
                     )
                 tab_content_json = json.dumps(tab_content_list)
-                tag['tab_contents-with-value'] = escape_html(tab_content_json)
+                tag['tab_contents-with-value'] = utils.escape_html(tab_content_json)
             else:
                 tag.decompose()
 
@@ -4628,7 +4579,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for tag in collapsibles_tags:
             if tag.has_attr('content-with-value'):
                 collapsible_content_json = (
-                    unescape_html(tag['content-with-value'])
+                    utils.unescape_html(tag['content-with-value'])
                 )
                 collapsible_content_list = json.loads(
                     collapsible_content_json)
@@ -4640,14 +4591,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     is_tags_nested_inside_tabs_or_collapsible=True
                 )
                 collapsible_content_json = json.dumps(collapsible_content_list)
-                tag['content-with-value'] = escape_html(
+                tag['content-with-value'] = utils.escape_html(
                     collapsible_content_json)
             else:
                 tag.decompose()
 
             if tag.has_attr('heading-with-value'):
                 collapsible_heading_json = (
-                    unescape_html(tag['heading-with-value']))
+                    utils.unescape_html(tag['heading-with-value']))
                 collapsible_heading_list = json.loads(
                     collapsible_heading_json)
                 if len(collapsible_heading_list) == 0:
