@@ -1232,7 +1232,7 @@ class TestBase(unittest.TestCase):
 
             raw_value = param_change.get_value(new_param_dict)
             new_param_dict[param_change.name] = (
-                object_registry.Registry.get_object_class_by_type(  # type: ignore[no-untyped-call]
+                object_registry.Registry.get_object_class_by_type(
                     obj_type).normalize(raw_value))
         return new_param_dict
 

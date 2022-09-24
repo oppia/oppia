@@ -157,7 +157,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     ca_spec.schema['obj_type'])
                 self.assertEqual(
                     ca_spec.default_value,
-                    obj_class.normalize(ca_spec.default_value))  # type: ignore[no-untyped-call]
+                    obj_class.normalize(ca_spec.default_value))
 
     def _validate_answer_visualization_specs(
         self,

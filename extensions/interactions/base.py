@@ -211,7 +211,7 @@ class BaseInteraction:
             return None
         else:
             answers: state_domain.AcceptableCorrectAnswerTypes = (
-                    object_registry.Registry.get_object_class_by_type(  # type: ignore[no-untyped-call]
+                    object_registry.Registry.get_object_class_by_type(
                         self.answer_type).normalize(answer)
                 )
             return answers

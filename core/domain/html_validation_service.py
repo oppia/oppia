@@ -668,7 +668,7 @@ def validate_svg_filenames_in_math_rich_text(
             json.loads(unescape_html(
                 math_tag['math_content-with-value'])))
         svg_filename = (
-            objects.UnicodeString.normalize(math_content_dict['svg_filename']))  # type: ignore[no-untyped-call]
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '':
             error_list.append(str(math_tag))
         else:
@@ -807,7 +807,7 @@ def extract_svg_filenames_in_math_rte_components(html_string: str) -> List[str]:
         svg_filename = math_content_dict['svg_filename']
         if svg_filename != '':
             normalized_svg_filename = (
-                objects.UnicodeString.normalize(svg_filename))  # type: ignore[no-untyped-call]
+                objects.UnicodeString.normalize(svg_filename))
             filenames.append(normalized_svg_filename)
     return filenames
 
@@ -849,7 +849,7 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                 raw_latex = (
                     json.loads(unescape_html(math_tag['raw_latex-with-value'])))
                 normalized_raw_latex = (
-                    objects.UnicodeString.normalize(raw_latex))  # type: ignore[no-untyped-call]
+                    objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
                 logging.exception(
                     'Invalid raw_latex string found in the math tag : %s' % (
@@ -864,7 +864,7 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
             # Normalize and validate the value before adding to the math
             # tag.
             normalized_math_content_dict = (
-                objects.MathExpressionContent.normalize(math_content_dict))  # type: ignore[no-untyped-call]
+                objects.MathExpressionContent.normalize(math_content_dict))
             # Add the new attribute math_expression_contents-with-value.
             math_tag['math_content-with-value'] = (
                 escape_html(
@@ -902,7 +902,7 @@ def validate_math_tags_in_html(html_string: str) -> List[str]:
                 # string.
                 raw_latex = (
                     json.loads(unescape_html(math_tag['raw_latex-with-value'])))
-                objects.UnicodeString.normalize(raw_latex)  # type: ignore[no-untyped-call]
+                objects.UnicodeString.normalize(raw_latex)
             except Exception:
                 error_list.append(math_tag)
         else:
@@ -935,8 +935,8 @@ def validate_math_tags_in_html_with_attribute_math_content(
                         math_tag['math_content-with-value'])))
                 raw_latex = math_content_dict['raw_latex']
                 svg_filename = math_content_dict['svg_filename']
-                objects.UnicodeString.normalize(svg_filename)  # type: ignore[no-untyped-call]
-                objects.UnicodeString.normalize(raw_latex)  # type: ignore[no-untyped-call]
+                objects.UnicodeString.normalize(svg_filename)
+                objects.UnicodeString.normalize(raw_latex)
             except Exception:
                 error_list.append(math_tag)
         else:

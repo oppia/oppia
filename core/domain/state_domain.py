@@ -2056,7 +2056,7 @@ class WrittenTranslation:
         translatable_obj_class = (
             translatable_object_registry.Registry.get_object_class(
                 translatable_class_name))
-        self.translation = translatable_obj_class.normalize_value(  # type: ignore[no-untyped-call]
+        self.translation = translatable_obj_class.normalize_value(
             self.translation)
 
         if not isinstance(self.needs_update, bool):
@@ -2733,7 +2733,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
             else:
                 # Otherwise, a simple parameter value needs to be normalizable
                 # by the parameter object in order to be valid.
-                param_obj.normalize(param_value)  # type: ignore[no-untyped-call]
+                param_obj.normalize(param_value)
 
     @staticmethod
     def convert_html_in_rule_spec(
@@ -3783,7 +3783,7 @@ class State(translation_domain.BaseTranslatableObject):
                             new_content_id_list.append(value['contentId'])
 
                         try:
-                            normalized_param = param_type.normalize(value)  # type: ignore[no-untyped-call]
+                            normalized_param = param_type.normalize(value)
                         except Exception as e:
                             raise Exception(
                                 'Value has the wrong type. It should be a %s. '
