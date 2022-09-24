@@ -127,4 +127,3 @@ angular.module('oppia').directive('oppiaTopicQuestionsTab',
   downgradeComponent({
     component: TopicQuestionsTabComponent
   }) as angular.IDirectiveFactory);
-
