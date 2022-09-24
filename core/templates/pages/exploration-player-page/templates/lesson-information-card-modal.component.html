@@ -190,11 +190,12 @@
     <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
     <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
       <div class="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
-      <div class="uid-btn-container">
+      <copy-exploration-url></copy-exploration-url>
+      <!-- <div class="uid-btn-container">
         <div class="uid-btn-message-box" *ngIf="showTooltip">{{ 'I18N_SAVE_PROGRESS_COPY_TOOLTIP' | translate }}</div>
         <div class="uid-btn-message-arrow" *ngIf="showTooltip"></div>
         <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">{{ 'I18N_SAVE_PROGRESS_BUTTON_TEXT' | translate }}</button>
-      </div>
+      </div> -->
     </div>
   </div>
   <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">

@@ -1,0 +1,52 @@
+<div class="uid-btn-container">
+  <!-- <div class="uid-btn-message-box" *ngIf="showTooltip">{{ 'I18N_SAVE_PROGRESS_COPY_TOOLTIP' | translate }}</div>
+  <div class="uid-btn-message-arrow" *ngIf="showTooltip"></div>
+  <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">{{ 'I18N_SAVE_PROGRESS_BUTTON_TEXT' | translate }}</button> -->
+  hii
+</div>
+
+<style>
+
+.uid-btn-container {
+  margin-left: 2%;
+  position: relative;
+  width: 20%;
+}
+
+.uid-copy-btn {
+  box-shadow: 1px 1px 2px 0 rgba(0, 100, 92, 0.8);
+  color: #00645c;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 auto;
+  position: relative;
+  width: 100%;
+}
+
+.uid-btn-container .uid-btn-message-box {
+  background-color: #00645c;
+  border-radius: 4px;
+  color: #fff;
+  cursor: default;
+  font-size: 14px;
+  font-style: Roboto, Arial, sans-serif;
+  padding: 8px 10px;
+  position: absolute;
+  right: 0;
+  top: -45px;
+}
+
+.uid-btn-container .uid-btn-message-arrow {
+  background-color: #00645c;
+  color: #fff;
+  cursor: default;
+  height: 10px;
+  position: absolute;
+  right: 28px;
+  top: -15px;
+  transform: rotate(45deg);
+  width: 10px;
+}
+
+</style>
