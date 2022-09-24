@@ -5,7 +5,7 @@
         <a href="/topics-and-skills-dashboard">
           Back to Topics Dashboard <i class="fa fa-angle-left"></i>
         </a>
-        <span>{{skill?.getDescription()}}</span>
+        <span>{{ skill?.getDescription() }}</span>
       </p>
       <oppia-skill-concept-card-editor></oppia-skill-concept-card-editor>
       <oppia-skill-misconceptions-editor></oppia-skill-misconceptions-editor>
@@ -35,7 +35,7 @@
             Subtopic:
           </strong>
           <span *ngIf="getSubtopicName()" class="status-value">
-            {{getSubtopicName()}}
+            {{ getSubtopicName() }}
           </span>
           <span *ngIf="!getSubtopicName()" class="status-value">
             Unassigned
@@ -49,7 +49,7 @@
               <loading-dots></loading-dots>
             </span>
             <div class="count-value" *ngIf="hasLoadedSkill()">
-              {{skill?.getMisconceptions().length}}
+              {{ skill?.getMisconceptions().length }}
             </div>
             <div class="count-text">Misconceptions</div>
           </div>
@@ -58,7 +58,7 @@
               <loading-dots></loading-dots>
             </span>
             <div class="count-value" *ngIf="hasLoadedSkill()">
-              {{skill?.getConceptCard().getWorkedExamples().length}}
+              {{ skill?.getConceptCard().getWorkedExamples().length }}
             </div>
             <div class="count-text">Worked Examples</div>
           </div>

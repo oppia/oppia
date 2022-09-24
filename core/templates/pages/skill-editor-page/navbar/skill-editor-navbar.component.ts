@@ -41,13 +41,13 @@ export class SkillEditorNavabarComponent implements OnInit {
   skill: Skill;
 
   constructor(
+    private alertsService: AlertsService,
+    private ngbModal: NgbModal,
     private skillEditorRoutingService: SkillEditorRoutingService,
     private skillEditorStateService: SkillEditorStateService,
+    private skillUpdateService: SkillUpdateService,
     private undoRedoService: UndoRedoService,
-    private urlService: UrlService,
-    private ngbModal: NgbModal,
-    private alertsService: AlertsService,
-    private skillUpdateService: SkillUpdateService
+    private urlService: UrlService
   ) {}
 
   directiveSubscriptions = new Subscription();

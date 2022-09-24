@@ -40,19 +40,19 @@ import { SkillEditorStateService } from './services/skill-editor-state.service';
 })
 export class SkillEditorPageComponent implements OnInit {
   constructor(
-    private skillEditorRoutingService: SkillEditorRoutingService,
-    private undoRedoService: UndoRedoService,
+    private bottomNavbarStatusService:
+      BottomNavbarStatusService,
+    private localStorageService: LocalStorageService,
     private ngbModal: NgbModal,
+    private preventPageUnloadEventService:
+      PreventPageUnloadEventService,
+    private skillEditorRoutingService: SkillEditorRoutingService,
     private skillEditorStateService: SkillEditorStateService,
     private skillEditorStalenessDetectionService:
       SkillEditorStalenessDetectionService,
-    private preventPageUnloadEventService:
-      PreventPageUnloadEventService,
-    private bottomNavbarStatusService:
-      BottomNavbarStatusService,
+    private undoRedoService: UndoRedoService,
     private urlService: UrlService,
     private windowRef: WindowRef,
-    private localStorageService: LocalStorageService
   ) {}
 
   skill: Skill;

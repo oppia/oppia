@@ -38,13 +38,14 @@ export class SkillEditorMainTabComponent implements OnInit {
   assignedSkillTopicData;
   skill: Skill;
   selectedTopic: Topic;
+
   constructor(
+    private focusManagerService: FocusManagerService,
+    private ngbModal: NgbModal,
+    private pageTitleService: PageTitleService,
     private skillEditorRoutingService: SkillEditorRoutingService,
     private skillEditorStateService: SkillEditorStateService,
-    private ngbModal: NgbModal,
     private undoRedoService: UndoRedoService,
-    private pageTitleService: PageTitleService,
-    private focusManagerService: FocusManagerService
   ) {}
 
   createQuestion(): void {
