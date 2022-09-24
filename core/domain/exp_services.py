@@ -1891,9 +1891,9 @@ def validate_exploration_for_story(
             if len(choices) < 4:
                 error_string = (
                     'Exploration in a story having MultipleChoiceInput '
-                    'interaction should have atleast 4 choices present. '
-                    'Exploration with ID %s and state name %s have choices'
-                    'less than 4.' %(exp.id, state_name)
+                    'interaction should have at least 4 choices present. '
+                    'Exploration with ID %s and state name %s have fewer than'
+                    '4 choices.' %(exp.id, state_name)
                 )
                 raise utils.ValidationError(error_string)
 

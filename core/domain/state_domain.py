@@ -677,9 +677,9 @@ class InteractionInstanceDict(TypedDict):
 class InteractionInstance(translation_domain.BaseTranslatableObject):
     """Value object for an instance of an interaction."""
 
-    class RangeVariable(TypedDict):
+    class RangeVariableDict(TypedDict):
         """Dictionary representing the range variable for the NumericInput
-        interaction
+        interaction.
         """
 
         ans_group_index: int
@@ -690,9 +690,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         ub_inclusive: bool
 
 
-    class MatchedDenominator(TypedDict):
+    class MatchedDenominatorDict(TypedDict):
         """Dictionary representing the matched denominator variable for the
-        FractionInput interaction
+        FractionInput interaction.
         """
 
         ans_group_index: int
@@ -941,13 +941,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return outcomes
 
     def _validate_continue_input(self) -> None:
-        """Validates the following in Continue interaction -
-        - Text should be non-empty and have a max-length of 20
-        - No answer groups should be present
+        """Validates the Continue interaction
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Text value is empty or is more than 20 characters
+            - Answer group is present
         """
         text_value = self.customization_args['buttonText'].value.unicode_str
         if len(text_value) > 20:
@@ -961,17 +961,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             )
 
     def _validate_end_exploration_input(self) -> None:
-        """Validates the following in End interaction -
-        - Should only have a default outcome (and no answer groups)
-        associated with it
-        - Total recommended explorations should not be more than 3
+        """Validates the End interaction
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Default outcome is present
+            - Answer group is present
+            - Recommended explorations are more than 3
         """
-        # Should only have a default outcome (and no answer groups)
-        # associated with it.
+        # Should not have a default outcome or any answer groups.
         if self.default_outcome is not None:
             raise utils.ValidationError(
                 'The End interaction does not require any default outcome.'
@@ -993,8 +992,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             )
 
     def _set_lower_and_upper_bounds(
-        self, range_var: RangeVariable, lower_bound: float,
-        upper_bound: float, lb_inclusive: bool, ub_inclusive: bool
+        self,
+        range_var: RangeVariableDict,
+        lower_bound: float,
+        upper_bound: float,
+        lb_inclusive: bool,
+        ub_inclusive: bool
     ) -> None:
         """Helper function for NumericInput and FractionInput interaction,
         Sets the lower and upper bounds for the range_var, mainly
@@ -1002,7 +1005,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         range lies in between or not to prevent redundancy
 
         Args:
-            range_var: RangeVariable. To keep track of each rule's
+            range_var: RangeVariableDict. To keep track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
             lower_bound: float. The lower bound.
@@ -1016,53 +1019,46 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         range_var['ub_inclusive'] = ub_inclusive
 
     def _is_enclosed_by(
-        self, range_compare_to: RangeVariable,
-        range_compare_with: RangeVariable
+        self,
+        test_range: RangeVariableDict,
+        base_range: RangeVariableDict
     ) -> bool:
         """Helper function for NumericInput and FractionInput interaction,
-        Checks whether the ranges of rules enclosed or not
+        Returns `True` when `test_range` variable lies within
+        `base_range` variable
 
         Args:
-            range_compare_to: RangeVariable. To keep track of each rule's
+            test_range: RangeVariableDictDict. It represents the variable for
+                which we have to check the range. It keeps track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive, It represents the variable for
-                which we have to check the range.
-            range_compare_with: RangeVariable. To keep track of other rule's
+                lb inclusive, ub inclusive.
+            base_range: RangeVariableDictDict. It is the variable to which
+                the range is compared. It keeps track of other rule's
                 ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive, It is the variable to which the
-                range is compared.
+                lb inclusive, ub inclusive.
 
         Returns:
-            is_enclosed: bool. Returns True if both rule's ranges are enclosed.
+            is_enclosed: bool. Returns True if test_range lies
+            within base_range.
         """
         if (
-            range_compare_with['lower_bound'] is None or
-            range_compare_to['lower_bound'] is None or
-            range_compare_with['upper_bound'] is None or
-            range_compare_to['upper_bound'] is None
+            base_range['lower_bound'] is None or
+            test_range['lower_bound'] is None or
+            base_range['upper_bound'] is None or
+            test_range['upper_bound'] is None
         ):
             return False
         lb_satisfied = (
-            range_compare_with['lower_bound'] < range_compare_to[
-                'lower_bound'] or
-            (
-                range_compare_with['lower_bound'] == range_compare_to[
-                    'lower_bound'] and
-                (
-                    not range_compare_to['lb_inclusive'] or
-                    range_compare_with['lb_inclusive']
+            base_range['lower_bound'] < test_range['lower_bound'] or (
+                base_range['lower_bound'] == test_range['lower_bound'] and (
+                    not test_range['lb_inclusive'] or base_range['lb_inclusive']
                 )
             )
         )
         ub_satisfied = (
-            range_compare_with['upper_bound'] > range_compare_to[
-                'upper_bound'] or
-            (
-                range_compare_with['upper_bound'] == range_compare_to[
-                    'upper_bound'] and
-                (
-                    not range_compare_to['ub_inclusive'] or
-                    range_compare_with['ub_inclusive']
+            base_range['upper_bound'] > test_range['upper_bound'] or (
+                base_range['upper_bound'] == test_range['upper_bound'] and (
+                    not test_range['ub_inclusive'] or base_range['ub_inclusive']
                 )
             )
         )
@@ -1070,11 +1066,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return is_enclosed
 
     def _should_check_range_criteria(
-        self, earlier_rule: state_domain.RuleSpec,
+        self,
+        earlier_rule: state_domain.RuleSpec,
         later_rule: state_domain.RuleSpec
     ) -> bool:
-        """Checks the range criteria between two rules by comparing their
-        rule type
+        """Compares the rule types of two rule specs to determine whether
+        to check for range enclosure
 
         Args:
             earlier_rule: state_domain.RuleSpec. Previous rule.
@@ -1083,55 +1080,56 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Returns True if the rules passes the range criteria check.
         """
-        if earlier_rule.rule_type != 'IsExactlyEqualTo':
+        if earlier_rule.rule_type in (
+            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan'
+            'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
+        ):
             return True
         return later_rule.rule_type in (
-            'IsExactlyEqualTo', 'IsEquivalentTo',
-            'IsEquivalentToAndInSimplestForm'
+            'HasDenominatorEqualTo', 'IsLessThan', 'IsGreaterThan'
         )
 
-    def _get_rule_value_f(self, rule_spec: state_domain.RuleSpec) -> bool:
-        """Return rule values from the rule_spec
+    def _get_rule_value_of_fraction_interaction(
+        self,
+        rule_spec: state_domain.RuleSpec
+    ) -> bool:
+        """Return rule value of the rule_spec of FractionInput interaction so
+        that we can keep track of rule's range
 
         Args:
-            rule_spec: (state_domain.RuleSpec). Rule spec of an answer group.
+            rule_spec: state_domain.RuleSpec. Rule spec of an answer group.
 
         Returns:
             rule_value_f: float. The value of the rule spec.
         """
         rule_value_f = rule_spec.inputs['f']
-        if rule_value_f['wholeNumber'] == 0:
-            rule_value_f = float(
-                rule_value_f['numerator'] / rule_value_f['denominator']
-            )
-        else:
-            rule_value_f = float(
-                rule_value_f['wholeNumber'] +
-                rule_value_f['numerator'] / rule_value_f['denominator']
-            )
+        rule_value_f = (
+            rule_value_f['wholeNumber'] +
+            float(rule_value_f['numerator']) / rule_value_f['denominator']
+        )
 
         return rule_value_f
 
     def _validate_numeric_input(self) -> None:
-        """Validates the following for NumericInput interaction -
-        - Rule should not be duplicate
-        - All rules should have solutions that is not subset of
-        previous rules' solutions
-        - `tol` value in `IsWithinTolerance` must be positive
-        - `a` should not be greater than `b` in `IsInclusivelyBetween` rule
-        - No rule should have string values
+        """Validates the NumericInput interaction
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Duplicate rules are present
+            - Rule having a solution that is subset of previous rules' solution
+            - `tol` value in `IsWithinTolerance` is negetive
+            - `a` is greater than or equal to `b` in `IsInclusivelyBetween` rule
         """
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
-        ranges: List[InteractionInstance.RangeVariable] = []
+        ranges: List[InteractionInstance.RangeVariableDict] = []
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs):
+                answer_group.rule_specs
+            ):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now:
                     raise utils.ValidationError(
@@ -1143,7 +1141,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     rule_spec_till_now.append(rule_spec.to_dict())
                 # All rules should have solutions that is not subset of
                 # previous rules' solutions.
-                range_var: InteractionInstance.RangeVariable = {
+                range_var: InteractionInstance.RangeVariableDict = {
                     'ans_group_index': int(ans_group_index),
                     'rule_spec_index': int(rule_spec_index),
                     'lower_bound': None,
@@ -1151,6 +1149,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     'lb_inclusive': False,
                     'ub_inclusive': False
                 }
+
                 if rule_spec.rule_type == 'IsLessThanOrEqualTo':
                     try:
                         rule_value = float(rule_spec.inputs['x'])
@@ -1195,7 +1194,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         raise utils.ValidationError(
                             f'Rule \'{rule_spec_index}\' from answer '
                             f'group \'{ans_group_index}\' having rule '
-                            f'type equals \'contains\' string '
+                            f'type \'equals\' contains string '
                             f'value - \'{rule_value}\''
                         )
 
@@ -1215,12 +1214,28 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'value - {rule_value}'
                         )
 
-                if rule_spec.rule_type == 'IsWithinTolerance':
-                    rule_value_x = rule_spec.inputs['x']
-                    rule_value_tol = rule_spec.inputs['tol']
+                if rule_spec.rule_type == 'IsGreaterThan':
                     try:
-                        rule_value_x = float(rule_value_x)
-                        rule_value_tol = float(rule_value_tol)
+                        rule_value = float(rule_spec.inputs['x'])
+                        self._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, False, False
+                        )
+                    except Exception:
+                        rule_value = rule_spec.inputs['x']
+                        raise utils.ValidationError(
+                            f'Rule \'{rule_spec_index}\' from answer '
+                            f'group \'{ans_group_index}\' having rule '
+                            f'type \'IsGreaterThan\' contains string '
+                            f'value - \'{rule_value}\''
+                        )
+
+                if rule_spec.rule_type == 'IsWithinTolerance':
+                    value_x = rule_spec.inputs['x']
+                    value_tol = rule_spec.inputs['tol']
+                    try:
+                        rule_value_x = float(value_x)
+                        rule_value_tol = float(value_tol)
                         # `tol` value in `IsWithinTolerance` must be positive.
                         if rule_value_tol <= 0.0:
                             raise utils.ValidationError(
@@ -1239,34 +1254,18 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'Rule \'{rule_spec_index}\' from answer '
                             f'group \'{ans_group_index}\' having rule '
                             f'type \'IsWithinTolerance\' contains string '
-                            f'value - \'{rule_value_x}\', \'{rule_value_tol}\''
-                        )
-
-                if rule_spec.rule_type == 'IsGreaterThan':
-                    try:
-                        rule_value = float(rule_spec.inputs['x'])
-                        self._set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            upper_infinity, False, False
-                        )
-                    except Exception:
-                        rule_value = rule_spec.inputs['x']
-                        raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type \'IsGreaterThan\' contains string '
-                            f'value - \'{rule_value}\''
+                            f'value - \'{value_x}\', \'{value_tol}\''
                         )
 
                 if rule_spec.rule_type == 'IsInclusivelyBetween':
-                    rule_value_a = rule_spec.inputs['a']
-                    rule_value_b = rule_spec.inputs['b']
+                    value_a = rule_spec.inputs['a']
+                    value_b = rule_spec.inputs['b']
                     try:
-                        rule_value_a = float(rule_value_a)
-                        rule_value_b = float(rule_value_b)
-                        # `a` should not be greater than `b` in
+                        rule_value_a = float(value_a)
+                        rule_value_b = float(value_b)
+                        # `a` should not be greater than equal to `b` in
                         # `IsInclusivelyBetween` rule.
-                        if rule_value_a > rule_value_b:
+                        if rule_value_a >= rule_value_b:
                             raise utils.ValidationError(
                                 f'The rule \'{rule_spec_index}\' of answer '
                                 f'group \'{ans_group_index}\' having '
@@ -1283,7 +1282,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'Rule \'{rule_spec_index}\' from answer '
                             f'group \'{ans_group_index}\' having rule '
                             f'type \'IsInclusivelyBetween\' contains string '
-                            f'value - \'{rule_value_a}\', \'{rule_value_b}\''
+                            f'value - \'{value_a}\', \'{value_b}\''
                         )
 
                 for range_ele in ranges:
@@ -1298,31 +1297,30 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 ranges.append(range_var)
 
     def _validate_fraction_input(self) -> None:
-        """Validates the following in FractionInput interaction -
-        - Rule should not be duplicate
-        - Denominator should be greater than 0
-        - Solution should be in simplest form if the `simplest form`
-        setting is turned on
-        - Solution should be in proper form if the `proper form`
-        setting is turned on
-        - `IsExactlyEqualTo` rule should not have integral value when
-        `allow non zero integers` setting is off
-        - All rules should have solutions that is not subset of
-        previous rules' solutions
-        - `HasDenominatorEqualTo` rule should not have value less than 0
-        - `HasFractionalPartExactlyEqualTo` rule should always come before
-        `HasDenominatorEqualTo` rule where the fractional denominator is
-        equal to `HasDenominatorEqualTo` rule value
+        """Validates the FractionInput interaction
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Duplicate rules are present
+            - Denominator is <= 0
+            - Solution is not in simplest form when the `simplest form`
+            setting is turned on
+            - Solution is in proper form when the `proper form` setting
+            is turned on
+            - `IsExactlyEqualTo` rule have integral value when
+            `allow non zero integers` setting is off
+            - Rule have solution that is subset of previous rules' solutions
+            - `HasDenominatorEqualTo` rule have value less than 0
+            - `HasFractionalPartExactlyEqualTo` rule comes after
+            `HasDenominatorEqualTo` rule where the fractional denominator is
+            equal to `HasDenominatorEqualTo` rule value
         """
-        ranges: List[InteractionInstance.RangeVariable] = []
+        ranges: List[InteractionInstance.RangeVariableDict] = []
         matched_denominator_list: List[
-            InteractionInstance.MatchedDenominator] = []
+            InteractionInstance.MatchedDenominatorDict] = []
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
-        inputs_with_whole_nums = [
+        inputs_without_fractions = [
             'HasDenominatorEqualTo',
             'HasNumeratorEqualTo',
             'HasIntegerPartEqualTo',
@@ -1331,17 +1329,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
         allow_non_zero_integ_part = (
-            self.customization_args[
-                'allowNonzeroIntegerPart'].value)
-        allow_imp_frac = (
-            self.customization_args[
-                'allowImproperFraction'].value)
+            self.customization_args['allowNonzeroIntegerPart'].value)
+        allow_imp_frac = self.customization_args['allowImproperFraction'].value
         require_simple_form = (
-            self.customization_args[
-                'requireSimplestForm'].value)
+            self.customization_args['requireSimplestForm'].value)
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs):
+                answer_group.rule_specs
+            ):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now:
                     raise utils.ValidationError(
@@ -1352,35 +1348,33 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 else:
                     rule_spec_till_now.append(rule_spec.to_dict())
 
-                if rule_spec.rule_type not in inputs_with_whole_nums:
+                if rule_spec.rule_type not in inputs_without_fractions:
                     num = rule_spec.inputs['f']['numerator']
                     den = rule_spec.inputs['f']['denominator']
                     whole = rule_spec.inputs['f']['wholeNumber']
 
                     # Denominator should be greater than 0.
-                    if whole == 0:
-                        if den <= 0:
-                            raise utils.ValidationError(
-                                f'The rule \'{rule_spec_index}\' of answer '
-                                f'group \'{ans_group_index}\' has '
-                                f'denominator less than or equal to zero '
-                                f'in FractionInput interaction.'
-                            )
+                    if den <= 0:
+                        raise utils.ValidationError(
+                            f'The rule \'{rule_spec_index}\' of answer '
+                            f'group \'{ans_group_index}\' has '
+                            f'denominator less than or equal to zero '
+                            f'in FractionInput interaction.'
+                        )
 
                     # Solution should be in simplest form if the `simplest form`
                     # setting is turned on.
                     if require_simple_form:
-                        if whole == 0:
-                            d = math.gcd(num, den)
-                            val_num = num // d
-                            val_den = den // d
-                            if val_num != num and val_den != den:
-                                raise utils.ValidationError(
-                                    f'The rule \'{rule_spec_index}\' of '
-                                    f'answer group \'{ans_group_index}\' do '
-                                    f'not have value in simple form '
-                                    f'in FractionInput interaction.'
-                                )
+                        d = math.gcd(num, den)
+                        val_num = num // d
+                        val_den = den // d
+                        if val_num != num and val_den != den:
+                            raise utils.ValidationError(
+                                f'The rule \'{rule_spec_index}\' of '
+                                f'answer group \'{ans_group_index}\' do '
+                                f'not have value in simple form '
+                                f'in FractionInput interaction.'
+                            )
 
                     # Solution should be in proper form if the `proper form`
                     # setting is turned on.
@@ -1393,6 +1387,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     f'not have value in proper fraction '
                                     f'in FractionInput interaction.'
                                 )
+                        else:
+                            raise utils.ValidationError(
+                                f'The rule \'{rule_spec_index}\' of '
+                                f'answer group \'{ans_group_index}\' do '
+                                f'not have value in proper fraction '
+                                f'in FractionInput interaction.'
+                            )
 
                 # All rules should have solutions that is not subset of
                 # previous rules' solutions.
@@ -1425,21 +1426,24 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     f'non zero integer part '
                                     f'in FractionInput interaction.'
                                 )
-                    rule_value_f = self._get_rule_value_f(rule_spec)
+                    rule_value_f = (
+                        self._get_rule_value_of_fraction_interaction(rule_spec))
                     self._set_lower_and_upper_bounds(
                         range_var, rule_value_f,
                         rule_value_f, True, True
                     )
 
                 if rule_spec.rule_type == 'IsGreaterThan':
-                    rule_value_f = self._get_rule_value_f(rule_spec)
+                    rule_value_f = (
+                        self._get_rule_value_of_fraction_interaction(rule_spec))
                     self._set_lower_and_upper_bounds(
                         range_var, rule_value_f,
                         upper_infinity, False, False
                     )
 
                 if rule_spec.rule_type == 'IsLessThan':
-                    rule_value_f = self._get_rule_value_f(rule_spec)
+                    rule_value_f = (
+                        self._get_rule_value_of_fraction_interaction(rule_spec))
                     self._set_lower_and_upper_bounds(
                         range_var, lower_infinity,
                         rule_value_f, False, False
@@ -1451,7 +1455,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         matched_denominator['denominator'] = rule_value_x
                         # `HasDenominatorEqualTo` rule should not have value
                         # less than 0.
-                        if rule_value_x <= 0:
+                        if rule_value_x == 0:
                             raise utils.ValidationError(
                                 f'The rule \'{rule_spec_index}\' of answer '
                                 f'group \'{ans_group_index}\' has '
@@ -1511,19 +1515,21 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 matched_denominator_list.append(matched_denominator)
 
     def _validate_number_with_units_input(self) -> None:
-        """Validates the following for NumberWithUnitsInput interaction -
-        - Rule should not be duplicate
-        - `IsEqualTo` rule should not come after `IsEquivalentTo` rule
+        """Validates the NumberWithUnitsInput interaction
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Duplicate rules are present
+            - `IsEqualTo` rule comes after `IsEquivalentTo` rule
         """
         number_with_units_rules = []
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs):
+                answer_group.rule_specs
+            ):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now:
                     raise utils.ValidationError(
@@ -1550,27 +1556,29 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         )
 
     def _validate_multi_choice_input(self) -> None:
-        """Validates the following for MultipleChoiceInput interaction -
-        - Rule should not be duplicate
-        - No ans choice should appear more than one
-        - Answer choices should be non-empty and unique
+        """Validates the MultipleChoiceInput interaction
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Duplicate rules are present
+            - Answer choice present in more than one rule
+            - Answer choices are empty or duplicate
         """
         selected_equals_choices = []
         rule_spec_list = []
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs):
+                answer_group.rule_specs
+            ):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now:
                     raise utils.ValidationError(
                         f'The rule \'{rule_spec_index}\' of answer group '
-                        f'\'{ans_group_index}\' of MultipleChoiceInput interaction '
-                        f'is already present.'
+                        f'\'{ans_group_index}\' of MultipleChoiceInput '
+                        f'interaction is already present.'
                     )
                 else:
                     rule_spec_till_now.append(rule_spec.to_dict())
@@ -1587,42 +1595,37 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             rule_spec.inputs['x'])
 
                 rule_spec_list.append(rule_spec.inputs['x'])
+
         choices = self.customization_args['choices'].value
 
         # Answer choices should be non-empty and unique.
         seen_choices = []
-        choice_empty = False
-        choice_duplicate = False
         for choice in choices:
             if choice.html in ('<p></p>', ''):
-                choice_empty = True
+                raise utils.ValidationError(
+                    'There should not be any empty '
+                    'choices in MultipleChoiceInput interaction.'
+                )
             if choice.html in seen_choices:
-                choice_duplicate = True
+                raise utils.ValidationError(
+                    'There should not be any duplicate '
+                    'choices in MultipleChoiceInput interaction.'
+                )
             seen_choices.append(choice.html)
-        if choice_empty:
-            raise utils.ValidationError(
-                'There should not be any empty '
-                'choices in MultipleChoiceInput interaction.'
-            )
-        if choice_duplicate:
-            raise utils.ValidationError(
-                'There should not be any duplicate '
-                'choices in MultipleChoiceInput interaction.'
-            )
 
     def _validate_item_selec_input(self) -> None:
-        """Validates the following for ItemSelectionInput interaction -
-        - Rule should not be duplicate
-        - `Equals` rule should have value between min and max number
-        of selections
-        - Minimum number of selections should be no greater than
-        maximum number of selections
-        - There should be enough choices to have minimum number of selections
-        - All choices should be unique and non-empty
+        """Validates the ItemSelectionInput interaction
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Duplicate rules are present
+            - `Equals` rule does not have value between min and max number
+            of selections
+            - Minimum number of selections value is greater than maximum
+            number of selections value
+            - Not enough choices to have minimum number of selections
+            - Answer choices are empty or duplicate
         """
         min_value = (
             self.customization_args
@@ -1631,9 +1634,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             self.customization_args
             ['maxAllowableSelectionCount'].value)
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs):
+                answer_group.rule_specs
+            ):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now:
                     raise utils.ValidationError(
@@ -1680,48 +1685,38 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         # All choices should be unique and non-empty.
         seen_choices = []
-        choice_empty = False
-        choice_duplicate = False
         for choice in choices:
             if choice.html in ('<p></p>', ''):
-                choice_empty = True
+                raise utils.ValidationError(
+                    'There should not be any empty '
+                    'choices in ItemSelectionInput interaction.'
+                )
             if choice.html in seen_choices:
-                choice_duplicate = True
+                raise utils.ValidationError(
+                    'There should not be any duplicate '
+                    'choices in ItemSelectionInput interaction.'
+                )
             seen_choices.append(choice.html)
-        if choice_empty:
-            raise utils.ValidationError(
-                'There should not be any empty '
-                'choices in ItemSelectionInput interaction.'
-            )
-        if choice_duplicate:
-            raise utils.ValidationError(
-                'There should not be any duplicate '
-                'choices in ItemSelectionInput interaction.'
-            )
 
     def _validate_drag_and_drop_input(self) -> None:
-        """Validates the following in DragAndDropInput interaction -
-        - Rule should not be duplicate.
-        - Multiple items cannot be in the same place iff the setting
-        is turned off
-        - `IsEqualToOrderingWithOneItemAtIncorrectPosition` rule should
-        not be present when `multiple items at same place` setting is turned
-        off
-        - In `HasElementXBeforeElementY` rule, `X` value should not be equal
-        to `Y` value
-        - `IsEqualToOrdering` rule should not have empty values
-        - `IsEqualToOrdering` rule should always come before
-        `HasElementXAtPositionY` where element `X` is present at position
-        `Y` in `IsEqualToOrdering` rule
-        - `IsEqualToOrdering` should always come before
-        `IsEqualToOrderingWithOneItemAtIncorrectPosition` when they are off
-        by one value
-        - There should be at least 2 items
-        - All inputs should be non-empty, unique
+        """Validates the DragAndDropInput interaction
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Duplicate rules are present
+            - Multiple items at the same place when the setting
+            is turned off
+            - `IsEqualToOrderingWithOneItemAtIncorrectPosition` rule
+            present when `multiple items at same place` setting is turned off
+            - In `HasElementXBeforeElementY` rule, `X` value is equal to `Y`
+            value
+            - `IsEqualToOrdering` rule have empty values
+            - `IsEqualToOrdering` rule comes after `HasElementXAtPositionY`
+            where element `X` is present at position `Y` in `IsEqualToOrdering`
+            rule
+            - Less than 2 items are present
+            - Answer choices are empty or duplicate
         """
         multi_item_value = (
             self.customization_args
@@ -1729,15 +1724,17 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         ele_x_at_y_rules = []
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
         equal_ordering_one_at_incorec_posn = []
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs):
+                answer_group.rule_specs
+            ):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now:
                     raise utils.ValidationError(
                         f'The rule \'{rule_spec_index}\' of answer group '
-                        f'\'{ans_group_index}\' of DragAndDropInput interaction '
-                        f'is already present.'
+                        f'\'{ans_group_index}\' of DragAndDropInput '
+                        f'interaction is already present.'
                     )
                 else:
                     rule_spec_till_now.append(rule_spec.to_dict())
@@ -1854,8 +1851,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     f'WithOneItemAtIncorrect '
                                     f'Position rule above.'
                                 )
-        choices = (
-            self.customization_args['choices'].value)
+        choices = self.customization_args['choices'].value
         # There should be at least 2 items.
         if len(choices) < 2:
             raise utils.ValidationError(
@@ -1864,39 +1860,33 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             )
         # All inputs should be non-empty, unique.
         seen_choices = []
-        choice_empty = False
-        choice_duplicate = False
         for choice in choices:
             if choice.html in ('<p></p>', ''):
-                choice_empty = True
+                raise utils.ValidationError(
+                    'There should not be any empty '
+                    'choices in DragAndDropSortInput interaction.'
+                )
             if choice.html in seen_choices:
-                choice_duplicate = True
+                raise utils.ValidationError(
+                    'There should not be any duplicate '
+                    'choices in DragAndDropSortInput interaction.'
+                )
             seen_choices.append(choice.html)
-        if choice_empty:
-            raise utils.ValidationError(
-                'There should not be any empty '
-                'choices in DragAndDropSortInput interaction.'
-            )
-        if choice_duplicate:
-            raise utils.ValidationError(
-                'There should not be any duplicate '
-                'choices in DragAndDropSortInput interaction.'
-            )
 
     def _validate_text_input(self) -> None:
-        """Validates the following in TextInput interaction -
-        - Rule should not be duplicate
-        - Text input height should be >= 1 and <= 10.
-        - `Contains` rule should always come after these rules (Contains,
-        StartsWith and Equals) where `Contains` rule string is a substring
-        of other rules string
-        - `StartsWith` rule should always come after the `Equals` and
-        another `StartsWith` rule where the `StartsWith` rule string is a
-        prefix of other rules string
+        """Validates the TextInput interaction:
 
         Raises:
-            ValidationError. Raises a validation error when the above
-                mentioned checks fails.
+            ValidationError. Raises a validation error in the following
+            condition:
+            - Text input height is not >= 1 and <= 10
+            - Duplicate rules are present
+            - `Contains` rule comes before these rules (Contains,
+            StartsWith and Equals) where `Contains` rule string is a substring
+            of other rules string
+            - `StartsWith` rule comes before the `Equals` and
+            another `StartsWith` rule where the `StartsWith` rule string is a
+            prefix of other rules string
         """
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
         seen_strings_contains = []
@@ -1910,6 +1900,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 f'Rows having value {rows_value} is either '
                 f'less than 1 or greater than 10.'
             )
+
         for ans_group_idx, answer_group in enumerate(self.answer_groups):
             for rule_spec_idx, rule_spec in enumerate(answer_group.rule_specs):
                 # Rule should not be duplicate.
@@ -2082,24 +2073,19 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # an exploration because as of now(16 Sept 2022) the data related
         # to Question model is not yet fixed.
         if validation_from_exploration:
-            if self.id == 'Continue':
-                self._validate_continue_input()
-            elif self.id == 'EndExploration':
-                self._validate_end_exploration_input()
-            elif self.id == 'NumericInput':
-                self._validate_numeric_input()
-            elif self.id == 'FractionInput':
-                self._validate_fraction_input()
-            elif self.id == 'NumberWithUnits':
-                self._validate_number_with_units_input()
-            elif self.id == 'MultipleChoiceInput':
-                self._validate_multi_choice_input()
-            elif self.id == 'ItemSelectionInput':
-                self._validate_item_selec_input()
-            elif self.id == 'DragAndDropSortInput':
-                self._validate_drag_and_drop_input()
-            elif self.id == 'TextInput':
-                self._validate_text_input()
+            interaction_id_to_validation_function_dict = {
+                'Continue': self._validate_continue_input(),
+                'EndExploration': self._validate_end_exploration_input(),
+                'NumericInput': self._validate_numeric_input(),
+                'FractionInput': self._validate_fraction_input(),
+                'NumberWithUnits': self._validate_number_with_units_input(),
+                'MultipleChoiceInput': self._validate_multi_choice_input(),
+                'ItemSelectionInput': self._validate_item_selec_input(),
+                'DragAndDropSortInput': self._validate_drag_and_drop_input(),
+                'TextInput': self._validate_text_input()
+            }
+            if self.id in interaction_id_to_validation_function_dict:
+                interaction_id_to_validation_function_dict[id]
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
@@ -4363,7 +4349,8 @@ class State(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
-            self.interaction.validate(exp_param_specs_dict, validation_from_exploration)
+            self.interaction.validate(
+                exp_param_specs_dict, validation_from_exploration)
 
         content_id_list = []
         content_id_list.append(self.content.content_id)
