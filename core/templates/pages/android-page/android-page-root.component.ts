@@ -27,7 +27,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 })
 export class AndroidPageRootComponent {
   androidPageIsEnabled = (
-    this.platformFeatureService.status.AndroidPage.isEnabled
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
   );
 
   constructor(

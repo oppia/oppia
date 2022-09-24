@@ -30,7 +30,7 @@ import './social-buttons.component.css';
 })
 export class SocialButtonsComponent {
   androidAppButtonIsShown = (
-    this.platformFeatureService.status.AndroidPage.isEnabled
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
   );
 
   constructor(private platformFeatureService: PlatformFeatureService) {}

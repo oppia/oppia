@@ -28,7 +28,7 @@ import { AndroidPageRootComponent } from './android-page-root.component';
 
 class MockPlatformFeatureService {
   status = {
-    AndroidPage: {
+    AndroidBetaLandingPage: {
       isEnabled: false
     }
   };
@@ -69,7 +69,7 @@ describe('Android Page Root', () => {
   });
 
   it('should initialize', () => {
-    mockPlatformFeatureService.status.AndroidPage.isEnabled = true;
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     const componentInstance = (
       TestBed.createComponent(AndroidPageRootComponent).componentInstance
@@ -85,7 +85,7 @@ describe('Android Page Root', () => {
   });
 
   it('should show android page if it is enabled', () => {
-    mockPlatformFeatureService.status.AndroidPage.isEnabled = true;
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
 
     const component = TestBed.createComponent(AndroidPageRootComponent);
 

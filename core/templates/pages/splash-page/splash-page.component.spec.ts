@@ -36,7 +36,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockPlatformFeatureService {
   status = {
-    AndroidPage: {
+    AndroidBetaLandingPage: {
       isEnabled: false
     }
   };
@@ -256,7 +256,7 @@ describe('Splash Page', () => {
   });
 
   it('should show android button if the feature is enabled', () => {
-    mockPlatformFeatureService.status.AndroidPage.isEnabled = true;
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
 
     const component = TestBed.createComponent(SplashPageComponent);
 

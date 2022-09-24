@@ -55,7 +55,7 @@ TEST_FEATURES_LIST = [
 PROD_FEATURES_LIST = [
     params.ParamNames.END_CHAPTER_CELEBRATION,
     params.ParamNames.CHECKPOINT_CELEBRATION,
-    params.ParamNames.ANDROID_PAGE
+    params.ParamNames.ANDROID_BETA_LANDING_PAGE
 ]
 
 # Names of features that should not be used anymore, e.g. features that are

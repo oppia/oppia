@@ -25,7 +25,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockPlatformFeatureService {
   status = {
-    AndroidPage: {
+    AndroidBetaLandingPage: {
       isEnabled: false
     }
   };
@@ -56,7 +56,7 @@ describe('SocialButtonsComponent', () => {
   });
 
   it('should show android app button', () => {
-    mockPlatformFeatureService.status.AndroidPage.isEnabled = true;
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
 
     const component = TestBed.createComponent(SocialButtonsComponent);
 

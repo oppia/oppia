@@ -159,7 +159,7 @@ describe('PlatformFeatureService', () => {
               [FeatureNames.DummyFeature]: true,
               [FeatureNames.EndChapterCelebration]: true,
               [FeatureNames.CheckpointCelebration]: true,
-              [FeatureNames.AndroidPage]: true
+              [FeatureNames.AndroidBetaLandingPage]: true
             }
           })
         });

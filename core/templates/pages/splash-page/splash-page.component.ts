@@ -55,7 +55,7 @@ export class SplashPageComponent implements OnInit {
   testimonials: Testimonial[] = [];
   userIsLoggedIn: boolean = false;
   androidPageIsEnabled: boolean = (
-    this.platformFeatureService.status.AndroidPage.isEnabled
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
   );
 
   constructor(
