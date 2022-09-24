@@ -949,6 +949,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             - Text value is empty or is more than 20 characters
             - Answer group is present
         """
+        print("*************************************")
+        print(self.customization_args)
         text_value = self.customization_args['buttonText'].value.unicode_str
         if len(text_value) > 20:
             raise utils.ValidationError(
@@ -2073,19 +2075,24 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # an exploration because as of now(16 Sept 2022) the data related
         # to Question model is not yet fixed.
         if validation_from_exploration:
-            interaction_id_to_validation_function_dict = {
-                'Continue': self._validate_continue_input(),
-                'EndExploration': self._validate_end_exploration_input(),
-                'NumericInput': self._validate_numeric_input(),
-                'FractionInput': self._validate_fraction_input(),
-                'NumberWithUnits': self._validate_number_with_units_input(),
-                'MultipleChoiceInput': self._validate_multi_choice_input(),
-                'ItemSelectionInput': self._validate_item_selec_input(),
-                'DragAndDropSortInput': self._validate_drag_and_drop_input(),
-                'TextInput': self._validate_text_input()
-            }
-            if self.id in interaction_id_to_validation_function_dict:
-                interaction_id_to_validation_function_dict[id]
+            if self.id == 'Continue':
+                self._validate_continue_input()
+            elif self.id == 'EndExploration':
+                self._validate_end_exploration_input()
+            elif self.id == 'NumericInput':
+                self._validate_numeric_input()
+            elif self.id == 'FractionInput':
+                self._validate_fraction_input()
+            elif self.id == 'NumberWithUnits':
+                self._validate_number_with_units_input()
+            elif self.id == 'MultipleChoiceInput':
+                self._validate_multi_choice_input()
+            elif self.id == 'ItemSelectionInput':
+                self._validate_item_selec_input()
+            elif self.id == 'DragAndDropSortInput':
+                self._validate_drag_and_drop_input()
+            elif self.id == 'TextInput':
+                self._validate_text_input()
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
