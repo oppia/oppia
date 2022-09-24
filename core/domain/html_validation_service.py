@@ -619,7 +619,7 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
         value_dict[attr] = json.loads(unescape_html(attrs[attr]))
 
     try:
-        component_types_to_component_classes[tag_name].validate(value_dict)  # type: ignore[no-untyped-call]
+        component_types_to_component_classes[tag_name].validate(value_dict)
         if tag_name == 'oppia-noninteractive-collapsible':
             content_html = value_dict['content-with-value']
             soup_for_collapsible = bs4.BeautifulSoup(
@@ -699,7 +699,7 @@ def validate_math_content_attribute_in_html(
             json.loads(unescape_html(
                 math_tag['math_content-with-value'])))
         try:
-            components.Math.validate({  # type: ignore[no-untyped-call]
+            components.Math.validate({
                 'math_content-with-value': math_content_dict
             })
         except utils.ValidationError as e:

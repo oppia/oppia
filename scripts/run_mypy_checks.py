@@ -156,7 +156,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/topics_and_skills_dashboard_test.py',
     'core/controllers/voice_artist.py',
     'core/controllers/voice_artist_test.py',
-    'extensions/rich_text_components',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',
     'scripts/concurrent_task_utils.py',
