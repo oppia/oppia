@@ -2038,7 +2038,6 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                     comment_line_number = line_num
 
                 if re.search(r'(\s*type:\s*ignore\[)', line):
-                    prohibited_error_code_present = False
 
                     error_codes = re.search(
                         r'(\s*type:\s*ignore)\[([a-z-\s\,]*)\]', line
@@ -2052,13 +2051,12 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                             error_code not in
                             self.config.allowed_type_ignore_error_codes
                         ):
-                            prohibited_error_code_present = True
                             encountered_prohibited_error_codes.append(
                                 error_code
                             )
                         encountered_error_codes.append(error_code)
 
-                    if prohibited_error_code_present:
+                    if encountered_prohibited_error_codes:
                         self.add_message(
                             'prohibited-type-ignore-used',
                             line=line_num,
@@ -2076,7 +2074,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                     ):
                         type_ignore_comment_present = False
                         no_of_type_ignore_comments = 0
-                    elif not prohibited_error_code_present:
+                    elif not encountered_prohibited_error_codes:
                         self.add_message(
                             'mypy-ignore-used', line=line_num, node=node
                         )

@@ -2379,22 +2379,22 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             pylint_extensions.TypeIgnoreCommentChecker)
         self.checker_test_object.setup_method()
         self.checker_test_object.checker.config.allowed_type_ignore_error_codes = [  # pylint: disable=line-too-long
-                'attr-defined',
-                'union-attr',
-                'arg-type',
-                'call-overload',
-                'override',
-                'return',
-                'assignment',
-                'list-item',
-                'dict-item',
-                'typeddict-item',
-                'func-returns-value',
-                'misc',
-                'type-arg',
-                'no-untyped-def',
-                'no-untyped-call',
-                'no-any-return'
+            'attr-defined',
+            'union-attr',
+            'arg-type',
+            'call-overload',
+            'override',
+            'return',
+            'assignment',
+            'list-item',
+            'dict-item',
+            'typeddict-item',
+            'func-returns-value',
+            'misc',
+            'type-arg',
+            'no-untyped-def',
+            'no-untyped-call',
+            'no-any-return'
         ]
 
     def test_type_ignore_used_without_comment_raises_error(self):
@@ -2683,7 +2683,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         temp_file.close()
 
     def test_type_ignores_with_comments_should_not_raises_error(self):
-        node_function = astroid.scoped_nodes.Module(
+        node_with_type_ignore_in_single_form = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
@@ -2706,10 +2706,40 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 func_only_accept_str(1234)  # type: ignore[arg-type] #@
                 """
             )
-        node_function.file = filename
+        node_with_type_ignore_in_single_form.file = filename
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(node_function)
+            self.checker_test_object.checker.visit_module(
+                node_with_type_ignore_in_single_form
+            )
+        temp_file.close()
+
+        node_with_type_ignore_in_combined_form = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we use MyPy ignore because ...
+                suggestion.change.new_value = (  # type: ignore[attr-defined, list-item]
+                    new_content
+                )
+
+                # Here we use MyPy ignore because ...
+                func_only_accept_str(1234)  # type: ignore[arg-type]
+                #@
+                """
+            )
+        node_with_type_ignore_in_combined_form.file = filename
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_module(
+                node_with_type_ignore_in_combined_form
+            )
         temp_file.close()
 
     def test_untyped_call_type_ignores_should_not_raise_error(self):
