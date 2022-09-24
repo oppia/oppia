@@ -499,10 +499,10 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectFeedbackTabToBeActive = function() {
-    expect(
-      feedbackTabButton[0]
-    ).toEqual(activeTranslationTabElement[0]);
+  this.expectFeedbackTabToBeActive = async function() {
+    var activeTabName = await action.getText(
+      'Active Transalation Tab', activeTranslationTabElement);
+    expect(activeTabName).toEqual('Feedback');
   };
 
   this.moveToState = async function(targetName) {
@@ -539,7 +539,8 @@ var ExplorationEditorTranslationTab = function() {
       if (listOfNames[i] === stateName) {
         var stateBackgroundNodes = await stateGraph.$$(
           '.e2e-test-node-background');
-        expect(await stateBackgroundNodes[i].getCSSProperty('fill')).toBe(
+        expect(
+          (await stateBackgroundNodes[i].getCSSProperty('fill')).value).toBe(
           expectedColor);
         matched = true;
       }
