@@ -4218,8 +4218,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_name: str. The name of the state.
         """
         answer_groups = state_dict['interaction']['answer_groups']
-        seen_strings_contains = []
-        seen_strings_startswith = []
+        seen_strings_contains: List[str] = []
+        seen_strings_startswith: List[str] = []
         invalid_rules = []
         # Remove duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
@@ -4356,7 +4356,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def fix_rte_tags(
         cls, html: str,
         is_tags_nested_inside_tabs_or_collapsible: bool=False
-    ):
+    ) -> str:
         """Handles all the invalid RTE tags, performs the following:
             - `oppia-noninteractive-image`
                 - If `alt-with-value` attribute not in the image tag,
@@ -4420,14 +4420,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             else:
                 if tag['text-with-value'] is None:
                     tag.decompose()
-                if tag['text-with-value'].strip() in empty_values:
+                elif tag['text-with-value'].strip() in empty_values:
                     tag.decompose()
             if not tag.has_attr('skill_id-with-value'):
                 tag.decompose()
             else:
                 if tag['skill_id-with-value'] is None:
                     tag.decompose()
-                if tag['skill_id-with-value'].strip() in empty_values:
+                elif tag['skill_id-with-value'].strip() in empty_values:
                     tag.decompose()
 
         for tag in soup.find_all('oppia-noninteractive-video'):
@@ -4508,7 +4508,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return str(soup).replace('<br/>', '<br>')
 
     @classmethod
-    def fix_tabs_and_collapsible_tags(cls, html: str):
+    def fix_tabs_and_collapsible_tags(cls, html: str) -> str:
         """Fixes all tabs and collapsible tags, performs the following:
         - `oppia-noninteractive-tabs`
             - If no `tab_contents-with-value` attribute, tag will be removed
