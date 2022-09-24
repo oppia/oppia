@@ -438,8 +438,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                             ): # pragma: no cover
                                 logging.info(
                                     'State name %s was not found in the '
-                                    'version history model for version %d' % (
-                                        state_name, version
+                                    'version history model for version %d for exploration %s' % (
+                                        state_name, version, exp_id
                                     )
                                 )
                             logging.info(
