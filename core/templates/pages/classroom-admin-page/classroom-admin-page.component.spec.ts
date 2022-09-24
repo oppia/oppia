@@ -24,6 +24,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ClassroomAdminPageComponent } from 'pages/classroom-admin-page/classroom-admin-page.component';
 import { ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
 import { ClassroomData } from './classroom-admin.model';
+import { AlertsService } from 'services/alerts.service';
 
 
 class MockNgbModal {
@@ -40,6 +41,7 @@ describe('Classroom Admin Page component ', () => {
 
   let classroomBackendApiService: ClassroomBackendApiService;
   let ngbModal: NgbModal;
+  let alertsService: AlertsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,6 +51,7 @@ describe('Classroom Admin Page component ', () => {
       ],
       declarations: [ClassroomAdminPageComponent],
       providers: [
+        AlertsService,
         ClassroomBackendApiService,
         {
           provide: NgbModal,
@@ -64,6 +67,7 @@ describe('Classroom Admin Page component ', () => {
   beforeEach(() => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
+    alertsService = TestBed.inject(AlertsService);
   });
 
   it('should initialize the component', fakeAsync(() => {
@@ -111,6 +115,21 @@ describe('Classroom Admin Page component ', () => {
 
       expect(component.classroomViewerMode).toBeTrue();
       expect(component.classroomDetailsIsShown).toBeTrue();
+    }));
+
+  it('should display alert when unable to fetch classroom data',
+    fakeAsync(() => {
+      spyOn(classroomBackendApiService, 'getClassroomDataAsync')
+        .and.returnValue(Promise.reject(400));
+      spyOn(alertsService, 'addWarning');
+
+      component.getClassroomData('classroomId');
+      tick();
+
+      expect(
+        classroomBackendApiService.getClassroomDataAsync).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to get classroom data');
     }));
 
   it(
@@ -192,7 +211,7 @@ describe('Classroom Admin Page component ', () => {
     }));
 
   it('should be able to update the classroom name', () => {
-    let response = {
+    const response = {
       classroomDict: {
         classroomId: 'classroomId',
         name: 'math',
@@ -213,6 +232,37 @@ describe('Classroom Admin Page component ', () => {
 
     expect(component.classroomDataIsChanged).toBeTrue();
   });
+
+  it(
+    'should not update the classroom field if the current changes match ' +
+    'with existing ones', () => {
+      const response = {
+        classroomDict: {
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {}
+        }
+      };
+      component.tempClassroomData = ClassroomData.createNewClassroomFromDict(
+        response.classroomDict);
+      component.classroomData = ClassroomData.createNewClassroomFromDict(
+        response.classroomDict);
+      component.tempClassroomData.name = 'Discrete maths';
+      component.classroomDataIsChanged = false;
+
+      component.updateClassroomField();
+
+      expect(component.classroomDataIsChanged).toBeTrue();
+
+      component.tempClassroomData.name = 'math';
+
+      component.updateClassroomField();
+
+      expect(component.classroomDataIsChanged).toBeFalse();
+    })
 
   it('should be able to update the classroom url fragment', () => {
     let response = {
