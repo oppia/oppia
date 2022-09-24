@@ -211,4 +211,33 @@ describe('Topic questions tab', () => {
     expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.getQuestionSummariesAsync).toHaveBeenCalledWith('1', true, true);
   });
+
+  it('should initialize tab when topic is initialized', () => {
+    // Setup.
+    const topicRights = TopicRights.createInterstitialRights();
+    const allSkillSummaries = subtopic1.getSkillSummaries();
+
+    // Action.
+    topicInitializedEventEmitter.emit();
+
+    // Endline verification.
+    expect(component.allSkillSummaries).toEqual(allSkillSummaries);
+    expect(component.topicRights).toEqual(topicRights);
+    expect(component.topic).toBe(topic);
+  });
+
+  it('should initialize tab when topic is reinitialized', () => {
+    const topicRights = TopicRights.createInterstitialRights();
+    const allSkillSummaries = subtopic1.getSkillSummaries();
+
+    topicInitializedEventEmitter.emit();
+    expect(component.allSkillSummaries).toEqual(allSkillSummaries);
+    expect(component.topicRights).toEqual(topicRights);
+    expect(component.topic).toBe(topic);
+    topicReinitializedEventEmitter.emit();
+
+    expect(component.allSkillSummaries).toEqual(allSkillSummaries);
+    expect(component.topicRights).toEqual(topicRights);
+    expect(component.topic).toBe(topic);
+  });
 });
