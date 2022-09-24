@@ -2318,8 +2318,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '<p>Hello, this is html1 for state2</p>'
                         '<oppia-noninteractive-image filepath-with-value="'
                         '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                        '"&amp;quot;&amp;quot;" alt-with-value='
-                        '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                        '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;'
+                        'image&amp;quot;"></oppia-noninteractive-image>'
                     )
                 )
             ),

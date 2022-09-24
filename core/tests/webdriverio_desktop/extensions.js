@@ -76,7 +76,7 @@ describe('rich-text components', function() {
         await richTextChecker.readRteComponent(
           'Link', 'https://google.com/', true);
         await richTextChecker.readRteComponent(
-          'Video', 'M7lc1UVf-VE', 10, 100, false);
+          'Video', 'M7lc1UVf-VE', 10, 100, true);
         await richTextChecker.readRteComponent(
           'Collapsible', 'title', await forms.toRichText('inner'));
         await richTextChecker.readRteComponent('Tabs', [{

@@ -1598,7 +1598,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;image.svg&amp;quot;}">'
             '</oppia-noninteractive-math>')
 
-        written_translations_dict_math = {
+        written_translations_dict_math: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content1': {
                     'en': {
@@ -1614,7 +1614,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 }
             }
         }
-        worked_example_dict_math = {
+        worked_example_dict_math: skill_domain.WorkedExampleDict = {
             'question': {
                 'content_id': 'question1',
                 'html': html_content

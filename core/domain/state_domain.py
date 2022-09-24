@@ -36,6 +36,7 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 import bs4
+import bleach
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast, overload
 )
@@ -2096,8 +2097,9 @@ def validate_rte_tags(
                 'Math tag does not have \'math_content-with-value\' '
                 'attribute.'
             )
+
         math_content_json = utils.unescape_html(
-            tag['math_content-with-value'])
+            bleach.clean(tag['math_content-with-value']))
         math_content_list = json.loads(math_content_json)
         if 'raw_latex' not in math_content_list:
             raise utils.ValidationError(
