@@ -104,7 +104,9 @@ if MYPY:  # pragma: no cover
         html: str
 
     class TranslatableSetOfNormalizedStringDict(TypedDict):
-        """Dictionary representing the TranslatableSetOfNormalizedString object."""
+        """Dictionary representing the TranslatableSetOfNormalizedString
+        object.
+        """
 
         contentId: Optional[str]
         normalizedStrSet: List[str]
