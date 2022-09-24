@@ -442,6 +442,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                         state_name, version
                                     )
                                 )
+                            logging.info(
+                                'Change list for version %d for exploration %s: %s' % (version, exp_id, metadata_model.commit_cmds)
+                            )
                     except Exception as e:
                         return (exp_id, [], e, version)
 
