@@ -6166,6 +6166,9 @@ export default {
   // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson on Oppia - a free platform for teaching and learning!",
 
+  // eslint-disable-next-line max-len
+  "DEFUALT_BLOG_POST_SHARE_TWITTER_TEXT": "Check out this new blog post on Oppia!",
+
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
   "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
@@ -6682,6 +6685,64 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        }
+      ]
+    },
+    "BLOG_HOMEPAGE": {
+      "ROUTE": "blog",
+      "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        }
+      ]
+    },
+    "BLOG_HOMEPAGE_SEARCH": {
+      "ROUTE": "blog/search/find",
+      "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        }
+      ]
+    },
+    "BLOG_POST_PAGE": {
+      "ROUTE": "blog/:blog_post_url_fragment",
+      "TITLE": "I18N_BLOG_POST_PAGE_TITLE",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
         }
       ]
     },
