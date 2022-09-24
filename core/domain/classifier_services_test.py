@@ -544,7 +544,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         exp1_id = u'1'
         state_name = 'Home'
         interaction_id = 'TextInput'
-        exp2_id = u'2'
+        exp2_id = u'0'
 
         job1_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
