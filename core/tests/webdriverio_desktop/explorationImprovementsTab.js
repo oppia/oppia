@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,22 +17,25 @@
  * in the exploration editor.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ExplorationEditorPage = (
-  require('../protractor_utils/ExplorationEditorPage.js'));
+  require('../webdriverio_utils/ExplorationEditorPage.js'));
 
 describe('Improvements tab', function() {
-  let adminPage = new AdminPage.AdminPage();
-  let explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-
-  let explorationEditorImprovementsTab = (
-    explorationEditorPage.getImprovementsTab());
+  let adminPage = null;
+  let explorationEditorPage = null;
+  let explorationEditorImprovementsTab = null;
 
   beforeAll(async() => {
+    adminPage = new AdminPage.AdminPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+
+    explorationEditorImprovementsTab = (
+      explorationEditorPage.getImprovementsTab());
     await users.createAndLoginCurriculumAdminUser(
       'superUser@improvementsTab.com', 'superUser');
     await adminPage.editConfigProperty(
