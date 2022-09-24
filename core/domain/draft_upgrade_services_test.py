@@ -186,7 +186,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             ],
             [],
             'Not None'
-        )
+        ).to_dict()
         ans_group_2 = state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state_name',
@@ -200,7 +200,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             [],
             [],
             None
-        )
+        ).to_dict()
         interaction_answer_groups = [
             ans_group_1,
             ans_group_2
@@ -219,13 +219,14 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'New state',
-                'old_value': state_domain.SubtitledHtml('content', ''),
+                'old_value': state_domain.SubtitledHtml(
+                    'content', '').to_dict(),
                 'new_value': state_domain.SubtitledHtml(
                     'content',
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&quot;abc.png&quot;" caption-with-value="&quot;'
                     '&quot;"></oppia-noninteractive-image>'
-                )
+                ).to_dict()
             })
         ]
         draft_change_list_v52_3 = [
@@ -233,7 +234,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'New state',
-                'old_value': state_domain.SubtitledHtml('content', ''),
+                'old_value': state_domain.SubtitledHtml(
+                    'content', '').to_dict(),
                 'new_value': state_domain.SubtitledHtml(
                     'content', (
                     '<oppia-noninteractive-tabs tab_contents-with-value=\"'
@@ -247,7 +249,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     '&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;'
                     'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/'
                     'oppia-noninteractive-image&amp;gt;&amp;quot;}]\">'
-                    '</oppia-noninteractive-tabs>'))
+                    '</oppia-noninteractive-tabs>')).to_dict()
                 }
             )
         ]
@@ -263,7 +265,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'en': state_domain.WrittenTranslation(
                             'html', '', False)
                     }
-                }),
+                }).to_dict(),
                 'new_value': state_domain.WrittenTranslations({
                     'content': {
                         'en': state_domain.WrittenTranslation(
@@ -277,7 +279,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                             True
                         )
                     }
-                })
+                }).to_dict()
             })
         ]
 

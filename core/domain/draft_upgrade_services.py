@@ -340,49 +340,93 @@ class DraftUpgradeUtil:
                     exp_change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
                 ):
-                    answer_groups = exp_change.new_value
-                    for answer_group in answer_groups:
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditExpStateProperty
+                    # InteractionAnswerGroupsCmd.
+                    edit_interaction_answer_groups_cmd = cast(
+                        exp_domain.
+                        EditExpStatePropertyInteractionAnswerGroupsCmd,
+                        exp_change
+                    )
+                    answer_group_dicts = (
+                        edit_interaction_answer_groups_cmd.new_value
+                    )
+                    for answer_group in answer_group_dicts:
                         if (
-                            answer_group.tagged_skill_misconception_id
+                            answer_group['tagged_skill_misconception_id']
                             is not None
                         ):
-                            answer_group.tagged_skill_misconception_id = None
-                        if len(answer_group.rule_specs) == 0:
-                            answer_groups.remove(answer_group)
+                            answer_group['tagged_skill_misconception_id'] = None
+                        if len(answer_group['rule_specs']) == 0:
+                            answer_group_dicts.remove(answer_group)
                         if (
-                            answer_group.outcome.labelled_as_correct and
-                            answer_group.outcome.dest == exp_change.state_name
+                            answer_group['outcome']['labelled_as_correct'] and
+                            answer_group['outcome'][
+                                'dest'] == exp_change.state_name
                         ):
-                            answer_group.outcome.labelled_as_correct = False
+                            answer_group['outcome'][
+                                'labelled_as_correct'] = False
                         if (
-                            answer_group.outcome.refresher_exploration_id
+                            answer_group['outcome']['refresher_exploration_id']
                             is not None
                         ):
-                            answer_group.outcome.refresher_exploration_id = None
+                            answer_group['outcome'][
+                                'refresher_exploration_id'] = None
                 elif exp_change.property_name == (
                     exp_domain.STATE_PROPERTY_CONTENT
                 ):
-                    exp_change.new_value.html = (
-                        exp_domain.Exploration.fix_rte_tags(
-                        exp_change.new_value.html))
-                    exp_change.new_value.html = (
-                        exp_domain.Exploration.fix_tabs_and_collapsible_tags(
-                        exp_change.new_value.html))
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditExpStatePropertyContentCmd.
+                    edit_contents_cmd = cast(
+                        exp_domain.EditExpStatePropertyContentCmd,
+                        exp_change
+                    )
+                    html = edit_contents_cmd.new_value['html']
+                    html = exp_domain.Exploration.fix_rte_tags(html)
+                    html = exp_domain.Exploration.fix_tabs_and_collapsible_tags(
+                        html)
+                    edit_contents_cmd.new_value['html'] = html
                 elif exp_change.property_name == (
                     exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
                 ):
-                    written_translations = exp_change.new_value
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditExpStatePropertyWritten
+                    # TranslationsCmd.
+                    edit_interaction_written_translations_cmd = cast(
+                        exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
+                        exp_change
+                    )
+                    written_translations = (
+                        edit_interaction_written_translations_cmd.new_value)
                     for translations in (
-                        written_translations.translations_mapping.values()
+                        written_translations['translations_mapping'].values()
                     ):
                         for written_translation in translations.values():
-                            written_translation.translation = (
-                                exp_domain.Exploration.fix_rte_tags(
-                                written_translation.translation))
-                            written_translation.translation = (
-                                exp_domain.Exploration.
-                                fix_tabs_and_collapsible_tags(
-                                    written_translation.translation))
+                            if isinstance(
+                                written_translation['translation'], List):
+                                translated_element_list = []
+                                for element in written_translation[
+                                    'translation']:
+                                    element = (
+                                        exp_domain.Exploration.fix_rte_tags(
+                                            element))
+                                    element = (
+                                        exp_domain.Exploration.
+                                        fix_tabs_and_collapsible_tags(element))
+                                    translated_element_list.append(element)
+                                written_translation['translation'] = (
+                                    translated_element_list)
+                            else:
+                                fixed_translation = (
+                                    exp_domain.Exploration.fix_rte_tags(
+                                    written_translation['translation']))
+                                fixed_translation = (
+                                    exp_domain.Exploration.
+                                    fix_tabs_and_collapsible_tags(
+                                        fixed_translation)
+                                )
+                                written_translation['translation'] = (
+                                    fixed_translation)
         return draft_change_list
 
     @classmethod

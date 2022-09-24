@@ -3067,7 +3067,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _remove_unwanted_content_ids_from_translations_and_voiceovers(
-        cls, state_dict: state_domain.StateDict):
+        cls, state_dict: state_domain.StateDict) -> None:
         """Helper function to remove the content IDs from the translations
         and voiceovers which are deleted from the state
 
@@ -3164,6 +3164,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
@@ -3280,7 +3281,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         else:
             for idx, empty_choice in enumerate(empty_choices):
                 empty_choice['html'] = (
-                    '<p>' + 'Choice ' + str(idx+1) + '</p>'
+                    '<p>' + 'Choice ' + str(idx + 1) + '</p>'
                 )
 
         # Duplicate choices.
@@ -3327,8 +3328,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _set_lower_and_upper_bounds(
         cls,
         range_var: RangeVariableDict,
-        lower_bound: float,
-        upper_bound: float,
+        lower_bound: Union[float, None],
+        upper_bound: Union[float, None],
         lb_inclusive: bool,
         ub_inclusive: bool
     ) -> None:
@@ -3341,8 +3342,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             range_var: dict[str, Any]. To keep track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
-            lower_bound: float. The lower bound.
-            upper_bound: float. The upper bound.
+            lower_bound: Union[float, None]. The lower bound.
+            upper_bound: Union[float, None]. The upper bound.
             lb_inclusive: bool. If lower bound is inclusive.
             ub_inclusive: bool. If upper bound is inclusive.
         """
@@ -3448,9 +3449,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             rule_value_f: float. The value of the rule spec.
         """
         rule_value_f = rule_spec['inputs']['f']
-        rule_value_f = float(
+        rule_value_f = (
             rule_value_f['wholeNumber'] +
-            rule_value_f['numerator']/rule_value_f['denominator']
+            float(rule_value_f['numerator']) / rule_value_f['denominator']
         )
 
         return rule_value_f
@@ -3519,8 +3520,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         empty_ans_groups = []
         for rule_to_remove in rules_to_remove_with_try_again_dest_node:
             for answer_group in reversed(answer_groups):
-                for rule_spec in reversed(answer_group['rule_specs']
-                ):
+                for rule_spec in reversed(answer_group['rule_specs']):
                     if (
                         rule_spec == rule_to_remove and
                         answer_group['outcome']['dest'] == state_name
@@ -3648,7 +3648,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for rule_spec_index, rule_spec in enumerate(
                 answer_group['rule_specs']
             ):
-                range_var = {
+                range_var: RangeVariableDict = {
                     'ans_group_index': int(ans_group_index),
                     'rule_spec_index': int(rule_spec_index),
                     'lower_bound': None,
@@ -3798,7 +3798,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for rule_spec_index, rule_spec in enumerate(
                 answer_group['rule_specs']
             ):
-                range_var = {
+                range_var: RangeVariableDict = {
                     'ans_group_index': int(ans_group_index),
                     'rule_spec_index': int(rule_spec_index),
                     'lower_bound': None,
@@ -3806,7 +3806,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'lb_inclusive': False,
                     'ub_inclusive': False
                 }
-                matched_denominator = {
+                matched_denominator: MatchedDenominatorDict = {
                     'ans_group_index': int(ans_group_index),
                     'rule_spec_index': int(rule_spec_index),
                     'denominator': 0
@@ -3816,17 +3816,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'IsEquivalentTo', 'IsExactlyEqualTo',
                     'IsEquivalentToAndInSimplestForm'
                 ):
-                    rule_value_f = cls._get_rule_value_of_fraction_interaction(
-                        rule_spec)
+                    rule_value_f: float = (
+                        cls._get_rule_value_of_fraction_interaction(rule_spec))
                     cls._set_lower_and_upper_bounds(
                         range_var, rule_value_f,
                         rule_value_f, True, True
                     )
 
                 if rule_spec['rule_type'] == 'IsGreaterThan':
-                    rule_value_f = (
-                        cls._get_rule_value_of_fraction_interaction(rule_spec)
-                    )
+                    rule_value_f: float = (
+                        cls._get_rule_value_of_fraction_interaction(rule_spec))
 
                     cls._set_lower_and_upper_bounds(
                         range_var, rule_value_f,
@@ -3834,9 +3833,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     )
 
                 if rule_spec['rule_type'] == 'IsLessThan':
-                    rule_value_f = (
-                        cls._get_rule_value_of_fraction_interaction(rule_spec)
-                    )
+                    rule_value_f: float = (
+                        cls._get_rule_value_of_fraction_interaction(rule_spec))
 
                     cls._set_lower_and_upper_bounds(
                         range_var, lower_infinity,
@@ -3914,7 +3912,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         selected_equals_choices = []
         empty_ans_groups = []
-        answer_groups = state_dict['interaction']['answer_groups']
+        answer_groups= state_dict['interaction']['answer_groups']
         # Removal of duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -3943,7 +3941,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             answer_groups.remove(empty_ans_group)
 
         # Answer choices should be non-empty and unique.
-        choices = (
+        choices: List[state_domain.SubtitledHtmlDict] = (
             state_dict['interaction']['customization_args'][
                 'choices']['value']
         )
@@ -3985,11 +3983,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args']
             ['maxAllowableSelectionCount']['value']
         )
-        choices = (
+        choices: List[state_domain.SubtitledHtmlDict] = (
             state_dict['interaction']['customization_args'][
                 'choices']['value']
         )
-        answer_groups = state_dict['interaction']['answer_groups']
+        answer_groups= state_dict['interaction']['answer_groups']
 
         # Rules should not be duplicate.
         cls._remove_duplicate_rules_inside_answer_groups(
@@ -4327,7 +4325,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if state_dict['interaction']['id'] == 'Continue':
                 cls._fix_continue_interaction(state_dict, language_code)
             elif state_dict['interaction']['id'] == 'EndExploration':
-                cls._fix_end_interaction
+                cls._fix_end_interaction(state_dict)
             elif state_dict['interaction']['id'] == 'NumericInput':
                 cls._fix_numeric_input_interaction(state_dict, state_name)
             elif state_dict['interaction']['id'] == 'FractionInput':
@@ -4523,6 +4521,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             html: str. The RTE tags.
+
+        Returns:
+            str. Returns the updated html value.
         """
         soup = bs4.BeautifulSoup(html, 'html.parser')
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
@@ -4597,24 +4598,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state in states_dict.values():
             # Fix tags for state content.
-            html = state['content']['html']
+            html: str = state['content']['html']
             html = cls.fix_rte_tags(html)
             html = cls.fix_tabs_and_collapsible_tags(html)
             state['content']['html'] = html
             # Fix tags for written translations.
-            written_translations = state['written_translations'][
-                'translations_mapping']
-            for language_code_to_written_translation in (
-                written_translations.values()):
-                for translation in (
-                    language_code_to_written_translation.values()):
-                    fixed_translation = cls.fix_rte_tags(
-                        translation['translation'])
-                    fixed_translation = (
-                        cls.fix_tabs_and_collapsible_tags(
-                            fixed_translation)
-                    )
-                    translation['translation'] = fixed_translation
+            written_translations = (
+                state['written_translations']['translations_mapping'])
+            for translation_item in written_translations.values():
+                for translation in translation_item.values():
+                    if isinstance(translation['translation'], List):
+                        translated_element_list = []
+                        for element in translation['translation']:
+                            element = cls.fix_rte_tags(element)
+                            element = cls.fix_tabs_and_collapsible_tags(element)
+                            translated_element_list.append(element)
+                        translation['translation'] = translated_element_list
+                    else:
+                        fixed_translation = cls.fix_rte_tags(
+                            translation['translation'])
+                        fixed_translation = (
+                            cls.fix_tabs_and_collapsible_tags(
+                                fixed_translation)
+                        )
+                        translation['translation'] = fixed_translation
         return states_dict
 
     @classmethod
