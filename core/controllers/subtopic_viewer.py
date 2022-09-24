@@ -26,6 +26,26 @@ from core.domain import topic_fetchers
 class SubtopicViewerPage(base.BaseHandler):
     """Renders the subtopic viewer page."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'subtopic_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, *args):
         """Handles GET requests."""
