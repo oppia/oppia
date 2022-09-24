@@ -104,9 +104,10 @@ class ModelProperty:
         """
         return self._property_name
 
-    # This method yields the values of properties of a model and that values
-    # can be of type string, list, integer and other types too. So, that's
-    # why Iterator[Any] type is used as a yield value of function.
+    # Here we use type Any because this method yields the values of properties
+    # of a model and that values can be of type string, list, integer and other
+    # types too. So, that's why Iterator[Any] type is used as a yield type of
+    # function.
     def yield_value_from_model(
         self, model: base_models.BaseModel
     ) -> Iterator[Any]:
@@ -211,7 +212,7 @@ class ModelProperty:
     def __repr__(self) -> str:
         return 'ModelProperty(%s, %s)' % (self._model_kind, self)
 
-    # NOTE: Needs to return Any because the function could also return
+    # NOTE: Here we use type Any because the function could also return
     # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
@@ -220,7 +221,7 @@ class ModelProperty:
                 other._model_kind, other._property_name) # pylint: disable=protected-access
             if self.__class__ is other.__class__ else NotImplemented)
 
-    # NOTE: Needs to return Any because the function could also return
+    # NOTE: Here we use type Any because the function could also return
     # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __ne__(self, other: Any) -> Any:
