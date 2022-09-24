@@ -1927,31 +1927,6 @@ class Voiceover:
                 self.duration_secs)
 
 
-def unescape_html(escaped_html_data: str) -> str:
-    """This function unescapes an escaped HTML string.
-
-    Args:
-        escaped_html_data: str. Escaped HTML string to be unescaped.
-
-    Returns:
-        str. Unescaped HTML string.
-    """
-    # Replace list to unescape html strings.
-    replace_list_for_unescaping = [
-        ('&quot;', '"'),
-        ('&#39;', '\''),
-        ('&lt;', '<'),
-        ('&gt;', '>'),
-        ('&amp;', '&')
-    ]
-    unescaped_html_data = escaped_html_data
-    for replace_tuple in replace_list_for_unescaping:
-        unescaped_html_data = unescaped_html_data.replace(
-            replace_tuple[0], replace_tuple[1])
-
-    return unescaped_html_data
-
-
 def validate_rte_tags(
     html: str, is_tags_nested_inside_tabs_or_collapsible: bool = False
 ) -> None:
@@ -2121,7 +2096,7 @@ def validate_rte_tags(
                 'Math tag does not have \'math_content-with-value\' '
                 'attribute.'
             )
-        math_content_json = unescape_html(
+        math_content_json = utils.unescape_html(
             tag['math_content-with-value'])
         math_content_list = json.loads(math_content_json)
         if 'raw_latex' not in math_content_list:
@@ -2190,7 +2165,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
     tabs_tags = soup.find_all('oppia-noninteractive-tabs')
     for tag in tabs_tags:
         if tag.has_attr('tab_contents-with-value'):
-            tab_content_json = unescape_html(
+            tab_content_json = utils.unescape_html(
                 tag['tab_contents-with-value'])
 
             tab_content_list = json.loads(tab_content_json)
@@ -2214,7 +2189,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
     for tag in collapsibles_tags:
         if tag.has_attr('content-with-value'):
             collapsible_content_json = (
-                unescape_html(
+                utils.unescape_html(
                 tag['content-with-value'])
             )
             collapsible_content_list = json.loads(
@@ -2236,7 +2211,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
 
         if tag.has_attr('heading-with-value'):
             collapsible_heading_json = (
-                unescape_html(
+                utils.unescape_html(
                 tag['heading-with-value'])
             )
             collapsible_heading_list = json.loads(
