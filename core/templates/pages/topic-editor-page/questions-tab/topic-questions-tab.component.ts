@@ -16,10 +16,10 @@
  * @fileoverview Component for the questions tab.
  */
 
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { Topic } from 'domain/topic/TopicObjectFactory';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { CategorizedSkills, TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { Subscription } from 'rxjs';
 import { QuestionsListService } from 'services/questions-list.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -34,22 +34,22 @@ import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
   templateUrl: './topic-questions-tab.component.html'
 })
 export class TopicQuestionsTabComponent implements OnInit,
- AfterViewInit {
-  question: Question;
-  skillId: string;
-  topic: Topic;
-  topicRights: TopicRights;
-  groupedSkillSummaries: object;
-  skillIdToRubricsObject: object;
-  allSkillSummaries: object[];
-  canEditQuestion: boolean;
-  misconceptions: Misconception[];
-  questionIsBeingUpdated: boolean;
-  questionIsBeingSaved: boolean;
+ AfterViewInit, OnDestroy {
+  question!: Question;
+  skillId!: string;
+  topic!: Topic;
+  topicRights!: TopicRights;
+  groupedSkillSummaries!: object;
+  skillIdToRubricsObject!: object;
+  allSkillSummaries!: object[];
+  canEditQuestion!: boolean;
+  misconceptions!: Misconception[];
   emptyMisconceptionsList;
-  selectedSkillId: string;
-  getSkillsCategorizedByTopics;
-  getUntriagedSkillSummaries: SkillSummary[];
+  selectedSkillId!: string;
+  getSkillsCategorizedByTopics!: CategorizedSkills;
+  getUntriagedSkillSummaries!: SkillSummary[];
+  questionIsBeingUpdated = false;
+  questionIsBeingSaved = false;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -107,7 +107,6 @@ export class TopicQuestionsTabComponent implements OnInit,
     // To-set autofocus when user navigates to editor using
     // question-editor-tab.
     this.focusManagerService.setFocus('selectSkillField');
-    this.selectedSkillId = null;
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(
         () => this._initTab()
