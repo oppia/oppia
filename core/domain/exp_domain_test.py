@@ -1724,6 +1724,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
+        # Interaction validations
+        new_exploration = exp_domain.Exploration.create_default_exploration(
+            'test_id')
+        self.set_interaction_for_state(
+            new_exploration.states['Introduction'], 'Continue')
+        state = new_exploration.states['Introduction']
+        state.answer_gruops.append(state_answer_group)
+        state.customization_args['buttonText'].value.unicode_str = (
+            'Continueeeeeeeeeeeeeeeeeeeeeee')
+        new_exploration.validate()
+
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')

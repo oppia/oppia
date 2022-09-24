@@ -949,8 +949,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             - Text value is empty or is more than 20 characters
             - Answer group is present
         """
-        print("*************************************")
-        print(self.customization_args)
         text_value = self.customization_args['buttonText'].value.unicode_str
         if len(text_value) > 20:
             raise utils.ValidationError(
