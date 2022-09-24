@@ -181,7 +181,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'x': {
                             'contentId': 'rule_input_Equals',
                             'normalizedStrSet': ['Test']
-                            }
+                        }
                     })
             ],
             [],
@@ -189,8 +189,14 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         )
         ans_group_2 = state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state_name', None, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None, None),
+                'state_name',
+                None,
+                state_domain.SubtitledHtml('feedback_1', '<p>Feedback</p>'),
+                False,
+                [],
+                None,
+                None
+            ),
             [],
             [],
             None
@@ -209,26 +215,25 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         ]
 
         draft_change_list_v52_2 = [
-            exp_domain.ExplorationChange(
-                {'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'New state',
-                'old_value': state_domain.SubtitledHtml(
-                    'content', ''),
+                'old_value': state_domain.SubtitledHtml('content', ''),
                 'new_value': state_domain.SubtitledHtml(
                     'content',
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&quot;abc.png&quot;" caption-with-value="&quot;'
-                    '&quot;"></oppia-noninteractive-image>')}
-            )
+                    '&quot;"></oppia-noninteractive-image>'
+                )
+            })
         ]
         draft_change_list_v52_3 = [
-            exp_domain.ExplorationChange(
-                {'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'New state',
-                'old_value': state_domain.SubtitledHtml(
-                    'content', ''),
+                'old_value': state_domain.SubtitledHtml('content', ''),
                 'new_value': state_domain.SubtitledHtml(
                     'content', (
                     '<oppia-noninteractive-tabs tab_contents-with-value=\"'
@@ -248,34 +253,32 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         ]
 
         draft_change_list_v52_4 = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
-                    'state_name': 'New state',
-                    'old_value': state_domain.WrittenTranslations({
-                        'content': {
-                            'en': state_domain.WrittenTranslation(
-                                'html', '', False)
-                        }
-                    }),
-                    'new_value': state_domain.WrittenTranslations({
-                        'content': {
-                            'en': state_domain.WrittenTranslation(
-                                'html',
-                                (
-                                    '<oppia-noninteractive-image '
-                                    'filepath-with-value="&quot;abc.png&quot;" '
-                                    'caption-with-value="&quot;&quot;">'
-                                    '</oppia-noninteractive-image>'
-                                ),
-                                True
-                            )
-                        }
-                    })
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
+                'state_name': 'New state',
+                'old_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html', '', False)
+                    }
+                }),
+                'new_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html',
+                            (
+                                '<oppia-noninteractive-image '
+                                'filepath-with-value="&quot;abc.png&quot;" '
+                                'caption-with-value="&quot;&quot;">'
+                                '</oppia-noninteractive-image>'
+                            ),
+                            True
+                        )
+                    }
+                })
+            })
         ]
 
         self.create_and_migrate_new_exploration('52', '53')

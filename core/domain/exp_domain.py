@@ -1260,7 +1260,7 @@ class SerializableExplorationDict(ExplorationDict):
     last_updated: str
 
 
-class RangeVariable(TypedDict):
+class RangeVariableDict(TypedDict):
     """Dictionary representing the range variable for the NumericInput
     interaction
     """
@@ -1273,7 +1273,7 @@ class RangeVariable(TypedDict):
     ub_inclusive: bool
 
 
-class MatchedDenominator(TypedDict):
+class MatchedDenominatorDict(TypedDict):
     """Dictionary representing the matched denominator variable for the
     FractionInput interaction
     """
@@ -3180,7 +3180,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 52 to 53. Version 53 fixes all the backend
         validation checks for explorations errored data which are
-        categorized as -
+        categorized as:
             - Exploration states
             - Exploration interaction
             - Exploration RTE
@@ -3214,7 +3214,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
         """Handles errored data for the general exploration state, performs the
-        following -
+        following:
             - If destination is `try again` and the value of labelled_as_correct
             is True, replaces it with False
 
@@ -3242,12 +3242,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # ########################################################.
     @classmethod
     def _choices_should_be_unique_and_non_empty(
-        cls, choices: List[state_domain.SubtitledHtmlDict],
+        cls,
+        choices: List[state_domain.SubtitledHtmlDict],
         answer_groups: List[state_domain.AnswerGroupDict],
         is_item_selection_interaction: bool=False
     ) -> None:
         """Handles choices present in the ItemSelectionInput or
-        in MultipleChoiceInput interactions, implements the following -
+        in MultipleChoiceInput interactions, implements the following:
             - If only one choice is empty then simply removes it
             - If multiple choices are empty replace them with `Choice 1` ,
             `Choice 2` etc
@@ -3325,7 +3326,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _set_lower_and_upper_bounds(
         cls,
-        range_var: RangeVariable,
+        range_var: RangeVariableDict,
         lower_bound: float,
         upper_bound: float,
         lb_inclusive: bool,
@@ -3351,17 +3352,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
         range_var['ub_inclusive'] = ub_inclusive
 
     @classmethod
-    def _is_enclosed_by(cls, range_compare_for, range_compare_with) -> bool:
+    def _is_enclosed_by(
+        cls,
+        range_compare_for: RangeVariableDict,
+        range_compare_with: RangeVariableDict
+    ) -> bool:
         """Helper function for NumericInput and FractionInput interaction,
         Checks whether the ranges of rules enclosed or not
 
         Args:
-            range_compare_for: dict[str, Any]. It represents the variable for
+            range_compare_for: RangeVariableDict. It represents the variable for
                 which we have to check the range. It keeps track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
-            range_compare_with: dict[str, Any]. It is the variable to which the
-                range is compared. It keeps track of other rule's
+            range_compare_with: RangeVariableDict. It is the variable to which
+                the range is compared. It keeps track of other rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
 
@@ -3403,7 +3408,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return is_enclosed
 
     @classmethod
-    def _should_check_range_criteria(cls, earlier_rule, later_rule) -> bool:
+    def _should_check_range_criteria(
+        cls,
+        earlier_rule: state_domain.RuleSpecDict,
+        later_rule: state_domain.RuleSpecDict
+    ) -> bool:
         """Helper function for FractionInput interaction,
         Checks the range criteria between two rules by comparing their
         rule type
@@ -3439,14 +3448,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             rule_value_f: float. The value of the rule spec.
         """
         rule_value_f = rule_spec['inputs']['f']
-        if rule_value_f['wholeNumber'] == 0:
-            rule_value_f = float(rule_value_f['numerator']/rule_value_f[
-                'denominator'])
-        else:
-            rule_value_f = float(
-                rule_value_f['wholeNumber'] +
-                rule_value_f['numerator']/rule_value_f['denominator']
-            )
+        rule_value_f = float(
+            rule_value_f['wholeNumber'] +
+            rule_value_f['numerator']/rule_value_f['denominator']
+        )
 
         return rule_value_f
 
@@ -3514,7 +3519,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         empty_ans_groups = []
         for rule_to_remove in rules_to_remove_with_try_again_dest_node:
             for answer_group in reversed(answer_groups):
-                for rule_spec in reversed(answer_group['rule_specs']):
+                for rule_spec in reversed(answer_group['rule_specs']
+                ):
                     if (
                         rule_spec == rule_to_remove and
                         answer_group['outcome']['dest'] == state_name
@@ -3548,7 +3554,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_continue_interaction(
-        cls, state_dict: state_domain.StateDict, language_code: str
+        cls, state_dict: state_domain.StateDict,
+        language_code: str
     ) -> None:
         """Fixes Continue interaction where the length of the text value
         is more than 20. We simply replace them with the word `Continue`
@@ -3561,75 +3568,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Text should have a max-length of 20.
         text_value = state_dict['interaction'][
             'customization_args']['buttonText']['value']['unicode_str']
+        lang_code_to_unicode_str_dict = {
+            'en': 'Continue',
+            'es': 'Continuar',
+            'nl': 'Doorgaan',
+            'ru': 'Продолжить',
+            'fr': 'Continuer',
+            'ca': 'Continua',
+            'hu': 'Folytatás',
+            'zh': '继续',
+            'it': 'Continua',
+            'fi': 'Jatka',
+            'pt': 'Continuar',
+            'de': 'Fortfahren',
+            'ar': 'استمرار',
+            'tr': 'İlerle'
+        }
         if len(text_value) > 20:
-            if language_code == 'en':
+            if language_code in lang_code_to_unicode_str_dict:
                 state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continue'
-
-            elif language_code == 'es':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continuar'
-
-            elif language_code == 'nl':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Doorgaan'
-
-            elif language_code == 'ru':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Продолжить'
-
-            elif language_code == 'sr':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continue'
-
-            elif language_code == 'bg':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continue'
-
-            elif language_code == 'fr':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continuer'
-
-            elif language_code == 'ca':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continua'
-
-            elif language_code == 'hu':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Folytatás'
-
-            elif language_code == 'zh':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = '继续'
-
-            elif language_code == 'it':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continua'
-
-            elif language_code == 'fi':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Jatka'
-
-            elif language_code == 'pt':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continuar'
-
-            elif language_code == 'de':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Fortfahren'
-
-            elif language_code == 'ar':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'استمرار'
-
-            elif language_code == 'cs':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continue'
-
-            elif language_code == 'tr':
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'İlerle'
-
+                    'buttonText']['value']['unicode_str'] = (
+                        lang_code_to_unicode_str_dict['language_code'])
             else:
                 state_dict['interaction']['customization_args'][
                     'buttonText']['value']['unicode_str'] = 'Continue'
@@ -3638,7 +3597,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_end_interaction(cls, state_dict: state_domain.StateDict) -> None:
         """Fixes the End exploration interaction where the recommended
         explorations are more than 3. We simply slice them till the
-        length 3.
+        length 3
 
         Args:
             state_dict: state_domain.StateDict. The state dictionary.
@@ -3654,9 +3613,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_numeric_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
-    ) -> None:
-        """Fixes NumericInput interaction for the following cases -
+        cls, state_dict: state_domain.StateDict, state_name: str) -> None:
+        """Fixes NumericInput interaction for the following cases:
         - The rules should not be duplicate else the one with not pointing to
         different state will be deleted
         - The rule should not match previous rules solution means it should
@@ -3680,7 +3638,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
         invalid_rules = []
-        ranges: List[RangeVariable] = []
+        ranges: List[RangeVariableDict] = []
         # Remove duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -3688,7 +3646,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # previous rules' solutions.
         for ans_group_index, answer_group in enumerate(answer_groups):
             for rule_spec_index, rule_spec in enumerate(
-                answer_group['rule_specs']):
+                answer_group['rule_specs']
+            ):
                 range_var = {
                     'ans_group_index': int(ans_group_index),
                     'rule_spec_index': int(rule_spec_index),
@@ -3807,7 +3766,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_fraction_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
+        cls,
+        state_dict: state_domain.StateDict,
+        state_name: str
     ) -> None:
         """Fixes FractionInput interaction where rule should not match previous
         rules solution means it should not be in the range of previous rules
@@ -3827,15 +3788,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
         answer_groups = state_dict['interaction']['answer_groups']
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
-        ranges = []
+        ranges: List[RangeVariableDict] = []
         invalid_rules = []
-        matched_denominator_list = []
+        matched_denominator_list: List[MatchedDenominatorDict] = []
         # Remove duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         for ans_group_index, answer_group in enumerate(answer_groups):
             for rule_spec_index, rule_spec in enumerate(
-                answer_group['rule_specs']):
+                answer_group['rule_specs']
+            ):
                 range_var = {
                     'ans_group_index': int(ans_group_index),
                     'rule_spec_index': int(rule_spec_index),
@@ -3933,9 +3895,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_multiple_choice_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
+        cls,
+        state_dict: state_domain.StateDict,
+        state_name: str
     ) -> None:
-        """Fixes MultipleChoiceInput interaction for the following cases -
+        """Fixes MultipleChoiceInput interaction for the following cases:
         - The rules should not be duplicate else the one with not pointing to
         different state will be deleted
         - No answer choice should appear in more than one rule else the
@@ -3992,9 +3956,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_item_selection_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
+        cls,
+        state_dict: state_domain.StateDict,
+        state_name: str
     ) -> None:
-        """Fixes ItemSelectionInput interaction for the following cases -
+        """Fixes ItemSelectionInput interaction for the following cases:
         - The rules should not be duplicate else the one with not pointing to
         different state will be deleted
         - `Equals` rule should have value between min and max number
@@ -4085,9 +4051,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_drag_and_drop_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
+        cls,
+        state_dict: state_domain.StateDict,
+        state_name: str
     ) -> None:
-        """Fixes the DragAndDropInput interaction with following checks -
+        """Fixes the DragAndDropInput interaction with following checks:
         - The rules should not be duplicate else the one with not pointing to
         different state will be deleted
         - Multiple items cannot be in the same place iff the setting is
@@ -4222,9 +4190,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_text_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
+        cls,
+        state_dict: state_domain.StateDict,
+        state_name: str
     ) -> None:
-        """Fixes the TextInput interaction with following checks -
+        """Fixes the TextInput interaction with following checks:
         - The rules should not be duplicate else the one with not pointing to
         different state will be deleted
         - Text input height shoule be >= 1 and <= 10 else we will replace with
@@ -4337,7 +4307,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _update_state_interaction(
-        cls, states_dict: Dict[str, state_domain.StateDict],
+        cls,
+        states_dict: Dict[str, state_domain.StateDict],
         language_code: str
     ) -> Dict[str, state_domain.StateDict]:
         """Handles all the invalid general state interactions
@@ -4388,7 +4359,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, html: str,
         is_tags_nested_inside_tabs_or_collapsible: bool=False
     ):
-        """Handles all the invalid RTE tags, performs the following
+        """Handles all the invalid RTE tags, performs the following:
             - `oppia-noninteractive-image`
                 - If `alt-with-value` attribute not in the image tag,
                 introduces the attribute and assign empty value
@@ -4540,7 +4511,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def fix_tabs_and_collapsible_tags(cls, html: str):
-        """Fixes all tabs and collapsible tags, performs the following -
+        """Fixes all tabs and collapsible tags, performs the following:
         - `oppia-noninteractive-tabs`
             - If no `tab_contents-with-value` attribute, tag will be removed
             - If `tab_contents-with-value` is empty then the tag will be removed
@@ -4570,7 +4541,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         is_tags_nested_inside_tabs_or_collapsible=True
                     )
                 tab_content_json = json.dumps(tab_content_list)
-                tag['tab_contents-with-value'] = utils.escape_html(tab_content_json)
+                tag['tab_contents-with-value'] = utils.escape_html(
+                    tab_content_json)
             else:
                 tag.decompose()
 
@@ -4610,7 +4582,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _update_state_rte(
-        cls, states_dict: Dict[str, state_domain.StateDict]
+        cls,
+        states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
         """Update the state RTE content and translations
 
@@ -4623,7 +4596,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
         for state in states_dict.values():
-            # Fix tags for state content.
             # Fix tags for state content.
             html = state['content']['html']
             html = cls.fix_rte_tags(html)
@@ -4681,12 +4653,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 versioned_exploration_states['states'], init_state_name)
         elif current_states_schema_version == 52:
             versioned_exploration_states['states'] = conversion_fn(
-                versioned_exploration_states['states'], language_code
-            )
+                versioned_exploration_states['states'], language_code)
         else:
             versioned_exploration_states['states'] = conversion_fn(
-                versioned_exploration_states['states']
-            )
+                versioned_exploration_states['states'])
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
