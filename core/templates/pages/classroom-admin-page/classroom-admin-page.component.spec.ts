@@ -262,7 +262,7 @@ describe('Classroom Admin Page component ', () => {
       component.updateClassroomField();
 
       expect(component.classroomDataIsChanged).toBeFalse();
-    })
+    });
 
   it('should be able to update the classroom url fragment', () => {
     let response = {

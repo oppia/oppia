@@ -37,7 +37,7 @@ export class CreateNewClassroomModalComponent
   }
 
   existingClassroomNames: string[] = [];
-  newClassroom: ClassroomData;
+  newClassroom!: ClassroomData;
 
   classroomUrlFragmentIsDuplicate: boolean = false;
   newClassroomCreationInProgress: boolean = false;

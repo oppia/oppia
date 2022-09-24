@@ -144,4 +144,4 @@ describe('Classroom admin model', () => {
       expect(classroomData.classroomUrlFragmentIsTooLong).toBeFalse();
       expect(classroomData.classroomUrlFragmentIsEmpty).toBeFalse();
     });
-})
+});

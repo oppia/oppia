@@ -45,12 +45,12 @@ export class ClassroomData {
   classroomUrlFragmentIsValid!: boolean;
 
   constructor(
-    classroomId: string,
-    name: string,
-    urlFragment: string,
-    courseDetails: string,
-    topicListIntro: string,
-    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+      classroomId: string,
+      name: string,
+      urlFragment: string,
+      courseDetails: string,
+      topicListIntro: string,
+      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ) {
     this.classroomId = classroomId;
     this.name = name;
@@ -61,18 +61,18 @@ export class ClassroomData {
   }
 
   supressClassroomNameErrorMessages(): void {
-  this.classroomNameIsTooLong = false;
-  this.emptyClassroomName = false;
-  this.duplicateClassroomName = false;
+    this.classroomNameIsTooLong = false;
+    this.emptyClassroomName = false;
+    this.duplicateClassroomName = false;
   }
 
-  supressClassroomUrlFragmentErrorMessages() {
+  supressClassroomUrlFragmentErrorMessages(): void {
     this.classroomUrlFragmentIsTooLong = false;
     this.classroomUrlFragmentIsEmpty = false;
     this.urlFragmentRegexMatched = true;
   }
 
-  setExistingClassroomData(existingClassroomNames): void {
+  setExistingClassroomData(existingClassroomNames: string[]): void {
     this.existingClassroomNames = existingClassroomNames;
   }
 
@@ -127,7 +127,9 @@ export class ClassroomData {
     }
   }
 
-  static createNewClassroomFromDict(classroomDict: ClassroomDict): ClassroomData {
+  static createNewClassroomFromDict(
+      classroomDict: ClassroomDict
+  ): ClassroomData {
     return new ClassroomData(
       classroomDict.classroomId,
       classroomDict.name,
@@ -135,7 +137,7 @@ export class ClassroomData {
       classroomDict.courseDetails,
       classroomDict.topicListIntro,
       classroomDict.topicIdToPrerequisiteTopicIds
-    )
+    );
   }
 
   getClassroomDict(): ClassroomDict {
@@ -146,8 +148,7 @@ export class ClassroomData {
       courseDetails: this.courseDetails,
       topicListIntro: this.topicListIntro,
       topicIdToPrerequisiteTopicIds: this.topicIdToPrerequisiteTopicIds
-    }
+    };
     return classroomDict;
   }
 }
-
