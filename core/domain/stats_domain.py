@@ -32,12 +32,15 @@ from core.domain import exp_domain
 from typing import Any, Dict, List, Optional, Union
 from typing_extensions import Final, Literal, TypedDict
 
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
 
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
+MYPY = False
+if MYPY:  # pragma: no cover
+    from core.domain import state_domain
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
@@ -71,19 +74,11 @@ IssuesCustomizationArgsDictType = Dict[
     str, Dict[str, Union[str, int, List[str]]]
 ]
 
-AcceptableAnswerTypes = Union[
-    str,
-    List[str],
-    List[List[str]],
-    Dict[str, str],
-    None
-]
-
 
 class SubmittedAnswerDict(TypedDict):
     """Dictionary representing the SubmittedAnswer object."""
 
-    answer: AcceptableAnswerTypes
+    answer: state_domain.AcceptableCorrectAnswerTypes
     time_spent_in_sec: float
     answer_group_index: int
     rule_spec_index: int
@@ -185,7 +180,7 @@ class LearnerActionDict(TypedDict):
 class AnswerOccurrenceDict(TypedDict):
     """Dictionary representing the AnswerOccurrence object."""
 
-    answer: AcceptableAnswerTypes
+    answer: state_domain.AcceptableCorrectAnswerTypes
     frequency: int
 
 
@@ -1491,7 +1486,7 @@ class SubmittedAnswer:
 
     def __init__(
         self,
-        answer: AcceptableAnswerTypes,
+        answer: state_domain.AcceptableCorrectAnswerTypes,
         interaction_id: str,
         answer_group_index: int,
         rule_spec_index: int,
@@ -1646,7 +1641,10 @@ class AnswerOccurrence:
     of times.
     """
 
-    def __init__(self, answer: AcceptableAnswerTypes, frequency: int) -> None:
+    def __init__(
+        self, answer: state_domain.AcceptableCorrectAnswerTypes,
+        frequency: int
+    ) -> None:
         """Initialize domain object for answer occurrences."""
         self.answer = answer
         self.frequency = frequency

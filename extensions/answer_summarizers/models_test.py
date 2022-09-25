@@ -28,6 +28,10 @@ from extensions.answer_summarizers import models as answer_models
 
 from typing import Dict, List, Union
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from core.domain import state_domain
+
 
 class BaseCalculationUnitTests(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
@@ -67,7 +71,7 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
 
     def _create_answer_dict(
         self,
-        answer: stats_domain.AcceptableAnswerTypes,
+        answer: state_domain.AcceptableCorrectAnswerTypes,
         time_spent_in_card: float = 3.2,
         session_id: str = 'sid1',
         classify_category: str = exp_domain.EXPLICIT_CLASSIFICATION
@@ -394,7 +398,7 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
-    def test_commonly_submitted_frequencies_are_not_calculated_with_none_answer(
+    def test_commonly_submitted_answers_frequencies_are_not_calculated_with_none_answer(  # pylint: disable=line-too-long
         self
     ) -> None:
         # None answer can only be present when interaction is a linear
@@ -407,6 +411,20 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
             Exception,
             'Answers of linear interactions should not be present while'
             ' calculating the commonly submitted answers\' frequencies.'
+        ):
+            self._perform_calculation(state_answers_dict)
+
+    def test_commonly_submitted_answers_frequencies_are_not_calculated_if_answers_are_not_iterable(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        # Here 123 is not an iterable answer.
+        answer_dicts_list = [self._create_answer_dict(123)]
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'To calculate commonly submitted answers\' frequencies, answers'
+            ' must be provided in iterable form, like: SetOfUnicodeString.'
         ):
             self._perform_calculation(state_answers_dict)
 

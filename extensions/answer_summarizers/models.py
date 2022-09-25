@@ -51,6 +51,10 @@ from core.domain import stats_domain
 from typing import Dict, FrozenSet, Iterable, List, Optional
 from typing_extensions import TypedDict
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from core.domain import state_domain
+
 CLASSIFICATION_CATEGORIES: FrozenSet[str] = frozenset([
     exp_domain.EXPLICIT_CLASSIFICATION,
     exp_domain.TRAINING_DATA_CLASSIFICATION,
@@ -67,7 +71,7 @@ UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES: FrozenSet[str] = frozenset([
 class AnswersWithFrequencyDict(TypedDict):
     """Type for the dictionary representation of answers with frequencies."""
 
-    answer: stats_domain.AcceptableAnswerTypes
+    answer: state_domain.AcceptableCorrectAnswerTypes
     frequency: int
 
 
@@ -81,16 +85,18 @@ class ClassificationResultsDict(TypedDict):
 class AnswersWithClassificationDict(TypedDict):
     """Type for the dictionary representation of answers with classification."""
 
-    answer: stats_domain.AcceptableAnswerTypes
+    answer: state_domain.AcceptableCorrectAnswerTypes
     classification_categorization: str
 
 
 class HashableAnswer:
     """Wraps answer with object that can be placed into sets and dicts."""
 
-    def __init__(self, answer: stats_domain.AcceptableAnswerTypes) -> None:
+    def __init__(
+        self, answer: state_domain.AcceptableCorrectAnswerTypes
+    ) -> None:
         self.answer = answer
-        self.hashable_answer: stats_domain.AcceptableAnswerTypes = (
+        self.hashable_answer: state_domain.AcceptableCorrectAnswerTypes = (
             utils.get_hashable_value(answer)
         )
 
@@ -104,7 +110,7 @@ class HashableAnswer:
 
 
 def _get_top_answers_by_frequency(
-    answers: Iterable[stats_domain.AcceptableAnswerTypes],
+    answers: Iterable[state_domain.AcceptableCorrectAnswerTypes],
     limit: Optional[int] = None
 ) -> stats_domain.AnswerFrequencyList:
     """Computes the number of occurrences of each answer, keeping only the top
@@ -403,6 +409,12 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
                     'Answers of linear interactions should not be present while'
                     ' calculating the commonly submitted answers\' frequencies.'
                 )
+            if not isinstance(answer_dict['answer'], collections.abc.Iterable):
+                raise Exception(
+                    'To calculate commonly submitted answers\' frequencies,'
+                    ' answers must be provided in iterable form, like:'
+                    ' SetOfUnicodeString.'
+                )
             answer_list.append(answer_dict['answer'])
         answer_frequency_list = _get_top_answers_by_frequency(
             itertools.chain.from_iterable(answer_list),
@@ -454,7 +466,7 @@ class TopAnswersByCategorization(BaseCalculation):
             state_answers_dict['submitted_answer_list'],
             operator.itemgetter('classification_categorization'))
         submitted_answers_by_categorization: Dict[
-            str, List[stats_domain.AcceptableAnswerTypes]
+            str, List[state_domain.AcceptableCorrectAnswerTypes]
         ] = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
             if category in CLASSIFICATION_CATEGORIES:

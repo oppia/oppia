@@ -96,7 +96,7 @@ class StateVersionHistoryDict(TypedDict):
 
 
 AcceptableCorrectAnswerTypes = Union[
-    List[List[str]], List[str], str, Dict[str, str], int, List[int], None
+    List[List[str]], List[str], str, Dict[str, str], int, None
 ]
 
 
