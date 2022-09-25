@@ -1738,17 +1738,230 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'most 20 characters.')
 
         # Validate End interaction.
-        self.set_interaction_for_state(
-            new_exploration.states['Introduction'], 'EndExploration')
-        state.interaction.customization_args[
-            'recommendedExplorationIds'].value = ['a', 'b', 'c', 'd']
-        self._assert_validation_error(
-            new_exploration, 'The End interaction should not have more than 3 '
-            'recommended explorations.')
+        # self.set_interaction_for_state(
+        #     new_exploration.states['Introduction'], 'EndExploration')
+        # state.interaction.customization_args[
+        #     'recommendedExplorationIds'].value = ['a', 'b', 'c', 'd']
+        # self._assert_validation_error(
+        #     new_exploration, 'Terminal interactions must not have a '
+        #     'default outcome.')
+        # self._assert_validation_error(
+        #     new_exploration, 'The End interaction should not have more than 3 '
+        #     'recommended explorations.')
 
         # Validate NumericInput interaction.
-        self.set_interaction_for_state(
-            new_exploration.states['Introduction'], 'NumericInput')
+        self.set_interaction_for_state(state, 'NumericInput')
+        test_ans_group_for_numeric_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 7
+                    }
+                },
+                {
+                    'rule_type': 'IsInclusivelyBetween',
+                    'inputs': {
+                        'a': 3,
+                        'b': 5
+                    }
+                },
+                {
+                    'rule_type': 'IsWithinTolerance',
+                    'inputs': {
+                        'x': 1,
+                        'tol': -1
+                    }
+                },
+                {
+                    'rule_type': 'IsInclusivelyBetween',
+                    'inputs': {
+                        'a': 8,
+                        'b': 8
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 7
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = test_ans_group_for_numeric_interaction
+        self._assert_validation_error(
+            new_exploration, 'Rule \'1\' from answer group \'0\' will never '
+            'be matched because it is made redundant by the above rules')
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' having '
+            'rule type \'IsWithinTolerance\' have \'tol\' value less than or '
+            'equal to zero in NumericInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' having rule '
+            'type \'IsInclusivelyBetween\' have `a` value greater than `b` '
+            'value in NumericInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'NumericInput interaction is already present.')
+        rule_specs.remove(rule_specs[1])
+
+        # Validate FractionInput interaction.
+        state = new_exploration.states['Introduction']
+        self.set_interaction_for_state(state, 'FractionInput')
+        test_ans_group_for_numeric_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 3,
+                            'denominator': 0
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 4,
+                            'denominator': 6
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 1,
+                            'numerator': 3,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 3,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 2,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = (
+            test_ans_group_for_numeric_interaction)
+        state.interaction.customization_args[
+            'allowNonzeroIntegerPart'].value = False
+        state.interaction.customization_args[
+            'allowImproperFraction'].value = False
+        state.interaction.customization_args[
+            'requireSimplestForm'].value = True
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'FractionInput interaction is already present.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' has '
+            'denominator less than or equal to zero '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in simple form '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in proper fraction '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in proper fraction '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' has '
+            'non zero integer part in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
 
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""

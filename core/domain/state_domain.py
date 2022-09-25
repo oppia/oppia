@@ -969,24 +969,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Raises:
             ValidationError. Raises a validation error in the following
             condition:
-            - Default outcome is present
-            - Answer group is present
             - Recommended explorations are more than 3
         """
-        # Should not have a default outcome or any answer groups.
-        try:
-            if self.default_outcome is not None:
-                raise utils.ValidationError(
-                    'The End interaction does not require any default outcome.'
-                )
-
-            if len(self.answer_groups) > 0:
-                raise utils.ValidationError(
-                    'The End interaction does not require any answer groups.'
-                )
-        except Exception:
-            pass
-
         # Total recommended explorations should not be more than 3.
         recc_exp_ids = (
             self.customization_args['recommendedExplorationIds'].value
@@ -1157,139 +1141,74 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 }
 
                 if rule_spec.rule_type == 'IsLessThanOrEqualTo':
-                    try:
-                        rule_value = float(rule_spec.inputs['x'])
-                        self._set_lower_and_upper_bounds(
-                            range_var, lower_infinity,
-                            rule_value, False, True
-                        )
-                    except Exception:
-                        rule_value = rule_spec.inputs['x']
-                        raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type \'IsLessThanOrEqualTo\' contains '
-                            f'string value - {rule_value}'
-                        )
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var, lower_infinity,
+                        rule_value, False, True
+                    )
 
                 if rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
-                    try:
-                        rule_value = float(rule_spec.inputs['x'])
-                        self._set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            upper_infinity, True, False
-                        )
-                    except Exception:
-                        rule_value = rule_spec.inputs['x']
-                        raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type \'IsGreaterThanOrEqualTo\' contains '
-                            f'string value - {rule_value}'
-                        )
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var, rule_value,
+                        upper_infinity, True, False
+                    )
 
                 if rule_spec.rule_type == 'Equals':
-                    try:
-                        rule_value = float(rule_spec.inputs['x'])
-                        self._set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            rule_value, True, True
-                        )
-                    except Exception:
-                        rule_value = rule_spec.inputs['x']
-                        raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type \'equals\' contains string '
-                            f'value - \'{rule_value}\''
-                        )
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var, rule_value,
+                        rule_value, True, True
+                    )
 
                 if rule_spec.rule_type == 'IsLessThan':
-                    try:
-                        rule_value = float(rule_spec.inputs['x'])
-                        self._set_lower_and_upper_bounds(
-                            range_var, lower_infinity,
-                            rule_value, False, False
-                        )
-                    except Exception:
-                        rule_value = rule_spec.inputs['x']
-                        raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type \'IsLessThan\' contains string '
-                            f'value - {rule_value}'
-                        )
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var, lower_infinity,
+                        rule_value, False, False
+                    )
 
                 if rule_spec.rule_type == 'IsGreaterThan':
-                    try:
-                        rule_value = float(rule_spec.inputs['x'])
-                        self._set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            upper_infinity, False, False
-                        )
-                    except Exception:
-                        rule_value = rule_spec.inputs['x']
-                        raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type \'IsGreaterThan\' contains string '
-                            f'value - \'{rule_value}\''
-                        )
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var, rule_value,
+                        upper_infinity, False, False
+                    )
 
                 if rule_spec.rule_type == 'IsWithinTolerance':
-                    value_x = rule_spec.inputs['x']
-                    value_tol = rule_spec.inputs['tol']
-                    try:
-                        rule_value_x = float(value_x)
-                        rule_value_tol = float(value_tol)
-                        # `tol` value in `IsWithinTolerance` must be positive.
-                        if rule_value_tol <= 0.0:
-                            raise utils.ValidationError(
-                                f'The rule \'{rule_spec_index}\' of answer '
-                                f'group \'{ans_group_index}\' having '
-                                f'rule type \'IsWithinTolerance\' '
-                                f'have \'tol\' value less than or equal to '
-                                f'zero in NumericInput interaction.'
-                            )
-                        self._set_lower_and_upper_bounds(
-                            range_var, rule_value_x - rule_value_tol,
-                            rule_value_x + rule_value_tol, True, True
-                        )
-                    except Exception:
+                    rule_value_x = float(rule_spec.inputs['x'])
+                    rule_value_tol = float(rule_spec.inputs['tol'])
+                    # `tol` value in `IsWithinTolerance` must be positive.
+                    if rule_value_tol <= 0.0:
                         raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type \'IsWithinTolerance\' contains string '
-                            f'value - \'{value_x}\', \'{value_tol}\''
+                            f'The rule \'{rule_spec_index}\' of answer '
+                            f'group \'{ans_group_index}\' having '
+                            f'rule type \'IsWithinTolerance\' '
+                            f'have \'tol\' value less than or equal to '
+                            f'zero in NumericInput interaction.'
                         )
+                    self._set_lower_and_upper_bounds(
+                        range_var, rule_value_x - rule_value_tol,
+                        rule_value_x + rule_value_tol, True, True
+                    )
 
                 if rule_spec.rule_type == 'IsInclusivelyBetween':
-                    value_a = rule_spec.inputs['a']
-                    value_b = rule_spec.inputs['b']
-                    try:
-                        rule_value_a = float(value_a)
-                        rule_value_b = float(value_b)
-                        # `a` should not be greater than equal to `b` in
-                        # `IsInclusivelyBetween` rule.
-                        if rule_value_a >= rule_value_b:
-                            raise utils.ValidationError(
-                                f'The rule \'{rule_spec_index}\' of answer '
-                                f'group \'{ans_group_index}\' having '
-                                f'rule type \'IsInclusivelyBetween\' '
-                                f'have `a` value greater than `b` value '
-                                f'in NumericInput interaction.'
-                            )
-                        self._set_lower_and_upper_bounds(
-                            range_var, rule_value_a,
-                            rule_value_b, True, True
-                        )
-                    except Exception:
+                    rule_value_a = float(rule_spec.inputs['a'])
+                    rule_value_b = float(rule_spec.inputs['b'])
+                    # `a` should not be greater than equal to `b` in
+                    # `IsInclusivelyBetween` rule.
+                    if rule_value_a >= rule_value_b:
                         raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type \'IsInclusivelyBetween\' contains string '
-                            f'value - \'{value_a}\', \'{value_b}\''
+                            f'The rule \'{rule_spec_index}\' of answer '
+                            f'group \'{ans_group_index}\' having '
+                            f'rule type \'IsInclusivelyBetween\' '
+                            f'have `a` value greater than `b` value '
+                            f'in NumericInput interaction.'
                         )
+                    self._set_lower_and_upper_bounds(
+                        range_var, rule_value_a,
+                        rule_value_b, True, True
+                    )
 
                 for range_ele in ranges:
                     if self._is_enclosed_by(range_var, range_ele):
@@ -1312,7 +1231,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             - Denominator is <= 0
             - Solution is not in simplest form when the `simplest form`
             setting is turned on
-            - Solution is in proper form when the `proper form` setting
+            - Solution is not in proper form when the `proper form` setting
             is turned on
             - `IsExactlyEqualTo` rule have integral value when
             `allow non zero integers` setting is off
@@ -1456,26 +1375,17 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     )
 
                 if rule_spec.rule_type == 'HasDenominatorEqualTo':
-                    try:
-                        rule_value_x = int(rule_spec.inputs['x'])
-                        matched_denominator['denominator'] = rule_value_x
-                        # `HasDenominatorEqualTo` rule should not have value
-                        # less than 0.
-                        if rule_value_x == 0:
-                            raise utils.ValidationError(
-                                f'The rule \'{rule_spec_index}\' of answer '
-                                f'group \'{ans_group_index}\' has '
-                                f'denominator less than or equal to zero '
-                                f'having rule type HasDenominatorEqualTo '
-                                f'in FractionInput interaction.'
-                            )
-                    except Exception:
-                        rule_value_x = rule_spec.inputs['x']
+                    rule_value_x = int(rule_spec.inputs['x'])
+                    matched_denominator['denominator'] = rule_value_x
+                    # `HasDenominatorEqualTo` rule should not have value
+                    # less than 0.
+                    if rule_value_x == 0:
                         raise utils.ValidationError(
-                            f'Rule \'{rule_spec_index}\' from answer '
-                            f'group \'{ans_group_index}\' having rule '
-                            f'type HasDenominatorEqualTo contains '
-                            f'string value - \'{rule_value_x}\''
+                            f'The rule \'{rule_spec_index}\' of answer '
+                            f'group \'{ans_group_index}\' has '
+                            f'denominator less than or equal to zero '
+                            f'having rule type HasDenominatorEqualTo '
+                            f'in FractionInput interaction.'
                         )
 
                 for range_ele in ranges:
