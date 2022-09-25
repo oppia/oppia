@@ -251,7 +251,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     customizationArgs = {
       useFractionForDivision: false,
       allowedVariables: {
-        value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+        value: ['y', 'x']
       }
     };
 
