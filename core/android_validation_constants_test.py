@@ -79,6 +79,6 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             language_ids_in_constants,
             android_validation_constants.SUPPORTED_LANGUAGE_CODES)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             language_ids_in_constants,
             list(android_validation_constants.LANGUAGE_CODE_TO_ENUM_MAP.keys()))

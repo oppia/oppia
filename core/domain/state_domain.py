@@ -325,7 +325,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
         return html_list
 
-    def to_android_answer_group_proto(self):
+    def to_android_answer_group_proto(self) -> state_pb2.BaseAnswerGroupDto:
         """Returns a proto representation of the answer group object.
 
         Returns:
@@ -447,7 +447,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         """Validates all properties of Hint."""
         self.hint_content.validate()
 
-    def to_android_hint_proto(self):
+    def to_android_hint_proto(self) -> state_pb2.HintDto:
         """Returns a proto representation of the hint object.
 
         Returns:
@@ -595,7 +595,7 @@ class Solution(translation_domain.BaseTranslatableObject):
             interaction_id).normalize_answer(self.correct_answer)
         self.explanation.validate()
 
-    def to_android_solution_proto(self) -> None:
+    def to_android_solution_proto(self) -> state_pb2.BaseSolutionDto:
         """Returns a proto representation of the solution object.
 
         Returns:
@@ -2069,7 +2069,7 @@ class Voiceover:
                 'or zero if not yet specified %s' %
                 self.duration_secs)
 
-    def to_android_voiceover_proto(self):
+    def to_android_voiceover_proto(self) -> languages_pb2.VoiceoverFileDto:
         """Returns a proto representation of the voiceover object.
 
         Returns:
@@ -3212,7 +3212,7 @@ class SubtitledHtml:
         """
         return cls(content_id, '')
 
-    def to_android_content_proto(self):
+    def to_android_content_proto(self) -> languages_pb2.SubtitledTextDto:
         """Returns a proto representation of the subtitled html object.
 
         Returns:
@@ -3305,7 +3305,7 @@ class SubtitledUnicode:
         """
         return cls(content_id, '')
 
-    def to_android_content_proto(self):
+    def to_android_content_proto(self) -> languages_pb2.SubtitledTextDto:
         """Returns a proto representation of the subtitled unicode object.
 
         Returns:
@@ -3394,7 +3394,8 @@ class TranslatableItem:
             TranslatableItem.DATA_FORMAT_SET_OF_UNICODE_STRING]
 
     @classmethod
-    def to_written_translatable_text_proto(cls, translation):
+    def to_written_translatable_text_proto(
+        cls, translation) -> languages_pb2.WrittenTranslatableTextDto:
         """Creates a WrittenTranslatableText proto object.
 
         Args:
@@ -3406,7 +3407,8 @@ class TranslatableItem:
         return languages_pb2.WrittenTranslatableTextDto(translation=translation)
 
     @classmethod
-    def to_written_translatable_set_proto(cls, translations):
+    def to_written_translatable_set_proto(
+        cls, translations) -> languages_pb2.SetOfWrittenTranslatableTextDto:
         """Creates a SetOfWrittenTranslatableText proto object.
 
         Args:
@@ -4439,7 +4441,7 @@ class State(translation_domain.BaseTranslatableObject):
             'next_content_id_index': self.next_content_id_index
         }
 
-    def to_android_state_proto(self):
+    def to_android_state_proto(self) -> state_pb2.StateDto:
         """Returns a proto representation of the state object.
 
         Returns:

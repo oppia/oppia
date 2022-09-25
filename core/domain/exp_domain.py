@@ -2145,7 +2145,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return self._cached_android_proto_size_in_bytes
 
-    def __setattr__(self, attribute, new_val):
+    def __setattr__(self, attribute, new_val) -> None:
         """Set _cached_android_proto_size_is_stale to True every time the
         exploration object is updated.
 

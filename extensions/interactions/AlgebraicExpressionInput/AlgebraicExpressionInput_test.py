@@ -22,6 +22,7 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.tests import test_utils
 
+
 class AlgebraicExpressionInputTests(test_utils.GenericTestBase):
 
     def test_algebraic_expression_input_converted_to_proto_correctly(self):

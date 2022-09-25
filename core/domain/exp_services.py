@@ -1818,7 +1818,7 @@ def validate_exploration_for_story(
     validation_error_messages = []
     if (
             exp.language_code not in
-            android_validation_constants.SUPPORTED_LANGUAGES):
+            android_validation_constants.SUPPORTED_LANGUAGE_CODES):
         error_string = (
             'Invalid language %s found for exploration '
             'with ID %s. This language is not supported for explorations '
