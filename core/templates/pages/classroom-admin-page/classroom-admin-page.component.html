@@ -141,22 +141,23 @@
               <em>No topics are currently added in a classroom</em>
             </p>
             <div cdkDropList (cdkDropListDropped)="drop($event)">
-              <div *ngFor="let topic of topicNameToPrerequisiteTopicNames | keyvalue"
+              <div *ngFor="let topicName of topicNames"
                    class="topic-dependency-container"
-                   cdkDrag>
+                   cdkDrag
+                   [cdkDragDisabled]="!classroomEditorMode">
                 <div class="topic-and-prerequisites-tile">
-                  <div>
+                  <div class="topic-and-prerequisites-wrapper">
                     <span class="topics-name">
-                      <strong>{{ topic.key }}</strong>
+                      <strong>{{ topicName }}</strong>
                     </span>
                     <div class="prerequisite-topics-container">
-                      <span *ngIf="topic.value.length === 0">
+                      <span *ngIf="topicNameToPrerequisiteTopicNames[topicName].length === 0">
                         <em>No prerequisites selected</em>
                       </span>
-                      <div *ngIf="topic.value.length > 0">
+                      <div *ngIf="topicNameToPrerequisiteTopicNames[topicName].length > 0">
                         <mat-chip-list>
-                          <mat-chip *ngFor="let prerequisiteTopic of topic.value"
-                                    (removed)="removeDependencyFromTopic(topic.key, prerequisiteTopic)">
+                          <mat-chip *ngFor="let prerequisiteTopic of topicNameToPrerequisiteTopicNames[topicName]"
+                                    (removed)="removeDependencyFromTopic(topicName, prerequisiteTopic)">
                             {{ prerequisiteTopic }}
                             <mat-icon matChipRemove
                                       *ngIf="classroomEditorMode"
@@ -170,12 +171,12 @@
                   </div>
 
                   <div ngbDropdown class="prerequisite-dropdown-selector"
-                      *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topic.key">
+                      *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topicName">
                     <oppia-filtered-choices-field [choices]="topicNames"
                                                   placeholder="Prerequisite"
                                                   searchLabel="Search"
                                                   [(selection)]="selectedTopicName"
-                                                  (selectionChange)="addDependencyForTopic(topic.key, selectedTopicName)">
+                                                  (selectionChange)="addDependencyForTopic(topicName, selectedTopicName)">
                     </oppia-filtered-choices-field>
                     <button (click)="closeDependencyGraphDropdown()"
                             mat-button matSuffix mat-icon-button
@@ -183,7 +184,7 @@
                       <mat-icon matListIcon>close</mat-icon>
                     </button>
                   </div>
-                  <p *ngIf="cyclicCheckError && currentTopicOnEdit === topic.key"
+                  <p *ngIf="tempClassroomData.cyclicCheckError && currentTopicOnEdit === topicName"
                      class="oppia-warning-text cyclic-check-error">
                     There is a cycle in the prerequisite dependencies.
                     Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
@@ -194,10 +195,10 @@
                 <div *ngIf="classroomEditorMode">
                   <p *ngIf="editTopicOptionIsShown"
                      class="fas fa-ellipsis-v topic-edit-box-icon"
-                     (click)="editDependency(topic.key)"
+                     (click)="editDependency(topicName)"
                      attr.aria-label="Edit dependencies">
                   </p>
-                  <div *ngIf="topicDependencyEditOptionIsShown && currentTopicOnEdit === topic.key"
+                  <div *ngIf="topicDependencyEditOptionIsShown && currentTopicOnEdit === topicName"
                        class="topic-edit-options">
                     <div (click)="editPrerequisite()">
                       <a class="topic-edit-options-edit">
@@ -205,7 +206,7 @@
                         <span>Add Prerequisites</span>
                       </a>
                     </div>
-                    <div (click)="deleteTopic(topic.key)">
+                    <div (click)="deleteTopic(topicName)">
                       <a>
                         <i class="fas fa-trash-alt"></i>
                         <span>Delete the topic</span>
@@ -250,9 +251,8 @@
                     [disabled]="classroomDataSaveInProgress">
               Cancel
             </button>
-
             <button class="btn btn-success save-classroom-changes"
-                    [disabled]="(!classroomDataIsChanged) || !(tempClassroomData.classroomNameIsValid && tempClassroomData.classroomUrlFragmentIsValid)"
+                    [disabled]="(!classroomDataIsChanged) || !(tempClassroomData.classroomNameIsValid && tempClassroomData.classroomUrlFragmentIsValid && tempClassroomData.topicsGraphIsCorrect)"
                     (click)="saveClassroomData(classroom.key)">
               <span *ngIf="!classroomDataSaveInProgress">Save</span>
               <mat-spinner *ngIf="classroomDataSaveInProgress"
@@ -280,6 +280,9 @@
 </mat-card>
 
 <style>
+  .topic-and-prerequisites-wrapper {
+    display: flex;
+  }
   .prerequisite-dropdown-selector {
     align-items: center;
     display: flex;
@@ -302,7 +305,7 @@
   }
   .topics-name {
     padding: 10px;
-    width: 200px;
+    width: 33%;
   }
   .edit-topic-dependencies {
     transform: scale(0.7);
@@ -340,7 +343,9 @@
   }
   .topic-dependency-container {
     align-items: center;
+    cursor: pointer;
     display: flex;
+    justify-content: space-between;
   }
   :host /deep/ .oppia-save-classroom-spinning-button circle {
     stroke: #fff;

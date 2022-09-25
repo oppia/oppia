@@ -73,7 +73,6 @@ export class ClassroomAdminPageComponent implements OnInit {
   eligibleTopicNames: string[] = [];
   topicIdsToTopicName: TopicIdToTopicName = {};
   newTopicId: string = '';
-  topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds = {};
   topicNameToPrerequisiteTopicNames: TopicNameToPrerequisiteTopicNames = {};
   topicsCountInClassroom: number = 0;
   selectedTopicName = '';
@@ -121,11 +120,8 @@ export class ClassroomAdminPageComponent implements OnInit {
           cloneDeep(response.classroomDict));
         this.tempClassroomData = ClassroomData.createNewClassroomFromDict(
           cloneDeep(response.classroomDict));
-
-        this.getTopicDependencyByTopicName(this.topicIdToPrerequisiteTopicIds);
         this.topicsCountInClassroom = Object.keys(
-          this.topicIdToPrerequisiteTopicIds).length;
-
+          this.tempClassroomData.topicIdToPrerequisiteTopicIds).length;
         this.classroomDataIsChanged = false;
 
         this.existingClassroomNames = (
@@ -139,9 +135,12 @@ export class ClassroomAdminPageComponent implements OnInit {
 
         this.tempClassroomData.setExistingClassroomData(
           this.existingClassroomNames);
-
         this.tempClassroomData.onClassroomNameChange();
         this.tempClassroomData.onClassroomUrlFragmentChange();
+        this.tempClassroomData.topicsGraphIsCorrect = true;
+
+        this.getTopicDependencyByTopicName(
+          this.tempClassroomData.topicIdToPrerequisiteTopicIds);
       }, (errorResponse) => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -216,16 +215,18 @@ export class ClassroomAdminPageComponent implements OnInit {
         return;
       }
 
-      this.classroomEditorMode = false;
-      this.classroomViewerMode = true;
+      this.openClassroomInViewerMode();
       this.classroomDataIsChanged = false;
-
       this.classroomBackendApiService.updateClassroomDataAsync(
         classroomId, backendDict).then(() => {
         this.classroomIdToClassroomName[this.tempClassroomData.classroomId] = (
           this.tempClassroomData.name);
         this.classroomData = cloneDeep(this.tempClassroomData);
         this.classroomDataSaveInProgress = false;
+      }, () => {
+        this.tempClassroomData = cloneDeep(this.classroomData);
+        this.getTopicDependencyByTopicName(
+          this.tempClassroomData.topicIdToPrerequisiteTopicIds);
       });
     });
   }
@@ -267,6 +268,8 @@ export class ClassroomAdminPageComponent implements OnInit {
       modalRef.result.then(() => {
         this.openClassroomInViewerMode();
         this.tempClassroomData = cloneDeep(this.classroomData);
+        this.getTopicDependencyByTopicName(
+          this.tempClassroomData.topicIdToPrerequisiteTopicIds);
 
         this.tempClassroomData.supressClassroomNameErrorMessages();
         this.tempClassroomData.supressClassroomUrlFragmentErrorMessages();
@@ -332,8 +335,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.topicNameToPrerequisiteTopicNames[currentTopicName] = (
           prerequisiteTopicNames);
         this.topicIdsToTopicName = topicIdsToTopicName;
-        this.topicNames = cloneDeep(
-          Object.keys(this.topicNameToPrerequisiteTopicNames));
+        this.topicNames = Object.values(this.topicIdsToTopicName);
       }
     });
   }
@@ -380,7 +382,8 @@ export class ClassroomAdminPageComponent implements OnInit {
     return topicIdForGivenTopicName;
   }
 
-  addDependencyForTopic(currentTopicName, prerequisiteTopicName) {
+  addDependencyForTopic(
+      currentTopicName: string, prerequisiteTopicName: string): void {
     this.selectedTopicName = '';
     this.closeDependencyGraphDropdown();
     let prerequisiteTopicNames = (
@@ -395,16 +398,15 @@ export class ClassroomAdminPageComponent implements OnInit {
 
     prerequisiteTopicNames.push(prerequisiteTopicName);
     prerequisiteTopicNames.sort();
-    this.topicIdToPrerequisiteTopicIds[currentTopicId].push(
+    this.tempClassroomData.topicIdToPrerequisiteTopicIds[currentTopicId].push(
       prerequisiteTopicId);
 
     this.tempClassroomData.validateDependencyGraph();
     this.classroomDataIsChanged = true;
-    this.tempClassroomData.topicIdToPrerequisiteTopicIds = (
-      this.topicIdToPrerequisiteTopicIds);
   }
 
-  removeDependencyFromTopic(currentTopicName, prerequisiteTopicName) {
+  removeDependencyFromTopic(
+      currentTopicName: string, prerequisiteTopicName: string): void {
     let prerequisiteTopicNames = (
       this.topicNameToPrerequisiteTopicNames[currentTopicName]);
     let currentTopicId = this.getTopicIdFromTopicName(currentTopicName);
@@ -414,14 +416,15 @@ export class ClassroomAdminPageComponent implements OnInit {
     let index = prerequisiteTopicNames.indexOf(prerequisiteTopicName);
     prerequisiteTopicNames.splice(index, 1);
 
-    index = this.topicIdToPrerequisiteTopicIds[currentTopicId].indexOf(
-      prerequisiteTopicId);
-    this.topicIdToPrerequisiteTopicIds[currentTopicId].splice(index, 1);
+    index = (
+      this.tempClassroomData
+        .topicIdToPrerequisiteTopicIds[currentTopicId].indexOf(
+          prerequisiteTopicId));
+    this.tempClassroomData.topicIdToPrerequisiteTopicIds[currentTopicId].splice(
+      index, 1);
 
     this.tempClassroomData.validateDependencyGraph();
     this.classroomDataIsChanged = true;
-    this.tempClassroomData.topicIdToPrerequisiteTopicIds = (
-      this.topicIdToPrerequisiteTopicIds);
   }
 
   showDependencyGraphDropdown(topicName: string): void {
@@ -486,12 +489,10 @@ export class ClassroomAdminPageComponent implements OnInit {
     modalRef.componentInstance.topicName = topicNameToDelete;
     modalRef.result.then(() => {
       const topicId = this.getTopicIdFromTopicName(topicNameToDelete);
-      delete this.topicIdToPrerequisiteTopicIds[topicId];
+      delete this.tempClassroomData.topicIdToPrerequisiteTopicIds[topicId];
       delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
 
       this.classroomDataIsChanged = true;
-      this.tempClassroomData.topicIdToPrerequisiteTopicIds = (
-        this.topicIdToPrerequisiteTopicIds);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is
@@ -499,15 +500,26 @@ export class ClassroomAdminPageComponent implements OnInit {
     });
   }
 
-  drop(event: CdkDragDrop<string[]>) {
-    let topicNamesToMove = Object.keys(this.topicNameToPrerequisiteTopicNames);
-    moveItemInArray(topicNamesToMove, event.previousIndex, event.currentIndex);
-    console.log(topicNamesToMove);
-    let temp = new Map();
-    for (let topicName of topicNamesToMove) {
-      temp[topicName] = this.topicNameToPrerequisiteTopicNames[topicName];
+  drop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.topicNames, event.previousIndex, event.currentIndex);
+    this.classroomDataIsChanged = true;
+    let tempTopicIdToPrerequisiteTopicIds = {};
+
+    for (let topicName of this.topicNames) {
+      let prerequisiteTopicNames = (
+        this.topicNameToPrerequisiteTopicNames[topicName]);
+      let prerequisiteTopicIds = [];
+      for (let prerequisiteTopicName of prerequisiteTopicNames) {
+        prerequisiteTopicIds.push(this.getTopicIdFromTopicName(
+          prerequisiteTopicName));
+      }
+      tempTopicIdToPrerequisiteTopicIds[
+        this.getTopicIdFromTopicName(topicName)
+      ] = prerequisiteTopicIds;
     }
-    console.log(temp);
+
+    this.tempClassroomData.topicIdToPrerequisiteTopicIds = (
+      tempTopicIdToPrerequisiteTopicIds);
   }
 }
 
