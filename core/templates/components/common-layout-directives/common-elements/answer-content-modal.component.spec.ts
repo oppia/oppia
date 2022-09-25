@@ -63,12 +63,13 @@ describe('Improvement Confirmation Modal', () => {
     fixture.detectChanges();
   });
 
-  it('should evalute scope letiables values correctly', fakeAsync(() => {
-    expect(component.answerHtml).toEqual('');
+  it('should check whether component is initialized correctly',
+    fakeAsync(() => {
+      expect(component.answerHtml).toEqual('');
 
-    component.close();
-    tick();
+      component.close();
+      tick();
 
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  }));
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    }));
 });

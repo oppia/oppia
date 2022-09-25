@@ -32,8 +32,6 @@ describe('Oppia visualization frequency table', () => {
       declarations: [
         OppiaVisualizationFrequencyTableComponent
       ],
-      providers: [
-      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));

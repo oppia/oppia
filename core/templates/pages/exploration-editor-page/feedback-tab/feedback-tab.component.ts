@@ -68,7 +68,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     private userService: UserService,
   ) { }
 
-  _resetTmpMessageFields(): void {
+  _resetFeedbackMessageFields(): void {
     this.feedbackMessage.status =
        this.activeThread && this.activeThread.status;
     this.feedbackMessage.text = '';
@@ -76,7 +76,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   clearActiveThread(): void {
     this.activeThread = null;
-    this._resetTmpMessageFields();
+    this._resetFeedbackMessageFields();
   }
 
   // Fetches the threads again if any thread is updated.
@@ -189,7 +189,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
     this.threadDataBackendApiService.addNewMessageAsync(
       thread, tmpText, tmpStatus).then((messages) => {
-      this._resetTmpMessageFields();
+      this._resetFeedbackMessageFields();
       this.activeThread.messages = messages;
       this.messageSendingInProgress = false;
     },
@@ -208,7 +208,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       this.activeThread = thread as SuggestionThread;
       this.threadDataBackendApiService.markThreadAsSeenAsync(this.activeThread);
       this.feedbackMessage.status = this.activeThread.status;
-      this.focusManagerService.setFocus('tmpMessageText');
+      this.focusManagerService.setFocus('feedbackMessage');
     });
   }
 

@@ -36,6 +36,7 @@ var ExplorationEditorFeedbackTab = function() {
   var suggestionReviewMessageInput = $('.e2e-test-suggestion-review-message');
   var feedbackStatusDropdown = $('.e2e-test-oppia-feedback-status-menu');
   var feedbackMessage = $('.e2e-test-exploration-feedback');
+  var feedbackMessageLocator = '.e2e-test-exploration-feedback';
   var feedbackMessagesSelector = function() {
     return $$('.e2e-test-exploration-feedback');
   };
@@ -151,13 +152,22 @@ var ExplorationEditorFeedbackTab = function() {
     await action.setValue(
       'Feedback Response Text Area',
       feedbackResponseTextArea, feedbackResponse);
+
+    await waitFor.visibilityOf(
+      feedbackStatusDropdown, 'Feedback Status Dropdown is not visible');
     await action.click('Feedback Status Dropdow', feedbackStatusDropdown);
     var optionLabelFeedbackStatus = (
       $('.e2e-test-oppia-feedback-status-' + feedbackStatus.toLowerCase()));
     await action.click(
       'Option feedback status', optionLabelFeedbackStatus);
+
     await action.click(
       'Feedback Send Response Button', feedbackSendResponseButton);
+  };
+
+  this.expectNumberOfFeedbackMessagesToBe = async function(number) {
+    await waitFor.numberOfElementsToBe(
+      feedbackMessageLocator, 'Feedback message', number);
   };
 
   this.readFeedbackMessagesFromThread = async function() {

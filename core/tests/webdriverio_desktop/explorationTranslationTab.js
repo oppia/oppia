@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,24 +17,24 @@
  * in the exploration editor.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var CreatorDashboardPage = require(
-  '../protractor_utils/CreatorDashboardPage.js');
+  '../webdriverio_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js');
+  '../webdriverio_utils/ExplorationEditorPage.js');
 
 describe('Exploration translation and voiceover tab', function() {
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
   var explorationEditorTranslationTab = null;
-  var YELLOW_STATE_PROGRESS_COLOR = 'rgb(233, 179, 48)';
-  var GREEN_STATE_PROGRESS_COLOR = 'rgb(22, 167, 101)';
-  var RED_STATE_PROGRESS_COLOR = 'rgb(209, 72, 54)';
+  var YELLOW_STATE_PROGRESS_COLOR = 'rgb(233,179,48)';
+  var GREEN_STATE_PROGRESS_COLOR = 'rgb(22,167,101)';
+  var RED_STATE_PROGRESS_COLOR = 'rgb(209,72,54)';
 
   beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -123,10 +123,9 @@ describe('Exploration translation and voiceover tab', function() {
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.expectSelectedLanguageToBe(
         'English');
-      await explorationEditorTranslationTab.changeLanguage('Hindi');
+      await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
       await browser.refresh();
-      await explorationEditorTranslationTab.expectSelectedLanguageToBe(
-        'Hindi');
+      await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
       await users.logout();
     });
 
@@ -135,7 +134,7 @@ describe('Exploration translation and voiceover tab', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.changeLanguage('Hindi');
+    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
     await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
     await users.logout();
   });
@@ -190,13 +189,13 @@ describe('Exploration translation and voiceover tab', function() {
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
       await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.changeLanguage('Hindi');
+      await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
       await explorationEditorTranslationTab.switchToTranslationMode();
       await explorationEditorTranslationTab.navigateToFeedbackTab();
       await explorationEditorTranslationTab.setTranslation(
         await forms.toRichText('Sample Translation.'));
       await explorationEditorPage.publishChanges('Adds one translation.');
-      explorationEditorTranslationTab.expectFeedbackTabToBeActive();
+      await explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       await users.logout();
     });
 
@@ -206,7 +205,7 @@ describe('Exploration translation and voiceover tab', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.changeLanguage('Hindi');
+    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
     await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
     await users.logout();
   });
@@ -216,7 +215,7 @@ describe('Exploration translation and voiceover tab', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.changeLanguage('Hindi');
+    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
     await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
 
     await explorationEditorTranslationTab.switchToTranslationMode();
@@ -234,7 +233,7 @@ describe('Exploration translation and voiceover tab', function() {
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
       await explorationEditorPage.navigateToTranslationTab();
-      await expEditorTranslationTab.changeLanguage('Hindi');
+      await expEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
       await expEditorTranslationTab.switchToTranslationMode();
 
       await expEditorTranslationTab.expectCorrectStatusColor(
