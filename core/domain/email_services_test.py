@@ -22,7 +22,7 @@ from core.domain import email_services
 from core.platform import models
 from core.tests import test_utils
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
+(email_models,) = models.Registry.import_models([models.Names.EMAIL])
 platform_email_services = models.Registry.import_email_services()
 
 
@@ -106,10 +106,11 @@ class EmailServicesTest(test_utils.EmailTestBase):
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_email)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. send_mail() method doesn't expect recipient_email
-            # to be None, and the case when the recipient_email is malformed
-            # must be tested this is why ignore[arg-type] is used here.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. send_mail() method
+            # doesn't expect recipient_email to be None, and the case when
+            # the recipient_email is malformed must be tested this is why
+            # ignore[arg-type] is used here.
             email_services.send_mail(
                 'sender@example.com', malformed_recipient_email, # type: ignore[arg-type]
                 'subject', 'body', 'html')

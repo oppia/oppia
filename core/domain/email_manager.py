@@ -48,8 +48,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import transaction_services
 
 (email_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.email,
-    models.NAMES.suggestion
+    models.Names.EMAIL,
+    models.Names.SUGGESTION
 ])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -233,12 +233,14 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: config_domain.ConfigProperty = (
     )
 )
 
+NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE: List[str] = []
+
 NOTIFICATION_USER_IDS_FOR_FAILED_TASKS: config_domain.ConfigProperty = (
     config_domain.ConfigProperty(
         'notification_user_ids_for_failed_tasks',
         NOTIFICATION_USER_IDS_LIST_SCHEMA,
         'User IDs to notify if an ML training task fails',
-        []
+        NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE
     )
 )
 
@@ -784,7 +786,13 @@ def send_post_signup_email(
 
     if not test_for_duplicate_email:
         for key, content in SIGNUP_EMAIL_CONTENT.value.items():
-            if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
+            email_content_default_value = SIGNUP_EMAIL_CONTENT.default_value
+            # Here, we used assert to narrow down the type from various allowed
+            # default types to Dict[str, str] and we are sure that it is always
+            # going to be Dict type because at the time of initialization of
+            # SIGNUP_EMAIL_CONTENT we are providing Dict as a default value.
+            assert isinstance(email_content_default_value, dict)
+            if content == email_content_default_value[key]:
                 logging.error(
                     'Please ensure that the value for the admin config '
                     'property SIGNUP_EMAIL_CONTENT is set, before allowing '
@@ -2177,6 +2185,8 @@ def send_email_to_new_contribution_reviewer(
 
     Raises:
         Exception. The review category is not valid.
+        Exception. The language_code cannot be None if the review category is
+            'translation' or 'voiceover'.
     """
     if review_category not in NEW_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -2188,8 +2198,11 @@ def send_email_to_new_contribution_reviewer(
     if review_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
+        if language_code is None:
+            raise Exception(
+                'The language_code cannot be None if the review category is'
+                ' \'translation\' or \'voiceover\''
+            )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         review_category_description = (
@@ -2249,6 +2262,8 @@ def send_email_to_removed_contribution_reviewer(
 
     Raises:
         Exception. The review category is not valid.
+        Exception. The language_code cannot be None if the review category is
+            'translation' or 'voiceover'.
     """
     if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -2260,8 +2275,11 @@ def send_email_to_removed_contribution_reviewer(
     if review_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
+        if language_code is None:
+            raise Exception(
+                'The language_code cannot be None if the review category is'
+                ' \'translation\' or \'voiceover\''
+            )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         reviewer_role_description = (
