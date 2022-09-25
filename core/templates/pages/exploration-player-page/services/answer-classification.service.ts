@@ -235,7 +235,7 @@ export class AnswerClassificationService {
           const ruleInputs = answerGroup.rules[j].inputs;
           if (this.checkForMisspellings(
             answer,
-            ruleInputs as any
+            ruleInputs as any //!ISSUE
           )) {
             return true;
           }

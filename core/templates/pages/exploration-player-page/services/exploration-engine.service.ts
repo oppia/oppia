@@ -548,7 +548,7 @@ export class ExplorationEngineService {
 
     // Work => let catchMisspellingsFeatOn = oldStateCard.getInteraction().customizationArgs.
     
-    if(oldInteractionId === "TextInput") {
+    if(oldInteractionId === "TextInput" && onSameCard) {
       var answerIsOnlyMisspelled = this.answerClassificationService.
     isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
       if (answerIsOnlyMisspelled) {

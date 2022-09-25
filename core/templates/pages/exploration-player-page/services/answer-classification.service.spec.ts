@@ -35,7 +35,7 @@ import { TextInputRulesService } from 'interactions/TextInput/directives/text-in
 import { AlertsService } from 'services/alerts.service';
 import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
 
-describe('Answer Classification Service', () => {
+fdescribe('Answer Classification Service', () => {
   const stateName = 'Test State';
 
   let alertsService: AlertsService;
@@ -159,6 +159,44 @@ describe('Answer Classification Service', () => {
                 x: {
                   contentId: 'rule_input_3',
                   normalizedStrSet: ['7']
+                }
+              }
+            }],
+          }, {
+            outcome: {
+              dest: 'outcome 2',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_1',
+                  normalizedStrSet: ['correct']
+                }
+              }
+            }, {
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_2',
+                  normalizedStrSet: ['CorrectAnswer']
+                }
+              }
+            }, {
+              rule_type: 'FuzzyEquals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_3',
+                  normalizedStrSet: ['Right']
                 }
               }
             }],
@@ -305,6 +343,25 @@ describe('Answer Classification Service', () => {
         ).toThrowError(
           'No interactionRulesService was available to classify the answer.');
       });
+
+      it('should check for misspellings correctly.', () => {
+
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+      });
+
+      expect(
+        answerClassificationService.isAnswerOnlyMisspelled(state.interaction,
+          "")
+      ).toEqual(
+        new AnswerClassificationResult(
+          outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
+          2, 0,
+          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
+        )
+      );      
+
+
   });
 
   describe('with string classifier enabled', () => {
