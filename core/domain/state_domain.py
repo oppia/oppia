@@ -955,10 +955,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 'The Continue button text should be at most 20 characters.'
             )
 
-        if len(self.answer_groups) > 0:
-            raise utils.ValidationError(
-                'The Continue button does not require answer groups.'
-            )
+        try:
+            if len(self.answer_groups) > 0:
+                raise utils.ValidationError(
+                    'The Continue button does not require answer groups.'
+                )
+        except Exception:
+            pass
 
     def _validate_end_exploration_input(self) -> None:
         """Validates the End interaction
@@ -971,15 +974,18 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             - Recommended explorations are more than 3
         """
         # Should not have a default outcome or any answer groups.
-        if self.default_outcome is not None:
-            raise utils.ValidationError(
-                'The End interaction does not require any default outcome.'
-            )
+        try:
+            if self.default_outcome is not None:
+                raise utils.ValidationError(
+                    'The End interaction does not require any default outcome.'
+                )
 
-        if len(self.answer_groups) > 0:
-            raise utils.ValidationError(
-                'The End interaction does not require any answer groups.'
-            )
+            if len(self.answer_groups) > 0:
+                raise utils.ValidationError(
+                    'The End interaction does not require any answer groups.'
+                )
+        except Exception:
+            pass
 
         # Total recommended explorations should not be more than 3.
         recc_exp_ids = (
