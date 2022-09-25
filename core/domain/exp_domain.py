@@ -3912,7 +3912,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         selected_equals_choices = []
         empty_ans_groups = []
-        answer_groups= state_dict['interaction']['answer_groups']
+        answer_groups = state_dict['interaction']['answer_groups']
         # Removal of duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -3987,7 +3987,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args'][
                 'choices']['value']
         )
-        answer_groups= state_dict['interaction']['answer_groups']
+        answer_groups = state_dict['interaction']['answer_groups']
 
         # Rules should not be duplicate.
         cls._remove_duplicate_rules_inside_answer_groups(
