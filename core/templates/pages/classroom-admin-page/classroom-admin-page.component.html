@@ -140,85 +140,77 @@
             <p *ngIf="topicsCountInClassroom == 0">
               <em>No topics are currently added in a classroom</em>
             </p>
-
-            <div *ngFor="let topic of topicNameToPrerequisiteTopicNames | keyvalue"
-                 class="topic-dependency-container">
-              <div class="topic-and-prerequisites-tile">
-                <div>
-                  <span class="topics-name">
-                    <strong>{{ topic.key }}</strong>
-                  </span>
-                  <div class="prerequisite-topics-container">
-                    <span *ngIf="topic.value.length === 0">
-                      <em>No prerequisites selected</em>
+            <div cdkDropList (cdkDropListDropped)="drop($event)">
+              <div *ngFor="let topic of topicNameToPrerequisiteTopicNames | keyvalue"
+                   class="topic-dependency-container"
+                   cdkDrag>
+                <div class="topic-and-prerequisites-tile">
+                  <div>
+                    <span class="topics-name">
+                      <strong>{{ topic.key }}</strong>
                     </span>
-                    <div *ngIf="topic.value.length > 0">
-                      <mat-chip-list>
-                        <mat-chip *ngFor="let prerequisiteTopic of topic.value"
-                                  (removed)="modifyDependencyForTopic(topic.key, prerequisiteTopic)">
-                          {{ prerequisiteTopic }}
-                          <mat-icon matChipRemove
-                                    *ngIf="classroomEditorMode"
-                                    class="update-cross-icon">
-                            cancel
-                          </mat-icon>
-                        </mat-chip>
-                      </mat-chip-list>
+                    <div class="prerequisite-topics-container">
+                      <span *ngIf="topic.value.length === 0">
+                        <em>No prerequisites selected</em>
+                      </span>
+                      <div *ngIf="topic.value.length > 0">
+                        <mat-chip-list>
+                          <mat-chip *ngFor="let prerequisiteTopic of topic.value"
+                                    (removed)="removeDependencyFromTopic(topic.key, prerequisiteTopic)">
+                            {{ prerequisiteTopic }}
+                            <mat-icon matChipRemove
+                                      *ngIf="classroomEditorMode"
+                                      class="update-cross-icon">
+                              cancel
+                            </mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div ngbDropdown
-                    *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topic.key">
-                  <button ngbDropdownToggle mat-button
-                          (click)="getAvailablePrerequisiteTopicNamesForDropdown(topic.key)"
-                          class="dropdown-toggle prerequisite-dropdown-selector">
-                    Select Prerequisite
-                  </button>
-
-                  <button (click)="closeDependencyGraphDropdown()"
-                          mat-button matSuffix mat-icon-button
-                          aria-label="Clear">
-                    <mat-icon matListIcon>close</mat-icon>
-                  </button>
-
-                  <ul ngbDropdownMenu
-                      class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu">
-                    <ng-container *ngFor="let topicName of eligibleTopicNames">
-                      <li ngbDropdownItem class="topic-dropdown-options"
-                          (click)="modifyDependencyForTopic(topic.key, topicName)">
-                        <span>{{ topicName }}</span>
-                      </li>
-                    </ng-container>
-                  </ul>
-                </div>
-                <p *ngIf="cyclicCheckError && currentTopicOnEdit === topic.key"
-                   class="oppia-warning-text cyclic-check-error">
-                  There is a cycle in the prerequisite dependencies.
-                  Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
-                  Please fix this error to save the changes.
-                </p>
-              </div>
-
-              <div *ngIf="classroomEditorMode">
-                <p *ngIf="editTopicOptionIsShown"
-                   class="fas fa-ellipsis-v topic-edit-box-icon"
-                   (click)="editDependency(topic.key)"
-                   attr.aria-label="Edit dependencies">
-                </p>
-                <div *ngIf="topicDependencyEditOptionIsShown && currentTopicOnEdit === topic.key"
-                     class="topic-edit-options">
-                  <div (click)="editPrerequisite()">
-                    <a class="topic-edit-options-edit">
-                      <i class="fa fa-pen"></i>
-                      <span>Add Prerequisites</span>
-                    </a>
+                  <div ngbDropdown class="prerequisite-dropdown-selector"
+                      *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topic.key">
+                    <oppia-filtered-choices-field [choices]="topicNames"
+                                                  placeholder="Prerequisite"
+                                                  searchLabel="Search"
+                                                  [(selection)]="selectedTopicName"
+                                                  (selectionChange)="addDependencyForTopic(topic.key, selectedTopicName)">
+                    </oppia-filtered-choices-field>
+                    <button (click)="closeDependencyGraphDropdown()"
+                            mat-button matSuffix mat-icon-button
+                            aria-label="Clear">
+                      <mat-icon matListIcon>close</mat-icon>
+                    </button>
                   </div>
-                  <div (click)="deleteTopic(topic.key)">
-                    <a>
-                      <i class="fas fa-trash-alt"></i>
-                      <span>Delete the topic</span>
-                    </a>
+                  <p *ngIf="cyclicCheckError && currentTopicOnEdit === topic.key"
+                     class="oppia-warning-text cyclic-check-error">
+                    There is a cycle in the prerequisite dependencies.
+                    Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
+                    Please fix this error to save the changes.
+                  </p>
+                </div>
+
+                <div *ngIf="classroomEditorMode">
+                  <p *ngIf="editTopicOptionIsShown"
+                     class="fas fa-ellipsis-v topic-edit-box-icon"
+                     (click)="editDependency(topic.key)"
+                     attr.aria-label="Edit dependencies">
+                  </p>
+                  <div *ngIf="topicDependencyEditOptionIsShown && currentTopicOnEdit === topic.key"
+                       class="topic-edit-options">
+                    <div (click)="editPrerequisite()">
+                      <a class="topic-edit-options-edit">
+                        <i class="fa fa-pen"></i>
+                        <span>Add Prerequisites</span>
+                      </a>
+                    </div>
+                    <div (click)="deleteTopic(topic.key)">
+                      <a>
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Delete the topic</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -289,7 +281,10 @@
 
 <style>
   .prerequisite-dropdown-selector {
+    align-items: center;
+    display: flex;
     margin-left: 25%;
+    width: 200px;
   }
   .cyclic-check-error {
     margin: 0 10px;

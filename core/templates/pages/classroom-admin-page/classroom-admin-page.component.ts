@@ -18,6 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import { ClassroomBackendApiService, ClassroomBackendDict, ClassroomDict } from '../../domain/classroom/classroom-backend-api.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -67,6 +68,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   courseDetails: string = '';
   topicListIntro: string = '';
   topicIds: string[] = [];
+  topicNames: string[] = [];
   eligibleTopicNames: string[] = [];
   topicIdsToTopicName: TopicIdToTopicName = {};
   newTopicId: string = '';
@@ -74,6 +76,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   topicNameToPrerequisiteTopicNames: TopicNameToPrerequisiteTopicNames = {};
   topicsCountInClassroom: number = 0;
   existingClassroomNames: string[] = [];
+  selectedTopicName = '';
 
   pageIsInitialized: boolean = false;
   classroomDataIsChanged: boolean = false;
@@ -250,6 +253,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomUrlFragmentIsValid = true;
         this.cyclicCheckError = false;
         this.topicDependencyEditOptionIsShown = false;
+        this.dependencyGraphDropdownIsShown = false;
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is
@@ -399,6 +403,8 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.topicNameToPrerequisiteTopicNames[currentTopicName] = (
           prerequisiteTopicNames);
         this.topicIdsToTopicName = topicIdsToTopicName;
+        this.topicNames = cloneDeep(
+          Object.keys(this.topicNameToPrerequisiteTopicNames));
       }
     });
   }
@@ -479,9 +485,57 @@ export class ClassroomAdminPageComponent implements OnInit {
     }
   }
 
+  addDependencyForTopic(currentTopicName, prerequisiteTopicName) {
+    this.selectedTopicName = '';
+    this.closeDependencyGraphDropdown();
+    let prerequisiteTopicNames = (
+      this.topicNameToPrerequisiteTopicNames[currentTopicName]);
+    let currentTopicId = this.getTopicIdFromTopicName(currentTopicName);
+    let prerequisiteTopicId = this.getTopicIdFromTopicName(
+      prerequisiteTopicName);
+
+    if (prerequisiteTopicNames.indexOf(prerequisiteTopicName) !== -1) {
+      return;
+    }
+
+    prerequisiteTopicNames.push(prerequisiteTopicName);
+    prerequisiteTopicNames.sort();
+    this.topicIdToPrerequisiteTopicIds[currentTopicId].push(
+      prerequisiteTopicId);
+
+    this.validateDependencyGraph();
+    this.classroomDataIsChanged = true;
+    this.updatedClassroomDict.topicIdToPrerequisiteTopicIds = (
+      this.topicIdToPrerequisiteTopicIds);
+
+    // this.editPrerequisite();
+  }
+
+  removeDependencyFromTopic(currentTopicName, prerequisiteTopicName) {
+    let prerequisiteTopicNames = (
+      this.topicNameToPrerequisiteTopicNames[currentTopicName]);
+    let currentTopicId = this.getTopicIdFromTopicName(currentTopicName);
+    let prerequisiteTopicId = this.getTopicIdFromTopicName(
+      prerequisiteTopicName);
+
+    let index = prerequisiteTopicNames.indexOf(prerequisiteTopicName);
+    prerequisiteTopicNames.splice(index, 1);
+
+    index = this.topicIdToPrerequisiteTopicIds[currentTopicId].indexOf(
+      prerequisiteTopicId);
+    this.topicIdToPrerequisiteTopicIds[currentTopicId].splice(index, 1);
+
+    this.validateDependencyGraph();
+    this.classroomDataIsChanged = true;
+    this.updatedClassroomDict.topicIdToPrerequisiteTopicIds = (
+      this.topicIdToPrerequisiteTopicIds);
+  }
+
   modifyDependencyForTopic(
       currentTopicName: string, prerequisiteTopicName: string
   ): void {
+    this.selectedTopicName = '';
+    this.closeDependencyGraphDropdown();
     let prerequisiteTopicNames = (
       this.topicNameToPrerequisiteTopicNames[currentTopicName]);
     let currentTopicId = this.getTopicIdFromTopicName(currentTopicName);
@@ -547,6 +601,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.topicDependencyEditOptionIsShown = false;
     this.dependencyGraphDropdownIsShown = true;
     this.editTopicOptionIsShown = false;
+    this.topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
   }
 
   deleteTopic(topicNameToDelete: string): void {
@@ -580,6 +635,17 @@ export class ClassroomAdminPageComponent implements OnInit {
       // This callback is triggered when the Cancel button is
       // clicked. No further action is needed.
     });
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    let topicNamesToMove = Object.keys(this.topicNameToPrerequisiteTopicNames);
+    moveItemInArray(topicNamesToMove, event.previousIndex, event.currentIndex);
+    console.log(topicNamesToMove);
+    let temp = new Map();
+    for (let topicName of topicNamesToMove) {
+      temp[topicName] = this.topicNameToPrerequisiteTopicNames[topicName];
+    }
+    console.log(temp);
   }
 }
 
