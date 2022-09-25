@@ -29,7 +29,7 @@ from core.platform import models
 
 from typing import (
         Dict, Final, List, Literal, Optional, Sequence, Tuple, TypedDict, Union,
-        cast, overload)
+        overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
