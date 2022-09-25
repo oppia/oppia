@@ -1228,7 +1228,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Raises a validation error in the following
             condition:
             - Duplicate rules are present
-            - Denominator is <= 0
             - Solution is not in simplest form when the `simplest form`
             setting is turned on
             - Solution is not in proper form when the `proper form` setting
@@ -1236,7 +1235,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             - `IsExactlyEqualTo` rule have integral value when
             `allow non zero integers` setting is off
             - Rule have solution that is subset of previous rules' solutions
-            - `HasDenominatorEqualTo` rule have value less than 0
             - `HasFractionalPartExactlyEqualTo` rule comes after
             `HasDenominatorEqualTo` rule where the fractional denominator is
             equal to `HasDenominatorEqualTo` rule value
@@ -1277,15 +1275,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     num = rule_spec.inputs['f']['numerator']
                     den = rule_spec.inputs['f']['denominator']
                     whole = rule_spec.inputs['f']['wholeNumber']
-
-                    # Denominator should be greater than 0.
-                    if den <= 0:
-                        raise utils.ValidationError(
-                            f'The rule \'{rule_spec_index}\' of answer '
-                            f'group \'{ans_group_index}\' has '
-                            f'denominator less than or equal to zero '
-                            f'in FractionInput interaction.'
-                        )
 
                     # Solution should be in simplest form if the `simplest form`
                     # setting is turned on.
@@ -1377,16 +1366,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 if rule_spec.rule_type == 'HasDenominatorEqualTo':
                     rule_value_x = int(rule_spec.inputs['x'])
                     matched_denominator['denominator'] = rule_value_x
-                    # `HasDenominatorEqualTo` rule should not have value
-                    # less than 0.
-                    if rule_value_x == 0:
-                        raise utils.ValidationError(
-                            f'The rule \'{rule_spec_index}\' of answer '
-                            f'group \'{ans_group_index}\' has '
-                            f'denominator less than or equal to zero '
-                            f'having rule type HasDenominatorEqualTo '
-                            f'in FractionInput interaction.'
-                        )
 
                 for range_ele in ranges:
                     earlier_rule = (
@@ -1437,7 +1416,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Raises a validation error in the following
             condition:
             - Duplicate rules are present
-            - `IsEqualTo` rule comes after `IsEquivalentTo` rule
+            - `IsEqualTo` rule comes after `IsEquivalentTo` rule having same
+            values
         """
         number_with_units_rules = []
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
@@ -1478,11 +1458,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Raises a validation error in the following
             condition:
             - Duplicate rules are present
-            - Answer choice present in more than one rule
             - Answer choices are empty or duplicate
         """
-        selected_equals_choices = []
-        rule_spec_list = []
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
@@ -1498,22 +1475,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     )
                 else:
                     rule_spec_till_now.append(rule_spec.to_dict())
-                # No ans choice should appear more than one.
-                if rule_spec.rule_type == 'Equals':
-                    if rule_spec.inputs['x'] in selected_equals_choices:
-                        raise utils.ValidationError(
-                            f'The rule \'{rule_spec_index}\' of answer group '
-                            f'\'{ans_group_index}\' is already present in '
-                            f'MultipleChoiceInput interaction.'
-                        )
-                    else:
-                        selected_equals_choices.append(
-                            rule_spec.inputs['x'])
-
-                rule_spec_list.append(rule_spec.inputs['x'])
 
         choices = self.customization_args['choices'].value
-
         # Answer choices should be non-empty and unique.
         seen_choices = []
         for choice in choices:
@@ -1551,6 +1514,26 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ['maxAllowableSelectionCount'].value)
         rule_spec_till_now: List[state_domain.RuleSpecDict] = []
 
+        # Minimum number of selections should be no greater than maximum
+        # number of selections.
+        if min_value > max_value:
+            raise utils.ValidationError(
+                f'Min value which is {str(min_value)} '
+                f'is greater than max value '
+                f'which is {str(max_value)} '
+                f'in ItemSelectionInput interaction.'
+            )
+        choices = self.customization_args['choices'].value
+
+        # There should be enough choices to have minimum number
+        # of selections.
+        if len(choices) < min_value:
+            raise utils.ValidationError(
+                f'Number of choices which is {str(len(choices))} '
+                f'is lesser than the '
+                f'min value selection which is {str(min_value)} '
+                f'in ItemSelectionInput interaction.'
+            )
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
                 answer_group.rule_specs
@@ -1575,29 +1558,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'Selected choices of rule \'{rule_spec_index}\' '
                             f'of answer group \'{ans_group_index}\' '
                             f'either less than min_selection_value '
-                            f'or greter than max_selection_value '
+                            f'or greater than max_selection_value '
                             f'in ItemSelectionInput interaction.'
                         )
-        choices = self.customization_args['choices'].value
-        # Minimum number of selections should be no greater than maximum
-        # number of selections.
-        if min_value > max_value:
-            raise utils.ValidationError(
-                f'Min value which is {str(min_value)} '
-                f'is greater than max value '
-                f'which is {str(max_value)} '
-                f'in ItemSelectionInput interaction.'
-            )
-
-        # There should be enough choices to have minimum number
-        # of selections.
-        if len(choices) < min_value:
-            raise utils.ValidationError(
-                f'Number of choices which is {str(len(choices))} '
-                f'is lesser than the '
-                f'min value selection which is {str(min_value)} '
-                f'in ItemSelectionInput interaction.'
-            )
 
         # All choices should be unique and non-empty.
         seen_choices = []

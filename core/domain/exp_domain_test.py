@@ -1824,11 +1824,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'NumericInput interaction is already present.')
         rule_specs.remove(rule_specs[1])
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
 
         # Validate FractionInput interaction.
         state = new_exploration.states['Introduction']
         self.set_interaction_for_state(state, 'FractionInput')
-        test_ans_group_for_numeric_interaction = [
+        test_ans_group_for_fraction_interaction = [
             state_domain.AnswerGroup.from_dict({
             'rule_specs': [
                 {
@@ -1850,17 +1852,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                             'wholeNumber': 0,
                             'numerator': 2,
                             'denominator': 3
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'HasFractionalPartExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 0,
-                            'numerator': 3,
-                            'denominator': 0
                         }
                     }
                 },
@@ -1907,6 +1898,45 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                             'denominator': 3
                         }
                     }
+                },
+                {
+                    'rule_type': 'IsGreaterThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 10,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 27,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasDenominatorEqualTo',
+                    'inputs': {
+                        'x': 4
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 9,
+                            'denominator': 4
+                        }
+                    }
                 }
             ],
             'outcome': {
@@ -1926,7 +1956,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             })
         ]
         state.interaction.answer_groups = (
-            test_ans_group_for_numeric_interaction)
+            test_ans_group_for_fraction_interaction)
         state.interaction.customization_args[
             'allowNonzeroIntegerPart'].value = False
         state.interaction.customization_args[
@@ -1937,11 +1967,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'FractionInput interaction is already present.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' has '
-            'denominator less than or equal to zero '
-            'in FractionInput interaction.')
         rule_specs.remove(rule_specs[1])
         self._assert_validation_error(
             new_exploration, 'The rule \'1\' of answer group \'0\' do '
@@ -1958,10 +1983,310 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'not have value in proper fraction '
             'in FractionInput interaction.')
         rule_specs.remove(rule_specs[1])
+        state.interaction.customization_args[
+            'allowImproperFraction'].value = True
         self._assert_validation_error(
             new_exploration, 'The rule \'1\' of answer group \'0\' has '
             'non zero integer part in FractionInput interaction.')
         rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'Rule \'2\' from answer group \'0\' of '
+            'FractionInput interaction will never be matched because it is '
+            'made redundant by the above rules')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'Rule \'3\' from answer group \'0\' of '
+            'FractionInput interaction having rule type HasFractionalPart'
+            'ExactlyEqualTo will never be matched because it is '
+            'made redundant by the above rules')
+        rule_specs.remove(rule_specs[1])
+
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
+        # Validate NumberWithUnits interaction.
+        self.set_interaction_for_state(state, 'NumberWithUnits')
+        test_ans_group_for_number_with_units_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'IsEquivalentTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsEquivalentTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.update_interaction_answer_groups(
+            test_ans_group_for_number_with_units_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' has '
+            'rule type equal is coming after rule type equivalent having '
+            'same value in FractionInput interaction.'
+        )
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'NumberWithUnitsInput interaction is already present.'
+        )
+
+        # Validate MultipleChoiceInput interaction.
+        self.set_interaction_for_state(state, 'MultipleChoiceInput')
+        test_ans_group_for_multiple_choice_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.update_interaction_answer_groups(
+            test_ans_group_for_multiple_choice_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
+        ]
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'MultipleChoiceInput interaction is already present.'
+        )
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'There should not be any duplicate '
+            'choices in MultipleChoiceInput interaction.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[1].html = '<p>3</p>'
+        self._assert_validation_error(
+            new_exploration, 'There should not be any empty '
+            'choices in MultipleChoiceInput interaction.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[2].html = '<p>2</p>'
+
+        # Validate ItemSelectionInput interaction.
+        self.set_interaction_for_state(state, 'ItemSelectionInput')
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        test_ans_group_for_item_selection_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': [
+                        'ca_choices_0',
+                        'ca_choices_1',
+                        'ca_choices_2'
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': [
+                        'ca_choices_0',
+                        'ca_choices_1',
+                        'ca_choices_2'
+                        ]
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.update_interaction_answer_groups(
+            test_ans_group_for_item_selection_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
+        ]
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 3
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 1
+        self._assert_validation_error(
+            new_exploration, 'Min value which is 3 is greater than max value '
+            'which is 1 in ItemSelectionInput interaction.'
+        )
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 4
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 4
+        self._assert_validation_error(
+            new_exploration, 'Number of choices which is 3 is lesser than the '
+                'min value selection which is 4 in ItemSelectionInput '
+                'interaction.')
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        self._assert_validation_error(
+            new_exploration, 'The rule 1 of answer group 0 of '
+            'ItemSelectionInput interaction is already present.'
+        )
+        rule_specs.remove(rule_specs[1])
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 2
+        self._assert_validation_error(
+            new_exploration, 'Selected choices of rule \'0\' of answer group '
+            '\'0\' either less than min_selection_value or greater than '
+            'max_selection_value in ItemSelectionInput interaction.'
+        )
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        self._assert_validation_error(
+            new_exploration, 'There should not be any duplicate '
+            'choices in ItemSelectionInput interaction.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[1].html = '<p>3</p>'
+        self._assert_validation_error(
+            new_exploration, 'There should not be any empty '
+            'choices in ItemSelectionInput interaction.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[2].html = '<p>2</p>'
 
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""
