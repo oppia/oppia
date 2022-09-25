@@ -30,7 +30,7 @@ from typing import Any, Dict, List, Sequence, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from extensions.interactions.GraphInput import GraphInput
+    from extensions import domain
 
 
 class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
@@ -616,7 +616,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         ]
 
         invalid_values_with_error_messages: List[Tuple[
-            Union[None, int, str, Dict[str, List[str]], GraphInput.GraphDict],
+            Union[None, int, str, Dict[str, List[str]], domain.GraphDict],
             str
         ]] = [
             (None, 'Cannot convert to graph None'),

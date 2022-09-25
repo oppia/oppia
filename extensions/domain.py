@@ -18,24 +18,77 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 from typing_extensions import TypedDict
 
-MYPY = False
-if MYPY: # pragma: no cover
-    from core.domain import state_domain
-    from extensions.interactions.GraphInput import GraphInput
-    from extensions.interactions.ImageClickInput import ImageClickInput
 
-    AllowedDefaultValueTypes = Union[
-        str,
-        float,
-        Dict[str, Union[str, List[ImageClickInput.LabeledRegionDict]]],
-        state_domain.SubtitledUnicodeDict,
-        GraphInput.GraphDict,
-        List[state_domain.SubtitledHtmlDict],
-        None
-    ]
+class VertexDict(TypedDict):
+    """Type for the dictionary representation of graph's vertices."""
+
+    x: float
+    y: float
+    label: str
+
+
+class EdgeDict(TypedDict):
+    """Type for the dictionary representation of graph's edges."""
+
+    src: int
+    dst: int
+    weight: int
+
+
+class GraphDict(TypedDict):
+    """Type for the dictionary representation of graph."""
+
+    vertices: List[VertexDict]
+    edges: List[EdgeDict]
+    isLabeled: bool
+    isDirected: bool
+    isWeighted: bool
+
+
+class RegionDict(TypedDict):
+    """Type representing the dictionary for region's area."""
+
+    regionType: str
+    area: List[List[float]]
+
+
+class LabeledRegionDict(TypedDict):
+    """Type representing the dictionary for image's labeled region."""
+
+    label: str
+    region: RegionDict
+
+
+class CustomizationArgSubtitledUnicodeDefaultDict(TypedDict):
+    """Type for the dictionary representation of CustomizationArgSpec's
+    SubtitledUnicode default_value.
+    """
+
+    content_id: Optional[str]
+    unicode_str: str
+
+
+class CustomizationArgSubtitledHtmlDefaultDict(TypedDict):
+    """Type for the dictionary representation of CustomizationArgSpec's
+    SubtitledHtml default_value.
+    """
+
+    content_id: Optional[str]
+    html: str
+
+
+AllowedDefaultValueTypes = Union[
+    str,
+    float,
+    GraphDict,
+    CustomizationArgSubtitledUnicodeDefaultDict,
+    List[CustomizationArgSubtitledHtmlDefaultDict],
+    Dict[str, Union[str, List[LabeledRegionDict]]],
+    None
+]
 
 
 class CustomizationArgSpecsDict(TypedDict):

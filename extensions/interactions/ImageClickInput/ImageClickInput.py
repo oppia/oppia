@@ -21,25 +21,10 @@ from __future__ import annotations
 from extensions.interactions import base
 
 from typing import Dict, List, Union
-from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from extensions import domain
-
-
-class RegionDict(TypedDict):
-    """Type representing the dictionary for region's area."""
-
-    regionType: str
-    area: List[List[float]]
-
-
-class LabeledRegionDict(TypedDict):
-    """Type representing the dictionary for image's labeled region."""
-
-    label: str
-    region: RegionDict
 
 
 class ImageClickInput(base.BaseInteraction):
@@ -60,7 +45,7 @@ class ImageClickInput(base.BaseInteraction):
     show_generic_submit_button: bool = False
 
     _image_and_regions_default_value: Dict[
-        str, Union[str, List[LabeledRegionDict]]
+        str, Union[str, List[domain.LabeledRegionDict]]
     ] = {
         'imagePath': '',
         'labeledRegions': []

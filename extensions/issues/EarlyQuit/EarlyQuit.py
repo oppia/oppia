@@ -18,10 +18,13 @@
 
 from __future__ import annotations
 
-from extensions import domain
 from extensions.issues import base
 
 from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
 
 
 class EarlyQuit(base.BaseExplorationIssueSpec):

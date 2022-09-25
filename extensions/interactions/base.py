@@ -68,7 +68,7 @@ ALLOWED_DISPLAY_MODES: Final = [
 
 
 class AnswerVisualizationSpecsDict(TypedDict):
-    """Dictionary representing the _answer_visualization_specs variable."""
+    """Type for the _answer_visualization_specs variable."""
 
     id: str
     options: models.OptionsDictType

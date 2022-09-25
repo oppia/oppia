@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from extensions.interactions.GraphInput import GraphInput
+    from extensions import domain
     from typing_extensions import TypedDict
 
     class CheckedProofDict(TypedDict):
@@ -129,13 +129,13 @@ if MYPY:  # pragma: no cover
         List[List[str]],
         List[List[float]],
         List[UnitsDict],
-        List[GraphInput.GraphDict],
+        List[domain.GraphDict],
         List[CodeEvaluationDict],
         List[MusicPhraseDict],
         MathExpressionContentDict,
         FractionDict,
         NumberWithUnitsDict,
-        GraphInput.GraphDict,
+        domain.GraphDict,
         TranslatableObjectDefaultValueTypes
     ]
 
@@ -898,7 +898,7 @@ class Graph(BaseObject):
     """A (mathematical) graph with edges and vertices."""
 
     description = 'A (mathematical) graph'
-    default_value: GraphInput.GraphDict = {
+    default_value: domain.GraphDict = {
         'edges': [],
         'isDirected': False,
         'isLabeled': False,
@@ -967,7 +967,7 @@ class Graph(BaseObject):
         }
 
     @classmethod
-    def normalize(cls, raw: GraphInput.GraphDict) -> GraphInput.GraphDict:
+    def normalize(cls, raw: domain.GraphDict) -> domain.GraphDict:
         """Validates and normalizes a raw Python object.
 
         Checks that there are no self-loops or multiple edges.
@@ -1038,7 +1038,7 @@ class ListOfGraph(BaseObject):
     """Class for lists of Graphs."""
 
     description = 'A list of graphs.'
-    default_value: List[GraphInput.GraphDict] = []
+    default_value: List[domain.GraphDict] = []
 
     @classmethod
     def get_schema(cls) -> SchemaDictType:

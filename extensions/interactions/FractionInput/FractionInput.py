@@ -69,7 +69,7 @@ class FractionInput(base.BaseInteraction):
             'obj_type': 'SubtitledUnicode'
         },
         'default_value': {
-            'content_id': '',
+            'content_id': None,
             'unicode_str': ''
         }
     }]

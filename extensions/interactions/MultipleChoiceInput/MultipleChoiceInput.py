@@ -69,7 +69,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             }
         },
         'default_value': [{
-            'content_id': '',
+            'content_id': None,
             'html': ''
         }],
     }, {

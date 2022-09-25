@@ -21,37 +21,10 @@ from __future__ import annotations
 from extensions.interactions import base
 
 from typing import List
-from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from extensions import domain
-
-
-class VertexDict(TypedDict):
-    """Type for the dictionary representation of graph's vertices."""
-
-    x: float
-    y: float
-    label: str
-
-
-class EdgeDict(TypedDict):
-    """Type for the dictionary representation of graph's edges."""
-
-    src: int
-    dst: int
-    weight: int
-
-
-class GraphDict(TypedDict):
-    """Type for the dictionary representation of graph."""
-
-    vertices: List[VertexDict]
-    edges: List[EdgeDict]
-    isLabeled: bool
-    isDirected: bool
-    isWeighted: bool
 
 
 class GraphInput(base.BaseInteraction):
@@ -71,7 +44,7 @@ class GraphInput(base.BaseInteraction):
     can_have_solution: bool = True
     show_generic_submit_button: bool = True
 
-    _graph_default_value: GraphDict = {
+    _graph_default_value: domain.GraphDict = {
         'vertices': [{
             'x': 150.0,
             'y': 50.0,

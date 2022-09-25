@@ -230,8 +230,6 @@ class AnswerFrequencies(BaseCalculation):
                 * state_name: Name of the state.
                 * interaction_id: id of the interaction.
                 * submitted_answer_list: A list of submitted answers.
-                    NOTE: The answers in this list must be sorted in
-                    chronological order of their submission.
 
         Returns:
             stats_domain.StateAnswersCalcOutput. A calculation output object
@@ -283,8 +281,6 @@ class Top5AnswerFrequencies(BaseCalculation):
                 * state_name: Name of the state.
                 * interaction_id: id of the interaction.
                 * submitted_answer_list: A list of submitted answers.
-                    NOTE: The answers in this list must be sorted in
-                    chronological order of their submission.
 
         Returns:
             stats_domain.StateAnswersCalcOutput. A calculation output object
@@ -336,8 +332,6 @@ class Top10AnswerFrequencies(BaseCalculation):
                 * state_name: Name of the state.
                 * interaction_id: id of the interaction.
                 * submitted_answer_list: A list of submitted answers.
-                    NOTE: The answers in this list must be sorted in
-                    chronological order of their submission.
 
         Returns:
             stats_domain.StateAnswersCalcOutput. A calculation output object
@@ -392,8 +386,6 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
                 * state_name: Name of the state.
                 * interaction_id: id of the interaction.
                 * submitted_answer_list: A list of submitted answers.
-                    NOTE: The answers in this list must be sorted in
-                    chronological order of their submission.
 
         Returns:
             stats_domain.StateAnswersCalcOutput. A calculation output object
@@ -449,8 +441,6 @@ class TopAnswersByCategorization(BaseCalculation):
                 * state_name: Name of the state.
                 * interaction_id: id of the interaction.
                 * submitted_answer_list: A list of submitted answers.
-                    NOTE: The answers in this list must be sorted in
-                    chronological order of their submission.
 
         Returns:
             stats_domain.StateAnswersCalcOutput. A calculation output object
