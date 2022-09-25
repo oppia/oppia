@@ -173,10 +173,15 @@ describe('Contributor dashboard page', function() {
         'create',
         ['rectangle', 'bezier', 'piechart', 'svgupload'],
         'An svg diagram.');
-    });
+    }, true);
     await explorationEditorMainTab.setInteraction('EndExploration');
     var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
+    let width = (await browser.getWindowSize()).width;
+    if (width < 769) {
+      var basicSettings = $('.e2e-test-settings-container');
+      await action.click('Basic Settings', basicSettings);
+    }
     await explorationEditorSettingsTab.setTitle('exp1');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(
@@ -199,7 +204,6 @@ describe('Contributor dashboard page', function() {
     await storyEditorPage.updateMetaTagContent('story meta tag');
     await storyEditorPage.saveStory('Saving Story');
     await storyEditorPage.publishStory();
-    await storyEditorPage.returnToTopic();
 
     // Testing the copy tool.
     let opportunityActionButtonCss = $(
@@ -209,6 +213,7 @@ describe('Contributor dashboard page', function() {
     let cancelButton = $('.e2e-test-cancel-rich-text-editor');
 
     await contributorDashboardPage.get();
+    await waitFor.pageToFullyLoad();
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(
       GERMAN_LANGUAGE);
@@ -254,7 +259,7 @@ describe('Contributor dashboard page', function() {
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
     await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'));
+      await forms.toRichText('Question 1'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
@@ -275,8 +280,18 @@ describe('Contributor dashboard page', function() {
     await users.login(USER_EMAILS[1]);
     await contributorDashboardPage.get();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
-    await contributorDashboardPage.clickOpportunityActionButton(
-      'Question 1', SKILL_DESCRIPTIONS[0]);
+
+    let width = (await browser.getWindowSize()).width;
+    if (width < 700) {
+      let opportunityItemSelector = function() {
+        return $$('.e2e-test-opportunity-list-item');
+      };
+      let opportunity = (await opportunityItemSelector())[0];
+      await action.click('Opportunity Item', opportunity);
+    } else {
+      await contributorDashboardPage.clickOpportunityActionButton(
+        'Question 1', SKILL_DESCRIPTIONS[0]);
+    }
     await (
       contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
     await contributorDashboardPage.clickAcceptQuestionSuggestionButton();
@@ -316,7 +331,7 @@ describe('Contributor dashboard page', function() {
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
     await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'));
+      await forms.toRichText('Question 1'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
@@ -337,8 +352,18 @@ describe('Contributor dashboard page', function() {
     await users.login(USER_EMAILS[1]);
     await contributorDashboardPage.get();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
-    await contributorDashboardPage.clickOpportunityActionButton(
-      'Question 1', SKILL_DESCRIPTIONS[0]);
+
+    let width = (await browser.getWindowSize()).width;
+    if (width < 700) {
+      let opportunityItemSelector = function() {
+        return $$('.e2e-test-opportunity-list-item');
+      };
+      let opportunity = (await opportunityItemSelector())[0];
+      await action.click('Opportunity Item', opportunity);
+    } else {
+      await contributorDashboardPage.clickOpportunityActionButton(
+        'Question 1', SKILL_DESCRIPTIONS[0]);
+    }
     await (
       contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
     await contributorDashboardPage.setQuestionSuggestionReviewMessage(

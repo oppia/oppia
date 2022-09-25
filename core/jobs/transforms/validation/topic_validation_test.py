@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
 (base_models, topic_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.topic])
+    [models.Names.BASE_MODEL, models.Names.TOPIC])
 
 
 class ValidateCanonicalNameMatchesNameInLowercaseTests(
@@ -548,7 +548,7 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_topic_summary_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'TopicSummaryModel', 'id'),
             ['TopicModel', 'TopicRightsModel'])

@@ -157,17 +157,17 @@ class BlogPost:
                 raise utils.ValidationError(
                     'Expected Thumbnail filename should be a string,'
                     ' received %s' % self.thumbnail_filename)
+
             self.require_valid_thumbnail_filename(
                 self.thumbnail_filename, strict=strict)
+
+            self.require_valid_url_fragment(self.url_fragment)
+            if not self.content:
+                raise utils.ValidationError('Content can not be empty')
 
         if not isinstance(self.content, str):
             raise utils.ValidationError(
                 'Expected contents to be a string, received: %s' % self.content)
-
-        if strict:
-            self.require_valid_url_fragment(self.url_fragment)
-            if not self.content:
-                raise utils.ValidationError('Content can not be empty')
 
     @classmethod
     def require_valid_tags(cls, tags: List[str], strict: bool) -> None:
@@ -397,7 +397,8 @@ class BlogPostSummary:
         tags: List[str],
         thumbnail_filename: Optional[str] = None,
         last_updated: Optional[datetime.datetime] = None,
-        published_on: Optional[datetime.datetime] = None
+        published_on: Optional[datetime.datetime] = None,
+        deleted: Optional[bool] = False,
     ) -> None:
         """Constructs a Blog Post Summary domain object.
 
@@ -414,6 +415,7 @@ class BlogPostSummary:
                 was last updated.
             published_on: datetime.datetime. Date and time when the blog post
                 is last published.
+            deleted: bool. Whether the blog post is deleted or not.
         """
         self.id = blog_post_id
         self.author_id = author_id
@@ -424,6 +426,7 @@ class BlogPostSummary:
         self.thumbnail_filename = thumbnail_filename
         self.last_updated = last_updated
         self.published_on = published_on
+        self.deleted = deleted
 
     @classmethod
     def require_valid_thumbnail_filename(
@@ -476,17 +479,18 @@ class BlogPostSummary:
                     'Expected thumbnail filename to be a string, received: %s.'
                     % self.thumbnail_filename
                 )
+
             self.require_valid_thumbnail_filename(
                 self.thumbnail_filename, strict=strict)
+
+            self.require_valid_url_fragment(self.url_fragment)
+
+            if not self.summary:
+                raise utils.ValidationError('Summary can not be empty')
 
         if not isinstance(self.summary, str):
             raise utils.ValidationError(
                 'Expected summary to be a string, received: %s' % self.summary)
-
-        if strict:
-            self.require_valid_url_fragment(self.url_fragment)
-            if not self.summary:
-                raise utils.ValidationError('Summary can not be empty')
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:

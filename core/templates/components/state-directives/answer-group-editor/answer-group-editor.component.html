@@ -1,7 +1,7 @@
 <div class="h-100">
   <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
   <div *ngIf="rules">
-    <strong>
+    <strong class="oppia-answer-group-heading">
       If the learner's answer...
     </strong>
     <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
@@ -53,6 +53,7 @@
   <oppia-outcome-editor [isEditable]="isEditable"
                         [displayFeedback]="displayFeedback"
                         (saveDest)="sendOnSaveAnswerGroupDest($event)"
+                        (saveDestIfStuck)="sendOnSaveAnswerGroupDestIfStuck($event)"
                         (saveFeedback)="sendOnSaveAnswerGroupFeedback($event)"
                         (saveCorrectnessLabel)="sendOnSaveAnswerGroupCorrectnessLabel($event)"
                         [outcome]="outcome"
@@ -134,4 +135,17 @@
   .oppia-answer-rule-block {
     border-bottom: 1px solid #ccc;
   }
+
+  @media screen and (max-width: 700px) {
+  .oppia-editor-card-section {
+      padding: 20px 10px;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .oppia-answer-group-heading {
+      font-size: 18px;
+    }
+  }
+
 </style>

@@ -44,20 +44,32 @@ var ExplorationEditorPage = function() {
   */
   var commitMessageInput = $('.e2e-test-commit-message-input');
   var confirmPublish = $('.e2e-test-confirm-publish');
-  var expCategoryDropdownElement = $('.e2e-test-exploration-category-dropdown');
+  var expCategoryDropdownElement = $(
+    '.e2e-test-exploration-category-metadata-modal');
   var expLanguageSelectorElement = $('.e2e-test-exploration-language-select');
+  var expLanguageSelectorElementModal = $(
+    '.e2e-test-exploration-language-select-modal');
   var explorationSaveModalElement = $('.e2e-test-exploration-save-modal');
   var expTagsSelectionChoiceElementsSelector = function() {
     return $$('.select2-selection__choice');
   };
   var expObjective = $('.e2e-test-exploration-objective-input');
-  var expTags = $('.e2e-test-tags');
+  var expInput = $('.e2e-test-chip-list-tags');
   var expTitle = $('.e2e-test-exploration-title-input');
+  var expTitleInPostPublishModal = $(
+    '.e2e-test-exploration-title-input-modal');
+  var expObjectiveInPostPublishModal = $(
+    '.e2e-test-exploration-objective-input-modal');
   var explorationMetadataModalHeaderElement = $(
     '.e2e-test-metadata-modal-header');
   var modalContentElement = $('.modal-content');
   var promptModalElement = $('.e2e-test-save-prompt-modal');
-  var selectionRenderedElement = $('.select2-selection__rendered');
+  var languageChoiceOptionElement = function(language) {
+    return $$(
+      `.e2e-test-exploration-language-select-lan=${language}`);
+  };
+  var explorationCategoryDropdown = $(
+    '.e2e-test-exploration-category-dropdown');
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
   var toastMessage = $('.e2e-test-toast-message');
 
@@ -93,9 +105,15 @@ var ExplorationEditorPage = function() {
   var saveChangesButton = $('.e2e-test-save-changes');
   var saveDiscardToggleButton = $('.e2e-test-save-discard-toggle');
   var saveDraftButtonTextContainer = $('.e2e-test-save-draft-message');
+  var saveButtonMobileSelector = function() {
+    return $$('.e2e-test-save-changes-for-small-screens');
+  };
+  var navigateToSettingsTabButtonMobile = $('.e2e-test-mobile-options');
+  var optionsDropdownMobile = $('.e2e-test-mobile-options-dropdown');
+  var settingsButtonMobile = $('.e2e-test-mobile-settings-button');
 
   /*
-   * Components
+        * Components
    */
   this.getImprovementsTab = function() {
     return (
@@ -141,13 +159,15 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
 
-    await action.setValue('Exploration title', expTitle, title);
+    await action.setValue(
+      'Exploration title', expTitleInPostPublishModal, title);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.setValue('Exploration objective', expObjective, objective);
+    await action.setValue(
+      'Exploration objective', expObjectiveInPostPublishModal, objective);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
@@ -164,16 +184,18 @@ var ExplorationEditorPage = function() {
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.select(
-      'Exploration Language', expLanguageSelectorElement,
-      language);
+    await action.click(
+      'Exploration Language', expLanguageSelectorElementModal);
+
+    var languageChoiceOption = await languageChoiceOptionElement(language)[0];
+    await action.click('Language input Choice', languageChoiceOption);
+
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
     for (var elem of tags) {
-      var expInput = expTags.$('<input>');
       await action.click('Exploration input', expInput);
       await action.setValue('Exploration input', expInput, elem + '\n');
       await action.click(
@@ -205,20 +227,20 @@ var ExplorationEditorPage = function() {
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
     var explorationCategory = await action.getText(
-      'Selection Rendered Element', selectionRenderedElement);
+      'Exploration Category Dropdown Element', explorationCategoryDropdown);
     var explorationLanguage = await action.getText(
       'Exploration Language Selector Element',
-      expLanguageSelectorElement.$('option:checked'));
+      expLanguageSelectorElement);
     await waitFor.visibilityOf(
       expTitle, 'Exploration Goal taking too long to appear');
-    var expTitleValue = await action.getAttribute(
-      'Exploration Title', expTitle, 'value');
+    var expTitleValue = await action.getValue(
+      'Exploration Title', expTitle);
     expect(expTitleValue).toMatch(title);
     expect(explorationCategory).toMatch(category);
-    var expObjectiveValue = await action.getAttribute(
-      'Exploration Objective', expObjective, 'value');
+    var expObjectiveValue = await action.getValue(
+      'Exploration Objective', expObjective);
     expect(expObjectiveValue).toMatch(objective);
-    expect(explorationLanguage).toMatch(language);
+    expect(explorationLanguage).toBe(language);
     var expTagsSelectionChoiceElements = (
       await expTagsSelectionChoiceElementsSelector());
     for (var i = 0; i < expTagsSelectionChoiceElements.length; i++) {
@@ -230,20 +252,37 @@ var ExplorationEditorPage = function() {
     }
   };
 
+  // eslint-disable-next-line padded-blocks
   this.saveChanges = async function(commitMessage) {
     await action.waitForAutosave();
-    await action.click('Save changes button', saveChangesButton);
-    if (commitMessage) {
-      await action.setValue(
-        'Commit message input', commitMessageInput, commitMessage);
+    let width = (await browser.getWindowSize()).width;
+    if (width > 768) {
+      await action.click('Save changes button', saveChangesButton);
+      if (commitMessage) {
+        await action.setValue(
+          'Commit message input', commitMessageInput, commitMessage);
+      }
+
+      await action.click('Save draft button', commitChangesButton);
+      // TODO(#13096): Remove browser.pause from e2e files.
+      /* eslint-disable-next-line oppia/e2e-practices */
+      await browser.pause(2500);
+      await waitFor.textToBePresentInElement(
+        saveDraftButtonTextContainer, 'Save Draft',
+        'Changes could not be saved');
+    } else {
+      var saveButtonMobile = await saveButtonMobileSelector();
+      if (await saveButtonMobile.length === 0) {
+        await action.click(
+          'Settings tab button', navigateToSettingsTabButtonMobile);
+      }
+      await action.click('Save draft', saveButtonMobile[0]);
+      if (commitMessage) {
+        await action.sendValue(
+          'Commit message input', commitMessageInput, commitMessage);
+      }
+      await action.click('Save draft button', commitChangesButton);
     }
-    await action.click('Save draft button', commitChangesButton);
-    // TODO(#13096): Remove browser.pause from e2e files.
-    // eslint-disable-next-line oppia/e2e-practices
-    await browser.pause(2500);
-    await waitFor.textToBePresentInElement(
-      saveDraftButtonTextContainer, 'Save Draft',
-      'Changes could not be saved');
   };
 
   this.publishChanges = async function(commitMessage) {
@@ -356,6 +395,10 @@ var ExplorationEditorPage = function() {
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
+    // Wait for the appearing and disappearing action to get completed after
+    // the main tab button is clicked.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.navigateToPreviewTab = async function() {
@@ -364,7 +407,20 @@ var ExplorationEditorPage = function() {
   };
 
   this.navigateToSettingsTab = async function() {
-    await action.click('Settings tab button', navigateToSettingsTabButton);
+    let width = (await browser.getWindowSize()).width;
+    if (width > 768) {
+      await action.click('Settings tab button', navigateToSettingsTabButton);
+    } else {
+      var saveButtonMobile = await saveButtonMobileSelector();
+      if (await saveButtonMobile.length === 0) {
+        await action.click(
+          'Settings tab button', navigateToSettingsTabButtonMobile);
+      }
+      await action.click(
+        'Options button dropdown', optionsDropdownMobile);
+      await action.click(
+        'Settings tab', settingsButtonMobile);
+    }
     await waitFor.pageToFullyLoad();
   };
 

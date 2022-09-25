@@ -26,23 +26,34 @@ from core import feconf
 from core.domain import feedback_services
 from core.tests import test_utils
 
+from typing_extensions import Final, TypedDict
+
+
+class ExpectedThreadDict(TypedDict):
+    """Type for the EXPECTED_THREAD_DICT dictionary."""
+
+    status: str
+    summary: None
+    original_author_username: None
+    subject: str
+
 
 class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
 
-    EXP_ID_1 = 'eid1'
+    EXP_ID_1: Final = 'eid1'
 
-    EXPECTED_THREAD_DICT = {
+    EXPECTED_THREAD_DICT: ExpectedThreadDict = {
         'status': u'open',
         'summary': None,
         'original_author_username': None,
         'subject': u'a subject'
     }
 
-    USER_EMAIL = 'user@example.com'
-    USER_USERNAME = 'user'
+    USER_EMAIL: Final = 'user@example.com'
+    USER_USERNAME: Final = 'user'
 
-    def setUp(self):
-        super(FeedbackThreadSummariesLoadTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -53,7 +64,7 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture', language_code='en')
 
-    def test_get_thread_summaries_load_test(self):
+    def test_get_thread_summaries_load_test(self) -> None:
         # The speed of fetching the summaries of 100 threads having 5 messages
         # should be less than 1.7 second. In reality, the time taken to fetch
         # all the summaries is less than 0.2s. However since it seems to take

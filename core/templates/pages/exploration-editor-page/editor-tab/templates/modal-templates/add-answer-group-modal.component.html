@@ -22,8 +22,8 @@
          title="Edit feedback" class="oppia-edit-feedback">
       <div class="oppia-rule-details-header oppia-editable-section">
         <div class="oppia-rule-preview oppia-transition-200">
-          <div class="oppia-click-to-start-editing e2e-test-open-feedback-editor" (click)="openFeedbackEditor()">
-            <i class="material-icons oppia-editor-edit-icon" title="Edit Feedback">&#xE254;</i>
+          <div class="oppia-click-to-start-editing" (click)="openFeedbackEditor()">
+            <i class="material-icons oppia-editor-edit-icon e2e-test-open-feedback-editor" title="Edit Feedback">&#xE254;</i>
           </div>
           <strong>Oppia tells the learner...</strong>
           <div class="position-relative">
@@ -50,12 +50,21 @@
                                       (getChanges)="validateChanges($event)"
                                       (addState)="updateState($event)">
     </oppia-outcome-destination-editor>
+
+    <oppia-outcome-if-stuck-destination-editor [outcome]="tmpOutcome"
+                                               *ngIf="!questionModeEnabled && destIfStuckFeatEnabled && !tmpOutcome.labelledAsCorrect"
+                                               (getChanges)="validateChanges($event)"
+                                               (addState)="updateState($event)">
+    </oppia-outcome-if-stuck-destination-editor>
   </form>
 
   <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+    <input class="e2e-test-editor-correctness-toggle mr-2"
+           type="checkbox"
+           [(ngModel)]="tmpOutcome.labelledAsCorrect">
     <strong>The answers in this group are correct</strong>
-    <input class="e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="tmpOutcome.labelledAsCorrect">
   </div>
+
   <oppia-question-misconception-editor *ngIf="questionModeEnabled"
                                        (saveTaggedMisconception)="updateTaggedMisconception($event)"
                                        (saveAnswerGroupFeedback)="updateAnswerGroupFeedback($event)"
@@ -73,6 +82,13 @@
 </div>
 
 <style>
+  .modal-footer {
+    display: flex;
+    justify-content: end;
+  }
+  .oppia-click-to-start-editing {
+    width: 95%;
+  }
   .oppia-outcome-feedback-editor-add-answer {
     margin-top: 50px;
   }
@@ -91,6 +107,11 @@
     color: #888;
   }
   @media screen and (max-width: 768px) {
+    .oppia-click-to-start-editing {
+      margin-top: 20px;
+      position: relative;
+      top: 20px;
+    }
     .add-answer-group-modal .modal-dialog ,
     .add-answer-group-modal .modal-content {
       border: 0;
@@ -110,6 +131,14 @@
     }
     .add-answer-group-modal .modal-header h3 {
       color: #fff;
+    }
+  }
+  @media screen and (max-width: 500px) {
+    strong {
+      font-size: 18px;
+    }
+    .oppia-correctness-label-editor {
+      margin-top: 0;
     }
   }
 </style>

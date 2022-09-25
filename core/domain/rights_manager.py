@@ -20,27 +20,41 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
+from core.domain import change_domain
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import taskqueue_services
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import Optional, overload
+from typing import Dict, List, Mapping, Optional, Sequence, Union, overload
 from typing_extensions import Literal
 
-datastore_services = models.Registry.import_datastore_services()
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import collection_models
+    from mypy_imports import datastore_services
+    from mypy_imports import exp_models
+
 (collection_models, exp_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration
+    models.Names.COLLECTION, models.Names.EXPLORATION
 ])
 
+datastore_services = models.Registry.import_datastore_services()
 
-def get_activity_rights_from_model(activity_rights_model, activity_type):
+
+def get_activity_rights_from_model(
+    activity_rights_model: Union[
+        collection_models.CollectionRightsModel,
+        exp_models.ExplorationRightsModel
+    ],
+    activity_type: str
+) -> rights_domain.ActivityRights:
     """Constructs an ActivityRights object from the given activity rights model.
 
     Args:
@@ -53,6 +67,15 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
     Returns:
         ActivityRights. The rights object created from the model.
     """
+    cloned_from_value = None
+    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+        # Ruling out the possibility of CollectionRightsModel for mypy
+        # type checking.
+        assert isinstance(
+            activity_rights_model,
+            exp_models.ExplorationRightsModel
+        )
+        cloned_from_value = activity_rights_model.cloned_from
 
     return rights_domain.ActivityRights(
         activity_rights_model.id,
@@ -61,9 +84,7 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
         activity_rights_model.voice_artist_ids,
         activity_rights_model.viewer_ids,
         community_owned=activity_rights_model.community_owned,
-        cloned_from=(
-            activity_rights_model.cloned_from
-            if activity_type == constants.ACTIVITY_TYPE_EXPLORATION else None),
+        cloned_from=cloned_from_value,
         status=activity_rights_model.status,
         viewable_if_private=activity_rights_model.viewable_if_private,
         first_published_msec=activity_rights_model.first_published_msec
@@ -71,8 +92,12 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
 
 
 def _save_activity_rights(
-        committer_id, activity_rights, activity_type, commit_message,
-        commit_cmds):
+    committer_id: str,
+    activity_rights: rights_domain.ActivityRights,
+    activity_type: str,
+    commit_message: str,
+    commit_cmds: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]]
+) -> None:
     """Saves an ExplorationRights or CollectionRights domain object to the
     datastore.
 
@@ -89,11 +114,25 @@ def _save_activity_rights(
     """
     activity_rights.validate()
 
+    # Ruling out the possibility of any other activity type.
+    assert (
+        activity_type in (
+            constants.ACTIVITY_TYPE_COLLECTION,
+            constants.ACTIVITY_TYPE_EXPLORATION
+        )
+    )
+
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        model_cls = exp_models.ExplorationRightsModel
+        model: Union[
+            exp_models.ExplorationRightsModel,
+            collection_models.CollectionRightsModel
+        ] = exp_models.ExplorationRightsModel.get(
+            activity_rights.id, strict=True
+        )
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        model_cls = collection_models.CollectionRightsModel
-    model = model_cls.get(activity_rights.id, strict=False)
+        model = collection_models.CollectionRightsModel.get(
+            activity_rights.id, strict=True
+        )
 
     model.owner_ids = activity_rights.owner_ids
     model.editor_ids = activity_rights.editor_ids
@@ -107,7 +146,9 @@ def _save_activity_rights(
     model.commit(committer_id, commit_message, commit_cmds)
 
 
-def _update_exploration_summary(activity_rights):
+def _update_exploration_summary(
+    activity_rights: rights_domain.ActivityRights
+) -> None:
     """Updates the exploration summary for the activity associated with the
     given rights object.
 
@@ -123,7 +164,9 @@ def _update_exploration_summary(activity_rights):
         activity_rights.id)
 
 
-def _update_collection_summary(activity_rights):
+def _update_collection_summary(
+    activity_rights: rights_domain.ActivityRights
+) -> None:
     """Updates the collection summary for the given activity associated with
     the given rights object.
 
@@ -138,7 +181,10 @@ def _update_collection_summary(activity_rights):
         activity_rights.id)
 
 
-def _update_activity_summary(activity_type, activity_rights):
+def _update_activity_summary(
+    activity_type: str,
+    activity_rights: rights_domain.ActivityRights
+) -> None:
     """Updates the activity summary for the given activity associated with
     the given rights object.
 
@@ -157,34 +203,9 @@ def _update_activity_summary(activity_type, activity_rights):
         _update_collection_summary(activity_rights)
 
 
-def update_activity_first_published_msec(
-        activity_type, activity_id, first_published_msec):
-    """Updates the first_published_msec field for the given activity.
-
-    The caller is responsible for ensuring that this value is not already
-    set before updating it.
-
-    Args:
-        activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
-        activity_id: str. ID of the activity.
-        first_published_msec: float. First publication time in milliseconds
-            since the Epoch.
-    """
-    activity_rights = _get_activity_rights(activity_type, activity_id)
-    commit_cmds = [{
-        'cmd': rights_domain.CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-        'old_first_published_msec': activity_rights.first_published_msec,
-        'new_first_published_msec': first_published_msec
-    }]
-    activity_rights.first_published_msec = first_published_msec
-    _save_activity_rights(
-        feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
-        'set first published time in msec', commit_cmds)
-
-
-def create_new_exploration_rights(exploration_id, committer_id):
+def create_new_exploration_rights(
+    exploration_id: str, committer_id: str
+) -> None:
     """Creates a new exploration rights object and saves it to the datastore.
     Subscribes the committer to the new exploration.
 
@@ -194,7 +215,7 @@ def create_new_exploration_rights(exploration_id, committer_id):
     """
     exploration_rights = rights_domain.ActivityRights(
         exploration_id, [committer_id], [], [], [])
-    commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
+    commit_cmds: List[Dict[str, str]] = [{'cmd': rights_domain.CMD_CREATE_NEW}]
 
     exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
@@ -212,7 +233,33 @@ def create_new_exploration_rights(exploration_id, committer_id):
         committer_id, exploration_id)
 
 
-def get_exploration_rights(exploration_id, strict=True):
+@overload
+def get_exploration_rights(
+    exploration_id: str
+) -> rights_domain.ActivityRights: ...
+
+
+@overload
+def get_exploration_rights(
+    exploration_id: str, *, strict: Literal[True]
+) -> rights_domain.ActivityRights: ...
+
+
+@overload
+def get_exploration_rights(
+    exploration_id: str, *, strict: Literal[False]
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
+@overload
+def get_exploration_rights(
+    exploration_id: str, *, strict: bool = False
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
+def get_exploration_rights(
+    exploration_id: str, strict: bool = True
+) -> Optional[rights_domain.ActivityRights]:
     """Retrieves the rights for this exploration from the datastore.
 
     Args:
@@ -235,7 +282,9 @@ def get_exploration_rights(exploration_id, strict=True):
         model, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
-def get_multiple_exploration_rights_by_ids(exp_ids):
+def get_multiple_exploration_rights_by_ids(
+    exp_ids: List[str]
+) -> List[Optional[rights_domain.ActivityRights]]:
     """Returns a list of ActivityRights objects for given exploration ids.
 
     Args:
@@ -247,20 +296,22 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
     """
     exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
         exp_ids)
-    exp_models_list = []
+    activity_rights_list: List[Optional[rights_domain.ActivityRights]] = []
 
     for model in exp_rights_models:
         if model is None:
-            exp_models_list.append(None)
+            activity_rights_list.append(None)
         else:
-            exp_models_list.append(
+            activity_rights_list.append(
                 get_activity_rights_from_model(
                     model, constants.ACTIVITY_TYPE_EXPLORATION))
 
-    return exp_models_list
+    return activity_rights_list
 
 
-def _get_activity_rights_where_user_is_owner(activity_type, user_id):
+def _get_activity_rights_where_user_is_owner(
+    activity_type: str, user_id: str
+) -> List[rights_domain.ActivityRights]:
     """Returns a list of activity rights where the user is the owner.
 
     Args:
@@ -273,23 +324,41 @@ def _get_activity_rights_where_user_is_owner(activity_type, user_id):
         list(ActivityRights). List of domain objects where the user has some
         role.
     """
-    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        rights_model_class = exp_models.ExplorationRightsModel
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        rights_model_class = collection_models.CollectionRightsModel
-
-    activity_rights_models = rights_model_class.query(
-        datastore_services.any_of(
-            rights_model_class.owner_ids == user_id
+    # Ruling out the possibility of any other activity type.
+    assert (
+        activity_type in (
+            constants.ACTIVITY_TYPE_COLLECTION,
+            constants.ACTIVITY_TYPE_EXPLORATION
         )
-    ).fetch()
+    )
+
+    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+        activity_rights_models: Sequence[
+            Union[
+                collection_models.CollectionRightsModel,
+                exp_models.ExplorationRightsModel
+            ]
+        ] = exp_models.ExplorationRightsModel.query(
+            datastore_services.any_of(
+                exp_models.ExplorationRightsModel.owner_ids == user_id
+            )
+        ).fetch()
+    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+        activity_rights_models = collection_models.CollectionRightsModel.query(
+            datastore_services.any_of(
+                collection_models.CollectionRightsModel.owner_ids == user_id
+            )
+        ).fetch()
+
     return [
         get_activity_rights_from_model(activity_rights_model, activity_type)
         for activity_rights_model in activity_rights_models
     ]
 
 
-def get_exploration_rights_where_user_is_owner(user_id):
+def get_exploration_rights_where_user_is_owner(
+    user_id: str
+) -> List[rights_domain.ActivityRights]:
     """Returns a list of exploration rights where the user is the owner.
 
     Args:
@@ -304,7 +373,9 @@ def get_exploration_rights_where_user_is_owner(user_id):
     )
 
 
-def get_collection_rights_where_user_is_owner(user_id):
+def get_collection_rights_where_user_is_owner(
+    user_id: str
+) -> List[rights_domain.ActivityRights]:
     """Returns a list of collection rights where the user is the owner.
 
     Args:
@@ -319,7 +390,7 @@ def get_collection_rights_where_user_is_owner(user_id):
     )
 
 
-def is_exploration_private(exploration_id):
+def is_exploration_private(exploration_id: str) -> bool:
     """Returns whether exploration is private.
 
     Args:
@@ -332,7 +403,7 @@ def is_exploration_private(exploration_id):
     return exploration_rights.status == rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
-def is_exploration_public(exploration_id):
+def is_exploration_public(exploration_id: str) -> bool:
     """Returns whether exploration is public.
 
     Args:
@@ -345,7 +416,7 @@ def is_exploration_public(exploration_id):
     return exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC
 
 
-def is_exploration_cloned(exploration_id):
+def is_exploration_cloned(exploration_id: str) -> bool:
     """Returns whether the exploration is a clone of another exploration.
 
     Args:
@@ -358,7 +429,9 @@ def is_exploration_cloned(exploration_id):
     return bool(exploration_rights.cloned_from)
 
 
-def create_new_collection_rights(collection_id, committer_id):
+def create_new_collection_rights(
+    collection_id: str, committer_id: str
+) -> None:
     """Creates a new collection rights object and saves it to the datastore.
     Subscribes the committer to the new collection.
 
@@ -403,6 +476,12 @@ def get_collection_rights(
 ) -> Optional[rights_domain.ActivityRights]: ...
 
 
+@overload
+def get_collection_rights(
+    collection_id: str, *, strict: bool = False
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
 def get_collection_rights(
     collection_id: str, strict: bool = True
 ) -> Optional[rights_domain.ActivityRights]:
@@ -427,7 +506,7 @@ def get_collection_rights(
         model, constants.ACTIVITY_TYPE_COLLECTION)
 
 
-def get_collection_owner_names(collection_id):
+def get_collection_owner_names(collection_id: str) -> List[str]:
     """Retrieves the owners for this collection from the datastore.
 
     Args:
@@ -442,7 +521,7 @@ def get_collection_owner_names(collection_id):
         collection_rights.owner_ids)
 
 
-def is_collection_private(collection_id):
+def is_collection_private(collection_id: str) -> bool:
     """Returns whether the collection is private.
 
     Args:
@@ -455,7 +534,7 @@ def is_collection_private(collection_id):
     return collection_rights.status == rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
-def is_collection_public(collection_id):
+def is_collection_public(collection_id: str) -> bool:
     """Returns whether the collection is public.
 
     Args:
@@ -468,7 +547,27 @@ def is_collection_public(collection_id):
     return collection_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC
 
 
-def _get_activity_rights(activity_type, activity_id):
+@overload
+def _get_activity_rights(
+    activity_type: str, activity_id: str, *, strict: Literal[True]
+) -> rights_domain.ActivityRights: ...
+
+
+@overload
+def _get_activity_rights(
+    activity_type: str, activity_id: str
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
+@overload
+def _get_activity_rights(
+    activity_type: str, activity_id: str, *, strict: Literal[False]
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
+def _get_activity_rights(
+    activity_type: str, activity_id: str, strict: bool = False
+) -> Optional[rights_domain.ActivityRights]:
     """Retrieves the rights object for the given activity
     based on its type.
 
@@ -477,24 +576,31 @@ def _get_activity_rights(activity_type, activity_id):
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
         activity_id: str. ID of the activity.
+        strict: bool. Whether to fail noisily if the activity_rights
+            doesn't exist for the given activity_id.
 
     Returns:
-        ActivityRights. The rights object associated with the given activity.
+        ActivityRights|None. The rights object associated with the given
+        activity, or None if no rights object exists.
 
     Raises:
         Exception. The activity_type provided is unknown.
     """
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        return get_exploration_rights(activity_id, strict=False)
+        activity_rights = get_exploration_rights(activity_id, strict=strict)
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        return get_collection_rights(activity_id, strict=False)
+        activity_rights = get_collection_rights(activity_id, strict=strict)
     else:
         raise Exception(
             'Cannot get activity rights for unknown activity type: %s' % (
                 activity_type))
+    return activity_rights
 
 
-def check_can_access_activity(user, activity_rights):
+def check_can_access_activity(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can access given activity.
 
     Args:
@@ -519,9 +625,13 @@ def check_can_access_activity(user, activity_rights):
             activity_rights.is_editor(user.user_id) or
             activity_rights.is_voice_artist(user.user_id) or
             activity_rights.viewable_if_private)
+    return False
 
 
-def check_can_edit_activity(user, activity_rights):
+def check_can_edit_activity(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can edit given activity.
 
     Args:
@@ -554,7 +664,10 @@ def check_can_edit_activity(user, activity_rights):
     return False
 
 
-def check_can_voiceover_activity(user, activity_rights):
+def check_can_voiceover_activity(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can voiceover given activity.
 
     Args:
@@ -588,7 +701,10 @@ def check_can_voiceover_activity(user, activity_rights):
     return False
 
 
-def check_can_manage_voice_artist_in_activity(user, activity_rights):
+def check_can_manage_voice_artist_in_activity(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Check whether the user can manage voice artist for an activity.
     Callers are expected to ensure that the activity is published when we are
     adding voice artists.
@@ -608,7 +724,10 @@ def check_can_manage_voice_artist_in_activity(user, activity_rights):
     return role_services.ACTION_CAN_MANAGE_VOICE_ARTIST in user.actions
 
 
-def check_can_save_activity(user, activity_rights):
+def check_can_save_activity(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can save given activity.
 
     Args:
@@ -625,7 +744,10 @@ def check_can_save_activity(user, activity_rights):
         check_can_voiceover_activity(user, activity_rights)))
 
 
-def check_can_delete_activity(user, activity_rights):
+def check_can_delete_activity(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can delete given activity.
 
     Args:
@@ -653,7 +775,10 @@ def check_can_delete_activity(user, activity_rights):
     return False
 
 
-def check_can_modify_core_activity_roles(user, activity_rights):
+def check_can_modify_core_activity_roles(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can modify core roles for the given activity. The
     core roles for an activity includes owner, editor etc.
 
@@ -681,7 +806,10 @@ def check_can_modify_core_activity_roles(user, activity_rights):
     return False
 
 
-def check_can_release_ownership(user, activity_rights):
+def check_can_release_ownership(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can release ownership for given activity.
 
     Args:
@@ -703,7 +831,10 @@ def check_can_release_ownership(user, activity_rights):
         user, activity_rights)
 
 
-def check_can_publish_activity(user, activity_rights):
+def check_can_publish_activity(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can publish given activity.
 
     Args:
@@ -734,7 +865,10 @@ def check_can_publish_activity(user, activity_rights):
     return False
 
 
-def check_can_unpublish_activity(user, activity_rights):
+def check_can_unpublish_activity(
+    user: user_domain.UserActionsInfo,
+    activity_rights: Optional[rights_domain.ActivityRights]
+) -> bool:
     """Checks whether the user can unpublish given activity.
 
     Args:
@@ -759,8 +893,13 @@ def check_can_unpublish_activity(user, activity_rights):
 
 
 def _assign_role(
-        committer, assignee_id, new_role, activity_id, activity_type,
-        allow_assigning_any_role=False):
+    committer: user_domain.UserActionsInfo,
+    assignee_id: str,
+    new_role: str,
+    activity_id: str,
+    activity_type: str,
+    allow_assigning_any_role: bool = False
+) -> None:
     """Assigns a new role to the user.
 
     Args:
@@ -790,9 +929,16 @@ def _assign_role(
         Exception. The user can already view the activity.
         Exception. The activity is already publicly viewable.
         Exception. The role is invalid.
+        Exception. No activity_rights exists for the given activity id.
     """
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
+
+    if activity_rights is None:
+        raise Exception(
+            'No activity_rights exists for the given activity_id: %s' %
+            activity_id
+        )
 
     if (
             new_role == rights_domain.ROLE_VOICE_ARTIST and
@@ -826,6 +972,7 @@ def _assign_role(
             rights_domain.ROLE_VIEWER
     ]:
         raise Exception('Invalid role: %s' % new_role)
+
     # TODO(#12369): Currently, only exploration allows reassigning users to
     # any role. We are expecting to remove the below check and allow this
     # function to assign any role in general once the collection is removed.
@@ -908,7 +1055,12 @@ def _assign_role(
     _update_activity_summary(activity_type, activity_rights)
 
 
-def _deassign_role(committer, removed_user_id, activity_id, activity_type):
+def _deassign_role(
+    committer: user_domain.UserActionsInfo,
+    removed_user_id: str,
+    activity_id: str,
+    activity_type: str
+) -> None:
     """Deassigns given user from their current role in the activity.
 
     Args:
@@ -924,9 +1076,16 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     Raises:
         Exception. UnauthorizedUserException: Could not deassign role.
         Exception. This user does not have any role for the given activity.
+        Exception. No activity_rights exists for the given activity id.
     """
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
+
+    if activity_rights is None:
+        raise Exception(
+            'No activity_rights exists for the given activity_id: %s' %
+            activity_id
+        )
 
     if (
             activity_rights.is_voice_artist(removed_user_id) and
@@ -945,6 +1104,7 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
                 committer_id, removed_user_id, activity_id))
         raise Exception(
             'UnauthorizedUserException: Could not deassign role.')
+
     if activity_rights.is_owner(removed_user_id):
         old_role = rights_domain.ROLE_OWNER
         activity_rights.owner_ids.remove(removed_user_id)
@@ -962,7 +1122,7 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
             'This user does not have any role in %s with ID %s'
             % (activity_type, activity_id))
 
-    assignee_username = user_services.get_usernames(removed_user_id)[0]
+    assignee_username = user_services.get_usernames([removed_user_id])[0]
     if assignee_username is None:
         assignee_username = 'ANONYMOUS'
     commit_message = 'Remove %s from role %s for %s' % (
@@ -983,7 +1143,11 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     _update_activity_summary(activity_type, activity_rights)
 
 
-def _release_ownership_of_activity(committer, activity_id, activity_type):
+def _release_ownership_of_activity(
+    committer: user_domain.UserActionsInfo,
+    activity_id: str,
+    activity_type: str
+) -> None:
     """Releases ownership of the given activity to the community.
 
     Args:
@@ -996,9 +1160,12 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
 
     Raises:
         Exception. The committer does not have release rights.
+        Exception. The activity rights does not exist for the given activity_id.
     """
     committer_id = committer.user_id
-    activity_rights = _get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(
+        activity_type, activity_id, strict=True
+    )
 
     if not check_can_release_ownership(committer, activity_rights):
         logging.error(
@@ -1023,7 +1190,12 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
 
 
 def _change_activity_status(
-        committer_id, activity_id, activity_type, new_status, commit_message):
+    committer_id: str,
+    activity_id: str,
+    activity_type: str,
+    new_status: str,
+    commit_message: str
+) -> None:
     """Changes the status of the given activity.
 
     Args:
@@ -1034,8 +1206,14 @@ def _change_activity_status(
             constants.ACTIVITY_TYPE_COLLECTION.
         new_status: str. The new status of the activity.
         commit_message: str. The human-written commit message for this change.
+
+    Raises:
+        Exception. The activity rights does not exist for the given activity_id.
     """
-    activity_rights = _get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(
+        activity_type, activity_id, strict=True
+    )
+
     old_status = activity_rights.status
     activity_rights.status = new_status
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
@@ -1060,7 +1238,11 @@ def _change_activity_status(
     _update_activity_summary(activity_type, activity_rights)
 
 
-def _publish_activity(committer, activity_id, activity_type):
+def _publish_activity(
+    committer: user_domain.UserActionsInfo,
+    activity_id: str,
+    activity_type: str
+) -> None:
     """Publishes the given activity.
 
     Args:
@@ -1092,7 +1274,11 @@ def _publish_activity(committer, activity_id, activity_type):
     )
 
 
-def _unpublish_activity(committer, activity_id, activity_type):
+def _unpublish_activity(
+    committer: user_domain.UserActionsInfo,
+    activity_id: str,
+    activity_type: str
+) -> None:
     """Unpublishes the given activity.
 
     Args:
@@ -1128,7 +1314,11 @@ def _unpublish_activity(committer, activity_id, activity_type):
 
 # Rights functions for activities.
 def assign_role_for_exploration(
-        committer, exploration_id, assignee_id, new_role):
+    committer: user_domain.UserActionsInfo,
+    exploration_id: str,
+    assignee_id: str,
+    new_role: str
+) -> None:
     """Assigns a user to the given role and subscribes the assignee to future
     exploration updates.
 
@@ -1161,7 +1351,11 @@ def assign_role_for_exploration(
             assignee_id, exploration_id)
 
 
-def deassign_role_for_exploration(committer, exploration_id, removed_user_id):
+def deassign_role_for_exploration(
+    committer: user_domain.UserActionsInfo,
+    exploration_id: str,
+    removed_user_id: str
+) -> None:
     """Deassigns a user from a given exploration.
 
     The caller should ensure that assignee_id corresponds to a valid user in
@@ -1186,7 +1380,10 @@ def deassign_role_for_exploration(committer, exploration_id, removed_user_id):
     )
 
 
-def release_ownership_of_exploration(committer, exploration_id):
+def release_ownership_of_exploration(
+    committer: user_domain.UserActionsInfo,
+    exploration_id: str
+) -> None:
     """Releases ownership of the given exploration to the community.
 
     Args:
@@ -1202,7 +1399,10 @@ def release_ownership_of_exploration(committer, exploration_id):
 
 
 def set_private_viewability_of_exploration(
-        committer, exploration_id, viewable_if_private):
+    committer: user_domain.UserActionsInfo,
+    exploration_id: str,
+    viewable_if_private: bool
+) -> None:
     """Sets the viewable_if_private attribute for the given exploration's rights
     object.
 
@@ -1238,7 +1438,7 @@ def set_private_viewability_of_exploration(
             'but that is already the current value.' % viewable_if_private)
 
     exploration_rights.viewable_if_private = viewable_if_private
-    commit_cmds = [{
+    commit_cmds: List[Dict[str, Union[str, bool]]] = [{
         'cmd': rights_domain.CMD_CHANGE_PRIVATE_VIEWABILITY,
         'old_viewable_if_private': old_viewable_if_private,
         'new_viewable_if_private': viewable_if_private,
@@ -1254,7 +1454,10 @@ def set_private_viewability_of_exploration(
     _update_exploration_summary(exploration_rights)
 
 
-def publish_exploration(committer, exploration_id):
+def publish_exploration(
+    committer: user_domain.UserActionsInfo,
+    exploration_id: str
+) -> None:
     """Publishes the given exploration.
 
     It is the responsibility of the caller to check that the exploration is
@@ -1272,7 +1475,10 @@ def publish_exploration(committer, exploration_id):
         committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
-def unpublish_exploration(committer, exploration_id):
+def unpublish_exploration(
+    committer: user_domain.UserActionsInfo,
+    exploration_id: str
+) -> None:
     """Unpublishes the given exploration.
 
     Args:
@@ -1292,7 +1498,11 @@ def unpublish_exploration(committer, exploration_id):
 
 # Rights functions for collections.
 def assign_role_for_collection(
-        committer, collection_id, assignee_id, new_role):
+    committer: user_domain.UserActionsInfo,
+    collection_id: str,
+    assignee_id: str,
+    new_role: str
+) -> None:
     """Assign the given user to the given role and subscribes the assignee
     to future collection updates.
 
@@ -1319,7 +1529,11 @@ def assign_role_for_collection(
             assignee_id, collection_id)
 
 
-def deassign_role_for_collection(committer, collection_id, removed_user_id):
+def deassign_role_for_collection(
+    committer: user_domain.UserActionsInfo,
+    collection_id: str,
+    removed_user_id: str
+) -> None:
     """Deassigns a user from a given collection.
 
     The caller should ensure that assignee_id corresponds to a valid user in
@@ -1344,7 +1558,10 @@ def deassign_role_for_collection(committer, collection_id, removed_user_id):
     )
 
 
-def release_ownership_of_collection(committer, collection_id):
+def release_ownership_of_collection(
+    committer: user_domain.UserActionsInfo,
+    collection_id: str
+) -> None:
     """Releases ownership of the given collection to the community.
 
     Args:
@@ -1359,7 +1576,10 @@ def release_ownership_of_collection(committer, collection_id):
         committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
 
 
-def publish_collection(committer, collection_id):
+def publish_collection(
+    committer: user_domain.UserActionsInfo,
+    collection_id: str
+) -> None:
     """Publishes the given collection.
 
     It is the responsibility of the caller to check that the collection is
@@ -1377,7 +1597,10 @@ def publish_collection(committer, collection_id):
         committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
 
 
-def unpublish_collection(committer, collection_id):
+def unpublish_collection(
+    committer: user_domain.UserActionsInfo,
+    collection_id: str
+) -> None:
     """Unpublishes the given collection.
 
     Args:

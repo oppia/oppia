@@ -51,24 +51,6 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/unicode_and_str_handler.py',
     'proto_files/text_classifier_pb2.py',
     'proto_files/training_job_response_payload_pb2.py',
-
-    # The files below are to be tested.
-    # GSoC'22: Improve line and branch coverage for the backend and frontend.
-    'scripts/run_custom_eslint_tests.py',
-    'scripts/run_backend_tests.py',
-    'scripts/run_lighthouse_tests.py',
-    'scripts/run_portserver.py',
-    'scripts/run_presubmit_checks.py',
-    'scripts/run_tests.py',
-    'scripts/start.py',
-    'setup.py',
-    'scripts/check_backend_associated_test_file.py',
-    'scripts/third_party_size_check.py',
-    'scripts/linters/warranted_angular_security_bypasses.py',
-    'core/feconf.py',
-    'core/domain/cron_services.py',
-    'core/platform/datastore/cloud_datastore_services.py',
-    'core/platform/transactions/cloud_transaction_services.py',
 ]
 
 
