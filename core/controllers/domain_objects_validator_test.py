@@ -252,6 +252,29 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
 class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     """Tests to validate exploration change coming from frontend"""
 
+    def test_incorrect_cmd_in_exploration_change_dict(self) -> None:
+        """Tests the incoming cmd of exploration change."""
+        # Tests when cmd is not provided raises an error.
+        incorrect_change_dict = {
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'New state',
+            'old_value': state_domain.SubtitledHtml('content', '').to_dict(),
+            'new_value': state_domain.SubtitledHtml('content', 'test').to_dict()
+        }
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'Missing cmd key in change dict'
+        ):
+            domain_objects_validator.validate_exploration_change(
+                incorrect_change_dict)
+        # Tests when cmd does not belong to exploration change allowed
+        # commands, raises an error.
+        incorrect_change_dict['cmd'] = 'Not valid'
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, '%s cmd is not allowed.' % incorrect_change_dict['cmd']
+        ):
+            domain_objects_validator.validate_exploration_change(
+                incorrect_change_dict)
+
     def test_incorrect_exp_state_domain_content(self) -> None:
         """Tests the state content of exploration change."""
         incorrect_change_dict = {
@@ -268,8 +291,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-image>').to_dict()
         }
         with self.assertRaisesRegex(
-            Exception, 'Image tag \'alt-with-value\' attribute '
-            'should not be less than 5.'
+            Exception, 'The length of the image tag \'alt-with-value\' '
+            'attribute value should be at least 5 characters.'
         ):
             domain_objects_validator.validate_exploration_change(
                 incorrect_change_dict)
@@ -302,8 +325,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             }).to_dict()
         }
         with self.assertRaisesRegex(
-            Exception, 'Image tag \'alt-with-value\' attribute '
-            'should not be less than 5.'
+            Exception, 'The length of the image tag \'alt-with-value\' '
+            'attribute value should be at least 5 characters.'
         ):
             domain_objects_validator.validate_exploration_change(
                 incorrect_change_dict)

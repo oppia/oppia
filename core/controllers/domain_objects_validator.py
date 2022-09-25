@@ -246,7 +246,7 @@ def validate_suggestion_images(files):
 
 
 def validate_exploration_change(exp_change_dict):
-    """Validate the exploration change list
+    """Validate the exploration change list.
 
     Args:
         exp_change_dict: dict. The exploration change dictionary
@@ -260,32 +260,34 @@ def validate_exploration_change(exp_change_dict):
         raise base.BaseHandler.InvalidInputException(
             'Missing cmd key in change dict')
 
-    exp_change_commands = [
+    allowed_exp_change_commands = [
         command['name'] for command in
         exp_domain.ExplorationChange.ALLOWED_COMMANDS
     ]
+    if exp_change_dict['cmd'] in allowed_exp_change_commands:
+        if exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
+            if exp_change_dict[
+                'property_name'] == exp_domain.STATE_PROPERTY_CONTENT:
+                content_obj = state_domain.SubtitledHtml.from_dict(
+                    exp_change_dict['new_value'])
+                content_obj.validate()
 
-    if exp_change_dict['cmd'] in exp_change_commands:
-        exp_domain.ExplorationChange(exp_change_dict)
-    if exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
-        if exp_change_dict[
-            'property_name'] == exp_domain.STATE_PROPERTY_CONTENT:
-            content_obj = state_domain.SubtitledHtml.from_dict(
-                exp_change_dict['new_value'])
-            content_obj.validate()
+            elif exp_change_dict['property_name'] == (
+                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
+            ):
+                written_translations = exp_change_dict['new_value']
+                for translations in written_translations.values():
+                    for language_code_to_written_translation in (
+                        translations.values()):
+                        for written_translation in (
+                            language_code_to_written_translation.values()):
+                            written_translation_obj = (
+                                state_domain.WrittenTranslation.from_dict(
+                                    written_translation)
+                            )
+                            written_translation_obj.validate()
 
-        elif exp_change_dict[
-            'property_name'] == exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS:
-            written_translations = exp_change_dict['new_value']
-            for translations in written_translations.values():
-                for language_code_to_written_translation in (
-                    translations.values()):
-                    for written_translation in (
-                        language_code_to_written_translation.values()):
-                        written_translation_obj = (
-                            state_domain.WrittenTranslation.from_dict(
-                                written_translation)
-                        )
-                        written_translation_obj.validate()
-
-    return exp_domain.ExplorationChange.from_dict(exp_change_dict)
+        return exp_domain.ExplorationChange.from_dict(exp_change_dict)
+    else:
+        raise base.BaseHandler.InvalidInputException(
+            '%s cmd is not allowed.' % exp_change_dict['cmd'])

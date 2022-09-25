@@ -1953,14 +1953,14 @@ def validate_rte_tags(
         if '&quot;' in tag['alt-with-value']:
             if len(tag['alt-with-value'].strip().split('&quot;')[1]) < 5:
                 raise utils.ValidationError(
-                    'Image tag \'alt-with-value\' attribute should not '
-                    'be less than 5.'
+                    'The length of the image tag \'alt-with-value\' '
+                    'attribute value should be at least 5 characters.'
                 )
         else:
             if len(tag['alt-with-value'].strip()) < 5:
                 raise utils.ValidationError(
-                    'Image tag \'alt-with-value\' attribute should not '
-                    'be less than 5.'
+                    'The length of the image tag \'alt-with-value\' '
+                    'attribute value should be at least 5 characters.'
                 )
         if not tag.has_attr('caption-with-value'):
             raise utils.ValidationError(
@@ -2099,7 +2099,7 @@ def validate_rte_tags(
             )
 
         math_content_json = utils.unescape_html(
-            bleach.clean(tag['math_content-with-value']))
+            tag['math_content-with-value'])
         math_content_list = json.loads(math_content_json)
         if 'raw_latex' not in math_content_list:
             raise utils.ValidationError(
