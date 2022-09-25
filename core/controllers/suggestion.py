@@ -481,6 +481,12 @@ class SuggestionListHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""

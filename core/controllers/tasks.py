@@ -146,6 +146,31 @@ class FlagExplorationEmailHandler(base.BaseHandler):
     to moderators.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'report_text': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'reporter_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_user_id'
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
