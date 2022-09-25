@@ -159,7 +159,7 @@ var ExplorationEditorFeedbackTab = function() {
     var optionLabelFeedbackStatus = (
       $('.e2e-test-oppia-feedback-status-' + feedbackStatus.toLowerCase()));
     await action.click(
-      'Option feedback status', optionLabelFeedbackStatus);
+      'Option feedback status', optionLabelFeedbackStatus, true);
 
     await action.click(
       'Feedback Send Response Button', feedbackSendResponseButton);
