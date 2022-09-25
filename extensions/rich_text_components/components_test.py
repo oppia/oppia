@@ -347,7 +347,7 @@ class ComponentE2eTests(test_utils.GenericTestBase):
     def test_component_e2e_tests(self):
         """Tests that an e2e test is defined for all rich text components."""
         test_file = os.path.join(
-            'extensions', 'rich_text_components', 'protractor.js')
+            'extensions', 'rich_text_components', 'webdriverio.js')
         rich_text_components_dir = (
             os.path.join(os.curdir, 'extensions', 'rich_text_components'))
         actual_components = [
