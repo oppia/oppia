@@ -163,18 +163,18 @@ class ContributorDashboardDebugInitializer:
 
     def _sign_in_with_email_and_password(
         self, email: str, password: str
-    ) -> str:
+    ) -> str | None:
         """Signs in with email and password, and returns the token id."""
-        token_id = str(requests.post(
+        token_id = requests.post(
             FIREBASE_SIGN_IN_URL,
             params={'key': 'fake-api-key'},
             json={
                 'email': email,
                 'password': password
             }
-        ).json()['idToken'])
+        ).json()['idToken']
 
-        return token_id
+        return str(token_id) if token_id else None
 
     def _get_csrf_token(self) -> str:
         """Gets the CSRF token."""
