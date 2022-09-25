@@ -25,6 +25,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './splash-page.component.css';
 
@@ -53,6 +54,9 @@ export class SplashPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
   testimonials: Testimonial[] = [];
   userIsLoggedIn: boolean = false;
+  androidPageIsEnabled: boolean = (
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
+  );
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -62,6 +66,7 @@ export class SplashPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
+    private platformFeatureService: PlatformFeatureService,
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
