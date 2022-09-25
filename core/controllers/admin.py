@@ -708,36 +708,30 @@ class AdminHandler(base.BaseHandler):
             skill_id_6 = skill_services.get_new_skill_id()
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
-                'fragm')
+                topic_id_1, 'Topic1', 'topic-one', 'description', 'fragm')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Dummy Topic 2', 'dummy-topic-two', 'description',
-                'fragm')
+                topic_id_2, 'Topic2', 'topic-two', 'description', 'fragm')
             topic_3 = topic_domain.Topic.create_default_topic(
-                topic_id_3, 'Dummy Topic 3', 'dummy-topic-three', 'description',
-                'fragm')
+                topic_id_3, 'Topic3', 'topic-three', 'description', 'fragm')
             topic_4 = topic_domain.Topic.create_default_topic(
-                topic_id_4, 'Dummy Topic 4', 'dummy-topic-four', 'description',
-                'fragm')
+                topic_id_4, 'Topic4', 'topic-four', 'description', 'fragm')
             topic_5 = topic_domain.Topic.create_default_topic(
-                topic_id_5, 'Dummy Topic 5', 'dummy-topic-five', 'description',
-                'fragm')
+                topic_id_5, 'Topic5', 'topic-five', 'description', 'fragm')
             topic_6 = topic_domain.Topic.create_default_topic(
-                topic_id_6, 'Dummy Topic 6', 'dummy-topic-six', 'description',
-                'fragm')
+                topic_id_6, 'Topic6', 'topic-six', 'description', 'fragm')
 
             skill_1 = self._create_dummy_skill(
-                skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
+                skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
             skill_2 = self._create_dummy_skill(
-                skill_id_2, 'Dummy Skill 2', '<p>Dummy Explanation 2</p>')
+                skill_id_2, 'Skill2', '<p>Dummy Explanation 2</p>')
             skill_3 = self._create_dummy_skill(
-                skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>')
+                skill_id_3, 'Skill3', '<p>Dummy Explanation 3</p>')
             skill_4 = self._create_dummy_skill(
-                skill_id_4, 'Dummy Skill 4', '<p>Dummy Explanation 4</p>')
+                skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>')
             skill_5 = self._create_dummy_skill(
-                skill_id_5, 'Dummy Skill 5', '<p>Dummy Explanation 5</p>')
+                skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
             skill_6 = self._create_dummy_skill(
-                skill_id_6, 'Dummy Skill 6', '<p>Dummy Explanation 6</p>')
+                skill_id_6, 'Skill6', '<p>Dummy Explanation 6</p>')
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)

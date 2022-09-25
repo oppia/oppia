@@ -88,23 +88,11 @@ describe('Create new topic modal', () => {
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
-    componentInstance.newClassroomId = '';
   });
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
   });
-
-  it('should intialize', fakeAsync(() => {
-    expect(componentInstance.newClassroomId).toEqual('');
-    spyOn(classroomBackendApiService, 'getNewClassroomIdAsync')
-      .and.returnValue(Promise.resolve('newClassroomId'));
-
-    componentInstance.ngOnInit();
-    tick();
-
-    expect(componentInstance.newClassroomId).toEqual('newClassroomId');
-  }));
 
   it('should be able to save new classroom name', fakeAsync(() => {
     spyOn(ngbActiveModal, 'close');
@@ -114,10 +102,17 @@ describe('Create new topic modal', () => {
       classroomBackendApiService,
       'doesClassroomWithUrlFragmentExistAsync'
     ).and.returnValue(Promise.resolve(false));
-    componentInstance.existingClassroomNames = ['math', 'chemistry'];
-    componentInstance.newClassroomId = 'newClassroomId';
+    spyOn(
+      classroomBackendApiService,
+      'getNewClassroomIdAsync'
+    ).and.returnValue(Promise.resolve('newClassroomId'));
 
-    componentInstance.createClassroom('physics', 'physics');
+    componentInstance.existingClassroomNames = ['math', 'chemistry'];
+    componentInstance.ngOnInit();
+    componentInstance.newClassroom.name = 'physics';
+    componentInstance.newClassroom.urlFragment = 'physics';
+
+    componentInstance.createClassroom();
     tick();
 
     let expectedDefaultClassroom = {
@@ -135,19 +130,24 @@ describe('Create new topic modal', () => {
   it(
     'should not be able to save classroom data when url fragment is duplicate',
     fakeAsync(() => {
+      componentInstance.ngOnInit();
       expect(componentInstance.classroomUrlFragmentIsDuplicate).toBeFalse();
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
+      expect(
+        componentInstance.newClassroom.classroomUrlFragmentIsValid).toBeFalse();
+      componentInstance.newClassroom.name = 'math';
+      componentInstance.newClassroom.urlFragment = 'math';
 
       spyOn(
         classroomBackendApiService,
         'doesClassroomWithUrlFragmentExistAsync'
       ).and.returnValue(Promise.resolve(true));
 
-      componentInstance.createClassroom('math', 'math');
+      componentInstance.createClassroom();
       tick();
 
       expect(componentInstance.classroomUrlFragmentIsDuplicate).toBeTrue();
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
+      expect(
+        componentInstance.newClassroom.classroomUrlFragmentIsValid).toBeFalse();
     }));
 
   it(
@@ -157,143 +157,14 @@ describe('Create new topic modal', () => {
       spyOn(classroomBackendApiService, 'updateClassroomDataAsync')
         .and.returnValue(Promise.resolve());
       componentInstance.existingClassroomNames = ['math', 'chemistry'];
-      componentInstance.newClassroomId = 'newClassroomId';
+      componentInstance.ngOnInit();
+      componentInstance.newClassroom.classroomId = 'newClassroomId';
+      componentInstance.newClassroom.name = 'chemistry';
+      componentInstance.newClassroom.urlFragment = 'chemistry';
 
-      componentInstance.createClassroom('chemistry', 'chemistry');
+      componentInstance.createClassroom();
       tick();
 
       expect(ngbActiveModal.close).not.toHaveBeenCalled();
     }));
-
-  it(
-    'should enable error messgage when classroom name exceeds max len',
-    () => {
-      expect(componentInstance.classroomNameIsValid).toBeFalse();
-      expect(componentInstance.classroomNameIsTooLong).toBeFalse();
-
-      componentInstance.newClassroomName = (
-        'Long classroom name with some randome texts abcdefghi');
-
-      componentInstance.onClassroomNameChange();
-
-      expect(componentInstance.classroomNameIsValid).toBeFalse();
-      expect(componentInstance.classroomNameIsTooLong).toBeTrue();
-    });
-
-  it(
-    'should enable error messgae when classroom name is empty',
-    () => {
-      expect(componentInstance.classroomNameIsValid).toBeFalse();
-      expect(componentInstance.emptyClassroomName).toBeFalse();
-
-      componentInstance.newClassroomName = '';
-
-      componentInstance.onClassroomNameChange();
-
-      expect(componentInstance.classroomNameIsValid).toBeFalse();
-      expect(componentInstance.emptyClassroomName).toBeTrue();
-    });
-
-  it(
-    'should enable error message when classroom name already exists',
-    () => {
-      expect(componentInstance.classroomNameIsValid).toBeFalse();
-      expect(componentInstance.duplicateClassroomName).toBeFalse();
-
-      componentInstance.existingClassroomNames = ['physics', 'chemistry'];
-      componentInstance.newClassroomName = 'physics';
-
-      componentInstance.onClassroomNameChange();
-
-      expect(componentInstance.classroomNameIsValid).toBeFalse();
-      expect(componentInstance.duplicateClassroomName).toBeTrue();
-    });
-
-  it(
-    'should not present any error when classroom name is valid', () => {
-      expect(componentInstance.classroomNameIsValid).toBeFalse();
-      expect(componentInstance.duplicateClassroomName).toBeFalse();
-      expect(componentInstance.emptyClassroomName).toBeFalse();
-      expect(componentInstance.classroomNameIsTooLong).toBeFalse();
-
-      componentInstance.existingClassroomNames = ['physics', 'chemistry'];
-      componentInstance.newClassroomName = 'math';
-
-      componentInstance.onClassroomNameChange();
-
-      expect(componentInstance.classroomNameIsValid).toBeTrue();
-      expect(componentInstance.duplicateClassroomName).toBeFalse();
-      expect(componentInstance.emptyClassroomName).toBeFalse();
-      expect(componentInstance.classroomNameIsTooLong).toBeFalse();
-    });
-
-  it(
-    'should present error messgae when clasroom url fragment is empty', () => {
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.classroomUrlFragmentIsEmpty).toBeFalse();
-
-      componentInstance.newClassroomUrlFragment = '';
-
-      componentInstance.onClassroomUrlFragmentChange();
-
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.classroomUrlFragmentIsEmpty).toBeTrue();
-    });
-
-  it(
-    'should present error message when classroom url fragment exceeds max len',
-    () => {
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.classroomUrlFragmentIsTooLong).toBeFalse();
-
-      componentInstance.newClassroomUrlFragment = (
-        'long-url-fragment-for-raising-error-msg');
-
-      componentInstance.onClassroomUrlFragmentChange();
-
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.classroomUrlFragmentIsTooLong).toBeTrue();
-    });
-
-  it(
-    'should present error message when classroom url fragment is invalid',
-    () => {
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.urlFragmentRegexMatched).toBeTrue();
-
-      componentInstance.newClassroomUrlFragment = 'Incorrect-url';
-
-      componentInstance.onClassroomUrlFragmentChange();
-
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.urlFragmentRegexMatched).toBeFalse();
-    });
-
-  it(
-    'should not present error for valid classroom url fragment', () => {
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.urlFragmentRegexMatched).toBeTrue();
-      expect(componentInstance.classroomUrlFragmentIsTooLong).toBeFalse();
-      expect(componentInstance.classroomUrlFragmentIsEmpty).toBeFalse();
-
-      componentInstance.newClassroomUrlFragment = 'physics-url-fragment';
-
-      componentInstance.onClassroomUrlFragmentChange();
-
-      expect(componentInstance.classroomUrlFragmentIsValid).toBeTrue();
-      expect(componentInstance.urlFragmentRegexMatched).toBeTrue();
-      expect(componentInstance.classroomUrlFragmentIsTooLong).toBeFalse();
-      expect(componentInstance.classroomUrlFragmentIsEmpty).toBeFalse();
-    });
-
-  it(
-    'should remove duplicate url fragment error message on model change',
-    () => {
-      componentInstance.classroomUrlFragmentIsDuplicate = true;
-      componentInstance.newClassroomUrlFragment = 'physics';
-
-      componentInstance.onClassroomUrlFragmentChange();
-
-      expect(componentInstance.classroomUrlFragmentIsDuplicate).toBeFalse();
-    });
 });

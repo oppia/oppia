@@ -1,4 +1,3 @@
-
 // Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,9 +18,9 @@
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ClassroomBackendApiService } from '../../../domain/classroom/classroom-backend-api.service';
+import { ClassroomData } from '../classroom-admin.model';
 
 
 @Component({
@@ -38,137 +37,54 @@ export class CreateNewClassroomModalComponent
   }
 
   existingClassroomNames: string[] = [];
-  newClassroomName: string = '';
-  newClassroomId: string = '';
-  newClassroomUrlFragment: string = '';
+  newClassroom!: ClassroomData;
+
+  classroomUrlFragmentIsDuplicate: boolean = false;
   newClassroomCreationInProgress: boolean = false;
 
-  classroomNameIsTooLong: boolean = false;
-  emptyClassroomName: boolean = false;
-  duplicateClassroomName: boolean = false;
-  classroomNameIsValid: boolean = false;
-
-  classroomUrlFragmentIsTooLong: boolean = false;
-  classroomUrlFragmentIsEmpty: boolean = false;
-  classroomUrlFragmentIsDuplicate: boolean = false;
-  urlFragmentRegexMatched: boolean = true;
-  classroomUrlFragmentIsValid: boolean = false;
-
-  getNewClassroomId(): void {
-    this.classroomBackendApiService.getNewClassroomIdAsync().then(
-      classroomId => {
-        this.newClassroomId = classroomId;
-      }
-    );
-  }
-
   ngOnInit(): void {
-    this.getNewClassroomId();
+    this.newClassroom = new ClassroomData('', '', '', '', '', {});
+    this.newClassroom.classroomNameIsValid = false;
+    this.newClassroom.classroomUrlFragmentIsValid = false;
+    this.newClassroom.setExistingClassroomData(this.existingClassroomNames);
+
+    // The error messages for classroom name and URL fragment, should not be
+    // presented to the user when the modal is just opened.
+    this.newClassroom.supressClassroomNameErrorMessages();
+    this.newClassroom.supressClassroomUrlFragmentErrorMessages();
   }
 
-  createClassroom(classroomName: string, classroomUrlFragment: string): void {
+  createClassroom(): void {
     this.newClassroomCreationInProgress = true;
     this.classroomUrlFragmentIsDuplicate = false;
+
     this.classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
-      classroomUrlFragment).then(response => {
+      this.newClassroom.urlFragment).then(response => {
       if (response) {
         this.classroomUrlFragmentIsDuplicate = true;
-        this.classroomUrlFragmentIsValid = false;
+        this.newClassroom.classroomUrlFragmentIsValid = false;
         this.newClassroomCreationInProgress = false;
         return;
       }
-      let defaultClassroomDict = {
-        classroom_id: this.newClassroomId,
-        name: classroomName,
-        url_fragment: classroomUrlFragment,
-        course_details: '',
-        topic_list_intro: '',
-        topic_id_to_prerequisite_topic_ids: {}
-      };
 
-      this.classroomBackendApiService.updateClassroomDataAsync(
-        this.newClassroomId, defaultClassroomDict).then(() => {
-        this.ngbActiveModal.close(defaultClassroomDict);
-        this.newClassroomCreationInProgress = false;
-      });
+      this.classroomBackendApiService.getNewClassroomIdAsync().then(
+        classroomId => {
+          const defaultClassroomDict = {
+            classroom_id: classroomId,
+            name: this.newClassroom.name,
+            url_fragment: this.newClassroom.urlFragment,
+            course_details: '',
+            topic_list_intro: '',
+            topic_id_to_prerequisite_topic_ids: {}
+          };
+
+          this.classroomBackendApiService.updateClassroomDataAsync(
+            classroomId, defaultClassroomDict).then(() => {
+            this.ngbActiveModal.close(defaultClassroomDict);
+            this.newClassroomCreationInProgress = false;
+          });
+        }
+      );
     });
-  }
-
-  onClassroomNameChange(): void {
-    this.newClassroomName = this.newClassroomName.replace(/\s+/g, ' ').trim();
-    this.classroomNameIsValid = true;
-
-    if (this.newClassroomName === '') {
-      this.emptyClassroomName = true;
-      this.classroomNameIsTooLong = false;
-      this.duplicateClassroomName = false;
-      this.classroomNameIsValid = false;
-      return;
-    } else {
-      this.emptyClassroomName = false;
-    }
-
-    if (
-      this.newClassroomName.length >
-      AppConstants.MAX_CHARS_IN_CLASSROOM_NAME
-    ) {
-      this.classroomNameIsTooLong = true;
-      this.duplicateClassroomName = false;
-      this.classroomNameIsValid = false;
-      return;
-    } else {
-      this.classroomNameIsTooLong = false;
-    }
-
-    if (this.existingClassroomNames.indexOf(this.newClassroomName) !== -1) {
-      this.duplicateClassroomName = true;
-      this.classroomNameIsValid = false;
-    } else {
-      this.duplicateClassroomName = false;
-    }
-  }
-
-  onClassroomUrlFragmentChange(): void {
-    this.classroomUrlFragmentIsValid = true;
-
-    if (this.newClassroomUrlFragment === '') {
-      this.classroomUrlFragmentIsEmpty = true;
-      this.classroomUrlFragmentIsDuplicate = false;
-      this.classroomUrlFragmentIsTooLong = false;
-      this.urlFragmentRegexMatched = true;
-      this.classroomUrlFragmentIsValid = false;
-      return;
-    } else {
-      this.classroomUrlFragmentIsEmpty = false;
-    }
-
-    if (
-      this.newClassroomUrlFragment.length >
-      AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
-    ) {
-      this.classroomUrlFragmentIsTooLong = true;
-      this.classroomUrlFragmentIsDuplicate = false;
-      this.urlFragmentRegexMatched = true;
-      this.classroomUrlFragmentIsValid = false;
-      return;
-    } else {
-      this.classroomUrlFragmentIsTooLong = false;
-    }
-
-    let validUrlFragmentRegex = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
-    if (validUrlFragmentRegex.test(this.newClassroomUrlFragment)) {
-      this.urlFragmentRegexMatched = true;
-    } else {
-      this.urlFragmentRegexMatched = false;
-      this.classroomUrlFragmentIsDuplicate = false;
-      this.classroomUrlFragmentIsValid = false;
-      return;
-    }
-
-    if (this.classroomUrlFragmentIsDuplicate) {
-      this.classroomUrlFragmentIsDuplicate = false;
-      this.classroomUrlFragmentIsValid = true;
-    }
   }
 }
