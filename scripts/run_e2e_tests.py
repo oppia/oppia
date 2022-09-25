@@ -74,8 +74,8 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--suite', default='full',
     help='Performs test for different suites, here suites are the '
-         'name of the test files present in core/tests/webdriverio_desktop/ and '
-         'core/test/webdriverio/ dirs. e.g. for the file '
+         'name of the test files present in core/tests/webdriverio_desktop/ '
+         'and core/test/webdriverio/ dirs. e.g. for the file '
          'core/tests/webdriverio/accessibility.js use --suite=accessibility. '
          'For performing a full test, no argument is required.')
 _PARSER.add_argument(

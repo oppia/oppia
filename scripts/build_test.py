@@ -268,7 +268,6 @@ class BuildTests(test_utils.GenericTestBase):
         """
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
-        protractor_filepath = os.path.join('extensions', 'protractor.js')
 
         python_controller_filepath = os.path.join('base.py')
         pyc_test_filepath = os.path.join(
@@ -277,7 +276,6 @@ class BuildTests(test_utils.GenericTestBase):
             'core', 'tests', 'base_test.py')
 
         self.assertFalse(build.should_file_be_built(spec_js_filepath))
-        self.assertFalse(build.should_file_be_built(protractor_filepath))
 
         self.assertFalse(build.should_file_be_built(service_ts_filepath))
 
