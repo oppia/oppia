@@ -110,6 +110,8 @@
 /core/controllers/blog_homepage*.py @oppia/lace-backend-reviewers
 /core/templates/domain/blog/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-home-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-post-page/ @oppia/lace-frontend-reviewers
 
 # Collection project.
 /core/controllers/collection*.py @oppia/lace-backend-reviewers
@@ -135,6 +137,7 @@
 
 # Core documentation
 /CHANGELOG @oppia/release-workflow-reviewers
+/core/templates/pages/android-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/about-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/about-page/about-page.constants.ts @oppia/angular-migration-reviewers
 /core/templates/pages/license-page/ @oppia/angular-migration-reviewers
@@ -223,6 +226,7 @@
 /core/templates/pages/exploration-editor-page/settings-tab/ @oppia/lace-frontend-reviewers
 /core/templates/pages/exploration-player-page/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
+/core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/context.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
