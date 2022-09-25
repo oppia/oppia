@@ -30,7 +30,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, List, Optional, TypedDict
+from typing import List, Optional, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -87,7 +87,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
     CURRENT_SCHEMA_VERSION = 2
 
     # Overriding method to add a new attribute added names 'fake_field'.
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with user_domain.ModifiableUserData.from_dict().
     @classmethod
     def from_dict(  # type: ignore[override]
@@ -116,7 +116,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
 
     # Overiding method to first convert raw user data dict to latest version
     # then returning a ModifiableUserData domain object.
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with user_domain.ModifiableUserData.from_raw_dict().
     @classmethod
     def from_raw_dict(  # type: ignore[override]
@@ -169,9 +169,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_user_id_raises_exception(self) -> None:
         self.user_settings.user_id = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -200,29 +200,35 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_invalid_banned_value_type_raises_exception(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.user_settings.banned = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected banned to be a bool'):
             self.user_settings.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.user_settings.banned = '123'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected banned to be a bool'):
             self.user_settings.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_invalid_roles_value_type_raises_exception(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.user_settings.roles = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.user_settings.roles = True  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected roles to be a list'):
@@ -258,9 +264,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'Expected roles to contains one default role.'):
             self.user_settings.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_pin_id(self) -> None:
         self.user_settings.pin = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -308,9 +314,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_role_raises_exception(self) -> None:
         self.user_settings.roles = [0]  # type: ignore[list-item]
         with self.assertRaisesRegex(
@@ -324,9 +330,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_display_alias_raises_error(self) -> None:
         self.user_settings.display_alias = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -334,9 +340,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             ' received %s' % self.user_settings.display_alias):
             self.user_settings.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_creator_dashboard_display_pref_raises_error(
         self
     ) -> None:
@@ -347,9 +353,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_none__email_raises_error(self) -> None:
         self.user_settings.email = None  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -435,7 +441,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         # Here, args can take any non-keyword argument.
-        def _mock_logging_function(msg: str, *args: Any) -> None:
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
@@ -511,9 +517,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
         )
         self.user_contributions.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_user_id(self) -> None:
         self.user_contributions.user_id = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -525,18 +531,18 @@ class UserContributionsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'No user id specified.'):
             self.user_contributions.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_list_created_exploration_ids(self) -> None:
         self.user_contributions.created_exploration_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected created_exploration_ids to be a list'):
             self.user_contributions.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_created_exploration_ids(self) -> None:
         self.user_contributions.created_exploration_ids = [0]  # type: ignore[list-item]
         with self.assertRaisesRegex(
@@ -544,18 +550,18 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'to be a string'):
             self.user_contributions.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_list_edited_exploration_ids(self) -> None:
         self.user_contributions.edited_exploration_ids = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected edited_exploration_ids to be a list'):
             self.user_contributions.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_edited_exploration_ids(self) -> None:
         self.user_contributions.edited_exploration_ids = [0]  # type: ignore[list-item]
         with self.assertRaisesRegex(
@@ -1218,26 +1224,28 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.user_contribution_rights.can_review_questions, True)
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_can_review_translation_for_language_codes_incorrect_type(
         self
     ) -> None:
         # To avoid pylint's line-too-long error, new variable is created here.
         user_contribution_rights = self.user_contribution_rights
-        # Here, List type is expected but for test purpose we're assigning it
-        # an int type. Thus to avoid MyPy error, we added an ignore here.
         user_contribution_rights.can_review_translation_for_language_codes = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_can_review_voiceover_for_language_codes_incorrect_type(
         self
     ) -> None:
         # To avoid pylint's line-too-long error, new variable is created here.
         user_contribution_rights = self.user_contribution_rights
-        # Here, List type is expected but for test purpose we're assigning it
-        # an int type. Thus to avoid MyPy error, we added an ignore here.
         user_contribution_rights.can_review_voiceover_for_language_codes = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1288,18 +1296,20 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
             'have duplicate values'):
             self.user_contribution_rights.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_incorrect_type_for_can_review_questions_raise_error(self) -> None:
-        # Here, bool value is expected but for test purpose we're assigning it
-        # an int type. Thus to avoid MyPy error, we added an ignore here.
         self.user_contribution_rights.can_review_questions = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_questions to be a boolean value'):
             self.user_contribution_rights.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_incorrect_type_for_can_submit_questions_raise_error(self) -> None:
-        # Here, bool value is expected but for test purpose we're assigning it
-        # an int type. Thus to avoid MyPy error, we added an ignore here.
         self.user_contribution_rights.can_submit_questions = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1389,9 +1399,9 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
     def test_from_raw_dict_with_none_schema_version_raises_error(
         self
     ) -> None:
-        # Here, schema_version is expecting an int type but for test
-        # purposes we're assigning it with None. Thus to avoid MyPy error,
-        # ignore statement is added here.
+        # Here we use MyPy ignore because schema_version is expecting an int
+        # type but for test purposes we're assigning it with None. Thus to
+        # avoid MyPy error, ignore statement is added here.
         user_data_dict: user_domain.RawUserDataDict = {
             'schema_version': None,  # type: ignore[typeddict-item]
             'display_alias': 'display_alias',
@@ -1446,17 +1456,17 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
                 'preferred_translation_language_code'),
             'user_id': 'user_id',
         }
-        invalid_schema_versions: List[Any] = [
-            '', 'abc', '-1', '1', {}, [1], 1.0
-        ]
-        for version in invalid_schema_versions:
-            user_data_dict['schema_version'] = version
-            error_msg = (
-                'Version has invalid type, expected int, '
-                'received %s' % type(version)
-            )
-            with self.assertRaisesRegex(Exception, error_msg):
-                user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        version = '-1'
+        user_data_dict['schema_version'] = version  # type: ignore[arg-type]
+        error_msg = (
+            'Version has invalid type, expected int, '
+            'received %s' % type(version)
+        )
+        with self.assertRaisesRegex(Exception, error_msg):
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     # This test should be modified to use the original class ModifiableUserData
     # itself when the CURRENT_SCHEMA_VERSION has been updated to 2 or higher.

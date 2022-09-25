@@ -95,7 +95,7 @@ class AuthClaims:
     def __hash__(self) -> int:
         return hash((self.auth_id, self.email, self.role_is_super_admin))
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         # https://docs.python.org/2/library/constants.html#NotImplemented.

@@ -30,8 +30,8 @@ import bs4
 from typing import Any, Dict, Final, List, TypedDict
 
 
-# Here the type chosen for `customization_args` is Dict[str, Any] because
-# the values of this dictionary can be various data types.
+# TODO(#15982): Here we use type Any because `customization_args` can accept
+# various data types.
 class ComponentsDict(TypedDict):
     """Dictionary that represents RTE Components."""
 

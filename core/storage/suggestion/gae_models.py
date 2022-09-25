@@ -21,8 +21,8 @@ import datetime
 from core import feconf
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
-from typing_extensions import Final, Literal
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing_extensions import Final, Literal, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -118,6 +118,19 @@ INCREMENT_SCORE_OF_AUTHOR_BY: Final = 1
 
 # The unique ID for the CommunityContributionStatsModel.
 COMMUNITY_CONTRIBUTION_STATS_MODEL_ID: Final = 'community_contribution_stats'
+
+
+class GeneralSuggestionExportDataDict(TypedDict):
+    """Type for the Dictionary of the data from GeneralSuggestionModel."""
+
+    suggestion_type: str
+    target_type: str
+    target_id: str
+    target_version_at_submission: int
+    status: str
+    change_cmd: Dict[str, change_domain.AcceptableChangeDictTypes]
+    language_code: str
+    edited_by_reviewer: bool
 
 
 class GeneralSuggestionModel(base_models.BaseModel):
@@ -742,12 +755,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
         query_set = cls.query(projection=['score_category'], distinct=True)
         return [data.score_category for data in query_set]
 
-    # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def export_data(
         cls, user_id: str
-    ) -> Dict[str, Dict[str, Union[str, int, bool, Dict[str, Any], None]]]:
+    ) -> Dict[str, GeneralSuggestionExportDataDict]:
         """Exports the data from GeneralSuggestionModel
         into dict format for Takeout.
 
@@ -758,7 +769,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             dict. Dictionary of the data from GeneralSuggestionModel.
         """
 
-        user_data = {}
+        user_data: Dict[str, GeneralSuggestionExportDataDict] = {}
         suggestion_models: Sequence[GeneralSuggestionModel] = (
             cls.get_all().filter(cls.author_id == user_id).fetch())
 
@@ -990,7 +1001,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     question_suggestion_count = (
         datastore_services.IntegerProperty(required=True))
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
@@ -1120,7 +1131,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         """Creates a new TranslationContributionStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.construct_id(
             language_code, contributor_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1141,10 +1152,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def generate_id(
+    def construct_id(
         language_code: str, contributor_user_id: str, topic_id: str
     ) -> str:
-        """Generates a unique ID for a TranslationContributionStatsModel
+        """Constructs a unique ID for a TranslationContributionStatsModel
         instance.
 
         Args:
@@ -1161,7 +1172,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             '%s.%s.%s' % (language_code, contributor_user_id, topic_id)
         )
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
@@ -1176,7 +1187,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             TranslationContributionStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.construct_id(
             language_code, contributor_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1361,7 +1372,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
         """Creates a new TranslationReviewStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.construct_id(
             language_code, reviewer_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1381,10 +1392,10 @@ class TranslationReviewStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def generate_id(
+    def construct_id(
         language_code: str, reviewer_user_id: str, topic_id: str
     ) -> str:
-        """Generates a unique ID for a TranslationReviewStatsModel
+        """Constructs a unique ID for a TranslationReviewStatsModel
         instance.
 
         Args:
@@ -1401,9 +1412,9 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             '%s.%s.%s' % (language_code, reviewer_user_id, topic_id)
         )
 
-    # Since signature of "get" incompatible with supertype "BaseModel" and
-    # there are no safety issues, the following line is skipped from Mypy
-    # checks.
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def get( # type: ignore[override]
         cls, language_code: str, reviewer_user_id: str, topic_id: str
@@ -1416,7 +1427,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             TranslationReviewStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.construct_id(
             language_code, reviewer_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1582,7 +1593,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
         """Creates a new QuestionContributionStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.construct_id(
             contributor_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1599,10 +1610,10 @@ class QuestionContributionStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def generate_id(
+    def construct_id(
         contributor_user_id: str, topic_id: str
     ) -> str:
-        """Generates a unique ID for a QuestionContributionStatsModel
+        """Constructs a unique ID for a QuestionContributionStatsModel
         instance.
 
         Args:
@@ -1618,9 +1629,9 @@ class QuestionContributionStatsModel(base_models.BaseModel):
             '%s.%s' % (contributor_user_id, topic_id)
         )
 
-    # Since signature of "get" incompatible with supertype "BaseModel" and
-    # there are no safety issues, the following line is skipped from Mypy
-    # checks.
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def get( # type: ignore[override]
         cls, contributor_user_id: str, topic_id: str
@@ -1633,7 +1644,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
             QuestionContributionStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.construct_id(
             contributor_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1788,7 +1799,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         """Creates a new QuestionReviewStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.construct_id(
             reviewer_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1805,10 +1816,10 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def generate_id(
+    def construct_id(
         reviewer_user_id: str, topic_id: str
     ) -> str:
-        """Generates a unique ID for a QuestionReviewStatsModel
+        """Constructs a unique ID for a QuestionReviewStatsModel
         instance.
 
         Args:
@@ -1824,9 +1835,9 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             '%s.%s' % (reviewer_user_id, topic_id)
         )
 
-    # Since signature of "get" incompatible with supertype "BaseModel" and
-    # there are no safety issues, the following line is skipped from Mypy
-    # checks.
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def get( # type: ignore[override]
         cls, reviewer_user_id: str, topic_id: str
@@ -1839,7 +1850,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             QuestionReviewStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.construct_id(
             reviewer_user_id, topic_id)
         return cls.get_by_id(entity_id)
 

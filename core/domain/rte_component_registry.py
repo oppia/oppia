@@ -26,7 +26,7 @@ from core import constants
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Type, TypedDict
+from typing import Any, Dict, List, Type, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -40,13 +40,10 @@ class CustomizationArgSpecDict(TypedDict):
 
     name: str
     description: str
-    # Here we used Any because values in schema dictionary can be of type str,
-    # List, Dict and other types too.
+    # Here we use type Any because values in schema dictionary can be of
+    # type str, List, Dict and other types too.
     schema: Dict[str, Any]
-    # Here, default_value can accept values of type List[str], str, bool and
-    # other types too. So to make it generalize for every default_value, we
-    # used Any type here.
-    default_value: Any
+    default_value: Union[str, int, List[str], Dict[str, str]]
 
 
 class RteComponentDict(TypedDict):

@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_domain
+from core.domain import stats_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
@@ -1073,9 +1074,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'has_viewed_lesson_info_modal_once': False,
         }
         skill_data: Dict[str, str] = {}
-        # Here, we used Any type because this Dict can contain different
-        # types of values like int, str, bool and other types too.
-        stats_data: Dict[str, Any] = {}
+        stats_data: Dict[str, stats_domain.AggregatedStatsDict] = {}
         story_progress_data: Dict[str, List[str]] = {}
         subscriptions_data: Dict[str, Optional[List[str]]] = {
             'exploration_ids': [],
@@ -1140,7 +1139,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
 
-        # Here, we used Any type because this dictionary contains other
+        # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
         # to complex Union types. So, to make this Dict generalized for
         # every other Dict. We used Any here.
@@ -1385,14 +1384,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   base_models
                   .MODEL_ASSOCIATION_TO_USER
                   .ONE_INSTANCE_SHARED_ACROSS_USERS):
-                # Here, model is of BaseModel type and BaseModel does not
-                # contain get_field_name_mapping_to_takeout_keys attribute
-                # and get_field_name_mapping_to_takeout_keys(), so because
-                # of this MyPy throws an error. Thus to avoid the error, we
-                # used ignore here.
+                # Here we use MyPy ignore because model is of
+                # BaseModel type and BaseModel does not contain
+                # get_field_name_mapping_to_takeout_keys attribute,
+                # so because of this MyPy throws an error. Thus to
+                # avoid the error, we used ignore here.
                 self.assertIsNotNone(
                     model.get_field_name_mapping_to_takeout_keys)  # type: ignore[attr-defined]
                 exported_data = model.export_data(self.USER_ID_1)
+                # Here we use MyPy ignore because model is of
+                # BaseModel type and BaseModel does not contain
+                # get_field_name_mapping_to_takeout_keys(), so
+                # because of this MyPy throws an error. Thus to
+                # avoid the error, we used ignore here.
                 field_mapping = model.get_field_name_mapping_to_takeout_keys()  # type: ignore[attr-defined]
                 self.assertEqual(
                     sorted(exported_field_names),

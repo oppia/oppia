@@ -873,6 +873,13 @@ class SkillDict(TypedDict):
     prerequisite_skill_ids: List[str]
 
 
+class SerializableSkillDict(SkillDict):
+    """Dictionary representing the serializable Skill object."""
+
+    created_on: str
+    last_updated: str
+
+
 class Skill:
     """Domain object for an Oppia Skill."""
 
@@ -1149,7 +1156,14 @@ class Skill:
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        skill_dict = self.to_dict()
+        # Here we use MyPy ignore because to_dict() method returns a general
+        # dictionary representation of domain object (SkillDict) which
+        # does not contain properties like created_on and last_updated but
+        # MyPy expects skill_dict, a dictionary which contains all the
+        # properties of domain object. That's why we are explicitly changing
+        # the type of skill_dict, here which causes MyPy to throw an
+        # error. Thus, to silence the error, we added an ignore here.
+        skill_dict: SerializableSkillDict = self.to_dict()  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
         # parameter.
@@ -1160,17 +1174,12 @@ class Skill:
         # to_dict().
         skill_dict['version'] = self.version
 
-        # The dictionary returned by `to_dict()` method is SkillDict, and
-        # SkillDict does not contain `created_on` and `last_updated` keys.
-        # But below we are defining those keys which causes MyPy to throw
-        # error `TypedDict "SkillDict" has no key 'created_on'`. Thus to
-        # avoid the error, we used ignore here.
         if self.created_on:
-            skill_dict['created_on'] = utils.convert_naive_datetime_to_string(  # type: ignore[misc]
+            skill_dict['created_on'] = utils.convert_naive_datetime_to_string(
                 self.created_on)
 
         if self.last_updated:
-            skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(  # type: ignore[misc]
+            skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
         return json.dumps(skill_dict)
@@ -1544,12 +1553,15 @@ class Skill:
         Returns:
             dict. The converted rubric_dict.
         """
-        # Here, rubric_dict is a dictionary of type RubricDict and RubricDict
-        # does not contain `explanation` key, but below we are accessing that
-        # `explanation` key which causes MyPy to throw error `TypedDict
-        # "RubricDict" has no key 'explanation'`. Thus to avoid the error,
-        # we used ignore statement here.
+        # Here we use MyPy ignore because in convert functions, we allow less
+        # strict typing because here we are working with previous versions of
+        # the domain object and in previous versions of the domain object there
+        # are some fields that are discontinued in the latest domain object
+        # (eg. explanation). So, while accessing these discontinued fields MyPy
+        # throws an error. Thus, to avoid the error, we used ignore here.
         explanation = rubric_dict['explanation']  # type: ignore[misc]
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
+        # TypedDict.
         del rubric_dict['explanation']  # type: ignore[misc]
         rubric_dict['explanations'] = [explanation]
         return rubric_dict

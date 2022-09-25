@@ -68,10 +68,10 @@ class MockAuditsExisting(validation_decorators.AuditsExisting):
         cls._DO_FN_TYPES_BY_KIND.clear()
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class DoFn(beam.DoFn):  # type: ignore[misc]
     """Simple DoFn that does nothing."""
 
@@ -80,10 +80,10 @@ class DoFn(beam.DoFn):  # type: ignore[misc]
         pass
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class UnrelatedDoFn(beam.DoFn):  # type: ignore[misc]
     """Simple DoFn that does nothing."""
 
@@ -308,18 +308,18 @@ class RelationshipsOfTests(test_utils.TestBase):
             MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
             {'BazModel'})
 
-    # TODO(#13059): After we fully type the codebase we plan to get rid of the
-    # tests that intentionally test wrong inputs that we can normally catch by
-    # typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_rejects_values_that_are_not_types(self) -> None:
         foo_model = FooModel()
 
         with self.assertRaisesRegex(TypeError, 'is an instance, not a type'):
             MockRelationshipsOf(foo_model)  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get rid of the
-    # tests that intentionally test wrong inputs that we can normally catch by
-    # typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_rejects_types_that_are_not_models(self) -> None:
         with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):
             MockRelationshipsOf(int)  # type: ignore[arg-type]

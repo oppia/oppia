@@ -324,7 +324,7 @@ describe('State Responses Component', () => {
 
     component.ngOnInit();
 
-    expect(component.responseCardIsShown).toBe(false);
+    expect(component.responseCardIsShown).toBe(true);
     expect(component.enableSolicitAnswerDetailsFeature).toBe(true);
     expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
     expect(component.stateName).toBe('Hola');
@@ -569,7 +569,7 @@ describe('State Responses Component', () => {
     spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(true);
+    expect(component.suppressDefaultAnswerGroup()).toBe(true);
   });
 
   it('should suppress default answer group warnings if each choice' +
@@ -613,14 +613,14 @@ describe('State Responses Component', () => {
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(
       answerChoices as AnswerChoice[]);
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(true);
+    expect(component.suppressDefaultAnswerGroup()).toBe(true);
   });
 
   it('should not suppress warnings for interactions other than multiple' +
     ' choice input or item selection input', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(false);
+    expect(component.suppressDefaultAnswerGroup()).toBe(false);
   });
 
   it('should save displayed value when solicit answer details' +
