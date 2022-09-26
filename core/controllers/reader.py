@@ -746,8 +746,7 @@ class StateCompleteEventHandler(base.BaseHandler):
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_STATE_NAME_LENGTH
                     }]
-                },
-                'default_value': None
+                }
             },
              'session_id': {
                 'schema': {
@@ -816,8 +815,7 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_STATE_NAME_LENGTH
                     }]
-                },
-                'default_value': None
+                }
             },
             'session_id': {
                 'schema': {
