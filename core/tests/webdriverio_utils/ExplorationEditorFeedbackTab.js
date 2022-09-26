@@ -133,6 +133,8 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.selectLatestFeedbackThread = async function() {
+    await waitFor.visibilityOf(
+      $(suggestionRowClassName), 'Suggestion row is taking too long to appear');
     var suggestionRowFirst = await $$(suggestionRowClassName)[0];
     await action.click(
       'Suggestion Row First', suggestionRowFirst);

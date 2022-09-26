@@ -28,9 +28,7 @@ import subprocess
 import sys
 import threading
 import time
-from unittest import mock
 
-from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import scripts_test_utils

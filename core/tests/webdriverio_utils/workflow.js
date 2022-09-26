@@ -306,30 +306,32 @@ var addExplorationPlaytester = async function(username) {
 };
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
-var _getExplorationRoles = async function(roleName) {
+var _getExplorationRoles = async function(roleName, isEmpty) {
   var explorationRoleNameLocator = '.e2e-test-' + roleName + '-role-names';
-  await waitFor.visibilityOf(
-    $(explorationRoleNameLocator),
-    `Exploration ${roleName} name is not visible`);
+  if (!isEmpty) {
+    await waitFor.visibilityOf(
+      $(explorationRoleNameLocator),
+      `Exploration ${roleName} name is not visible`);
+  }
   return await $$(explorationRoleNameLocator).map(async function(elem) {
     return await elem.getText();
   });
 };
 
-var getExplorationManagers = async function() {
-  return await _getExplorationRoles('owner');
+var getExplorationManagers = async function(isEmpty = false) {
+  return await _getExplorationRoles('owner', isEmpty);
 };
 
-var getExplorationCollaborators = async function() {
-  return await _getExplorationRoles('editor');
+var getExplorationCollaborators = async function(isEmpty = false) {
+  return await _getExplorationRoles('editor', isEmpty);
 };
 
-var getExplorationVoiceArtists = async function() {
-  return await _getExplorationRoles('voiceArtist');
+var getExplorationVoiceArtists = async function(isEmpty = false) {
+  return await _getExplorationRoles('voiceArtist', isEmpty);
 };
 
-var getExplorationPlaytesters = async function() {
-  return await _getExplorationRoles('viewer');
+var getExplorationPlaytesters = async function(isEmpty = false) {
+  return await _getExplorationRoles('viewer', isEmpty);
 };
 
 var createSkillAndAssignTopic = async function(

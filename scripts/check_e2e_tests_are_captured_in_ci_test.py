@@ -246,7 +246,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         common_test_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST',
-            'oneword')
+            'threeWords')
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,

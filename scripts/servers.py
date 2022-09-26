@@ -545,6 +545,7 @@ def managed_portserver():
                     # end it by calling terminate() and/or kill().
                     pass
 
+
 @contextlib.contextmanager
 def managed_webdriverio_server(
         suite_name='full', dev_mode=True, debug_mode=False,

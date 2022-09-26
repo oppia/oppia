@@ -290,7 +290,7 @@ describe('Permissions for private explorations', function() {
       ['alicePrivileges']);
     expect(await workflow.getExplorationCollaborators()).toEqual(
       ['bobPrivileges']);
-    expect(await workflow.getExplorationPlaytesters()).toEqual([]);
+    expect(await workflow.getExplorationPlaytesters(true)).toEqual([]);
     var explorationId = await general.getExplorationIdFromEditor();
     await users.logout();
 
