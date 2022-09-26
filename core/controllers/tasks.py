@@ -20,7 +20,6 @@ import json
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import editor
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -81,7 +80,10 @@ class SuggestionEmailHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'exploration_id': {
-                'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             },
             'contributor_user_id': {
                 'schema': {
