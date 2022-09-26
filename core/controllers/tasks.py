@@ -82,7 +82,7 @@ class SuggestionEmailHandler(base.BaseHandler):
         'POST': {
             'exploration_id': {
                 'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-            }, 
+            },
             'contributor_user_id': {
                 'schema': {
                     'type': 'basestring'
