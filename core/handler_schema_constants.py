@@ -42,7 +42,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'InstantFeedbackMessageEmailHandler',
     'LearnerAnswerDetailsSubmissionHandler',
     'LearnerGoalsHandler',
-    'LeaveForRefresherExpEventHandler',
     'MemoryCacheAdminHandler',
     'MergeSkillHandler',
     'NewTopicHandler',

@@ -792,14 +792,63 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    URL_PATH_ARGS_SCHEMAS = {
+         'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'refresher_exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                },
+                'default_value': None
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'time_spent_in_state_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
+        refresher_exp_id = self.normalized_payload.get('refresher_exp_id')
+        exp_version = self.normalized_payload.get('exp_version')
+        state_name = self.normalized_payload.get('state_name')
+        session_id = self.normalized_payload.get('session_id')
+        time_spent_in_state_secs = self.normalized_payload.get('time_spent_in_state_secs')
+
         event_services.LeaveForRefresherExpEventHandler.record(
-            exploration_id, self.payload.get('refresher_exp_id'),
-            self.payload.get('exp_version'), self.payload.get('state_name'),
-            self.payload.get('session_id'),
-            self.payload.get('time_spent_in_state_secs'))
+            exploration_id, refresher_exp_id,
+            exp_version, state_name,
+            session_id,
+            time_spent_in_state_secs)
         self.render_json({})
 
 
