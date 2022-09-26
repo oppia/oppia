@@ -26,10 +26,6 @@ from core.domain import platform_parameter_registry as registry
 Registry = registry.Registry
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
 class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
@@ -38,6 +34,7 @@ class ParamNames(enum.Enum):
 
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
+    ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
 
 
 # Platform parameters should all be defined below.
@@ -65,3 +62,8 @@ Registry.create_feature_flag(
     'This flag is for the checkpoint celebration feature.',
     platform_parameter_domain.FeatureStages.PROD,
 )
+
+Registry.create_feature_flag(
+    ParamNames.ANDROID_BETA_LANDING_PAGE,
+    'This flag is for Android beta promo landing page.',
+    platform_parameter_domain.FeatureStages.PROD)

@@ -42,6 +42,9 @@ var AdminPage = function() {
   var featuresTab = $('.e2e-test-admin-features-tab');
   var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
   var progressSpinner = $('.e2e-test-progress-spinner');
+  var reloadCollectionButtonsSelector = function() {
+    return $$('.e2e-test-reload-collection-button');
+  };
   var removeRuleButtonLocator = '.e2e-test-remove-rule-button';
   var reloadCollectionButtonsSelector = function() {
     return $$('.e2e-test-reload-collection-button');
@@ -123,7 +126,13 @@ var AdminPage = function() {
   }
 
   var _switchToRolesTab = async function() {
-    await action.click('Admin roles tab button', adminRolesTab);
+    let width = (await browser.getWindowSize()).width;
+    if (width < 711) {
+      // TODO(#15562): Add proper mobile navigation after this has been fixed.
+      await browser.url('/admin#/roles');
+    } else {
+      await action.click('Admin roles tab button', adminRolesTab);
+    }
 
     await expect(await adminRolesTab.getAttribute('class')).toMatch('active');
     await waitFor.visibilityOf(
@@ -285,7 +294,16 @@ var AdminPage = function() {
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();
-    await action.click('Config Tab', configTab);
+
+    let width = (await browser.getWindowSize()).width;
+
+    if (width < 711) {
+      // TODO(#15562): Add proper mobile navigation after this has been fixed.
+      await browser.url('admin#/config');
+    } else {
+      await action.click('Config Tab', configTab);
+    }
+
     await waitFor.elementToBeClickable(saveAllConfigs);
 
     var results = [];
