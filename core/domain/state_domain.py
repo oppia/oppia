@@ -1111,7 +1111,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             for set_of_html_value in list_of_set_of_html_answer:
                                 html_list += set_of_html_value
                         elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
-                            # Here we use cast because above 'else' clause
+                            # Here we use cast because above 'elif' clause
                             # forces 'correct_answer' to be of type List[str].
                             set_of_html_answer = cast(
                                 List[str], self.solution.correct_answer

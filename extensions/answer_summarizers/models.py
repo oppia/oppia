@@ -402,6 +402,9 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         Raises:
             Exception. Answers of linear interactions should not be present
                 while calculating the commonly submitted answers' frequencies.
+            Exception. To calculate commonly submitted answers\' frequencies,
+                answers must be provided in an iterable form, like:
+                SetOfUnicodeString.
         """
         answer_dicts = state_answers_dict['submitted_answer_list']
         answer_list = []
@@ -414,7 +417,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
             if not isinstance(answer_dict['answer'], collections.abc.Iterable):
                 raise Exception(
                     'To calculate commonly submitted answers\' frequencies,'
-                    ' answers must be provided in iterable form, like:'
+                    ' answers must be provided in an iterable form, like:'
                     ' SetOfUnicodeString.'
                 )
             answer_list.append(answer_dict['answer'])

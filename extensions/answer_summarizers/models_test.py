@@ -424,7 +424,7 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
         with self.assertRaisesRegex(
             Exception,
             'To calculate commonly submitted answers\' frequencies, answers'
-            ' must be provided in iterable form, like: SetOfUnicodeString.'
+            ' must be provided in an iterable form, like: SetOfUnicodeString.'
         ):
             self._perform_calculation(state_answers_dict)
 
