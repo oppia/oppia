@@ -188,6 +188,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 # used ignore here.
                 self.assertIsInstance(spec[key], item_type)  # type: ignore[misc]
                 if item_type == str:
+                    # Here we use MyPy ignore because here we are accessing
+                    # 'spec' TypedDict using a str variable whereas according
+                    # to MyPy TypedDicts can only be accessed by using specific
+                    # string literals.
                     self.assertTrue(spec[key])  # type: ignore[misc]
 
     def _listdir_omit_ignored(self, directory: str) -> List[str]:

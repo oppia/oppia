@@ -33,6 +33,8 @@ class OptionsSpecsDict(TypedDict):
 
     name: str
     description: str
+    # Here we use type Any because values in schema dictionary can be of type
+    # str, List, Dict, nested Dict and other types too.
     schema: Dict[str, Any]
 
 

@@ -103,6 +103,8 @@ class HashableAnswer:
     def __hash__(self) -> int:
         return hash(self.hashable_answer)
 
+    # Here we use object because we want to allow every type of object with
+    # which we can compare the hashable_answer.
     def __eq__(self, other: object) -> bool:
         if isinstance(other, HashableAnswer):
             return self.hashable_answer == other.hashable_answer

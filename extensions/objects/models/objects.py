@@ -182,9 +182,9 @@ class BaseObject:
         """
         return schema_utils.normalize_against_schema(raw, cls.get_schema())
 
-    # Here we used Any type because get_schema() returns a schema dictionary and
-    # values in a schema dictionary can be of type str, List, Dict and other
-    # types too.
+    # Here we use type Any because get_schema() returns a schema dictionary and
+    # values in a schema dictionary can be of type str, List, Dict, nested Dict
+    # and other types too.
     @classmethod
     def get_schema(cls) -> Dict[str, Any]:
         """This method should be implemented by subclasses.
@@ -1755,6 +1755,8 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 class JsonEncodedInString(BaseObject):
     """Converts stringified value to its actual data type."""
 
+    # Here we use type Any because the method 'normalize' can return any kind
+    # of python object based on the JSON string provided.
     @classmethod
     def normalize(cls, raw: str) -> Any:
         """Validates and normalizes a raw Python object.

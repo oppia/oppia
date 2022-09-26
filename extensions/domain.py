@@ -96,8 +96,8 @@ class CustomizationArgSpecsDict(TypedDict):
 
     name: str
     description: str
-    # Here we used Any because values in schema dictionary can be of type str,
-    # List, Dict and other types too.
+    # Here we use type Any because values in schema dictionary can be of type
+    # str, List, Dict, nested Dict and other types too.
     schema: Dict[str, Any]
     default_value: AllowedDefaultValueTypes
 
@@ -105,6 +105,9 @@ class CustomizationArgSpecsDict(TypedDict):
 class CustomizationArgSpec:
     """Value object for a customization arg specification."""
 
+    # Here we use type Any because the argument 'schema' can accept schema
+    # dictionaries and values in schema dictionaries can be of type str, List,
+    # Dict, nested Dict and other types too.
     def __init__(
         self,
         name: str,
