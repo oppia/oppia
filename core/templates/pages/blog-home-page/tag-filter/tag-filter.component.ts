@@ -28,7 +28,8 @@ import isEqual from 'lodash/isEqual';
 import '../blog-home-page.component.css';
 @Component({
   selector: 'oppia-tag-filter',
-  templateUrl: './tag-filter.component.html'
+  templateUrl: './tag-filter.component.html',
+  styleUrls: ['../blog-home-page.component.css']
 })
 
 export class TagFilterComponent implements OnInit {

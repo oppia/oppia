@@ -31,7 +31,7 @@ import './android-page.component.css';
 @Component({
   selector: 'android-page',
   templateUrl: './android-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./android-page.component.css'],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [

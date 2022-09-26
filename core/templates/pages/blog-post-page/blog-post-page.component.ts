@@ -30,7 +30,8 @@ import './blog-post-page.component.css';
 
 @Component({
   selector: 'oppia-blog-post-page',
-  templateUrl: './blog-post-page.component.html'
+  templateUrl: './blog-post-page.component.html',
+  styleUrls: ['./blog-post-page.component.css']
 })
 export class BlogPostPageComponent implements OnInit {
   @Input() blogPostPageData!: BlogPostPageData;
