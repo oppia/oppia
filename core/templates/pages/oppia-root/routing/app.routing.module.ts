@@ -43,6 +43,14 @@ const routes: Route[] = [
       .then(m => m.ExplorationPlayerPageModule)
   },
   {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .EXPLORATION_PLAYER_EMBED.ROUTE),
+    loadChildren: () => import(
+      'pages/exploration-player-page/exploration-player-page.module')
+      .then(m => m.ExplorationPlayerPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,
     loadChildren: () => import('pages/android-page/android-page.module')
       .then(m => m.AndroidPageModule)

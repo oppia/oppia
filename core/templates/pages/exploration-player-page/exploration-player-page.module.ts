@@ -37,6 +37,7 @@ import { LessonInformationCardModalComponent } from './templates/lesson-informat
 import { ExplorationPlayerPageRoutingModule } from './exploration-player-page-routing.module';
 import { ExplorationPlayerPageRootComponent } from './exploration-player-page-root.component';
 import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
+import { HintAndSolutionModalService } from './services/hint-and-solution-modal.service';
 
 import 'third-party-imports/skulpt.import';
 
@@ -74,6 +75,9 @@ import 'third-party-imports/skulpt.import';
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
+  ],
+  providers: [
+    HintAndSolutionModalService
   ]
 })
 export class ExplorationPlayerPageModule {}
