@@ -23,6 +23,22 @@ interface TopicIdToPrerequisiteTopicIds {
   [topicId: string]: string[];
 }
 
+interface NewClassroom {
+
+}
+
+interface ExistingClassroom {
+
+}
+
+export class NewClassroomData implements NewClassroom {
+
+}
+
+export class ExistingClassroomData implements ExistingClassroomData {
+
+}
+
 
 export class ClassroomData {
   classroomId: string;
@@ -43,6 +59,7 @@ export class ClassroomData {
   classroomUrlFragmentIsEmpty!: boolean;
   urlFragmentRegexMatched!: boolean;
   classroomUrlFragmentIsValid!: boolean;
+  duplicateClassroomUrlFragment!: boolean;
 
   constructor(
       classroomId: string,
