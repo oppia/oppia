@@ -103,6 +103,10 @@ _PARSER.add_argument(
     action='store_true')
 
 
+MOBILE_SUITES = [
+    'contributorDashboard'
+]
+
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
@@ -215,6 +219,13 @@ def run_tests(args):
                 **os.environ,
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
+
+        if (args.mobile) and (args.suite not in MOBILE_SUITES):
+            print(
+                f'The {args.suite} suite should not be run ' +
+                'in the mobile viewport'
+                )
+            sys.exit(1)
 
         proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
