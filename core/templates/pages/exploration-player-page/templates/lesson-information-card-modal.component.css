@@ -450,7 +450,7 @@
   width: 100%;
 }
 
-.save-progress-menu .uid-box .uid-copy .uid-btn-container .uid-btn-message-box {
+/* .save-progress-menu .uid-box .uid-copy .uid-btn-container .uid-btn-message-box {
   background-color: #00645c;
   border-radius: 4px;
   color: #fff;
@@ -473,7 +473,7 @@
   top: -15px;
   transform: rotate(45deg);
   width: 10px;
-}
+} */
 
 .save-progress-menu .save-progress-close-button {
   background: transparent;
