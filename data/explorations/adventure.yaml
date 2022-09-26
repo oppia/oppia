@@ -350,7 +350,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{numcoins}}'
+            x: 0
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -396,23 +396,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: '{{numcoins}}'
+            x: 0
           rule_type: IsGreaterThan
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: Rainbow
-          feedback:
-            content_id: feedback_5
-            html: <p>More than that!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: '{{numcoins}}'
-          rule_type: IsLessThan
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -439,7 +424,6 @@ states:
         feedback_2: {}
         feedback_3: {}
         feedback_4: {}
-        feedback_5: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -449,7 +433,6 @@ states:
         feedback_2: {}
         feedback_3: {}
         feedback_4: {}
-        feedback_5: {}
   Road:
     classifier_model_id: null
     content:
@@ -650,7 +633,7 @@ states:
           dest: END
           feedback:
             content_id: feedback_7
-            html: "<p>You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
+            html: "<p>You give the coins to the troll. He counts them. \n\"Hmm, 0\
               \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
               \ and toward victory!</p>"
           labelled_as_correct: false
