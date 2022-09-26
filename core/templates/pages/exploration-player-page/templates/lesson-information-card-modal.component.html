@@ -51,8 +51,8 @@
               {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
             </button>
           </div>
-          <div  *ngIf="checkpointStatusArray[0] === 'in-progress'"
-                class="save-progress-btn-tooltip alert alert-danger">
+          <div *ngIf="checkpointStatusArray[0] === 'in-progress'"
+               class="save-progress-btn-tooltip alert alert-danger">
             {{ 'I18N_SAVE_BUTTON_ALERT_TOOLTIP' | translate }}
           </div>
         </div>
