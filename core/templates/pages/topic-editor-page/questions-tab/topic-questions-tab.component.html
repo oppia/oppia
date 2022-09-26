@@ -8,7 +8,9 @@
                 class="e2e-test-select-skill-dropdown"
                 [oppiaFocusOn]="selectSkillField">
       <mat-option *ngFor="let summary of allSkillSummaries"
-                  [value]="summary.getId()">{{ summary.getDescription() }}</mat-option>
+                  [value]="summary.getId()">
+        {{ summary.getDescription() }}
+      </mat-option>
     </mat-select>
   </mat-form-field>
 </div>
