@@ -149,6 +149,9 @@ export class CustomizeInteractionModalComponent
   explorationIsLinkedToStory: boolean;
   customizationModalReopened: boolean;
   isinteractionOpen: boolean;
+  explorationTitle: string;
+  inputField: HTMLCollectionOf<Element>;
+  inputValue: string;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -169,7 +172,9 @@ export class CustomizeInteractionModalComponent
   }
 
   getTitle(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].name;
+    if(INTERACTION_SPECS[interactionId] !== undefined) {
+      return INTERACTION_SPECS[interactionId].name;
+    }
   }
 
   getDescription(interactionId: string): string {
@@ -254,23 +259,21 @@ export class CustomizeInteractionModalComponent
   }
 
   isSaveInteractionButtonEnabled(): boolean {
-    let exploration = this.getTitle(this.stateInteractionIdService.displayed);
-    if (exploration === 'End Exploration') {
-      let inputField = document.getElementsByClassName('form-control display-inline');
-      if (inputField === undefined) {
+    if (this.explorationTitle === 'End Exploration') {
+      if (this.inputField === undefined) {  // means user hasn't addded any exploration id
         return true;
-      }
-      let inputValue = angular.element(inputField[inputField.length-1]).attr('ng-reflect-model');
-      if (inputValue === "") {
-        return false;
+      } 
+      if (this.inputValue === "") {
+        return false; // empty field => button disabled
       }
       return true;
+    } else {
+      return !!(
+        this.hasCustomizationArgs &&
+        this.stateInteractionIdService.displayed &&
+        this.getCustomizationArgsWarningsList().length === 0
+      );
     }
-    return !!(
-      this.hasCustomizationArgs &&
-      this.stateInteractionIdService.displayed &&
-      this.getCustomizationArgsWarningsList().length === 0
-    );
   }
 
   getSaveInteractionButtonTooltip(): string {
@@ -452,6 +455,9 @@ export class CustomizeInteractionModalComponent
   }
 
   ngOnInit(): void {
+    this.explorationTitle = this.getTitle(this.stateInteractionIdService.displayed);
+    this.inputField = document.getElementsByClassName('form-control display-inline');
+    this.inputValue = angular.element(this.inputField[this.inputField.length-1]).attr('ng-reflect-model');
     if (this.stateInteractionIdService.displayed) {
       this.isinteractionOpen = false;
     } else {

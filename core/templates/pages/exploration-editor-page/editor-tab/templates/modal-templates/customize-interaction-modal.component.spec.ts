@@ -232,6 +232,19 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should update Save interaction Button when userinputs data', () => {
+
+    component.explorationTitle = "End Exploration";
+ 
+    expect(() => {
+      component.inputField = undefined;
+      expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+      
+      component.inputValue = "";
+      expect(component.isSaveInteractionButtonEnabled()).toBe(false);
+
+      expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+    });
+
     component.hasCustomizationArgs = true;
 
     spyOn(component, 'getCustomizationArgsWarningsList').and
