@@ -451,7 +451,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                 logging.info(
                                     'State name %s was not found in the '
                                     'version history model for version %d for exploration %s' % (
-                                        state_name, version, exp_id
+                                        state_name, version - 1, exp_id
                                     )
                                 )
                         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
