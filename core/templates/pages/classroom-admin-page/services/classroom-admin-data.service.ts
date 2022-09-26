@@ -1,3 +1,21 @@
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service that handles validation for the classroom data.
+ */
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ClassroomData } from '../classroom-admin.model';
@@ -9,10 +27,10 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class ClassroomAdminDataService {
-
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService
-  ){}
+  ) {}
+
   classroom!: ClassroomData;
   existingClassroomNames: string[];
   urlFragmentIsDuplicate: boolean;
@@ -30,7 +48,7 @@ export class ClassroomAdminDataService {
     classroom.urlFragmentRegexMatched = true;
   }
 
-  validateName(classroom: ClassroomData) {
+  validateName(classroom: ClassroomData): void {
     this.supressClassroomNameErrorMessages(classroom);
     classroom.classroomNameIsValid = true;
 
@@ -54,7 +72,7 @@ export class ClassroomAdminDataService {
 
   validateUrlFragment(
       classroom: ClassroomData, existingClassroomUrlFragment: string
-  ) {
+  ): void {
     this.supressClassroomUrlFragmentErrorMessages(classroom);
     classroom.classroomUrlFragmentIsValid = true;
 
@@ -83,16 +101,17 @@ export class ClassroomAdminDataService {
 
     this.classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
       classroom.urlFragment).then((response: boolean) => {
-        if (
-            response && (
-            classroom.urlFragment !== existingClassroomUrlFragment)
-        ) {
-          classroom.duplicateClassroomUrlFragment = true;
-          classroom.classroomUrlFragmentIsValid = false;
-          return;
-        }
-      })
+      if (
+        response && (
+          classroom.urlFragment !== existingClassroomUrlFragment)
+      ) {
+        classroom.duplicateClassroomUrlFragment = true;
+        classroom.classroomUrlFragmentIsValid = false;
+        return;
+      }
+    });
   }
 }
+
 angular.module('oppia').factory('ClassroomAdminDataService',
   downgradeInjectable(ClassroomAdminDataService));
