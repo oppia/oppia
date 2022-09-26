@@ -90,7 +90,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ]
             },
             'allowMultipleItemsInSamePosition': {
-                'value': False
+                'value': True
             }
         }
         state_answer_group = state_domain.AnswerGroup(
