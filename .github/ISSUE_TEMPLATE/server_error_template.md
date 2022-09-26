@@ -1,6 +1,7 @@
 ---
 name: Server error
 about: Report a production bug from the server logs
+labels: triage needed, server errors
 ---
 <!--
   - Before filing a new issue, please do a quick search to check that it hasn't
