@@ -35,11 +35,18 @@ import { TopicEditorRoutingService } from '../services/topic-editor-routing.serv
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { TopicEditorNavbarComponent } from './topic-editor-navbar.component';
 
-class MockNgbModal {
-  open() {
-    return {
-      result: Promise.resolve()
-    };
+class MockWindowRef {
+  _window = {
+    location: {
+      href: '',
+      replace: (val: string) => {}
+    },
+    open: (url: string) => {},
+    gtag: () => {}
+  };
+
+  get nativeWindow() {
+    return this._window;
   }
 }
 
@@ -53,14 +60,15 @@ describe('Topic Editor Navbar', () => {
   let undoRedoService: UndoRedoService;
   let alertsService: AlertsService;
   let ngbModal: NgbModal;
-  let windowRef: WindowRef;
+  let windowRef: MockWindowRef;
   let topicEditorRoutingService: TopicEditorRoutingService;
   let topicRightsBackendApiService: TopicRightsBackendApiService;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
   let undoRedoChangeAppliedEventEmitter = new EventEmitter();
 
-  beforeEach(waitForAsync(() =>{
+  beforeEach(waitForAsync(() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
@@ -75,8 +83,8 @@ describe('Topic Editor Navbar', () => {
         UndoRedoService,
         TopicRightsBackendApiService,
         {
-          provide: NgbModal,
-          useClass: MockNgbModal
+          provide: WindowRef,
+          useValue: windowRef
         },
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -88,14 +96,13 @@ describe('Topic Editor Navbar', () => {
     componentInstance = fixture.componentInstance;
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     ngbModal = TestBed.inject(NgbModal);
-    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
+    topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
     topicObjectFactory = TestBed.inject(TopicObjectFactory);
     urlService = TestBed.inject(UrlService);
     undoRedoService = TestBed.inject(UndoRedoService);
     alertsService = TestBed.inject(AlertsService);
     topicRightsBackendApiService =
       TestBed.inject(TopicRightsBackendApiService);
-    windowRef = TestBed.inject(WindowRef);
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._skillIds = ['skill_1'];
@@ -312,50 +319,6 @@ describe('Topic Editor Navbar', () => {
       .toHaveBeenCalledWith(1);
   });
 
-  it('should publish topic when user clicks the \'publish\' button',
-    fakeAsync(() => {
-      spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
-        Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
-      spyOn(alertsService, 'addSuccessMessage');
-      componentInstance.topicRights = TopicRights.createFromBackendDict({
-        published: false,
-        can_publish_topic: true,
-        can_edit_topic: true
-      });
-
-      componentInstance.publishTopic();
-      tick();
-
-      expect(alertsService.addSuccessMessage)
-        .toHaveBeenCalledWith('Topic published.', 1000);
-      expect(componentInstance.topicRights.isPublished()).toBeTrue();
-      expect(
-        windowRef.nativeWindow.location).toBe('/topics-and-skills-dashboard');
-    }));
-
-  it('should send email when user who doesn\'t have publishing rights' +
-  ' clicks the \'publish\' button', fakeAsync(() => {
-    spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
-      Promise.resolve());
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
-        result: Promise.resolve('success')
-      } as NgbModalRef);
-    });
-    spyOn(alertsService, 'addSuccessMessage');
-    componentInstance.topicRights = TopicRights.createFromBackendDict({
-      published: false,
-      can_publish_topic: false,
-      can_edit_topic: true
-    });
-
-    componentInstance.publishTopic();
-    tick();
-
-    expect(alertsService.addSuccessMessage)
-      .toHaveBeenCalledWith('Mail Sent.', 1000);
-  }));
-
   it('should not send email when user who doesn\'t have publishing rights' +
   ' clicks the \'publish\' button and then cancels', fakeAsync(() => {
     spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
@@ -473,6 +436,9 @@ describe('Topic Editor Navbar', () => {
   it('should save topic when user saves topic changes', fakeAsync(() => {
     const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return ({
+        componentInstance: {
+          topicIsPublished: true
+        },
         result: Promise.resolve('commitMessage')
       } as NgbModalRef);
     });
@@ -483,7 +449,15 @@ describe('Topic Editor Navbar', () => {
       can_edit_topic: true
     });
     spyOn(alertsService, 'addSuccessMessage');
-    spyOn(topicEditorStateService, 'saveTopic');
+    spyOn(topicEditorStateService, 'saveTopic').and.callFake(
+      // This throws "Cannot set properties of undefined (setting
+      // 'topicIsPublished')". We need to suppress this error because
+      // we can't return a true value here for spyOn.
+      // @ts-ignore
+      (commitMessage: string, successCallback: () => void) => {
+        successCallback();
+        expect(commitMessage).toBe('commitMessage');
+      });
     componentInstance.saveChanges();
     tick();
 
@@ -495,6 +469,9 @@ describe('Topic Editor Navbar', () => {
   it('should close save topic modal when user clicks cancel', fakeAsync(() => {
     const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return ({
+        componentInstance: {
+          topicIsPublished: true
+        },
         result: Promise.reject()
       } as NgbModalRef);
     });
@@ -628,4 +605,49 @@ describe('Topic Editor Navbar', () => {
 
       expect(componentInstance.topicRights.isPublished()).toBe(false);
     }));
+
+  it('should publish topic when user clicks the \'publish\' button',
+    fakeAsync(() => {
+      spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
+        Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
+      spyOn(alertsService, 'addSuccessMessage');
+      componentInstance.topicRights = TopicRights.createFromBackendDict({
+        published: false,
+        can_publish_topic: true,
+        can_edit_topic: true
+      });
+
+      componentInstance.publishTopic();
+      tick(100);
+
+      expect(alertsService.addSuccessMessage)
+        .toHaveBeenCalledWith('Topic published.', 1000);
+      expect(componentInstance.topicRights.isPublished()).toBeTrue();
+      expect(
+        windowRef.nativeWindow.location.href).toBe(
+        '/topics-and-skills-dashboard');
+    }));
+
+  it('should send email when user who doesn\'t have publishing rights' +
+  ' clicks the \'publish\' button', fakeAsync(() => {
+    spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
+      Promise.resolve());
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.resolve('success')
+      } as NgbModalRef);
+    });
+    spyOn(alertsService, 'addSuccessMessage');
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: true
+    });
+
+    componentInstance.publishTopic();
+    tick(100);
+
+    expect(alertsService.addSuccessMessage)
+      .toHaveBeenCalledWith('Mail Sent.', 1000);
+  }));
 });

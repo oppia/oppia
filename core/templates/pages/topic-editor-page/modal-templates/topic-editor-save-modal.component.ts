@@ -30,7 +30,7 @@ export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() topicIsPublished!: boolean;
+  @Input() topicIsPublished = false;
   MAX_COMMIT_MESSAGE_LENGTH!: number;
   isTopicPublished: boolean = false;
 

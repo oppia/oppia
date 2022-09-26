@@ -121,7 +121,8 @@ export class TopicEditorNavbarComponent {
     ).then(() => {
       let successToast = 'Topic published.';
       if (redirectToDashboard) {
-        this.windowRef.nativeWindow.location = '/topics-and-skills-dashboard';
+        this.windowRef.nativeWindow.location.href = (
+          '/topics-and-skills-dashboard');
       }
       this.alertsService.addSuccessMessage(
         successToast, 1000);
@@ -155,12 +156,12 @@ export class TopicEditorNavbarComponent {
   }
 
   saveChanges(): void {
-    let topicIsPublished = Boolean(this.topicRights.isPublished());
+    let isTopicPublished = this.topicRights.isPublished();
     const modelRef = this.ngbModal.open(TopicEditorSaveModalComponent, {
       backdrop: 'static',
     });
-    modelRef.componentInstance.topicIsPublished = topicIsPublished;
-    modelRef.result.then((commitMessage) => {
+    modelRef.componentInstance.topicIsPublished = isTopicPublished;
+    modelRef.result.then((commitMessage: string) => {
       this.topicEditorStateService.saveTopic(commitMessage, () => {
         this.alertsService.addSuccessMessage('Changes Saved.');
       });
