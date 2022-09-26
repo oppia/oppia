@@ -195,7 +195,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self,
         interaction: base.BaseInteraction,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        validation_from_exploration: bool=False
+        validation_from_exploration: bool = False
     ) -> None:
         """Verifies that all rule classes are valid, and that the AnswerGroup
         only has one classifier rule.
@@ -929,8 +929,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return outcomes
 
     def validate(
-        self, exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        validation_from_exploration: bool=False
+        self,
+        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        validation_from_exploration: bool = False
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -3227,7 +3228,7 @@ class State(translation_domain.BaseTranslatableObject):
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         allow_null_interaction: bool,
-        validation_from_exploration: bool=False
+        validation_from_exploration: bool = False
     ) -> None:
         """Validates various properties of the State.
 
