@@ -975,3 +975,39 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_get_require_valid_name_with_empty_string(self) -> None:
         utils.require_valid_name('', 'the exploration title', allow_empty=True)
+
+    def test_escape_html_function(self) -> None:
+        html_data = (
+            '<oppia-noninteractive-math math_content-with-value=\''
+            '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+            'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+            'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'
+        )
+        expected_html_data = (
+            '&lt;oppia-noninteractive-math math_content-with-value=&#39;'
+            '{&amp;amp;quot;raw_latex&amp;amp;quot;:&amp;amp;quot;+,-,-,+'
+            '&amp;amp;quot;, &amp;amp;quot;svg_filename&amp;amp;quot;: '
+            '&amp;amp;quot;mathImg.svg&amp;amp;quot;}&#39;&gt;&lt;/'
+            'oppia-noninteractive-math&gt;'
+        )
+        self.assertEqual(
+            utils.escape_html(html_data), expected_html_data
+        )
+
+    def test_unescape_html_function(self) -> None:
+        html_data = (
+            '&lt;oppia-noninteractive-math math_content-with-value=&#39;'
+            '{&amp;amp;quot;raw_latex&amp;amp;quot;:&amp;amp;quot;+,-,-,+'
+            '&amp;amp;quot;, &amp;amp;quot;svg_filename&amp;amp;quot;: '
+            '&amp;amp;quot;mathImg.svg&amp;amp;quot;}&#39;&gt;&lt;/'
+            'oppia-noninteractive-math&gt;'
+        )
+        expected_html_data = (
+            '<oppia-noninteractive-math math_content-with-value=\''
+            '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+            'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+            'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'
+        )
+        self.assertEqual(
+            utils.unescape_html(html_data), expected_html_data
+        )

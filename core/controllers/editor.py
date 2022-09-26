@@ -138,7 +138,7 @@ class ExplorationHandler(EditorHandler):
                     'items': {
                         'type': 'object_dict',
                         'validation_method': (
-                            objects_validator.validate_exploration_change
+                            objects_validator.validate_exp_change_dict_and_return_exp_change_domain_obj # pylint: disable=line-too-long
                         )
                     }
                 }

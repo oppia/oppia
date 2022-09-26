@@ -245,8 +245,9 @@ def validate_suggestion_images(files):
     return files
 
 
-def validate_exploration_change(exp_change_dict):
-    """Validate the exploration change list.
+def validate_exp_change_dict_and_return_exp_change_domain_obj(exp_change_dict):
+    """Validate the exploration change list and return the exploration
+    change domain object.
 
     Args:
         exp_change_dict: dict. The exploration change dictionary
