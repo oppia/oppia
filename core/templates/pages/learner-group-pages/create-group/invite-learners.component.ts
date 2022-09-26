@@ -29,7 +29,8 @@ import './invite-learners.component.css';
 
 @Component({
   selector: 'oppia-invite-learners',
-  templateUrl: './invite-learners.component.html'
+  templateUrl: './invite-learners.component.html',
+  styleUrls: ['./invite-learners.component.css']
 })
 export class InviteLearnersComponent {
   @Input() learnerGroupID: string = '';

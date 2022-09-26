@@ -41,7 +41,7 @@ import './practice-tab.component.css';
 @Component({
   selector: 'practice-tab',
   templateUrl: './practice-tab.component.html',
-  styleUrls: []
+  styleUrls: ['./practice-tab.component.css']
 })
 export class PracticeTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

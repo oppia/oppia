@@ -6742,8 +6742,8 @@ export default {
     }
   },
 
-  "DEV_MODE": false,
-  "EMULATOR_MODE": false,
+  "DEV_MODE": true,
+  "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
   "ASSET_TYPE_THUMBNAIL": "thumbnail",

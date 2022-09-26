@@ -48,7 +48,8 @@ import './exploration-footer.component.css';
 
 @Component({
   selector: 'oppia-exploration-footer',
-  templateUrl: './exploration-footer.component.html'
+  templateUrl: './exploration-footer.component.html',
+  styleUrls: ['./exploration-footer.component.css']
 })
 export class ExplorationFooterComponent {
   directiveSubscriptions = new Subscription();

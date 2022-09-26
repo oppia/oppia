@@ -33,7 +33,8 @@ import './learner-group-preferences.component.css';
 
 @Component({
   selector: 'oppia-learner-group-preferences',
-  templateUrl: './learner-group-preferences.component.html'
+  templateUrl: './learner-group-preferences.component.html',
+  styleUrls: ['./learner-group-preferences.component.css']
 })
 export class LearnerGroupPreferencesComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;

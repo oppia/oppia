@@ -40,7 +40,7 @@ import './subtopic-viewer-page.component.css';
 @Component({
   selector: 'oppia-subtopic-viewer-page',
   templateUrl: './subtopic-viewer-page.component.html',
-  styleUrls: []
+  styleUrls: ['./subtopic-viewer-page.component.css']
 })
 export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

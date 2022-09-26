@@ -46,7 +46,8 @@ interface LanguageIdAndText {
 
 @Component({
   selector: 'oppia-search-bar',
-  templateUrl: './search-bar.component.html'
+  templateUrl: './search-bar.component.html',
+  styleUrls: ['./search-bar.component.css']
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

@@ -53,7 +53,8 @@ interface SearchDropDownItems {
 
 @Component({
   selector: 'oppia-add-syllabus-items',
-  templateUrl: './add-syllabus-items.component.html'
+  templateUrl: './add-syllabus-items.component.html',
+  styleUrls: ['./add-syllabus-items.component.css']
 })
 export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   @Input() learnerGroupId: string = '';

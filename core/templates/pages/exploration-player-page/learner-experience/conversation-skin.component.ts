@@ -90,6 +90,7 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 @Component({
   selector: 'oppia-conversation-skin',
   templateUrl: './conversation-skin.component.html',
+  styleUrls: ['./conversation-skin.component.css']
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;

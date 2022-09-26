@@ -48,7 +48,7 @@ import './topic-viewer-page.component.css';
 @Component({
   selector: 'topic-viewer-page',
   templateUrl: './topic-viewer-page.component.html',
-  styleUrls: []
+  styleUrls: ['./topic-viewer-page.component.css']
 })
 export class TopicViewerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

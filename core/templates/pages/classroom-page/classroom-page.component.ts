@@ -38,7 +38,8 @@ import './classroom-page.component.css';
 
 @Component({
   selector: 'oppia-classroom-page',
-  templateUrl: './classroom-page.component.html'
+  templateUrl: './classroom-page.component.html',
+  styleUrls: ['./classroom-page.component.css']
 })
 export class ClassroomPageComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();

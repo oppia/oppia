@@ -29,8 +29,8 @@
             ],
             "styles": [
               "src/styles.scss",
-              "src/css/oppia.scss",
-              "src/css/oppia-material.scss"
+              "core/templates/css/oppia.css",
+              "core/templates/css/oppia-material.css"
             ],
             "scripts": []
           },

@@ -53,7 +53,7 @@ import './learner-dashboard-page.component.css';
 @Component({
   selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./learner-dashboard-page.component.css'],
   animations: [
     trigger('slideInOut', [
       state('true', style({

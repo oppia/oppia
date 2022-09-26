@@ -34,7 +34,8 @@ import './goals-tab.component.css';
 
  @Component({
    selector: 'oppia-goals-tab',
-   templateUrl: './goals-tab.component.html'
+   templateUrl: './goals-tab.component.html',
+   styleUrls: ['./goals-tab.component.css']
  })
 export class GoalsTabComponent implements OnInit {
   constructor(

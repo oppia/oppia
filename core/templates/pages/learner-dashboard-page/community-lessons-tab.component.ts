@@ -37,7 +37,8 @@ interface ShowMoreInSectionDict {
 
  @Component({
    selector: 'oppia-community-lessons-tab',
-   templateUrl: './community-lessons-tab.component.html'
+   templateUrl: './community-lessons-tab.component.html',
+   styleUrls: ['./community-lessons-tab.component.css']
  })
 export class CommunityLessonsTabComponent {
   constructor(

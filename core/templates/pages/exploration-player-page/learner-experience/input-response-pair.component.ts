@@ -40,7 +40,8 @@ import './input-response-pair.component.css';
 
 @Component({
   selector: 'oppia-input-response-pair',
-  templateUrl: './input-response-pair.component.html'
+  templateUrl: './input-response-pair.component.html',
+  styleUrls: ['./input-response-pair.component.css']
 })
 export class InputResponsePairComponent {
   // This property is initialized using component interactions

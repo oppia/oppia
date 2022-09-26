@@ -34,7 +34,8 @@ import './edit-learner-group-page.component.css';
 
 @Component({
   selector: 'oppia-edit-learner-group-page',
-  templateUrl: './edit-learner-group-page.component.html'
+  templateUrl: './edit-learner-group-page.component.html',
+  styleUrls: ['./edit-learner-group-page.component.css']
 })
 export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

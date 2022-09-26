@@ -44,6 +44,7 @@ const SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX = 1370;
 @Component({
   selector: 'oppia-checkpoint-celebration-modal',
   templateUrl: './checkpoint-celebration-modal.component.html',
+  styleUrls: ['./checkpoint-celebration-modal.component.css']
 })
 export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   @ViewChild('checkpointCelebrationModalTimer') checkpointTimerTemplateRef!:
