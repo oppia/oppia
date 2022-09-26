@@ -510,7 +510,7 @@ var expectRichText = function(elem) {
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = await elem.$$(XPATH_SELECTOR);
-    var fullText = (await entry.getHTML(false)).replace(
+    var fullText = (await elem.getHTML(false)).replace(
       /<!--[^>]*-->/g, '').trim();
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
