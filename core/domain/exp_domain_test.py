@@ -1728,26 +1728,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         new_exploration = exp_domain.Exploration.create_default_exploration(
             'test_id')
         # Validate Continue interaction.
-        self.set_interaction_for_state(
-            new_exploration.states['Introduction'], 'Continue')
         state = new_exploration.states['Introduction']
+        self.set_interaction_for_state(state, 'Continue')
         state.interaction.customization_args['buttonText'].value.unicode_str = (
             'Continueeeeeeeeeeeeeeeeeeeeeee')
         self._assert_validation_error(
             new_exploration, 'The Continue button text should be at '
             'most 20 characters.')
-
-        # Validate End interaction.
-        # self.set_interaction_for_state(
-        #     new_exploration.states['Introduction'], 'EndExploration')
-        # state.interaction.customization_args[
-        #     'recommendedExplorationIds'].value = ['a', 'b', 'c', 'd']
-        # self._assert_validation_error(
-        #     new_exploration, 'Terminal interactions must not have a '
-        #     'default outcome.')
-        # self._assert_validation_error(
-        #     new_exploration, 'The End interaction should not have more than 3 '
-        #     'recommended explorations.')
 
         # Validate NumericInput interaction.
         self.set_interaction_for_state(state, 'NumericInput')
@@ -2287,6 +2274,423 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         state.interaction.customization_args[
             'choices'].value[2].html = '<p>2</p>'
+
+        # Validate DragAndDropSortInput interaction.
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_2')
+        self.set_interaction_for_state(state, 'DragAndDropSortInput')
+        test_ans_group_for_drag_and_drop_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': (
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXBeforeElementY',
+                    'inputs': {
+                    'x': 'ca_choices_0',
+                    'y': 'ca_choices_0'
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': []
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 1
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': (
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_1', 'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_2'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_1'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_2', 'ca_choices_3'
+                            ]
+                        ]
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = (
+            test_ans_group_for_drag_and_drop_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = False
+        self._assert_validation_error(
+            new_exploration, 'The rule \'0\' of answer group \'0\' '
+            'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
+            ' should not be there when the multiple items in same position '
+            'setting is turned off in DragAndDropSortInput interaction.')
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'0\' of answer group \'0\' '
+            'have multiple items at same place when multiple items in same '
+            'position settings is turned off in DragAndDropSortInput '
+            'interaction.')
+        state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = True
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\', '
+            'the value 1 and value 2 cannot be same when rule type is '
+            'HasElementXBeforeElementY of DragAndDropSortInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\'of answer group \'0\', '
+            'having rule type IsEqualToOrdering should not have empty values.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'2\' of answer group \'0\' of '
+            'DragAndDropInput interaction is already present.')
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - 1 of answer group 0 '
+            'will never be match because it is made redundant by the '
+            'HasElementXAtPositionY rule above.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - 1 of answer group 0 will never '
+            'be match because it is made redundant by the '
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition rule above.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'Atleast 2 choices should be there '
+            'in DragAndDropSortInput interaction.')
+        state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
+        ]
+        self._assert_validation_error(
+            new_exploration, 'There should not be any duplicate '
+            'choices in DragAndDropSortInput interaction.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[1].html = '<p>3</p>'
+        self._assert_validation_error(
+            new_exploration, 'There should not be any empty '
+            'choices in DragAndDropSortInput interaction.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[2].html = '<p>2</p>'
+
+        # Validate TextInput interaction.
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('rule_input_27')
+        state.written_translations.add_content_id_for_translation(
+            'rule_input_27')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_2')
+        self.set_interaction_for_state(state, 'TextInput')
+        test_ans_group_for_text_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello',
+                            'abc',
+                            'def'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'helloooooo'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'exci'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'excitement'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'he'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'he'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'he'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello'
+                        ]
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = (
+            test_ans_group_for_text_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        state.interaction.customization_args['rows'].value = 20
+        self._assert_validation_error(
+            new_exploration, 'Rows having value 20 is either '
+            'less than 1 or greater than 10.'
+        )
+        state.interaction.customization_args['rows'].value = 5
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Contains\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.')
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'TextInput interaction is already present.')
+
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_2')
+        # Validate End interaction.
+        self.set_interaction_for_state(state, 'EndExploration')
+        state.update_interaction_default_outcome(None)
+        state.interaction.customization_args[
+            'recommendedExplorationIds'].value = ['a', 'b', 'c', 'd']
+        self._assert_validation_error(
+            new_exploration, 'The End interaction should not have more than 3 '
+            'recommended explorations.')
 
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""

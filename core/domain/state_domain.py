@@ -1617,20 +1617,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     )
                 else:
                     rule_spec_till_now.append(rule_spec.to_dict())
-                # Multiple items cannot be in the same place iff the
-                # setting is turned off.
-                if not multi_item_value:
-                    for ele in rule_spec.inputs['x']:
-                        if len(ele) > 1:
-                            raise utils.ValidationError(
-                                f'The rule \'{rule_spec_index}\' of '
-                                f'answer group \'{ans_group_index}\' '
-                                f'have multiple items at same place '
-                                f'when multiple items in same '
-                                f'position settings is turned off '
-                                f'in DragAndDropSortInput interaction.'
-                            )
-
                 # `IsEqualToOrderingWithOneItemAtIncorrectPosition`
                 # rule should not be present when `multiple items at same
                 # place` setting is turned off.
@@ -1649,6 +1635,19 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'setting is turned off '
                             f'in DragAndDropSortInput interaction.'
                         )
+                # Multiple items cannot be in the same place iff the
+                # setting is turned off.
+                if not multi_item_value:
+                    for ele in rule_spec.inputs['x']:
+                        if len(ele) > 1:
+                            raise utils.ValidationError(
+                                f'The rule \'{rule_spec_index}\' of '
+                                f'answer group \'{ans_group_index}\' '
+                                f'have multiple items at same place '
+                                f'when multiple items in same '
+                                f'position settings is turned off '
+                                f'in DragAndDropSortInput interaction.'
+                            )
 
                 # In `HasElementXBeforeElementY` rule, `X` value
                 # should not be equal to `Y` value.
@@ -1727,8 +1726,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     f'group {ans_group_index} will never '
                                     f'be match because it is made '
                                     f'redundant by the IsEqualToOrdering'
-                                    f'WithOneItemAtIncorrect '
-                                    f'Position rule above.'
+                                    f'WithOneItemAtIncorrectPosition '
+                                    f'rule above.'
                                 )
         choices = self.customization_args['choices'].value
         # There should be at least 2 items.
@@ -1805,10 +1804,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     raise utils.ValidationError(
                                         f'Rule - \'{rule_spec_idx}\' of answer '
                                         f'group - \'{ans_group_idx}\' having '
-                                        f'rule type {rule_spec.rule_type} '
+                                        f'rule type \'{rule_spec.rule_type}\' '
                                         f'will never be matched because it '
                                         f'is made redundant by the above '
-                                        f'contains rule.'
+                                        f'\'contains\' rule.'
                                     )
 
                     seen_strings_contains.append(
@@ -1825,12 +1824,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                 if rule_value.startswith(
                                     start_with_rule_string):
                                     raise utils.ValidationError(
-                                        f'Rule -\' {rule_spec_idx}\' of answer '
+                                        f'Rule - \'{rule_spec_idx}\' of answer '
                                         f'group - \'{ans_group_idx}\' having '
                                         f'rule type \'{rule_spec.rule_type}\' '
                                         f'will never be matched because it '
                                         f'is made redundant by the above '
-                                        f'starts with rule.'
+                                        f'\'StartsWith\' rule.'
                                     )
 
                     # `Contains` should always come after `StartsWith` rule
@@ -1846,7 +1845,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                         f'rule type \'{rule_spec.rule_type}\' '
                                         f'will never be matched because it '
                                         f'is made redundant by the above '
-                                        f'contains rule.'
+                                        f'\'contains\' rule.'
                                     )
 
                     seen_strings_startswith.append(rule_values)
@@ -1866,7 +1865,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                         f'rule type \'{rule_spec.rule_type}\' '
                                         f'will never be matched because it '
                                         f'is made redundant by the above '
-                                        f'contains rule.'
+                                        f'\'contains\' rule.'
                                     )
 
                     # `Startswith` should always come after the `Equals`
@@ -1883,7 +1882,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                         f'rule type \'{rule_spec.rule_type}\' '
                                         f'will never be matched because it '
                                         f'is made redundant by the above '
-                                        f'starts with rule.'
+                                        f'\'StartsWith\' rule.'
                                     )
 
     def validate(
