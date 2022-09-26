@@ -107,6 +107,8 @@ export class ClassroomAdminPageComponent implements OnInit {
     ) {
       this.classroomDetailsIsShown = false;
       this.classroomViewerMode = false;
+      this.topicNames = [];
+      this.topicNameToPrerequisiteTopicNames = {};
       return;
     }
 
@@ -466,7 +468,6 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.topicDependencyEditOptionIsShown = false;
     this.dependencyGraphDropdownIsShown = true;
     this.editTopicOptionIsShown = false;
-    this.topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
   }
 
   deleteTopic(topicNameToDelete: string): void {
@@ -491,6 +492,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       const topicId = this.getTopicIdFromTopicName(topicNameToDelete);
       delete this.tempClassroomData.topicIdToPrerequisiteTopicIds[topicId];
       delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
+      this.topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
 
       this.classroomDataIsChanged = true;
     }, () => {
