@@ -733,9 +733,7 @@ class StateCompleteEventHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
          'exploration_id': {
-            'schema': {
-                'type': 'basestring'
-            }
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
         }
     }
 
