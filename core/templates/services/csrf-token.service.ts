@@ -34,6 +34,8 @@ export class CsrfTokenService {
   http: HttpClient;
 
   constructor(httpBackend: HttpBackend) {
+    // We pass HttpBackend into this constructor in order to bypass the default
+    // REQUEST_INTERCEPTER which we use and which depends on CsrfTokenService.
     this.http = new HttpClient(httpBackend);
   }
 
@@ -47,9 +49,6 @@ export class CsrfTokenService {
       // Remove the protective XSSI (cross-site scripting inclusion) prefix.
       return JSON.parse(responseText.substring(5)).token;
     }, (err) => {
-      console.error(
-        'The following error is thrown while trying to get CSRF token.');
-      console.error(err);
       throw err;
     });
   }
