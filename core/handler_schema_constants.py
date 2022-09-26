@@ -64,7 +64,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SkillDataHandler',
     'SkillDescriptionHandler',
     'StartedTranslationTutorialEventHandler',
-    'StateCompleteEventHandler',
     'StateHitEventHandler',
     'SubtopicPageDataHandler',
     'SubtopicViewerPage',

@@ -728,19 +728,63 @@ class StateCompleteEventHandler(base.BaseHandler):
     """Tracks a learner complete a state. Here, 'completing' means answering
     the state and progressing to a new state.
     """
+    
+    URL_PATH_ARGS_SCHEMAS = {
+         'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
 
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                },
+                'default_value': None
+            }, 
+             'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'time_spent_in_state_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            }
+        }
+    }
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.payload.get('exp_version') is None:
+        state_name = self.normalized_payload.get('state_name')
+        session_id = self.normalized_payload.get('session_id')
+        time_spent_in_state_secs = self.normalized_payload.get('time_spent_in_state_secs')
+        exp_version = self.normalized_payload.get('exp_version')
+
+        if exp_version is None:
             raise self.InvalidInputException(
                 'NONE EXP VERSION: State Complete')
         event_services.StateCompleteEventHandler.record(
-            exploration_id, self.payload.get('exp_version'),
-            self.payload.get('state_name'), self.payload.get('session_id'),
-            self.payload.get('time_spent_in_state_secs'))
+            exploration_id, exp_version,
+            state_name, session_id,
+            time_spent_in_state_secs)
         self.render_json({})
 
 
