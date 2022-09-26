@@ -24,9 +24,9 @@ export interface TopicRightsBackendDict {
 }
 
 export class TopicRights {
-  _published = false;
-  _canPublishTopic = false;
-  _canEditTopic = false;
+  _published: boolean;
+  _canPublishTopic: boolean;
+  _canEditTopic: boolean;
 
   constructor(
       published: boolean, canPublishTopic: boolean, canEditTopic: boolean) {
