@@ -129,6 +129,26 @@ describe('Skill Misconceptions Editor Component', () => {
     expect(component.misconceptionsListIsShown).toBe(false);
   });
 
+  it('should display Misconception Card on maximizing the window', () => {
+    component.misconceptionsListIsShown = false;
+
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    component.MisconceptionListsOnResize();
+
+    expect(component.misconceptionsListIsShown).toBeTrue();
+  });
+
+  it('should hide Misconception Card on minimizing the window', () => {
+    component.misconceptionsListIsShown = true;
+
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+
+    component.MisconceptionListsOnResize();
+
+    expect(component.misconceptionsListIsShown).toBeFalse();
+  });
+
   it('should open add misconception modal when clicking on add ' +
     'button', fakeAsync(() => {
     component.skill = sampleSkill;

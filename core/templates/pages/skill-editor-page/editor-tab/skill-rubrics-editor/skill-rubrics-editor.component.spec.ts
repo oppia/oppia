@@ -146,6 +146,26 @@ describe('Skill Rubrics Editor Component', () => {
       expect(component.rubricsListIsShown).toBeFalse();
     });
 
+    it('should display Rubrics Card on maximizing the window', () => {
+      component.rubricsListIsShown = false;
+  
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+  
+      component.RubricsListOnResize();
+  
+      expect(component.rubricsListIsShown).toBeTrue();
+    });
+  
+    it('should hide Rubrics Card on minimizing the window', () => {
+      component.rubricsListIsShown = true;
+  
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+  
+      component.RubricsListOnResize();
+  
+      expect(component.rubricsListIsShown).toBeFalse();
+    });
+
     it('should update skill rubrics when user saves', () => {
       spyOn(skillUpdateService, 'updateRubricForDifficulty');
 

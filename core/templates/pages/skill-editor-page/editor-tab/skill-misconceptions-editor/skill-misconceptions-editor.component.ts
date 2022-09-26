@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill misconceptions editor.
  */
 
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, HostListener, EventEmitter, OnInit, Output } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
@@ -124,6 +124,12 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
         !this.misconceptionsListIsShown);
     }
   }
+
+  @HostListener('window:resize')
+  MisconceptionListsOnResize(): void {
+    this.misconceptionsListIsShown = !this.windowDimensionsService.isWindowNarrow();
+  }
+
 }
 
 angular.module('oppia').directive('oppiaSkillMisconceptionsEditor',
