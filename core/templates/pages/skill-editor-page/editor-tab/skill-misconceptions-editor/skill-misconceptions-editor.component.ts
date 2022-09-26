@@ -129,7 +129,6 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   MisconceptionListsOnResize(): void {
     this.misconceptionsListIsShown = !this.windowDimensionsService.isWindowNarrow();
   }
-
 }
 
 angular.module('oppia').directive('oppiaSkillMisconceptionsEditor',

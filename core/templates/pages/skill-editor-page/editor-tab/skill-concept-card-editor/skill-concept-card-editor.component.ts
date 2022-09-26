@@ -233,4 +233,3 @@ angular.module('oppia').directive('oppiaSkillConceptCardEditor',
 downgradeComponent({
   component: SkillConceptCardEditorComponent
 }) as angular.IDirectiveFactory);
-

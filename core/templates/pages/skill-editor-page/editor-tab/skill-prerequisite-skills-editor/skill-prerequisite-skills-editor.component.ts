@@ -133,6 +133,7 @@ implements OnInit {
     }
     return null;
   }
+
   @HostListener('window:resize')
   SkillDescriptionOnResize(): void {
     this.prerequisiteSkillsAreShown = !this.windowDimensionsService.isWindowNarrow();
