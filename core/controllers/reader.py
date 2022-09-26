@@ -729,6 +729,8 @@ class StateCompleteEventHandler(base.BaseHandler):
     the state and progressing to a new state.
     """
     
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
     URL_PATH_ARGS_SCHEMAS = {
          'exploration_id': {
             'schema': {
@@ -768,7 +770,6 @@ class StateCompleteEventHandler(base.BaseHandler):
             }
         }
     }
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
