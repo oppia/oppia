@@ -9,7 +9,7 @@
     <div class="new-classroom-name-input">
       <textarea [(ngModel)]="newClassroom.name"
                 rows="1"
-                (ngModelChange)="newClassroom.onClassroomNameChange()">
+                (ngModelChange)="classroomAdminDataService.validateName(newClassroom)">
       </textarea>
       <p *ngIf="newClassroom.classroomNameIsTooLong" class="oppia-warning-text">
         The classroom name should contain at most 39 characters.
@@ -28,7 +28,7 @@
     <div class="new-classroom-name-input">
       <textarea [(ngModel)]="newClassroom.urlFragment"
                 rows="1"
-                (ngModelChange)="newClassroom.onClassroomUrlFragmentChange()">
+                (ngModelChange)="classroomAdminDataService.validateUrlFragment(newClassroom, '')">
       </textarea>
       <p *ngIf="newClassroom.classroomUrlFragmentIsTooLong" class="oppia-warning-text">
         The classroom URL fragment should contain at most 20 characters.

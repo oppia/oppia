@@ -16,7 +16,6 @@
  * @fileoverview Create new classroom modal.
  */
 
-import { AppConstants } from 'app.constants';
 import { ClassroomDict } from '../../domain/classroom/classroom-backend-api.service';
 
 interface TopicIdToPrerequisiteTopicIds {
@@ -24,23 +23,64 @@ interface TopicIdToPrerequisiteTopicIds {
 }
 
 interface NewClassroom {
+  classroomId: string;
+  name: string;
+  urlFragment: string;
 
+  classroomNameIsTooLong: boolean;
+  emptyClassroomName: boolean;
+  duplicateClassroomName: boolean;
+  classroomNameIsValid: boolean;
+
+  classroomUrlFragmentIsTooLong: boolean;
+  classroomUrlFragmentIsEmpty: boolean;
+  urlFragmentRegexMatched: boolean;
+  classroomUrlFragmentIsValid: boolean;
+  duplicateClassroomUrlFragment: boolean;
+  existingClassroomNames: string[];
 }
 
-interface ExistingClassroom {
-
+interface ExistingClassroom extends NewClassroom {
+  courseDetails: string;
+  topicListIntro: string;
+  topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
+  getClassroomDict: () => ClassroomDict;
 }
+
+export type ClassroomData = NewClassroom | ExistingClassroom;
+
 
 export class NewClassroomData implements NewClassroom {
+  classroomId: string;
+  name: string;
+  urlFragment: string;
 
+  existingClassroomNames!: string[];
+
+  classroomNameIsTooLong: boolean;
+  emptyClassroomName: boolean;
+  duplicateClassroomName: boolean;
+  classroomNameIsValid: boolean;
+
+  classroomUrlFragmentIsTooLong: boolean;
+  classroomUrlFragmentIsEmpty: boolean;
+  urlFragmentRegexMatched: boolean;
+  classroomUrlFragmentIsValid: boolean;
+  duplicateClassroomUrlFragment: boolean;
+
+  constructor(
+      classroomId: string,
+      name: string,
+      urlFragment: string
+  ) {
+    this.classroomId = classroomId;
+    this.name = name;
+    this.urlFragment = urlFragment;
+  }
 }
 
-export class ExistingClassroomData implements ExistingClassroomData {
 
-}
-
-
-export class ClassroomData {
+export class ExistingClassroomData implements ExistingClassroom {
   classroomId: string;
   name: string;
   urlFragment: string;
@@ -77,77 +117,10 @@ export class ClassroomData {
     this.topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
   }
 
-  supressClassroomNameErrorMessages(): void {
-    this.classroomNameIsTooLong = false;
-    this.emptyClassroomName = false;
-    this.duplicateClassroomName = false;
-  }
-
-  supressClassroomUrlFragmentErrorMessages(): void {
-    this.classroomUrlFragmentIsTooLong = false;
-    this.classroomUrlFragmentIsEmpty = false;
-    this.urlFragmentRegexMatched = true;
-  }
-
-  setExistingClassroomData(existingClassroomNames: string[]): void {
-    this.existingClassroomNames = existingClassroomNames;
-  }
-
-  onClassroomNameChange(): void {
-    this.name = this.name.replace(/\s+/g, ' ').trim();
-    this.supressClassroomNameErrorMessages();
-    this.classroomNameIsValid = true;
-
-    if (this.name === '') {
-      this.emptyClassroomName = true;
-      this.classroomNameIsValid = false;
-      return;
-    }
-
-    if (this.name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
-      this.classroomNameIsTooLong = true;
-      this.classroomNameIsValid = false;
-      return;
-    }
-
-    if (this.existingClassroomNames.indexOf(this.name) !== -1) {
-      this.duplicateClassroomName = true;
-      this.classroomNameIsValid = false;
-    }
-  }
-
-  onClassroomUrlFragmentChange(): void {
-    this.supressClassroomUrlFragmentErrorMessages();
-    this.classroomUrlFragmentIsValid = true;
-
-    if (this.urlFragment === '') {
-      this.classroomUrlFragmentIsEmpty = true;
-      this.classroomUrlFragmentIsValid = false;
-      return;
-    }
-
-    if (
-      this.urlFragment.length >
-      AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
-    ) {
-      this.classroomUrlFragmentIsTooLong = true;
-      this.classroomUrlFragmentIsValid = false;
-      return;
-    }
-
-    const validUrlFragmentRegex = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
-    if (!validUrlFragmentRegex.test(this.urlFragment)) {
-      this.urlFragmentRegexMatched = false;
-      this.classroomUrlFragmentIsValid = false;
-      return;
-    }
-  }
-
-  static createNewClassroomFromDict(
+  static createClassroomFromDict(
       classroomDict: ClassroomDict
-  ): ClassroomData {
-    return new ClassroomData(
+  ): ExistingClassroomData {
+    return new ExistingClassroomData(
       classroomDict.classroomId,
       classroomDict.name,
       classroomDict.urlFragment,

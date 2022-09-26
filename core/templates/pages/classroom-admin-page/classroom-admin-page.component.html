@@ -62,7 +62,7 @@
               <textarea *ngIf="classroomEditorMode"
                         [(ngModel)]="tempClassroomData.name"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="tempClassroomData.onClassroomNameChange()"
+                        (ngModelChange)="classroomAdminDataService.validateName(tempClassroomData)"
                         rows="1">
               </textarea>
               <p *ngIf="tempClassroomData.classroomNameIsTooLong" class="oppia-warning-text">
@@ -88,7 +88,7 @@
               <textarea *ngIf="classroomEditorMode"
                         [(ngModel)]="tempClassroomData.urlFragment"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="tempClassroomData.onClassroomUrlFragmentChange()"
+                        (ngModelChange)="classroomAdminDataService.validateUrlFragment(tempClassroomData, classroomData.urlFragment)"
                         rows="1">
               </textarea>
               <p *ngIf="tempClassroomData.classroomUrlFragmentIsTooLong" class="oppia-warning-text">
@@ -97,7 +97,7 @@
               <p *ngIf="tempClassroomData.classroomUrlFragmentIsEmpty" class="oppia-warning-text">
                 The classroom URL fragment should not be empty.
               </p>
-              <p *ngIf="classroomUrlFragmentIsDuplicate" class="oppia-warning-text">
+              <p *ngIf="tempClassroomData.duplicateClassroomUrlFragment" class="oppia-warning-text">
                 A classroom with this URL fragment already exists.
               </p>
               <p *ngIf="!tempClassroomData.urlFragmentRegexMatched" class="oppia-warning-text">

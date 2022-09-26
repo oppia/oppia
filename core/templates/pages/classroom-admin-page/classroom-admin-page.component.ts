@@ -26,7 +26,8 @@ import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-
 import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
 import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
 import cloneDeep from 'lodash/cloneDeep';
-import { ClassroomData } from './classroom-admin.model';
+import { ExistingClassroomData } from './classroom-admin.model';
+import { ClassroomAdminDataService } from './services/classroom-admin-data.service';
 
 @Component({
   selector: 'oppia-classroom-admin-page',
@@ -38,6 +39,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
+    private classroomAdminDataService: ClassroomAdminDataService,
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
   ) {}
@@ -45,8 +47,8 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomCount: number = 0;
   classroomIdToClassroomName: {[classroomId: string]: string} = {};
 
-  classroomData!: ClassroomData;
-  tempClassroomData!: ClassroomData;
+  classroomData!: ExistingClassroomData;
+  tempClassroomData!: ExistingClassroomData;
 
   classroomUrlFragmentIsDuplicate: boolean = false;
   existingClassroomNames: string[] = [];
@@ -75,9 +77,9 @@ export class ClassroomAdminPageComponent implements OnInit {
 
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {
-        this.classroomData = ClassroomData.createNewClassroomFromDict(
+        this.classroomData = ExistingClassroomData.createClassroomFromDict(
           cloneDeep(response.classroomDict));
-        this.tempClassroomData = ClassroomData.createNewClassroomFromDict(
+        this.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
           cloneDeep(response.classroomDict));
 
         this.classroomDataIsChanged = false;
@@ -91,11 +93,12 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomDetailsIsShown = true;
         this.classroomViewerMode = true;
 
-        this.tempClassroomData.setExistingClassroomData(
+        this.classroomAdminDataService.existingClassroomNames = (
           this.existingClassroomNames);
 
-        this.tempClassroomData.onClassroomNameChange();
-        this.tempClassroomData.onClassroomUrlFragmentChange();
+        this.classroomAdminDataService.validateName(this.tempClassroomData);
+        this.classroomAdminDataService.validateUrlFragment(
+          this.tempClassroomData, this.classroomData.urlFragment);
       }, (errorResponse) => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -154,33 +157,19 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   saveClassroomData(classroomId: string): void {
     this.classroomDataSaveInProgress = true;
-    let backendDict = this.convertClassroomDictToBackendForm(
+    const backendDict = this.convertClassroomDictToBackendForm(
       this.tempClassroomData.getClassroomDict());
 
-    this.classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
-      this.tempClassroomData.urlFragment).then(response => {
-      if (
-        response && (
-          this.tempClassroomData.urlFragment !== this.classroomData.urlFragment
-        )
-      ) {
-        this.classroomDataSaveInProgress = false;
-        this.classroomUrlFragmentIsDuplicate = true;
-        this.tempClassroomData.classroomUrlFragmentIsValid = false;
-        return;
-      }
+    this.classroomEditorMode = false;
+    this.classroomViewerMode = true;
+    this.classroomDataIsChanged = false;
 
-      this.classroomEditorMode = false;
-      this.classroomViewerMode = true;
-      this.classroomDataIsChanged = false;
-
-      this.classroomBackendApiService.updateClassroomDataAsync(
-        classroomId, backendDict).then(() => {
-        this.classroomIdToClassroomName[this.tempClassroomData.classroomId] = (
-          this.tempClassroomData.name);
-        this.classroomData = cloneDeep(this.tempClassroomData);
-        this.classroomDataSaveInProgress = false;
-      });
+    this.classroomBackendApiService.updateClassroomDataAsync(
+      classroomId, backendDict).then(() => {
+      this.classroomIdToClassroomName[this.tempClassroomData.classroomId] = (
+        this.tempClassroomData.name);
+      this.classroomData = cloneDeep(this.tempClassroomData);
+      this.classroomDataSaveInProgress = false;
     });
   }
 
@@ -222,8 +211,10 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.openClassroomInViewerMode();
         this.tempClassroomData = cloneDeep(this.classroomData);
 
-        this.tempClassroomData.supressClassroomNameErrorMessages();
-        this.tempClassroomData.supressClassroomUrlFragmentErrorMessages();
+        this.classroomAdminDataService.supressClassroomNameErrorMessages(
+          this.tempClassroomData);
+        this.classroomAdminDataService
+          .supressClassroomUrlFragmentErrorMessages(this.tempClassroomData);
 
         this.tempClassroomData.classroomNameIsValid = true;
         this.tempClassroomData.classroomUrlFragmentIsValid = true;
