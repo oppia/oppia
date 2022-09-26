@@ -18,15 +18,15 @@
  */
 
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationCreationBackendApiService } from './exploration-creation-backend-api.service';
 
  @Injectable({
@@ -37,14 +37,13 @@ export class ExplorationCreationService {
   explorationCreationInProgress: boolean = false;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private csrfTokenService: CsrfTokenService,
     private siteAnalyticsService: SiteAnalyticsService,
     private alertsService: AlertsService,
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private explorationCreationBackendApiService:
-     ExplorationCreationBackendApiService
+      ExplorationCreationBackendApiService
   ) {}
 
   createNewExploration(): void {
@@ -78,44 +77,29 @@ export class ExplorationCreationService {
   showUploadExplorationModal(): void {
     this.alertsService.clearWarnings();
     this.ngbModal.open(
-      UploadActivityModalComponent,
-      {backdrop: 'static'}
+      UploadActivityModalComponent, {backdrop: 'static'}
     ).result.then((result) => {
       const yamlFile = result.yamlFile;
 
       this.loaderService.showLoadingScreen('Creating exploration');
-
-      var form = new FormData();
-      form.append('yaml_file', yamlFile);
-      form.append('payload', JSON.stringify({}));
-      this.csrfTokenService.getTokenAsync().then((token) => {
-        form.append('csrf_token', token);
-        $.ajax({
-          contentType: false,
-          data: form,
-          dataFilter: (data) => {
-            // Remove the XSSI prefix.
-            return JSON.parse(data.substring(5));
-          },
-          dataType: 'text',
-          processData: false,
-          type: 'POST',
-          url: 'contributehandler/upload'
-        }).done((data) => {
-          this.windowRef.nativeWindow.location.href =
-          this.urlInterpolationService.interpolateUrl(
-            this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-              exploration_id: data.exploration_id
-            }
+      this.explorationCreationBackendApiService.uploadExploration(
+        yamlFile
+      ).then(
+        (data) => {
+          this.windowRef.nativeWindow.location.href = (
+            this.urlInterpolationService.interpolateUrl(
+              this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                exploration_id: data.explorationId
+              }
+            )
           );
-        }).fail((data) => {
-          var transformedData = data.responseText.substring(5);
-          var parsedResponse = JSON.parse(transformedData);
+        },
+        (response) => {
           this.alertsService.addWarning(
-            parsedResponse.error || 'Error communicating with server.');
+            response.error || 'Error communicating with server.');
           this.loaderService.hideLoadingScreen();
-        });
-      });
+        }
+      );
     });
   }
 }
