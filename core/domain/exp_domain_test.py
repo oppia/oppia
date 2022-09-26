@@ -2028,7 +2028,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             new_exploration, 'No heading attribute present in collapsible tag.')
-        state.content.html = "Valid content"
+        state.content.html = 'Valid content'
 
         # Validate written translations.
         content_id_of_continue_button_text = (

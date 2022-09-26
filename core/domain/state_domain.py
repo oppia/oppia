@@ -36,7 +36,6 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 import bs4
-import bleach
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast, overload
 )
@@ -2082,12 +2081,11 @@ def validate_rte_tags(
                 'Math tag does not have \'math_content-with-value\' '
                 'attribute.'
             )
-        else:
-            if tag['math_content-with-value'].strip() in empty_values:
-                raise utils.ValidationError(
-                    'Math tag \'math_content-with-value\' attribute should not '
-                    'be empty.'
-                )
+        if tag['math_content-with-value'].strip() in empty_values:
+            raise utils.ValidationError(
+                'Math tag \'math_content-with-value\' attribute should not '
+                'be empty.'
+            )
 
         math_content_json = utils.unescape_html(
             tag['math_content-with-value'])
