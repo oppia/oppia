@@ -1987,11 +1987,6 @@ def validate_rte_tags(
                 'SkillReview tag does not have \'text-with-value\' '
                 'attribute.'
             )
-        if tag['text-with-value'] is None:
-            raise utils.ValidationError(
-                'SkillReview tag should not have \'text-with-value\' '
-                'attribute value as None.'
-            )
         if tag['text-with-value'].strip() in empty_values:
             raise utils.ValidationError(
                 'SkillReview tag should not have \'text-with-value\' '
@@ -2002,15 +1997,10 @@ def validate_rte_tags(
                 'SkillReview tag does not have \'skill_id-with-value\' '
                 'attribute.'
             )
-        if tag['skill_id-with-value'] is None:
-            raise utils.ValidationError(
-                'SkillReview tag should not have '
-                '\'skill_id-with-value\' attribute value as None.'
-            )
         if tag['skill_id-with-value'].strip() in empty_values:
             raise utils.ValidationError(
                 'SkillReview tag should not have '
-                '\'skill_id-with-value\' attribute value as empty.'
+                '\'skill_id-with-value\' attribute value as empty string.'
             )
 
     for tag in soup.find_all('oppia-noninteractive-video'):
@@ -2021,7 +2011,7 @@ def validate_rte_tags(
             )
         if tag['start-with-value'].strip() in empty_values:
             raise utils.ValidationError(
-                'Video tag \'start-with-value\' attribute should not'
+                'Video tag \'start-with-value\' attribute should not '
                 'be empty.'
             )
         if not tag.has_attr('end-with-value'):
@@ -2031,7 +2021,7 @@ def validate_rte_tags(
             )
         if tag['end-with-value'].strip() in empty_values:
             raise utils.ValidationError(
-                'Video tag \'end-with-value\' attribute should not'
+                'Video tag \'end-with-value\' attribute should not '
                 'be empty.'
             )
         start_value = float(tag['start-with-value'].strip())
@@ -2058,14 +2048,9 @@ def validate_rte_tags(
                 'Video tag does not have \'video_id-with-value\' '
                 'attribute.'
             )
-        if tag['video_id-with-value'] is None:
-            raise utils.ValidationError(
-                'Video tag \'video_id-with-value\' attribute should not'
-                'be None.'
-            )
         if tag['video_id-with-value'].strip() in empty_values:
             raise utils.ValidationError(
-                'Video tag \'video_id-with-value\' attribute should not'
+                'Video tag \'video_id-with-value\' attribute should not '
                 'be empty.'
             )
 
@@ -2077,7 +2062,7 @@ def validate_rte_tags(
             )
         if tag['text-with-value'].strip() in empty_values:
             raise utils.ValidationError(
-                'Link tag \'text-with-value\' attribute should not'
+                'Link tag \'text-with-value\' attribute should not '
                 'be empty.'
             )
         if not tag.has_attr('url-with-value'):
@@ -2087,7 +2072,7 @@ def validate_rte_tags(
             )
         if tag['url-with-value'].strip() in empty_values:
             raise utils.ValidationError(
-                'Link tag \'url-with-value\' attribute should not'
+                'Link tag \'url-with-value\' attribute should not '
                 'be empty.'
             )
 
@@ -2097,6 +2082,12 @@ def validate_rte_tags(
                 'Math tag does not have \'math_content-with-value\' '
                 'attribute.'
             )
+        else:
+            if tag['math_content-with-value'].strip() in empty_values:
+                raise utils.ValidationError(
+                    'Math tag \'math_content-with-value\' attribute should not '
+                    'be empty.'
+                )
 
         math_content_json = utils.unescape_html(
             tag['math_content-with-value'])
@@ -2105,11 +2096,6 @@ def validate_rte_tags(
             raise utils.ValidationError(
                 'Math tag does not have \'raw_latex-with-value\' '
                 'attribute.'
-            )
-        if math_content_list['raw_latex'] is None:
-            raise utils.ValidationError(
-                'Math tag \'raw_latex-with-value\' attribute should not '
-                'be None.'
             )
         if math_content_list['raw_latex'].strip() in empty_values:
             raise utils.ValidationError(
@@ -2120,11 +2106,6 @@ def validate_rte_tags(
             raise utils.ValidationError(
                 'Math tag does not have \'svg_filename-with-value\' '
                 'attribute.'
-            )
-        if math_content_list['svg_filename'] is None:
-            raise utils.ValidationError(
-                'Math tag \'svg_filename-with-value\' attribute should not '
-                'be None.'
             )
         if math_content_list['svg_filename'].strip() in empty_values:
             raise utils.ValidationError(

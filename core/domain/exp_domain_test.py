@@ -1724,6 +1724,311 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
+        # Validation for state RTE content and translations.
+        new_exploration = exp_domain.Exploration.create_default_exploration(
+            'test_id')
+        # Validate Continue interaction.
+        state = new_exploration.states['Introduction']
+        self.set_interaction_for_state(state, 'Continue')
+        # Validate image tags.
+        state.content.html = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            new_exploration, 'Image tag does not have \'alt-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="&quot;&quot;">'
+            '</oppia-noninteractive-image>')
+        self._assert_validation_error(
+            new_exploration, 'The length of the image tag \'alt-with-value\' '
+            'attribute value should be at least 5 characters.')
+        state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="">'
+            '</oppia-noninteractive-image>')
+        self._assert_validation_error(
+            new_exploration, 'The length of the image tag \'alt-with-value\' '
+            'attribute value should be at least 5 characters.')
+        state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
+            'caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaa&amp;quot;\"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            new_exploration, 'Image tag \'caption-with-value\' attribute '
+                'should not be greater than 500 characters.')
+        state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+        self._assert_validation_error(
+            new_exploration, 'Image tag does not have \'caption-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-image filepath-with-value="&quot;&quot;'
+            '" caption-with-value="&quot;&quot;" alt-with-value="&quot;'
+            'Image&quot;"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            new_exploration, 'Image tag \'filepath-with-value\' attribute '
+            'should not be empty.')
+        state.content.html = (
+            '<oppia-noninteractive-image caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            new_exploration, 'Image tag does not have \'filepath-with-value\' '
+            'attribute.')
+
+        # Validate skillreview tag.
+        state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" ></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'SkillReview tag does not have \'text-with-value\''
+            ' attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
+            '&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'SkillReview tag should not have '
+            '\'text-with-value\' attribute value as empty string.')
+        state.content.html = (
+            '<oppia-noninteractive-skillreview text-with-value=\"&amp;quot;'
+            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'SkillReview tag does not have '
+            '\'skill_id-with-value\' attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
+            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'SkillReview tag should not have '
+            '\'skill_id-with-value\' attribute value as empty string.')
+
+        # Validate video tag.
+        state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Video tag does not have \'start-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Video tag \'start-with-value\' attribute should '
+            'not be empty.')
+        state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Video tag does not have \'end-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"\" start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Video tag \'end-with-value\' attribute should '
+            'not be empty.')
+        state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Start value should not be greater than End '
+            'value in Video tag.')
+        state.content.html = (
+            '<oppia-noninteractive-video '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Video tag does not have \'autoplay-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"not valid\" '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Video tag \'autoplay-with-value\' attribute '
+            'should be a boolean value.')
+        state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"9\">'
+            '</oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Video tag does not have \'video_id-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            new_exploration, 'Video tag \'video_id-with-value\' attribute '
+            'should not be empty.')
+
+        # Validate link tag.
+        state.content.html = (
+            '<oppia-noninteractive-link '
+            'url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">'
+            '</oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Link tag does not have \'text-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-link'
+            ' text-with-value=\"&amp;quot;&amp;quot;\"'
+            ' url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">'
+            '</oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Link tag \'text-with-value\' attribute should not'
+            ' be empty.')
+        state.content.html = (
+            '<oppia-noninteractive-link'
+            ' text-with-value=\"&amp;quot;something&amp;quot;\">'
+            '</oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Link tag does not have \'url-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-link'
+            ' text-with-value=\"&amp;quot;something&amp;quot;\"'
+            ' url-with-value=\"\"></oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Link tag \'url-with-value\' attribute should not'
+            ' be empty.')
+
+        # Validate math tag.
+        state.content.html = (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Math tag does not have '
+            '\'math_content-with-value\' attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-math'
+            ' math_content-with-value=\"\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Math tag \'math_content-with-value\' attribute '
+            'should not be empty.')
+        state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Math tag does not have \'raw_latex-with-value\' '
+            'attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Math tag \'raw_latex-with-value\' attribute '
+            'should not be empty.')
+        state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;not empty'
+            '&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Math tag does not have '
+            '\'svg_filename-with-value\' attribute.')
+        state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            '&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Math tag \'svg_filename-with-value\' attribute '
+            'should not be empty.')
+        state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'image.png&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Math tag \'svg_filename-with-value\' '
+            'attribute should have svg extension.')
+
+        # Validate tabs tag.
+        state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'No tabs are present inside the tabs tag.')
+        state.content.html = (
+            '<oppia-noninteractive-tabs></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'No content attribute is present inside '
+            'the tabs tag.')
+
+        # Validate collapsible tag.
+        state.content.html = (
+            '<oppia-noninteractive-collapsible '
+            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'No collapsible content is present is present '
+            'inside the tag.')
+        state.content.html = (
+            '<oppia-noninteractive-collapsible heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'No content attribute present in collapsible tag.')
+        state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value='
+            '\'&amp;quot;Content&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Heading attribute inside the collapsible '
+            'tag is empty.')
+        state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value=\'&amp;'
+            'quot;Content&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'No heading attribute present in collapsible tag.')
+
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
