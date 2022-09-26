@@ -139,6 +139,9 @@ if MYPY:  # pragma: no cover
         TranslatableObjectDefaultValueTypes
     ]
 
+    # Here we use type Any because here we are defining type variable for schema
+    # dictionaries, and in schema dictionaries, values can be of any type like
+    # str, Dict, nested Dict and etc.
     SchemaDictType = Dict[str, Any]
 
 

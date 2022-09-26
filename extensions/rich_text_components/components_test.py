@@ -39,6 +39,8 @@ ValidItemTypes = Union[
 class ComponentValidationUnitTests(test_utils.GenericTestBase):
     """Tests validation of rich text components."""
 
+    # Here we use type Any because here we are providing different types of
+    # tuples for testing purposes.
     def check_validation(
         self,
         rte_component_class: Type[components.BaseRteComponent],

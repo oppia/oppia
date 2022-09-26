@@ -36,6 +36,8 @@ if MYPY:  # pragma: no cover
 class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     """Tests normalization of typed objects."""
 
+    # Here we use type Any because here we are providing different types of
+    # tuples for testing purposes.
     def check_normalization(
         self,
         object_class: Type[objects.BaseObject],
