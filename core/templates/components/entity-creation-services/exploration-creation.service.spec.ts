@@ -19,10 +19,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ExplorationCreationBackendApiService, ExplorationCreationResponse } from './exploration-creation-backend-api.service';
@@ -53,7 +53,6 @@ describe('ExplorationCreationService', () => {
   let loaderService: LoaderService;
   let siteAnalyticsService: SiteAnalyticsService;
   let urlInterpolationService: UrlInterpolationService;
-  let csrfTokenService: CsrfTokenService;
   let alertsService: AlertsService;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
@@ -75,7 +74,6 @@ describe('ExplorationCreationService', () => {
     loaderService = TestBed.inject(LoaderService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    csrfTokenService = TestBed.inject(CsrfTokenService);
     alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
   });
@@ -86,7 +84,7 @@ describe('ExplorationCreationService', () => {
       spyOn(ecbas, 'registerNewExplorationAsync');
       ecs.explorationCreationInProgress = true;
 
-      expect(ecs.createNewExploration()).toBeUndefined();
+      ecs.createNewExploration();
       expect(ecbas.registerNewExplorationAsync).not.toHaveBeenCalled();
     });
 
@@ -161,21 +159,15 @@ describe('ExplorationCreationService', () => {
           })
         } as NgbModalRef
       );
-      spyOn(csrfTokenService, 'getTokenAsync')
-        .and.resolveTo('sample-csrf-token');
-
-      // @ts-ignore in order to ignore JQuery properties that should
-      // be declared.
-      spyOn($, 'ajax').and.callFake((options: Promise) => {
-        let d = $.Deferred();
-        d.resolve(
-          options.dataFilter(')]}\',\n{"exploration_id": "expId"}')
-        );
-        return d.promise();
+      spyOn(ecbas, 'uploadExploration').and.callFake((_: string) => {
+        return Promise.resolve({
+          explorationId: 'expId'
+        });
       });
 
       ecs.showUploadExplorationModal();
-      tick();
+
+      tick(200);
 
       expect(windowRef.nativeWindow.location.href).toBe('/create/expId');
     }));
@@ -189,23 +181,15 @@ describe('ExplorationCreationService', () => {
           })
         } as NgbModalRef
       );
-      spyOn(csrfTokenService, 'getTokenAsync')
-        .and.resolveTo('sample-csrf-token');
       spyOn(alertsService, 'addWarning');
       spyOn(loaderService, 'hideLoadingScreen');
-
-      // @ts-ignore in order to ignore JQuery properties that should
-      // be declared.
-      spyOn($, 'ajax').and.callFake(() => {
-        let d = $.Deferred();
-        d.reject({
-          responseText: ')]}\',\n{"error": "Failed to upload exploration"}'
-        });
-        return d.promise();
+      spyOn(ecbas, 'uploadExploration').and.callFake((_: string) => {
+        return Promise.reject({ error: 'Failed to upload exploration' });
       });
 
       ecs.showUploadExplorationModal();
-      tick();
+
+      tick(200);
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to upload exploration');

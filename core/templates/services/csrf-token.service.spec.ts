@@ -17,21 +17,18 @@
  */
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { TestBed } from '@angular/core/testing';
-import { HttpBackend } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService;
-  let httpBackend: HttpBackend;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    httpBackend = TestBed.get(HttpBackend);
-    csrfTokenService = new CsrfTokenService(httpBackend);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
   });
 
   it('should correctly set the csrf token', (done) => {
@@ -44,6 +41,20 @@ describe('Csrf Token Service', function() {
     let req = httpTestingController.expectOne('/csrfhandler');
     expect(req.request.method).toEqual('GET');
     req.flush('12345{"token": "sample-csrf-token"}');
+
+    httpTestingController.verify();
+  });
+
+  it('should throw error when the request failed', (done) => {
+    csrfTokenService.initializeToken();
+
+    csrfTokenService.getTokenAsync().then(done.fail, done);
+
+    let req = httpTestingController.expectOne('/csrfhandler');
+    expect(req.request.method).toEqual('GET');
+    req.error(
+      new ErrorEvent('network error'), {status: 500, statusText: 'error'}
+    );
 
     httpTestingController.verify();
   });
