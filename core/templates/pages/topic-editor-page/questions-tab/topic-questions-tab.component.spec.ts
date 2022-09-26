@@ -160,8 +160,6 @@ describe('Topic questions tab', () => {
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'selectSkillField');
     expect(component.selectedSkillId).toBeUndefined();
-    expect(component.question).toBeUndefined();
-    expect(component.skillId).toBeUndefined();
     expect(component.topic).toBe(topic);
     expect(component.topicRights).toEqual(topicRights);
     expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
@@ -171,10 +169,6 @@ describe('Topic questions tab', () => {
     expect(component.getUntriagedSkillSummaries)
       .toBe(untriagedSkillSummariesData);
     expect(component.canEditQuestion).toBe(false);
-    expect(component.misconceptions).toEqual([]);
-    expect(component.questionIsBeingUpdated).toBe(false);
-    expect(component.questionIsBeingSaved).toBe(false);
-    expect(component.emptyMisconceptionsList).toEqual([]);
   });
 
   it('should setFocus on selectSkillField when screen loads', () => {

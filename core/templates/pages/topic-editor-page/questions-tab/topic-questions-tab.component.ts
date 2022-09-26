@@ -26,8 +26,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { Question } from 'domain/question/QuestionObjectFactory';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 @Component({
   selector: 'oppia-topic-questions-tab',
@@ -35,21 +34,15 @@ import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 })
 export class TopicQuestionsTabComponent implements OnInit,
  AfterViewInit, OnDestroy {
-  question!: Question;
-  skillId!: string;
   topic!: Topic;
   topicRights!: TopicRights;
   groupedSkillSummaries!: object;
   skillIdToRubricsObject!: object;
-  allSkillSummaries!: object[];
+  allSkillSummaries!: ShortSkillSummary[];
   canEditQuestion!: boolean;
-  misconceptions!: Misconception[];
-  emptyMisconceptionsList;
   selectedSkillId!: string;
   getSkillsCategorizedByTopics!: CategorizedSkills;
   getUntriagedSkillSummaries!: SkillSummary[];
-  questionIsBeingUpdated = false;
-  questionIsBeingSaved = false;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -66,8 +59,8 @@ export class TopicQuestionsTabComponent implements OnInit,
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.groupedSkillSummaries = (
       this.topicEditorStateService.getGroupedSkillSummaries());
-    this.skillIdToRubricsObject =
-      this.topicEditorStateService.getSkillIdToRubricsObject();
+    this.skillIdToRubricsObject = (
+      this.topicEditorStateService.getSkillIdToRubricsObject());
     this.allSkillSummaries = [];
     this.allSkillSummaries = this.allSkillSummaries.concat(
       this.topic.getUncategorizedSkillSummaries());
@@ -84,10 +77,6 @@ export class TopicQuestionsTabComponent implements OnInit,
           response.untriagedSkillSummaries);
       });
     this.canEditQuestion = this.topicRights.canEditTopic();
-    this.misconceptions = [];
-    this.questionIsBeingUpdated = false;
-    this.questionIsBeingSaved = false;
-    this.emptyMisconceptionsList = [];
   }
 
   reinitializeQuestionsList(skillId: string): void {
