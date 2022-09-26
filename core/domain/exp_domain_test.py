@@ -2028,6 +2028,32 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             new_exploration, 'No heading attribute present in collapsible tag.')
+        state.content.html = "Valid content"
+
+        # Validate written translations.
+        content_id_of_continue_button_text = (
+            state.interaction.customization_args[
+                'buttonText'].value.content_id)
+        state.written_translations.add_translation(
+            content_id_of_continue_button_text,
+            'en',
+            '<oppia-noninteractive-image></oppia-noninteractive-image>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Image tag does not have \'alt-with-value\' '
+            'attribute.')
+        state.written_translations.translations_mapping[
+            content_id_of_continue_button_text]['en'].translation = (
+            '<oppia-noninteractive-collapsible '
+            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'No collapsible content is present is present '
+            'inside the tag.')
+        state.written_translations.translations_mapping[
+            content_id_of_continue_button_text]['en'].translation = (
+            'valid value')
 
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""
