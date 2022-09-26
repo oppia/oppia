@@ -728,7 +728,7 @@ class StateCompleteEventHandler(base.BaseHandler):
     """Tracks a learner complete a state. Here, 'completing' means answering
     the state and progressing to a new state.
     """
-    
+
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -748,7 +748,7 @@ class StateCompleteEventHandler(base.BaseHandler):
                     }]
                 },
                 'default_value': None
-            }, 
+            },
              'session_id': {
                 'schema': {
                     'type': 'basestring'
@@ -774,7 +774,8 @@ class StateCompleteEventHandler(base.BaseHandler):
         """Handles POST requests."""
         state_name = self.normalized_payload.get('state_name')
         session_id = self.normalized_payload.get('session_id')
-        time_spent_in_state_secs = self.normalized_payload.get('time_spent_in_state_secs')
+        time_spent_in_state_secs = self.normalized_payload.get(
+            'time_spent_in_state_secs')
         exp_version = self.normalized_payload.get('exp_version')
 
         if exp_version is None:
@@ -842,7 +843,8 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
         exp_version = self.normalized_payload.get('exp_version')
         state_name = self.normalized_payload.get('state_name')
         session_id = self.normalized_payload.get('session_id')
-        time_spent_in_state_secs = self.normalized_payload.get('time_spent_in_state_secs')
+        time_spent_in_state_secs = self.normalized_payload.get(
+            'time_spent_in_state_secs')
 
         event_services.LeaveForRefresherExpEventHandler.record(
             exploration_id, refresher_exp_id,
