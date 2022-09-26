@@ -20,6 +20,7 @@ import json
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import editor
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -75,6 +76,21 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
 
 class SuggestionEmailHandler(base.BaseHandler):
     """Handler task of sending email of suggestion."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_id': {
+                'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+            }, 
+            'contributor_user_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
