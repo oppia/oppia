@@ -515,7 +515,8 @@ var ExplorationEditorMainTab = function() {
     var richTextEditor = await forms.RichTextEditor(stateEditorTag);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
-    await action.click('Save State Content Button', saveStateContentButton);
+    await action.click(
+      'Save State Content Button', saveStateContentButton, true);
     await waitFor.invisibilityOf(
       saveStateContentButton,
       'State content editor takes too long to disappear');
@@ -619,7 +620,7 @@ var ExplorationEditorMainTab = function() {
       deleteInteractionButton,
       'Please delete interaction before creating a new one');
 
-    await action.click('Add Interaction button', addInteractionButton);
+    await action.click('Add Interaction button', addInteractionButton, true);
 
     var INTERACTION_ID_TO_TAB_NAME = {
       Continue: 'commonly-used',

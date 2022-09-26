@@ -120,11 +120,21 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
-  await waitFor.elementToBeClickable(
-    $('.e2e-test-publish-exploration'));
-  await $('.e2e-test-publish-exploration').isDisplayed();
-  var testPublishExploration = $('.e2e-test-publish-exploration');
-  await action.click('Test Publish Exploration', testPublishExploration);
+  var publishButton = $('.e2e-test-publish-exploration');
+  var publishButtonMobile = $('.e2e-test-mobile-publish-button');
+
+  let width = (await browser.getWindowSize()).width;
+  if (width > 768) {
+    await waitFor.elementToBeClickable(publishButton);
+    await publishButton.isDisplayed();
+    await action.click('Test Publish Exploration', publishButton);
+  } else {
+    var changesOptions = $('.e2e-test-mobile-changes-dropdown');
+    await action.click('Changes options', changesOptions);
+    await publishButtonMobile.isDisplayed();
+    await action.click('Publish button mobile', publishButtonMobile);
+  }
+
   var prePublicationButtonElem = $('.e2e-test-confirm-pre-publication');
   await action.click(
     'Pre Publication Button Element', prePublicationButtonElem);

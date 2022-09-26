@@ -89,7 +89,7 @@
                     (mouseenter)="activateDropdownMenu()"
                     (mouseleave)="deactivateDropdownMenu()">
                   <li *ngFor="let tab of ADMIN_TAB_URLS | keyvalue">
-                    <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab"
+                    <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab protractor-test-admin-{{ tab.key | lowercase }}-tab-mobile"
                        [href]="tab.value">
                       {{ tab.key }}
                     </a>
