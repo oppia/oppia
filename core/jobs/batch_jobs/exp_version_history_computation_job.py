@@ -431,7 +431,19 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         new_vh_model.update_timestamps()
                         version_history_models[version - 1] = new_vh_model
 
-                        # Additional Log.
+                        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+                        if len(exp_versions_diff.added_state_names) > 0:
+                            for state_name in exp_versions_diff.added_state_names:
+                                if state_name not in (
+                                    new_vh_model.state_version_history
+                                ): # pragma: no cover
+                                    logging.info(
+                                        'State name %s was not found in the '
+                                        'version history model for version %d for exploration %s' % (
+                                            state_name, version, exp_id
+                                        )
+                                    )
+                    except Exception as e:
                         for state_name in new_exploration.states:
                             if state_name not in (
                                 new_vh_model.state_version_history
@@ -442,10 +454,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                         state_name, version, exp_id
                                     )
                                 )
-                            logging.info(
-                                'Change list for version %d for exploration %s: %s' % (version, exp_id, metadata_model.commit_cmds)
-                            )
-                    except Exception as e:
+                        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+                        logging.info('Added states: %s' % exp_versions_diff.added_state_names)
+                        logging.info('Removed states: %s' % exp_versions_diff.deleted_state_names)
+                        logging.info('Renamed states: %s' % exp_versions_diff.old_to_new_state_names)
                         return (exp_id, [], e, version)
 
             return (exp_id, version_history_models) # type: ignore[return-value]
