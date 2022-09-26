@@ -3935,7 +3935,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
                 '<oppia-noninteractive-image alt-with-value=\'&amp;quot;'
-                'test&amp;quot;\' caption-with-value=\'&amp;quot;&amp;'
+                'testing&amp;quot;\' caption-with-value=\'&amp;quot;&amp;'
                 'quot;\' filepath-with-value=\'&amp;quot;img.svg&amp;quot;'
                 '\'></oppia-noninteractive-image></p>'))
         expected_reviewable_suggestion_email_info = (

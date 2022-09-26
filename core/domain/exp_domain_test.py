@@ -2049,7 +2049,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
         )
         self._assert_validation_error(
-            new_exploration, 'No collapsible content is present is present '
+            new_exploration, 'No collapsible content is present '
             'inside the tag.')
         state.written_translations.translations_mapping[
             content_id_of_continue_button_text]['en'].translation = (

@@ -2177,8 +2177,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
                 collapsible_content_json)
             if len(collapsible_content_list) == 0:
                 raise utils.ValidationError(
-                    'No collapsible content is present is present '
-                    'inside the tag.'
+                    'No collapsible content is present inside the tag.'
                 )
 
             validate_rte_tags(
