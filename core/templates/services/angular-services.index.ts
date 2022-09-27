@@ -429,6 +429,8 @@ import { ExplorationSaveService } from 'pages/exploration-editor-page/services/e
 import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
+import { ContributionAndReviewStatsBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats-backend-api.service';
+import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -496,6 +498,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContributionAndReviewService', ContributionAndReviewService],
   ['ContributionAndReviewBackendApiService',
     ContributionAndReviewBackendApiService],
+  ['ContributionAndReviewStatsService', ContributionAndReviewStatsService],
+  ['ContributionAndReviewStatsBackendApiService',
+    ContributionAndReviewStatsBackendApiService],
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
