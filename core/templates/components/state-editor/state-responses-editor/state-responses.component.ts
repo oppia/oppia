@@ -38,7 +38,6 @@ import { AlertsService } from 'services/alerts.service';
 import { StateNextContentIdIndexService } from '../state-editor-properties-services/state-next-content-id-index.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -96,7 +95,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private answerGroupObjectFactory: AnswerGroupObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionsService: WindowDimensionsService,
     private convertToPlainText: ConvertToPlainTextPipe,
     private parameterizeRuleDescription: ParameterizeRuleDescriptionPipe,
     private truncate: TruncatePipe,
@@ -646,8 +644,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
       AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
-    this.responseCardIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.responseCardIsShown = true;
     this.stateName = this.stateEditorService.getActiveStateName();
     this.enableSolicitAnswerDetailsFeature = (
       AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);

@@ -630,9 +630,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Expected change to be of type StoryChange')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         with logging_swap, assert_raises_regexp_context_manager:
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, [{}], 'Updated story node.')  # type: ignore[list-item]
@@ -684,9 +684,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list,
                 'Updated story outline.')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_cannot_update_story_with_no_commit_message(self) -> None:
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -697,6 +694,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'New description.'
         })]
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception,
             'Expected a commit message but received none.'):
@@ -1582,11 +1582,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_PARAM_CHANGES,
                 'state_name': feconf.DEFAULT_INIT_STATE_NAME,
                 'new_value': [
-                    # Here, the expected type for 3rd argument of paramChange is
-                    # CustomizationArgsDict, but for testing purposes here we
-                    # are providing an empty dict which causes MyPy to throw an
-                    # 'incompatible argument type' error. Thus to avoid error,
-                    # we used ignore.
+                    # Here we use MyPy ignore because the expected type for 3rd
+                    # argument of paramChange is CustomizationArgsDict, but for
+                    # testing purposes here we are providing an empty dict which
+                    # causes MyPy to throw an incompatible argument type error.
+                    # Thus to avoid error, we used ignore.
                     param_domain.ParamChange('param1', 'Copier', {}).to_dict()]  # type: ignore[arg-type]
             })],
             '')
