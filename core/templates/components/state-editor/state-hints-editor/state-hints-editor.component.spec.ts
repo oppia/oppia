@@ -186,18 +186,18 @@ describe('StateHintsEditorComponent', () => {
   });
 
   it('should set component properties on initialization', () => {
-    expect(component.hintCardIsShown).toBe(false);
+    expect(component.hintCardIsShown).toBe(true);
     expect(component.canEdit).toBe(true);
     expect(component.getStaticImageUrl('/demo/img'))
       .toBe('/assets/images/demo/img');
   });
 
   it('should toggle hint card when user clicks on hint header', () => {
-    expect(component.hintCardIsShown).toBe(false);
+    expect(component.hintCardIsShown).toBe(true);
 
     component.toggleHintCard();
 
-    expect(component.hintCardIsShown).toBe(true);
+    expect(component.hintCardIsShown).toBe(false);
   });
 
   it('should save displayed hint value when user saves inline hint', () => {

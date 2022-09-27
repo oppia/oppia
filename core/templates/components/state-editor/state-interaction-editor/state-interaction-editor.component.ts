@@ -271,8 +271,7 @@ export class StateInteractionEditorComponent
     'Congratulations, you have finished!';
 
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-    this.interactionEditorIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.interactionEditorIsShown = true;
     this.hasLoaded = false;
     this.customizationModalReopened = false;
     this.directiveSubscriptions.add(

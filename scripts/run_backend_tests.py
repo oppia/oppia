@@ -62,10 +62,10 @@ import sys
 import threading
 import time
 
-# from . import install_third_party_libs
-# # This installs third party libraries before importing other files or importing
-# # libraries that use the builtins python module (e.g. build, utils).
-# install_third_party_libs.main()
+from . import install_third_party_libs
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, utils).
+install_third_party_libs.main()
 
 from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -439,7 +439,15 @@ def main(args=None):
             servers.managed_cloud_datastore_emulator(clear_datastore=True))
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:
-            if '_test' in parsed_args.test_target:
+            # Check if target either ends with '_test' which means a path to
+            # a test file has been provided or has '_test.' in it which means
+            # a path to a particular test class or a method in a test file has
+            # been provided. If the path provided does not exist, error is
+            # raised when we try to execute the tests.
+            if (
+                parsed_args.test_target.endswith('_test')
+                or '_test.' in parsed_args.test_target
+            ):
                 all_test_targets = [parsed_args.test_target]
             else:
                 print('')

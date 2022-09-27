@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@
  * exploration editor.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
 
 describe('Exploration history', function() {
   var explorationEditorPage = null;
@@ -36,11 +36,11 @@ describe('Exploration history', function() {
   var explorationEditorSettingsTab = null;
 
   // Constants for colors of nodes in history graph.
-  var COLOR_ADDED = 'rgb(78, 162, 78)';
-  var COLOR_DELETED = 'rgb(220, 20, 60)';
-  var COLOR_CHANGED = 'rgb(30, 144, 255)';
-  var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
-  var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
+  var COLOR_ADDED = 'rgb(78,162,78)';
+  var COLOR_DELETED = 'rgb(220,20,60)';
+  var COLOR_CHANGED = 'rgb(30,144,255)';
+  var COLOR_UNCHANGED = 'rgb(245,245,220)';
+  var COLOR_RENAMED_UNCHANGED = 'rgb(255,215,0)';
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();

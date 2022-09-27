@@ -31,7 +31,6 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { AlertsService } from 'services/alerts.service';
 import { EditabilityService } from 'services/editability.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
@@ -74,7 +73,6 @@ export class StateHintsEditorComponent implements OnInit {
     private stateInteractionIdService: StateInteractionIdService,
     private stateSolutionService: StateSolutionService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionsService: WindowDimensionsService,
   ) {}
 
   drop(event: CdkDragSortEvent<Hint[]>): void {
@@ -216,8 +214,7 @@ export class StateHintsEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.hintCardIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.hintCardIsShown = true;
     this.stateHintsService.setActiveHintIndex(null);
     this.canEdit = this.editabilityService.isEditable();
     // When the page is scrolled so that the top of the page is above
