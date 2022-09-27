@@ -360,7 +360,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         task = MockTask()
         task.finished = False
         task_output = ['Ran 9 tests in 1.244s', '98']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results.append(task_result)
 
@@ -382,7 +382,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         task = MockTask()
         task_output = ['Ran 9 tests in 1.244s', '98']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results.append(task_result)
 
@@ -405,7 +405,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         task = MockTask()
         task_output = ['Ran 9 tests in 1.234s', '100']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results.append(task_result)
 
@@ -429,7 +429,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         task = MockTask()
         task_output = ['Ran 9 tests in 1.234s', '98']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results.append(task_result)
 
@@ -459,7 +459,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         task = MockTask()
         task_output = ['XYZ', '100']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results = [task_result]
 
