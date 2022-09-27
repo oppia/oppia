@@ -47,8 +47,8 @@ handlers:
   static_dir: webpack_bundles
   secure: always
   expiration: "0"
-- url: /dist/oppia-angular
-  static_dir: dist/oppia-angular
+- url: /dist
+  static_dir: dist/
   secure: always
   expiration: "0"
 - url: /assets

@@ -170,6 +170,32 @@ def is_oppia_server_already_running():
             return True
     return False
 
+def run_ng_compilation():
+    """Runs webpack compilation.
+
+    Args:
+        source_maps: bool. Whether to compile with source maps.
+    """
+    max_tries = 2
+    ng_bundles_dir_name = 'dist/oppia-angular'
+
+    for _ in range(max_tries):
+        try:
+            managed_ng_compiler = (
+                servers.managed_ng_compiler())
+            with managed_ng_compiler as proc:
+                proc.wait()
+        except subprocess.CalledProcessError as error:
+            print(error.output)
+            sys.exit(error.returncode)
+            return
+        if os.path.isdir(ng_bundles_dir_name):
+            break
+    else:
+        # We didn't break out of the loop, meaning all attempts have failed.
+        print('Failed to complete ng compilation, exiting...')
+        sys.exit(1)
+
 
 def run_webpack_compilation(source_maps=False):
     """Runs webpack compilation.
@@ -227,6 +253,7 @@ def build_js_files(dev_mode, source_maps=False):
 
     else:
         build.main(args=[])
+        run_ng_compilation()
         run_webpack_compilation(source_maps=source_maps)
 
 

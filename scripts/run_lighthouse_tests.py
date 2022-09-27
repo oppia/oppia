@@ -98,6 +98,23 @@ def run_lighthouse_puppeteer_script() -> None:
         sys.exit(1)
 
 
+def run_ng_compilation() -> None:
+    """Runs webpack compilation."""
+    max_tries = 2
+    ng_bundles_dir_name = 'dist/oppia-angular'
+    for _ in range(max_tries):
+        try:
+            with servers.managed_ng_compiler() as proc:
+                proc.wait()
+        except subprocess.CalledProcessError as error:
+            print(error.output)
+            sys.exit(error.returncode)
+        if os.path.isdir(ng_bundles_dir_name):
+            break
+    if not os.path.isdir(ng_bundles_dir_name):
+        print('Failed to complete webpack compilation, exiting...')
+        sys.exit(1)
+
 def run_webpack_compilation() -> None:
     """Runs webpack compilation."""
     max_tries = 5
@@ -191,6 +208,7 @@ def main(args=None) -> None:
         build.main(args=['--prod_env'])
     else:
         build.main(args=[])
+        run_ng_compilation
         run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:

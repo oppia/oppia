@@ -24,6 +24,7 @@ import { DocumentAttributeCustomizationService } from 'services/contextual/docum
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, LanguageInfo } from 'services/i18n-language-code.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
+import { CookieService } from 'ngx-cookie';
 import { UserService } from 'services/user.service';
 
 @Injectable({
@@ -33,6 +34,8 @@ export class I18nService {
   private _directionChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
 
+  prevLangDirection: string = localStorage.getItem('direction');
+  COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   url!: URL;
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
@@ -61,6 +64,7 @@ export class I18nService {
   constructor(
     private documentAttributeCustomizationService:
     DocumentAttributeCustomizationService,
+    private cookieService: CookieService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private userBackendApiService: UserBackendApiService,
     private userService: UserService,
@@ -81,8 +85,24 @@ export class I18nService {
   initialize(): void {
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => {
+        const cookieSetDateMsecs = this.cookieService.get(
+          this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
+        const langDirection = (
+          this.i18nLanguageCodeService.isLanguageRTL(code) ? 'rtl' : 'ltr');
+        if (!!cookieSetDateMsecs &&
+          +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
+        ) {
+          this.cookieService.put(
+            'dir',
+            langDirection
+          );
+          this.cookieService.put('lang', code);
+        }
         this.translateService.use(code);
         this.documentAttributeCustomizationService.addAttribute('lang', code);
+        if (this.prevLangDirection !== langDirection) {
+          window.location.reload();
+        }
       }
     );
 
