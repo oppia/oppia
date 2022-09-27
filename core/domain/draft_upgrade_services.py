@@ -355,38 +355,22 @@ class DraftUpgradeUtil:
                 for answer_group in answer_group_dicts:
                     answer_group['tagged_skill_misconception_id'] = None
                     answer_group['outcome']['refresher_exploration_id'] = None
-
                     if len(answer_group['rule_specs']) == 0:
                         answer_group_dicts.remove(answer_group)
-                    if (
-                        answer_group['outcome']['labelled_as_correct'] and
-                        answer_group['outcome']['dest'] == exp_change.state_name
-                    ):
+                    if answer_group['outcome']['dest'] == exp_change.state_name:
                         answer_group['outcome']['labelled_as_correct'] = False
             elif exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                # Here we use cast because this 'if' condition forces
-                # change to have type EditExpStatePropertyContentCmd.
-                edit_contents_cmd = cast(
-                    exp_domain.EditExpStatePropertyContentCmd,
-                    exp_change
-                )
-                html = edit_contents_cmd.new_value['html']
+                assert isinstance(exp_change.new_value, dict)
+                html = exp_change.new_value['html']
                 html = exp_domain.Exploration.fix_rte_tags(html)
                 html = exp_domain.Exploration.fix_tabs_and_collapsible_tags(
                     html)
-                edit_contents_cmd.new_value['html'] = html
+                exp_change.new_value['html'] = html
             elif exp_change.property_name == (
                 exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
             ):
-                # Here we use cast because this 'if' condition forces
-                # change to have type EditExpStatePropertyWritten
-                # TranslationsCmd.
-                edit_interaction_written_translations_cmd = cast(
-                    exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
-                    exp_change
-                )
-                written_translations = (
-                    edit_interaction_written_translations_cmd.new_value)
+                assert isinstance(exp_change.new_value, dict)
+                written_translations = exp_change.new_value
                 for translations in (
                     written_translations['translations_mapping'].values()
                 ):

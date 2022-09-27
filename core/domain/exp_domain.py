@@ -1267,8 +1267,8 @@ class RangeVariableDict(TypedDict):
 
     ans_group_index: int
     rule_spec_index: int
-    lower_bound: None
-    upper_bound: None
+    lower_bound: Optional[float]
+    upper_bound: Optional[float]
     lb_inclusive: bool
     ub_inclusive: bool
 
@@ -3328,8 +3328,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _set_lower_and_upper_bounds(
         cls,
         range_var: RangeVariableDict,
-        lower_bound: Union[float, None],
-        upper_bound: Union[float, None],
+        lower_bound: Optional[float],
+        upper_bound: Optional[float],
         lb_inclusive: bool,
         ub_inclusive: bool
     ) -> None:
@@ -3342,8 +3342,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             range_var: dict[str, Any]. To keep track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
-            lower_bound: Union[float, None]. The lower bound.
-            upper_bound: Union[float, None]. The upper bound.
+            lower_bound: Optional[float]. The lower bound.
+            upper_bound: Optional[float]. The upper bound.
             lb_inclusive: bool. If lower bound is inclusive.
             ub_inclusive: bool. If upper bound is inclusive.
         """
@@ -3446,15 +3446,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
             rule_spec: state_domain.RuleSpecDict. Rule spec of an answer group.
 
         Returns:
-            rule_value_f: float. The value of the rule spec.
+            value: float. The value of the rule spec.
         """
-        rule_value_f = rule_spec['inputs']['f']
-        rule_value_f = (
+        rule_value_f = rule_spec.inputs['f']
+        value: float = (
             rule_value_f['wholeNumber'] +
             float(rule_value_f['numerator']) / rule_value_f['denominator']
         )
 
-        return rule_value_f
+        return value
 
     @classmethod
     def _remove_duplicate_rules_inside_answer_groups(
