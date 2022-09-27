@@ -122,7 +122,7 @@ export class SettingsTabComponent
     private alertsService: AlertsService,
     private changeListService: ChangeListService,
     private contextService: ContextService,
-    private editabilityService: EditabilityService,
+    public editabilityService: EditabilityService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private explorationAutomaticTextToSpeechService:
@@ -139,7 +139,7 @@ export class SettingsTabComponent
     private explorationObjectiveService: ExplorationObjectiveService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationParamSpecsService: ExplorationParamSpecsService,
-    private explorationRightsService: ExplorationRightsService,
+    public explorationRightsService: ExplorationRightsService,
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService,

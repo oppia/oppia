@@ -166,11 +166,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
+            stack.enter_context(servers.managed_ng_build())
             stack.enter_context(servers.managed_webpack_compiler(
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
                 watch_mode=True))
-            
-            stack.enter_context()
+
 
         app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
         dev_appserver = stack.enter_context(servers.managed_dev_appserver(

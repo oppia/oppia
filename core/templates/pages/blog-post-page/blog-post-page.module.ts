@@ -30,9 +30,9 @@ import { BlogPostPageComponent } from './blog-post-page.component';
 import { CommonModule } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 import { BlogPostPageRoutingModule } from './blog-post-page-routing.module';
-import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { SharedBlogComponentsModule } from 'pages/blog-dashboard-page/shared-blog-components.module';
 
 @NgModule({
   imports: [
@@ -47,17 +47,16 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     TranslateModule,
     ReactiveFormsModule,
     Error404PageModule,
-    MatTooltipModule
+    MatTooltipModule,
+    SharedBlogComponentsModule
   ],
   declarations: [
     BlogPostPageComponent,
     BlogPostPageRootComponent,
-    BlogCardComponent
   ],
   entryComponents: [
     BlogPostPageComponent,
     BlogPostPageRootComponent,
-    BlogCardComponent
   ]
 })
 export class BlogPostPageModule {}

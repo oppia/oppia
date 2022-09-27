@@ -42,7 +42,7 @@ export class StateNameEditorComponent
   stateNameEditorIsShown: boolean;
 
   constructor(
-    private editabilityService: EditabilityService,
+    public editabilityService: EditabilityService,
     private explorationStatesService: ExplorationStatesService,
     private externalSaveService: ExternalSaveService,
     private focusManagerService: FocusManagerService,

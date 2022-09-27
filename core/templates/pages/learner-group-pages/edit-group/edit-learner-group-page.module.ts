@@ -35,26 +35,21 @@ import { LearnerGroupSyllabusComponent } from
   './learner-group-syllabus.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { AddSyllabusItemsComponent } from
-  '../create-group/add-syllabus-items.component';
 import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
 import { SyllabusAdditionSuccessModalComponent } from
   '../templates/syllabus-addition-success-modal.component';
 import { LearnerGroupPreferencesComponent } from
   './learner-group-preferences.component';
-import { LearnerGroupDetailsComponent } from
-  '../create-group/learner-group-details.component';
 import { InviteLearnersModalComponent } from
   '../templates/invite-learners-modal.component';
-import { InviteLearnersComponent } from
-  '../create-group/invite-learners.component';
 import { LearnerGroupLearnersProgressComponent } from
   './learner-group-learners-progress.component';
 import { LearnerGroupLearnerSpecificProgressComponent } from
   './learner-group-learner-specific-progress.component';
 import { InviteSuccessfulModalComponent } from
   '../templates/invite-successful-modal.component';
+import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/shared-learner-group-component.module';
 
 @NgModule({
   imports: [
@@ -66,7 +61,8 @@ import { InviteSuccessfulModalComponent } from
     SmartRouterModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    SharedLearnerGroupComponentsModule
   ],
   declarations: [
     EditLearnerGroupPageComponent,
@@ -75,9 +71,6 @@ import { InviteSuccessfulModalComponent } from
     LearnerGroupLearnersProgressComponent,
     LearnerGroupPreferencesComponent,
     LearnerGroupLearnerSpecificProgressComponent,
-    AddSyllabusItemsComponent,
-    InviteLearnersComponent,
-    LearnerGroupDetailsComponent,
     RemoveItemModalComponent,
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
@@ -90,9 +83,6 @@ import { InviteSuccessfulModalComponent } from
     LearnerGroupLearnersProgressComponent,
     LearnerGroupPreferencesComponent,
     LearnerGroupLearnerSpecificProgressComponent,
-    AddSyllabusItemsComponent,
-    InviteLearnersComponent,
-    LearnerGroupDetailsComponent,
     RemoveItemModalComponent,
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,

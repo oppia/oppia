@@ -179,8 +179,7 @@ export class ExplorationMetadataModalComponent
     return Boolean(
       this.explorationTitleService.displayed &&
       this.explorationObjectiveService.displayed &&
-      // TODO(#13015): Remove use of unknown as a type.
-      (this.explorationObjectiveService.displayed as unknown[]).length >= 15 &&
+      this.explorationObjectiveService.displayed.length >= 15 &&
       this.explorationCategoryService.displayed &&
       this.explorationLanguageCodeService.displayed);
   }

@@ -31,6 +31,7 @@ export class ExplorationSaveModalComponent
   extends ConfirmOrCancelModal {
   earlierVersionHeader: string = 'Last saved';
   laterVersionHeader: string = 'New changes';
+  commitMessage: string = '';
   showDiff: boolean = false;
   MAX_COMMIT_MESSAGE_LENGTH = String(AppConstants.MAX_COMMIT_MESSAGE_LENGTH);
 

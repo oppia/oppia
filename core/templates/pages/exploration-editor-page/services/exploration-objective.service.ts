@@ -32,6 +32,7 @@ import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normaliz
 })
 export class ExplorationObjectiveService extends ExplorationPropertyService {
   propertyName: string = 'objective';
+  displayed: string;
   constructor(
     private validatorsService: ValidatorsService,
     private explorationRightsService: ExplorationRightsService,

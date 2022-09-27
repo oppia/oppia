@@ -370,6 +370,17 @@ def create_managed_web_browser(port):
     else:
         return None
 
+@contextlib.contextmanager
+def managed_ng_build():
+    compiler_args = [
+        common.NG_BIN_PATH, 'build', '--watch'
+    ]
+    with contextlib.ExitStack() as exit_stack:
+        proc = exit_stack.enter_context(managed_process(
+            compiler_args, human_readable_name='Angular Compiler', shell=True,
+            # Capture compiler's output to detect when builds have completed.
+            stdout=subprocess.PIPE))
+        yield proc
 
 @contextlib.contextmanager
 def managed_webpack_compiler(

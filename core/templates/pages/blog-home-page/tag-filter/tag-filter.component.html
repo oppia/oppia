@@ -1,7 +1,7 @@
 <div class="oppia-same-row-container tag-filter w-100">
   <mat-form-field appearance="fill"
                   class="w-100"
-                  [ngClass]="{'pb-5': !isSmallScreenViewActive}">
+                  [ngClass]="{'pb-5': !smallScreenViewIsActive}">
     <mat-label>{{ 'I18N_BLOG_HOME_PAGE_TAG_FILTER_HOLDER_TEXT' | translate }}</mat-label>
     <mat-chip-list #chipList aria-label="Tags Filter">
       <mat-chip *ngFor="let tag of selectedTags"

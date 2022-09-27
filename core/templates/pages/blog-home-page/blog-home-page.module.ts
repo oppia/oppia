@@ -28,10 +28,10 @@ import { BlogHomePageRootComponent } from './blog-home-page-root.component';
 import { BlogHomePageComponent } from './blog-home-page.component';
 import { CommonModule } from '@angular/common';
 import { BlogHomePageRoutingModule } from './blog-home-page-routing.module';
-import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { TagFilterComponent } from './tag-filter/tag-filter.component';
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { SharedBlogComponentsModule } from 'pages/blog-dashboard-page/shared-blog-components.module';
 
 @NgModule({
   imports: [
@@ -42,6 +42,7 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     FormsModule,
     NgbModule,
     StringUtilityPipesModule,
+    SharedBlogComponentsModule,
     TranslateModule,
     ReactiveFormsModule,
     Error404PageModule
@@ -49,13 +50,11 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
   declarations: [
     BlogHomePageComponent,
     BlogHomePageRootComponent,
-    BlogCardComponent,
     TagFilterComponent
   ],
   entryComponents: [
     BlogHomePageComponent,
     BlogHomePageRootComponent,
-    BlogCardComponent,
     TagFilterComponent
   ]
 })
