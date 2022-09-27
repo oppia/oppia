@@ -3067,7 +3067,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _remove_unwanted_content_ids_from_translations_and_voiceovers(
-        cls, state_dict: state_domain.StateDict) -> None:
+        cls,
+        state_dict: state_domain.StateDict
+    ) -> None:
         """Helper function to remove the content IDs from the translations
         and voiceovers which are deleted from the state
 
@@ -3124,7 +3126,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 .convert_customization_args_dict_to_customization_args(
                     interaction['id'],
                     interaction['customization_args'],
-                    state_schema_version=51
+                    state_schema_version=53
                 )
             )
             for ca_name in customisation_args:
@@ -3134,10 +3136,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         translations_mapping = (
             state_dict['written_translations']['translations_mapping'])
-        new_translations_mapping = {}
-        for content_id, translation_item in translations_mapping.items():
-            if content_id in content_id_list:
-                new_translations_mapping[content_id] = translation_item
+        new_translations_mapping = {
+             content_id: translation_item for 
+             content_id, translation_item in translations_mapping.items()
+             if content_id in content_id_list
+        }
         state_dict['written_translations']['translations_mapping'] = (
             new_translations_mapping)
 
@@ -3272,12 +3275,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if choice['html'].strip() in ('<p></p>', ''):
                 empty_choices.append(choice)
 
-        # Only one choice is empty.
         if len(empty_choices) == 1:
             invalid_choices_index.append(choices.index(empty_choices[0]))
             invalid_choices_content_ids.append(empty_choices[0]['content_id'])
             choices.remove(empty_choices[0])
-        # Multiple choices are empty.
         else:
             for idx, empty_choice in enumerate(empty_choices):
                 empty_choice['html'] = (
@@ -3306,11 +3307,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
                     if is_item_selection_interaction:
                         rule_values = rule_spec['inputs']['x']
-                        check = any(
+                        if any(
                             item in rule_values for item in
                             invalid_choices_content_ids
-                        )
-                        if check:
+                        ):
                             invalid_rules.append(rule_spec)
 
             for invalid_rule in invalid_rules:
@@ -3448,7 +3448,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             value: float. The value of the rule spec.
         """
-        rule_value_f = rule_spec.inputs['f']
+        rule_value_f = rule_spec['inputs']['f']
         value: float = (
             rule_value_f['wholeNumber'] +
             float(rule_value_f['numerator']) / rule_value_f['denominator']
@@ -3486,13 +3486,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         seen_rules_with_diff_dest_node.append(rule_spec)
                         rules_to_remove_with_try_again_dest_node.append(
                             rule_spec)
-
                     elif (
                         answer_group['outcome']['dest'] != state_name and
                         rule_spec in seen_rules_with_diff_dest_node
                     ):
                         rules_to_remove_with_diff_dest_node.append(rule_spec)
-
                     else:
                         rules_to_remove_with_try_again_dest_node.append(
                             rule_spec)
@@ -3510,7 +3508,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         answer_group['outcome']['dest'] == state_name
                     ):
                         seen_rules_with_try_again_dest_node.append(rule_spec)
-
                     elif (
                         rule_spec not in seen_rules_with_diff_dest_node and
                         answer_group['outcome']['dest'] != state_name
@@ -3548,7 +3545,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ):
                     empty_ans_groups.append(answer_group)
 
-        # Remove empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
@@ -3606,14 +3602,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
         recc_exp_ids = state_dict['interaction'][
             'customization_args']['recommendedExplorationIds']['value']
         if len(recc_exp_ids) > 3:
-            recc_exp_ids = recc_exp_ids[0:3]
+            recc_exp_ids = recc_exp_ids[:3]
 
         state_dict['interaction']['customization_args'][
             'recommendedExplorationIds']['value'] = recc_exp_ids
 
     @classmethod
     def _fix_numeric_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str) -> None:
+        cls,
+        state_dict: state_domain.StateDict,
+        state_name: str
+    ) -> None:
         """Fixes NumericInput interaction for the following cases:
         - The rules should not be duplicate else the one with not pointing to
         different state will be deleted
@@ -3639,7 +3638,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         upper_infinity = float('inf')
         invalid_rules = []
         ranges: List[RangeVariableDict] = []
-        # Remove duplicate rules.
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         # All rules should have solutions that do not match
@@ -3700,7 +3698,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     try:
                         rule_value_x = rule_spec['inputs']['x']
                         rule_value_tol = rule_spec['inputs']['tol']
-                        # For x in [a-b, a+b], b must be a positive value.
+                        # The `tolerance` value needs to be a positive value.
                         if rule_value_tol <= 0:
                             rule_spec['inputs']['tol'] = abs(rule_value_tol)
                         rule_value_x = float(rule_value_x)
@@ -3758,7 +3756,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ):
                     empty_ans_groups.append(answer_group)
 
-        # Removal of empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
@@ -3791,7 +3788,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         ranges: List[RangeVariableDict] = []
         invalid_rules = []
         matched_denominator_list: List[MatchedDenominatorDict] = []
-        # Remove duplicate rules.
+
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         for ans_group_index, answer_group in enumerate(answer_groups):
@@ -3885,7 +3882,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ):
                     empty_ans_groups.append(answer_group)
 
-        # Removal of empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
@@ -3913,7 +3909,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         selected_equals_choices = []
         empty_ans_groups = []
         answer_groups = state_dict['interaction']['answer_groups']
-        # Removal of duplicate rules.
+
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         # No answer choice should appear in more than one rule.
@@ -3936,7 +3932,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 answer_group not in empty_ans_groups
             ):
                 empty_ans_groups.append(answer_group)
-        # Removal of empty answer group.
+
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
@@ -4004,8 +4000,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         len(rule_value) < min_value or
                         len(rule_value) > max_value
                     ):
-                        if answer_group['outcome'][
-                            'dest'] == state_name:
+                        if answer_group['outcome']['dest'] == state_name:
                             invalid_rules.append(rule_spec)
                         else:
                             if len(rule_value) < min_value:
@@ -4021,7 +4016,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 answer_group not in empty_ans_groups
             ):
                 empty_ans_groups.append(answer_group)
-        # Removal of empty answer groups.
+
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
@@ -4115,9 +4110,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 # In `HasElementXBeforeElementY` rule, `X` value
                 # should not be equal to `Y` value.
                 elif (
-                    rule_spec['rule_type'] ==
-                    'HasElementXBeforeElementY' and rule_spec[
-                        'inputs']['x'] == rule_spec['inputs']['y']
+                    rule_spec['rule_type'] =='HasElementXBeforeElementY' and
+                    rule_spec['inputs']['x'] == rule_spec['inputs']['y']
                 ):
                     invalid_rules.append(rule_spec)
 
@@ -4154,17 +4148,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         # they are off by one value.
                         item_to_layer_idx = {}
                         for layer_idx, layer in enumerate(
-                            rule_spec['inputs']['x']):
+                            rule_spec['inputs']['x']
+                        ):
                             for item in layer:
                                 item_to_layer_idx[item] = layer_idx
 
                         for ele in off_by_one_rules:
-                            wrong_positions = 0
+                            off_by_one_value = False
                             for layer_idx, layer in enumerate(ele):
                                 for item in layer:
                                     if layer_idx != item_to_layer_idx[item]:
-                                        wrong_positions += 1
-                            if wrong_positions <= 1:
+                                        off_by_one_value = True
+                            if off_by_one_value:
                                 invalid_rules.append(rule_spec)
 
         empty_ans_groups = []
@@ -4180,7 +4175,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ):
                     empty_ans_groups.append(answer_group)
 
-        # Removal of empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
@@ -4229,7 +4223,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args'][
                 'rows']['value']
         )
-        if rows_value < 1 or rows_value > 10:
+        if rows_value < 1:
+            state_dict['interaction']['customization_args'][
+                'rows']['value'] = 1
+        elif rows_value > 10:
             state_dict['interaction']['customization_args'][
                 'rows']['value'] = 10
         for answer_group in answer_groups:
@@ -4254,7 +4251,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         for start_with_rule_string in start_with_rule_ele:
                             for rule_value in rule_values:
                                 if rule_value.startswith(
-                                    start_with_rule_string):
+                                    start_with_rule_string
+                                ):
                                     invalid_rules.append(rule_spec)
                     # `Contains` should always come after `StartsWith` rule
                     # where the contains rule strings is a substring
@@ -4281,7 +4279,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         for start_with_rule_string in start_with_rule_ele:
                             for rule_value in rule_values:
                                 if rule_value.startswith(
-                                    start_with_rule_string):
+                                    start_with_rule_string
+                                ):
                                     invalid_rules.append(rule_spec)
 
         empty_ans_groups = []
@@ -4297,7 +4296,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ):
                     empty_ans_groups.append(answer_group)
 
-        # Removal of empty answer groups.
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
@@ -4406,11 +4404,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for tag in soup.find_all('oppia-noninteractive-image'):
             if not tag.has_attr('alt-with-value'):
                 tag['alt-with-value'] = '&quot;&quot;'
+
             if not tag.has_attr('filepath-with-value'):
                 tag.decompose()
             else:
                 if tag['filepath-with-value'] in empty_values:
                     tag.decompose()
+
             if not tag.has_attr('caption-with-value'):
                 tag['caption-with-value'] = '&quot;&quot;'
 
@@ -4422,6 +4422,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     tag.decompose()
                 elif tag['text-with-value'].strip() in empty_values:
                     tag.decompose()
+
             if not tag.has_attr('skill_id-with-value'):
                 tag.decompose()
             else:
@@ -4436,11 +4437,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             else:
                 if tag['start-with-value'].strip() in empty_values:
                     tag['start-with-value'] = '0'
+
             if not tag.has_attr('end-with-value'):
                 tag['end-with-value'] = '0'
             else:
                 if tag['end-with-value'].strip() in empty_values:
                     tag['end-with-value'] = '0'
+
             if not tag.has_attr('autoplay-with-value'):
                 tag['autoplay-with-value'] = 'false'
             else:
@@ -4449,6 +4452,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     '\"true\"', '\"false\"', True, False
                 ):
                     tag['autoplay-with-value'] = 'false'
+
             if not tag.has_attr('video_id-with-value'):
                 tag.decompose()
             else:
@@ -4456,6 +4460,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     tag.decompose()
                 elif tag['video_id-with-value'].strip() in empty_values:
                     tag.decompose()
+
             start_value = float(tag['start-with-value'])
             end_value = float(tag['end-with-value'])
             if (

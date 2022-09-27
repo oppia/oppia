@@ -1612,6 +1612,8 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
+        # The version 53 only fixes the data for `Exploration` and make
+        # no changes in the `Question` that is why we are simply returning.
         return question_state_dict
 
     @classmethod

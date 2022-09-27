@@ -341,17 +341,8 @@ class DraftUpgradeUtil:
                 exp_change.property_name ==
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
             ):
-                # Here we use cast because this 'if' condition forces
-                # change to have type EditExpStateProperty
-                # InteractionAnswerGroupsCmd.
-                edit_interaction_answer_groups_cmd = cast(
-                    exp_domain.
-                    EditExpStatePropertyInteractionAnswerGroupsCmd,
-                    exp_change
-                )
-                answer_group_dicts = (
-                    edit_interaction_answer_groups_cmd.new_value
-                )
+                assert isinstance(exp_change.new_value, dict)
+                answer_group_dicts = exp_change.new_value
                 for answer_group in answer_group_dicts:
                     answer_group['tagged_skill_misconception_id'] = None
                     answer_group['outcome']['refresher_exploration_id'] = None
