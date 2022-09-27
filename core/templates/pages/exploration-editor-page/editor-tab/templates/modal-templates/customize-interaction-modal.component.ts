@@ -259,21 +259,11 @@ export class CustomizeInteractionModalComponent
   }
 
   isSaveInteractionButtonEnabled(): boolean {
-    if (this.explorationTitle === 'End Exploration') {
-      if (this.inputField === undefined) {  // means user hasn't addded any exploration id
-        return true;
-      } 
-      if (this.inputValue === "") {
-        return false; // empty field => button disabled
-      }
-      return true;
-    } else {
-      return !!(
-        this.hasCustomizationArgs &&
-        this.stateInteractionIdService.displayed &&
-        this.getCustomizationArgsWarningsList().length === 0
-      );
-    }
+    return !!(
+      this.hasCustomizationArgs &&
+      this.stateInteractionIdService.displayed &&
+      this.getCustomizationArgsWarningsList().length === 0
+    );
   }
 
   getSaveInteractionButtonTooltip(): string {

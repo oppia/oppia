@@ -57,6 +57,8 @@ class EndExploration(base.BaseInteraction):
             'validators': [{
                 'id': 'has_length_at_most',
                 'max_value': 3,
+            },{
+                'id': 'is_nonempty',
             }],
             'ui_config': {
                 'add_element_text': 'Add exploration ID',
