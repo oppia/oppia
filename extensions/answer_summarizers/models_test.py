@@ -208,8 +208,8 @@ class AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Answers of linear interactions should not be present while'
-            ' calculating the answers\' frequencies.'
+            'Answers of linear interactions should not be present while '
+            'calculating the answers\' frequencies.'
         ):
             self._perform_calculation(state_answers_dict)
 
@@ -269,8 +269,8 @@ class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Answers of linear interactions should not be present while'
-            ' calculating the top 5 answers, by frequency.'
+            'Answers of linear interactions should not be present while '
+            'calculating the top 5 answers, by frequency.'
         ):
             self._perform_calculation(state_answers_dict)
 
@@ -339,8 +339,8 @@ class Top10AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Answers of linear interactions should not be present while'
-            ' calculating the top 10 answers, by frequency.'
+            'Answers of linear interactions should not be present while '
+            'calculating the top 10 answers, by frequency.'
         ):
             self._perform_calculation(state_answers_dict)
 
@@ -398,23 +398,23 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
-    def test_commonly_submitted_answers_frequencies_are_not_calculated_with_none_answer(  # pylint: disable=line-too-long
+    def test_common_answers_frequencies_are_not_calculated_with_none_answers(
         self
     ) -> None:
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
-        answers = ['A', 'B', 'C', 'D', None]
+        answers = ['A', 'B', 'C', 'D', None, None]
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         with self.assertRaisesRegex(
             Exception,
-            'Answers of linear interactions should not be present while'
-            ' calculating the commonly submitted answers\' frequencies.'
+            'Answers of linear interactions should not be present while '
+            'calculating the commonly submitted answers\' frequencies.'
         ):
             self._perform_calculation(state_answers_dict)
 
-    def test_commonly_submitted_answers_frequencies_are_not_calculated_if_answers_are_not_iterable(  # pylint: disable=line-too-long
+    def test_raises_error_if_non_iterable_answer_provided(
         self
     ) -> None:
         # Here 123 is not an iterable answer.
@@ -423,8 +423,8 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'To calculate commonly submitted answers\' frequencies, answers'
-            ' must be provided in an iterable form, like: SetOfUnicodeString.'
+            'To calculate commonly submitted answers\' frequencies, answers '
+            'must be provided in an iterable form, like: SetOfUnicodeString.'
         ):
             self._perform_calculation(state_answers_dict)
 
@@ -532,8 +532,8 @@ class TopAnswersByCategorizationUnitTests(CalculationUnitTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Answers of linear interactions should not be present while'
-            ' calculating the top submitted answers.'
+            'Answers of linear interactions should not be present while '
+            'calculating the top submitted answers.'
         ):
             self._perform_calculation(state_answers_dict)
 
@@ -628,7 +628,7 @@ class TopNUnresolvedAnswersByFrequencyUnitTests(CalculationUnitTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Answers of linear interactions should not be present while'
-            ' calculating the top unresolved answers, by frequency.'
+            'Answers of linear interactions should not be present while '
+            'calculating the top unresolved answers, by frequency.'
         ):
             self._perform_calculation(state_answers_dict)

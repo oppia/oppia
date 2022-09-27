@@ -62,6 +62,13 @@ class LabeledRegionDict(TypedDict):
     region: RegionDict
 
 
+class ImageAndRegionDict(TypedDict):
+    """Dictionary representation of imageAndRegions customization arg value."""
+
+    imagePath: str
+    labeledRegions: List[LabeledRegionDict]
+
+
 class CustomizationArgSubtitledUnicodeDefaultDict(TypedDict):
     """Type for the dictionary representation of CustomizationArgSpec's
     SubtitledUnicode default_value.
@@ -84,9 +91,9 @@ AllowedDefaultValueTypes = Union[
     str,
     float,
     GraphDict,
+    ImageAndRegionDict,
     CustomizationArgSubtitledUnicodeDefaultDict,
     List[CustomizationArgSubtitledHtmlDefaultDict],
-    Dict[str, Union[str, List[LabeledRegionDict]]],
     None
 ]
 

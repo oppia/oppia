@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
-from typing import Dict, List, Union
+from typing import List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -44,11 +44,11 @@ class ImageClickInput(base.BaseInteraction):
     can_have_solution: bool = False
     show_generic_submit_button: bool = False
 
-    _image_and_regions_default_value: Dict[
-        str, Union[str, List[domain.LabeledRegionDict]]
-    ] = {
+    _labeled_regions_list: List[domain.LabeledRegionDict] = []
+
+    _image_and_regions_default_value: domain.ImageAndRegionDict = {
         'imagePath': '',
-        'labeledRegions': []
+        'labeledRegions': _labeled_regions_list
     }
 
     _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{

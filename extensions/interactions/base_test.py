@@ -38,8 +38,8 @@ from core.tests import test_utils
 from extensions import domain
 from extensions.interactions import base
 
-from typing import Dict, List, Set
-from typing_extensions import Final
+from typing import Dict, List, Set, Tuple, Type
+from typing_extensions import Final, Literal
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
@@ -78,6 +78,14 @@ _INTERACTION_CONFIG_SCHEMA: Final = [
     ('_customization_arg_specs', list),
     ('is_terminal', bool), ('needs_summary', bool),
     ('show_generic_submit_button', bool)]
+
+
+AnswerVisualizationsDictKeys = Literal[
+    'id',
+    'options',
+    'calculation_id',
+    'addressed_info_is_supported'
+]
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
@@ -169,11 +177,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             answer_visualization_specs: list(dict(str, *)). The answer
                 visualization specs to be validated.
         """
-        _answer_visualizations_specs_schema = [
+        # Here we use object because every in-built type is inherited from
+        # object class.
+        _answer_visualizations_specs_schema: List[
+            Tuple[AnswerVisualizationsDictKeys, Type[object]]
+        ] = [
             ('id', str),
             ('options', dict),
             ('calculation_id', str),
-            ('addressed_info_is_supported', bool)]
+            ('addressed_info_is_supported', bool)
+        ]
         _answer_visualization_keys = [
             item[0] for item in _answer_visualizations_specs_schema]
 
@@ -181,18 +194,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for spec in answer_visualization_specs:
             self.assertItemsEqual(list(spec.keys()), _answer_visualization_keys)
             for key, item_type in _answer_visualizations_specs_schema:
-                # Here we use MyPy ignore because here we are accessing 'spec'
-                # TypedDict using a str variable whereas according to MyPy
-                # TypedDicts can only be accessed by using string literals. So,
-                # due this MyPy throws an error. Thus, to avoid the error, we
-                # used ignore here.
-                self.assertIsInstance(spec[key], item_type)  # type: ignore[misc]
+                self.assertIsInstance(spec[key], item_type)
                 if item_type == str:
-                    # Here we use MyPy ignore because here we are accessing
-                    # 'spec' TypedDict using a str variable whereas according
-                    # to MyPy TypedDicts can only be accessed by using specific
-                    # string literals.
-                    self.assertTrue(spec[key])  # type: ignore[misc]
+                    self.assertTrue(spec[key])
 
     def _listdir_omit_ignored(self, directory: str) -> List[str]:
         """List all files and directories within 'directory', omitting the ones

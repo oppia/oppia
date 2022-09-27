@@ -416,9 +416,9 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
                 )
             if not isinstance(answer_dict['answer'], collections.abc.Iterable):
                 raise Exception(
-                    'To calculate commonly submitted answers\' frequencies,'
-                    ' answers must be provided in an iterable form, like:'
-                    ' SetOfUnicodeString.'
+                    'To calculate commonly submitted answers\' frequencies, '
+                    'answers must be provided in an iterable form, like: '
+                    'SetOfUnicodeString.'
                 )
             answer_list.append(answer_dict['answer'])
         answer_frequency_list = _get_top_answers_by_frequency(
@@ -479,9 +479,9 @@ class TopAnswersByCategorization(BaseCalculation):
                 for answer_dict in answer_dicts:
                     if answer_dict['answer'] is None:
                         raise Exception(
-                            'Answers of linear interactions should not be'
-                            ' present while calculating the top submitted'
-                            ' answers.'
+                            'Answers of linear interactions should not be '
+                            'present while calculating the top submitted '
+                            'answers.'
                         )
                     answer_list.append(answer_dict['answer'])
                 submitted_answers_by_categorization[category].extend(
