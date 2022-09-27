@@ -91,6 +91,13 @@ AcceptableActivityModelTypes = Union[
     user_models.IncompleteActivitiesModel
 ]
 
+class UnsupportedRTEContentValidationError(Exception):
+    """Error class for when exploration fails validation check for Unsupported
+    RTE content for android.
+    """
+
+    pass
+
 
 class UserExplorationDataDict(TypedDict):
     """Dictionary representing the user's specific exploration data."""
@@ -1800,7 +1807,7 @@ def validate_exploration_for_story(
                 'with ID %s is not supported on mobile for explorations '
                 'in a story.' % (state_name, exp.id))
             if strict:
-                raise utils.ValidationError(error_string)
+                raise UnsupportedRTEContentValidationError(error_string)
             validation_error_messages.append(error_string)
 
         if state.interaction.id == 'EndExploration':

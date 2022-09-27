@@ -502,7 +502,6 @@ import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-edi
     FilteredChoicesFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
-    TranslationsFetchingMessageModalComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,

@@ -85,8 +85,14 @@ class MigrateExplorationJob(base_jobs.JobBase):
             with datastore_services.get_ndb_context():
                 if exp_services.get_story_id_linked_to_exploration(
                         exp_id) is not None:
-                    exp_services.validate_exploration_for_story(
-                        exploration, True)
+                    try:
+                        exp_services.validate_exploration_for_story(
+                            exploration, True)
+                    except exp_services.UnsupportedRTEContentValidationError:
+                        # The unsupported RTE content error is supressed as we
+                        # need to fix the error in existing exploration before
+                        # enabling this check.
+                        pass
 
         except Exception as e:
             logging.exception(e)
@@ -289,11 +295,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
             # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda exp_model: exp_model.id)
-            # TODO(#15871): This filter should be removed after the explorations
-            # are fixed and it is possible to migrate them.
-            | 'Remove broken exploration' >> beam.Filter(
-                lambda id_and_exp: id_and_exp[0] not in (
-                    'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
         exp_rights_models = (
