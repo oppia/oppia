@@ -2286,6 +2286,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state.written_translations.add_content_id_for_translation(
             'ca_choices_2')
         self.set_interaction_for_state(state, 'DragAndDropSortInput')
+        empty_list: List[str] = []
         test_ans_group_for_drag_and_drop_interaction = [
             state_domain.AnswerGroup.from_dict({
             'rule_specs': [
@@ -2332,7 +2333,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 {
                     'rule_type': 'IsEqualToOrdering',
                     'inputs': {
-                        'x': []
+                        'x': empty_list
                     }
                 },
                 {

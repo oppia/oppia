@@ -60,7 +60,9 @@ AllowedRuleSpecInputTypes = Union[
     int,
     List[str],
     List[List[str]],
-    Dict[str, Union[str, List[str]]],
+    # Here we use type Any because some rule specs have deeply nested types,
+    # such as for the `NumberWithUnits` interaction.
+    Mapping[str, Union[str, List[str], int, bool, Dict[str, int], List[Any]]],
 ]
 
 # TODO(#15982): Here we use type Any because `CustomizationArgsDictType` is a
@@ -947,7 +949,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 - Text value is empty or is more than 20 characters.
                 - Answer group is present.
         """
-        text_value = self.customization_args['buttonText'].value.unicode_str
+        button_text = self.customization_args['buttonText'].value
+        assert isinstance(button_text, SubtitledUnicode)
+        text_value = button_text.unicode_str
         if len(text_value) > 20:
             raise utils.ValidationError(
                 'The Continue button text should be at most 20 characters.'
@@ -1080,7 +1084,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def _get_rule_value_of_fraction_interaction(
         self,
         rule_spec: RuleSpec
-    ) -> bool:
+    ) -> float:
         """Return rule value of the rule_spec of FractionInput interaction so
         that we can keep track of rule's range.
 
@@ -1091,12 +1095,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             rule_value_f: float. The value of the rule spec.
         """
         rule_value_f = rule_spec.inputs['f']
-        rule_value_f = (
+        value: float = (
             rule_value_f['wholeNumber'] +
             float(rule_value_f['numerator']) / rule_value_f['denominator']
         )
 
-        return rule_value_f
+        return value
 
     def _validate_numeric_input(self) -> None:
         """Validates the NumericInput interaction.
@@ -2219,9 +2223,11 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     """
 
     # Here we use type Any because values in schema dictionary can be of type
-    # str, List, Dict and other types too.
+    # str, List, Dict and other types too. We also use type Any for `value`
+    # because it can be of type SubtitledHtmlDict, SubtitledUnicodeDict
+    # and so on.
     def __init__(
-        self, value: Union[str, Dict[str, str]], schema: Dict[str, Any]
+        self, value: Any, schema: Dict[str, Any]
     ) -> None:
         """Initializes a InteractionCustomizationArg domain object.
 
