@@ -342,7 +342,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_correct_exp_state_domain_content(self) -> None:
         """Validates that the correct exp change dictionary returns
-        the exploration change domain object."""
+        the exploration change domain object.
+        """
         correct_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
