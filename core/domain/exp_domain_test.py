@@ -2006,7 +2006,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
         )
         self._assert_validation_error(
-            new_exploration, 'No collapsible content is present is present '
+            new_exploration, 'No collapsible content is present '
             'inside the tag.')
         state.content.html = (
             '<oppia-noninteractive-collapsible heading-with-value='
