@@ -363,9 +363,7 @@ class DraftUpgradeUtil:
                         answer_group['outcome']['dest'] == exp_change.state_name
                     ):
                         answer_group['outcome']['labelled_as_correct'] = False
-            elif exp_change.property_name == (
-                exp_domain.STATE_PROPERTY_CONTENT
-            ):
+            elif exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                 # Here we use cast because this 'if' condition forces
                 # change to have type EditExpStatePropertyContentCmd.
                 edit_contents_cmd = cast(

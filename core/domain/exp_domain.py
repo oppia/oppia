@@ -3246,7 +3246,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls,
         choices: List[state_domain.SubtitledHtmlDict],
         answer_groups: List[state_domain.AnswerGroupDict],
-        is_item_selection_interaction: bool=False
+        is_item_selection_interaction: bool = False
     ) -> None:
         """Handles choices present in the ItemSelectionInput or
         in MultipleChoiceInput interactions, implements the following:
@@ -4355,7 +4355,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def fix_rte_tags(
         cls, html: str,
-        is_tags_nested_inside_tabs_or_collapsible: bool=False
+        is_tags_nested_inside_tabs_or_collapsible: bool = False
     ) -> str:
         """Handles all the invalid RTE tags, performs the following:
             - `oppia-noninteractive-image`
