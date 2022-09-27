@@ -21,10 +21,15 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.constants import constants
 
+from google import auth
 from google.cloud import secretmanager
 
-CLIENT = secretmanager.SecretManagerServiceClient()
+CLIENT = secretmanager.SecretManagerServiceClient(
+    credentials=(
+        auth.credentials.AnonymousCredentials()
+        if constants.EMULATOR_MODE else auth.default()[0]))
 
 
 def get_secret(name: str) -> str:
