@@ -3198,6 +3198,8 @@ def regenerate_missing_stats_for_exploration(
                     else None)
                 current_interaction_id = (
                     exp.state_interaction_ids_dict[state_name])
+                exp_stats_list_item = exp_stats_list[i]
+                assert exp_stats_list_item is not None
                 # In early schema versions of ExplorationModel, the END
                 # card was a persistant, implicit state present in every
                 # exploration. The snapshots of these old explorations have
@@ -3207,28 +3209,32 @@ def regenerate_missing_stats_for_exploration(
                 if current_interaction_id != prev_interaction_id or (
                         current_interaction_id == 'EndExploration' and
                         prev_state_name == 'END'):
-                    exp_stats_list[i].state_stats_mapping[state_name] = ( # type: ignore[union-attr]
-                        stats_domain.StateStats.create_default())
+                    exp_stats_list_item.state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default()
+                    )
                 else:
-                    exp_stats_list[i].state_stats_mapping[state_name] = ( # type: ignore[union-attr]
-                        prev_exp_stats.state_stats_mapping[ # type: ignore[union-attr]
-                            prev_state_name].clone())
+                    assert prev_exp_stats is not None
+                    exp_stats_list_item.state_stats_mapping[state_name] = (
+                        prev_exp_stats.state_stats_mapping[
+                            prev_state_name].clone()
+                    )
                 missing_state_stats.append(
                     'StateStats(exp_id=%r, exp_version=%r, '
                     'state_name=%r)' % (exp_id, exp.version, state_name))
             except Exception as e:
+                assert exp_versions_diff is not None
                 raise Exception(
                     'Exploration(id=%r, exp_version=%r) has no '
                     'State(name=%r): %r' % (
                         exp_id, exp_stats.exp_version, prev_state_name, {
                             'added_state_names': (
-                                exp_versions_diff.added_state_names), # type: ignore[union-attr]
+                                exp_versions_diff.added_state_names),
                             'deleted_state_names': (
-                                exp_versions_diff.deleted_state_names), # type: ignore[union-attr]
+                                exp_versions_diff.deleted_state_names),
                             'new_to_old_state_names': (
-                                exp_versions_diff.new_to_old_state_names), # type: ignore[union-attr]
+                                exp_versions_diff.new_to_old_state_names),
                             'old_to_new_state_names': (
-                                exp_versions_diff.old_to_new_state_names), # type: ignore[union-attr]
+                                exp_versions_diff.old_to_new_state_names),
                             'prev_exp.states': (
                                 prev_exp.state_interaction_ids_dict.keys()),
                             'prev_exp_stats': prev_exp_stats
@@ -3236,7 +3242,8 @@ def regenerate_missing_stats_for_exploration(
 
     for index, exp_stats in enumerate(exp_stats_list):
         if index not in missing_exp_stats_indices:
-            stats_services.save_stats_model(exp_stats) # type: ignore[arg-type]
+            assert exp_stats is not None
+            stats_services.save_stats_model(exp_stats)
 
     return (
         missing_exp_stats, missing_state_stats,

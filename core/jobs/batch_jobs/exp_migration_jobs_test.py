@@ -40,6 +40,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
+    from mypy_imports import stats_models
 
 (
     exp_models,
@@ -510,14 +511,23 @@ class RegenerateMissingExplorationStatsModelsJobTests(
                 'property_name': 'title',
                 'new_value': 'New title 5'
             })], 'Changed title.')
-        stats_models.ExplorationStatsModel.get_model(exp_id, 2).delete() # type: ignore[attr-defined]
-        stats_models.ExplorationStatsModel.get_model(exp_id, 4).delete() # type: ignore[attr-defined]
+        exp_stats_model_for_version_2 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
+        assert exp_stats_model_for_version_2 is not None
+        exp_stats_model_for_version_2.delete()
+
+        exp_stats_model_for_version_4 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        )
+        assert exp_stats_model_for_version_4 is not None
+        exp_stats_model_for_version_4.delete()
 
         self.assertIsNone(
-            stats_models.ExplorationStatsModel.get_model(exp_id, 2) # type: ignore[attr-defined]
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
         )
         self.assertIsNone(
-            stats_models.ExplorationStatsModel.get_model(exp_id, 4) # type: ignore[attr-defined]
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
         )
 
         self.assert_job_output_is([
@@ -525,8 +535,37 @@ class RegenerateMissingExplorationStatsModelsJobTests(
         ])
 
         self.assertIsNotNone(
-            stats_models.ExplorationStatsModel.get_model(exp_id, 2) # type: ignore[attr-defined]
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
         )
         self.assertIsNotNone(
-            stats_models.ExplorationStatsModel.get_model(exp_id, 4) # type: ignore[attr-defined]
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        )
+
+    def test_job_regenerates_missing_stats_models_when_no_models_exist(
+        self
+    ) -> None:
+        exp_id = 'ID1'
+        self.save_new_default_exploration(exp_id, 'owner_id')
+        exp_stats_model_for_version_1 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        )
+        assert exp_stats_model_for_version_1 is not None
+        exp_stats_model_for_version_1.delete()
+
+        self.assertIsNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='',
+                stderr=(
+                    'EXP PROCESSED ERROR: "(\'ID1\', '
+                    'Exception(\'No ExplorationStatsModels found\'))": 1'
+                )
+            )
+        ])
+
+        self.assertIsNotNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
         )

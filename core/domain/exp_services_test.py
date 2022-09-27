@@ -9251,10 +9251,6 @@ title: Title
 class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
     """Test apply draft functions in exp_services."""
 
-    def _do_not_create_stats_models(self) -> None:
-        """Returns a context manager which does not create new stats models."""
-        return self.swap(stats_services, 'create_stats_model', lambda _: None) # type: ignore[return-value]
-
     def test_when_exp_and_state_stats_models_exist(self) -> None:
         self.save_new_default_exploration('ID', 'owner_id')
 
@@ -9295,11 +9291,16 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_stats_list = (
             stats_services.get_multiple_exploration_stats_by_version(
                 exp_id, [1, 2, 3]))
-        exp_stats_list[0].state_stats_mapping['new'] = ( # type: ignore[union-attr]
-            exp_stats_list[0].state_stats_mapping['Introduction']) # type: ignore[union-attr]
-        del exp_stats_list[0].state_stats_mapping['Introduction'] # type: ignore[union-attr]
-        stats_services.save_stats_model(exp_stats_list[0]) # type: ignore[arg-type]
-        stats_models.ExplorationStatsModel.get_model(exp_id, 3).delete() # type: ignore[union-attr]
+        assert exp_stats_list[0] is not None
+        exp_stats_list[0].state_stats_mapping['new'] = (
+            exp_stats_list[0].state_stats_mapping['Introduction'])
+        del exp_stats_list[0].state_stats_mapping['Introduction']
+        stats_services.save_stats_model(exp_stats_list[0])
+        exp_stats_model_to_delete = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 3)
+        )
+        assert exp_stats_model_to_delete is not None
+        exp_stats_model_to_delete.delete()
         error_message = (
             r'Exploration\(id=.*, exp_version=1\) has no State\(name=.*\)')
         with self.assertRaisesRegex(Exception, error_message):
@@ -9334,7 +9335,11 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New title 4'
             })], 'Changed title.')
         exp_services.revert_exploration(owner_id, exp_id, 5, 4)
-        stats_models.ExplorationStatsModel.get_model(exp_id, 6).delete() # type: ignore[union-attr]
+        exp_stats_model_to_delete = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 6)
+        )
+        assert exp_stats_model_to_delete is not None
+        exp_stats_model_to_delete.delete()
 
         self.assertItemsEqual(
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
@@ -9375,8 +9380,9 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             })], 'Changed title.')
         exp_services.revert_exploration(owner_id, exp_id, 5, 4)
         exp_stats = stats_services.get_exploration_stats_by_id(exp_id, 6)
-        exp_stats.state_stats_mapping = {} # type: ignore[union-attr]
-        stats_services.save_stats_model(exp_stats) # type: ignore[arg-type]
+        assert exp_stats is not None
+        exp_stats.state_stats_mapping = {}
+        stats_services.save_stats_model(exp_stats)
 
         self.assertItemsEqual(
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
@@ -9422,8 +9428,17 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                 'property_name': 'title',
                 'new_value': 'New title 5'
             })], 'Changed title.')
-        stats_models.ExplorationStatsModel.get_model(exp_id, 2).delete() # type: ignore[union-attr]
-        stats_models.ExplorationStatsModel.get_model(exp_id, 4).delete() # type: ignore[union-attr]
+
+        exp_stats_model_for_version_2 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
+        exp_stats_model_for_version_4 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        )
+        assert exp_stats_model_for_version_2 is not None
+        assert exp_stats_model_for_version_4 is not None
+        exp_stats_model_for_version_2.delete()
+        exp_stats_model_for_version_4.delete()
 
         self.assertItemsEqual(
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
@@ -9469,9 +9484,23 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                 'property_name': 'title',
                 'new_value': 'New title 5'
             })], 'Changed title.')
-        stats_models.ExplorationStatsModel.get_model(exp_id, 1).delete() # type: ignore[union-attr]
-        stats_models.ExplorationStatsModel.get_model(exp_id, 2).delete() # type: ignore[union-attr]
-        stats_models.ExplorationStatsModel.get_model(exp_id, 3).delete() # type: ignore[union-attr]
+        exp_stats_model_for_version_1 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        )
+        assert exp_stats_model_for_version_1 is not None
+        exp_stats_model_for_version_1.delete()
+
+        exp_stats_model_for_version_2 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
+        assert exp_stats_model_for_version_2 is not None
+        exp_stats_model_for_version_2.delete()
+
+        exp_stats_model_for_version_3 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 3)
+        )
+        assert exp_stats_model_for_version_3 is not None
+        exp_stats_model_for_version_3.delete()
 
         self.assertItemsEqual(
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
@@ -9514,8 +9543,17 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             })], 'Changed title.')
         exp_services.revert_exploration(owner_id, exp_id, 5, 3)
 
-        stats_models.ExplorationStatsModel.get_model(exp_id, 1).delete() # type: ignore[union-attr]
-        stats_models.ExplorationStatsModel.get_model(exp_id, 2).delete() # type: ignore[union-attr]
+        exp_stats_model_for_version_1 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        )
+        assert exp_stats_model_for_version_1 is not None
+        exp_stats_model_for_version_1.delete()
+
+        exp_stats_model_for_version_2 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
+        assert exp_stats_model_for_version_2 is not None
+        exp_stats_model_for_version_2.delete()
 
         self.assertItemsEqual(
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
@@ -9531,7 +9569,11 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_id = 'ID1'
         owner_id = 'owner_id'
         self.save_new_default_exploration(exp_id, owner_id)
-        stats_models.ExplorationStatsModel.get_model(exp_id, 1).delete() # type: ignore[union-attr]
+        exp_stats_model_for_version_1 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        )
+        assert exp_stats_model_for_version_1 is not None
+        exp_stats_model_for_version_1.delete()
 
         with self.assertRaisesRegex(
             Exception, 'No ExplorationStatsModels found'):
@@ -9572,8 +9614,9 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New title 5'
             })], 'Changed title.')
         exp_stats = stats_services.get_exploration_stats_by_id(exp_id, 2)
-        exp_stats.state_stats_mapping = {} # type: ignore[union-attr]
-        stats_services.save_stats_model(exp_stats) # type: ignore[arg-type]
+        assert exp_stats is not None
+        exp_stats.state_stats_mapping = {}
+        stats_services.save_stats_model(exp_stats)
 
         self.assertItemsEqual(
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
@@ -9619,8 +9662,9 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New title 5'
             })], 'Changed title.')
         exp_stats = stats_services.get_exploration_stats_by_id(exp_id, 2)
-        exp_stats.state_stats_mapping = {} # type: ignore[union-attr]
-        stats_services.save_stats_model(exp_stats) # type: ignore[arg-type]
+        assert exp_stats is not None
+        exp_stats.state_stats_mapping = {}
+        stats_services.save_stats_model(exp_stats)
 
         self.assertItemsEqual(
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
