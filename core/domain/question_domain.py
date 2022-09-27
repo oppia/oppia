@@ -1597,6 +1597,24 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v52_dict_to_v53_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from version 52 to 53. Version 53 fixes errored data present
+        in exploration state, RTE and interactions.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
         cls,
         versioned_question_state: VersionedQuestionStateDict,
