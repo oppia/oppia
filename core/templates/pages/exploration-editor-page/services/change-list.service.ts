@@ -369,7 +369,7 @@ export class ChangeListService {
    */
   markTranslationsAsNeedingUpdate(contentId: string): void {
     this.addChange({
-      cmd: 'mark_translations_as_needing_update',
+      cmd: 'mark_translations_needs_update',
       content_id: contentId
     });
   }

@@ -28,7 +28,7 @@ import { InteractionCustomizationArgsBackendDict } from 'interactions/customizat
 export type ExplorationChange = (
   ExplorationChangeAddState |
   ExplorationChangeAddWrittenTranslation |
-  ExplorationChangeMarkTranslationsAsNeedingUpdate |
+  ExplorationChangeMarkTranslationsNeedsUpdate |
   ExplorationChangeRemoveTranslations |
   ExplorationChangeRenameState |
   ExplorationChangeDeleteState |
@@ -114,8 +114,8 @@ export interface ExplorationChangeAddWrittenTranslation {
   'translation_html': string;
 }
 
-export interface ExplorationChangeMarkTranslationsAsNeedingUpdate {
-  'cmd': 'mark_translations_as_needing_update';
+export interface ExplorationChangeMarkTranslationsNeedsUpdate {
+  'cmd': 'mark_translations_needs_update';
   'content_id': string;
 }
 
