@@ -763,7 +763,15 @@ class StateCompleteEventHandler(base.BaseHandler):
                 }
             },
             'exp_version': {
-                'schema': editor.SCHEMA_FOR_VERSION
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                },
+                'default_value': None
             }
         }
     }
@@ -806,7 +814,14 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
                 }
             },
             'exp_version': {
-                'schema': editor.SCHEMA_FOR_VERSION
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                }
             },
             'state_name': {
                 'schema': {
