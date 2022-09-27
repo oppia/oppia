@@ -280,7 +280,7 @@ describe('Responses Service', () => {
       ],
       new Outcome(
         'State', null, new SubtitledHtml('', 'This is a new feedback text'),
-        true, [], 'test',null
+        true, [], 'test', 'test_skill_id'
       ),
       [], null)
 

@@ -359,12 +359,14 @@ class BaseTranslatableObject:
         min_non_displayable_translation_count = (
             feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS)
 
-        content_id_to_translatable_content = (
-            self.get_translatable_contents_collection()
-            .content_id_to_translatable_content)
+        content_ids = self.get_translatable_content_ids()
+        for content_id in content_ids:
+            if content_id.startswith(ContentType.RULE.value):
+                if not content_id in entity_translation.translations:
+                    # Rule-related translations cannot be missing.
+                    return False
 
-        translatable_content_count = len(
-            content_id_to_translatable_content.keys())
+        translatable_content_count = len(content_ids)
         translated_content_count = entity_translation.get_translation_count()
         translations_missing_count = (
             translatable_content_count - translated_content_count)

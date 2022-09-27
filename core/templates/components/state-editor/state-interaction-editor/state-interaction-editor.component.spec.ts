@@ -37,6 +37,7 @@ import { StateCustomizationArgsService } from '../state-editor-properties-servic
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 class MockNgbModal {
   modal: string;
@@ -90,6 +91,7 @@ describe('State Interaction component', () => {
   let editabilityService: EditabilityService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let fixture: ComponentFixture<StateInteractionEditorComponent>;
+  let generateContentIdService: GenerateContentIdService;
   let interactionDetailsCacheService: InteractionDetailsCacheService;
   let mockNgbModal: MockNgbModal;
   let responsesService: ResponsesService;
@@ -138,6 +140,7 @@ describe('State Interaction component', () => {
     editabilityService = TestBed.inject(EditabilityService);
     explorationHtmlFormatterService =
       TestBed.inject(ExplorationHtmlFormatterService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
     interactionDetailsCacheService =
       TestBed.inject(InteractionDetailsCacheService);
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
@@ -254,6 +257,7 @@ describe('State Interaction component', () => {
 
   it('should close modal when user click cancel', fakeAsync(() => {
     const mockEventEmitter = new EventEmitter();
+    generateContentIdService.init(() => 1, () => {});
     mockNgbModal.modal = 'add_interaction';
     stateContentService.savedMemento = new SubtitledHtml('html', 'contentID');
     stateCustomizationArgsService.savedMemento = {

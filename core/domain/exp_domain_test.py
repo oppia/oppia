@@ -5976,21 +5976,36 @@ class ExplorationChangesMergeabilityUnitTests(
         test_utils.EmailTestBase):
     """Test methods related to exploration changes mergeability."""
 
+    def  setUp(self):
+        super().setUp()
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+        self.content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+    def append_next_content_id_index_change(self, change_list):
+        """Appends the next_content_id_index change in the change list."""
+        return change_list.append(exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'next_content_id_index',
+            'new_value': self.content_id_generator.next_content_id_index,
+            'old_value': 0
+        }))
+
     def test_changes_are_mergeable_when_content_changes_do_not_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
             'new_value': 'First title'
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed title.')
 
         test_dict: Dict[str, str] = {}
         # Making changes to properties except content.
@@ -6008,7 +6023,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'ca_placeholder_0',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
                         'unicode_str': ''
                     }
                 },
@@ -6029,7 +6045,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'buttonText': {
                     'value': {
-                        'content_id': 'ca_buttonText_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
                         'unicode_str': 'Continue'
                     }
                 }
@@ -6037,7 +6054,9 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': test_dict
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2, 'Changed Interaction.')
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Interaction.')
 
         # Changing content of second state.
         change_list_3 = [exp_domain.ExplorationChange({
@@ -6050,7 +6069,8 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'new_value': {
                 'html': '<p>Congratulations, you have finished!</p>',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
             }
         })]
 
@@ -6065,7 +6085,9 @@ class ExplorationChangesMergeabilityUnitTests(
         self.assertEqual(changes_are_mergeable, True)
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_3,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_3),
+
             'Changed content of End state.')
 
         # Changing content of first state.
@@ -6091,7 +6113,8 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'new_value': {
                 'html': '<p>Hello</p>',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
             }
         })]
 
@@ -6108,11 +6131,6 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_not_mergeable_when_content_changes_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         # Making changes to content of the first state.
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
@@ -6124,11 +6142,14 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'new_value': {
                 'html': '<p>Content 1.</p>',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
             }
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list, 'Changed Content.')
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed Content.')
 
         # Changing content of the same state to check that
         # changes are not mergeable.
@@ -6142,7 +6163,8 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'new_value': {
                 'html': '<p>Content 2.</p>',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
             }
         })]
 
@@ -6154,16 +6176,12 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_mergeable_when_interaction_id_changes_do_not_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         # Making changes in the properties which are
         # not related to the interaction id.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
@@ -6176,7 +6194,8 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_1',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
                     'html': '<p>This is a first hint.</p>'
                 }
             }],
@@ -6187,12 +6206,14 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_1',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>This is a first hint.</p>'
                 }
             }, {
                 'hint_content': {
-                    'content_id': 'hint_2',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>This is the second hint.</p>'
                 }
             }],
@@ -6207,7 +6228,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
                 'html': '<p>Congratulations, you have finished!</p>'
             },
             'state_name': 'End',
@@ -6219,7 +6241,9 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'content'
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Changed Contents and Hint')
 
         test_dict: Dict[str, str] = {}
@@ -6257,7 +6281,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'buttonText': {
                     'value': {
-                        'content_id': 'ca_buttonText_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
                         'unicode_str': 'Continue'
                     }
                 }
@@ -6321,7 +6346,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [],
                 'feedback': {
                     'html': '',
-                    'content_id': 'default_outcome'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 }
             },
             'old_value': None,
@@ -6339,7 +6365,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'param_changes': [],
                     'feedback': {
                         'html': '<p>Feedback</p>',
-                        'content_id': 'feedback_0'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                     }
                 },
                 'rule_specs': [{
@@ -6366,11 +6393,6 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_not_mergeable_when_interaction_id_changes_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         test_dict: Dict[str, str] = {}
         # Changes to the properties affected by or affecting
         # interaction id and in interaction_id itself.
@@ -6406,7 +6428,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'buttonText': {
                     'value': {
-                        'content_id': 'ca_buttonText_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
                         'unicode_str': 'Continue'
                     }
                 }
@@ -6417,7 +6440,9 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'widget_customization_args'
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Changed Contents and Hint')
 
         # Changes to the properties affected by or affecting
@@ -6455,7 +6480,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'buttonText': {
                     'value': {
-                        'content_id': 'ca_buttonText_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
                         'unicode_str': 'Continue'
                     }
                 }
@@ -6473,17 +6499,13 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_mergeable_when_customization_args_changes_do_not_conflict(  # pylint: disable=line-too-long
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         test_dict: Dict[str, str] = {}
         # Changes in the properties which aren't affected by
         # customization args or doesn't affects customization_args.
         change_list = [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
@@ -6496,7 +6518,8 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_1',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>This is a first hint.</p>'
                 }
             }],
@@ -6507,12 +6530,14 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_1',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>This is a first hint.</p>'
                 }
             }, {
                 'hint_content': {
-                    'content_id': 'hint_2',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
                     'html': '<p>This is the second hint.</p>'
                 }
             }],
@@ -6527,7 +6552,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
                 'html': '<p>Congratulations, you have finished!</p>'
             },
             'state_name': 'End',
@@ -6539,7 +6565,9 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'content'
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Changed Contents and Hints')
 
         # Changes to the properties affecting customization_args
@@ -6578,7 +6606,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'value':
                     {
-                        'content_id': 'ca_placeholder_0',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
                         'unicode_str': 'Placeholder text'
                     }
                 },
@@ -6661,7 +6690,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     {
                         'feedback':
                         {
-                            'content_id': 'feedback_3',
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                             'html': '<p>Next</p>'
                         },
                         'param_changes': [],
@@ -6730,16 +6760,20 @@ class ExplorationChangesMergeabilityUnitTests(
                 'choices': {
                     'value': [{
                         'html': '<p>A</p>',
-                        'content_id': 'ca_choices_0'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.RULE)
                     }, {
                         'html': '<p>B</p>',
-                        'content_id': 'ca_choices_1'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.RULE)
                     }, {
                         'html': '<p>C</p>',
-                        'content_id': 'ca_choices_2'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.RULE)
                     }, {
                         'html': '<p>D</p>',
-                        'content_id': 'ca_choices_3'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.RULE)
                     }]
                 },
                 'maxAllowableSelectionCount': {
@@ -6758,7 +6792,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'html': '',
-                    'content_id': 'default_outcome'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'param_changes': [],
                 'labelled_as_correct': False
@@ -6782,7 +6817,8 @@ class ExplorationChangesMergeabilityUnitTests(
                         'feedback':
                         {
                             'html': '<p>Good</p>',
-                            'content_id': 'feedback_4'
+                            'content_id': self.content_id_generator.generate(
+                                translation_domain.ContentType.FEEDBACK)
                         },
                         'param_changes': [],
                         'labelled_as_correct': False
@@ -6811,11 +6847,6 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_not_mergeable_when_customization_args_changes_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         test_dict: Dict[str, str] = {}
         # Changes in the properties which affected by or affecting
         # customization_args.
@@ -6850,7 +6881,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'value':
                     {
-                        'content_id': 'ca_placeholder_0',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'unicode_str': 'Placeholder text'
                     }
                 },
@@ -6933,7 +6965,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     {
                         'feedback':
                         {
-                            'content_id': 'feedback_3',
+                            'content_id': self.content_id_generator.generate(
+                                translation_domain.ContentType.FEEDBACK),
                             'html': '<p>Next</p>'
                         },
                         'param_changes': [],
@@ -6948,7 +6981,9 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Changed Customization Args and related properties again')
 
         # Changes to the customization_args in same
@@ -6975,7 +7010,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'value':
                     {
-                        'content_id': 'ca_placeholder_0',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
                         'unicode_str': 'Placeholder text 2.'
                     }
                 },
@@ -6994,11 +7030,6 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_mergeable_when_answer_groups_changes_do_not_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         # Adding answer_groups and solutions to the existing state.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
@@ -7010,7 +7041,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'rule_type': 'StartsWith',
                     'inputs': {
                         'x': {
-                            'contentId': 'rule_input_2',
+                            'contentId':  self.content_id_generator.generate(
+                                translation_domain.ContentType.RULE),
                             'normalizedStrSet': ['Hello', 'Hola']
                         }
                     }
@@ -7019,7 +7051,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'labelled_as_correct': False,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7037,7 +7070,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_3',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': '<p>Hint 1.</p>'
                 }
             }]
@@ -7049,7 +7083,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'correct_answer': 'Hello Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': '<p>Explanation.</p>'
                 },
                 'answer_is_exclusive': False
@@ -7057,7 +7092,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Added answer groups and solution')
 
         # Changes to the properties that are not related to
@@ -7066,7 +7103,8 @@ class ExplorationChangesMergeabilityUnitTests(
         # they can be merged easily.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
@@ -7079,12 +7117,14 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_3',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
                     'html': '<p>Hint 1.</p>'
                 }
             }, {
                 'hint_content': {
-                    'content_id': 'hint_4',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
                     'html': '<p>This is a first hint.</p>'
                 }
             }],
@@ -7099,7 +7139,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
                 'html': '<p>Congratulations, you have finished!</p>'
             },
             'state_name': 'End',
@@ -7111,7 +7152,9 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'content'
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Changed Contents and Hint')
 
         change_list_3 = [exp_domain.ExplorationChange({
@@ -7137,7 +7180,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'refresher_exploration_id': None,
                 'feedback': {
-                    'content_id': 'default_outcome',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
                     'html': '<p>Feedback 1.</p>'
                 },
                 'param_changes': [
@@ -7158,7 +7202,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7216,7 +7261,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hi Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -7235,7 +7281,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7259,7 +7306,8 @@ class ExplorationChangesMergeabilityUnitTests(
             }, {
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_4',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7314,7 +7362,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Oppia is selected for GSoC.',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -7324,7 +7373,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hi Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': 'solution_5',
                     'html': '<p>Explanation.</p>'
                 }
             }
@@ -7395,16 +7444,20 @@ class ExplorationChangesMergeabilityUnitTests(
                 'choices': {
                     'value': [{
                         'html': '<p>A</p>',
-                        'content_id': 'ca_choices_0'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG)
                     }, {
                         'html': '<p>B</p>',
-                        'content_id': 'ca_choices_1'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG)
                     }, {
                         'html': '<p>C</p>',
-                        'content_id': 'ca_choices_2'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG)
                     }, {
                         'html': '<p>D</p>',
-                        'content_id': 'ca_choices_3'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG)
                     }]
                 },
                 'maxAllowableSelectionCount': {
@@ -7423,7 +7476,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'html': '',
-                    'content_id': 'default_outcome'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
                 },
                 'param_changes': [],
                 'labelled_as_correct': False
@@ -7443,7 +7497,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'html': '<p>Good</p>',
-                        'content_id': 'feedback_4'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                     },
                     'param_changes': [],
                     'labelled_as_correct': False
@@ -7464,11 +7519,6 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_not_mergeable_when_answer_groups_changes_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         # Adding answer_groups and solutions to the existing state.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
@@ -7489,7 +7539,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'labelled_as_correct': False,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7507,7 +7558,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_3',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>Hint 1.</p>'
                 }
             }]
@@ -7519,7 +7571,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'correct_answer': 'Hello Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 },
                 'answer_is_exclusive': False
@@ -7527,7 +7580,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Added answer groups and solution')
 
         # Changes to the answer_groups and the properties that
@@ -7537,7 +7592,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7595,7 +7651,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hi Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -7614,7 +7671,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7638,7 +7696,8 @@ class ExplorationChangesMergeabilityUnitTests(
             }, {
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_4',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7693,7 +7752,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Oppia is selected for GSoC.',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -7709,7 +7769,9 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Changed Answer Groups and related properties')
 
         # Changes to the answer group in same state again
@@ -7719,7 +7781,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7779,11 +7842,6 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_mergeable_when_solutions_changes_do_not_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         # Adding new answer_groups and solutions.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
@@ -7807,7 +7865,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'labelled_as_correct': False,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7825,7 +7884,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_3',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>Hint 1.</p>'
                 }
             }]
@@ -7837,7 +7897,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'correct_answer': 'Hello Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 },
                 'answer_is_exclusive': False
@@ -7850,13 +7911,16 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Added answer groups and solution')
 
         # Changes to the properties unrelated to the solutions.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
@@ -7869,12 +7933,14 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_3',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>Hint 1.</p>'
                 }
             }, {
                 'hint_content': {
-                    'content_id': 'hint_4',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>This is a first hint.</p>'
                 }
             }],
@@ -7889,7 +7955,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
                 'html': '<p>Congratulations, you have finished!</p>'
             },
             'state_name': 'End',
@@ -7906,7 +7973,9 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': True
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Changed Contents and Hint')
 
         # Changes to the solutions and the properties that affects
@@ -7916,7 +7985,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -7971,7 +8041,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hi Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -7981,7 +8052,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hello Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             }
@@ -7990,7 +8062,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -8014,7 +8087,8 @@ class ExplorationChangesMergeabilityUnitTests(
             }, {
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_4',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'missing_prerequisite_skill_id': None,
@@ -8069,7 +8143,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Oppia is selected for GSoC.',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -8079,7 +8154,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hi Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             }
@@ -8149,7 +8225,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'refresher_exploration_id': None,
                 'feedback': {
                     'html': '',
-                    'content_id': 'default_outcome'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
                 }
             },
             'cmd': 'edit_state_property',
@@ -8167,7 +8244,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'refresher_exploration_id': None,
                     'feedback': {
                         'html': '<p>Good</p>',
-                        'content_id': 'feedback_0'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                     }
                 },
                 'training_data': [],
@@ -8187,7 +8265,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Hint 1. State 2.</p>',
-                    'content_id': 'hint_1'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }],
             'cmd': 'edit_state_property',
@@ -8199,7 +8278,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'correct_answer': 30,
                 'explanation': {
                     'html': '<p>Explanation.</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 },
                 'answer_is_exclusive': False
             },
@@ -8211,7 +8291,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'correct_answer': 30,
                 'explanation': {
                     'html': '<p>Explanation.</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 },
                 'answer_is_exclusive': False
             },
@@ -8219,7 +8300,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'correct_answer': 10,
                 'explanation': {
                     'html': '<p>Explanation.</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 },
                 'answer_is_exclusive': False
             },
@@ -8235,11 +8317,6 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_not_mergeable_when_solutions_changes_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         # Adding new answer_groups and solutions.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
@@ -8263,7 +8340,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'labelled_as_correct': False,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -8281,7 +8359,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
-                    'content_id': 'hint_3',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
                     'html': '<p>Hint 1.</p>'
                 }
             }]
@@ -8293,7 +8372,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'correct_answer': 'Hello Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 },
                 'answer_is_exclusive': False
@@ -8301,7 +8381,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Added answer groups and solution')
 
         # Changes to the solutions and the properties that affects
@@ -8311,7 +8393,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -8366,7 +8449,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hi Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -8385,7 +8469,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
@@ -8409,7 +8494,8 @@ class ExplorationChangesMergeabilityUnitTests(
             }, {
                 'outcome': {
                     'feedback': {
-                        'content_id': 'feedback_4',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'missing_prerequisite_skill_id': None,
@@ -8464,7 +8550,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Oppia is selected for GSoC.',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -8480,7 +8567,9 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Changed Solutions and affected properties')
 
         # Change to the solution of same state again
@@ -8491,7 +8580,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hello Aryaman!',
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 }
             },
@@ -8514,17 +8604,13 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_mergeable_when_hints_changes_do_not_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        # Adding hints to the existing state.
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
         change_list = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Hint 1.</p>',
-                    'content_id': 'hint_1'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }],
             'property_name': 'hints',
@@ -8536,7 +8622,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'explanation': {
                     'html': '<p>Explanation</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 },
                 'correct_answer': 'Hello'
             },
@@ -8546,7 +8633,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Added Hint and Solution in Introduction state')
 
         test_dict: Dict[str, str] = {}
@@ -8557,7 +8646,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'old_value': {
                 'html': '',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
             },
             'new_value': {
                 'html': '<p>Content in Introduction.</p>',
@@ -8578,7 +8668,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'explanation': {
                     'html': '<p>Explanation</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 },
                 'answer_is_exclusive': False,
                 'correct_answer': 'Hello Aryaman'
@@ -8664,7 +8755,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'dest_if_really_stuck': None,
                     'feedback': {
                         'html': '',
-                        'content_id': 'feedback_2'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                     },
                     'param_changes': []
                 }
@@ -8677,7 +8769,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'explanation': {
                     'html': '<p>Explanation</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 },
                 'answer_is_exclusive': False,
                 'correct_answer': 42
@@ -8692,7 +8785,8 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'new_value': {
                 'html': '<p>Congratulations, you have finished!</p>',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
             }
         }), exp_domain.ExplorationChange({
             'property_name': 'title',
@@ -8714,7 +8808,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'explanation': {
                     'html': '<p>Explanation</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 },
                 'answer_is_exclusive': False,
                 'correct_answer': 40
@@ -8722,7 +8817,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Made changes in interaction, contents, solutions, answer_groups in both states') # pylint: disable=line-too-long
 
         # Changes to the old hints and also deleted and added
@@ -8739,12 +8836,14 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Hint 1.</p>',
-                    'content_id': 'hint_1'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }, {
                 'hint_content': {
                     'html': '<p>Hint 2.</p>',
-                    'content_id': 'hint_2'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }],
             'state_name': 'Introduction'
@@ -8765,12 +8864,14 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Changed hint 1.</p>',
-                    'content_id': 'hint_1'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }, {
                 'hint_content': {
                     'html': '<p>Hint 2.</p>',
-                    'content_id': 'hint_2'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }],
             'state_name': 'Introduction'
@@ -8792,12 +8893,14 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'hint_content': {
                         'html': '<p>Hint 2.</p>',
-                        'content_id': 'hint_2'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                     }
                 }, {
                     'hint_content': {
                         'html': '<p>Changed hint 1.</p>',
-                        'content_id': 'hint_1'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                     }
                 }
             ],
@@ -8811,17 +8914,13 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_not_mergeable_when_hints_changes_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        # Adding hints to the existing state.
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
         change_list = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Hint 1.</p>',
-                    'content_id': 'hint_1'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }],
             'property_name': 'hints',
@@ -8833,7 +8932,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'explanation': {
                     'html': '<p>Explanation</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 },
                 'correct_answer': 'Hello'
             },
@@ -8843,7 +8943,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Added Hint and Solution in Introduction state')
 
         # Changes to the old hints and also deleted and added
@@ -8860,12 +8962,14 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Hint 1.</p>',
-                    'content_id': 'hint_1'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                 }
             }, {
                 'hint_content': {
                     'html': '<p>Hint 2.</p>',
-                    'content_id': 'hint_2'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                 }
             }],
             'state_name': 'Introduction'
@@ -8878,7 +8982,8 @@ class ExplorationChangesMergeabilityUnitTests(
             }, {
                 'hint_content': {
                     'html': '<p>Hint 2.</p>',
-                    'content_id': 'hint_2'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }],
             'cmd': 'edit_state_property',
@@ -8886,12 +8991,14 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Changed hint 1.</p>',
-                    'content_id': 'hint_1'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }, {
                 'hint_content': {
                     'html': '<p>Hint 2.</p>',
-                    'content_id': 'hint_2'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }],
             'state_name': 'Introduction'
@@ -8913,19 +9020,23 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'hint_content': {
                         'html': '<p>Hint 2.</p>',
-                        'content_id': 'hint_2'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                     }
                 }, {
                     'hint_content': {
                         'html': '<p>Changed hint 1.</p>',
-                        'content_id': 'hint_1'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                     }
                 }
             ],
             'state_name': 'Introduction'
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Changes in the hints again.')
 
         change_list_3 = [exp_domain.ExplorationChange({
@@ -8940,7 +9051,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'hint_content': {
                     'html': '<p>Changed Hint 1.</p>',
-                    'content_id': 'hint_1'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
                 }
             }],
             'state_name': 'Introduction'
@@ -8953,11 +9065,6 @@ class ExplorationChangesMergeabilityUnitTests(
     def test_changes_are_mergeable_when_exploration_properties_changes_do_not_conflict(  # pylint: disable=line-too-long
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         test_dict: Dict[str, str] = {}
         # Changes to all the properties of both states other than
         # exploration properties i.e. title, category, objective etc.
@@ -8967,7 +9074,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'new_value': {
                 'html': '<p>Content</p>',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
@@ -8981,7 +9089,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'hint_content': {
                         'html': '<p>Hint 1.</p>',
-                        'content_id': 'hint_1'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                     }
                 }
             ],
@@ -9042,7 +9151,8 @@ class ExplorationChangesMergeabilityUnitTests(
                         'refresher_exploration_id': None,
                         'feedback': {
                             'html': '<p>Good.</p>',
-                            'content_id': 'feedback_2'
+                            'content_id': self.content_id_generator.generate(
+                                translation_domain.ContentType.FEEDBACK)
                         },
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False,
@@ -9071,7 +9181,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'refresher_exploration_id': None,
                 'feedback': {
                     'html': '<p>Try Again.</p>',
-                    'content_id': 'default_outcome'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
                 },
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
@@ -9101,7 +9212,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'refresher_exploration_id': None,
                 'feedback': {
                     'html': '<p>Try Again.</p>',
-                    'content_id': 'default_outcome'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
                 },
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
@@ -9129,7 +9241,9 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Made changes in interaction, contents, solutions, answer_groups in introduction state.') # pylint: disable=line-too-long
 
         # Changes to properties of second state.
@@ -9140,7 +9254,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'correct_answer': 25,
                 'explanation': {
                     'html': '<p>Explanation.</p>',
-                    'content_id': 'solution'
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
                 }
             },
             'cmd': 'edit_state_property',
@@ -9152,13 +9267,15 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'hint_content': {
                         'html': '<p>Hint 1.</p>',
-                        'content_id': 'hint_1'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                     }
                 },
                 {
                     'hint_content': {
                         'html': '<p>Hint 2.</p>',
-                        'content_id': 'hint_3'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
                     }
                 }
             ],
@@ -9174,7 +9291,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End',
             'new_value': {
                 'html': '<p>Congratulations, you have finished!</p>',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.HINT)
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
@@ -9189,7 +9307,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Made changes in solutions in introduction state and content, state_name in end state.') # pylint: disable=line-too-long
 
         # Changes to the exploration properties to check
@@ -9330,7 +9450,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Changes in the Exploration Properties.')
 
         change_list_2 = [exp_domain.ExplorationChange({
@@ -9376,663 +9498,23 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    def test_changes_are_mergeable_when_translations_changes_do_not_conflict(
-        self
-    ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
-        # Adding content, feedbacks, solutions so that
-        # voiceovers can be added later on.
-        change_list = [exp_domain.ExplorationChange({
-            'property_name': 'content',
-            'old_value': {
-                'content_id': 'content_0',
-                'html': ''
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'content_id': 'content_0',
-                'html': '<p>First State Content.</p>'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'widget_customization_args',
-            'old_value': {
-                'placeholder': {
-                    'value': {
-                        'unicode_str': '',
-                        'content_id': 'ca_placeholder_0'
-                    }
-                },
-                'rows': {
-                    'value': 1
-                }
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'placeholder': {
-                    'value': {
-                        'unicode_str': 'Placeholder',
-                        'content_id': 'ca_placeholder_0'
-                    }
-                },
-                'rows': {
-                    'value': 1
-                }
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'default_outcome',
-            'old_value': {
-                'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
-                'refresher_exploration_id': None,
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': ''
-                },
-                'param_changes': [],
-                'dest_if_really_stuck': None,
-                'dest': 'End'
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
-                'refresher_exploration_id': None,
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': '<p>Feedback 1.</p>'
-                },
-                'param_changes': [
-
-                ],
-                'dest_if_really_stuck': None,
-                'dest': 'End'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'hints',
-            'old_value': ['old_value'],
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': [
-                {
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': '<p>Hint 1.</p>'
-                    }
-                }
-            ]
-        }), exp_domain.ExplorationChange({
-            'property_name': 'solution',
-            'old_value': None,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'answer_is_exclusive': False,
-                'explanation': {
-                    'content_id': 'solution',
-                    'html': '<p>Explanation.</p>'
-                },
-                'correct_answer': 'Solution'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'content',
-            'old_value': {
-                'content_id': 'content_0',
-                'html': ''
-            },
-            'state_name': 'End',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'content_id': 'content',
-                'html': '<p>Second State Content.</p>'
-            }
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
-            'Added various contents.')
-
-        change_list_2 = [exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'property_name': 'answer_groups',
-            'old_value': ['old_value'],
-            'state_name': 'Introduction',
-            'new_value': [{
-                'rule_specs': [{
-                    'rule_type': 'StartsWith',
-                    'inputs': {
-                        'x': {
-                            'contentId': 'rule_input_2',
-                            'normalizedStrSet': [
-                                'Hello',
-                                'Hola'
-                            ]
-                        }
-                    }
-                }],
-                'tagged_skill_misconception_id': None,
-                'outcome': {
-                    'labelled_as_correct': False,
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'missing_prerequisite_skill_id': None,
-                    'dest': 'End',
-                    'dest_if_really_stuck': None,
-                    'param_changes': [],
-                    'refresher_exploration_id': None
-                },
-                'training_data': []
-            }]
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
-            'Added answer group.')
-
-        # Adding some translations to the first state.
-        change_list_3 = [exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'content',
-            'translation_html': '<p>Translation Content.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'default_outcome',
-            'translation_html': '<p>Translation Feedback 1.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'cmd': 'mark_written_translations_as_needing_update',
-            'state_name': 'Introduction',
-            'content_id': 'default_outcome'
-        })]
-
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list_3)
-        self.assertEqual(changes_are_mergeable, True)
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_3,
-            'Added some translations.')
-
-        # Adding translations again to the different contents
-        # of same state to check that they can be merged.
-        change_list_4 = [exp_domain.ExplorationChange({
-            'new_state_name': 'Intro-Rename',
-            'cmd': 'rename_state',
-            'old_state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'content_html': 'N/A',
-            'translation_html': 'Placeholder Translation.',
-            'state_name': 'Intro-Rename',
-            'language_code': 'de',
-            'content_id': 'ca_placeholder_0',
-            'cmd': 'add_written_translation',
-            'data_format': 'unicode'
-        }), exp_domain.ExplorationChange({
-            'content_html': 'N/A',
-            'translation_html': '<p>Hints Translation.</p>',
-            'state_name': 'Intro-Rename',
-            'language_code': 'de',
-            'content_id': 'hint_1',
-            'cmd': 'add_written_translation',
-            'data_format': 'html'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'rule_input_2',
-            'translation_html': '<p>Translation Rule Input.</p>',
-            'state_name': 'Intro-Rename',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'feedback_1',
-            'translation_html': '<p>Translation Feedback.</p>',
-            'state_name': 'Intro-Rename',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'solution',
-            'translation_html': '<p>Translation Solution.</p>',
-            'state_name': 'Intro-Rename',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'new_state_name': 'Introduction',
-            'cmd': 'rename_state',
-            'old_state_name': 'Intro-Rename'
-        })]
-
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 3, change_list_4)
-        self.assertEqual(changes_are_mergeable, True)
-
-        # Adding translations to the second state to check
-        # that they can be merged even in the same property.
-        change_list_5 = [exp_domain.ExplorationChange({
-            'content_html': 'N/A',
-            'translation_html': '<p>State 2 Content Translation.</p>',
-            'state_name': 'End',
-            'language_code': 'de',
-            'content_id': 'content',
-            'cmd': 'add_written_translation',
-            'data_format': 'html'
-        })]
-
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 3, change_list_5)
-        self.assertEqual(changes_are_mergeable_1, True)
-
-        # Add changes to the different content of first state to
-        # check that translation changes to some properties doesn't
-        # affects the changes of content of other properties.
-        change_list_6 = [exp_domain.ExplorationChange({
-            'old_value': {
-                'rows': {
-                    'value': 1
-                },
-                'placeholder': {
-                    'value': {
-                        'unicode_str': 'Placeholder',
-                        'content_id': 'ca_placeholder_0'
-                    }
-                }
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'rows': {
-                    'value': 1
-                },
-                'placeholder': {
-                    'value': {
-                        'unicode_str': 'Placeholder Changed.',
-                        'content_id': 'ca_placeholder_0'
-                    }
-                }
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'default_outcome',
-            'old_value': {
-                'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
-                'refresher_exploration_id': None,
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': 'Feedback 1.'
-                },
-                'param_changes': [
-
-                ],
-                'dest_if_really_stuck': None,
-                'dest': 'End'
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
-                'refresher_exploration_id': None,
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': '<p>Feedback 2.</p>'
-                },
-                'param_changes': [
-
-                ],
-                'dest_if_really_stuck': None,
-                'dest': 'End'
-            }
-        })]
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_6,
-            'Changing Customization Args Placeholder in First State.')
-        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 4, change_list_5)
-        self.assertEqual(changes_are_mergeable_3, True)
-
-    def test_changes_are_not_mergeable_when_translations_changes_conflict(
-        self
-    ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
-        # Adding content, feedbacks, solutions so that
-        # translations can be added later on.
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'property_name': 'answer_groups',
-            'old_value': ['old_value'],
-            'state_name': 'Introduction',
-            'new_value': [{
-                'rule_specs': [{
-                    'rule_type': 'StartsWith',
-                    'inputs': {
-                        'x': {
-                            'contentId': 'rule_input_2',
-                            'normalizedStrSet': [
-                                'Hello',
-                                'Hola'
-                            ]
-                        }
-                    }
-                }],
-                'tagged_skill_misconception_id': None,
-                'outcome': {
-                    'labelled_as_correct': False,
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'missing_prerequisite_skill_id': None,
-                    'dest': 'End',
-                    'dest_if_really_stuck': None,
-                    'param_changes': [],
-                    'refresher_exploration_id': None
-                },
-                'training_data': []
-            }]
-        }), exp_domain.ExplorationChange({
-            'property_name': 'content',
-            'old_value': {
-                'content_id': 'content',
-                'html': ''
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'content_id': 'content',
-                'html': '<p>First State Content.</p>'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'widget_customization_args',
-            'old_value': {
-                'placeholder': {
-                    'value': {
-                        'unicode_str': '',
-                        'content_id': 'ca_placeholder_0'
-                    }
-                },
-                'rows': {
-                    'value': 1
-                }
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'placeholder': {
-                    'value': {
-                        'unicode_str': 'Placeholder',
-                        'content_id': 'ca_placeholder_0'
-                    }
-                },
-                'rows': {
-                    'value': 1
-                }
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'default_outcome',
-            'old_value': {
-                'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
-                'refresher_exploration_id': None,
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': ''
-                },
-                'param_changes': [
-
-                ],
-                'dest_if_really_stuck': None,
-                'dest': 'End'
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
-                'refresher_exploration_id': None,
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': '<p>Feedback 1.</p>'
-                },
-                'param_changes': [
-
-                ],
-                'dest_if_really_stuck': None,
-                'dest': 'End'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'hints',
-            'old_value': ['old_value'],
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': [
-                {
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': '<p>Hint 1.</p>'
-                    }
-                }
-            ]
-        }), exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': 2
-        }), exp_domain.ExplorationChange({
-            'property_name': 'solution',
-            'old_value': None,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'answer_is_exclusive': False,
-                'explanation': {
-                    'content_id': 'solution',
-                    'html': '<p>Explanation.</p>'
-                },
-                'correct_answer': 'Solution'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'content',
-            'old_value': {
-                'content_id': 'content',
-                'html': ''
-            },
-            'state_name': 'End',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'content_id': 'content',
-                'html': '<p>Second State Content.</p>'
-            }
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
-            'Added various contents.')
-
-        # Adding some translations to the first state.
-        change_list_2 = [exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'old_value': {
-                'content_id': 'content',
-                'html': '<p>First State Content.</p>'
-            },
-            'new_value': {
-                'content_id': 'content',
-                'html': '<p>Changed First State Content.</p>'
-            },
-            'property_name': 'content',
-            'cmd': 'edit_state_property'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'content',
-            'translation_html': '<p>Translation Content.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'default_outcome',
-            'translation_html': '<p>Translation Feedback 1.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'ca_placeholder_0',
-            'translation_html': '<p>Translation Placeholder.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'hint_1',
-            'translation_html': '<p>Translation Hint.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'solution',
-            'translation_html': '<p>Translation Solution.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'rule_input_2',
-            'translation_html': '<p>Translation Rule Input.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'new_state_name': 'Intro-Rename',
-            'cmd': 'rename_state',
-            'old_state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'de',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'feedback_1',
-            'translation_html': '<p>Translation Feedback.</p>',
-            'state_name': 'Intro-Rename',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'new_state_name': 'Introduction',
-            'cmd': 'rename_state',
-            'old_state_name': 'Intro-Rename'
-        })]
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
-            'Added some translations.')
-
-        # Adding translations again to the same contents
-        # of same state to check that they can not be
-        # merged.
-        change_list_3 = [exp_domain.ExplorationChange({
-            'language_code': 'bn',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'content',
-            'translation_html': '<p>Translation Content.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        }), exp_domain.ExplorationChange({
-            'language_code': 'bn',
-            'data_format': 'html',
-            'cmd': 'add_written_translation',
-            'content_id': 'default_outcome',
-            'translation_html': '<p>Translation Feedback 1.</p>',
-            'state_name': 'Introduction',
-            'content_html': 'N/A'
-        })]
-
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list_3)
-        self.assertEqual(changes_are_not_mergeable, False)
-
-        # Changes to the content of second state to check that
-        # the changes to the translations can not be made in
-        # same state if the property which can be translated is
-        # changed.
-        change_list_3 = [exp_domain.ExplorationChange({
-            'state_name': 'End',
-            'old_value': {
-                'content_id': 'content',
-                'html': '<p>Second State Content.</p>'
-            },
-            'new_value': {
-                'content_id': 'content',
-                'html': '<p>Changed Second State Content.</p>'
-            },
-            'property_name': 'content',
-            'cmd': 'edit_state_property'
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_3,
-            'Changing Content in Second State.')
-
-        # Adding translations to the same property in
-        # second state to check that they can not be merged.
-        change_list_4 = [exp_domain.ExplorationChange({
-            'content_html': 'N/A',
-            'translation_html': '<p>State 2 Content Translation.</p>',
-            'state_name': 'End',
-            'language_code': 'de',
-            'content_id': 'content',
-            'cmd': 'add_written_translation',
-            'data_format': 'html'
-        })]
-        changes_are_not_mergeable_1 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 3, change_list_4)
-        self.assertEqual(changes_are_not_mergeable_1, False)
-
     def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(
         self
     ) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
-
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-
         # Adding content, feedbacks, solutions so that
         # voiceovers can be added later on.
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': ''
             },
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>First State Content.</p>'
             }
         }), exp_domain.ExplorationChange({
@@ -10041,7 +9523,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'placeholder': {
                     'value': {
                         'unicode_str': '',
-                        'content_id': 'ca_placeholder_0'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                     }
                 },
                 'rows': {
@@ -10054,7 +9537,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'placeholder': {
                     'value': {
                         'unicode_str': 'Placeholder',
-                        'content_id': 'ca_placeholder_0'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                     }
                 },
                 'rows': {
@@ -10068,7 +9552,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'refresher_exploration_id': None,
                 'feedback': {
-                    'content_id': 'default_outcome',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': ''
                 },
                 'param_changes': [
@@ -10084,7 +9569,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'refresher_exploration_id': None,
                 'feedback': {
-                    'content_id': 'default_outcome',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': '<p>Feedback 1.</p>'
                 },
                 'param_changes': [
@@ -10101,17 +9587,12 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [
                 {
                     'hint_content': {
-                        'content_id': 'hint_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Hint 1.</p>'
                     }
                 }
             ]
-        }), exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': 2
         }), exp_domain.ExplorationChange({
             'property_name': 'solution',
             'old_value': None,
@@ -10120,7 +9601,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'answer_is_exclusive': False,
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': '<p>Explanation.</p>'
                 },
                 'correct_answer': 'Solution'
@@ -10128,18 +9610,22 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': ''
             },
             'state_name': 'End',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>Second State Content.</p>'
             }
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Added various contents.')
 
         # Adding change to the field which is neither
@@ -10151,7 +9637,9 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': True
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Added single unrelated change.')
 
         # Adding some voiceovers to the first state.
@@ -10233,7 +9721,9 @@ class ExplorationChangesMergeabilityUnitTests(
         self.assertEqual(changes_are_mergeable, True)
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_3,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_3),
+
             'Added some voiceovers.')
 
         # Adding voiceovers again to the same first state
@@ -10312,11 +9802,13 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_6 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>First State Content.</p>'
             },
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>Changed First State Content.</p>'
             },
             'property_name': 'content',
@@ -10324,7 +9816,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_6,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_6),
+
             'Changing Content in First State.')
         changes_are_mergeable_3 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_5)
@@ -10337,11 +9831,13 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_6 = [exp_domain.ExplorationChange({
             'state_name': 'End',
             'old_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>Second State Content.</p>'
             },
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>Changed Second State Content.</p>'
             },
             'property_name': 'content',
@@ -10349,7 +9845,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_6,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_6),
+
             'Changing Content in Second State.')
 
         changes_are_not_mergeable = exp_services.are_changes_mergeable(
@@ -10369,13 +9867,15 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': ''
             },
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>First State Content.</p>'
             }
         }), exp_domain.ExplorationChange({
@@ -10384,7 +9884,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'placeholder': {
                     'value': {
                         'unicode_str': '',
-                        'content_id': 'ca_placeholder_0'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                     }
                 },
                 'rows': {
@@ -10397,7 +9898,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'placeholder': {
                     'value': {
                         'unicode_str': 'Placeholder',
-                        'content_id': 'ca_placeholder_0'
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                     }
                 },
                 'rows': {
@@ -10411,7 +9913,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'refresher_exploration_id': None,
                 'feedback': {
-                    'content_id': 'default_outcome',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': ''
                 },
                 'param_changes': [
@@ -10427,7 +9930,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'refresher_exploration_id': None,
                 'feedback': {
-                    'content_id': 'default_outcome',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': '<p>Feedback 1.</p>'
                 },
                 'param_changes': [
@@ -10444,7 +9948,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [
                 {
                     'hint_content': {
-                        'content_id': 'hint_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Hint 1.</p>'
                     }
                 }
@@ -10457,7 +9962,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'answer_is_exclusive': False,
                 'explanation': {
-                    'content_id': 'solution',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': '<p>Explanation.</p>'
                 },
                 'correct_answer': 'Solution'
@@ -10465,18 +9971,22 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': ''
             },
             'state_name': 'End',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>Second State Content.</p>'
             }
         })]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Added various contents.')
 
         # Adding some voiceovers to the first state.
@@ -10555,7 +10065,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+
             'Added some voiceovers.')
 
         # Adding voiceovers again to the same first state
@@ -10618,7 +10130,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'ca_placeholder_0',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'unicode_str': ''
                     }
                 },
@@ -10676,7 +10189,8 @@ class ExplorationChangesMergeabilityUnitTests(
                         'dest': 'End',
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
-                            'content_id': 'feedback_1',
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                             'html': ''
                         },
                         'labelled_as_correct': False,
@@ -10692,7 +10206,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [
                 {
                     'hint_content': {
-                        'content_id': 'hint_2',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Hint.</p>'
                     }
                 }
@@ -10700,20 +10215,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': 'Congratulations, you have finished!'
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>2Congratulations, you have finished!</p>'
             },
             'state_name': 'End'
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+
             'Changed various properties in both states.')
 
         # Change to the unrelated property to check that
@@ -10721,11 +10240,13 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_2 = [exp_domain.ExplorationChange({
             'old_value': {
                 'html': '',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
             },
             'new_value': {
                 'html': '<p>Hello Aryaman!</p>',
-                'content_id': 'content_0'
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
             },
             'state_name': 'Introduction',
             'property_name': 'content',
@@ -10783,7 +10304,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'labelled_as_correct': False,
@@ -10807,7 +10329,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'labelled_as_correct': False,
@@ -10822,7 +10345,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
-                    'content_id': 'default_outcome',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': ''
                 },
                 'labelled_as_correct': False,
@@ -10836,7 +10360,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'dest_if_really_stuck': 'End',
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
-                    'content_id': 'default_outcome',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': ''
                 },
                 'labelled_as_correct': False,
@@ -10845,13 +10370,15 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': ''
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': 'Congratulations, you have finished!'
             },
             'state_name': 'End'
@@ -10878,7 +10405,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
-                    'content_id': 'default_outcome',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': ''
                 },
                 'labelled_as_correct': False,
@@ -10891,7 +10419,9 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_3,
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_3),
+
             'Added and deleted states.')
 
         # Checking that old changes that could be
@@ -10922,7 +10452,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'ca_placeholder_0',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'unicode_str': ''
                     }
                 },
@@ -10962,7 +10493,8 @@ class ExplorationChangesMergeabilityUnitTests(
                         'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
-                            'content_id': 'feedback_1',
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                             'html': ''
                         },
                         'labelled_as_correct': False,
@@ -10978,7 +10510,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [
                 {
                     'hint_content': {
-                        'content_id': 'hint_2',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': '<p>Hint.</p>'
                     }
                 }
@@ -10986,13 +10519,15 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': 'Congratulations, you have finished!'
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
             'new_value': {
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'html': '<p>2Congratulations, you have finished!</p>'
             },
             'state_name': 'End'
@@ -11035,7 +10570,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'old_value': {
                     'placeholder': {
                         'value': {
-                            'content_id': 'ca_placeholder_0',
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                             'unicode_str': ''
                         }
                     },
@@ -11093,7 +10629,8 @@ class ExplorationChangesMergeabilityUnitTests(
                             'dest_if_really_stuck': None,
                             'missing_prerequisite_skill_id': None,
                             'feedback': {
-                                'content_id': 'feedback_1',
+                                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                                 'html': ''
                             },
                             'labelled_as_correct': False,
@@ -11109,7 +10646,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'new_value': [
                     {
                         'hint_content': {
-                            'content_id': 'hint_2',
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                             'html': '<p>Hint.</p>'
                         }
                     }
@@ -11117,20 +10655,24 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
                 'old_value': {
-                    'content_id': 'content_0',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': 'Congratulations, you have finished!'
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'new_value': {
-                    'content_id': 'content_0',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': '<p>2Congratulations, you have finished!</p>'
                 },
                 'state_name': 'End'
             })]
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, change_list,
+                self.owner_id, self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list),
+
                 'Changed various properties in both states.')
 
             change_list_2 = [exp_domain.ExplorationChange({
@@ -11177,7 +10719,8 @@ class ExplorationChangesMergeabilityUnitTests(
                         'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
-                            'content_id': 'feedback_1',
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                             'html': ''
                         },
                         'labelled_as_correct': False,
@@ -11201,7 +10744,8 @@ class ExplorationChangesMergeabilityUnitTests(
                         'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
-                            'content_id': 'feedback_1',
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                             'html': ''
                         },
                         'labelled_as_correct': False,
@@ -11216,7 +10760,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'labelled_as_correct': False,
@@ -11230,7 +10775,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'labelled_as_correct': False,
@@ -11239,13 +10785,15 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
                 'old_value': {
-                    'content_id': 'content_0',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'new_value': {
-                    'content_id': 'content_0',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                     'html': 'Congratulations, you have finished!'
                 },
                 'state_name': 'End'
@@ -11272,7 +10820,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'labelled_as_correct': False,
@@ -11285,16 +10834,20 @@ class ExplorationChangesMergeabilityUnitTests(
             })]
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, change_list_2,
+                self.owner_id, self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list_2),
+
                 'Added and deleted states.')
             change_list_3 = [exp_domain.ExplorationChange({
                 'old_value': {
                     'html': '',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'new_value': {
                     'html': '<p>Hello Aryaman!</p>',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'state_name': 'Introduction',
                 'property_name': 'content',
@@ -11310,11 +10863,13 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'Introduction',
                 'new_value': {
                     'html': '<p>Hello Aryaman!</p>',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'old_value': {
                     'html': '',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
             }]
 
@@ -11327,7 +10882,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
+                'Thanks!' % (self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list_3_dict),
+                1, 3)
             )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
@@ -11349,18 +10906,22 @@ class ExplorationChangesMergeabilityUnitTests(
             change_list = [exp_domain.ExplorationChange({
                 'old_value': {
                     'html': '',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'new_value': {
                     'html': '<p>End State</p>',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'state_name': 'End',
                 'property_name': 'content',
                 'cmd': 'edit_state_property'
             })]
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, change_list,
+                self.owner_id, self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list),
+
                 'Changed various properties in both states.')
 
             # State name changed.
@@ -11371,17 +10932,21 @@ class ExplorationChangesMergeabilityUnitTests(
             })]
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, change_list_2,
+                self.owner_id, self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list_2),
+
                 'Changed various properties in both states.')
 
             change_list_3 = [exp_domain.ExplorationChange({
                 'old_value': {
                     'html': 'End State',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'new_value': {
                     'html': '<p>End State Changed</p>',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'state_name': 'End',
                 'property_name': 'content',
@@ -11397,11 +10962,13 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'End',
                 'new_value': {
                     'html': '<p>End State Changed</p>',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
                 'old_value': {
                     'html': 'End State',
-                    'content_id': 'content_0'
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
                 },
             }]
             expected_email_html_body = (
@@ -11413,7 +10980,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
+                'Thanks!' % (self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list_3_dict),
+                2, 3)
             )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
@@ -11426,7 +10995,8 @@ class ExplorationChangesMergeabilityUnitTests(
                 'translation_html': '<p>State 2 Content Translation.</p>',
                 'state_name': 'End',
                 'language_code': 'de',
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'cmd': 'add_written_translation',
                 'data_format': 'html'
             })]
@@ -11437,7 +11007,8 @@ class ExplorationChangesMergeabilityUnitTests(
             change_list_4_dict = [{
                 'cmd': 'add_written_translation',
                 'state_name': 'End',
-                'content_id': 'content_0',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
                 'language_code': 'de',
                 'content_html': 'N/A',
                 'translation_html': '<p>State 2 Content Translation.</p>',
@@ -11452,7 +11023,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_4_dict, 2, 3)
+                'Thanks!' % (self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list_4_dict),
+                2, 3)
             )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)

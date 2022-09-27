@@ -2743,8 +2743,11 @@ class State(translation_domain.BaseTranslatableObject):
         Args:
             content: SubtitledHtml. Representation of updated content.
         """
+        old_content_id = self.content.content_id
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = content
+        self._update_content_ids_in_assets(
+            [old_content_id], [self.content.content_id])
 
     def update_param_changes(
         self, param_changes: List[param_domain.ParamChange]

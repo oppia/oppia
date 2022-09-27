@@ -37,8 +37,12 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
+import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-describe('Content translation manager service', () => {
+fdescribe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
   let ehfs: ExplorationHtmlFormatterService;
   let iof: InteractionObjectFactory;
@@ -49,7 +53,26 @@ describe('Content translation manager service', () => {
 
   let writtenTranslations: WrittenTranslations;
 
+  class MockActiveModal {
+    close(): void {
+      return;
+    }
+  }
+
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        TranslationsFetchingMessageModalComponent,
+        LoadingDotsComponent
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ]
+    });
     ctms = TestBed.inject(ContentTranslationManagerService);
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     iof = TestBed.inject(InteractionObjectFactory);

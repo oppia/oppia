@@ -30,6 +30,7 @@ import { ExtractImageFilenamesFromModelService } from
 import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 
 describe('Extracting Image file names in the state service', () => {
@@ -44,6 +45,7 @@ describe('Extracting Image file names in the state service', () => {
   let expectedImageFilenamesInSkill: string[];
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [CamelCaseToHyphensPipe]
     });
     eof = TestBed.inject(ExplorationObjectFactory);

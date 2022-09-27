@@ -244,7 +244,7 @@ describe('StateHintsEditorComponent', () => {
     ' changing active hint index', fakeAsync(() => {
     spyOn(stateHintsService, 'getActiveHintIndex').and.returnValue(0);
     stateHintsService.displayed = [
-      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1'))];
+      new Hint(SubtitledHtml.createDefault('', '1'))];
 
     component.changeActiveHintIndex(0);
     tick();

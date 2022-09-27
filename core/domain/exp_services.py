@@ -2710,7 +2710,6 @@ def are_changes_mergeable(
         return True
     if current_exploration.version < change_list_version:
         return False
-
     # A complete list of changes from one version to another
     # is composite_change_list.
     composite_change_list = get_composite_change_list(

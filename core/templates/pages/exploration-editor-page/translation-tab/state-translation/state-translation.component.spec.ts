@@ -40,9 +40,6 @@ import { StateEditorService } from
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
@@ -396,9 +393,6 @@ describe('State translation component', function() {
       'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value(
-      'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
-    $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
@@ -414,6 +408,13 @@ describe('State translation component', function() {
       StateRecordedVoiceoversService);
     subtitledUnicodeObjectFactory = TestBed.get(SubtitledUnicodeObjectFactory);
   });
+
+  beforeEach(angular.mock.inject(function ($injector, $componentController) {
+    entityTranslationsService = $injector.get('EntityTranslationsService');
+    entityTranslationsService.entityTranslation = {
+      getWrittenTranslation: () => { }
+    };
+  }));
 
   afterEach(function() {
     ctrl.$onDestroy();
@@ -704,7 +705,8 @@ describe('State translation component', function() {
         content_id: 'content_1',
         html: 'This is the html'
       });
-      expect($scope.getRequiredHtml(subtitledObject)).toBe('Translation');
+      expect($scope.getRequiredHtml(subtitledObject)).toBe(
+        'This is the html');
       expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
         'This is the html');
     });
@@ -1223,6 +1225,9 @@ describe('State translation component', function() {
         'TranslationTabActiveModeService');
 
       contextService.explorationId = 'expId';
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        'Introduction');
+
       entityTranslationsService.entityTranslation = {
         getWrittenTranslation: () => {}
       };

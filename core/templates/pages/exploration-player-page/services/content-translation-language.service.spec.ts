@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the content translation language service.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { ContentTranslationLanguageService } from
@@ -31,6 +32,10 @@ describe('Content translation language service', () => {
   let availableLanguageCodes: string[];
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
     ctls = TestBed.inject(ContentTranslationLanguageService);
     ctms = TestBed.inject(ContentTranslationManagerService);
     us = TestBed.inject(UrlService);

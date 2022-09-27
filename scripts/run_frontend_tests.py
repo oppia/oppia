@@ -30,7 +30,7 @@ from typing import Optional, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
-from . import install_third_party_libs  # isort:skip
+# from . import install_third_party_libs  # isort:skip
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
@@ -115,8 +115,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if parsed_args.dtslint_only:
         return
 
-    if not parsed_args.skip_install:
-        install_third_party_libs.main()
+    # if not parsed_args.skip_install:
+    #     install_third_party_libs.main()
 
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',

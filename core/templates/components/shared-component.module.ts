@@ -168,6 +168,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 
 @NgModule({
   imports: [
@@ -501,6 +502,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     FilteredChoicesFieldComponent,
     PracticeTabComponent,
     CollectionSummaryTileComponent,
+    TranslationsFetchingMessageModalComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
