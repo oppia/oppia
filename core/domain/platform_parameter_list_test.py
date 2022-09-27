@@ -29,7 +29,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
 
     EXPECTED_PARAM_NAMES = ['dummy_feature', 'dummy_parameter',
                             'end_chapter_celebration',
-                            'checkpoint_celebration']
+                            'checkpoint_celebration',
+                            'android_beta_landing_page']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
