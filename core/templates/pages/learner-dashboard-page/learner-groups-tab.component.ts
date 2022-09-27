@@ -17,7 +17,6 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
@@ -42,14 +41,7 @@ export class LearnerGroupsTabComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
-  classroomUrlFragment!: string;
-  width!: number;
-  CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
-  nextIncompleteNodeTitles: string[] = [];
-  widthConst: number = 233;
-  continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
   windowIsNarrow: boolean = false;
-  showThreeDotsDropdown: boolean = false;
   directiveSubscriptions = new Subscription();
   invitedToLearnerGroups: ShortLearnerGroupSummary[] = [];
   learnerOfLearnerGroups: ShortLearnerGroupSummary[] = [];
@@ -90,23 +82,6 @@ export class LearnerGroupsTabComponent {
     );
   }
 
-  getWidth(length: number): number {
-    /**
-     * If there are 3 or more topics for each untrackedTopic, the total
-     * width of the section will be 662px in mobile view to enable scrolling.
-    */
-    if (length >= 3) {
-      return 662;
-    }
-    /**
-     * If there less than 3 topics for each untrackedTopic, the total
-     * width of the section will be calculated by multiplying the addition of
-     * number of topics and one classroom card with 164px in mobile view to
-     * enable scrolling.
-    */
-    return (length + 1) * 164;
-  }
-
   changeActiveSection(): void {
     this.setActiveSection.emit(
       LearnerDashboardPageConstants
@@ -131,7 +106,7 @@ export class LearnerGroupsTabComponent {
       );
       this.learnerGroupBackendApiService.updateLearnerGroupInviteAsync(
         learnerGroupSummary.id, this.username, false
-      ).then((learnerGroup) => {});
+      ).then();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -155,9 +130,9 @@ export class LearnerGroupsTabComponent {
       this.learnerOfLearnerGroups = this.learnerOfLearnerGroups.filter(
         (learnerGroup) => learnerGroup.id !== learnerGroupSummary.id
       );
-      this.learnerGroupBackendApiService.updateLearnerGroupInviteAsync(
-        learnerGroupSummary.id, this.username, false
-      ).then((learnerGroup) => {});
+      this.learnerGroupBackendApiService.exitLearnerGroupAsync(
+        learnerGroupSummary.id, this.username
+      ).then();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

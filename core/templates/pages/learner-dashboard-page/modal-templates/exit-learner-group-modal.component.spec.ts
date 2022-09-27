@@ -14,8 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the decline learner group invitation
- * modal component.
+ * @fileoverview Unit tests for the exit learner group modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';

@@ -790,6 +790,67 @@ class LearnerGroupLearnerInvitationHandler(base.BaseHandler):
         })
 
 
+class ExitLearnerGroupHandler(base.BaseHandler):
+    """Handles a learner exiting from a learner group."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'learner_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_USERNAME_LENGTH
+                    }]
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def put(self, learner_group_id):
+        """Handles PUT requests."""
+
+        learner_username = self.normalized_payload.get('learner_username')
+
+        learner_user_id = user_services.get_user_id_from_username(
+            learner_username)
+        learner_group_services.remove_learners_from_learner_group(
+            learner_group_id, [learner_user_id], True)
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
+
+        self.render_json({
+            'id': learner_group.group_id,
+            'title': learner_group.title,
+            'description': learner_group.description,
+            'facilitator_usernames': user_services.get_usernames(
+                learner_group.facilitator_user_ids),
+            'learner_usernames': user_services.get_usernames(
+                learner_group.learner_user_ids),
+            'invited_learner_usernames': user_services.get_usernames(
+                learner_group.invited_learner_user_ids),
+            'subtopic_page_ids': learner_group.subtopic_page_ids,
+            'story_ids': learner_group.story_ids
+        })
+
+
 class LearnerStoriesChaptersProgressHandler(base.BaseHandler):
     """Handles fetching progress of a user in all chapters of given stories"""
 

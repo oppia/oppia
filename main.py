@@ -1014,6 +1014,9 @@ URLS = [
         r'/learner_group_learner_invitation_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerInvitationHandler),
     get_redirect_route(
+        r'/exit_learner_group_handler/<learner_group_id>',
+        learner_group.ExitLearnerGroupHandler),
+    get_redirect_route(
         r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',

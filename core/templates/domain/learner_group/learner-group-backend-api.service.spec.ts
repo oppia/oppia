@@ -334,7 +334,7 @@ describe('Learner Group Backend API Service', () => {
       story_ids: ['story_id_1']
     };
 
-    const LEARNER_GROUP_LEARNER_INVITES_GET_URL = (
+    const LEARNER_GROUP_LEARNER_INVITES_PUT_URL = (
       '/learner_group_learner_invitation_handler/groupId'
     );
 
@@ -342,7 +342,7 @@ describe('Learner Group Backend API Service', () => {
       'groupId', 'learner1', true, true).then(successHandler, failHandler);
 
     var req = httpTestingController.expectOne(
-      LEARNER_GROUP_LEARNER_INVITES_GET_URL);
+      LEARNER_GROUP_LEARNER_INVITES_PUT_URL);
     expect(req.request.method).toEqual('PUT');
     req.flush(sampleLearnerGroupData);
 
@@ -353,4 +353,66 @@ describe('Learner Group Backend API Service', () => {
         sampleLearnerGroupData));
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
+  it('should successfully exit learner group', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    const sampleLearnerGroupData = {
+      id: 'groupId',
+      title: 'updated title',
+      description: 'updated description',
+      facilitator_usernames: ['facilitator2'],
+      learner_usernames: [],
+      invited_learner_usernames: ['learner2'],
+      subtopic_page_ids: ['subtopic_id_1'],
+      story_ids: ['story_id_1']
+    };
+
+    const EXIT_LEARNER_GROUP_PUT_URL = (
+      '/exit_learner_group_handler/groupId'
+    );
+
+    learnerGroupBackendApiService.exitLearnerGroupAsync(
+      'groupId', 'learner1').then(successHandler, failHandler);
+
+    var req = httpTestingController.expectOne(
+      EXIT_LEARNER_GROUP_PUT_URL);
+    expect(req.request.method).toEqual('PUT');
+    req.flush(sampleLearnerGroupData);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      LearnerGroupData.createFromBackendDict(
+        sampleLearnerGroupData));
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should check if learner group feature is enabled correctly',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      const LEARNER_GROUP_FEATURE_STATUS_GET_URL = (
+        '/learner_groups_feature_status_handler'
+      );
+      const sampleLearnerGroupFeatureStatus = {
+        feature_is_enabled: true
+      };
+
+      learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync()
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        LEARNER_GROUP_FEATURE_STATUS_GET_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleLearnerGroupFeatureStatus);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(true);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

@@ -215,7 +215,30 @@ export class LearnerGroupBackendApiService {
     });
   }
 
-  async _getLearnerGroupFeatureActivationStatusAsync():
+  async exitLearnerGroupAsync(
+      learnerGroupId: string,
+      learnerUsername: string
+  ): Promise<LearnerGroupData> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/exit_learner_group_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+      const putData = {
+        learner_username: learnerUsername
+      };
+
+      this.http.put<LearnerGroupBackendDict>(
+        learnerGroupUrl, putData).toPromise().then(response => {
+        resolve(LearnerGroupData.createFromBackendDict(response));
+      });
+    });
+  }
+
+  async _isLearnerGroupFeatureEnabledAsync():
   Promise<boolean> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = '/learner_groups_feature_status_handler';
@@ -228,7 +251,7 @@ export class LearnerGroupBackendApiService {
 
   async isLearnerGroupFeatureEnabledAsync():
   Promise<boolean> {
-    return this._getLearnerGroupFeatureActivationStatusAsync();
+    return this._isLearnerGroupFeatureEnabledAsync();
   }
 }
 
