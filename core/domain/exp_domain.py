@@ -3137,7 +3137,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         translations_mapping = (
             state_dict['written_translations']['translations_mapping'])
         new_translations_mapping = {
-             content_id: translation_item for 
+             content_id: translation_item for
              content_id, translation_item in translations_mapping.items()
              if content_id in content_id_list
         }
@@ -3333,15 +3333,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         lb_inclusive: bool,
         ub_inclusive: bool
     ) -> None:
-        """Helper function for NumericInput and FractionInput interaction,
-        Sets the lower and upper bounds for the range_var, mainly
-        we need to set the range so to keep track if any other rule's
-        range lies in between or not to prevent redundancy
+        """Sets the lower and upper bounds for the range_var.
 
         Args:
-            range_var: dict[str, Any]. To keep track of each rule's
-                ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive.
+            range_var: dict[str, Any]. Variable used to keep track of each
+                range.
             lower_bound: Optional[float]. The lower bound.
             upper_bound: Optional[float]. The upper bound.
             lb_inclusive: bool. If lower bound is inclusive.
@@ -3355,58 +3351,43 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _is_enclosed_by(
         cls,
-        range_compare_for: RangeVariableDict,
-        range_compare_with: RangeVariableDict
+        test_range: RangeVariableDict,
+        base_range: RangeVariableDict
     ) -> bool:
-        """Helper function for NumericInput and FractionInput interaction,
-        Checks whether the ranges of rules enclosed or not
+        """Checks whether the ranges of rules enclosed or not
 
         Args:
-            range_compare_for: RangeVariableDict. It represents the variable for
-                which we have to check the range. It keeps track of each rule's
-                ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive.
-            range_compare_with: RangeVariableDict. It is the variable to which
-                the range is compared. It keeps track of other rule's
-                ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive.
+            test_range: RangeVariableDict. It represents the variable for
+                which we have to check the range.
+            base_range: RangeVariableDict. It is the variable to which
+                the range is compared.
 
         Returns:
-            is_enclosed: bool. Returns True if both rule's ranges are enclosed.
+            bool. Returns True if both rule's ranges are enclosed.
         """
         if (
-            range_compare_with['lower_bound'] is None or
-            range_compare_for['lower_bound'] is None or
-            range_compare_with['upper_bound'] is None or
-            range_compare_for['upper_bound'] is None
+            base_range['lower_bound'] is None or
+            test_range['lower_bound'] is None or
+            base_range['upper_bound'] is None or
+            test_range['upper_bound'] is None
         ):
             return False
+
         lb_satisfied = (
-            range_compare_with['lower_bound'] < range_compare_for[
-                'lower_bound'] or
+            base_range['lower_bound'] < test_range['lower_bound'] or
             (
-                range_compare_with['lower_bound'] == range_compare_for[
-                    'lower_bound'] and
-                (
-                    not range_compare_for['lb_inclusive'] or
-                    range_compare_with['lb_inclusive']
-                )
+                base_range['lower_bound'] == test_range['lower_bound'] and
+                (not test_range['lb_inclusive'] or base_range['lb_inclusive'])
             )
         )
         ub_satisfied = (
-            range_compare_with['upper_bound'] > range_compare_for[
-                'upper_bound'] or
+            base_range['upper_bound'] > test_range['upper_bound'] or
             (
-                range_compare_with['upper_bound'] == range_compare_for[
-                    'upper_bound'] and
-                (
-                    not range_compare_for['ub_inclusive'] or
-                    range_compare_with['ub_inclusive']
-                )
+                base_range['upper_bound'] == test_range['upper_bound'] and
+                (not test_range['ub_inclusive'] or base_range['ub_inclusive'])
             )
         )
-        is_enclosed = lb_satisfied and ub_satisfied
-        return is_enclosed
+        return lb_satisfied and ub_satisfied
 
     @classmethod
     def _should_check_range_criteria(
@@ -3414,8 +3395,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         earlier_rule: state_domain.RuleSpecDict,
         later_rule: state_domain.RuleSpecDict
     ) -> bool:
-        """Helper function for FractionInput interaction,
-        Checks the range criteria between two rules by comparing their
+        """Checks the range criteria between two rules by comparing their
         rule type
 
         Args:
@@ -3439,7 +3419,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls,
         rule_spec: state_domain.RuleSpecDict
     ) -> float:
-        """Return rule value of the rule_spec of FractionInput interaction so
+        """Returns rule value of the rule_spec of FractionInput interaction so
         that we can keep track of rule's range
 
         Args:
@@ -3820,7 +3800,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_value_f, True, True
                     )
 
-                if rule_spec['rule_type'] == 'IsGreaterThan':
+                elif rule_spec['rule_type'] == 'IsGreaterThan':
                     rule_value_f: float = (
                         cls._get_rule_value_of_fraction_interaction(rule_spec))
 
@@ -3829,7 +3809,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         upper_infinity, False, False
                     )
 
-                if rule_spec['rule_type'] == 'IsLessThan':
+                elif rule_spec['rule_type'] == 'IsLessThan':
                     rule_value_f: float = (
                         cls._get_rule_value_of_fraction_interaction(rule_spec))
 
@@ -3838,7 +3818,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_value_f, False, False
                     )
 
-                if rule_spec['rule_type'] == 'HasDenominatorEqualTo':
+                elif rule_spec['rule_type'] == 'HasDenominatorEqualTo':
                     try:
                         rule_value_x = int(rule_spec['inputs']['x'])
                         matched_denominator['denominator'] = rule_value_x
@@ -3850,21 +3830,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'ans_group_index']]['rule_specs'][
                             range_ele['rule_spec_index']]
                     if cls._should_check_range_criteria(
-                        earlier_rule, rule_spec
+                        earlier_rule, rule_spec and
+                        cls._is_enclosed_by(range_var, range_ele)
                     ):
-                        if cls._is_enclosed_by(range_var, range_ele):
-                            invalid_rules.append(rule_spec)
+                        invalid_rules.append(rule_spec)
 
                 for den in matched_denominator_list:
                     if (
                         rule_spec['rule_type'] ==
-                        'HasFractionalPartExactlyEqualTo'
+                        'HasFractionalPartExactlyEqualTo' and
+                        den['denominator'] ==
+                        rule_spec['inputs']['f']['denominator']
                     ):
-                        if (
-                            den['denominator'] ==
-                            rule_spec['inputs']['f']['denominator']
-                        ):
-                            invalid_rules.append(rule_spec)
+                        invalid_rules.append(rule_spec)
 
                 ranges.append(range_var)
                 matched_denominator_list.append(matched_denominator)
@@ -3925,6 +3903,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     else:
                         selected_equals_choices.append(
                             rule_spec['inputs']['x'])
+
             for ele in unwanted_rule:
                 answer_group['rule_specs'].remove(ele)
             if (
@@ -4081,7 +4060,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         invalid_rules = []
         ele_x_at_y_rules = []
         off_by_one_rules = []
-        # Remove duplicate rules.
+
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         for answer_group in answer_groups:
@@ -4215,7 +4194,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         seen_strings_contains: List[str] = []
         seen_strings_startswith: List[str] = []
         invalid_rules = []
-        # Remove duplicate rules.
+
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         # Text input height shoule be >= 1 and <= 10.

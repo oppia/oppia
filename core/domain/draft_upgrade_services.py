@@ -341,7 +341,7 @@ class DraftUpgradeUtil:
                 exp_change.property_name ==
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
             ):
-                assert isinstance(exp_change.new_value, dict)
+                assert isinstance(exp_change.new_value, list)
                 answer_group_dicts = exp_change.new_value
                 for answer_group in answer_group_dicts:
                     answer_group['tagged_skill_misconception_id'] = None
