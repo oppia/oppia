@@ -23,6 +23,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { AndroidPageComponent } from './android-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+
 
 class MockIntersectionObserver {
   observe: () => void;
@@ -58,7 +60,7 @@ describe('Android page', () => {
   let pageTitleService: PageTitleService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
-      declarations: [AndroidPageComponent],
+      declarations: [AndroidPageComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
         PageTitleService,
