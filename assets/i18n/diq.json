@@ -67,8 +67,8 @@
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Peyd rışyen akerê",
 	"I18N_DASHBOARD_STATS_OPEN_FEEDBACK": "Peyd rışyen akerê",
 	"I18N_DASHBOARD_STATS_TOTAL_PLAYS": "Kay pêro",
-	"I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS": "Aboney",
-	"I18N_DASHBOARD_SUBSCRIBERS": "Aboney",
+	"I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS": "Aboneyi",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Aboneyi",
 	"I18N_DASHBOARD_SUGGESTIONS": "Wesıbneyay",
 	"I18N_DASHBOARD_TABLE_HEADING_EXPLORATION": "Keşıfi",
 	"I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED": "Rocanekerdışo Peyên",
@@ -235,7 +235,7 @@
 	"I18N_LICENSE_PAGE_PARAGRAPH_1": "Keşıfê zerrekê Oppia'y pero <a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode\" class=\"inline-links\">CC-BY-SA 4.0</a> bın de lisans biyo.",
 	"I18N_MODAL_CANCEL_BUTTON": "Bıtexelne",
 	"I18N_MODAL_CONTINUE_BUTTON": "Dewam ke",
-	"I18N_ONE_SUBSCRIBER_TEXT": "1 aboney tı est o.",
+	"I18N_ONE_SUBSCRIBER_TEXT": "1 aboneyê to esto.",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING": "Hesabo kı Bıesteriyo",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2_HEADING": "Detayê esterıtışi",
 	"I18N_PLAYER_AUDIO_EXPAND_TEXT": "Goş bıde derse",
@@ -340,5 +340,5 @@
 	"I18N_TOPNAV_PREFERENCES": "Tercihi",
 	"I18N_TOPNAV_SIGN_IN": "Cı kewe",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia bomos",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Abone bevec"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Aboneyiye ra veciye"
 }
