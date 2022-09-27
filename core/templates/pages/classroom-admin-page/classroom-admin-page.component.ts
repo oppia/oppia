@@ -30,6 +30,9 @@ import { DeleteTopicFromClassroomModalComponent } from './modals/delete-topic-fr
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ClassroomData } from './classroom-admin.model';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 
 
 interface TopicIdToPrerequisiteTopicIds {
@@ -62,6 +65,9 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   classroomCount: number = 0;
   classroomIdToClassroomName: {[classroomId: string]: string} = {};
+
+  myControl = new FormControl('');
+  filteredOptions: Observable<string[]>;
 
   classroomId: string = '';
   classroomName: string = '';
@@ -98,6 +104,32 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   dependencyGraphDropdownIsShown: boolean = false;
   currentTopicOnEdit!: string;
+  eligibleTopicNamesForPrerequisites: string[];
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.eligibleTopicNames.filter(
+      option => option.toLowerCase().includes(filterValue));
+  }
+
+  getEligibleTopicPrerequisites(currentTopicName: string): void {
+    this.eligibleTopicNames = [];
+    let topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
+    for (let topicName of topicNames) {
+      if (
+        topicName !== currentTopicName &&
+          this.topicNameToPrerequisiteTopicNames[currentTopicName]
+            .indexOf(topicName) === -1
+      ) {
+        this.eligibleTopicNames.push(topicName);
+      }
+    }
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value || '')),
+    );
+  }
 
   getClassroomData(classroomId: string): void {
     if (
