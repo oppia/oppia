@@ -328,7 +328,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
     ReviewTestPageComponent,
-    ComponentOverviewComponent
+    // ComponentOverviewComponent
   ],
 
   entryComponents: [
@@ -582,7 +582,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
     ReviewTestPageComponent,
-    ComponentOverviewComponent
+    // ComponentOverviewComponent
   ],
 })
 
