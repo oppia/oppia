@@ -15,3 +15,59 @@
 /**
  * @fileoverview Tests for the topic dependency graph viz modal component.
  */
+
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { TopicsDependencyGraphModalComponent } from './topic-dependency-graph-viz-modal.component';
+
+describe('Topic Dependency Graph Visualization Modal Component', () => {
+  let fixture: ComponentFixture<TopicsDependencyGraphModalComponent>;
+  let componentInstance: TopicsDependencyGraphModalComponent;
+  let closeSpy: jasmine.Spy;
+  let ngbActiveModal: NgbActiveModal;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        TopicsDependencyGraphModalComponent
+      ],
+      providers: [
+        NgbActiveModal,
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopicsDependencyGraphModalComponent);
+    componentInstance = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+  });
+
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it('should be able to close modal', () => {
+    componentInstance.close();
+    expect(closeSpy).toHaveBeenCalled();
+  });
+
+  it('should be able to get graph data from topic dependency', () => {
+    let topicIdToTopicName: {
+      id1: 'Topic1',
+      id2: 'Topic2'
+      id3: 'Topic3'
+      id4: 'Topic4'
+      id5: 'Topic5'
+    }
+    let topicIdToPrerequisiteTopicIds = {
+      id1: [],
+      id2: ['id1'],
+      id3: ['id1'],
+      id4: ['id2'],
+      id5: ['id3'],
+    }
+  });
+
+})

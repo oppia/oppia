@@ -16,7 +16,7 @@
  * @fileoverview Classroom admin component.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, NgModuleRef, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import { AlertsService } from 'services/alerts.service';
@@ -557,29 +557,17 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.tempClassroomData.topicIdToPrerequisiteTopicIds = (
       tempTopicIdToPrerequisiteTopicIds);
   }
+
   viewGraph() {
-    this.graphData = {
-      finalStateIds: ['4', '5'],
-      initStateId: 1,
-      links: [
-        {source: 1, target: 2, linkProperty: null},
-        {source: 1, target: 3, linkProperty: null},
-        {source: 2, target: 4, linkProperty: null},
-        {source: 3, target: 5, linkProperty: null}
-      ],
-      nodes: {
-        1: 'Dummy Topic 1',
-        2: 'Dummy Topic 2',
-        3: 'Dummy Topic 3',
-        4: 'Dummy Topic 4',
-        5: 'Dummy Topic 5',
-      }
-    }
     let modalRef: NgbModalRef = this.ngbModal.
       open(TopicsDependencyGraphModalComponent, {
-        backdrop: 'static'
+        backdrop: true,
+        windowClass: 'oppia-large-modal-window'
       });
-    modalRef.componentInstance.graphData = this.graphData;
+    modalRef.componentInstance.topicIdToPrerequisiteTopicIds = (
+      this.tempClassroomData.topicIdToPrerequisiteTopicIds);
+    modalRef.componentInstance.topicIdToTopicName = this.topicIdsToTopicName;
+
     modalRef.result.then(() => {
     }, () => {
       // Note to developers:

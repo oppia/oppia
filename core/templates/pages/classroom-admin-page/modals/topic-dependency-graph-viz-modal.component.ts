@@ -65,11 +65,15 @@ export class TopicsDependencyGraphModalComponent
   augmentedLinks: AugmentedLink[];
   nodeList: NodeData[];
 
+  topicIdToPrerequisiteTopicIds = {};
+  topicIdToTopicName = {};
+
   close(): void {
     this.ngbActiveModal.close();
   }
 
   ngOnInit(): void {
+    this.normalizeTopicDependencyGraph()
     this.drawGraph(
       this.graphData.nodes, this.graphData.links,
       this.graphData.initStateId, this.graphData.finalStateIds
@@ -112,5 +116,73 @@ export class TopicsDependencyGraphModalComponent
     return this.truncate.transform(
       nodeLabel,
       AppConstants.MAX_NODE_LABEL_LENGTH);
+  }
+
+  normalizeTopicDependencyGraph() {
+    const intialTopicIds = this.computeInitialTopicIds(
+      this.topicIdToPrerequisiteTopicIds);
+    const finalTopics = this.computeFinalTopicIds(
+      this.topicIdToPrerequisiteTopicIds);
+    const links = this.computeEdges(this.topicIdToPrerequisiteTopicIds);
+    const nodes = this.topicIdToTopicName;
+
+    this.graphData = {
+      finalStateIds: finalTopics,
+      initStateId: intialTopicIds[0],
+      links: links,
+      nodes: nodes
+    }
+  }
+
+  computeInitialTopicIds(topicIdToPrerequisiteTopicIds) {
+    let initialTopicIds = [];
+    for (let topicId in topicIdToPrerequisiteTopicIds) {
+      if (topicIdToPrerequisiteTopicIds[topicId].length === 0) {
+        initialTopicIds.push(topicId);
+      }
+    }
+    return initialTopicIds;
+  }
+
+
+  computeEdges(topicIdToPrerequisiteTopicIds) {
+    let edgeSet = [];
+    for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
+      let prerequisiteTopics = (
+        topicIdToPrerequisiteTopicIds[currentTopicId]);
+
+      for (let topicId of prerequisiteTopics) {
+        edgeSet.push(this.computeSingleEdge(
+          topicId, currentTopicId));
+      }
+    }
+    return edgeSet;
+  }
+
+  computeSingleEdge(sourceTopic, destTopic) {
+    return {
+      source: sourceTopic,
+      target: destTopic,
+      linkProperty: null,
+    };
+  }
+
+  computeFinalTopicIds(topicIdToPrerequisiteTopicIds) {
+    let prerequisitesOfAllTopics = [];
+    let finalTopicIds = [];
+    for (let topicId in topicIdToPrerequisiteTopicIds) {
+      prerequisitesOfAllTopics = prerequisitesOfAllTopics.concat(
+        topicIdToPrerequisiteTopicIds[topicId]);
+    }
+
+    for (let topicId in topicIdToPrerequisiteTopicIds) {
+      let index = prerequisitesOfAllTopics.indexOf(topicId);
+
+      if (index === -1) {
+        finalTopicIds.push(topicId);
+      }
+    }
+
+    return finalTopicIds;
   }
 }
