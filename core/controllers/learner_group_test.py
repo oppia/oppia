@@ -1219,7 +1219,7 @@ class ExitLearnerGroupHandlerTests(test_utils.GenericTestBase):
             learner_group_fetchers.get_new_learner_group_id()
         )
 
-        learner_group = learner_group_services.create_learner_group(
+        learner_group_services.create_learner_group(
             learner_group_id, 'Learner Group Title', 'Description',
             [self.facilitator_id], [self.learner_id],
             ['subtopic_id_1'], ['story_id_1'])
