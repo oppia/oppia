@@ -28,8 +28,9 @@ import { AlertsService } from 'services/alerts.service';
 import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'oppia-skill-prerequisite-skills-editor',
@@ -47,6 +48,7 @@ implements OnInit {
   skill!: Skill;
   prerequisiteSkillsAreShown: boolean = false;
   allAvailableSkills: SkillSummary[] = [];
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private skillUpdateService: SkillUpdateService,
@@ -134,13 +136,16 @@ implements OnInit {
     return null;
   }
 
-  @HostListener('window:resize')
-  SkillDescriptionOnResize(): void {
-    this.prerequisiteSkillsAreShown = !this.windowDimensionsService.isWindowNarrow();
-  }
-
-
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.prerequisiteSkillsAreShown = (
+            !this.windowDimensionsService.isWindowNarrow());
+        }
+      )
+    );
+    
     this.groupedSkillSummaries = this.skillEditorStateService
       .getGroupedSkillSummaries();
 
@@ -165,6 +170,10 @@ implements OnInit {
           skillSummaries[idx].description;
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

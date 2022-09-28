@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill misconceptions editor.
  */
 
-import { Component, HostListener, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
@@ -55,6 +55,15 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.misconceptionsListIsShown = (
+            !this.windowDimensionsService.isWindowNarrow());
+        }
+      )
+    );
+    
     this.skill = this.skillEditorStateService.getSkill();
     this.misconceptionsListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
@@ -123,11 +132,6 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
       this.misconceptionsListIsShown = (
         !this.misconceptionsListIsShown);
     }
-  }
-
-  @HostListener('window:resize')
-  MisconceptionListsOnResize(): void {
-    this.misconceptionsListIsShown = !this.windowDimensionsService.isWindowNarrow();
   }
 }
 

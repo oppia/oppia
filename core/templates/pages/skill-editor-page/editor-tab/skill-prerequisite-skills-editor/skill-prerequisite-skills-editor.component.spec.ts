@@ -341,26 +341,6 @@ describe('Skill editor main tab Component', () => {
     expect(desc2).toEqual('Dummy Skill 1');
   }));
 
-  it('should display Prerequisites Skills on maximizing the window', () => {
-    component.prerequisiteSkillsAreShown = false;
-
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-
-    component.SkillDescriptionOnResize();
-
-    expect(component.prerequisiteSkillsAreShown).toBeTrue();
-  });
-
-  it('should hide Prerequisites Skills on minimizing the window', () => {
-    component.prerequisiteSkillsAreShown = true;
-
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-
-    component.SkillDescriptionOnResize();
-
-    expect(component.prerequisiteSkillsAreShown).toBeFalse();
-  });
-
   describe('while adding a skill', () => {
     it('should show info message if we try ' +
       'to add a prerequisite skill to itself', fakeAsync(() => {

@@ -146,25 +146,33 @@ describe('Skill Rubrics Editor Component', () => {
       expect(component.rubricsListIsShown).toBeFalse();
     });
 
-    it('should display Rubrics Card on maximizing the window', () => {
-      component.rubricsListIsShown = false;
+    // it('should toggle rubrics list on clicking', () => {
+    //   component.rubricsListIsShown = true;
+    //   spyOn(windowDimensionsService, 'isWindowNarrow')
+    //     .and.returnValue(true);
+  
+    //   component.toggleRubricsList();
+  
+    //   expect(component.rubricsListIsShown).toBeFalse();
+  
+    //   component.toggleRubricsList();
+  
+    //   expect(component.rubricsListIsShown).toBeTrue();
+    // });
 
-      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-
-      component.RubricsListOnResize();
-
-      expect(component.rubricsListIsShown).toBeTrue();
-    });
-
-    it('should hide Rubrics Card on minimizing the window', () => {
-      component.rubricsListIsShown = true;
-
-      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-
-      component.RubricsListOnResize();
-
-      expect(component.rubricsListIsShown).toBeFalse();
-    });
+    // it('should toggle rubrics card on clicking', () => {
+    //   component.rubricsListIsShown = true;
+    //   spyOn(windowDimensionsService, 'isWindowNarrow')
+    //     .and.returnValue(true);
+  
+    //   component.toggleRubricsList();
+  
+    //   expect(component.rubricsListIsShown).toBeFalse();
+  
+    //   component.toggleRubricsList();
+  
+    //   expect(component.rubricsListIsShown).toBeTrue();
+    // });
 
     it('should update skill rubrics when user saves', () => {
       spyOn(skillUpdateService, 'updateRubricForDifficulty');

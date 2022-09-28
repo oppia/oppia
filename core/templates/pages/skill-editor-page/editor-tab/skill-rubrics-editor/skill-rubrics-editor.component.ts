@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill rubrics editor.
  */
 
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { Rubric } from 'domain/skill/rubric.model';
@@ -55,12 +55,16 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  @HostListener('window:resize')
-  RubricsListOnResize(): void {
-    this.rubricsListIsShown = !this.windowDimensionsService.isWindowNarrow();
-  }
-
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.rubricsListIsShown = (
+            !this.windowDimensionsService.isWindowNarrow());
+        }
+      )
+    )
+    
     this.skill = this.skillEditorStateService.getSkill();
     this.rubricsListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());

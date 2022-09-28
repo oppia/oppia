@@ -17,7 +17,7 @@
  */
 
 import { CdkDragSortEvent, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, HostListener, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
@@ -203,12 +203,16 @@ export class SkillConceptCardEditorComponent implements OnInit {
     }
   }
 
-  @HostListener('window:resize')
-  SkillEditorCardOnResize(): void {
-    this.workedExamplesListIsShown = !this.windowDimensionsService.isWindowNarrow();
-  }
-
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.workedExamplesListIsShown = (
+            !this.windowDimensionsService.isWindowNarrow());
+        }
+      )
+    );
+    
     this.isEditable = true;
     this.skill = this.skillEditorStateService.getSkill();
     this.initBindableFieldsDict();

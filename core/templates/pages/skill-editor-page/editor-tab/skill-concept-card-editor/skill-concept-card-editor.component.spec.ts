@@ -302,26 +302,6 @@ describe('Skill Concept Card Editor Component', () => {
     expect(component.skillEditorCardIsShown).toBeTrue();
   });
 
-  it('should display Skill Card on maximizing the window', () => {
-    component.workedExamplesListIsShown = false;
-
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-
-    component.SkillEditorCardOnResize();
-
-    expect(component.workedExamplesListIsShown).toBeTrue();
-  });
-
-  it('should hide Skill Card on minimizing the window', () => {
-    component.workedExamplesListIsShown = true;
-
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-
-    component.SkillEditorCardOnResize();
-
-    expect(component.workedExamplesListIsShown).toBeFalse();
-  });
-
   it('should format given worked example summary html content', () => {
     let result = component.getWorkedExampleSummary('<p>Worked Example</p>');
 
