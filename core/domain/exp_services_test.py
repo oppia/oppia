@@ -2685,7 +2685,8 @@ title: A title
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2778,7 +2779,8 @@ title: A title
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2866,7 +2868,8 @@ title: A title
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -3124,7 +3127,8 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -3178,7 +3182,8 @@ written_translations:
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -3646,7 +3651,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add state name')
 
@@ -3691,7 +3697,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add state name')
 
@@ -3973,7 +3980,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -4136,7 +4144,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -4315,7 +4324,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -5004,7 +5014,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5097,7 +5108,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5172,7 +5184,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5211,7 +5224,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }, {
             'cmd': exp_domain.CMD_DELETE_STATE,
@@ -8221,7 +8235,8 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 })
             ], 'Edited interaction'

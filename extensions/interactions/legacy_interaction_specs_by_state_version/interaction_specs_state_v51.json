@@ -866,14 +866,6 @@
       "id": "AlgebraicExpressionInput",
       "customization_arg_specs": [
         {
-          "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-          "name": "customOskLetters",
-          "schema": {
-            "obj_type": "CustomOskLetters",
-            "type": "custom"
-          },
-          "default_value": []
-        }, {
           "description": "Represent division using fractions (rather than ÷).",
           "name": "useFractionForDivision",
           "schema": {
