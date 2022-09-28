@@ -264,22 +264,16 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'
         ):
-            (
-                domain_objects_validator.
-                get_exp_change_from_dict(
-                    incorrect_change_dict)
-            )
+            domain_objects_validator.get_exp_change_from_dict(
+                incorrect_change_dict)
         # Tests when cmd does not belong to exploration change allowed
         # commands, raises an error.
         incorrect_change_dict['cmd'] = 'Not valid'
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, '%s cmd is not allowed.' % incorrect_change_dict['cmd']
         ):
-            (
-                domain_objects_validator.
-                get_exp_change_from_dict(
-                    incorrect_change_dict)
-            )
+            domain_objects_validator.get_exp_change_from_dict(
+                incorrect_change_dict)
 
     def test_incorrect_exp_state_domain_content(self) -> None:
         """Tests the state content of exploration change."""
@@ -300,11 +294,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             Exception, 'The length of the image tag \'alt-with-value\' '
             'attribute value should be at least 5 characters.'
         ):
-            (
-                domain_objects_validator.
-                get_exp_change_from_dict(
-                    incorrect_change_dict)
-            )
+            domain_objects_validator.get_exp_change_from_dict(
+                incorrect_change_dict)
 
     def test_incorrect_exp_state_domain_translations(self):
         """Tests the state translations of exploration change."""
@@ -344,6 +335,12 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         """Validates that the correct exp change dictionary returns
         the exploration change domain object.
         """
+        math_tag = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;abc.png&quot;" caption-with-value="&quot;'
+            '&quot;" alt-with-value="&quot;caption&quot;">'
+            '</oppia-noninteractive-image>'
+        )
         correct_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -351,31 +348,25 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             'old_value': state_domain.SubtitledHtml(
                 'content', '').to_dict(),
             'new_value': state_domain.SubtitledHtml(
-                'content',
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&quot;abc.png&quot;" caption-with-value="&quot;'
-                '&quot;" alt-with-value="&quot;caption&quot;">'
-                '</oppia-noninteractive-image>').to_dict()
+                'content', math_tag).to_dict()
         }
 
-        expected_domain_obj = exp_domain.ExplorationChange.from_dict(
-            correct_change_dict)
         returned_domain_obj = (
             domain_objects_validator.get_exp_change_from_dict(
                 correct_change_dict))
-        self.assertEqual(expected_domain_obj.cmd, returned_domain_obj.cmd)
+        self.assertEqual('edit_state_property', returned_domain_obj.cmd)
         self.assertEqual(
-            expected_domain_obj.property_name,
+            'content',
             returned_domain_obj.property_name)
         self.assertEqual(
-            expected_domain_obj.old_value['content_id'],
+            'content',
             returned_domain_obj.old_value['content_id'])
         self.assertEqual(
-            expected_domain_obj.old_value['html'],
+            '',
             returned_domain_obj.old_value['html'])
         self.assertEqual(
-            expected_domain_obj.new_value['content_id'],
+            'content',
             returned_domain_obj.new_value['content_id'])
         self.assertEqual(
-            expected_domain_obj.new_value['html'],
+            math_tag,
             returned_domain_obj.new_value['html'])

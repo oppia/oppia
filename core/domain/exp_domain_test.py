@@ -2031,9 +2031,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state.content.html = 'Valid content'
 
         # Validate written translations.
-        content_id_of_continue_button_text = (
-            state.interaction.customization_args[
-                'buttonText'].value.content_id)
+        cust_args = state.interaction.customization_args['buttonText'].value
+        assert isinstance(cust_args, state_domain.SubtitledHtml)
+        content_id_of_continue_button_text = cust_args.content_id
         state.written_translations.add_translation(
             content_id_of_continue_button_text,
             'en',
