@@ -68,7 +68,7 @@ oppia-tutor-card .oppia-learner-view-card.animate-card-width {
   word-wrap: break-word;
 }
 
-.oppia-learner-view-card-top-content p:not(:last-child) {
+oppia-tutor-card .oppia-learner-view-card-top-content p:not(:last-child) {
   line-height: 1.5;
   margin-bottom: 18px;
 }
