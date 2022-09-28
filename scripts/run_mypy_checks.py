@@ -66,8 +66,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/run_portserver.py',
     'scripts/run_presubmit_checks.py',
     'scripts/script_import_test.py',
-    'scripts/servers.py',
-    'scripts/servers_test.py',
     'scripts/setup.py',
     'scripts/setup_test.py',
     'scripts/linters/',

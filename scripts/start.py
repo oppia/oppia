@@ -180,7 +180,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
         managed_web_browser = (
             None if parsed_args.no_browser else
-            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))  # type: ignore[no-untyped-call]
+            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
 
         if managed_web_browser is None:
             common.print_each_string_after_two_new_lines([
