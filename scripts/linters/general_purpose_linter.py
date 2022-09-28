@@ -545,8 +545,7 @@ class GeneralPurposeLinter:
                 ('.js')) and filepath.startswith(
                     ('core/templates', 'extensions')) and (
                         filepath not in build.JS_FILEPATHS_NOT_TO_BUILD
-                        ) and not filepath.endswith(
-                        ('webdriverio.js')):
+                        ) and not filepath.endswith('webdriverio.js'):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)

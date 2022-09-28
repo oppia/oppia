@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A script to check that the CI config files & protractor.conf.js have
+"""A script to check that the CI config files & wdio.conf.js have
 the same e2e test suites.
 """
 
@@ -37,7 +37,6 @@ TEST_SUITES_NOT_RUN_IN_CI = ['full']
 
 WEBDRIVERIO_CONF_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'wdio.conf.js')
-SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'publication'
 CI_PATH = os.path.join(os.getcwd(), '.github', 'workflows')
 
 
@@ -143,8 +142,8 @@ def get_e2e_test_filenames_from_webdriverio_conf_file() -> List[str]:
 
 
 def main() -> None:
-    """Test the CI config files wdio.conf.js to have same e2e
-    test suites.
+    """Check that the CI config files and wdio.conf.js have the same
+    e2e test suites.
     """
     print('Checking all e2e test files are captured in wdio.conf.js...')
     webdriverio_test_suite_files = (
@@ -153,8 +152,6 @@ def main() -> None:
         get_e2e_test_filenames_from_webdriverio_conf_file())
 
     if not webdriverio_test_suite_files == webdriverio_conf_test_suites:
-        print(webdriverio_test_suite_files)
-        print(webdriverio_conf_test_suites)
         raise Exception(
             'One or more test file from webdriverio or webdriverio_desktop '
             'directory is missing from wdio.conf.js')
@@ -176,15 +173,7 @@ def main() -> None:
             'The e2e test suites that have been extracted from '
             'wdio.conf.js are empty.')
 
-    if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in ci_suite_names:
-        raise Exception(
-            '{} is expected to be in the e2e test suites '
-            'extracted from the script section of CI config '
-            'files, but it is missing.'
-            .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
-
-    if set(webdriverio_test_suites) != (
-        set(ci_suite_names)):
+    if set(webdriverio_test_suites) != set(ci_suite_names):
         raise Exception(
             'WebdriverIO test suites and CI test suites are '
             'not in sync. '
