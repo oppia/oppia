@@ -20,6 +20,7 @@ import json
 
 from core import feconf
 from core.constants import constants
+from core.domain import config_domain
 from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
@@ -1114,5 +1115,127 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response[0]['exploration_id'], self.exp_id_1)
         self.assertEqual(response[0]['visited_checkpoints_count'], 1)
         self.assertEqual(response[0]['total_checkpoints_count'], 1)
+
+        self.logout()
+
+
+class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
+    """Unit test for LearnerGroupsFeatureStatusHandler."""
+
+    def test_get_request_returns_correct_status(self):
+        self.set_config_property(
+            config_domain.LEARNER_GROUPS_ARE_ENABLED, False)
+
+        response = self.get_json('/learner_groups_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'feature_is_enabled': False
+            })
+
+        self.set_config_property(
+            config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
+        response = self.get_json('/learner_groups_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'feature_is_enabled': True,
+            })
+
+
+class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.facilitator_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.learner_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+    def test_get_learner_dashboard_learner_groups_view(self):
+        self.login(self.NEW_USER_EMAIL)
+
+        # User has not joined any learner group and has not been invited to join
+        # any learner groups.
+        response = self.get_json(
+            '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
+
+        self.assertEqual(response['learner_of_learner_groups'], [])
+        self.assertEqual(response['invited_to_learner_groups'], [])
+
+        # Create a learner group.
+        learner_group_id = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+
+        learner_group = learner_group_services.create_learner_group(
+            learner_group_id, 'Learner Group Title', 'Description',
+            [self.facilitator_id], [self.learner_id],
+            ['subtopic_id_1'], ['story_id_1'])
+
+        response = self.get_json(
+            '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
+
+        self.assertEqual(len(response['invited_to_learner_groups']), 1)
+        self.assertEqual(len(response['learner_of_learner_groups']), 0)
+        self.assertEqual(
+            response['invited_to_learner_groups'][0]['id'],
+            learner_group.group_id)
+
+        # User accepts the invitation to join the learner group.
+        learner_group_services.add_learner_to_learner_group(
+            learner_group_id, self.learner_id, False)
+
+        response = self.get_json(
+            '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
+
+        self.assertEqual(len(response['invited_to_learner_groups']), 0)
+        self.assertEqual(len(response['learner_of_learner_groups']), 1)
+        self.assertEqual(
+            response['learner_of_learner_groups'][0]['id'],
+            learner_group.group_id)
+
+        self.logout()
+
+
+class ExitLearnerGroupHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.facilitator_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.learner_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+    def test_exit_learner_group(self):
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        learner_group_id = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+
+        learner_group = learner_group_services.create_learner_group(
+            learner_group_id, 'Learner Group Title', 'Description',
+            [self.facilitator_id], [self.learner_id],
+            ['subtopic_id_1'], ['story_id_1'])
+
+        # User accepts the invitation to join the learner group.
+        learner_group_services.add_learner_to_learner_group(
+            learner_group_id, self.learner_id, False)
+
+        payload = {
+            'learner_username': self.NEW_USER_USERNAME
+        }
+        response = self.put_json(
+            '/exit_learner_group_handler/%s' % (learner_group_id),
+            payload, csrf_token=csrf_token)
+
+        self.assertEqual(response['id'], learner_group_id)
+        self.assertEqual(response['learner_usernames'], [])
 
         self.logout()
