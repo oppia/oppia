@@ -63,7 +63,7 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
-        
+
       <div *ngIf="isReviewTranslationsTab()"" class="oppia-language-selector-container">
         <translation-language-selector class="oppia-language-selector"
         [activeLanguageCode]="languageCode"
@@ -324,8 +324,8 @@
 
   .oppia-language-selector-container {
     display: flex;
-    margin-top: 20px;
     justify-content: flex-end;
+    margin-top: 20px;
     margin-right: 15px;
   }
 
