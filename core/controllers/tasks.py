@@ -85,7 +85,7 @@ class SuggestionEmailHandler(base.BaseHandler):
                 },
                 'default_value': None
             },
-            'contributor_user_id': {
+            'thread_id': {
                 'schema': {
                     'type': 'basestring'
                 },
