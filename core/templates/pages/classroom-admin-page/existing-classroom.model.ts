@@ -18,7 +18,7 @@
 
 import { AppConstants } from 'app.constants';
 import { ClassroomDict } from '../../domain/classroom/classroom-backend-api.service';
-import { NewClassroom } from './new-classroom-admin.model';
+import { NewClassroom } from './new-classroom.model';
 
 
 export interface ValidateClassroomFieldResponse {
@@ -26,11 +26,9 @@ export interface ValidateClassroomFieldResponse {
   type: string;
 }
 
-
 interface TopicIdToPrerequisiteTopicIds {
   [topicId: string]: string[];
 }
-
 
 interface ExistingClassroom extends NewClassroom {
   _courseDetails: string;
@@ -40,8 +38,6 @@ interface ExistingClassroom extends NewClassroom {
   getCourseDetails: () => string;
   getTopicListIntro: () => string;
   getTopicIdToPrerequisiteTopicId: () => TopicIdToPrerequisiteTopicIds;
-  IsClassroomNameValid: () => ValidateClassroomFieldResponse;
-  IsClassroomUrlFragmentIsValid: () => ValidateClassroomFieldResponse;
 }
 
 export type ClassroomData = ExistingClassroom | NewClassroom;
@@ -54,9 +50,7 @@ export class ExistingClassroomData implements ExistingClassroom {
   _courseDetails: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
-  _existingClassroomNames!: string[];
-  _classroomNameIsValid!: boolean;
-  _classroomUrlFragmentIsValid!: boolean;
+  _classroomDataIsValid: boolean;
 
   constructor(
       classroomId: string,
@@ -72,6 +66,14 @@ export class ExistingClassroomData implements ExistingClassroom {
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
+  }
+
+  isClassroomDataValid(): boolean {
+    return this._classroomDataIsValid;
+  }
+
+  setClassroomValidityFlag(classroomDataIsValid: boolean): void {
+    this._classroomDataIsValid = classroomDataIsValid;
   }
 
   getClassroomId(): string {
@@ -114,67 +116,39 @@ export class ExistingClassroomData implements ExistingClassroom {
     this._topicListIntro = topicListIntro;
   }
 
-  IsClassroomNameValid(): ValidateClassroomFieldResponse {
-    this._classroomNameIsValid = true;
-
+  getClassroomNamValidationError(): string {
+    let errorMsg = '';
     if (this._name === '') {
-      return {
-        type: 'The classroom name should not be empty.',
-        result: false
-      };
+      errorMsg = 'The classroom name should not be empty.';
     }
-
-    if (this._name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
-      return {
-        type: 'The classroom name should contain at most 39 characters.',
-        result: false
-      };
+    else if (this._name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
+      errorMsg = 'The classroom name should contain at most 39 characters.';
     }
-
-    return {
-      type: '',
-      result: true
-    };
+    return errorMsg;
   }
 
-  IsClassroomUrlFragmentIsValid(): ValidateClassroomFieldResponse {
-    if (this._urlFragment === '') {
-      return {
-        type: 'The classroom URL fragment should not be empty.',
-        result: false
-      };
-    }
+  getClassroomUrlValidationError(): string {
+    let errorMsg = '';
+    const validUrlFragmentRegex = new RegExp(
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
 
-    if (
+    if (this._urlFragment === '') {
+      errorMsg = 'The classroom URL fragment should not be empty.';
+    }
+    else if (
         this._urlFragment.length >
         AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
-      return {
-        type: (
-          'The classroom URL fragment should contain at most 20 characters.'),
-        result: false
-      };
+      errorMsg = (
+        'The classroom URL fragment should contain at most 20 characters.'
+      );
     }
-
-    const validUrlFragmentRegex = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
-    if (!validUrlFragmentRegex.test(this._urlFragment)) {
-      return {
-        type: (
-          'The classroom URL fragment should only contain lowercase ' +
-          'letters separated by hyphens.'),
-        result: false
-      };
+    else if (!validUrlFragmentRegex.test(this._urlFragment)) {
+      errorMsg = (
+        'The classroom URL fragment should only contain lowercase ' +
+        'letters separated by hyphens.');
     }
-
-    return {
-      type: '',
-      result: true
-    };
-  }
-
-  setExistingClassroomNames(existingClassroomNames): void {
-    this._existingClassroomNames = existingClassroomNames;
+    return errorMsg;
   }
 
   static createClassroomFromDict(

@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ClassroomBackendApiService } from '../../../domain/classroom/classroom-backend-api.service';
-import { NewClassroomData } from '../new-classroom-admin.model';
+import { NewClassroomData } from '../new-classroom.model';
 import { ClassroomAdminDataService } from '../services/classroom-admin-data.service';
 
 
@@ -39,13 +39,16 @@ export class CreateNewClassroomModalComponent
   }
 
   existingClassroomNames: string[] = [];
-  newClassroom!: NewClassroomData;
+  tempClassroom!: NewClassroomData;
+  classroom!: NewClassroomData;
 
   classroomUrlFragmentIsDuplicate: boolean = false;
   newClassroomCreationInProgress: boolean = false;
 
   ngOnInit(): void {
-    this.newClassroom = new NewClassroomData('', '', '');
+    this.tempClassroom = new NewClassroomData('', '', '');
+    this.classroom = new NewClassroomData('', '', '');
+
     this.classroomAdminDataService.existingClassroomNames = (
       this.existingClassroomNames);
   }
@@ -58,8 +61,8 @@ export class CreateNewClassroomModalComponent
       classroomId => {
         const defaultClassroomDict = {
           classroom_id: classroomId,
-          name: this.newClassroom.getClassroomName(),
-          url_fragment: this.newClassroom.getClassroomUrlFragment(),
+          name: this.tempClassroom.getClassroomName(),
+          url_fragment: this.tempClassroom.getClassroomUrlFragment(),
           course_details: '',
           topic_list_intro: '',
           topic_id_to_prerequisite_topic_ids: {}

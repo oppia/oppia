@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { ClassroomData, ValidateClassroomFieldResponse } from '../existing-classroom-admin.model';
+import { ClassroomData } from '../existing-classroom.model';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 
 
@@ -34,20 +34,13 @@ export class ClassroomAdminDataService {
   existingClassroomNames: string[];
   urlFragmentIsDuplicate: boolean;
 
-  namevalidationResponse: ValidateClassroomFieldResponse = {
-    type: '',
-    result: false
-  };
-
-  urlValidationResponse: ValidateClassroomFieldResponse = {
-    type: '',
-    result: false
-  };
+  nameValidationError: string = '';
+  urlValidationError: string = '';
 
   onClassroomNameChange(classroom: ClassroomData): void {
-    this.namevalidationResponse = classroom.IsClassroomNameValid();
+    this.nameValidationError = classroom.getClassroomNamValidationError();
 
-    if (!this.namevalidationResponse.result) {
+    if (this.nameValidationError.length > 0) {
       return;
     }
 
@@ -55,26 +48,18 @@ export class ClassroomAdminDataService {
       this.existingClassroomNames.indexOf(
         classroom.getClassroomName()) !== -1
     ) {
-      this.namevalidationResponse = {
-        type: 'A classroom with this name already exists.',
-        result: false
-      };
-      return;
+      this.nameValidationError = (
+        'A classroom with this name already exists.');
     }
-
-    this.namevalidationResponse = {
-      type: '',
-      result: true
-    };
   }
 
   onClassroomUrlChange(
       classroom: ClassroomData,
       existingClassroomUrl: string
   ): void {
-    this.urlValidationResponse = classroom.IsClassroomUrlFragmentIsValid();
+    this.urlValidationError = classroom.getClassroomUrlValidationError();
 
-    if (!this.urlValidationResponse.result) {
+    if (this.urlValidationError.length > 0) {
       return;
     }
 
@@ -86,25 +71,29 @@ export class ClassroomAdminDataService {
           classroom.getClassroomUrlFragment() !==
             existingClassroomUrl)
       ) {
-        this.urlValidationResponse = {
-          type: 'A classroom with this name already exists.',
-          result: false
-        };
-        return;
+        this.urlValidationError = (
+          'A classroom with this name already exists.');
       }
-
-      this.urlValidationResponse = {
-        type: '',
-        result: true
-      };
     });
   }
 
-  reinitializeClassroomValidationFields(): void {
-    this.namevalidationResponse.type = '';
-    this.namevalidationResponse.result = false;
-    this.urlValidationResponse.type = '';
-    this.urlValidationResponse.result = false;
+  isClassroomValid(
+      tempClassroom: ClassroomData,
+      existingClassroom: ClassroomData
+  ): void {
+    this.onClassroomNameChange(tempClassroom);
+    this.onClassroomUrlChange(
+      tempClassroom, existingClassroom.getClassroomUrlFragment());
+
+    tempClassroom.setClassroomValidityFlag(
+      this.nameValidationError === '' &&
+      this.urlValidationError === ''
+    );
+  }
+
+  reinitializeErrorMsgs(): void {
+    this.nameValidationError = '';
+    this.urlValidationError = '';
   }
 }
 

@@ -18,7 +18,7 @@
 
 
 import { TestBed } from '@angular/core/testing';
-import { ExistingClassroomData } from './existing-classroom-admin.model';
+import { ExistingClassroomData } from './existing-classroom.model';
 
 
 describe('Classroom admin model', () => {

@@ -7,12 +7,12 @@
   <div class="row new-classroom-input-data">
     <span class="col-lg-3 col-md-3 col-sm-3">Name</span>
     <div class="new-classroom-name-input">
-      <textarea [(ngModel)]="newClassroom._name"
+      <textarea [(ngModel)]="tempClassroom._name"
                 rows="1"
-                (ngModelChange)="classroomAdminDataService.onClassroomNameChange(newClassroom)">
+                (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroom, classroom)">
       </textarea>
-      <p *ngIf="classroomAdminDataService.namevalidationResponse.type.length > 0" class="oppia-warning-text">
-        {{ classroomAdminDataService.namevalidationResponse.type }}
+      <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
+        {{ classroomAdminDataService.nameValidationError }}
       </p>
     </div>
   </div>
@@ -20,12 +20,12 @@
   <div class="row new-classroom-input-data">
     <span class="col-lg-3 col-md-3 col-sm-3">URL Fragment</span>
     <div class="new-classroom-name-input">
-      <textarea [(ngModel)]="newClassroom._urlFragment"
+      <textarea [(ngModel)]="tempClassroom._urlFragment"
                 rows="1"
-                (ngModelChange)="classroomAdminDataService.onClassroomUrlChange(newClassroom, '')">
+                (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroom, classroom)">
       </textarea>
-      <p *ngIf="classroomAdminDataService.urlValidationResponse.type.length > 0" class="oppia-warning-text">
-        {{ classroomAdminDataService.urlValidationResponse.type }}
+      <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
+        {{ classroomAdminDataService.urlValidationError }}
       </p>
     </div>
   </div>
@@ -38,7 +38,7 @@
   </button>
   <button class="btn btn-success"
           (click)="createClassroom()"
-          [disabled]="!(classroomAdminDataService.namevalidationResponse.result && classroomAdminDataService.urlValidationResponse.result)">
+          [disabled]="!tempClassroom.isClassroomDataValid()">
     <span *ngIf="!newClassroomCreationInProgress">Create</span>
     <mat-spinner *ngIf="newClassroomCreationInProgress"
                  class="oppia-create-classroom-spinning-button"

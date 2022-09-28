@@ -24,14 +24,14 @@ export interface NewClassroom {
   _classroomId: string;
   _name: string;
   _urlFragment: string;
-  _existingClassroomNames: string[];
-  _classroomNameIsValid: boolean;
-  _classroomUrlFragmentIsValid: boolean;
+  _classroomDataIsValid: boolean;
   getClassroomId: () => string;
   getClassroomName: () => string;
   getClassroomUrlFragment: () => string;
-  IsClassroomNameValid: () => ValidateClassroomFieldResponse;
-  IsClassroomUrlFragmentIsValid: () => ValidateClassroomFieldResponse;
+  getClassroomNamValidationError: () => string;
+  getClassroomUrlValidationError: () => string;
+  isClassroomDataValid: () => boolean;
+  setClassroomValidityFlag: (boolean) => void;
 }
 
 
@@ -39,9 +39,7 @@ export class NewClassroomData implements NewClassroom {
   _classroomId: string;
   _name: string;
   _urlFragment: string;
-  _existingClassroomNames!: string[];
-  _classroomNameIsValid!: boolean;
-  _classroomUrlFragmentIsValid!: boolean;
+  _classroomDataIsValid: boolean;
 
   constructor(
       classroomId: string,
@@ -53,10 +51,17 @@ export class NewClassroomData implements NewClassroom {
     this._urlFragment = urlFragment;
   }
 
+  isClassroomDataValid(): boolean {
+    return this._classroomDataIsValid;
+  }
+
+  setClassroomValidityFlag(classroomDataIsValid: boolean): void {
+    this._classroomDataIsValid = classroomDataIsValid;
+  }
+
   getClassroomId(): string {
     return this._classroomId;
   }
-
 
   getClassroomName(): string {
     return this._name;
@@ -66,62 +71,37 @@ export class NewClassroomData implements NewClassroom {
     return this._urlFragment;
   }
 
-  IsClassroomNameValid(): ValidateClassroomFieldResponse {
-    this._classroomNameIsValid = true;
-
+  getClassroomNamValidationError(): string {
+    let errorMsg = '';
     if (this._name === '') {
-      return {
-        type: 'The classroom name should not be empty.',
-        result: false
-      };
+      errorMsg = 'The classroom name should not be empty.';
+    } else if (this._name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
+      errorMsg = 'The classroom name should contain at most 39 characters.';
     }
-
-    if (this._name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
-      return {
-        type: 'The classroom name should contain at most 39 characters.',
-        result: false
-      };
-    }
-
-    return {
-      type: '',
-      result: true
-    };
+    return errorMsg;
   }
 
-  IsClassroomUrlFragmentIsValid(): ValidateClassroomFieldResponse {
-    if (this._urlFragment === '') {
-      return {
-        type: 'The classroom URL fragment should not be empty.',
-        result: false
-      };
-    }
+  getClassroomUrlValidationError(): string {
+    let errorMsg = '';
+    const validUrlFragmentRegex = new RegExp(
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
 
-    if (
+    if (this._urlFragment === '') {
+      errorMsg = 'The classroom URL fragment should not be empty.';
+    }
+    else if (
         this._urlFragment.length >
         AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
-      return {
-        type: (
-          'The classroom URL fragment should contain at most 20 characters.'),
-        result: false
-      };
+      errorMsg = (
+        'The classroom URL fragment should contain at most 20 characters.'
+      );
     }
-
-    const validUrlFragmentRegex = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
-    if (!validUrlFragmentRegex.test(this._urlFragment)) {
-      return {
-        type: (
-          'The classroom URL fragment should only contain lowercase ' +
-          'letters separated by hyphens.'),
-        result: false
-      };
+    else if (!validUrlFragmentRegex.test(this._urlFragment)) {
+      errorMsg = (
+        'The classroom URL fragment should only contain lowercase ' +
+        'letters separated by hyphens.');
     }
-
-    return {
-      type: '',
-      result: true
-    };
+    return errorMsg;
   }
 }

@@ -62,11 +62,11 @@
               <textarea *ngIf="classroomEditorMode"
                         [(ngModel)]="tempClassroomData._name"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="classroomAdminDataService.onClassroomNameChange(tempClassroomData)"
+                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
                         rows="1">
               </textarea>
-              <p *ngIf="classroomAdminDataService.namevalidationResponse.type.length > 0" class="oppia-warning-text">
-                {{ classroomAdminDataService.namevalidationResponse.type }}
+              <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
+                {{ classroomAdminDataService.nameValidationError }}
               </p>
             </div>
           </div>
@@ -82,11 +82,11 @@
               <textarea *ngIf="classroomEditorMode"
                         [(ngModel)]="tempClassroomData._urlFragment"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="classroomAdminDataService.onClassroomUrlChange(tempClassroomData, classroomData.getClassroomUrlFragment())"
+                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
                         rows="1">
               </textarea>
-              <p *ngIf="classroomAdminDataService.urlValidationResponse.type.length > 0" class="oppia-warning-text">
-                {{ classroomAdminDataService.urlValidationResponse.type }}
+              <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
+                {{ classroomAdminDataService.urlValidationError }}
               </p>
             </div>
           </div>
@@ -101,6 +101,7 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._courseDetails"
                       (blur)="updateClassroomField()"
+                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
                       rows="6"
                       class="classroom-field">
             </textarea>
@@ -116,6 +117,7 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._topicListIntro"
                       (blur)="updateClassroomField()"
+                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
                       rows="4"
                       class="classroom-field">
             </textarea>
@@ -128,7 +130,7 @@
               Cancel
             </button>
             <button class="btn btn-success save-classroom-changes"
-                    [disabled]="(!classroomDataIsChanged) || !(classroomAdminDataService.namevalidationResponse.result && classroomAdminDataService.urlValidationResponse.result)"
+                    [disabled]="(!classroomDataIsChanged) || !(tempClassroomData.isClassroomDataValid())"
                     (click)="saveClassroomData(classroom.key)">
               <span *ngIf="!classroomDataSaveInProgress">Save</span>
               <mat-spinner *ngIf="classroomDataSaveInProgress"

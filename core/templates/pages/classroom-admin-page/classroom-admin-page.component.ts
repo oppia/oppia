@@ -26,7 +26,7 @@ import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-
 import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
 import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
 import cloneDeep from 'lodash/cloneDeep';
-import { ExistingClassroomData } from './existing-classroom-admin.model';
+import { ExistingClassroomData } from './existing-classroom.model';
 import { ClassroomAdminDataService } from './services/classroom-admin-data.service';
 
 @Component({
@@ -219,8 +219,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.openClassroomInViewerMode();
         this.tempClassroomData = cloneDeep(this.classroomData);
         this.classroomDataIsChanged = false;
-
-        this.classroomAdminDataService.reinitializeClassroomValidationFields();
+        this.classroomAdminDataService.reinitializeErrorMsgs();
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is
@@ -246,9 +245,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         classroomDict.name);
       this.classroomCount++;
     }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is
-      // clicked. No further action is needed.
+      this.classroomAdminDataService.reinitializeErrorMsgs();
     });
   }
 
