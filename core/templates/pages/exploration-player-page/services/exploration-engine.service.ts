@@ -544,7 +544,7 @@ export class ExplorationEngineService {
     // Check if the answer is only misspelled and close
     // to the correct answer. Only to be checked if the
     // interaction is TextInput.
-    let oldInteractionId = oldStateCard.getInteraction().id;
+    let oldInteractionId = oldState.interaction.id;
 
     // Work => let catchMisspellingsFeatOn = oldStateCard.getInteraction().customizationArgs.
     
