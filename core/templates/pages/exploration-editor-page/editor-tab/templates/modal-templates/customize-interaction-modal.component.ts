@@ -149,9 +149,6 @@ export class CustomizeInteractionModalComponent
   explorationIsLinkedToStory: boolean;
   customizationModalReopened: boolean;
   isinteractionOpen: boolean;
-  explorationTitle: string;
-  inputField: HTMLCollectionOf<Element>;
-  inputValue: string;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -172,7 +169,7 @@ export class CustomizeInteractionModalComponent
   }
 
   getTitle(interactionId: string): string {
-    if(INTERACTION_SPECS[interactionId] !== undefined) {
+    if (INTERACTION_SPECS[interactionId] !== undefined) {
       return INTERACTION_SPECS[interactionId].name;
     }
   }
@@ -445,9 +442,6 @@ export class CustomizeInteractionModalComponent
   }
 
   ngOnInit(): void {
-    this.explorationTitle = this.getTitle(this.stateInteractionIdService.displayed);
-    this.inputField = document.getElementsByClassName('form-control display-inline');
-    this.inputValue = angular.element(this.inputField[this.inputField.length-1]).attr('ng-reflect-model');
     if (this.stateInteractionIdService.displayed) {
       this.isinteractionOpen = false;
     } else {
