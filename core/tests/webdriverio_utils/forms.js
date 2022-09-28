@@ -506,12 +506,11 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return (await entry.getHTML(false)).replace(/<!--[^>]*-->/g, '').trim();
+        return await entry.getText();
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = await elem.$$(XPATH_SELECTOR);
-    var fullText = (await elem.getHTML(false)).replace(
-      /<!--[^>]*-->/g, '').trim();
+    var fullText = await elem.getText();
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);

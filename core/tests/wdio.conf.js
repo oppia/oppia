@@ -404,6 +404,7 @@ exports.config = {
       var filePath = path.join(screenshotPath, fileName);
       // Save screenshot.
       await browser.saveScreenshot(filePath);
+      await browser.pause(5000);
     }
   },
 };
