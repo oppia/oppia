@@ -121,9 +121,11 @@ export class MathEquationInputValidationService {
 
         let unsupportedFunctions = (
           mathInteractionsService.checkUnsupportedFunctions(
-            splitInput[0]).concat(
+            splitInput[0]
+          ).concat(
             mathInteractionsService.checkUnsupportedFunctions(
-              splitInput[1])
+              splitInput[1]
+            )
           )
         );
         if (unsupportedFunctions.length > 0) {
