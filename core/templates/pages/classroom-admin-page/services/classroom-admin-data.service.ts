@@ -18,9 +18,8 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { ClassroomData } from '../classroom-admin.model';
+import { ClassroomData, ValidateClassroomFieldResponse } from '../existing-classroom-admin.model';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { AppConstants } from 'app.constants';
 
 
 @Injectable({
@@ -35,81 +34,77 @@ export class ClassroomAdminDataService {
   existingClassroomNames: string[];
   urlFragmentIsDuplicate: boolean;
 
-  supressClassroomNameErrorMessages(classroom: ClassroomData): void {
-    classroom.classroomNameIsTooLong = false;
-    classroom.emptyClassroomName = false;
-    classroom.duplicateClassroomName = false;
-  }
+  namevalidationResponse: ValidateClassroomFieldResponse = {
+    type: '',
+    result: false
+  };
 
-  supressClassroomUrlFragmentErrorMessages(classroom: ClassroomData): void {
-    classroom.classroomUrlFragmentIsTooLong = false;
-    classroom.classroomUrlFragmentIsEmpty = false;
-    classroom.duplicateClassroomUrlFragment = false;
-    classroom.urlFragmentRegexMatched = true;
-  }
+  urlValidationResponse: ValidateClassroomFieldResponse = {
+    type: '',
+    result: false
+  };
 
-  validateName(classroom: ClassroomData): void {
-    this.supressClassroomNameErrorMessages(classroom);
-    classroom.classroomNameIsValid = true;
+  onClassroomNameChange(classroom: ClassroomData): void {
+    this.namevalidationResponse = classroom.IsClassroomNameValid();
 
-    if (classroom.name === '') {
-      classroom.emptyClassroomName = true;
-      classroom.classroomNameIsValid = false;
-      return;
-    }
-
-    if (classroom.name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
-      classroom.classroomNameIsTooLong = true;
-      classroom.classroomNameIsValid = false;
-      return;
-    }
-
-    if (this.existingClassroomNames.indexOf(classroom.name) !== -1) {
-      classroom.duplicateClassroomName = true;
-      classroom.classroomNameIsValid = false;
-    }
-  }
-
-  validateUrlFragment(
-      classroom: ClassroomData, existingClassroomUrlFragment: string
-  ): void {
-    this.supressClassroomUrlFragmentErrorMessages(classroom);
-    classroom.classroomUrlFragmentIsValid = true;
-
-    if (classroom.urlFragment === '') {
-      classroom.classroomUrlFragmentIsEmpty = true;
-      classroom.classroomUrlFragmentIsValid = false;
+    if (!this.namevalidationResponse.result) {
       return;
     }
 
     if (
-      classroom.urlFragment.length >
-      AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+      this.existingClassroomNames.indexOf(
+        classroom.getClassroomName()) !== -1
     ) {
-      classroom.classroomUrlFragmentIsTooLong = true;
-      classroom.classroomUrlFragmentIsValid = false;
+      this.namevalidationResponse = {
+        type: 'A classroom with this name already exists.',
+        result: false
+      };
       return;
     }
 
-    const validUrlFragmentRegex = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
-    if (!validUrlFragmentRegex.test(classroom.urlFragment)) {
-      classroom.urlFragmentRegexMatched = false;
-      classroom.classroomUrlFragmentIsValid = false;
+    this.namevalidationResponse = {
+      type: '',
+      result: true
+    };
+  }
+
+  onClassroomUrlChange(
+      classroom: ClassroomData,
+      existingClassroomUrl: string
+  ): void {
+    this.urlValidationResponse = classroom.IsClassroomUrlFragmentIsValid();
+
+    if (!this.urlValidationResponse.result) {
       return;
     }
 
     this.classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
-      classroom.urlFragment).then((response: boolean) => {
+      classroom.getClassroomUrlFragment()
+    ).then((response: boolean) => {
       if (
         response && (
-          classroom.urlFragment !== existingClassroomUrlFragment)
+          classroom.getClassroomUrlFragment() !==
+            existingClassroomUrl)
       ) {
-        classroom.duplicateClassroomUrlFragment = true;
-        classroom.classroomUrlFragmentIsValid = false;
+        this.urlValidationResponse = {
+          type: 'A classroom with this name already exists.',
+          result: false
+        };
         return;
       }
+
+      this.urlValidationResponse = {
+        type: '',
+        result: true
+      };
     });
+  }
+
+  reinitializeClassroomValidationFields(): void {
+    this.namevalidationResponse.type = '';
+    this.namevalidationResponse.result = false;
+    this.urlValidationResponse.type = '';
+    this.urlValidationResponse.result = false;
   }
 }
 

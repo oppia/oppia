@@ -13,24 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for state-card.model.ts.
+ * @fileoverview Tests for existing classroom model.
  */
 
 
 import { TestBed } from '@angular/core/testing';
-import { ClassroomData } from './classroom-admin.model';
+import { ExistingClassroomData } from './existing-classroom-admin.model';
 
 
 describe('Classroom admin model', () => {
-  let classroomData: ClassroomData;
+  let newClassroomData: NewClassroomData;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: []
     });
 
-    classroomData = new ClassroomData(
-      'classroomId', 'math', 'math', '', '', {});
+    newClassroomData = new NewClassroomData('classroomId', 'math', 'math');
   });
 
   it(

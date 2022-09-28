@@ -26,7 +26,7 @@ import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-
 import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
 import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
 import cloneDeep from 'lodash/cloneDeep';
-import { ExistingClassroomData } from './classroom-admin.model';
+import { ExistingClassroomData } from './existing-classroom-admin.model';
 import { ClassroomAdminDataService } from './services/classroom-admin-data.service';
 
 @Component({
@@ -63,7 +63,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   getClassroomData(classroomId: string): void {
     if (
       this.tempClassroomData && (
-        this.tempClassroomData.classroomId === classroomId) &&
+        this.tempClassroomData.getClassroomId() === classroomId) &&
       this.classroomViewerMode
     ) {
       this.classroomDetailsIsShown = false;
@@ -87,7 +87,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.existingClassroomNames = (
           Object.values(this.classroomIdToClassroomName));
         const index = this.existingClassroomNames.indexOf(
-          this.tempClassroomData.name);
+          this.tempClassroomData.getClassroomName());
         this.existingClassroomNames.splice(index, 1);
 
         this.classroomDetailsIsShown = true;
@@ -96,9 +96,11 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomAdminDataService.existingClassroomNames = (
           this.existingClassroomNames);
 
-        this.classroomAdminDataService.validateName(this.tempClassroomData);
-        this.classroomAdminDataService.validateUrlFragment(
-          this.tempClassroomData, this.classroomData.urlFragment);
+        this.classroomAdminDataService.onClassroomNameChange(
+          this.tempClassroomData);
+        this.classroomAdminDataService.onClassroomUrlChange(
+          this.tempClassroomData,
+          this.classroomData.getClassroomUrlFragment());
       }, (errorResponse) => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -119,16 +121,21 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   updateClassroomField(): void {
     const classroomNameIsChanged = (
-      this.tempClassroomData.name !== this.classroomData.name);
+      this.tempClassroomData.getClassroomName() !==
+      this.classroomData.getClassroomName()
+    );
     const classroomUrlIsChanged = (
-      this.tempClassroomData.urlFragment !==
-      this.classroomData.urlFragment);
+      this.tempClassroomData.getClassroomUrlFragment() !==
+      this.classroomData.getClassroomUrlFragment()
+    );
     const classroomTopicListIntroIsChanged = (
-      this.tempClassroomData.topicListIntro !==
-      this.classroomData.topicListIntro);
+      this.tempClassroomData.getTopicListIntro() !==
+      this.classroomData.getTopicListIntro()
+    );
     const classroomCourseDetailsIsChanged = (
-      this.tempClassroomData.courseDetails !==
-      this.classroomData.courseDetails);
+      this.tempClassroomData.getCourseDetails() !==
+      this.classroomData.getCourseDetails()
+    );
 
     if (
       classroomNameIsChanged ||
@@ -166,8 +173,9 @@ export class ClassroomAdminPageComponent implements OnInit {
 
     this.classroomBackendApiService.updateClassroomDataAsync(
       classroomId, backendDict).then(() => {
-      this.classroomIdToClassroomName[this.tempClassroomData.classroomId] = (
-        this.tempClassroomData.name);
+      this.classroomIdToClassroomName[
+        this.tempClassroomData.getClassroomId()] = (
+        this.tempClassroomData.getClassroomName());
       this.classroomData = cloneDeep(this.tempClassroomData);
       this.classroomDataSaveInProgress = false;
     });
@@ -210,15 +218,9 @@ export class ClassroomAdminPageComponent implements OnInit {
       modalRef.result.then(() => {
         this.openClassroomInViewerMode();
         this.tempClassroomData = cloneDeep(this.classroomData);
-
-        this.classroomAdminDataService.supressClassroomNameErrorMessages(
-          this.tempClassroomData);
-        this.classroomAdminDataService
-          .supressClassroomUrlFragmentErrorMessages(this.tempClassroomData);
-
-        this.tempClassroomData.classroomNameIsValid = true;
-        this.tempClassroomData.classroomUrlFragmentIsValid = true;
         this.classroomDataIsChanged = false;
+
+        this.classroomAdminDataService.reinitializeClassroomValidationFields();
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is

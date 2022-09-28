@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ClassroomBackendApiService } from '../../../domain/classroom/classroom-backend-api.service';
-import { NewClassroomData } from '../classroom-admin.model';
+import { NewClassroomData } from '../new-classroom-admin.model';
 import { ClassroomAdminDataService } from '../services/classroom-admin-data.service';
 
 
@@ -46,17 +46,8 @@ export class CreateNewClassroomModalComponent
 
   ngOnInit(): void {
     this.newClassroom = new NewClassroomData('', '', '');
-    this.newClassroom.classroomNameIsValid = false;
-    this.newClassroom.classroomUrlFragmentIsValid = false;
     this.classroomAdminDataService.existingClassroomNames = (
       this.existingClassroomNames);
-
-    // The error messages for classroom name and URL fragment, should not be
-    // presented to the user when the modal is just opened.
-    this.classroomAdminDataService.supressClassroomNameErrorMessages(
-      this.newClassroom);
-    this.classroomAdminDataService.supressClassroomUrlFragmentErrorMessages(
-      this.newClassroom);
   }
 
   createClassroom(): void {
@@ -67,8 +58,8 @@ export class CreateNewClassroomModalComponent
       classroomId => {
         const defaultClassroomDict = {
           classroom_id: classroomId,
-          name: this.newClassroom.name,
-          url_fragment: this.newClassroom.urlFragment,
+          name: this.newClassroom.getClassroomName(),
+          url_fragment: this.newClassroom.getClassroomUrlFragment(),
           course_details: '',
           topic_list_intro: '',
           topic_id_to_prerequisite_topic_ids: {}

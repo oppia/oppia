@@ -23,8 +23,9 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ClassroomAdminPageComponent } from 'pages/classroom-admin-page/classroom-admin-page.component';
 import { ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
-import { ClassroomData } from './classroom-admin.model';
+// import { ClassroomData } from './new-classroom-admin.model';
 import { AlertsService } from 'services/alerts.service';
+import { ExistingClassroomData } from './existing-classroom-admin.model';
 
 
 class MockNgbModal {
@@ -40,6 +41,7 @@ describe('Classroom Admin Page component ', () => {
   let fixture: ComponentFixture<ClassroomAdminPageComponent>;
 
   let classroomBackendApiService: ClassroomBackendApiService;
+  let existingClassroomData: ExistingClassroomData;
   let ngbModal: NgbModal;
   let alertsService: AlertsService;
 
@@ -53,6 +55,7 @@ describe('Classroom Admin Page component ', () => {
       providers: [
         AlertsService,
         ClassroomBackendApiService,
+        ExistingClassroomData,
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -66,6 +69,7 @@ describe('Classroom Admin Page component ', () => {
 
   beforeEach(() => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    existingClassroomData = TestBed.inject(ExistingClassroomData);
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
   });
@@ -150,7 +154,7 @@ describe('Classroom Admin Page component ', () => {
       component.classroomViewerMode = true;
       component.classroomDetailsIsShown = true;
 
-      component.tempClassroomData = ClassroomData.createNewClassroomFromDict(
+      component.tempClassroomData = ExistingClassroomData.createNewClassroomFromDict(
         response.classroomDict);
 
       component.getClassroomData('classroomId');
@@ -221,7 +225,7 @@ describe('Classroom Admin Page component ', () => {
         topicIdToPrerequisiteTopicIds: {}
       }
     };
-    component.tempClassroomData = ClassroomData.createNewClassroomFromDict(
+    component.tempClassroomData = ExistingClassroomData.createNewClassroomFromDict(
       response.classroomDict);
     component.classroomData = ClassroomData.createNewClassroomFromDict(
       response.classroomDict);
