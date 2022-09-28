@@ -168,13 +168,13 @@ def report_pass(suite_name: str) -> None:
             PASS_REPORT_URL))
 
 
-def check_test_flakiness(output_lines: List[str], suite_name: str) -> bool:
+def check_test_flakiness(output_lines: List[bytes], suite_name: str) -> bool:
     """Checks whether the test output matches any flaky test log.
 
     Whether the test is flaky is printed to the console.
 
     Args:
-        output_lines: list(str). The output from the test run.
+        output_lines: list(bytes). The output from the test run.
         suite_name: str. Name of the E2E test suite.
 
     Returns:

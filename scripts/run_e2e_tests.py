@@ -33,15 +33,18 @@ from scripts import flake_checker  # isort:skip
 from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
 
-MAX_RETRY_COUNT = 3
-GOOGLE_APP_ENGINE_PORT = 9001
-ELASTICSEARCH_SERVER_PORT = 9200
-PORTS_USED_BY_OPPIA_PROCESSES = [
+from typing import List, Optional, Tuple
+from typing_extensions import Final
+
+MAX_RETRY_COUNT: Final = 3
+GOOGLE_APP_ENGINE_PORT: Final = 9001
+ELASTICSEARCH_SERVER_PORT: Final = 9200
+PORTS_USED_BY_OPPIA_PROCESSES: Final = [
     GOOGLE_APP_ENGINE_PORT,
     ELASTICSEARCH_SERVER_PORT,
 ]
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
    python -m scripts.run_e2e_tests
@@ -103,7 +106,7 @@ _PARSER.add_argument(
     action='store_true')
 
 
-SUITES_MIGRATED_TO_WEBDRIVERIO = [
+SUITES_MIGRATED_TO_WEBDRIVERIO: Final = [
     'accessibility',
     'additionalEditorFeatures',
     'additionalEditorFeaturesModals',
@@ -140,7 +143,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'wipeout',
 ]
 
-SUITES_STILL_IN_PROTRACTOR = [
+SUITES_STILL_IN_PROTRACTOR: Final = [
     'featureGating',
     'fileUploadFeatures',
     'fileUploadExtensions',
@@ -149,12 +152,12 @@ SUITES_STILL_IN_PROTRACTOR = [
     'publication',
 ]
 
-MOBILE_SUITES = [
+MOBILE_SUITES: Final = [
     'contributorDashboard'
 ]
 
 
-def is_oppia_server_already_running():
+def is_oppia_server_already_running() -> bool:
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
@@ -171,7 +174,7 @@ def is_oppia_server_already_running():
     return False
 
 
-def run_webpack_compilation(source_maps=False):
+def run_webpack_compilation(source_maps: bool = False) -> None:
     """Runs webpack compilation.
 
     Args:
@@ -198,7 +201,7 @@ def run_webpack_compilation(source_maps=False):
         sys.exit(1)
 
 
-def install_third_party_libraries(skip_install):
+def install_third_party_libraries(skip_install: bool) -> None:
     """Run the installation script.
 
     Args:
@@ -208,7 +211,7 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def build_js_files(dev_mode, source_maps=False):
+def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     """Build the javascript files.
 
     Args:
@@ -230,7 +233,7 @@ def build_js_files(dev_mode, source_maps=False):
         run_webpack_compilation(source_maps=source_maps)
 
 
-def run_tests(args):
+def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start end-to-end tests."""
     if is_oppia_server_already_running():
         sys.exit(1)
@@ -353,10 +356,11 @@ def run_tests(args):
             if proc.poll() is not None:
                 break
 
-        return output_lines, proc.returncode
+        return_value = output_lines, proc.returncode
+    return return_value
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
 

@@ -328,7 +328,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         expected_payload = {
             'suite': 'suiteName',
-            'output_lines': ['line1', 'line2'],
+            'output_lines': [b'line1', b'line2'],
             'metadata': {
                 'username': 'user',
                 'build_url': 'https://example.com',
@@ -353,7 +353,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         with getenv_swap, datetime_swap, post_swap:
             rerun = flake_checker.check_test_flakiness(
-                ['line1', 'line2'], 'suiteName')
+                [b'line1', b'line2'], 'suiteName')
             self.assertTrue(rerun)
 
     def test_successful_report_unknown_rerun(self) -> None:
@@ -387,7 +387,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         expected_payload = {
             'suite': 'suiteName',
-            'output_lines': ['line1', 'line2'],
+            'output_lines': [b'line1', b'line2'],
             'metadata': {
                 'username': 'user',
                 'build_url': 'https://example.com',
@@ -412,7 +412,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         with getenv_swap, datetime_swap, post_swap:
             rerun = flake_checker.check_test_flakiness(
-                ['line1', 'line2'], 'suiteName')
+                [b'line1', b'line2'], 'suiteName')
             self.assertFalse(rerun)
 
     def test_successful_report_construct_url(self) -> None:
@@ -447,7 +447,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         expected_payload = {
             'suite': 'suiteName',
-            'output_lines': ['line1', 'line2'],
+            'output_lines': [b'line1', b'line2'],
             'metadata': {
                 'username': 'user',
                 'build_url': 'https://github.com/foo/oppia/actions/runs/1234',
@@ -472,7 +472,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         with getenv_swap, datetime_swap, post_swap:
             rerun = flake_checker.check_test_flakiness(
-                ['line1', 'line2'], 'suiteName')
+                [b'line1', b'line2'], 'suiteName')
             self.assertFalse(rerun)
 
     def test_unsuccessful_report_exception(self) -> None:
@@ -496,7 +496,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         expected_payload = {
             'suite': 'suiteName',
-            'output_lines': ['line1', 'line2'],
+            'output_lines': [b'line1', b'line2'],
             'metadata': {
                 'username': 'user',
                 'build_url': 'https://example.com',
@@ -521,7 +521,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         with getenv_swap, datetime_swap, post_swap:
             rerun = flake_checker.check_test_flakiness(
-                ['line1', 'line2'], 'suiteName')
+                [b'line1', b'line2'], 'suiteName')
             self.assertFalse(rerun)
 
     def test_unsuccessful_report_not_ok(self) -> None:
@@ -545,7 +545,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         expected_payload = {
             'suite': 'suiteName',
-            'output_lines': ['line1', 'line2'],
+            'output_lines': [b'line1', b'line2'],
             'metadata': {
                 'username': 'user',
                 'build_url': 'https://example.com',
@@ -570,7 +570,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         with getenv_swap, datetime_swap, post_swap:
             rerun = flake_checker.check_test_flakiness(
-                ['line1', 'line2'], 'suiteName')
+                [b'line1', b'line2'], 'suiteName')
             self.assertFalse(rerun)
 
     def test_unsuccessful_report_bad_payload(self) -> None:
@@ -594,7 +594,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         expected_payload = {
             'suite': 'suiteName',
-            'output_lines': ['line1', 'line2'],
+            'output_lines': [b'line1', b'line2'],
             'metadata': {
                 'username': 'user',
                 'build_url': 'https://example.com',
@@ -619,5 +619,5 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         with getenv_swap, datetime_swap, post_swap:
             rerun = flake_checker.check_test_flakiness(
-                ['line1', 'line2'], 'suiteName')
+                [b'line1', b'line2'], 'suiteName')
             self.assertFalse(rerun)
