@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,21 @@
  * @fileoverview End-to-end tests of embedding explorations in other websites.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var workflow = require('../protractor_utils/workflow.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 describe('Embedding', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
-
-  explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-  explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
   var createCountingExploration = async function() {
     // Intro.
@@ -120,6 +116,12 @@ describe('Embedding', function() {
     '\'X-Frame-Options\' to \'deny\'.',
   ];
 
+  beforeAll(async() => {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  });
+
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
@@ -134,12 +136,6 @@ describe('Embedding', function() {
     }];
 
     var playCountingExploration = async function(version) {
-      // Protractor's waitForAngularEnabled does not work well inside
-      // iframes. see: https://github.com/angular/protractor/issues/4678
-      // Current, work-around is to use browser.sleep() before executing
-      // functions that require angular to be present inside the iframe.
-      // eslint-disable-next-line oppia/e2e-practices
-      await browser.sleep(5000);
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText((
@@ -178,45 +174,39 @@ describe('Embedding', function() {
     await explorationEditorPage.publishChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
-      // This is necessary as the pages are non-angular.
-      var driver = browser.driver;
-      await driver.get(
+      await browser.url(
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
         TEST_PAGES[i].filename);
 
-      await (await driver.findElement(by.css(
+      await (await $(
         '.e2e-test-exploration-id-input-field')
-      )).sendKeys(explorationId);
+      ).setValue(explorationId);
 
-      await (await driver.findElement(by.css(
+      await (await $(
         '.e2e-test-exploration-id-submit-button')
-      )).click();
+      ).click();
 
       // Test of standard loading (new and old versions).
-      await browser.switchTo().frame(
-        await driver.findElement(
-          by.css('.e2e-test-standard > iframe')));
+      await browser.switchToFrame(
+        await $('.e2e-test-standard > iframe'));
       await playCountingExploration(3);
-      await browser.switchTo().defaultContent();
+      await browser.switchToParentFrame();
 
       if (TEST_PAGES[i].isVersion1) {
         // Test of deferred loading (old version).
-        await driver.findElement(
-          by.css('.e2e-test-old-version > oppia > div > button')
-        ).click();
+        await $('.e2e-test-old-version > oppia > div > button').click();
       }
 
-      await browser.switchTo().frame(
-        await driver.findElement(
-          by.css('.e2e-test-old-version > iframe')));
+      await browser.switchToFrame(
+        await $('.e2e-test-old-version > iframe'));
       await playCountingExploration(2);
-      await browser.switchTo().defaultContent();
+      await browser.switchToParentFrame();
     }
 
     // Certain events in the exploration playthroughs should trigger hook
     // functions in the outer page; these send logs to the console which we
     // now check to ensure that the hooks work correctly.
-    var browserLogs = await browser.manage().logs().get('browser');
+    var browserLogs = await browser.getLogs('browser');
     var embeddingLogs = [];
     for (var i = 0; i < browserLogs.length; i++) {
       // We ignore all logs that are not of the desired form.
@@ -264,33 +254,24 @@ describe('Embedding', function() {
       // correct.
       var explorationId = null;
       var checkPlaceholder = async function(expectedPlaceholder) {
-        var driver = browser.driver;
-        await driver.get(
+        await browser.url(
           general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
           'embedding_tests_dev_i18n_0.0.1.html');
 
-        await (await driver.findElement(by.css(
-          '.e2e-test-exploration-id-input-field')
-        )).sendKeys(explorationId);
+        await (await $(
+          '.e2e-test-exploration-id-input-field')).setValue(explorationId);
 
-        await (await driver.findElement(by.css(
-          '.e2e-test-exploration-id-submit-button')
-        )).click();
+        await (await $(
+          '.e2e-test-exploration-id-submit-button')).click();
 
-        await browser.switchTo().frame(await driver.findElement(
-          by.css('.e2e-test-embedded-exploration > iframe')));
-        // Protractor's waitForAngularEnabled does not work well inside
-        // iframes. see: https://github.com/angular/protractor/issues/4678
-        // Current, work-around is to use browser.sleep() before executing
-        // functions that require angular to be present inside the iframe.
-        // eslint-disable-next-line oppia/e2e-practices
-        await browser.sleep(5000);
+        await browser.switchToFrame(await $(
+          '.e2e-test-embedded-exploration > iframe'));
         await waitFor.pageToFullyLoad();
 
-        expect(await (await driver.findElement(
-          by.css('.e2e-test-float-form-input'))).getAttribute(
+        expect(await (await $(
+          '.e2e-test-float-form-input')).getAttribute(
           'placeholder')).toBe(expectedPlaceholder);
-        await browser.switchTo().defaultContent();
+        await browser.switchToParentFrame();
       };
 
       await users.createAndLoginSuperAdminUser(
@@ -301,7 +282,7 @@ describe('Embedding', function() {
       explorationId = await general.getExplorationIdFromEditor();
 
       await explorationEditorMainTab.setContent(
-        await forms.toRichText('Language Test'));
+        await forms.toRichText('Language Test'), true);
       await explorationEditorMainTab.setInteraction('NumericInput');
       await explorationEditorMainTab.addResponse(
         'NumericInput', await forms.toRichText('Nice!!'),
@@ -314,7 +295,8 @@ describe('Embedding', function() {
       await responseEditor.setDestination('(try again)', null, false);
 
       await explorationEditorMainTab.moveToState('END');
-      await explorationEditorMainTab.setContent(await forms.toRichText('END'));
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('END'), true);
       await explorationEditorMainTab.setInteraction('EndExploration');
 
       // Save changes.
@@ -333,7 +315,7 @@ describe('Embedding', function() {
       // Change language to Thai, which is not a supported site language.
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
-      await explorationEditorSettingsTab.setLanguage('ภาษาไทย');
+      await explorationEditorSettingsTab.setLanguage('ภาษาไทย (Thai)');
       await explorationEditorPage.publishChanges(
         'Changing the language to a not supported one.');
       // We expect the default language, English.
@@ -342,7 +324,7 @@ describe('Embedding', function() {
       // Change language to Spanish, which is a supported site language.
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
-      await explorationEditorSettingsTab.setLanguage('español');
+      await explorationEditorSettingsTab.setLanguage('español (Spanish)');
       await explorationEditorPage.publishChanges(
         'Changing the language to a supported one.');
       await checkPlaceholder('Ingresa un número');
