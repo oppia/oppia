@@ -90,12 +90,13 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_id, e))
-
+        print('***********')
         return result.Ok((exp_id, exploration))
 
     @staticmethod
     def _generate_exploration_changes(
-        exp_id: str, exp_model: exp_models.ExplorationModel
+        exp_model: exp_models.ExplorationModel,
+        exploration: exp_domain.Exploration
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
         """Generates exploration change objects. The ExplorationChange object
         is only generated when the exploration's states schema version is lower
@@ -111,14 +112,17 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
             ExplorationChange object.
         """
         exp_version = exp_model.version
+        print('***********')
+        print(exp_model.android_proto_size_in_bytes)
+        print(exploration.android_proto_size_in_bytes)
         if exp_version < exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION:
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
                     exp_domain.CMD_EDIT_EXPLORATION_PROPERTY),
                 'property_name': 'android_proto_size_in_bytes',
-                'new_value': exp_model.android_proto_size_in_bytes
+                'new_value': exploration.android_proto_size_in_bytes
             })
-            yield (exp_id, exp_change)
+            yield (exp_model.id, exp_change)
 
     @staticmethod
     def _delete_exploration_from_cache(
@@ -169,9 +173,6 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
         updated_exp_model = (
             exp_services.populate_exp_model_fields(
                 exp_model, migrated_exp))
-
-        print('**************')
-        print(exp_model)
 
         commit_message = (
             'Updated android_proto_size_in_bytes for the exploration')
@@ -312,13 +313,21 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
                     'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
+        exp_rights_models = (
+                self.pipeline
+                | 'Get all non-deleted exploration rights models' >> (
+                    ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
+                | 'Add exploration rights ID' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+            lambda exp_rights_model: exp_rights_model.id)
+        )
+
         migrated_exp_results = (
             unmigrated_exploration_models
             | 'Transform and migrate model' >> beam.MapTuple( # pylint: disable=no-value-for-parameter
                 self._migrate_exploration)
         )
 
-        valid_exp = (
+        migrated_exp = (
             migrated_exp_results
             | 'Filter oks' >> beam.Filter(
                 lambda result_item: result_item.is_ok())
@@ -326,110 +335,89 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
                 lambda result_item: result_item.unwrap())
         )
 
-        migrated_exp_job_run_results = (
+        migrated_exploration_job_run_results = (
             migrated_exp_results
             | 'Generate results for migration' >> (
-                job_result_transforms.ResultsToJobRunResults('TOTAL EXP PROCESSED'))
+                job_result_transforms.ResultsToJobRunResults(
+                    'EXPLORATION PROCESSED'))
         )
 
+        migrated_exploration_object_list = (
+            {
+                'exp_model': unmigrated_exploration_models,
+                'exploration': migrated_exp,
+            }
+            | 'Merge object' >> beam.CoGroupByKey()
+            | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated exploration object' >> beam.Filter(
+        lambda x: len(x['exploration']) > 0)
+            | 'Reorganize the exploration object' >> beam.Map(lambda objects: {
+                'exp_model': objects['exp_model'][0],
+                'exploration': objects['exploration'][0]}))
+
+        # exp_id_to_migrated_exp = beam.pvalue.AsDict(migrated_exp)
         exp_changes = (
-            unmigrated_exploration_models
-            | 'Generate exploration changes' >> beam.FlatMapTuple(
-                self._generate_exploration_changes)
+                migrated_exploration_object_list
+                | 'Generate exploration changes' >> beam.FlatMap(
+            lambda exp_objects: self._generate_exploration_changes(
+                exp_objects['exp_model'],
+                exp_objects['exploration']
+            ))
         )
 
         exp_objects_list = (
             {
                 'exp_model': unmigrated_exploration_models,
-                'exp_summary_model': exp_summary_models,
                 'exp_rights_model': exp_rights_models,
                 'exploration': migrated_exp,
                 'exp_changes': exp_changes
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
-        )
-
-        transformed_exp_objects_list = (
-            exp_objects_list
-            | 'Remove unmigrated explorations' >> beam.Filter(
-                lambda x: (
-                    len(x['exp_changes']) > 0 and
-                    len(x['exploration']) > 0
-                ))
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                 'exp_model': objects['exp_model'][0],
                 'exploration': objects['exploration'][0],
-                'exp_rights_model': objects['exp_rights_model'][0],
-                'exp_summary_model': objects['exp_summary_model'][0],
-                'exp_changes': objects['exp_changes']
+                'exp_changes': objects['exp_changes'],
+                'exp_rights_model': objects['exp_rights_model'][0]
             })
         )
 
+        # transformed_exp_objects_list = (
+        #     exp_objects_list
+        #     | 'Remove unmigrated explorations' >> beam.Filter(
+        #         lambda x: (
+        #                 len(x['exp_changes']) > 0 and
+        #                 len(x['exploration']) > 0
+        #         ))
+        #     | 'Reorganize the transformed exploration objects' >> beam.Map(lambda objects: {
+        #         'exp_model': objects['exp_model'][0],
+        #         'exploration': objects['exploration'][0],
+        #         'exp_rights_model': objects['exp_rights_model'][0],
+        #         'exp_changes': objects['exp_changes']
+        #     })
+        # )
+
         exp_objects_list_job_run_results = (
-            transformed_exp_objects_list
-            | 'Transform exp objects into job run results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'EXP MIGRATED'))
-        )
-
-        already_migrated_job_run_results = (
             exp_objects_list
-            | 'Remove migrated explorations' >> beam.Filter(
-                lambda x: (
-                    len(x['exp_changes']) == 0 and len(x['exploration']) > 0
-                ))
-            | 'Transform previously migrated exps into job run results' >> (
+            | 'Transform exploration objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'EXP PREVIOUSLY MIGRATED'))
-        )
-
-        cache_deletion_job_run_results = (
-            transformed_exp_objects_list
-            | 'Delete exploration from cache' >> beam.Map(
-                lambda exp_object: self._delete_exploration_from_cache(
-                    exp_object['exploration']))
-            | 'Generate results for cache deletion' >> (
-                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
+                    'EXPLORATION POPULATED WITH android_proto_size_in_bytes'))
         )
 
         exp_models_to_put = (
             exp_objects_list
-            | 'Generate exploration models to put' >> beam.FlatMap(
-                lambda exp_objects: self._update_exploration(
-                    exp_objects['exp_model'],
-                    exp_objects['exp_rights_model'],
-                    exp_objects['exploration'],
-                    exp_objects['exp_changes'],
+                | 'Generate exploration models to put' >> beam.FlatMap(
+                    lambda exp_objects: self._update_exploration(
+                        exp_objects['exp_model'],
+                        exp_objects['exp_rights_model'],
+                        exp_objects['exploration'],
+                        exp_objects['exp_changes'],
                 ))
-        )
-
-        exp_summary_models_to_put = (
-            transformed_exp_objects_list
-            | 'Generate exp summary models to put' >> beam.Map(
-                lambda exp_objects: self._update_exp_summary(
-                    exp_objects['exploration'],
-                    exp_objects['exp_summary_model'],
-                    exp_objects['exp_rights_model']
-                ))
-        )
-
-        exp_opp_summary_models_to_put = (
-            migrated_exp
-            | 'Generate exp opportunity summary models to put' >> (
-                beam.MapTuple(
-                    self._update_exploration_opportunity_summary_models,
-                    exp_id_to_exp_opp_summary_model=(
-                        exp_opp_summary_models_to_exp)))
         )
 
         unused_put_results = (
-            (
-                exp_models_to_put,
-                exp_summary_models_to_put,
-                exp_opp_summary_models_to_put
-            )
-            | 'Merge models' >> beam.Flatten()
+            exp_models_to_put
+            # | 'Merge models' >> beam.Flatten()
             | 'Filter None models' >> beam.Filter(
                 lambda x: x is not None)
             | 'Put models into datastore' >> ndb_io.PutModels()
@@ -437,10 +425,10 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
 
         return (
             (
-                cache_deletion_job_run_results,
-                migrated_exp_job_run_results,
+                # cache_deletion_job_run_results,
+                migrated_exploration_job_run_results,
                 exp_objects_list_job_run_results,
-                already_migrated_job_run_results
+                # already_migrated_job_run_results
             )
             | beam.Flatten()
         )
