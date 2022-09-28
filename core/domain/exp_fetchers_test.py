@@ -166,7 +166,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 'does not match the latest schema version %s' % (
                     self.EXP_1_ID,
                     '1',
-                    '52',
+                    '53',
                     '60'
                 )
         )
@@ -465,14 +465,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: False
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: False
       default_outcome:
         dest: End
         dest_if_really_stuck: null
