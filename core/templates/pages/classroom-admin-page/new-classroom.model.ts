@@ -16,8 +16,7 @@
  * @fileoverview New classroom model.
  */
 
-import { AppConstants } from "app.constants";
-import { ValidateClassroomFieldResponse } from "./existing-classroom-admin.model";
+import { AppConstants } from 'app.constants';
 
 
 export interface NewClassroom {
@@ -28,6 +27,9 @@ export interface NewClassroom {
   getClassroomId: () => string;
   getClassroomName: () => string;
   getClassroomUrlFragment: () => string;
+  setClassroomId: (string) => void;
+  setClassroomName: (string) => void;
+  setUrlFragment: (string) => void;
   getClassroomNamValidationError: () => string;
   getClassroomUrlValidationError: () => string;
   isClassroomDataValid: () => boolean;
@@ -71,6 +73,18 @@ export class NewClassroomData implements NewClassroom {
     return this._urlFragment;
   }
 
+  setClassroomId(classroomId: string): void {
+    this._classroomId = classroomId;
+  }
+
+  setClassroomName(classroomName: string): void {
+    this._name = classroomName;
+  }
+
+  setUrlFragment(urlFragment: string): void {
+    this._urlFragment = urlFragment;
+  }
+
   getClassroomNamValidationError(): string {
     let errorMsg = '';
     if (this._name === '') {
@@ -88,16 +102,14 @@ export class NewClassroomData implements NewClassroom {
 
     if (this._urlFragment === '') {
       errorMsg = 'The classroom URL fragment should not be empty.';
-    }
-    else if (
-        this._urlFragment.length >
+    } else if (
+      this._urlFragment.length >
         AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
       errorMsg = (
         'The classroom URL fragment should contain at most 20 characters.'
       );
-    }
-    else if (!validUrlFragmentRegex.test(this._urlFragment)) {
+    } else if (!validUrlFragmentRegex.test(this._urlFragment)) {
       errorMsg = (
         'The classroom URL fragment should only contain lowercase ' +
         'letters separated by hyphens.');

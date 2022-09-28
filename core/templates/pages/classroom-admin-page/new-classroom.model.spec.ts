@@ -22,125 +22,78 @@ import { NewClassroomData } from './new-classroom.model';
 
 
 describe('Classroom admin model', () => {
-  let newClassroomData: NewClassroomData;
+  let classroomData: NewClassroomData;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: []
     });
 
-    newClassroomData = new NewClassroomData('classroomId', 'math', 'math');
+    classroomData = new NewClassroomData('classroomId', 'math', 'math');
   });
 
   it(
-    'should enable error messgage when classroom name exceeds max len',
+    'should return error messgage when classroom name exceeds max len',
     () => {
-      classroomData.classroomNameIsValid = true;
-      classroomData.classroomNameIsTooLong = false;
-      classroomData.name = (
-        'Long classroom name with some randome texts abcdefghi');
+      classroomData.setClassroomName(
+        'Long classroom name with some random texts abcdefghi');
 
-      classroomData.onClassroomNameChange();
-
-      expect(classroomData.classroomNameIsValid).toBeFalse();
-      expect(classroomData.classroomNameIsTooLong).toBeTrue();
+      expect(classroomData.getClassroomNamValidationError()).toEqual(
+        'The classroom name should contain at most 39 characters.'
+      );
     });
 
   it(
-    'should enable error messgae when classroom name is empty',
+    'should present error messgae when classroom name is empty',
     () => {
-      classroomData.classroomNameIsValid = true;
-      classroomData.emptyClassroomName = false;
-      classroomData.name = '';
+      classroomData.setClassroomName('');
 
-      classroomData.onClassroomNameChange();
-
-      expect(classroomData.classroomNameIsValid).toBeFalse();
-      expect(classroomData.emptyClassroomName).toBeTrue();
-    });
-
-  it(
-    'should enable error message when classroom name already exists',
-    () => {
-      classroomData.classroomNameIsValid = true;
-      classroomData.duplicateClassroomName = false;
-      classroomData.existingClassroomNames = ['physics', 'chemistry'];
-      classroomData.name = 'physics';
-
-      classroomData.onClassroomNameChange();
-
-      expect(classroomData.classroomNameIsValid).toBeFalse();
-      expect(classroomData.duplicateClassroomName).toBeTrue();
+      expect(classroomData.getClassroomNamValidationError()).toEqual(
+        'The classroom name should not be empty.'
+      );
     });
 
   it(
     'should not present any error when classroom name is valid', () => {
-      classroomData.classroomNameIsValid = true;
-      classroomData.duplicateClassroomName = false;
-      classroomData.emptyClassroomName = false;
-      classroomData.classroomNameIsTooLong = false;
-      classroomData.existingClassroomNames = ['physics', 'chemistry'];
-      classroomData.name = 'Discrete maths';
+      classroomData.setClassroomName('Discrete maths');
 
-      classroomData.onClassroomNameChange();
-
-      expect(classroomData.classroomNameIsValid).toBeTrue();
-      expect(classroomData.duplicateClassroomName).toBeFalse();
-      expect(classroomData.emptyClassroomName).toBeFalse();
-      expect(classroomData.classroomNameIsTooLong).toBeFalse();
+      expect(classroomData.getClassroomNamValidationError()).toEqual('');
     });
 
   it(
     'should present error messgae when clasroom url fragment is empty', () => {
-      classroomData.classroomUrlFragmentIsValid = true;
-      classroomData.classroomUrlFragmentIsEmpty = false;
-      classroomData.urlFragment = '';
+      classroomData.setUrlFragment('');
 
-      classroomData.onClassroomUrlFragmentChange();
-
-      expect(classroomData.classroomUrlFragmentIsValid).toBeFalse();
-      expect(classroomData.classroomUrlFragmentIsEmpty).toBeTrue();
+      expect(classroomData.getClassroomUrlValidationError()).toEqual(
+        'The classroom URL fragment should not be empty.'
+      );
     });
 
   it(
     'should present error message when classroom url fragment exceeds max len',
     () => {
-      classroomData.classroomUrlFragmentIsValid = true;
-      classroomData.classroomUrlFragmentIsTooLong = false;
-      classroomData.urlFragment = 'long-url-fragment-for-raising-error-msg';
+      classroomData.setUrlFragment('long-url-fragment-for-raising-error-msg');
 
-      classroomData.onClassroomUrlFragmentChange();
-
-      expect(classroomData.classroomUrlFragmentIsValid).toBeFalse();
-      expect(classroomData.classroomUrlFragmentIsTooLong).toBeTrue();
+      expect(classroomData.getClassroomUrlValidationError()).toEqual(
+        'The classroom URL fragment should contain at most 20 characters.'
+      );
     });
 
   it(
     'should present error message when classroom url fragment is invalid',
     () => {
-      classroomData.classroomUrlFragmentIsValid = true;
-      classroomData.urlFragmentRegexMatched = true;
-      classroomData.urlFragment = 'Incorrect-url';
+      classroomData.setUrlFragment('Incorrect-url');
 
-      classroomData.onClassroomUrlFragmentChange();
-
-      expect(classroomData.classroomUrlFragmentIsValid).toBeFalse();
-      expect(classroomData.urlFragmentRegexMatched).toBeFalse();
+      expect(classroomData.getClassroomUrlValidationError()).toEqual(
+        'The classroom URL fragment should only contain lowercase ' +
+        'letters separated by hyphens.'
+      );
     });
 
   it(
     'should not present error for valid classroom url fragment', () => {
-      classroomData.classroomUrlFragmentIsValid = true;
-      classroomData.urlFragmentRegexMatched = true;
-      classroomData.classroomUrlFragmentIsTooLong = false;
-      classroomData.classroomUrlFragmentIsEmpty = false;
-      classroomData.urlFragment = 'physics-url-fragment';
+      classroomData.setUrlFragment('physics-url-fragment');
 
-      classroomData.onClassroomUrlFragmentChange();
-
-      expect(classroomData.classroomUrlFragmentIsValid).toBeTrue();
-      expect(classroomData.urlFragmentRegexMatched).toBeTrue();
-      expect(classroomData.classroomUrlFragmentIsTooLong).toBeFalse();
-      expect(classroomData.classroomUrlFragmentIsEmpty).toBeFalse();
+      expect(classroomData.getClassroomUrlValidationError()).toEqual('');
     });
 });

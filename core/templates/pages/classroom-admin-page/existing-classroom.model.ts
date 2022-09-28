@@ -100,11 +100,15 @@ export class ExistingClassroomData implements ExistingClassroom {
     return this._topicIdToPrerequisiteTopicIds;
   }
 
+  setClassroomId(classroomId: string): void {
+    this._classroomId = classroomId;
+  }
+
   setClassroomName(name: string): void {
     this._name = name;
   }
 
-  setClassroomUrlFragment(urlFragment: string): void {
+  setUrlFragment(urlFragment: string): void {
     this._urlFragment = urlFragment;
   }
 
@@ -120,8 +124,7 @@ export class ExistingClassroomData implements ExistingClassroom {
     let errorMsg = '';
     if (this._name === '') {
       errorMsg = 'The classroom name should not be empty.';
-    }
-    else if (this._name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
+    } else if (this._name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
       errorMsg = 'The classroom name should contain at most 39 characters.';
     }
     return errorMsg;
@@ -134,16 +137,14 @@ export class ExistingClassroomData implements ExistingClassroom {
 
     if (this._urlFragment === '') {
       errorMsg = 'The classroom URL fragment should not be empty.';
-    }
-    else if (
-        this._urlFragment.length >
+    } else if (
+      this._urlFragment.length >
         AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
       errorMsg = (
         'The classroom URL fragment should contain at most 20 characters.'
       );
-    }
-    else if (!validUrlFragmentRegex.test(this._urlFragment)) {
+    } else if (!validUrlFragmentRegex.test(this._urlFragment)) {
       errorMsg = (
         'The classroom URL fragment should only contain lowercase ' +
         'letters separated by hyphens.');
