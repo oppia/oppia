@@ -21,7 +21,6 @@ from __future__ import annotations
 import collections
 import copy
 import itertools
-import json
 import logging
 import re
 
@@ -35,7 +34,6 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-import bleach
 import bs4
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast, overload
@@ -1928,298 +1926,6 @@ class Voiceover:
                 self.duration_secs)
 
 
-def validate_rte_tags(
-    html: str, is_tag_nested_inside_tabs_or_collapsible: bool = False
-) -> None:
-    """Validate all the RTE tags.
-
-    Args:
-        html: str. The RTE content of the state.
-        is_tag_nested_inside_tabs_or_collapsible: bool. True when we
-            validate tags inside `Tabs` or `Collapsible` tag.
-
-    Raises:
-        utils.ValidationError. Raises the validation error in case the
-            content is not valid.
-    """
-    soup = bs4.BeautifulSoup(html, 'html.parser')
-    empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
-
-    for tag in soup.find_all('oppia-noninteractive-image'):
-        if not tag.has_attr('alt-with-value'):
-            raise utils.ValidationError(
-                'Image tag does not have \'alt-with-value\' attribute.'
-            )
-        alt_value = utils.unescape_html(
-            tag['alt-with-value'])[1:-1].replace('\\"', '')
-        if len(alt_value.strip()) < 5:
-            raise utils.ValidationError(
-                'The length of the image tag \'alt-with-value\' '
-                'attribute value should be at least 5 characters.'
-            )
-
-        if not tag.has_attr('caption-with-value'):
-            raise utils.ValidationError(
-                'Image tag does not have \'caption-with-value\' attribute.'
-            )
-        caption_value = utils.unescape_html(
-                tag['caption-with-value'])[1:-1].replace('\\"', '')
-        if len(caption_value.strip()) > 500:
-            raise utils.ValidationError(
-                'Image tag \'caption-with-value\' attribute should not '
-                'be greater than 500 characters.'
-            )
-
-        if not tag.has_attr('filepath-with-value'):
-            raise utils.ValidationError(
-                'Image tag does not have \'filepath-with-value\' attribute.'
-            )
-        filepath_value = utils.unescape_html(
-                tag['filepath-with-value'])[1:-1].replace('\\"', '')
-        if filepath_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'Image tag \'filepath-with-value\' attribute should not '
-                'be empty.'
-            )
-
-    for tag in soup.find_all('oppia-noninteractive-skillreview'):
-        if not tag.has_attr('text-with-value'):
-            raise utils.ValidationError(
-                'SkillReview tag does not have \'text-with-value\' '
-                'attribute.'
-            )
-        text_value = utils.unescape_html(
-                tag['text-with-value'])[1:-1].replace('\\"', '')
-        if text_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'SkillReview tag should not have \'text-with-value\' '
-                'attribute value as empty string.'
-            )
-
-        if not tag.has_attr('skill_id-with-value'):
-            raise utils.ValidationError(
-                'SkillReview tag does not have \'skill_id-with-value\' '
-                'attribute.'
-            )
-        skill_value = utils.unescape_html(
-                tag['skill_id-with-value'])[1:-1].replace('\\"', '')
-        if skill_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'SkillReview tag should not have '
-                '\'skill_id-with-value\' attribute value as empty string.'
-            )
-
-    for tag in soup.find_all('oppia-noninteractive-video'):
-        if not tag.has_attr('start-with-value'):
-            raise utils.ValidationError(
-                'Video tag does not have \'start-with-value\' '
-                'attribute.'
-            )
-        if tag['start-with-value'].strip() in empty_values:
-            raise utils.ValidationError(
-                'Video tag \'start-with-value\' attribute should not '
-                'be empty.'
-            )
-        if not tag.has_attr('end-with-value'):
-            raise utils.ValidationError(
-                'Video tag does not have \'end-with-value\' '
-                'attribute.'
-            )
-        if tag['end-with-value'].strip() in empty_values:
-            raise utils.ValidationError(
-                'Video tag \'end-with-value\' attribute should not '
-                'be empty.'
-            )
-        start_value = float(tag['start-with-value'].strip())
-        end_value = float(tag['end-with-value'].strip())
-        if start_value > end_value and start_value != 0.0 and end_value != 0.0:
-            raise utils.ValidationError(
-                'Start value should not be greater than End value in Video tag.'
-            )
-        if not tag.has_attr('autoplay-with-value'):
-            raise utils.ValidationError(
-                'Video tag does not have \'autoplay-with-value\' '
-                'attribute.'
-            )
-        if tag['autoplay-with-value'].strip() not in (
-            'true', 'false', '\'true\'', '\'false\'',
-            '\"true\"', '\"false\"', True, False
-        ):
-            raise utils.ValidationError(
-                'Video tag \'autoplay-with-value\' attribute should be '
-                'a boolean value.'
-            )
-
-        if not tag.has_attr('video_id-with-value'):
-            raise utils.ValidationError(
-                'Video tag does not have \'video_id-with-value\' '
-                'attribute.'
-            )
-        video_id_value = utils.unescape_html(
-                tag['video_id-with-value'])[1:-1].replace('\\"', '')
-        if video_id_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'Video tag \'video_id-with-value\' attribute should not '
-                'be empty.'
-            )
-
-    for tag in soup.find_all('oppia-noninteractive-link'):
-        if not tag.has_attr('text-with-value'):
-            raise utils.ValidationError(
-                'Link tag does not have \'text-with-value\' '
-                'attribute.'
-            )
-        text_value = utils.unescape_html(
-                tag['text-with-value'])[1:-1].replace('\\"', '')
-        if text_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'Link tag \'text-with-value\' attribute should not '
-                'be empty.'
-            )
-
-        if not tag.has_attr('url-with-value'):
-            raise utils.ValidationError(
-                'Link tag does not have \'url-with-value\' '
-                'attribute.'
-            )
-        url_value = utils.unescape_html(
-                tag['url-with-value'])[1:-1].replace('\\"', '')
-        if url_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'Link tag \'url-with-value\' attribute should not '
-                'be empty.'
-            )
-
-    for tag in soup.find_all('oppia-noninteractive-math'):
-        if not tag.has_attr('math_content-with-value'):
-            raise utils.ValidationError(
-                'Math tag does not have \'math_content-with-value\' '
-                'attribute.'
-            )
-        if tag['math_content-with-value'].strip() in empty_values:
-            raise utils.ValidationError(
-                'Math tag \'math_content-with-value\' attribute should not '
-                'be empty.'
-            )
-
-        math_content_json = utils.unescape_html(
-            tag['math_content-with-value'])
-        math_content_list = json.loads(math_content_json)
-        if 'raw_latex' not in math_content_list:
-            raise utils.ValidationError(
-                'Math tag does not have \'raw_latex-with-value\' '
-                'attribute.'
-            )
-        if math_content_list['raw_latex'].strip() in empty_values:
-            raise utils.ValidationError(
-                'Math tag \'raw_latex-with-value\' attribute should not '
-                'be empty.'
-            )
-
-        if 'svg_filename' not in math_content_list:
-            raise utils.ValidationError(
-                'Math tag does not have \'svg_filename-with-value\' '
-                'attribute.'
-            )
-        if math_content_list['svg_filename'].strip() in empty_values:
-            raise utils.ValidationError(
-                'Math tag \'svg_filename-with-value\' attribute should not '
-                'be empty.'
-            )
-        if math_content_list['svg_filename'].strip()[-4:] != '.svg':
-            raise utils.ValidationError(
-                'Math tag \'svg_filename-with-value\' attribute should '
-                'have svg extension.'
-            )
-
-    if is_tag_nested_inside_tabs_or_collapsible:
-        tabs_tags = soup.find_all('oppia-noninteractive-tabs')
-        if len(tabs_tags) > 0:
-            raise utils.ValidationError(
-                'Tabs tag should not be present inside another '
-                'Tabs or Collapsible tag.'
-            )
-        collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
-        if len(collapsible_tags) > 0:
-            raise utils.ValidationError(
-                'Collapsible tag should not be present inside another '
-                'Tabs or Collapsible tag.'
-            )
-
-
-def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
-    """Validates `Tabs` and `Collapsible` RTE tags
-
-    Args:
-        html: str. The RTE content of the state.
-
-    Raises:
-        utils.ValidationError. Raises the validation error in case the
-            `Tabs` or `Collapsible` tag is not valid.
-    """
-    soup = bs4.BeautifulSoup(html, 'html.parser')
-
-    tabs_tags = soup.find_all('oppia-noninteractive-tabs')
-    for tag in tabs_tags:
-        if tag.has_attr('tab_contents-with-value'):
-            tab_content_json = utils.unescape_html(
-                tag['tab_contents-with-value'])
-
-            tab_content_list = json.loads(tab_content_json)
-
-            if len(tab_content_list) == 0:
-                raise utils.ValidationError(
-                    'No tabs are present inside the tabs tag.'
-                )
-            for tab_content in tab_content_list:
-                validate_rte_tags(
-                    tab_content['content'],
-                    is_tag_nested_inside_tabs_or_collapsible=True
-                )
-        else:
-            raise utils.ValidationError(
-                'No content attribute is present inside the tabs tag.'
-            )
-
-    collapsibles_tags = soup.find_all(
-        'oppia-noninteractive-collapsible')
-    for tag in collapsibles_tags:
-        if tag.has_attr('content-with-value'):
-            collapsible_content_json = (
-                utils.unescape_html(tag['content-with-value'])
-            )
-            collapsible_content_list = json.loads(
-                collapsible_content_json)
-            if len(collapsible_content_list) == 0:
-                raise utils.ValidationError(
-                    'No collapsible content is present inside the tag.'
-                )
-
-            validate_rte_tags(
-                collapsible_content_list,
-                is_tag_nested_inside_tabs_or_collapsible=True
-            )
-        else:
-            raise utils.ValidationError(
-                'No content attribute present in collapsible tag.'
-            )
-
-        if tag.has_attr('heading-with-value'):
-            collapsible_heading_json = (
-                utils.unescape_html(tag['heading-with-value'])
-            )
-            collapsible_heading_list = json.loads(
-                collapsible_heading_json)
-            if len(collapsible_heading_list) == 0:
-                raise utils.ValidationError(
-                    'Heading attribute inside the collapsible tag is empty.'
-                )
-        else:
-            raise utils.ValidationError(
-                'No heading attribute present in collapsible tag.'
-            )
-
-
 class WrittenTranslationDict(TypedDict):
     """Dictionary representing the WrittenTranslation object."""
 
@@ -2348,13 +2054,15 @@ class WrittenTranslation:
                 self.needs_update)
 
         # Validate translations.
-        if isinstance(self.translation, list):
-            for html in self.translation:
-                validate_rte_tags(html)
-                validate_tabs_and_collapsible_rte_tags(html)
-        else:
-            validate_rte_tags(self.translation)
-            validate_tabs_and_collapsible_rte_tags(self.translation)
+        if self.data_format == 'html':
+            if isinstance(self.translation, list):
+                for html in self.translation:
+                    html_cleaner.validate_rte_tags(html)
+                    html_cleaner.validate_tabs_and_collapsible_rte_tags(html)
+            else:
+                html_cleaner.validate_rte_tags(self.translation)
+                html_cleaner.validate_tabs_and_collapsible_rte_tags(
+                    self.translation)
 
 
 class WrittenTranslationsDict(TypedDict):
@@ -3224,10 +2932,10 @@ class SubtitledHtml:
         self.html = html_cleaner.clean(self.html)
 
         # Validates the RTE tags.
-        validate_rte_tags(self.html)
+        html_cleaner.validate_rte_tags(self.html)
 
         # Validate tabs and collapsible RTE tags.
-        validate_tabs_and_collapsible_rte_tags(self.html)
+        html_cleaner.validate_tabs_and_collapsible_rte_tags(self.html)
 
     @classmethod
     def create_default_subtitled_html(cls, content_id: str) -> SubtitledHtml:

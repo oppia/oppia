@@ -1997,6 +1997,51 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             new_exploration, 'No content attribute is present inside '
             'the tabs tag.')
+        state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            '&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'No title attribute is present inside '
+            'the tabs tag.')
+        state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;content&amp;quot;:'
+            '&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;quot;}]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Title present inside tabs tag is empty.')
+        state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'No content attribute is present inside '
+            'the tabs tag.')
+        state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            'content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;/p&amp;gt;'
+            '&amp;quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Content present inside tabs tag is empty.')
+        state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            'content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-'
+            'noninteractive-tabs&amp;gt;&amp;lt;/oppia-noninteractive-tabs'
+            '&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;}]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Tabs tag should not be present inside another '
+            'Tabs or Collapsible tag.')
 
         # Validate collapsible tag.
         state.content.html = (
@@ -2009,7 +2054,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'inside the tag.')
         state.content.html = (
             '<oppia-noninteractive-collapsible heading-with-value='
-            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+            '\'&amp;quot;head&amp;quot;\'></oppia-noninteractive-collapsible>'
         )
         self._assert_validation_error(
             new_exploration, 'No content attribute present in collapsible tag.')
@@ -2027,10 +2072,22 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             new_exploration, 'No heading attribute present in collapsible tag.')
+        state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value='
+            '\'&amp;quot;<oppia-noninteractive-collapsible>'
+            '</oppia-noninteractive-collapsible>&amp;quot;\' heading-with-value'
+            '=\'&amp;quot;heading&amp;quot;\'>'
+            '</oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            new_exploration, 'Collapsible tag should not be present inside '
+            'another Tabs or Collapsible tag.')
         state.content.html = 'Valid content'
 
         # Validate written translations.
-        cust_args = state.interaction.customization_args['buttonText'].value
+        cust_args = (
+            state.interaction.customization_args['buttonText'].value)
+        assert isinstance(cust_args, state_domain.SubtitledUnicode)
         content_id_of_continue_button_text = cust_args.content_id
         state.written_translations.add_translation(
             content_id_of_continue_button_text,
