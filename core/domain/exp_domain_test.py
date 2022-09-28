@@ -1727,7 +1727,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Validation for state RTE content and translations.
         new_exploration = exp_domain.Exploration.create_default_exploration(
             'test_id')
-        # Validate Continue interaction.
         state = new_exploration.states['Introduction']
         self.set_interaction_for_state(state, 'Continue')
         # Validate image tags.
@@ -2032,7 +2031,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Validate written translations.
         cust_args = state.interaction.customization_args['buttonText'].value
-        assert isinstance(cust_args, state_domain.SubtitledHtml)
         content_id_of_continue_button_text = cust_args.content_id
         state.written_translations.add_translation(
             content_id_of_continue_button_text,

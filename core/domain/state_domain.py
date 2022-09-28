@@ -35,6 +35,7 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
+import bleach
 import bs4
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast, overload
@@ -1928,13 +1929,13 @@ class Voiceover:
 
 
 def validate_rte_tags(
-    html: str, is_tags_nested_inside_tabs_or_collapsible: bool = False
+    html: str, is_tag_nested_inside_tabs_or_collapsible: bool = False
 ) -> None:
     """Validate all the RTE tags.
 
     Args:
         html: str. The RTE content of the state.
-        is_tags_nested_inside_tabs_or_collapsible: bool. True when we
+        is_tag_nested_inside_tabs_or_collapsible: bool. True when we
             validate tags inside `Tabs` or `Collapsible` tag.
 
     Raises:
@@ -1949,32 +1950,33 @@ def validate_rte_tags(
             raise utils.ValidationError(
                 'Image tag does not have \'alt-with-value\' attribute.'
             )
-        if '&quot;' in tag['alt-with-value']:
-            if len(tag['alt-with-value'].strip().split('&quot;')[1]) < 5:
-                raise utils.ValidationError(
-                    'The length of the image tag \'alt-with-value\' '
-                    'attribute value should be at least 5 characters.'
-                )
-        else:
-            if len(tag['alt-with-value'].strip()) < 5:
-                raise utils.ValidationError(
-                    'The length of the image tag \'alt-with-value\' '
-                    'attribute value should be at least 5 characters.'
-                )
+        alt_value = utils.unescape_html(
+            tag['alt-with-value'])[1:-1].replace('\\"', '')
+        if len(alt_value.strip()) < 5:
+            raise utils.ValidationError(
+                'The length of the image tag \'alt-with-value\' '
+                'attribute value should be at least 5 characters.'
+            )
+
         if not tag.has_attr('caption-with-value'):
             raise utils.ValidationError(
                 'Image tag does not have \'caption-with-value\' attribute.'
             )
-        if len(tag['caption-with-value'].strip()) > 500:
+        caption_value = utils.unescape_html(
+                tag['caption-with-value'])[1:-1].replace('\\"', '')
+        if len(caption_value.strip()) > 500:
             raise utils.ValidationError(
                 'Image tag \'caption-with-value\' attribute should not '
                 'be greater than 500 characters.'
             )
+
         if not tag.has_attr('filepath-with-value'):
             raise utils.ValidationError(
                 'Image tag does not have \'filepath-with-value\' attribute.'
             )
-        if tag['filepath-with-value'].strip() in empty_values:
+        filepath_value = utils.unescape_html(
+                tag['filepath-with-value'])[1:-1].replace('\\"', '')
+        if filepath_value.strip() in empty_values:
             raise utils.ValidationError(
                 'Image tag \'filepath-with-value\' attribute should not '
                 'be empty.'
@@ -1986,17 +1988,22 @@ def validate_rte_tags(
                 'SkillReview tag does not have \'text-with-value\' '
                 'attribute.'
             )
-        if tag['text-with-value'].strip() in empty_values:
+        text_value = utils.unescape_html(
+                tag['text-with-value'])[1:-1].replace('\\"', '')
+        if text_value.strip() in empty_values:
             raise utils.ValidationError(
                 'SkillReview tag should not have \'text-with-value\' '
                 'attribute value as empty string.'
             )
+
         if not tag.has_attr('skill_id-with-value'):
             raise utils.ValidationError(
                 'SkillReview tag does not have \'skill_id-with-value\' '
                 'attribute.'
             )
-        if tag['skill_id-with-value'].strip() in empty_values:
+        skill_value = utils.unescape_html(
+                tag['skill_id-with-value'])[1:-1].replace('\\"', '')
+        if skill_value.strip() in empty_values:
             raise utils.ValidationError(
                 'SkillReview tag should not have '
                 '\'skill_id-with-value\' attribute value as empty string.'
@@ -2042,12 +2049,15 @@ def validate_rte_tags(
                 'Video tag \'autoplay-with-value\' attribute should be '
                 'a boolean value.'
             )
+
         if not tag.has_attr('video_id-with-value'):
             raise utils.ValidationError(
                 'Video tag does not have \'video_id-with-value\' '
                 'attribute.'
             )
-        if tag['video_id-with-value'].strip() in empty_values:
+        video_id_value = utils.unescape_html(
+                tag['video_id-with-value'])[1:-1].replace('\\"', '')
+        if video_id_value.strip() in empty_values:
             raise utils.ValidationError(
                 'Video tag \'video_id-with-value\' attribute should not '
                 'be empty.'
@@ -2059,17 +2069,22 @@ def validate_rte_tags(
                 'Link tag does not have \'text-with-value\' '
                 'attribute.'
             )
-        if tag['text-with-value'].strip() in empty_values:
+        text_value = utils.unescape_html(
+                tag['text-with-value'])[1:-1].replace('\\"', '')
+        if text_value.strip() in empty_values:
             raise utils.ValidationError(
                 'Link tag \'text-with-value\' attribute should not '
                 'be empty.'
             )
+
         if not tag.has_attr('url-with-value'):
             raise utils.ValidationError(
                 'Link tag does not have \'url-with-value\' '
                 'attribute.'
             )
-        if tag['url-with-value'].strip() in empty_values:
+        url_value = utils.unescape_html(
+                tag['url-with-value'])[1:-1].replace('\\"', '')
+        if url_value.strip() in empty_values:
             raise utils.ValidationError(
                 'Link tag \'url-with-value\' attribute should not '
                 'be empty.'
@@ -2100,6 +2115,7 @@ def validate_rte_tags(
                 'Math tag \'raw_latex-with-value\' attribute should not '
                 'be empty.'
             )
+
         if 'svg_filename' not in math_content_list:
             raise utils.ValidationError(
                 'Math tag does not have \'svg_filename-with-value\' '
@@ -2116,7 +2132,7 @@ def validate_rte_tags(
                 'have svg extension.'
             )
 
-    if is_tags_nested_inside_tabs_or_collapsible:
+    if is_tag_nested_inside_tabs_or_collapsible:
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
         if len(tabs_tags) > 0:
             raise utils.ValidationError(
@@ -2158,7 +2174,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
             for tab_content in tab_content_list:
                 validate_rte_tags(
                     tab_content['content'],
-                    is_tags_nested_inside_tabs_or_collapsible=True
+                    is_tag_nested_inside_tabs_or_collapsible=True
                 )
         else:
             raise utils.ValidationError(
@@ -2170,8 +2186,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
     for tag in collapsibles_tags:
         if tag.has_attr('content-with-value'):
             collapsible_content_json = (
-                utils.unescape_html(
-                tag['content-with-value'])
+                utils.unescape_html(tag['content-with-value'])
             )
             collapsible_content_list = json.loads(
                 collapsible_content_json)
@@ -2182,7 +2197,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
 
             validate_rte_tags(
                 collapsible_content_list,
-                is_tags_nested_inside_tabs_or_collapsible=True
+                is_tag_nested_inside_tabs_or_collapsible=True
             )
         else:
             raise utils.ValidationError(
@@ -2191,8 +2206,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
 
         if tag.has_attr('heading-with-value'):
             collapsible_heading_json = (
-                utils.unescape_html(
-                tag['heading-with-value'])
+                utils.unescape_html(tag['heading-with-value'])
             )
             collapsible_heading_list = json.loads(
                 collapsible_heading_json)
