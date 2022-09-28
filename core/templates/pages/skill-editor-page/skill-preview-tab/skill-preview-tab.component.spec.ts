@@ -18,9 +18,10 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
+import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -99,7 +100,7 @@ const questionDict = {
 };
 
 class MockQuestionBackendApiService {
-  fetchQuestionsAsync(): Promise<QuestionBackendDict[]> {
+  async fetchQuestionsAsync() {
     return Promise.resolve([questionDict as unknown as QuestionBackendDict]);
   }
 }
@@ -112,10 +113,9 @@ describe('Skill preview tab', () => {
   let currentInteractionService: CurrentInteractionService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let mockOnSkillChangeEmitter = new EventEmitter();
-  let questionBackendApiService: MockQuestionBackendApiService;
+  let mockInteractionRule: InteractionRulesService;
 
-  beforeEach(() => {
-    questionBackendApiService = new MockQuestionBackendApiService();
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SkillPreviewTabComponent],
@@ -126,12 +126,12 @@ describe('Skill preview tab', () => {
         ExplorationPlayerStateService,
         {
           provide: QuestionBackendApiService,
-          useClass: questionBackendApiService
+          useClass: MockQuestionBackendApiService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-  });
+  }));
 
   let questionDict1 = {
     question_state_data: {
@@ -180,7 +180,6 @@ describe('Skill preview tab', () => {
       ExplorationPlayerStateService);
     let skillId = 'df432fe';
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue(skillId);
-
 
     component.ngOnInit();
   });
@@ -239,14 +238,12 @@ describe('Skill preview tab', () => {
     expect(component.displayedQuestions).toEqual([questionDict1]);
   });
 
-  it('should trigger feedback when an answer is submitted', () => {
+  it('should trigger feedback when an answer is submitted', fakeAsync(() => {
     spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
 
     component.ngOnInit();
-    spyOn(currentInteractionService, 'onSubmit');
+    currentInteractionService.onSubmit('answer', mockInteractionRule);
 
-    expect(
-      explorationPlayerStateService.onOppiaFeedbackAvailable.emit
-    ).toHaveBeenCalled();
-  });
+    expect(component.questionsFetched).toBeFalse();
+  }));
 });

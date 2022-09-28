@@ -46,7 +46,7 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.skillEditorStateService.getSkill()) {
+    if (this.skillEditorStateService.getSkill() !== undefined) {
       this._init();
     }
     this.directiveSubscriptions.add(

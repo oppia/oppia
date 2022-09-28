@@ -71,8 +71,8 @@ describe('Skill editor main tab component', () => {
   });
 
   it('should initialize the variables', () => {
-    expect(component.selectedTopic).toEqual(null);
-    expect(component.subtopicName).toEqual(null);
+    expect(component.selectedTopic).toBeUndefined();
+    expect(component.subtopicName).toBeUndefined();
   });
 
   it('should navigate to questions tab when unsaved changes are not present',
@@ -94,7 +94,7 @@ describe('Skill editor main tab component', () => {
     expect(component.hasLoadedSkill()).toBe(true);
   });
 
-  it('should open save changes modal with $uibModal when unsaved changes are' +
+  it('should open save changes modal with ngbModal when unsaved changes are' +
   ' present', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -108,16 +108,30 @@ describe('Skill editor main tab component', () => {
     expect(modalSpy).toHaveBeenCalled();
   });
 
+  it('should close save changes modal with ngbModal when cancel button is' +
+  ' clicked', () => {
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject()
+      }) as NgbModalRef;
+    });
+
+    component.createQuestion(),
+    expect(modalSpy).toHaveBeenCalled();
+  });
+
   it('should return assigned Skill Topic Data', () => {
-    expect(component.assignedSkillTopicData).toEqual(null);
-    expect(component.getAssignedSkillTopicData()).toEqual(null);
+    expect(component.assignedSkillTopicData).toBeUndefined();
+    expect(component.getAssignedSkillTopicData()).toBeNull();
     component.assignedSkillTopicData = assignedSkillTopicData;
     expect(
       component.getAssignedSkillTopicData()).toEqual(assignedSkillTopicData);
   });
 
   it('should return subtopic name', () => {
-    expect(component.subtopicName).toEqual(null);
+    expect(component.subtopicName).toBeUndefined();
     component.subtopicName = 'Subtopic1';
     expect(component.getSubtopicName()).toEqual('Subtopic1');
   });

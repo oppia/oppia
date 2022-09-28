@@ -38,7 +38,7 @@ class MockNgbModalRef {
   };
 }
 
-describe('Skill Editor Navbar Directive', () => {
+describe('Skill Editor Navbar Component', () => {
   let component: SkillEditorNavabarComponent;
   let fixture: ComponentFixture<SkillEditorNavabarComponent>;
   let ngbModal: NgbModal;
@@ -262,17 +262,15 @@ describe('Skill Editor Navbar Directive', () => {
     let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
       (modal, modalOptions) => {
         return ({
-          result: Promise.resolve()
+          result: Promise.reject()
         } as NgbModalRef);
       });
-    let saveSkillSpy = spyOn(skillEditorStateService, 'saveSkill')
-      .and.returnValue(null);
+    spyOn(skillEditorStateService, 'saveSkill').and.returnValue(null);
 
     component.saveChanges();
     tick();
 
-    expect(saveSkillSpy).not.toHaveBeenCalled();
-    expect(ngbModalSpy).not.toHaveBeenCalled();
+    expect(ngbModalSpy).toHaveBeenCalled();
   }));
 
   describe('on navigating to questions tab ', () => {
@@ -285,6 +283,28 @@ describe('Skill Editor Navbar Directive', () => {
         return ({
           componentInstance: MockNgbModalRef,
           result: Promise.resolve()
+        }) as NgbModalRef;
+      });
+      let navigateToQuestionsTabSpy = spyOn(
+        skillEditorRoutingService, 'navigateToQuestionsTab')
+        .and.returnValue(null);
+
+      component.selectQuestionsTab();
+      tick();
+
+      expect(ngbModalSpy).toHaveBeenCalled();
+      expect(navigateToQuestionsTabSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should close undo changes modal if somewhere outside is' +
+    ' clicked', fakeAsync(() => {
+    // Setting unsaved changes to be two.
+      spyOn(undoRedoService, 'getChangeCount')
+        .and.returnValue(2);
+      const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject()
         }) as NgbModalRef;
       });
       let navigateToQuestionsTabSpy = spyOn(

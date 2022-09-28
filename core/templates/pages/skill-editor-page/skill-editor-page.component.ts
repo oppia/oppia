@@ -157,7 +157,7 @@ export class SkillEditorPageComponent implements OnInit {
         .OPENED_SKILL_EDITOR_BROWSER_TABS);
   }
 
-  onCreateOrUpdateSkillEditorBrowserTabsInfo(event: { key: string}): void {
+  onCreateOrUpdateSkillEditorBrowserTabsInfo(event: StorageEvent): void {
     if (event.key === (
       EntityEditorBrowserTabsInfoDomainConstants
         .OPENED_SKILL_EDITOR_BROWSER_TABS)

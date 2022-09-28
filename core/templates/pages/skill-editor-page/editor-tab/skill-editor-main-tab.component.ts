@@ -35,7 +35,7 @@ import { AssignedSkillTopicData, SkillEditorStateService } from '../services/ski
 export class SkillEditorMainTabComponent implements OnInit {
   subtopicName: string;
   topicName: string;
-  assignedSkillTopicData;
+  assignedSkillTopicData: AssignedSkillTopicData;
   skill: Skill;
   selectedTopic: Topic;
 

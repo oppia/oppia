@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/compiler';
-// Import { EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -58,6 +58,8 @@ describe('Skill editor page', () => {
   let urlService: UrlService;
   let skillObjectFactory: SkillObjectFactory;
   let skill: Skill;
+  let mockStaleTabEvenEmitter = new EventEmitter();
+  let mockUnsavedChangesEventEmitter = new EventEmitter();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -69,6 +71,7 @@ describe('Skill editor page', () => {
         UrlService,
         SkillEditorStateService,
         SkillUpdateService,
+        SkillEditorStalenessDetectionService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -203,6 +206,21 @@ describe('Skill editor page', () => {
     expect(modalSpy).toHaveBeenCalled();
   });
 
+  it('should close save changes modal when somewhere outside is clicked',
+    () => {
+      spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+        () => {
+          return ({
+            componentInstance: MockNgbModalRef,
+            result: Promise.reject()
+          }) as NgbModalRef;
+        });
+
+      component.selectQuestionsTab();
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
   it('should navigate to questions tab when unsaved changes are not present',
     () => {
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
@@ -319,13 +337,12 @@ describe('Skill editor page', () => {
 
   it('should emit the stale tab and presence of unsaved changes events ' +
   'when the \'storage\' event is triggered', () => {
-    spyOn(
-      skillEditorStalenessDetectionService.staleTabEventEmitter, 'emit'
-    ).and.callThrough();
-    spyOn(
-      skillEditorStalenessDetectionService
-        .presenceOfUnsavedChangesEventEmitter, 'emit'
-    ).and.callThrough();
+    spyOnProperty(skillEditorStalenessDetectionService, 'staleTabEventEmitter').
+      and.returnValue(mockStaleTabEvenEmitter);
+    spyOnProperty(
+      skillEditorStalenessDetectionService,
+      'presenceOfUnsavedChangesEventEmitter').and.returnValue(
+      mockUnsavedChangesEventEmitter);
     spyOn(localStorageService, 'registerNewStorageEventListener').and.callFake(
       (callback) => {
         document.addEventListener(
@@ -334,7 +351,10 @@ describe('Skill editor page', () => {
       });
     spyOn(skillEditorStateService, 'loadSkill').and.stub();
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
+
     component.ngOnInit();
+    mockStaleTabEvenEmitter.emit();
+    mockUnsavedChangesEventEmitter.emit();
 
     let storageEvent = new StorageEvent('storage', {
       key: EntityEditorBrowserTabsInfoDomainConstants
@@ -349,5 +369,6 @@ describe('Skill editor page', () => {
       skillEditorStalenessDetectionService
         .presenceOfUnsavedChangesEventEmitter.emit
     ).toHaveBeenCalled();
+    expect(component.skillIsInitialized).toBeFalse();
   });
 });
