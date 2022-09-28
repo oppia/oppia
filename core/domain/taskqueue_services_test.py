@@ -26,7 +26,7 @@ from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, Optional, Set
+from typing import Dict, Optional, Set
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -115,7 +115,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         def mock_create_http_task(
             queue_name: str,
             url: str,
-            payload: Optional[Dict[str, Any]] = None,
+            payload: Optional[Dict[str, str]] = None,
             scheduled_for: Optional[datetime.datetime] = None,
             task_name: Optional[str] = None
         ) -> None:

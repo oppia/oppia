@@ -37,7 +37,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user
+    models.Names.BASE_MODEL, models.Names.USER
 ])
 
 
@@ -1193,6 +1193,40 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_4,
             deleted=True
         ).put()
+
+    def test_exclude_non_existing_creator_user_model_while_exporting_data(
+        self
+    ) -> None:
+        user_models.UserSettingsModel(
+            id='test_user',
+            email='some@email.com'
+        ).put()
+        test_creator_ids = self.CREATOR_IDS + ['Invalid_id']
+
+        user_models.UserSubscriptionsModel(
+            id='test_user',
+            creator_ids=test_creator_ids,
+            collection_ids=self.COLLECTION_IDS,
+            exploration_ids=self.EXPLORATION_IDS,
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
+            last_checked=self.GENERIC_DATETIME
+        ).put()
+
+        exported_data = user_models.UserSubscriptionsModel.export_data(
+            'test_user'
+        )
+
+        # Here we are deleting 'last_checked_msec', because this key contains
+        # the time stamp which can be different at the time of creation of model
+        # and checking the output.
+        del exported_data['last_checked_msec']
+        expected_dict = {
+            'exploration_ids': ['exp_1', 'exp_2', 'exp_3'],
+            'collection_ids': ['23', '42', '4'],
+            'general_feedback_thread_ids': ['42', '4', '8'],
+            'creator_usernames': ['usernameuser_id_5', 'usernameuser_id_6']
+        }
+        self.assertEqual(expected_dict, exported_data)
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(

@@ -56,10 +56,10 @@ if MYPY: # pragma: no cover
     story_models,
     suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback,
-    models.NAMES.opportunity,
-    models.NAMES.story,
-    models.NAMES.suggestion
+    models.Names.FEEDBACK,
+    models.Names.OPPORTUNITY,
+    models.Names.STORY,
+    models.Names.SUGGESTION
 ])
 
 
@@ -976,6 +976,14 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'Missing language codes [\'new_lang\'] in exploration '
                 'opportunity model with id 0'
             )
+
+    def test_get_exploration_opportunity_summary_by_id_for_none_result(
+        self
+    ) -> None:
+        self.assertIsNone(
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                'exp_1')
+        )
 
     def test_delete_exp_opportunities_corresponding_to_story_when_story_deleted(
         self
