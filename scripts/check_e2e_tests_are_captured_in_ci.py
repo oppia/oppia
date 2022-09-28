@@ -37,6 +37,7 @@ TEST_SUITES_NOT_RUN_IN_CI = ['full']
 
 WEBDRIVERIO_CONF_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'wdio.conf.js')
+SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'publication'
 CI_PATH = os.path.join(os.getcwd(), '.github', 'workflows')
 
 

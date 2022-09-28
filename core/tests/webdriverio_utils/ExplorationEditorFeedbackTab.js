@@ -29,7 +29,7 @@ var ExplorationEditorFeedbackTab = function() {
   var feedbackBackButton = $('.e2e-test-oppia-feedback-back-button');
   var feedbackResponseTextArea = $('.e2e-test-feedback-response-textarea');
   var suggestionRowClassName = '.e2e-test-oppia-feedback-tab-row';
-  var suggestionRowClassNameElement = $('.e2e-test-oppia-feedback-tab-row');
+  var suggestionRowElement = $('.e2e-test-oppia-feedback-tab-row');
   var feedbackSubjectClassName = (
     '.e2e-test-exploration-feedback-subject');
   var suggestionCommitMessageInput = $('.e2e-test-suggestion-commit-message');
@@ -78,7 +78,7 @@ var ExplorationEditorFeedbackTab = function() {
   this.getSuggestionThreads = async function() {
     var threads = [];
     await waitFor.visibilityOf(
-      suggestionRowClassNameElement,
+      suggestionRowElement,
       'No suggestion threads are visible');
     var rows = await $$(suggestionRowClassName);
     var rowCount = rows.length;
@@ -98,7 +98,7 @@ var ExplorationEditorFeedbackTab = function() {
   this.readFeedbackMessages = async function() {
     var messages = [];
     await waitFor.visibilityOf(
-      suggestionRowClassNameElement,
+      suggestionRowElement,
       'No feedback messages are visible.');
     var rows = await $$(suggestionRowClassName);
     var rowCount = rows.length;
@@ -134,7 +134,7 @@ var ExplorationEditorFeedbackTab = function() {
 
   this.selectLatestFeedbackThread = async function() {
     await waitFor.visibilityOf(
-      $(suggestionRowClassName), 'Suggestion row is taking too long to appear');
+      suggestionRowElement, 'Suggestion row is taking too long to appear');
     var suggestionRowFirst = await $$(suggestionRowClassName)[0];
     await action.click(
       'Suggestion Row First', suggestionRowFirst);
