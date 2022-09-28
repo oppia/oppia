@@ -58,7 +58,6 @@ export class NonnegativeIntEditorComponent implements OnInit {
       this.value = 0;
       this.valueChanged.emit(this.value);
     }
-    console.log("\n\nRUn")
   }
 
   getSchema(): NonnegativeIntSchema {

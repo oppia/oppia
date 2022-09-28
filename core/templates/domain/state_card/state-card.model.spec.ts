@@ -186,10 +186,8 @@ describe('State card object factory', () => {
     expect(_sampleCard2.getInteractionInstructions()).toBeNull();
     expect(_sampleCard1.getInteractionCustomizationArgs()).toEqual({
       rows: {value: 1},
-      placeholder: {value: new SubtitledUnicode('Type your answer here.', ''),
-      catchMisspellings: {
-        value: false
-      }}
+      placeholder: {value: new SubtitledUnicode('Type your answer here.', '')},
+      catchMisspellings: {value: false}
     });
     expect(_sampleCard2.getInteractionCustomizationArgs()).toBeNull();
     expect(_sampleCard1.getInteractionHtml()).toEqual(

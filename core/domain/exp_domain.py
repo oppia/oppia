@@ -3497,7 +3497,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             following schema version v58.
         """
         exploration_dict['schema_version'] = 58
-        print("\n\n\n\ncalled\n\n")
         exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 53
