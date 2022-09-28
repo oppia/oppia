@@ -409,7 +409,7 @@ describe('State translation component', function() {
     subtitledUnicodeObjectFactory = TestBed.get(SubtitledUnicodeObjectFactory);
   });
 
-  beforeEach(angular.mock.inject(function ($injector, $componentController) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     entityTranslationsService = $injector.get('EntityTranslationsService');
     entityTranslationsService.entityTranslation = {
       getWrittenTranslation: () => { }

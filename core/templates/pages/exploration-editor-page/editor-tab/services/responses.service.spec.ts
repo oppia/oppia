@@ -282,7 +282,7 @@ describe('Responses Service', () => {
         'State', null, new SubtitledHtml('', 'This is a new feedback text'),
         true, [], 'test', 'test_skill_id'
       ),
-      [], null)
+      [], null);
 
     const callbackSpy = jasmine.createSpy('callback');
     responsesService.updateAnswerGroup(0, updatedAnswerGroup, callbackSpy);

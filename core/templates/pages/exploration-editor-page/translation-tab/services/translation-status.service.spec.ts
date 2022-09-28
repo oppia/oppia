@@ -295,7 +295,7 @@ describe('Translation status service', () => {
             needs_update: false
           }
         }
-        }
+      }
       )));
     tss.refresh();
     tick();
@@ -632,7 +632,7 @@ describe('Translation status service', () => {
     tss.refresh();
     tick();
 
-    tss.entityTranslation.markTranslationAsNeedingUpdate('feedback_3')
+    tss.entityTranslation.markTranslationAsNeedingUpdate('feedback_3');
     activeStateContentIdNeedsUpdateStatus = (
       tss.getActiveStateContentIdNeedsUpdateStatus('feedback_3'));
     expect(activeStateContentIdNeedsUpdateStatus).toBe(true);

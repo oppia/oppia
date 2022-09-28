@@ -42,7 +42,7 @@ import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-edi
 import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-fdescribe('Content translation manager service', () => {
+describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
   let ehfs: ExplorationHtmlFormatterService;
   let iof: InteractionObjectFactory;

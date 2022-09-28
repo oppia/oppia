@@ -27,9 +27,7 @@ import { ContextService } from 'services/context.service';
 import { InteractionRulesService } from './answer-classification.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
-import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;

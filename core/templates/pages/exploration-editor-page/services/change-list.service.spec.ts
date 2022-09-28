@@ -187,7 +187,7 @@ describe('Change List Service when changes are mergable', () => {
       changeListService.autosaveInProgressEventEmitter, 'emit')
       .and.callThrough();
 
-      changeListService.addState('state', 'content_1', 'dafault_outcome_4');
+    changeListService.addState('state', 'content_1', 'dafault_outcome_4');
     flush();
 
     expect(saveSpy).toHaveBeenCalled();

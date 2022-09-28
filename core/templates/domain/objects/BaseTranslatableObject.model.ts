@@ -21,7 +21,6 @@ import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFacto
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { TranslatableSetOfNormalizedString, TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
-import { StringDecoder } from 'string_decoder';
 
 export type TranslatableField = (
   SubtitledHtml |
@@ -111,7 +110,7 @@ export class BaseTranslatableObject {
       return content instanceof SubtitledHtml;
     }).map((content) => {
       content = content as SubtitledHtml;
-      return content.html
+      return content.html;
     });
   }
 

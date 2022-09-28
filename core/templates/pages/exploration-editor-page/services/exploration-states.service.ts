@@ -55,7 +55,6 @@ import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
 import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
 
 interface ContentsMapping {
