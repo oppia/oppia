@@ -250,6 +250,12 @@
             </div>
           </div>
 
+          <div>
+            <button (click)="viewGraph()">
+              View Graph
+            </button>
+          </div>
+
           <div *ngIf="classroomEditorMode" class="action-buttons">
             <button class="btn btn-secondary cancel-classroom-changes"
                     (click)="closeClassroomConfigEditor()"

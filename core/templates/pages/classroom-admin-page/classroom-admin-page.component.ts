@@ -33,6 +33,7 @@ import { ClassroomData } from './classroom-admin.model';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
+import { TopicsDependencyGraphModalComponent } from './modals/topic-dependency-graph-viz-modal.component';
 
 
 interface TopicIdToPrerequisiteTopicIds {
@@ -68,6 +69,7 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   myControl = new FormControl('');
   filteredOptions: Observable<string[]>;
+  graphData;
 
   classroomId: string = '';
   classroomName: string = '';
@@ -554,6 +556,36 @@ export class ClassroomAdminPageComponent implements OnInit {
 
     this.tempClassroomData.topicIdToPrerequisiteTopicIds = (
       tempTopicIdToPrerequisiteTopicIds);
+  }
+  viewGraph() {
+    this.graphData = {
+      finalStateIds: ['4', '5'],
+      initStateId: 1,
+      links: [
+        {source: 1, target: 2, linkProperty: null},
+        {source: 1, target: 3, linkProperty: null},
+        {source: 2, target: 4, linkProperty: null},
+        {source: 3, target: 5, linkProperty: null}
+      ],
+      nodes: {
+        1: 'Dummy Topic 1',
+        2: 'Dummy Topic 2',
+        3: 'Dummy Topic 3',
+        4: 'Dummy Topic 4',
+        5: 'Dummy Topic 5',
+      }
+    }
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(TopicsDependencyGraphModalComponent, {
+        backdrop: 'static'
+      });
+    modalRef.componentInstance.graphData = this.graphData;
+    modalRef.result.then(() => {
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
+    });
   }
 }
 
