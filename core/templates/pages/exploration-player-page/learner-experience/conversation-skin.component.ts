@@ -287,8 +287,18 @@ export class ConversationSkinComponent {
           // the end of the exploration.
           if (
             !this._editorPreviewMode && this.nextCard.isTerminal()) {
+            const currentEngineService = (
+              this.explorationPlayerStateService.getCurrentEngineService()
+            );
             this.statsReportingService.recordExplorationCompleted(
-              newStateName, this.learnerParamsService.getAllParams());
+              newStateName,
+              this.learnerParamsService.getAllParams(),
+              String(
+                this.completedChaptersCount && this.completedChaptersCount + 1
+              ),
+              String(this.playerTranscriptService.getNumCards()),
+              currentEngineService.getLanguageCode()
+            );
 
             // If the user is a guest, has completed this exploration
             // within the context of a collection, and the collection is
@@ -1115,7 +1125,13 @@ export class ConversationSkinComponent {
           if (!remainOnCurrentCard) {
             this.statsReportingService.recordStateTransition(
               oldStateName, nextCard.getStateName(), answer,
-              this.learnerParamsService.getAllParams(), isFirstHit);
+              this.learnerParamsService.getAllParams(), isFirstHit,
+              String(
+                this.completedChaptersCount && this.completedChaptersCount + 1
+              ),
+              String(this.playerTranscriptService.getNumCards()),
+              currentEngineService.getLanguageCode()
+            );
 
             this.statsReportingService.recordStateCompleted(
               oldStateName);

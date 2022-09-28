@@ -211,7 +211,7 @@ export class SignupPageComponent {
           this.submissionInProcess = false;
           return;
         }
-        this.siteAnalyticsService.registerNewSignupEvent();
+        this.siteAnalyticsService.registerNewSignupEvent('#signup-submit');
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = (
             this.utilsService.getSafeReturnUrl(returnUrl));

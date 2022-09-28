@@ -81,9 +81,18 @@ export class SplashPageComponent implements OnInit {
     );
   }
 
+  private _nagivateToClassroomPage(): void {
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+  }
+
+  onClickStartLearningButton(): void {
+    this.siteAnalyticsService.registerClickHomePageStartLearningButtonEvent();
+    this._nagivateToClassroomPage();
+  }
+
   onClickBrowseLessonsButton(): void {
     this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this._nagivateToClassroomPage();
   }
 
   onClickAccessAndroidButton(): void {

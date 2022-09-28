@@ -72,6 +72,7 @@ export class SearchResultsComponent {
           userInfoPromise.then((userInfo) => {
             this.userIsLoggedIn = userInfo.isLoggedIn();
             this.loaderService.hideLoadingScreen();
+            this.siteAnalyticsService.registerSearchResultsViewedEvent();
           });
         })
     );

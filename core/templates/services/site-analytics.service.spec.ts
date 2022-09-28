@@ -69,7 +69,7 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register new signup event', () => {
-      sas.registerNewSignupEvent();
+      sas.registerNewSignupEvent('srcElement');
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'signup', {
         event_category: 'OnboardingEngagement',
