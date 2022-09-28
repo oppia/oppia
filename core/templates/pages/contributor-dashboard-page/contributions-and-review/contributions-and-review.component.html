@@ -63,6 +63,14 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
+        
+      <div *ngIf="isReviewTranslationsTab()"" class="oppia-language-selector-container">
+        <translation-language-selector class="oppia-language-selector"
+        [activeLanguageCode]="languageCode"
+        (setActiveLanguageCode)="onChangeLanguage($event)">
+        </translation-language-selector>
+      </div>
+
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
@@ -312,6 +320,17 @@
       background-color: transparent;
       width: 95%;
     }
+  }
+
+  .oppia-language-selector-container {
+    display: flex;
+    margin-top: 20px;
+    justify-content: flex-end;
+    margin-right: 15px;
+  }
+
+  .oppia-language-selector-container .oppia-language-selector {
+    min-width: 240px;
   }
 
   @media only screen and (min-width: 601px) and (max-width: 1500px) {
