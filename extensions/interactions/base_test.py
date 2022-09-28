@@ -239,7 +239,15 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     }]
                 },
                 'default_value': 1,
-            }])
+            }, {
+                'name': 'catchMisspellings',
+                'description': 'Catch Misspellings',
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': False
+            }
+        ])
 
     def test_interaction_rules(self):
         """Tests the interaction rules."""
