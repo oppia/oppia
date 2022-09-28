@@ -3186,3 +3186,81 @@ class LearnerGroupsUserModel(base_models.BaseModel):
 
         cls.update_timestamps_multi(learner_groups_user_models_to_put)
         cls.put_multi(learner_groups_user_models_to_put)
+
+class BlogAuthorDetailsModel(base_models.BaseModel):
+    """Model for storing user's blog author details.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # The publicly viewable name of th user to display as author name in blog
+    # posts.
+    author_name = datastore_services.StringProperty(indexed=True)
+    # User specified biography to be shown on their blog author page.
+    author_bio = datastore_services.TextProperty(indexed=False)
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to pseudonymize corresponding to a user:
+        id field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether BlogAuthorUserModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def export_data(user_id: str) -> Dict[str, str]:
+        """Exports the data from BlogAuthorDetailModel into dict format for
+        Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from BlogAuthorDetailModel.
+        """
+        authorModel = BlogAuthorDetailsModel.get(user_id)
+        return {
+            'author_name': authorModel.author_name,
+            'author_bio': authorModel.author_bio
+        }
+
+    @classmethod
+    def create(
+        cls, user_id: str, author_name: str, author_bio: str
+    ) -> None:
+        """Creates a new BlogAuthorDetailsModel entry.
+
+        Args:
+            user_id: str. The user ID of the author.
+            author_name: str. The author name of the user.
+            author_bio: str. The author bio of the user.
+
+        Raises:
+            Exception. A blog author details model with the given ID exists
+            already.
+        """
+        if cls.get_by_id(user_id):
+            raise Exception(
+                'A blog author details model with the given ID exists already.')
+
+        entity = cls(
+            id=user_id, author_name=author_name, author_bio=author_bio)
+        entity.update_timestamps()
+        entity.put()

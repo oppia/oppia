@@ -6,7 +6,21 @@
            alt="Profile image of the author of the blog post"
            class="e2e-test-profile-current-user-photo">
       <mat-card-title class="blog-dashboard-card-title e2e-test-username-visible">
-        {{ blogDashboardData.username }}
+        <input class="form-control required general-text-format"
+               [(ngModel)]="authorName"
+               [ngClass]="{'blog-title-input-field': blogPostData.title.length > 0}"
+               maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
+               minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
+               aria-label="Title"
+               (focusout)="updateAuthorName()"
+               (focus)="authorNameEditorOpened"
+               autofocus>
+        <button *ngIf="!authorNameEditorOpened"
+                class="fas fa-pen oppia-editor-edit-icon oppia-autofocus"
+                title="Edit Author Name"
+                (click)="authorNameEditorOpened=true">
+          &#xE254;
+        </button>
       </mat-card-title>
       <mat-card-subtitle>
         <button mat-button

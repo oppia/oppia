@@ -6185,6 +6185,9 @@ export default {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
+  // Maximum allowed length of a blog post author's name.
+  "MAX_AUTHOR_NAME_LENGTH": 35,
+
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
 
@@ -6708,6 +6711,25 @@ export default {
     "BLOG_HOMEPAGE_SEARCH": {
       "ROUTE": "blog/search/find",
       "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        }
+      ]
+    },
+    "BLOG_AUTHOR_PROFILE_PAGE": {
+      "ROUTE": "blog/author/:author_username",
+      "TITLE": "I18N_BLOG_AUTHOR_PROFILE_PAGE_TITLE",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",

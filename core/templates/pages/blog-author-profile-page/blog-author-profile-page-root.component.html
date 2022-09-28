@@ -1,0 +1,19 @@
+<oppia-angular-root>
+  <oppia-base-content>
+    <navbar-breadcrumb class="blog-post-page-breadcrumb">
+      <div class="nav navbar-nav oppia-navbar-breadcrumb">
+        <span class="mx-3 oppia-navbar-breadcrumb-separator"></span>
+        <div class="d-flex flex-column pt-2">
+          <p class="oppia-blog-home-page-title">
+            {{ 'I18N_BLOG_HOME_PAGE_BREADCRUMB' | translate}}
+          </p>
+        </div>
+      </div>
+    </navbar-breadcrumb>
+    <content class="mb-5">
+      <oppia-blog-author-page></oppia-blog-author-page>
+    </content>
+  </oppia-base-content>
+</oppia-angular-root>
+
+<oppia-error-page-root *ngIf="errorPageIsShown"></oppia-error-page-root>

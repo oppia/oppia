@@ -396,7 +396,7 @@ def get_blog_post_rights(
 
 
 def get_published_blog_post_summaries_by_user_id(
-    user_id: str, max_limit: int
+    user_id: str, max_limit: int, offset: int=0
 ) -> List[blog_domain.BlogPostSummary]:
     """Retrieves the summary objects for given number of published blog posts
     for which the given user is an editor.
@@ -404,6 +404,7 @@ def get_published_blog_post_summaries_by_user_id(
     Args:
         user_id: str. ID of the user.
         max_limit: int. The number of models to be fetched.
+        offset: int. Number of query results to skip from top.
 
     Returns:
         list(BlogPostSummary). The summary objects associated with the
@@ -411,7 +412,9 @@ def get_published_blog_post_summaries_by_user_id(
     """
     blog_rights_models = (
         blog_models.BlogPostRightsModel.get_published_models_by_user(
-            user_id, max_limit))
+            user_id, offset, max_limit
+        )
+    )
     if not blog_rights_models:
         return []
     blog_post_ids = [model.id for model in blog_rights_models]
@@ -816,6 +819,18 @@ def get_total_number_of_published_blog_post_summaries() -> int:
     return blog_models.BlogPostRightsModel.query(
         blog_models.BlogPostRightsModel.blog_post_is_published == True  # pylint: disable=singleton-comparison
     ).count()
+
+
+def get_total_number_of_published_blog_post_summaries_by_author(
+    author_id
+) -> int:
+    """Returns total number of published BlogPostSummaries by author.
+
+    Returns:
+        int. Total number of published BlogPostSummaries by author.
+    """
+    return len(blog_models.BlogPostRightsModel.get_published_models_by_user(
+        author_id))
 
 
 def update_blog_models_author_and_published_on_date(

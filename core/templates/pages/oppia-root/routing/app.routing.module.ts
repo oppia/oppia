@@ -200,6 +200,15 @@ const routes: Route[] = [
   },
   {
     path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-author-profile-page/blog-author-profile-page.module')
+      .then(m => m.BlogAuthorProfilePageModule)
+  },
+  {
+    path: (
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE
     ),
     pathMatch: 'full',

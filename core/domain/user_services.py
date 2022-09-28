@@ -1518,7 +1518,8 @@ def add_user_role(user_id: str, role: str) -> None:
         raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
         raise Exception('Adding a %s role is not allowed.' % role)
-
+    if role in [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]:
+        create_blog_author_details_model(user_id)
     user_settings.roles.append(role)
     role_services.log_role_query(
         user_id, feconf.ROLE_ACTION_ADD, role=role,
@@ -2937,3 +2938,55 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
         exp_user_model.put()
 
     return exp_fetchers.get_exploration_user_data(user_id, exploration_id)
+
+def create_blog_author_details_model(user_id: str):
+    """Creates a new blog author details model.
+
+    Args:
+        user_id: str. The user ID of the blog author.
+    """
+    blog_author_details_model = (
+        user_models.BlogAuthorDetailsModel.get_by_id(user_id))
+    if blog_author_details_model:
+        return
+    user_settings = get_user_settings(user_id, strict=True)
+    user_models.BlogAuthorDetailsModel.create(
+        user_id,
+        user_settings.username,
+        user_settings.user_bio
+    )
+
+
+def get_blog_author_details(user_id: str):
+    """Returns the blog author details for the given user id.
+
+    Args:
+        user_id: str. The user id of the blog author.
+
+    Returns:
+        BlogAuthorDetails. The blog author details for the given user id.
+    """
+    blog_author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)
+    if blog_author_model is None:
+        return None
+    return user_domain.BlogAuthorDetails(
+        blog_author_model.author_name,
+        blog_author_model.author_bio,
+        blog_author_model.last_updated
+    )
+
+
+def update_blog_author_details(
+    user_id: str, author_name: str, author_bio: str
+) -> None:
+    """Updates the author name and bio for the given user id.
+
+    Args:
+        user_id: str. The user id of the blog author.
+        author_bio: str. The bio of the blog author.
+    """
+    blog_author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)
+    blog_author_model.author_name = author_name
+    blog_author_model.author_bio = author_bio
+    blog_author_model.update_timestamps()
+    blog_author_model.put()

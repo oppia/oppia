@@ -62,6 +62,13 @@ class UserSettingsDict(TypedDict):
     created_on: Optional[datetime.datetime]
 
 
+class BlogAuthorDetailsDict(TypedDict):
+    """Dict type for BlogAuthorDetails object."""
+
+    author_name: str
+    author_bio: str
+
+
 class UserSettings:
     """Value object representing a user's settings.
 
@@ -1618,3 +1625,74 @@ class LearnerGroupsUser:
                     'Learner cannot be invited to join learner group '
                     '%s since they are already its learner.' % (
                         learner_group_details.group_id))
+
+
+class BlogAuthorDetails:
+    """Domain object for user's blog author details."""
+
+    def __init__(
+        self,
+        author_name: str,
+        author_bio: str,
+        last_updated: datetime.datetime,
+    ) -> None:
+        """Constructs a BlogAuthorDetails domain object.
+
+        Attributes:
+            author_name: str. The publicly viewable name of the user as author
+                of the blog posts.
+            author_bio: str. User specified biography to be shown on the author
+                profile page.
+            last_updated: datetime.datetime. Date and time when the author
+                details were last updated.
+        """
+        self.author_name = author_name
+        self.author_bio = author_bio
+        self.last_updated = last_updated
+
+    def require_valid_author_name(cls, author_name: str) -> None:
+        """Checks if the given author name is valid or not.
+
+        Args:
+            author_name: str. The author name to validate.
+
+        Raises:
+            ValidationError. An empty author name is supplied.
+            ValidationError. The given author name exceeds the maximum allowed
+                number of characters.
+            ValidationError. The given author name contains non-alphanumeric
+                characters.
+            ValidationError. The given author name contains reserved substrings.
+        """
+        if not author_name:
+            raise utils.ValidationError('Empty author name supplied.')
+        if len(author_name) > constants.MAX_AUTHOR_NAME_LENGTH:
+            raise utils.ValidationError(
+                'A author name can have at most %s characters.'
+                % constants.MAX_AUTHOR_NAME_LENGTH)
+        if not re.match(feconf.ALPHANUMERIC_REGEX, author_name):
+            raise utils.ValidationError(
+                'Author name can only have alphanumeric characters.')
+
+        # Disallow author names that contain the system usernames or the
+        # strings "admin".
+        reserved_usernames = (
+            set(feconf.SYSTEM_USERS.values()) | {'admin'}
+        )
+        for reserved_username in reserved_usernames:
+            if reserved_username in author_name.lower().strip():
+                raise utils.ValidationError('This name is not available.')
+
+    def to_dict(self) -> BlogAuthorDetailsDict:
+        """Returns a dict representing this author details domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of blogAuthorDetails instance.
+        """
+        last_updated = utils.convert_naive_datetime_to_string(
+            self.last_updated) if self.last_updated else None
+        return {
+            'author_name': self.author_name,
+            'author_bio': self.author_bio,
+            'last_updated': last_updated
+        }

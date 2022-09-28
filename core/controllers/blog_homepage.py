@@ -246,27 +246,39 @@ class AuthorsPageHandler(base.BaseHandler):
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
+        'GET': {
+            'offset': {
+                'schema': {
+                    'type': 'basestring'
+                },
+            }
+        },
     }
 
     @acl_decorators.open_access
     def get(self, author_username):
         """Handles GET requests."""
+        offset = int(self.normalized_request.get('offset'))
+
         user_settings = (
-            user_services.get_user_settings_from_username(author_username))
-        if user_settings is None:
-            raise self.PageNotFoundException(
-                Exception(
-                    'User with given username does not exist'))
-        if not any(role in user_settings.roles for role in [
-                BLOG_ADMIN, BLOG_POST_EDITOR]):
-            raise self.PageNotFoundException(
-                Exception(
-                    'The given user is not a blog post author.'))
+            user_services.get_user_settings_from_username(author_username)
+        )
+
+        author_details = user_services.get_blog_author_details(
+            user_settings.user_id).to_dict()
+        number_of_published_blog_post_summaries = (
+                blog_services
+                .get_total_number_of_published_blog_post_summaries_by_author(
+                    user_settings.user_id
+                )
+            )
         blog_post_summaries = (
             blog_services.get_published_blog_post_summaries_by_user_id(
                 user_settings.user_id,
-                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE)) # pylint: disable=line-too-long
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE,
+                offset
+            )
+        )
         blog_post_summary_dicts = []
         if blog_post_summaries:
             blog_post_summary_dicts = (
@@ -274,10 +286,10 @@ class AuthorsPageHandler(base.BaseHandler):
                     blog_post_summaries))
 
         self.values.update({
-            'author_name': author_username,
+            'author_details': author_details,
             'profile_picture_data_url': (
                 user_settings.profile_picture_data_url),
-            'author_bio': user_settings.user_bio,
+            'no_of_blog_post_summaries': number_of_published_blog_post_summaries,
             'summary_dicts': blog_post_summary_dicts
         })
         self.render_json(self.values)

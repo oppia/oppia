@@ -173,7 +173,7 @@ describe('Blog Dashboard Page Component', () => {
   it('should initialize main tab', fakeAsync(() => {
     let defaultImageUrl = 'banner_image_url';
     let blogDashboardData = {
-      username: 'test_user',
+      authorName: 'test_user',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,

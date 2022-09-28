@@ -37,6 +37,8 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeTab!: string;
+  authorName!: string;
+  authorBio!: string;
   authorProfilePictureUrl!: string;
   blogDashboardData!: BlogDashboardData;
   windowIsNarrow: boolean = false;
@@ -86,6 +88,8 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     this.blogDashboardBackendService.fetchBlogDashboardDataAsync().then(
       (dashboardData) => {
         this.blogDashboardData = dashboardData;
+        this.authorName = dashboardData.authorName;
+        this.authorBio = dashboardData.authorBio;
         this.authorProfilePictureUrl = decodeURIComponent((
           // eslint-disable-next-line max-len
           dashboardData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
@@ -138,6 +142,16 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     if (index > -1) {
       summaryDicts.splice(index, 1);
     }
+  }
+
+  updateAuthorName(): void {
+    this.blogDashboardBackendService.updateAuthorDetailsAsync(
+      this.authorName, this.authorBio).then(() => {
+      this.alertsService.addSuccessMessage('Author name saved successfully.');
+    }, (error) => {
+      this.alertsService.addWarning(
+        `Unable to update author name. Error: ${error}`);
+    });
   }
 }
 

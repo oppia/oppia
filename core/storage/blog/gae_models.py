@@ -357,13 +357,16 @@ class BlogPostRightsModel(base_models.BaseModel):
     def get_published_models_by_user(
         cls,
         user_id: str,
-        limit: Optional[int] = None
+        offset: int = 0,
+        limit: Optional[int] = None,
     ) -> List[BlogPostRightsModel]:
         """Retrieves the blog post rights objects for published blog posts for
         which the given user is an editor.
 
         Args:
             user_id: str. ID of the author of the blog post.
+            offset: int|None. Number of query results to skip from top. If None,
+                all results from top will be returned.
             limit: int|None. The maximum number of BlogPostRightsModels to be
                 fetched. If None, all existing published models by user will be
                 fetched.
@@ -377,7 +380,9 @@ class BlogPostRightsModel(base_models.BaseModel):
             cls.editor_ids == user_id, cls.blog_post_is_published == True # pylint: disable=singleton-comparison
         ).order(-cls.last_updated)
         return list(
-            query.fetch(limit) if limit is not None else query.fetch()
+            query.fetch(
+                limit, offset=offset
+            ) if limit is not None else query.fetch(offset=offset)
         )
 
     @classmethod

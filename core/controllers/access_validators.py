@@ -203,3 +203,47 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
 
         if not blog_post:
             raise self.PageNotFoundException
+
+
+class BlogAuthorProfilePageAccessValidationHandler(base.BaseHandler):
+    """Validates whether request made to correct blog author page route."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {
+        'author_username': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+        'GET': {}
+    }
+
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self, author_username) -> None:
+        print(author_username)
+        user_settings = (
+            user_services.get_user_settings_from_username(author_username))
+        if user_settings is None:
+            raise self.PageNotFoundException(
+                Exception(
+                    'User with given username does not exist'
+                )
+            )
+        author_details = user_services.get_blog_author_details( # type: ignore[no-untyped-call]
+            user_settings.user_id)
+
+        if not author_details:
+            raise self.PageNotFoundException(
+                Exception(
+                    'User with given username is not a blog post author.'
+                )
+            )

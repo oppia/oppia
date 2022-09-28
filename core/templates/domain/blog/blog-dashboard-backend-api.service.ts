@@ -23,8 +23,12 @@ import { Injectable } from '@angular/core';
 import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 
+export interface BlogAuthorDetailsBackendDict {
+  'author_name': string;
+  'author_bio': string;
+}
 interface BlogDashboardBackendResponse {
-  'username': string;
+  'author_details': BlogAuthorDetailsBackendDict;
   'profile_picture_data_url': string;
   'no_of_published_blog_posts': number;
   'no_of_draft_blog_posts': number;
@@ -36,12 +40,17 @@ interface NewBlogPostBackendResponse {
   'blog_post_id': string;
 }
 export interface BlogDashboardData {
-  username: string;
+  authorName: string;
+  authorBio: string;
   profilePictureDataUrl: string;
   numOfPublishedBlogPosts: number;
   numOfDraftBlogPosts: number;
   publishedBlogPostSummaryDicts: BlogPostSummary[];
   draftBlogPostSummaryDicts: BlogPostSummary[];
+}
+interface BlogAuthorDetails {
+  authorName: string;
+  authorBio: string;
 }
 @Injectable({
   providedIn: 'root'
@@ -55,7 +64,8 @@ export class BlogDashboardBackendApiService {
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE).toPromise()
         .then(response => {
           resolve({
-            username: response.username,
+            authorName: response.author_details.author_name,
+            authorBio: response.author_details.author_bio,
             profilePictureDataUrl: response.profile_picture_data_url,
             numOfDraftBlogPosts: response.no_of_draft_blog_posts,
             numOfPublishedBlogPosts: response.no_of_published_blog_posts,
@@ -82,6 +92,27 @@ export class BlogDashboardBackendApiService {
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {}
       ).toPromise().then(response => {
         resolve(response.blog_post_id);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async updateAuthorDetailsAsync(
+      authorName: string, authorBio: string
+  ): Promise<BlogAuthorDetails> {
+    return new Promise((resolve, reject) => {
+      const putData = {
+        author_name: authorName,
+        author_bio: authorBio
+      };
+      this.http.put<BlogAuthorDetailsBackendDict>(
+        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, putData
+      ).toPromise().then(() => {
+        resolve({
+          authorName: authorName,
+          authorBio: authorBio
+        });
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
