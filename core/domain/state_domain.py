@@ -195,6 +195,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self,
         interaction: base.BaseInteraction,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        *,
         validation_from_exploration: bool = False
     ) -> None:
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -213,6 +214,10 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 invalid.
             ValidationError. The AnswerGroup contains more than one classifier
                 rule.
+            ValidationError. Validation called from exploration and tagged skill
+                misconception is not None.
+            ValidationError. Validation called from exploration and rule spec is
+                empty.
         """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
@@ -931,6 +936,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        *,
         validation_from_exploration: bool = False
     ) -> None:
         """Validates various properties of the InteractionInstance.
@@ -976,7 +982,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         for answer_group in self.answer_groups:
             answer_group.validate(
-                interaction, exp_param_specs_dict, validation_from_exploration)
+                interaction, exp_param_specs_dict,
+                validation_from_exploration=validation_from_exploration)
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -3228,6 +3235,7 @@ class State(translation_domain.BaseTranslatableObject):
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         allow_null_interaction: bool,
+        *,
         validation_from_exploration: bool = False
     ) -> None:
         """Validates various properties of the State.
@@ -3260,7 +3268,8 @@ class State(translation_domain.BaseTranslatableObject):
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
             self.interaction.validate(
-                exp_param_specs_dict, validation_from_exploration)
+                exp_param_specs_dict,
+                validation_from_exploration=validation_from_exploration)
 
         content_id_list = []
         content_id_list.append(self.content.content_id)
