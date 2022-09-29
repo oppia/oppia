@@ -24,6 +24,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+
 @Component({
   selector: 'oppia-blog-dashboard-tile',
   templateUrl: './blog-dashboard-tile.component.html'
@@ -36,18 +38,24 @@ export class BlogDashboardTileComponent implements OnInit {
   @Input() activeView!: string;
   @Input() blogPostIsPublished: boolean = false;
   lastUpdatedDateString: string = '';
+  summaryContent!: string;
   @Output() unpublisedBlogPost: EventEmitter<void> = new EventEmitter();
   @Output() deletedBlogPost: EventEmitter<void> = new EventEmitter();
   constructor(
     private blogDashboardPageService: BlogDashboardPageService,
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,
     private ngbModal: NgbModal,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private truncatePipe: TruncatePipe,
   ) {}
 
   ngOnInit(): void {
     const lastUpdated = this.blogPostSummary.lastUpdated;
     this.lastUpdatedDateString = this.getDateStringInWords(lastUpdated);
+    // Truncating the summary to 220 characters to avoid display in blog
+    // dashboard tile to avoid overflow of text outside the tile.
+    this.summaryContent = this.truncatePipe.transform(
+      this.blogPostSummary.summary, 220);
   }
 
   getDateStringInWords(naiveDate: string): string {
