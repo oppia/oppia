@@ -38,6 +38,7 @@ import { TopicEditorNavbarComponent } from './topic-editor-navbar.component';
 class MockWindowRef {
   _window = {
     location: {
+      hash: '123',
       href: '',
       replace: (val: string) => {}
     },
@@ -77,7 +78,6 @@ describe('Topic Editor Navbar', () => {
         TopicEditorSendMailComponent
       ],
       providers: [
-        TopicEditorRoutingService,
         TopicEditorStateService,
         UrlService,
         UndoRedoService,
