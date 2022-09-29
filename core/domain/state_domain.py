@@ -948,6 +948,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Answer group is present.
         """
         button_text = self.customization_args['buttonText'].value
+        # Ruling out the possibility of different types for mypy type checking.
         assert isinstance(button_text, SubtitledUnicode)
         text_value = button_text.unicode_str
         if len(text_value) > 20:
@@ -966,7 +967,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Raises:
             ValidationError. Recommended explorations are more than 3.
         """
-        # Total recommended explorations should not be more than 3.
         recc_exp_ids = (
             self.customization_args['recommendedExplorationIds'].value
         )
@@ -987,7 +987,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Sets the lower and upper bounds for the range_var.
 
         Args:
-            range_var: RangeVariableDict. Variable used to keep track of each 
+            range_var: RangeVariableDict. Variable used to keep track of each
                 range.
             lower_bound: float. The lower bound.
             upper_bound: float. The upper bound.
@@ -1000,9 +1000,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         range_var['ub_inclusive'] = ub_inclusive
 
     def _is_enclosed_by(
-        self,
-        test_range: RangeVariableDict,
-        base_range: RangeVariableDict
+        self, test_range: RangeVariableDict, base_range: RangeVariableDict
     ) -> bool:
         """Returns `True` when `test_range` variable lies within
         `base_range` variable.
@@ -1024,15 +1022,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             test_range['upper_bound'] is None
         ):
             return False
+
         lb_satisfied = (
-            base_range['lower_bound'] < test_range['lower_bound'] or 
+            base_range['lower_bound'] < test_range['lower_bound'] or
             (
                 base_range['lower_bound'] == test_range['lower_bound'] and
                 (not test_range['lb_inclusive'] or base_range['lb_inclusive'])
             )
         )
         ub_satisfied = (
-            base_range['upper_bound'] > test_range['upper_bound'] or 
+            base_range['upper_bound'] > test_range['upper_bound'] or
             (
                 base_range['upper_bound'] == test_range['upper_bound'] and
                 (not test_range['ub_inclusive'] or base_range['ub_inclusive'])
@@ -1041,9 +1040,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return lb_satisfied and ub_satisfied
 
     def _should_check_range_criteria(
-        self,
-        earlier_rule: RuleSpec,
-        later_rule: RuleSpec
+        self, earlier_rule: RuleSpec, later_rule: RuleSpec
     ) -> bool:
         """Compares the rule types of two rule specs to determine whether
         to check for range enclosure.
@@ -1060,13 +1057,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
         ):
             return True
+
         return later_rule.rule_type in (
             'HasDenominatorEqualTo', 'IsLessThan', 'IsGreaterThan'
         )
 
     def _get_rule_value_of_fraction_interaction(
-        self,
-        rule_spec: RuleSpec
+        self, rule_spec: RuleSpec
     ) -> float:
         """Returns rule value of the rule_spec of FractionInput interaction so
         that we can keep track of rule's range.
@@ -1092,9 +1089,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Duplicate rules are present.
             ValidationError. Rule having a solution that is subset of previous
                 rules' solution.
-            ValidationError. `tol` value in `IsWithinTolerance` is negetive.
-            ValidationError. `a` is greater than or equal to `b` in
-                `IsInclusivelyBetween` rule.
+            ValidationError. 'tol' value in 'IsWithinTolerance' is negetive.
+            ValidationError. 'a' is greater than or equal to 'b' in
+                'IsInclusivelyBetween' rule.
         """
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
@@ -1162,7 +1159,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 elif rule_spec.rule_type == 'IsWithinTolerance':
                     rule_value_x = float(rule_spec.inputs['x'])
                     rule_value_tol = float(rule_spec.inputs['tol'])
-                    # `tol` value in `IsWithinTolerance` must be positive.
                     if rule_value_tol <= 0.0:
                         raise utils.ValidationError(
                             f'The rule \'{rule_spec_index}\' of answer '
@@ -1172,15 +1168,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'zero in NumericInput interaction.'
                         )
                     self._set_lower_and_upper_bounds(
-                        range_var, rule_value_x - rule_value_tol,
-                        rule_value_x + rule_value_tol, True, True
+                        range_var,
+                        rule_value_x - rule_value_tol,
+                        rule_value_x + rule_value_tol,
+                        lb_inclusive=True,
+                        ub_inclusive=True
                     )
 
                 elif rule_spec.rule_type == 'IsInclusivelyBetween':
                     rule_value_a = float(rule_spec.inputs['a'])
                     rule_value_b = float(rule_spec.inputs['b'])
-                    # `a` should not be greater than equal to `b` in
-                    # `IsInclusivelyBetween` rule.
                     if rule_value_a >= rule_value_b:
                         raise utils.ValidationError(
                             f'The rule \'{rule_spec_index}\' of answer '
@@ -1211,16 +1208,18 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Raises:
             ValidationError. Duplicate rules are present.
             ValidationError. Solution is not in simplest form when the
-                `simplest form` setting is turned on.
-            ValidationError. Solution is not in proper form when the
-                `proper form` setting is turned on.
-            ValidationError. `IsExactlyEqualTo` rule have integral value when
-                `allow non zero integers` setting is off.
+                'simplest form' setting is turned on.
+            ValidationError. Solution is not in proper form, having values
+                like 1 2/3 when the 'proper form' setting is turned on.
+            ValidationError. Solution is not in proper form, when the 'proper
+                form' setting is turned on.
+            ValidationError. 'IsExactlyEqualTo' rule have integral value when
+                'allow non zero integers' setting is off.
             ValidationError. Rule have solution that is subset of previous
-                rules' solutions
-            ValidationError. `HasFractionalPartExactlyEqualTo` rule comes after
-                `HasDenominatorEqualTo` rule where the fractional denominator is
-                equal to `HasDenominatorEqualTo` rule value.
+                rules' solutions.
+            ValidationError. 'HasFractionalPartExactlyEqualTo' rule comes after
+                'HasDenominatorEqualTo' rule where the fractional denominator is
+                equal to 'HasDenominatorEqualTo' rule value.
         """
         ranges: List[InteractionInstance.RangeVariableDict] = []
         matched_denominator_list: List[
@@ -1272,8 +1271,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                 f'in FractionInput interaction.'
                             )
 
-                    # Solution should be in proper form if the `proper form`
-                    # setting is turned on.
                     if not allow_imp_frac and whole != 0:
                         raise utils.ValidationError(
                             f'The rule \'{rule_spec_index}\' of '
@@ -1310,16 +1307,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     'IsEquivalentTo', 'IsExactlyEqualTo',
                     'IsEquivalentToAndInSimplestForm'
                 ):
-                    # `IsExactlyEqualTo` rule should not have integral
-                    # value when `allow non zero integers` setting is off.
-                    if rule_spec.rule_type == 'IsExactlyEqualTo':
-                        if not allow_non_zero_integ_part and whole != 0:
-                            raise utils.ValidationError(
-                                f'The rule \'{rule_spec_index}\' of '
-                                f'answer group \'{ans_group_index}\' has '
-                                f'non zero integer part '
-                                f'in FractionInput interaction.'
-                            )
+                    if (
+                        rule_spec.rule_type == 'IsExactlyEqualTo' and
+                        not allow_non_zero_integ_part and whole != 0
+                    ):
+                        raise utils.ValidationError(
+                            f'The rule \'{rule_spec_index}\' of '
+                            f'answer group \'{ans_group_index}\' has '
+                            f'non zero integer part '
+                            f'in FractionInput interaction.'
+                        )
                     rule_value_f = (
                         self._get_rule_value_of_fraction_interaction(rule_spec))
                     self._set_lower_and_upper_bounds(
@@ -1393,7 +1390,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         Raises:
             ValidationError. Duplicate rules are present.
-            ValidationError. `IsEqualTo` rule comes after `IsEquivalentTo` rule
+            ValidationError. 'IsEqualTo' rule comes after 'IsEquivalentTo' rule
                 having same values.
         """
         number_with_units_rules = []
@@ -1415,15 +1412,37 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 # `IsEqualTo` rule should not come after `IsEquivalentTo` rule.
                 if rule_spec.rule_type == 'IsEquivalentTo':
                     number_with_units_rules.append(rule_spec.inputs['f'])
-                if rule_spec.rule_type == 'IsEqualTo':
-                    if rule_spec.inputs['f'] in number_with_units_rules:
-                        raise utils.ValidationError(
-                            f'The rule \'{rule_spec_index}\' of answer '
-                            f'group \'{ans_group_index}\' has '
-                            f'rule type equal is coming after '
-                            f'rule type equivalent having same value '
-                            f'in FractionInput interaction.'
-                        )
+                if (
+                    rule_spec.rule_type == 'IsEqualTo' and
+                    rule_spec.inputs['f'] in number_with_units_rules
+                ):
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' of answer '
+                        f'group \'{ans_group_index}\' has '
+                        f'rule type equal is coming after '
+                        f'rule type equivalent having same value '
+                        f'in FractionInput interaction.'
+                    )
+
+    def _validate_choices_should_be_unique_and_empty(self) -> None:
+        """Validates that the answer choice should be unique and non empty
+
+        Raises:
+            ValidationError. Answer choice is empty.
+            ValidationError. Answer choice is duplicate.
+        """
+        choices = self.customization_args['choices'].value
+        seen_choices = []
+        for choice in choices:
+            if choice.html in ('<p></p>', ''):
+                raise utils.ValidationError(
+                    'There should not be any empty choices.'
+                )
+            if choice.html in seen_choices:
+                raise utils.ValidationError(
+                    'There should not be any duplicate choices.'
+                )
+            seen_choices.append(choice.html)
 
     def _validate_multi_choice_input(self) -> None:
         """Validates the MultipleChoiceInput interaction.
@@ -1447,41 +1466,25 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     )
                 rule_spec_till_now.append(rule_spec.to_dict())
 
-        choices = self.customization_args['choices'].value
-        # Answer choices should be non-empty and unique.
-        seen_choices = []
-        for choice in choices:
-            if choice.html in ('<p></p>', ''):
-                raise utils.ValidationError(
-                    'There should not be any empty '
-                    'choices in MultipleChoiceInput interaction.'
-                )
-            if choice.html in seen_choices:
-                raise utils.ValidationError(
-                    'There should not be any duplicate '
-                    'choices in MultipleChoiceInput interaction.'
-                )
-            seen_choices.append(choice.html)
+        self._validate_choices_should_be_unique_and_empty()
 
     def _validate_item_selec_input(self) -> None:
         """Validates the ItemSelectionInput interaction.
 
         Raises:
             ValidationError. Duplicate rules are present.
-            ValidationError. `Equals` rule does not have value between min and
+            ValidationError. 'Equals' rule does not have value between min and
                 max number of selections.
             ValidationError. Minimum number of selections value is greater
                 than maximum number of selections value.
             ValidationError. Not enough choices to have minimum number of
-                selections
+                selections.
             ValidationError. Answer choices are empty or duplicate.
         """
         min_value = (
-            self.customization_args
-            ['minAllowableSelectionCount'].value)
+            self.customization_args['minAllowableSelectionCount'].value)
         max_value = (
-            self.customization_args
-            ['maxAllowableSelectionCount'].value)
+            self.customization_args['maxAllowableSelectionCount'].value)
         rule_spec_till_now: List[RuleSpecDict] = []
 
         # Minimum number of selections should be no greater than maximum
@@ -1504,6 +1507,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 f'min value selection which is {str(min_value)} '
                 f'in ItemSelectionInput interaction.'
             )
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
                 answer_group.rule_specs
@@ -1531,20 +1535,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'in ItemSelectionInput interaction.'
                         )
 
-        # All choices should be unique and non-empty.
-        seen_choices = []
-        for choice in choices:
-            if choice.html in ('<p></p>', ''):
-                raise utils.ValidationError(
-                    'There should not be any empty '
-                    'choices in ItemSelectionInput interaction.'
-                )
-            if choice.html in seen_choices:
-                raise utils.ValidationError(
-                    'There should not be any duplicate '
-                    'choices in ItemSelectionInput interaction.'
-                )
-            seen_choices.append(choice.html)
+        self._validate_choices_should_be_unique_and_empty()
 
     def _validate_drag_and_drop_input(self) -> None:
         """Validates the DragAndDropInput interaction.
@@ -1553,15 +1544,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Duplicate rules are present.
             ValidationError. Multiple items at the same place when the setting
                 is turned off.
-            ValidationError. `IsEqualToOrderingWithOneItemAtIncorrectPosition`
-                rule present when `multiple items at same place` setting
+            ValidationError. 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                rule present when 'multiple items at same place' setting
                 turned off.
-            ValidationError. In `HasElementXBeforeElementY` rule, `X` value
-                is equal to `Y` value.
-            ValidationError. `IsEqualToOrdering` rule have empty values.
-            ValidationError. `IsEqualToOrdering` rule comes after
-                `HasElementXAtPositionY` where element `X` is present at
-                position `Y` in `IsEqualToOrdering` rule.
+            ValidationError. In 'HasElementXBeforeElementY' rule, 'X' value
+                is equal to 'Y' value.
+            ValidationError. 'IsEqualToOrdering' rule have empty values.
+            ValidationError. 'IsEqualToOrdering' rule comes after
+                'HasElementXAtPositionY' where element 'X' is present at
+                position 'Y' in 'IsEqualToOrdering' rule.
             ValidationError. Less than 2 items are present.
             ValidationError. Answer choices are empty or duplicate.
         """
@@ -1584,9 +1575,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         f'interaction is already present.'
                     )
                 rule_spec_till_now.append(rule_spec.to_dict())
-                # `IsEqualToOrderingWithOneItemAtIncorrectPosition`
-                # rule should not be present when `multiple items at same
-                # place` setting is turned off.
                 if not multi_item_value and (
                     rule_spec.rule_type ==
                     'IsEqualToOrderingWithOneItemAtIncorrectPosition'
@@ -1602,7 +1590,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         f'in DragAndDropSortInput interaction.'
                     )
                 # Multiple items cannot be in the same place iff the
-                # setting is turned off.
+                # `allow multiple items at same place` setting is turned off.
                 if not multi_item_value:
                     for ele in rule_spec.inputs['x']:
                         if len(ele) > 1:
@@ -1615,8 +1603,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                 f'in DragAndDropSortInput interaction.'
                             )
 
-                # In `HasElementXBeforeElementY` rule, `X` value
-                # should not be equal to `Y` value.
                 if (
                     rule_spec.rule_type == 'HasElementXBeforeElementY' and
                     rule_spec.inputs['x'] == rule_spec.inputs['y']
@@ -1695,26 +1681,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                 f'WithOneItemAtIncorrectPosition '
                                 f'rule above.'
                             )
+
         choices = self.customization_args['choices'].value
         if len(choices) < 2:
             raise utils.ValidationError(
                 'Atleast 2 choices should be there '
                 'in DragAndDropSortInput interaction.'
             )
-        # All inputs should be non-empty and unique.
-        seen_choices = []
-        for choice in choices:
-            if choice.html in ('<p></p>', ''):
-                raise utils.ValidationError(
-                    'There should not be any empty '
-                    'choices in DragAndDropSortInput interaction.'
-                )
-            if choice.html in seen_choices:
-                raise utils.ValidationError(
-                    'There should not be any duplicate '
-                    'choices in DragAndDropSortInput interaction.'
-                )
-            seen_choices.append(choice.html)
+
+        self._validate_choices_should_be_unique_and_empty()
 
     def _validate_text_input(self) -> None:
         """Validates the TextInput interaction.
@@ -1722,16 +1697,26 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Raises:
             ValidationError. Text input height is not >= 1 and <= 10.
             ValidationError. Duplicate rules are present.
-            ValidationError. `Contains` rule comes before these rules (Contains,
-                StartsWith and Equals) where `Contains` rule string is a
-                substring of other rules string.
-            ValidationError. `StartsWith` rule comes before the `Equals` and
-                another `StartsWith` rule where the `StartsWith` rule string is
+            ValidationError. 'Contains' rule comes before another 'Contains'
+                rule, where 'Contains' rule string is a substring of other
+                rules string.
+            ValidationError. 'Contains' rule comes before 'StartsWith'
+                rule, where 'Contains' rule string is a substring of other
+                rules string.
+            ValidationError. 'Contains' rule comes before 'Equals'
+                rule, where 'Contains' rule string is a substring of other
+                rules string.
+            ValidationError. 'StartsWith' rule comes before the 'Equals'
+                rule where the 'StartsWith' rule string is a prefix of other
+                rules string.
+            ValidationError. 'StartsWith' rule comes before the another
+                'StartsWith' rule where the 'StartsWith' rule string is
                 a prefix of other rules string.
         """
         rule_spec_till_now: List[RuleSpecDict] = []
         seen_strings_contains: List[List[str]] = []
         seen_strings_startswith: List[List[str]] = []
+
         # Text input height should be >= 1 and <= 10.
         rows_value = self.customization_args['rows'].value
         if rows_value < 1 or rows_value > 10:
@@ -1850,6 +1835,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        *,
         validation_from_exploration: bool = False
     ) -> None:
         """Validates various properties of the InteractionInstance.
@@ -1916,24 +1902,19 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # an exploration because as of now(16 Sept 2022) the data related
         # to Question model is not yet fixed.
         if validation_from_exploration:
-            if self.id == 'Continue':
-                self._validate_continue_input()
-            elif self.id == 'EndExploration':
-                self._validate_end_exploration_input()
-            elif self.id == 'NumericInput':
-                self._validate_numeric_input()
-            elif self.id == 'FractionInput':
-                self._validate_fraction_input()
-            elif self.id == 'NumberWithUnits':
-                self._validate_number_with_units_input()
-            elif self.id == 'MultipleChoiceInput':
-                self._validate_multi_choice_input()
-            elif self.id == 'ItemSelectionInput':
-                self._validate_item_selec_input()
-            elif self.id == 'DragAndDropSortInput':
-                self._validate_drag_and_drop_input()
-            elif self.id == 'TextInput':
-                self._validate_text_input()
+            interaction_id_to_validation_dict = {
+                'Continue': self._validate_continue_input,
+                'EndExploration': self._validate_end_exploration_input,
+                'NumericInput': self._validate_numeric_input,
+                'FractionInput': self._validate_fraction_input,
+                'NumberWithUnits': self._validate_number_with_units_input,
+                'MultipleChoiceInput': self._validate_multi_choice_input,
+                'ItemSelectionInput': self._validate_item_selec_input,
+                'DragAndDropSortInput': self._validate_drag_and_drop_input,
+                'TextInput': self._validate_text_input
+            }
+            if self.id in interaction_id_to_validation_dict:
+                interaction_id_to_validation_dict[self.id]()
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
@@ -2196,7 +2177,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     # because it can be of type SubtitledHtmlDict, SubtitledUnicodeDict
     # and so on.
     def __init__(
-        self, value: Any, schema: Dict[str, Any]
+        self, value: Any, schema: Dict[str, Union[
+            SubtitledHtmlDict, SubtitledUnicodeDict, str]]
     ) -> None:
         """Initializes a InteractionCustomizationArg domain object.
 
@@ -4203,7 +4185,8 @@ class State(translation_domain.BaseTranslatableObject):
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
             self.interaction.validate(
-                exp_param_specs_dict, validation_from_exploration)
+                exp_param_specs_dict,
+                validation_from_exploration=validation_from_exploration)
 
         content_id_list = []
         content_id_list.append(self.content.content_id)

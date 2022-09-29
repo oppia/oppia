@@ -1140,6 +1140,1057 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
             translation_dict)
 
+    def _tests_continue_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests Continue interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        self.set_interaction_for_state(state, 'Continue')
+        state.interaction.customization_args['buttonText'].value.unicode_str = (
+            'Continueeeeeeeeeeeeeeeeeeeeeee')
+        self._assert_validation_error(
+            new_exploration, 'The Continue button text should be at '
+            'most 20 characters.')
+
+    def _tests_numeric_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests Numeric interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        self.set_interaction_for_state(state, 'NumericInput')
+        test_ans_group_for_numeric_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 7
+                    }
+                },
+                {
+                    'rule_type': 'IsInclusivelyBetween',
+                    'inputs': {
+                        'a': 3,
+                        'b': 5
+                    }
+                },
+                {
+                    'rule_type': 'IsWithinTolerance',
+                    'inputs': {
+                        'x': 1,
+                        'tol': -1
+                    }
+                },
+                {
+                    'rule_type': 'IsInclusivelyBetween',
+                    'inputs': {
+                        'a': 8,
+                        'b': 8
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 7
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = test_ans_group_for_numeric_interaction
+        self._assert_validation_error(
+            new_exploration, 'Rule \'1\' from answer group \'0\' will never '
+            'be matched because it is made redundant by the above rules')
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' having '
+            'rule type \'IsWithinTolerance\' have \'tol\' value less than or '
+            'equal to zero in NumericInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' having rule '
+            'type \'IsInclusivelyBetween\' have `a` value greater than `b` '
+            'value in NumericInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'NumericInput interaction is already present.')
+        rule_specs.remove(rule_specs[1])
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
+
+    def _tests_fraction_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests Fraction interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        state = new_exploration.states['Introduction']
+        self.set_interaction_for_state(state, 'FractionInput')
+        test_ans_group_for_fraction_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 4,
+                            'denominator': 6
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 1,
+                            'numerator': 3,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 3,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 2,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsGreaterThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 10,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 27,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasDenominatorEqualTo',
+                    'inputs': {
+                        'x': 4
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 9,
+                            'denominator': 4
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = (
+            test_ans_group_for_fraction_interaction)
+        state.interaction.customization_args[
+            'allowNonzeroIntegerPart'].value = False
+        state.interaction.customization_args[
+            'allowImproperFraction'].value = False
+        state.interaction.customization_args[
+            'requireSimplestForm'].value = True
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'FractionInput interaction is already present.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in simple form '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in proper fraction '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in proper fraction '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        state.interaction.customization_args[
+            'allowImproperFraction'].value = True
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' has '
+            'non zero integer part in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'Rule \'2\' from answer group \'0\' of '
+            'FractionInput interaction will never be matched because it is '
+            'made redundant by the above rules')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'Rule \'3\' from answer group \'0\' of '
+            'FractionInput interaction having rule type HasFractionalPart'
+            'ExactlyEqualTo will never be matched because it is '
+            'made redundant by the above rules')
+        rule_specs.remove(rule_specs[1])
+
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
+
+    def _tests_number_with_units_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests NumberWithUnits interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        self.set_interaction_for_state(state, 'NumberWithUnits')
+        test_ans_group_for_number_with_units_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'IsEquivalentTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsEquivalentTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.update_interaction_answer_groups(
+            test_ans_group_for_number_with_units_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' has '
+            'rule type equal is coming after rule type equivalent having '
+            'same value in FractionInput interaction.'
+        )
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'NumberWithUnitsInput interaction is already present.'
+        )
+
+    def _tests_multiple_choice_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests MultipleChoice interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        self.set_interaction_for_state(state, 'MultipleChoiceInput')
+        test_ans_group_for_multiple_choice_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.update_interaction_answer_groups(
+            test_ans_group_for_multiple_choice_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
+        ]
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'MultipleChoiceInput interaction is already present.'
+        )
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'There should not be any duplicate choices.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[1].html = '<p>3</p>'
+        self._assert_validation_error(
+            new_exploration, 'There should not be any empty choices.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[2].html = '<p>2</p>'
+
+    def _tests_item_selection_choice_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests ItemSelection interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        self.set_interaction_for_state(state, 'ItemSelectionInput')
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        test_ans_group_for_item_selection_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': [
+                        'ca_choices_0',
+                        'ca_choices_1',
+                        'ca_choices_2'
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': [
+                        'ca_choices_0',
+                        'ca_choices_1',
+                        'ca_choices_2'
+                        ]
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.update_interaction_answer_groups(
+            test_ans_group_for_item_selection_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
+        ]
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 3
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 1
+        self._assert_validation_error(
+            new_exploration, 'Min value which is 3 is greater than max value '
+            'which is 1 in ItemSelectionInput interaction.'
+        )
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 4
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 4
+        self._assert_validation_error(
+            new_exploration, 'Number of choices which is 3 is lesser than the '
+                'min value selection which is 4 in ItemSelectionInput '
+                'interaction.')
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        self._assert_validation_error(
+            new_exploration, 'The rule 1 of answer group 0 of '
+            'ItemSelectionInput interaction is already present.'
+        )
+        rule_specs.remove(rule_specs[1])
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 2
+        self._assert_validation_error(
+            new_exploration, 'Selected choices of rule \'0\' of answer group '
+            '\'0\' either less than min_selection_value or greater than '
+            'max_selection_value in ItemSelectionInput interaction.'
+        )
+        state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        self._assert_validation_error(
+            new_exploration, 'There should not be any duplicate choices.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[1].html = '<p>3</p>'
+        self._assert_validation_error(
+            new_exploration, 'There should not be any empty choices.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[2].html = '<p>2</p>'
+
+    def _tests_drag_and_drop_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests DragAndDrop interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_2')
+        self.set_interaction_for_state(state, 'DragAndDropSortInput')
+        empty_list: List[str] = []
+        test_ans_group_for_drag_and_drop_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': (
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXBeforeElementY',
+                    'inputs': {
+                    'x': 'ca_choices_0',
+                    'y': 'ca_choices_0'
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': empty_list
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 1
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': (
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_1', 'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_2'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_1'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_2', 'ca_choices_3'
+                            ]
+                        ]
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = (
+            test_ans_group_for_drag_and_drop_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = False
+        self._assert_validation_error(
+            new_exploration, 'The rule \'0\' of answer group \'0\' '
+            'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
+            ' should not be there when the multiple items in same position '
+            'setting is turned off in DragAndDropSortInput interaction.')
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'0\' of answer group \'0\' '
+            'have multiple items at same place when multiple items in same '
+            'position settings is turned off in DragAndDropSortInput '
+            'interaction.')
+        state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = True
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\', '
+            'the value 1 and value 2 cannot be same when rule type is '
+            'HasElementXBeforeElementY of DragAndDropSortInput interaction.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\'of answer group \'0\', '
+            'having rule type IsEqualToOrdering should not have empty values.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'2\' of answer group \'0\' of '
+            'DragAndDropInput interaction is already present.')
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - 1 of answer group 0 '
+            'will never be match because it is made redundant by the '
+            'HasElementXAtPositionY rule above.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - 1 of answer group 0 will never '
+            'be match because it is made redundant by the '
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition rule above.')
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            new_exploration, 'Atleast 2 choices should be there '
+            'in DragAndDropSortInput interaction.')
+        state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
+        ]
+        self._assert_validation_error(
+            new_exploration, 'There should not be any duplicate choices.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[1].html = '<p>3</p>'
+        self._assert_validation_error(
+            new_exploration, 'There should not be any empty choices.'
+        )
+        state.interaction.customization_args[
+            'choices'].value[2].html = '<p>2</p>'
+
+    def _tests_text_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests Text interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('rule_input_27')
+        state.written_translations.add_content_id_for_translation(
+            'rule_input_27')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_2')
+        self.set_interaction_for_state(state, 'TextInput')
+        test_ans_group_for_text_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello',
+                            'abc',
+                            'def'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'helloooooo'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'exci'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'excitement'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'he'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'he'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'he'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello'
+                        ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                        'contentId': 'rule_input_27',
+                        'normalizedStrSet': [
+                            'hello'
+                        ]
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = (
+            test_ans_group_for_text_interaction)
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+        state.interaction.customization_args['rows'].value = 20
+        self._assert_validation_error(
+            new_exploration, 'Rows having value 20 is either '
+            'less than 1 or greater than 10.'
+        )
+        state.interaction.customization_args['rows'].value = 5
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Contains\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.')
+        rule_specs.remove(rule_specs[0])
+        self._assert_validation_error(
+            new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'TextInput interaction is already present.')
+
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
+        state.written_translations.add_content_id_for_translation(
+            'ca_choices_2')
+
+    def _tests_end_interaction(
+        self,
+        state: state_domain.State,
+        new_exploration: exp_domain.Exploration
+    ) -> None:
+        """Tests End interaction.
+
+        Args:
+            state: state_domain.State. The exploration state.
+            new_exploration: exp_domain.Exploration. The exploration.
+        """
+        self.set_interaction_for_state(state, 'EndExploration')
+        state.update_interaction_default_outcome(None)
+        state.interaction.customization_args[
+            'recommendedExplorationIds'].value = ['a', 'b', 'c', 'd']
+        self._assert_validation_error(
+            new_exploration, 'The End interaction should not have more than 3 '
+            'recommended explorations.')
+
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
     def test_validation(self) -> None:
@@ -1727,971 +2778,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Interaction validations.
         new_exploration = exp_domain.Exploration.create_default_exploration(
             'test_id')
-        # Validate Continue interaction.
         state = new_exploration.states['Introduction']
-        self.set_interaction_for_state(state, 'Continue')
-        state.interaction.customization_args['buttonText'].value.unicode_str = (
-            'Continueeeeeeeeeeeeeeeeeeeeeee')
-        self._assert_validation_error(
-            new_exploration, 'The Continue button text should be at '
-            'most 20 characters.')
 
-        # Validate NumericInput interaction.
-        self.set_interaction_for_state(state, 'NumericInput')
-        test_ans_group_for_numeric_interaction = [
-            state_domain.AnswerGroup.from_dict({
-            'rule_specs': [
-                {
-                    'rule_type': 'IsLessThanOrEqualTo',
-                    'inputs': {
-                        'x': 7
-                    }
-                },
-                {
-                    'rule_type': 'IsInclusivelyBetween',
-                    'inputs': {
-                        'a': 3,
-                        'b': 5
-                    }
-                },
-                {
-                    'rule_type': 'IsWithinTolerance',
-                    'inputs': {
-                        'x': 1,
-                        'tol': -1
-                    }
-                },
-                {
-                    'rule_type': 'IsInclusivelyBetween',
-                    'inputs': {
-                        'a': 8,
-                        'b': 8
-                    }
-                },
-                {
-                    'rule_type': 'IsLessThanOrEqualTo',
-                    'inputs': {
-                        'x': 7
-                    }
-                }
-            ],
-            'outcome': {
-                'dest': 'EXP_1_STATE_1',
-                'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'dest_if_really_stuck': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-            })
-        ]
-        state.interaction.answer_groups = test_ans_group_for_numeric_interaction
-        self._assert_validation_error(
-            new_exploration, 'Rule \'1\' from answer group \'0\' will never '
-            'be matched because it is made redundant by the above rules')
-        rule_specs = state.interaction.answer_groups[0].rule_specs
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' having '
-            'rule type \'IsWithinTolerance\' have \'tol\' value less than or '
-            'equal to zero in NumericInput interaction.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' having rule '
-            'type \'IsInclusivelyBetween\' have `a` value greater than `b` '
-            'value in NumericInput interaction.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'NumericInput interaction is already present.')
-        rule_specs.remove(rule_specs[1])
-        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
-        state.written_translations.add_content_id_for_translation('feedback_0')
-
-        # Validate FractionInput interaction.
-        state = new_exploration.states['Introduction']
-        self.set_interaction_for_state(state, 'FractionInput')
-        test_ans_group_for_fraction_interaction = [
-            state_domain.AnswerGroup.from_dict({
-            'rule_specs': [
-                {
-                    'rule_type': 'HasFractionalPartExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 0,
-                            'numerator': 2,
-                            'denominator': 3
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'HasFractionalPartExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 0,
-                            'numerator': 2,
-                            'denominator': 3
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'HasFractionalPartExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 0,
-                            'numerator': 4,
-                            'denominator': 6
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'HasFractionalPartExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 1,
-                            'numerator': 3,
-                            'denominator': 2
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'HasFractionalPartExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 0,
-                            'numerator': 3,
-                            'denominator': 2
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'IsExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 2,
-                            'numerator': 2,
-                            'denominator': 3
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'IsGreaterThan',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 0,
-                            'numerator': 10,
-                            'denominator': 3
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'IsExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 0,
-                            'numerator': 27,
-                            'denominator': 2
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'HasDenominatorEqualTo',
-                    'inputs': {
-                        'x': 4
-                    }
-                },
-                {
-                    'rule_type': 'HasFractionalPartExactlyEqualTo',
-                    'inputs': {
-                        'f': {
-                            'isNegative': False,
-                            'wholeNumber': 0,
-                            'numerator': 9,
-                            'denominator': 4
-                        }
-                    }
-                }
-            ],
-            'outcome': {
-                'dest': 'EXP_1_STATE_1',
-                'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'dest_if_really_stuck': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-            })
-        ]
-        state.interaction.answer_groups = (
-            test_ans_group_for_fraction_interaction)
-        state.interaction.customization_args[
-            'allowNonzeroIntegerPart'].value = False
-        state.interaction.customization_args[
-            'allowImproperFraction'].value = False
-        state.interaction.customization_args[
-            'requireSimplestForm'].value = True
-        rule_specs = state.interaction.answer_groups[0].rule_specs
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'FractionInput interaction is already present.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' do '
-            'not have value in simple form '
-            'in FractionInput interaction.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' do '
-            'not have value in proper fraction '
-            'in FractionInput interaction.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' do '
-            'not have value in proper fraction '
-            'in FractionInput interaction.')
-        rule_specs.remove(rule_specs[1])
-        state.interaction.customization_args[
-            'allowImproperFraction'].value = True
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' has '
-            'non zero integer part in FractionInput interaction.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'Rule \'2\' from answer group \'0\' of '
-            'FractionInput interaction will never be matched because it is '
-            'made redundant by the above rules')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'Rule \'3\' from answer group \'0\' of '
-            'FractionInput interaction having rule type HasFractionalPart'
-            'ExactlyEqualTo will never be matched because it is '
-            'made redundant by the above rules')
-        rule_specs.remove(rule_specs[1])
-
-        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
-        state.written_translations.add_content_id_for_translation('feedback_0')
-        # Validate NumberWithUnits interaction.
-        self.set_interaction_for_state(state, 'NumberWithUnits')
-        test_ans_group_for_number_with_units_interaction = [
-            state_domain.AnswerGroup.from_dict({
-            'rule_specs': [
-                {
-                    'rule_type': 'IsEquivalentTo',
-                    'inputs': {
-                        'f': {
-
-                            'type': 'real',
-                            'real': 2,
-                            'fraction': {
-                                'isNegative': False,
-                                'wholeNumber': 0,
-                                'numerator': 0,
-                                'denominator': 1
-                            },
-                            'units': [
-                                {
-                                    'unit': 'km',
-                                    'exponent': 1
-                                },
-                                {
-                                    'unit': 'hr',
-                                    'exponent': -1
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'IsEqualTo',
-                    'inputs': {
-                        'f': {
-
-                            'type': 'real',
-                            'real': 2,
-                            'fraction': {
-                                'isNegative': False,
-                                'wholeNumber': 0,
-                                'numerator': 0,
-                                'denominator': 1
-                            },
-                            'units': [
-                                {
-                                    'unit': 'km',
-                                    'exponent': 1
-                                },
-                                {
-                                    'unit': 'hr',
-                                    'exponent': -1
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'IsEquivalentTo',
-                    'inputs': {
-                        'f': {
-
-                            'type': 'real',
-                            'real': 2,
-                            'fraction': {
-                                'isNegative': False,
-                                'wholeNumber': 0,
-                                'numerator': 0,
-                                'denominator': 1
-                            },
-                            'units': [
-                                {
-                                    'unit': 'km',
-                                    'exponent': 1
-                                },
-                                {
-                                    'unit': 'hr',
-                                    'exponent': -1
-                                }
-                            ]
-                        }
-                    }
-                }
-            ],
-            'outcome': {
-                'dest': 'EXP_1_STATE_1',
-                'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'dest_if_really_stuck': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-            })
-        ]
-        state.update_interaction_answer_groups(
-            test_ans_group_for_number_with_units_interaction)
-        rule_specs = state.interaction.answer_groups[0].rule_specs
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' has '
-            'rule type equal is coming after rule type equivalent having '
-            'same value in FractionInput interaction.'
-        )
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'NumberWithUnitsInput interaction is already present.'
-        )
-
-        # Validate MultipleChoiceInput interaction.
-        self.set_interaction_for_state(state, 'MultipleChoiceInput')
-        test_ans_group_for_multiple_choice_interaction = [
-            state_domain.AnswerGroup.from_dict({
-            'rule_specs': [
-                {
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': 0
-                    }
-                },
-                {
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': 0
-                    }
-                }
-            ],
-            'outcome': {
-                'dest': 'EXP_1_STATE_1',
-                'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'dest_if_really_stuck': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-            })
-        ]
-        state.update_interaction_answer_groups(
-            test_ans_group_for_multiple_choice_interaction)
-        rule_specs = state.interaction.answer_groups[0].rule_specs
-        state.interaction.customization_args['choices'].value = [
-            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
-        ]
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_0')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_1')
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'MultipleChoiceInput interaction is already present.'
-        )
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'There should not be any duplicate '
-            'choices in MultipleChoiceInput interaction.'
-        )
-        state.interaction.customization_args[
-            'choices'].value[1].html = '<p>3</p>'
-        self._assert_validation_error(
-            new_exploration, 'There should not be any empty '
-            'choices in MultipleChoiceInput interaction.'
-        )
-        state.interaction.customization_args[
-            'choices'].value[2].html = '<p>2</p>'
-
-        # Validate ItemSelectionInput interaction.
-        self.set_interaction_for_state(state, 'ItemSelectionInput')
-        state.interaction.customization_args[
-            'minAllowableSelectionCount'].value = 1
-        state.interaction.customization_args[
-            'maxAllowableSelectionCount'].value = 3
-        test_ans_group_for_item_selection_interaction = [
-            state_domain.AnswerGroup.from_dict({
-            'rule_specs': [
-                {
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': [
-                        'ca_choices_0',
-                        'ca_choices_1',
-                        'ca_choices_2'
-                        ]
-                    }
-                },
-                {
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': [
-                        'ca_choices_0',
-                        'ca_choices_1',
-                        'ca_choices_2'
-                        ]
-                    }
-                }
-            ],
-            'outcome': {
-                'dest': 'EXP_1_STATE_1',
-                'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'dest_if_really_stuck': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-            })
-        ]
-        state.update_interaction_answer_groups(
-            test_ans_group_for_item_selection_interaction)
-        rule_specs = state.interaction.answer_groups[0].rule_specs
-        state.interaction.customization_args['choices'].value = [
-            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
-        ]
-        state.interaction.customization_args[
-            'minAllowableSelectionCount'].value = 3
-        state.interaction.customization_args[
-            'maxAllowableSelectionCount'].value = 1
-        self._assert_validation_error(
-            new_exploration, 'Min value which is 3 is greater than max value '
-            'which is 1 in ItemSelectionInput interaction.'
-        )
-        state.interaction.customization_args[
-            'minAllowableSelectionCount'].value = 4
-        state.interaction.customization_args[
-            'maxAllowableSelectionCount'].value = 4
-        self._assert_validation_error(
-            new_exploration, 'Number of choices which is 3 is lesser than the '
-                'min value selection which is 4 in ItemSelectionInput '
-                'interaction.')
-        state.interaction.customization_args[
-            'minAllowableSelectionCount'].value = 1
-        state.interaction.customization_args[
-            'maxAllowableSelectionCount'].value = 3
-        self._assert_validation_error(
-            new_exploration, 'The rule 1 of answer group 0 of '
-            'ItemSelectionInput interaction is already present.'
-        )
-        rule_specs.remove(rule_specs[1])
-        state.interaction.customization_args[
-            'minAllowableSelectionCount'].value = 1
-        state.interaction.customization_args[
-            'maxAllowableSelectionCount'].value = 2
-        self._assert_validation_error(
-            new_exploration, 'Selected choices of rule \'0\' of answer group '
-            '\'0\' either less than min_selection_value or greater than '
-            'max_selection_value in ItemSelectionInput interaction.'
-        )
-        state.interaction.customization_args[
-            'minAllowableSelectionCount'].value = 1
-        state.interaction.customization_args[
-            'maxAllowableSelectionCount'].value = 3
-        self._assert_validation_error(
-            new_exploration, 'There should not be any duplicate '
-            'choices in ItemSelectionInput interaction.'
-        )
-        state.interaction.customization_args[
-            'choices'].value[1].html = '<p>3</p>'
-        self._assert_validation_error(
-            new_exploration, 'There should not be any empty '
-            'choices in ItemSelectionInput interaction.'
-        )
-        state.interaction.customization_args[
-            'choices'].value[2].html = '<p>2</p>'
-
-        # Validate DragAndDropSortInput interaction.
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_0')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_1')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_2')
-        self.set_interaction_for_state(state, 'DragAndDropSortInput')
-        empty_list: List[str] = []
-        test_ans_group_for_drag_and_drop_interaction = [
-            state_domain.AnswerGroup.from_dict({
-            'rule_specs': [
-                {
-                    'rule_type': (
-                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
-                    'inputs': {
-                        'x': [
-                            [
-                            'ca_choices_0'
-                            ],
-                            [
-                            'ca_choices_1', 'ca_choices_2'
-                            ],
-                            [
-                            'ca_choices_3'
-                            ]
-                        ]
-                    }
-                },
-                {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': [
-                            [
-                            'ca_choices_0'
-                            ],
-                            [
-                            'ca_choices_1', 'ca_choices_2'
-                            ],
-                            [
-                            'ca_choices_3'
-                            ]
-                        ]
-                    }
-                },
-                {
-                    'rule_type': 'HasElementXBeforeElementY',
-                    'inputs': {
-                    'x': 'ca_choices_0',
-                    'y': 'ca_choices_0'
-                    }
-                },
-                {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': empty_list
-                    }
-                },
-                {
-                    'rule_type': 'HasElementXAtPositionY',
-                    'inputs': {
-                        'x': 'ca_choices_0',
-                        'y': 1
-                    }
-                },
-                {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': [
-                            [
-                            'ca_choices_0'
-                            ],
-                            [
-                            'ca_choices_1', 'ca_choices_2'
-                            ],
-                            [
-                            'ca_choices_3'
-                            ]
-                        ]
-                    }
-                },
-                {
-                    'rule_type': (
-                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
-                    'inputs': {
-                        'x': [
-                            [
-                            'ca_choices_1', 'ca_choices_3'
-                            ],
-                            [
-                            'ca_choices_0'
-                            ],
-                            [
-                            'ca_choices_2'
-                            ]
-                        ]
-                    }
-                },
-                {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': [
-                            [
-                            'ca_choices_1'
-                            ],
-                            [
-                            'ca_choices_0'
-                            ],
-                            [
-                            'ca_choices_2', 'ca_choices_3'
-                            ]
-                        ]
-                    }
-                }
-            ],
-            'outcome': {
-                'dest': 'EXP_1_STATE_1',
-                'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'dest_if_really_stuck': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-            })
-        ]
-        state.interaction.answer_groups = (
-            test_ans_group_for_drag_and_drop_interaction)
-        rule_specs = state.interaction.answer_groups[0].rule_specs
-        state.interaction.customization_args[
-            'allowMultipleItemsInSamePosition'].value = False
-        self._assert_validation_error(
-            new_exploration, 'The rule \'0\' of answer group \'0\' '
-            'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
-            ' should not be there when the multiple items in same position '
-            'setting is turned off in DragAndDropSortInput interaction.')
-        rule_specs.remove(rule_specs[0])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'0\' of answer group \'0\' '
-            'have multiple items at same place when multiple items in same '
-            'position settings is turned off in DragAndDropSortInput '
-            'interaction.')
-        state.interaction.customization_args[
-            'allowMultipleItemsInSamePosition'].value = True
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\', '
-            'the value 1 and value 2 cannot be same when rule type is '
-            'HasElementXBeforeElementY of DragAndDropSortInput interaction.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\'of answer group \'0\', '
-            'having rule type IsEqualToOrdering should not have empty values.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'2\' of answer group \'0\' of '
-            'DragAndDropInput interaction is already present.')
-        rule_specs.remove(rule_specs[0])
-        self._assert_validation_error(
-            new_exploration, 'Rule - 1 of answer group 0 '
-            'will never be match because it is made redundant by the '
-            'HasElementXAtPositionY rule above.')
-        rule_specs.remove(rule_specs[0])
-        rule_specs.remove(rule_specs[0])
-        self._assert_validation_error(
-            new_exploration, 'Rule - 1 of answer group 0 will never '
-            'be match because it is made redundant by the '
-            'IsEqualToOrderingWithOneItemAtIncorrectPosition rule above.')
-        rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            new_exploration, 'Atleast 2 choices should be there '
-            'in DragAndDropSortInput interaction.')
-        state.interaction.customization_args['choices'].value = [
-            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
-        ]
-        self._assert_validation_error(
-            new_exploration, 'There should not be any duplicate '
-            'choices in DragAndDropSortInput interaction.'
-        )
-        state.interaction.customization_args[
-            'choices'].value[1].html = '<p>3</p>'
-        self._assert_validation_error(
-            new_exploration, 'There should not be any empty '
-            'choices in DragAndDropSortInput interaction.'
-        )
-        state.interaction.customization_args[
-            'choices'].value[2].html = '<p>2</p>'
-
-        # Validate TextInput interaction.
-        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
-        state.written_translations.add_content_id_for_translation('feedback_0')
-        state.recorded_voiceovers.add_content_id_for_voiceover('rule_input_27')
-        state.written_translations.add_content_id_for_translation(
-            'rule_input_27')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_0')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_1')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_2')
-        self.set_interaction_for_state(state, 'TextInput')
-        test_ans_group_for_text_interaction = [
-            state_domain.AnswerGroup.from_dict({
-            'rule_specs': [
-                {
-                    'rule_type': 'Contains',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello',
-                            'abc',
-                            'def'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'Contains',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'helloooooo'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'StartsWith',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'exci'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'StartsWith',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'excitement'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'Contains',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'he'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'StartsWith',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'Contains',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'he'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'StartsWith',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'he'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello'
-                        ]
-                        }
-                    }
-                },
-                {
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello'
-                        ]
-                        }
-                    }
-                }
-            ],
-            'outcome': {
-                'dest': 'EXP_1_STATE_1',
-                'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'dest_if_really_stuck': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-            })
-        ]
-        state.interaction.answer_groups = (
-            test_ans_group_for_text_interaction)
-        rule_specs = state.interaction.answer_groups[0].rule_specs
-        state.interaction.customization_args['rows'].value = 20
-        self._assert_validation_error(
-            new_exploration, 'Rows having value 20 is either '
-            'less than 1 or greater than 10.'
-        )
-        state.interaction.customization_args['rows'].value = 5
-        self._assert_validation_error(
-            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Contains\' will never be matched because it '
-            'is made redundant by the above \'contains\' rule.')
-        rule_specs.remove(rule_specs[0])
-        rule_specs.remove(rule_specs[0])
-        self._assert_validation_error(
-            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'StartsWith\' will never be matched because it '
-            'is made redundant by the above \'StartsWith\' rule.')
-        rule_specs.remove(rule_specs[0])
-        rule_specs.remove(rule_specs[0])
-        self._assert_validation_error(
-            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'StartsWith\' will never be matched because it '
-            'is made redundant by the above \'contains\' rule.')
-        rule_specs.remove(rule_specs[0])
-        rule_specs.remove(rule_specs[0])
-        self._assert_validation_error(
-            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Equals\' will never be matched because it '
-            'is made redundant by the above \'contains\' rule.')
-        rule_specs.remove(rule_specs[0])
-        rule_specs.remove(rule_specs[0])
-        self._assert_validation_error(
-            new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Equals\' will never be matched because it '
-            'is made redundant by the above \'StartsWith\' rule.')
-        rule_specs.remove(rule_specs[0])
-        self._assert_validation_error(
-            new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'TextInput interaction is already present.')
-
-        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
-        state.written_translations.add_content_id_for_translation('feedback_0')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_0')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_0')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_1')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_1')
-        state.recorded_voiceovers.add_content_id_for_voiceover('ca_choices_2')
-        state.written_translations.add_content_id_for_translation(
-            'ca_choices_2')
-        # Validate End interaction.
-        self.set_interaction_for_state(state, 'EndExploration')
-        state.update_interaction_default_outcome(None)
-        state.interaction.customization_args[
-            'recommendedExplorationIds'].value = ['a', 'b', 'c', 'd']
-        self._assert_validation_error(
-            new_exploration, 'The End interaction should not have more than 3 '
-            'recommended explorations.')
+        self._tests_continue_interaction(state, new_exploration)
+        self._tests_numeric_interaction(state, new_exploration)
+        self._tests_fraction_interaction(state, new_exploration)
+        self._tests_number_with_units_interaction(state, new_exploration)
+        self._tests_multiple_choice_interaction(state, new_exploration)
+        self._tests_item_selection_choice_interaction(state, new_exploration)
+        self._tests_drag_and_drop_interaction(state, new_exploration)
+        self._tests_text_interaction(state, new_exploration)
+        self._tests_end_interaction(state, new_exploration)
 
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""
