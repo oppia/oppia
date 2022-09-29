@@ -59,15 +59,6 @@ export class SkillEditorPageComponent implements OnInit {
   skillIsInitialized = false;
   directiveSubscriptions = new Subscription();
 
-  // When the URL path changes, reroute to the appropriate tab in the
-  // Skill editor page if back and forward button pressed in browser.
-  // $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
-  //   if (newPath !== '') {
-  //     this.skillEditorRoutingService._changeTab(newPath);
-  //     $rootScope.$applyAsync();
-  //   }
-  // });
-
   getActiveTabName(): string {
     return this.skillEditorRoutingService.getActiveTabName();
   }
@@ -157,7 +148,14 @@ export class SkillEditorPageComponent implements OnInit {
         .OPENED_SKILL_EDITOR_BROWSER_TABS);
   }
 
-  onCreateOrUpdateSkillEditorBrowserTabsInfo(event: StorageEvent): void {
+  onCreateOrUpdateSkillEditorBrowserTabsInfo(
+      event: BeforeUnloadEvent | StorageEvent
+  ): void {
+    // This throws "Property 'key' does not exist on type 'BeforeUnloadEvent'".
+    // We need to suppress this error because 'BeforeUnloadEvent' does not have
+    // 'key' property but it is needed for 'StorageEvent' to check if any extra
+    // duplicate tabs are opened.
+    // @ts-ignore
     if (event.key === (
       EntityEditorBrowserTabsInfoDomainConstants
         .OPENED_SKILL_EDITOR_BROWSER_TABS)
@@ -183,9 +181,13 @@ export class SkillEditorPageComponent implements OnInit {
     this.skillIsInitialized = false;
     this.skillEditorStalenessDetectionService.init();
     this.windowRef.nativeWindow.addEventListener(
-      'beforeunload', this.onClosingSkillEditorBrowserTab);
-    this.localStorageService.registerNewStorageEventListener(
-      this.onCreateOrUpdateSkillEditorBrowserTabsInfo);
+      'beforeunload', (event) => {
+        this.onCreateOrUpdateSkillEditorBrowserTabsInfo(event);
+      });
+    this.windowRef.nativeWindow.addEventListener(
+      'storage', (event) => {
+        this.onCreateOrUpdateSkillEditorBrowserTabsInfo(event);
+      });
   }
 }
 
