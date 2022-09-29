@@ -167,9 +167,9 @@ var TopicEditorPage = function() {
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
-    await waitFor.visibilityOf(
-      selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
-    await selectSkillDropdown.selectByVisibleText(skillDescription);
+    await action.click('Select Skill Dropdown', selectSkillDropdown);
+    var dropdownOption = await $(`.mat-option-text=${skillDescription}`);
+    await action.click(skillDescription, dropdownOption);
     await waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
     var questionItems = await questionItemsSelector();
