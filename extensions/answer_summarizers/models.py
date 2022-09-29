@@ -244,25 +244,23 @@ class AnswerFrequencies(BaseCalculation):
             containing the answers' frequencies.
 
         Raises:
-            Exception. Answers of linear interactions should not be present
-                while calculating the answers' frequencies.
+            Exception. Linear interaction is not allowed for the calculation of
+                answers' frequencies.
         """
+        interaction_id = state_answers_dict['interaction_id']
+        if interaction_id in feconf.LINEAR_INTERACTION_IDS:
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation '
+                'of answers\' frequencies.' % interaction_id
+            )
         answer_dicts = state_answers_dict['submitted_answer_list']
-        answer_list = []
-        for answer_dict in answer_dicts:
-            if answer_dict['answer'] is None:
-                raise Exception(
-                    'Answers of linear interactions should not be present while'
-                    ' calculating the answers\' frequencies.'
-                )
-            answer_list.append(answer_dict['answer'])
         answer_frequency_list = (
-            _get_top_answers_by_frequency(answer_list))
+            _get_top_answers_by_frequency(d['answer'] for d in answer_dicts))
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
-            state_answers_dict['interaction_id'],
+            interaction_id,
             self.id,
             answer_frequency_list)
 
@@ -295,25 +293,23 @@ class Top5AnswerFrequencies(BaseCalculation):
             containing the top 5 answers, by frequency.
 
         Raises:
-            Exception. Answers of linear interactions should not be present
-                while calculating the top 5 answers, by frequency.
+            Exception. Linear interaction is not allowed for the calculation of
+                top 5 answers, by frequency.
         """
+        interaction_id = state_answers_dict['interaction_id']
+        if interaction_id in feconf.LINEAR_INTERACTION_IDS:
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation '
+                'of top 5 answers, by frequency.' % interaction_id
+            )
         answer_dicts = state_answers_dict['submitted_answer_list']
-        answer_list = []
-        for answer_dict in answer_dicts:
-            if answer_dict['answer'] is None:
-                raise Exception(
-                    'Answers of linear interactions should not be present while'
-                    ' calculating the top 5 answers, by frequency.'
-                )
-            answer_list.append(answer_dict['answer'])
         answer_frequency_list = _get_top_answers_by_frequency(
-            answer_list, limit=5)
+            (d['answer'] for d in answer_dicts), limit=5)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
-            state_answers_dict['interaction_id'],
+            interaction_id,
             self.id,
             answer_frequency_list)
 
@@ -346,20 +342,18 @@ class Top10AnswerFrequencies(BaseCalculation):
             containing the top 10 answers, by frequency.
 
         Raises:
-            Exception. Answers of linear interactions should not be present
-                while calculating the top 10 answers, by frequency.
+            Exception. Linear interaction is not allowed for the calculation of
+                top 10 answers, by frequency.
         """
+        interaction_id = state_answers_dict['interaction_id']
+        if interaction_id in feconf.LINEAR_INTERACTION_IDS:
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation '
+                'of top 10 answers, by frequency.' % interaction_id
+            )
         answer_dicts = state_answers_dict['submitted_answer_list']
-        answer_list = []
-        for answer_dict in answer_dicts:
-            if answer_dict['answer'] is None:
-                raise Exception(
-                    'Answers of linear interactions should not be present while'
-                    ' calculating the top 10 answers, by frequency.'
-                )
-            answer_list.append(answer_dict['answer'])
         answer_frequency_list = _get_top_answers_by_frequency(
-            answer_list, limit=10)
+            (d['answer'] for d in answer_dicts), limit=10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -400,20 +394,21 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
             containing the commonly submitted answers, by frequency.
 
         Raises:
-            Exception. Answers of linear interactions should not be present
-                while calculating the commonly submitted answers' frequencies.
+            Exception. Linear interaction is not allowed for the calculation of
+                commonly submitted answers' frequencies.
             Exception. To calculate commonly submitted answers\' frequencies,
                 answers must be provided in an iterable form, like:
                 SetOfUnicodeString.
         """
+        interaction_id = state_answers_dict['interaction_id']
+        if interaction_id in feconf.LINEAR_INTERACTION_IDS:
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation '
+                'of commonly submitted answers\' frequencies.' % interaction_id
+            )
         answer_dicts = state_answers_dict['submitted_answer_list']
         answer_list = []
         for answer_dict in answer_dicts:
-            if answer_dict['answer'] is None:
-                raise Exception(
-                    'Answers of linear interactions should not be present while'
-                    ' calculating the commonly submitted answers\' frequencies.'
-                )
             if not isinstance(answer_dict['answer'], collections.abc.Iterable):
                 raise Exception(
                     'To calculate commonly submitted answers\' frequencies, '
@@ -464,9 +459,15 @@ class TopAnswersByCategorization(BaseCalculation):
             containing the top answers by categorization.
 
         Raises:
-            Exception. Answers of linear interactions should not be present
-                while calculating the top submitted answers.
+            Exception. Linear interaction is not allowed for the calculation of
+                top submitted answers, by frequency.
         """
+        interaction_id = state_answers_dict['interaction_id']
+        if interaction_id in feconf.LINEAR_INTERACTION_IDS:
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation '
+                'of top submitted answers, by frequency.' % interaction_id
+            )
         grouped_submitted_answer_dicts = itertools.groupby(
             state_answers_dict['submitted_answer_list'],
             operator.itemgetter('classification_categorization'))
@@ -475,17 +476,8 @@ class TopAnswersByCategorization(BaseCalculation):
         ] = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
             if category in CLASSIFICATION_CATEGORIES:
-                answer_list = []
-                for answer_dict in answer_dicts:
-                    if answer_dict['answer'] is None:
-                        raise Exception(
-                            'Answers of linear interactions should not be '
-                            'present while calculating the top submitted '
-                            'answers.'
-                        )
-                    answer_list.append(answer_dict['answer'])
                 submitted_answers_by_categorization[category].extend(
-                    answer_list)
+                    d['answer'] for d in answer_dicts)
 
         categorized_answer_frequency_lists = (
             stats_domain.CategorizedAnswerFrequencyLists({
@@ -534,22 +526,20 @@ class TopNUnresolvedAnswersByFrequency(BaseCalculation):
             order of frequency (up to at most limit answers).
 
         Raises:
-            Exception. Answers of linear interactions should not be present
-                while calculating the top unresolved answers, by frequency.
+            Exception. Linear interaction is not allowed for the calculation of
+                top unresolved answers, by frequency.
         """
-        answers_with_classification: List[AnswersWithClassificationDict] = []
-
-        for ans in state_answers_dict['submitted_answer_list']:
-            if ans['answer'] is None:
-                raise Exception(
-                    'Answers of linear interactions should not be present while'
-                    ' calculating the top unresolved answers, by frequency.'
-                )
-            answers_with_classification.append({
-                'answer': ans['answer'],
-                'classification_categorization': (
-                    ans['classification_categorization'])
-            })
+        interaction_id = state_answers_dict['interaction_id']
+        if interaction_id in feconf.LINEAR_INTERACTION_IDS:
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation '
+                'of top submitted answers, by frequency.' % interaction_id
+            )
+        answers_with_classification: List[AnswersWithClassificationDict] = [{
+            'answer': ans['answer'],
+            'classification_categorization': (
+                ans['classification_categorization'])
+        } for ans in state_answers_dict['submitted_answer_list']]
 
         unresolved_answers = _get_top_unresolved_answers_by_frequency(
             answers_with_classification,
