@@ -28,6 +28,7 @@ import { WindowRef } from
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './about-page.component.css';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
 @Component({
@@ -52,15 +53,24 @@ export class AboutPageComponent {
     imageFilename: '/about/language_icon.svg'
   }];
 
+  androidPageIsEnabled: boolean = (
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
+  );
+
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private siteAnalyticsService: SiteAnalyticsService) {
-  }
+    private siteAnalyticsService: SiteAnalyticsService,
+    private platformFeatureService: PlatformFeatureService
+  ) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  onClickAccessAndroidButton(): void {
+    this.windowRef.nativeWindow.location.href = '/android';
   }
 
   onClickVisitClassroomButton(): void {

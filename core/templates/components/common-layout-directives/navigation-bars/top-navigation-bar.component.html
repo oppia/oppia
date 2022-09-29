@@ -144,16 +144,32 @@
                     </div>
                   </div>
                 </a>
-                <a class="nav-content nav-item-right d-flex flex-column" tabindex="0"
-                   href="/community-library" (click)="navigateToClassroomPage('/community-library')">
-                  <div class="nav-item-right-head">{{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}</div>
-                  <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
-                  <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                       class="nav-item-bottom-link">
-                    <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
-                    <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
-                  </div>
-                </a>
+                <span class="nav-item-right d-flex flex-column">
+                  <a class="nav-content mb-5"
+                     tabindex="0"
+                     href="/community-library"
+                     (click)="navigateToClassroomPage('/community-library')">
+                    <div class="nav-item-right-head">{{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}</div>
+                    <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
+                    <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                         class="nav-item-bottom-link">
+                      <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
+                      <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
+                    </div>
+                  </a>
+                  <a *ngIf="androidPageIsEnabled"
+                     class="nav-content"
+                     tabindex="0"
+                     href="/android">
+                    <div class="nav-item-right-head">{{ 'I18N_TOPNAV_ANDROID_APP_HEADING' | translate }}</div>
+                    <div class="des" [innerHTML]="'I18N_TOPNAV_ANDROID_APP_DESCRIPTION' | translate"></div>
+                    <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                         class="nav-item-core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.htmlbottom-link">
+                      <span class="link">{{ 'I18N_TOPNAV_TRY_ANDROID_APP_TEXT' | translate }}</span>
+                      <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
+                    </div>
+                  </a>
+                </span>
               </div>
             </li>
           </ul>

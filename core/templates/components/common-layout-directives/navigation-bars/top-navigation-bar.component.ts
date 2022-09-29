@@ -41,6 +41,7 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 import './top-navigation-bar.component.css';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
 interface LanguageInfo {
@@ -140,6 +141,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
+  androidPageIsEnabled: boolean = (
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
+  );
+
   constructor(
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
@@ -158,7 +163,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private windowRef: WindowRef,
-    private focusManagerService: FocusManagerService
+    private focusManagerService: FocusManagerService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
