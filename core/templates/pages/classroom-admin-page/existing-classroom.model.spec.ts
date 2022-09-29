@@ -22,125 +22,97 @@ import { ExistingClassroomData } from './existing-classroom.model';
 
 
 describe('Classroom admin model', () => {
-  let newClassroomData: NewClassroomData;
+  let existingClassroomData: ExistingClassroomData;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: []
     });
 
-    newClassroomData = new NewClassroomData('classroomId', 'math', 'math');
+    existingClassroomData = new ExistingClassroomData(
+      'classroomId',
+      'math',
+      'math',
+      'Curated math foundations course.',
+      'Start from the basics with our first topic.',
+      {}
+    );
   });
 
-  it(
-    'should enable error messgage when classroom name exceeds max len',
-    () => {
-      classroomData.classroomNameIsValid = true;
-      classroomData.classroomNameIsTooLong = false;
-      classroomData.name = (
-        'Long classroom name with some randome texts abcdefghi');
+  it('should be able to get and set course details', () => {
+    expect(existingClassroomData.getCourseDetails()).toEqual(
+      'Curated math foundations course.');
 
-      classroomData.onClassroomNameChange();
+    existingClassroomData.setCourseDetails('Test data for course details.');
 
-      expect(classroomData.classroomNameIsValid).toBeFalse();
-      expect(classroomData.classroomNameIsTooLong).toBeTrue();
+    expect(existingClassroomData.getCourseDetails()).toEqual(
+      'Test data for course details.');
+  });
+
+  it('should be able to get and set topic list intro', () => {
+    expect(existingClassroomData.getTopicListIntro()).toEqual(
+      'Start from the basics with our first topic.');
+
+    existingClassroomData.setTopicListIntro('Test data for topic list intro.');
+
+    expect(existingClassroomData.getTopicListIntro()).toEqual(
+      'Test data for topic list intro.');
+  });
+
+  it('should be able to get and set topic dependency', () => {
+    expect(existingClassroomData.getTopicIdToPrerequisiteTopicId()).toEqual({});
+
+    const sampleTopicIdToprerequisiteTopicIds = {
+      topic1: [],
+      topic2: ['topic1'],
+      topic3: ['topic2']
+    };
+
+    existingClassroomData.setTopicIdToPrerequisiteTopicId(
+      sampleTopicIdToprerequisiteTopicIds);
+
+    expect(existingClassroomData.getTopicIdToPrerequisiteTopicId()).toEqual(
+      sampleTopicIdToprerequisiteTopicIds);
+  });
+
+  it('should be able to create existing classroom model from dict', () => {
+    const classroomDict = {
+      classroomId: 'pysicsClassroomId',
+      name: 'physics',
+      urlFragment: 'physics',
+      courseDetails: 'Test course details',
+      topicListIntro: 'Test topic intro',
+      topicIdToPrerequisiteTopicIds: {
+        topic1: [],
+        topic2: ['topic1']
+      }
+    };
+
+    let classroom: ExistingClassroomData = (
+      ExistingClassroomData.createClassroomFromDict(classroomDict));
+
+    expect(classroom.getClassroomId()).toEqual('pysicsClassroomId');
+    expect(classroom.getClassroomName()).toEqual('physics');
+    expect(classroom.getClassroomUrlFragment()).toEqual('physics');
+    expect(classroom.getCourseDetails()).toEqual('Test course details');
+    expect(classroom.getTopicListIntro()).toEqual('Test topic intro');
+    expect(classroom.getTopicIdToPrerequisiteTopicId()).toEqual({
+      topic1: [],
+      topic2: ['topic1']
     });
+  });
 
-  it(
-    'should enable error messgae when classroom name is empty',
-    () => {
-      classroomData.classroomNameIsValid = true;
-      classroomData.emptyClassroomName = false;
-      classroomData.name = '';
+  it('should be able to get classroom dict from object', () => {
+    const expectedClassroomDict = {
+      classroomId: 'classroomId',
+      name: 'math',
+      urlFragment: 'math',
+      courseDetails: 'Curated math foundations course.',
+      topicListIntro: 'Start from the basics with our first topic.',
+      topicIdToPrerequisiteTopicIds: {}
+    };
 
-      classroomData.onClassroomNameChange();
-
-      expect(classroomData.classroomNameIsValid).toBeFalse();
-      expect(classroomData.emptyClassroomName).toBeTrue();
-    });
-
-  it(
-    'should enable error message when classroom name already exists',
-    () => {
-      classroomData.classroomNameIsValid = true;
-      classroomData.duplicateClassroomName = false;
-      classroomData.existingClassroomNames = ['physics', 'chemistry'];
-      classroomData.name = 'physics';
-
-      classroomData.onClassroomNameChange();
-
-      expect(classroomData.classroomNameIsValid).toBeFalse();
-      expect(classroomData.duplicateClassroomName).toBeTrue();
-    });
-
-  it(
-    'should not present any error when classroom name is valid', () => {
-      classroomData.classroomNameIsValid = true;
-      classroomData.duplicateClassroomName = false;
-      classroomData.emptyClassroomName = false;
-      classroomData.classroomNameIsTooLong = false;
-      classroomData.existingClassroomNames = ['physics', 'chemistry'];
-      classroomData.name = 'Discrete maths';
-
-      classroomData.onClassroomNameChange();
-
-      expect(classroomData.classroomNameIsValid).toBeTrue();
-      expect(classroomData.duplicateClassroomName).toBeFalse();
-      expect(classroomData.emptyClassroomName).toBeFalse();
-      expect(classroomData.classroomNameIsTooLong).toBeFalse();
-    });
-
-  it(
-    'should present error messgae when clasroom url fragment is empty', () => {
-      classroomData.classroomUrlFragmentIsValid = true;
-      classroomData.classroomUrlFragmentIsEmpty = false;
-      classroomData.urlFragment = '';
-
-      classroomData.onClassroomUrlFragmentChange();
-
-      expect(classroomData.classroomUrlFragmentIsValid).toBeFalse();
-      expect(classroomData.classroomUrlFragmentIsEmpty).toBeTrue();
-    });
-
-  it(
-    'should present error message when classroom url fragment exceeds max len',
-    () => {
-      classroomData.classroomUrlFragmentIsValid = true;
-      classroomData.classroomUrlFragmentIsTooLong = false;
-      classroomData.urlFragment = 'long-url-fragment-for-raising-error-msg';
-
-      classroomData.onClassroomUrlFragmentChange();
-
-      expect(classroomData.classroomUrlFragmentIsValid).toBeFalse();
-      expect(classroomData.classroomUrlFragmentIsTooLong).toBeTrue();
-    });
-
-  it(
-    'should present error message when classroom url fragment is invalid',
-    () => {
-      classroomData.classroomUrlFragmentIsValid = true;
-      classroomData.urlFragmentRegexMatched = true;
-      classroomData.urlFragment = 'Incorrect-url';
-
-      classroomData.onClassroomUrlFragmentChange();
-
-      expect(classroomData.classroomUrlFragmentIsValid).toBeFalse();
-      expect(classroomData.urlFragmentRegexMatched).toBeFalse();
-    });
-
-  it(
-    'should not present error for valid classroom url fragment', () => {
-      classroomData.classroomUrlFragmentIsValid = true;
-      classroomData.urlFragmentRegexMatched = true;
-      classroomData.classroomUrlFragmentIsTooLong = false;
-      classroomData.classroomUrlFragmentIsEmpty = false;
-      classroomData.urlFragment = 'physics-url-fragment';
-
-      classroomData.onClassroomUrlFragmentChange();
-
-      expect(classroomData.classroomUrlFragmentIsValid).toBeTrue();
-      expect(classroomData.urlFragmentRegexMatched).toBeTrue();
-      expect(classroomData.classroomUrlFragmentIsTooLong).toBeFalse();
-      expect(classroomData.classroomUrlFragmentIsEmpty).toBeFalse();
-    });
+    expect(existingClassroomData.getClassroomDict()).toEqual(
+      expectedClassroomDict);
+  });
 });

@@ -27,13 +27,12 @@ export interface NewClassroom {
   getClassroomId: () => string;
   getClassroomName: () => string;
   getClassroomUrlFragment: () => string;
-  setClassroomId: (string) => void;
-  setClassroomName: (string) => void;
-  setUrlFragment: (string) => void;
-  getClassroomNamValidationError: () => string;
-  getClassroomUrlValidationError: () => string;
+  setClassroomName: (classroomName: string) => void;
+  setUrlFragment: (urlFragment: string) => void;
+  getClassroomNameValidationErrors: () => string;
+  getClassroomUrlValidationErrors: () => string;
   isClassroomDataValid: () => boolean;
-  setClassroomValidityFlag: (boolean) => void;
+  setClassroomValidityFlag: (classroomDataIsValid: boolean) => void;
 }
 
 
@@ -41,7 +40,7 @@ export class NewClassroomData implements NewClassroom {
   _classroomId: string;
   _name: string;
   _urlFragment: string;
-  _classroomDataIsValid: boolean;
+  _classroomDataIsValid!: boolean;
 
   constructor(
       classroomId: string,
@@ -73,10 +72,6 @@ export class NewClassroomData implements NewClassroom {
     return this._urlFragment;
   }
 
-  setClassroomId(classroomId: string): void {
-    this._classroomId = classroomId;
-  }
-
   setClassroomName(classroomName: string): void {
     this._name = classroomName;
   }
@@ -85,7 +80,7 @@ export class NewClassroomData implements NewClassroom {
     this._urlFragment = urlFragment;
   }
 
-  getClassroomNamValidationError(): string {
+  getClassroomNameValidationErrors(): string {
     let errorMsg = '';
     if (this._name === '') {
       errorMsg = 'The classroom name should not be empty.';
@@ -95,7 +90,7 @@ export class NewClassroomData implements NewClassroom {
     return errorMsg;
   }
 
-  getClassroomUrlValidationError(): string {
+  getClassroomUrlValidationErrors(): string {
     let errorMsg = '';
     const validUrlFragmentRegex = new RegExp(
       AppConstants.VALID_URL_FRAGMENT_REGEX);

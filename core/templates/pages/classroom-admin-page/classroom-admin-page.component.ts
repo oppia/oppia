@@ -25,9 +25,9 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
 import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
 import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
-import cloneDeep from 'lodash/cloneDeep';
 import { ExistingClassroomData } from './existing-classroom.model';
 import { ClassroomAdminDataService } from './services/classroom-admin-data.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'oppia-classroom-admin-page',

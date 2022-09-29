@@ -53,7 +53,6 @@ describe('Classroom Admin Page component ', () => {
       providers: [
         AlertsService,
         ClassroomBackendApiService,
-        ExistingClassroomData,
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -151,11 +150,7 @@ describe('Classroom Admin Page component ', () => {
       component.classroomViewerMode = true;
       component.classroomDetailsIsShown = true;
 
-      component.tempClassroomData.setClassroomId(
-        response.classroomDict.classroomId);
-
-
-      (
+      component.tempClassroomData = (
         ExistingClassroomData.createClassroomFromDict(response.classroomDict));
 
       component.getClassroomData('classroomId');
@@ -182,15 +177,15 @@ describe('Classroom Admin Page component ', () => {
         .and.returnValue(Promise.resolve(response));
 
       component.classroomEditorMode = true;
+      component.classroomViewerMode = false;
       component.classroomDetailsIsShown = true;
-
-      component.ngOnInit();
 
       component.getClassroomData('classroomId');
       tick();
 
       expect(component.classroomDetailsIsShown).toBeTrue();
       expect(component.classroomEditorMode).toBeTrue();
+      expect(component.classroomViewerMode).toBeFalse();
     }));
 
   it(
@@ -411,46 +406,6 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it(
-    'should not be able to save classroom data when url fragment is duplicate',
-    fakeAsync(() => {
-      component.classroomViewerMode = false;
-      component.classroomEditorMode = true;
-
-      let classroomDict = {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: 'Oppia\'s curated maths lesson.',
-        topicListIntro: 'Start from the basics with our first topic.',
-        topicIdToPrerequisiteTopicIds: {}
-      };
-      component.tempClassroomData = (
-        ExistingClassroomData.createClassroomFromDict(classroomDict));
-      component.classroomData = ExistingClassroomData.createClassroomFromDict(
-        classroomDict);
-      component.tempClassroomData.setUrlFragment('discrete-maths');
-
-      expect(component.classroomUrlFragmentIsDuplicate).toBeFalse();
-
-
-      spyOn(
-        classroomBackendApiService,
-        'updateClassroomDataAsync'
-      ).and.returnValue(Promise.resolve());
-      spyOn(
-        classroomBackendApiService,
-        'doesClassroomWithUrlFragmentExistAsync'
-      ).and.returnValue(Promise.resolve(true));
-
-      component.saveClassroomData('classroomId');
-      tick();
-
-      expect(component.classroomUrlFragmentIsDuplicate).toBeTrue();
-      expect(component.classroomViewerMode).toBeFalse();
-      expect(component.classroomEditorMode).toBeTrue();
-    }));
-
-  it(
     'should present a confirmation modal before exiting editor mode if ' +
     'any classroom propeties are already modified', fakeAsync(() => {
       component.classroomDataIsChanged = true;
@@ -479,6 +434,7 @@ describe('Classroom Admin Page component ', () => {
       expect(component.classroomViewerMode).toBeTrue();
       expect(component.classroomDataIsChanged).toBeFalse();
     }));
+
   it(
     'should be able to cancel the exit editor confirmation modal and ' +
     'continue editing', () => {

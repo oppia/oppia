@@ -31,14 +31,13 @@ export class ClassroomAdminDataService {
   ) {}
 
   classroom!: ClassroomData;
-  existingClassroomNames: string[];
-  urlFragmentIsDuplicate: boolean;
+  existingClassroomNames: string[] = [];
 
   nameValidationError: string = '';
   urlValidationError: string = '';
 
   onClassroomNameChange(classroom: ClassroomData): void {
-    this.nameValidationError = classroom.getClassroomNamValidationError();
+    this.nameValidationError = classroom.getClassroomNameValidationErrors();
 
     if (this.nameValidationError.length > 0) {
       return;
@@ -57,7 +56,7 @@ export class ClassroomAdminDataService {
       classroom: ClassroomData,
       existingClassroomUrl: string
   ): void {
-    this.urlValidationError = classroom.getClassroomUrlValidationError();
+    this.urlValidationError = classroom.getClassroomUrlValidationErrors();
 
     if (this.urlValidationError.length > 0) {
       return;

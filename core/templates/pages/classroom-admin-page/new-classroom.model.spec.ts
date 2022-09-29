@@ -38,7 +38,7 @@ describe('Classroom admin model', () => {
       classroomData.setClassroomName(
         'Long classroom name with some random texts abcdefghi');
 
-      expect(classroomData.getClassroomNamValidationError()).toEqual(
+      expect(classroomData.getClassroomNameValidationErrors()).toEqual(
         'The classroom name should contain at most 39 characters.'
       );
     });
@@ -48,7 +48,7 @@ describe('Classroom admin model', () => {
     () => {
       classroomData.setClassroomName('');
 
-      expect(classroomData.getClassroomNamValidationError()).toEqual(
+      expect(classroomData.getClassroomNameValidationErrors()).toEqual(
         'The classroom name should not be empty.'
       );
     });
@@ -57,14 +57,14 @@ describe('Classroom admin model', () => {
     'should not present any error when classroom name is valid', () => {
       classroomData.setClassroomName('Discrete maths');
 
-      expect(classroomData.getClassroomNamValidationError()).toEqual('');
+      expect(classroomData.getClassroomNameValidationErrors()).toEqual('');
     });
 
   it(
     'should present error messgae when clasroom url fragment is empty', () => {
       classroomData.setUrlFragment('');
 
-      expect(classroomData.getClassroomUrlValidationError()).toEqual(
+      expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
         'The classroom URL fragment should not be empty.'
       );
     });
@@ -74,7 +74,7 @@ describe('Classroom admin model', () => {
     () => {
       classroomData.setUrlFragment('long-url-fragment-for-raising-error-msg');
 
-      expect(classroomData.getClassroomUrlValidationError()).toEqual(
+      expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
         'The classroom URL fragment should contain at most 20 characters.'
       );
     });
@@ -84,7 +84,7 @@ describe('Classroom admin model', () => {
     () => {
       classroomData.setUrlFragment('Incorrect-url');
 
-      expect(classroomData.getClassroomUrlValidationError()).toEqual(
+      expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
         'The classroom URL fragment should only contain lowercase ' +
         'letters separated by hyphens.'
       );
@@ -94,6 +94,16 @@ describe('Classroom admin model', () => {
     'should not present error for valid classroom url fragment', () => {
       classroomData.setUrlFragment('physics-url-fragment');
 
-      expect(classroomData.getClassroomUrlValidationError()).toEqual('');
+      expect(classroomData.getClassroomUrlValidationErrors()).toEqual('');
     });
+
+  it('should be able to set and get classroom validity flag', () => {
+    classroomData.setClassroomValidityFlag(false);
+
+    expect(classroomData.isClassroomDataValid()).toBeFalse();
+
+    classroomData.setClassroomValidityFlag(true);
+
+    expect(classroomData.isClassroomDataValid()).toBeTrue();
+  });
 });

@@ -16,9 +16,8 @@
  * @fileoverview Existing classroom model.
  */
 
-import { AppConstants } from 'app.constants';
 import { ClassroomDict } from '../../domain/classroom/classroom-backend-api.service';
-import { NewClassroom } from './new-classroom.model';
+import { NewClassroom, NewClassroomData } from './new-classroom.model';
 
 
 export interface ValidateClassroomFieldResponse {
@@ -43,14 +42,11 @@ interface ExistingClassroom extends NewClassroom {
 export type ClassroomData = ExistingClassroom | NewClassroom;
 
 
-export class ExistingClassroomData implements ExistingClassroom {
-  _classroomId: string;
-  _name: string;
-  _urlFragment: string;
+export class ExistingClassroomData extends
+    NewClassroomData implements ExistingClassroom {
   _courseDetails: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
-  _classroomDataIsValid: boolean;
 
   constructor(
       classroomId: string,
@@ -60,32 +56,10 @@ export class ExistingClassroomData implements ExistingClassroom {
       topicListIntro: string,
       topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ) {
-    this._classroomId = classroomId;
-    this._name = name;
-    this._urlFragment = urlFragment;
+    super(classroomId, name, urlFragment);
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
-  }
-
-  isClassroomDataValid(): boolean {
-    return this._classroomDataIsValid;
-  }
-
-  setClassroomValidityFlag(classroomDataIsValid: boolean): void {
-    this._classroomDataIsValid = classroomDataIsValid;
-  }
-
-  getClassroomId(): string {
-    return this._classroomId;
-  }
-
-  getClassroomName(): string {
-    return this._name;
-  }
-
-  getClassroomUrlFragment(): string {
-    return this._urlFragment;
   }
 
   getCourseDetails(): string {
@@ -100,18 +74,6 @@ export class ExistingClassroomData implements ExistingClassroom {
     return this._topicIdToPrerequisiteTopicIds;
   }
 
-  setClassroomId(classroomId: string): void {
-    this._classroomId = classroomId;
-  }
-
-  setClassroomName(name: string): void {
-    this._name = name;
-  }
-
-  setUrlFragment(urlFragment: string): void {
-    this._urlFragment = urlFragment;
-  }
-
   setCourseDetails(courseDetails: string): void {
     this._courseDetails = courseDetails;
   }
@@ -120,36 +82,10 @@ export class ExistingClassroomData implements ExistingClassroom {
     this._topicListIntro = topicListIntro;
   }
 
-  getClassroomNamValidationError(): string {
-    let errorMsg = '';
-    if (this._name === '') {
-      errorMsg = 'The classroom name should not be empty.';
-    } else if (this._name.length > AppConstants.MAX_CHARS_IN_CLASSROOM_NAME) {
-      errorMsg = 'The classroom name should contain at most 39 characters.';
-    }
-    return errorMsg;
-  }
-
-  getClassroomUrlValidationError(): string {
-    let errorMsg = '';
-    const validUrlFragmentRegex = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
-
-    if (this._urlFragment === '') {
-      errorMsg = 'The classroom URL fragment should not be empty.';
-    } else if (
-      this._urlFragment.length >
-        AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
-    ) {
-      errorMsg = (
-        'The classroom URL fragment should contain at most 20 characters.'
-      );
-    } else if (!validUrlFragmentRegex.test(this._urlFragment)) {
-      errorMsg = (
-        'The classroom URL fragment should only contain lowercase ' +
-        'letters separated by hyphens.');
-    }
-    return errorMsg;
+  setTopicIdToPrerequisiteTopicId(
+      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+  ): void {
+    this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
   }
 
   static createClassroomFromDict(
