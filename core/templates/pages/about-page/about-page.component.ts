@@ -26,9 +26,9 @@ import { UrlInterpolationService } from
 import { WindowRef } from
   'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './about-page.component.css';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
 @Component({

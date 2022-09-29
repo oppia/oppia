@@ -39,9 +39,9 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './top-navigation-bar.component.css';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
 interface LanguageInfo {
