@@ -98,10 +98,7 @@ describe('Create new topic modal', () => {
     spyOn(ngbActiveModal, 'close');
     spyOn(classroomBackendApiService, 'updateClassroomDataAsync')
       .and.returnValue(Promise.resolve());
-    spyOn(
-      classroomBackendApiService,
-      'doesClassroomWithUrlFragmentExistAsync'
-    ).and.returnValue(Promise.resolve(false));
+
     spyOn(
       classroomBackendApiService,
       'getNewClassroomIdAsync'
@@ -109,8 +106,8 @@ describe('Create new topic modal', () => {
 
     componentInstance.existingClassroomNames = ['math', 'chemistry'];
     componentInstance.ngOnInit();
-    componentInstance.newClassroom.name = 'physics';
-    componentInstance.newClassroom.urlFragment = 'physics';
+    componentInstance.tempClassroom.setClassroomName('physics');
+    componentInstance.tempClassroom.setUrlFragment('physics');
 
     componentInstance.createClassroom();
     tick();
@@ -126,45 +123,4 @@ describe('Create new topic modal', () => {
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith(expectedDefaultClassroom);
   }));
-
-  it(
-    'should not be able to save classroom data when url fragment is duplicate',
-    fakeAsync(() => {
-      componentInstance.ngOnInit();
-      expect(componentInstance.classroomUrlFragmentIsDuplicate).toBeFalse();
-      expect(
-        componentInstance.newClassroom.classroomUrlFragmentIsValid).toBeFalse();
-      componentInstance.newClassroom.name = 'math';
-      componentInstance.newClassroom.urlFragment = 'math';
-
-      spyOn(
-        classroomBackendApiService,
-        'doesClassroomWithUrlFragmentExistAsync'
-      ).and.returnValue(Promise.resolve(true));
-
-      componentInstance.createClassroom();
-      tick();
-
-      expect(componentInstance.classroomUrlFragmentIsDuplicate).toBeTrue();
-      expect(
-        componentInstance.newClassroom.classroomUrlFragmentIsValid).toBeFalse();
-    }));
-
-  it(
-    'should not be able to save new classroom if given classroom name ' +
-    'matches with the existing classroom name', fakeAsync(() => {
-      spyOn(ngbActiveModal, 'close');
-      spyOn(classroomBackendApiService, 'updateClassroomDataAsync')
-        .and.returnValue(Promise.resolve());
-      componentInstance.existingClassroomNames = ['math', 'chemistry'];
-      componentInstance.ngOnInit();
-      componentInstance.newClassroom.classroomId = 'newClassroomId';
-      componentInstance.newClassroom.name = 'chemistry';
-      componentInstance.newClassroom.urlFragment = 'chemistry';
-
-      componentInstance.createClassroom();
-      tick();
-
-      expect(ngbActiveModal.close).not.toHaveBeenCalled();
-    }));
 });

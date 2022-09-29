@@ -17,13 +17,13 @@
       <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
         <div class="oppia-classroom-tile"
              (click)="getClassroomData(classroom.key)">
-          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.classroomId)">
-            {{classroom.value}}
+          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())">
+            {{ classroom.value }}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.classroomId && tempClassroomData.name.length > 0">
-            {{this.tempClassroomData.name}}
+          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0">
+            {{ this.tempClassroomData.getClassroomName() }}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.classroomId && tempClassroomData.name.length === 0">
+          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length === 0">
             [New Classroom]
           </span>
           <button mat-button matSuffix mat-icon-button
@@ -35,7 +35,7 @@
         </div>
 
         <div class="classroom-details"
-             *ngIf="classroomDetailsIsShown && tempClassroomData.classroomId === classroom.key">
+             *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.key">
           <div *ngIf="classroomViewerMode"
                (click)="openClassroomInEditorMode()">
             <i class="material-icons oppia-edit-icon" title="Edit Classroom">
@@ -49,22 +49,16 @@
             </span>
             <div class="classroom-field">
               <span *ngIf="classroomViewerMode">
-                {{tempClassroomData.name}}
+                {{tempClassroomData.getClassroomName()}}
               </span>
               <textarea *ngIf="classroomEditorMode"
-                        [(ngModel)]="tempClassroomData.name"
+                        [(ngModel)]="tempClassroomData._name"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="tempClassroomData.onClassroomNameChange()"
+                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
                         rows="1">
               </textarea>
-              <p *ngIf="tempClassroomData.classroomNameIsTooLong" class="oppia-warning-text">
-                The classroom name should contain at most 39 characters.
-              </p>
-              <p *ngIf="tempClassroomData.emptyClassroomName" class="oppia-warning-text">
-                The classroom name should not be empty.
-              </p>
-              <p *ngIf="tempClassroomData.duplicateClassroomName" class="oppia-warning-text">
-                A classroom with this name already exists.
+              <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
+                {{ classroomAdminDataService.nameValidationError }}
               </p>
             </div>
           </div>
@@ -75,25 +69,16 @@
             </span>
             <div class="classroom-field">
               <span *ngIf="classroomViewerMode">
-                {{tempClassroomData.urlFragment}}
+                {{tempClassroomData.getClassroomUrlFragment()}}
               </span>
               <textarea *ngIf="classroomEditorMode"
-                        [(ngModel)]="tempClassroomData.urlFragment"
+                        [(ngModel)]="tempClassroomData._urlFragment"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="tempClassroomData.onClassroomUrlFragmentChange()"
+                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
                         rows="1">
               </textarea>
-              <p *ngIf="tempClassroomData.classroomUrlFragmentIsTooLong" class="oppia-warning-text">
-                The classroom URL fragment should contain at most 20 characters.
-              </p>
-              <p *ngIf="tempClassroomData.classroomUrlFragmentIsEmpty" class="oppia-warning-text">
-                The classroom URL fragment should not be empty.
-              </p>
-              <p *ngIf="classroomUrlFragmentIsDuplicate" class="oppia-warning-text">
-                A classroom with this URL fragment already exists.
-              </p>
-              <p *ngIf="!tempClassroomData.urlFragmentRegexMatched" class="oppia-warning-text">
-                The classroom URL fragment should only contain lowercase letters separated by hyphens.
+              <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
+                {{ classroomAdminDataService.urlValidationError }}
               </p>
             </div>
           </div>
@@ -103,11 +88,12 @@
               <strong>Course details</strong>
             </span>
             <span *ngIf="classroomViewerMode" class="classroom-field">
-              {{tempClassroomData.courseDetails}}
+              {{ tempClassroomData.getCourseDetails() }}
             </span>
             <textarea *ngIf="classroomEditorMode"
-                      [(ngModel)]="tempClassroomData.courseDetails"
+                      [(ngModel)]="tempClassroomData._courseDetails"
                       (blur)="updateClassroomField()"
+                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
                       rows="6"
                       class="classroom-field">
             </textarea>
@@ -118,11 +104,12 @@
               <strong>Topic list intro</strong>
             </span>
             <span *ngIf="classroomViewerMode" class="classroom-field">
-                {{tempClassroomData.topicListIntro}}
+                {{tempClassroomData.getTopicListIntro()}}
             </span>
             <textarea *ngIf="classroomEditorMode"
-                      [(ngModel)]="tempClassroomData.topicListIntro"
+                      [(ngModel)]="tempClassroomData._topicListIntro"
                       (blur)="updateClassroomField()"
+                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
                       rows="4"
                       class="classroom-field">
             </textarea>
@@ -263,7 +250,7 @@
               Cancel
             </button>
             <button class="btn btn-success save-classroom-changes"
-                    [disabled]="(!classroomDataIsChanged) || !(tempClassroomData.classroomNameIsValid && tempClassroomData.classroomUrlFragmentIsValid && tempClassroomData.topicsGraphIsCorrect)"
+                    [disabled]="(!classroomDataIsChanged) || !(tempClassroomData.isClassroomDataValid())"
                     (click)="saveClassroomData(classroom.key)">
               <span *ngIf="!classroomDataSaveInProgress">Save</span>
               <mat-spinner *ngIf="classroomDataSaveInProgress"
@@ -373,6 +360,7 @@
     justify-content: space-between;
     padding: 5px;
   }
+  /* TODO(#16156): Remove the instances of /deep/ from the codebase. */
   :host /deep/ .oppia-save-classroom-spinning-button circle {
     stroke: #fff;
   }

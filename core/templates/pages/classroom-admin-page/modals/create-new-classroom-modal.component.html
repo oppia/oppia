@@ -7,18 +7,12 @@
   <div class="row new-classroom-input-data">
     <span class="col-lg-3 col-md-3 col-sm-3">Name</span>
     <div class="new-classroom-name-input">
-      <textarea [(ngModel)]="newClassroom.name"
+      <textarea [(ngModel)]="tempClassroom._name"
                 rows="1"
-                (ngModelChange)="newClassroom.onClassroomNameChange()">
+                (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroom, classroom)">
       </textarea>
-      <p *ngIf="newClassroom.classroomNameIsTooLong" class="oppia-warning-text">
-        The classroom name should contain at most 39 characters.
-      </p>
-      <p *ngIf="newClassroom.emptyClassroomName" class="oppia-warning-text">
-        The classroom name should not be empty.
-      </p>
-      <p *ngIf="newClassroom.duplicateClassroomName" class="oppia-warning-text">
-        A classroom with this name already exists.
+      <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
+        {{ classroomAdminDataService.nameValidationError }}
       </p>
     </div>
   </div>
@@ -26,21 +20,12 @@
   <div class="row new-classroom-input-data">
     <span class="col-lg-3 col-md-3 col-sm-3">URL Fragment</span>
     <div class="new-classroom-name-input">
-      <textarea [(ngModel)]="newClassroom.urlFragment"
+      <textarea [(ngModel)]="tempClassroom._urlFragment"
                 rows="1"
-                (ngModelChange)="newClassroom.onClassroomUrlFragmentChange()">
+                (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroom, classroom)">
       </textarea>
-      <p *ngIf="newClassroom.classroomUrlFragmentIsTooLong" class="oppia-warning-text">
-        The classroom URL fragment should contain at most 20 characters.
-      </p>
-      <p *ngIf="newClassroom.classroomUrlFragmentIsEmpty" class="oppia-warning-text">
-        The classroom URL fragment should not be empty.
-      </p>
-      <p *ngIf="classroomUrlFragmentIsDuplicate" class="oppia-warning-text">
-        A classroom with this URL fragment already exists.
-      </p>
-      <p *ngIf="!newClassroom.urlFragmentRegexMatched" class="oppia-warning-text">
-        The classroom URL fragment should only contain lowercase letters separated by hyphens.
+      <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
+        {{ classroomAdminDataService.urlValidationError }}
       </p>
     </div>
   </div>
@@ -53,7 +38,7 @@
   </button>
   <button class="btn btn-success"
           (click)="createClassroom()"
-          [disabled]="!(newClassroom.classroomNameIsValid && newClassroom.classroomUrlFragmentIsValid)">
+          [disabled]="!tempClassroom.isClassroomDataValid()">
     <span *ngIf="!newClassroomCreationInProgress">Create</span>
     <mat-spinner *ngIf="newClassroomCreationInProgress"
                  class="oppia-create-classroom-spinning-button"
@@ -66,6 +51,7 @@
   .new-classroom-input-data {
     margin: 10px;
   }
+  /* TODO(#16156): Remove the instances of /deep/ from the codebase. */
   :host /deep/ .oppia-create-classroom-spinning-button circle {
     stroke: #fff;
   }
