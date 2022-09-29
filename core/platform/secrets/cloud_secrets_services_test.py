@@ -30,7 +30,7 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
     def test_get_secret_returns_existing_secret(self) -> None:
         with self.swap_to_always_return(
             cloud_secrets_services.CLIENT,
-            'get_secret',
+            'access_secret_version',
             types.SimpleNamespace(payload=types.SimpleNamespace(data=b'secret'))
         ):
             secret = cloud_secrets_services.get_secret('name')

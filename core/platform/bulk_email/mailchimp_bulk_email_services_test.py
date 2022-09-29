@@ -215,15 +215,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 self.assertItemsEqual(
                     observed_log_messages, ['Mailchimp username is not set.'])
 
-                # Here we use MyPy ignore because for the below test, the email
-                # ID for the user doesn't matter since the function should
-                # return earlier if mailchimp api key or username is not set.
-                # Permanently deletes returns None when mailchimp keys
-                # are not set.
-                self.assertIsNone(
-                    mailchimp_bulk_email_services
-                    .permanently_delete_user_from_list('sample_email')) # type: ignore[func-returns-value]
-
+                mailchimp_bulk_email_services.permanently_delete_user_from_list(
+                    'sample_email')
                 self.assertFalse(
                     mailchimp_bulk_email_services.add_or_update_user_status(
                         'sample_email', True))

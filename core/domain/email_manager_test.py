@@ -6641,7 +6641,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
 class MailchimpSecretTest(test_utils.GenericTestBase):
     """Tests for the verify_mailchimp_secret."""
-    
+
     def setUp(self) -> None:
         super().setUp()
         self.swap_webhook_feconf_return_secret = self.swap(
