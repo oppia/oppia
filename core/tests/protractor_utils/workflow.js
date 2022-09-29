@@ -130,12 +130,28 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
-  await waitFor.elementToBeClickable(element(by.css(
-    '.e2e-test-publish-exploration')));
-  await element(by.css('.e2e-test-publish-exploration')).isDisplayed();
-  var testPublishExploration = element(
-    by.css('.e2e-test-publish-exploration'));
-  await action.click('Test Publish Exploration', testPublishExploration);
+  var changesOptions = element.all(by.css('.e2e-test-mobile-changes-dropdown'));
+  var navigateToSettingsTabButtonMobile = element(
+    by.css('.e2e-test-mobile-options'));
+  var publishButton = element(by.css(
+    '.e2e-test-publish-exploration'));
+  var publishButtonMobile = element(by.css('.e2e-test-mobile-publish-button'));
+
+  let width = (await browser.manage().window().getSize()).width;
+  if (width > 768) {
+    await waitFor.elementToBeClickable(publishButton);
+    await publishButton.isDisplayed();
+    await action.click('Test Publish Exploration', publishButton);
+  } else {
+    if (changesOptions.count() === 0) {
+      await action.click(
+        'Settings tab button', navigateToSettingsTabButtonMobile, true);
+    }
+    await action.click('Changes options', changesOptions.first(), true);
+    await publishButtonMobile.isDisplayed();
+    await action.click('Publish button mobile', publishButtonMobile, true);
+  }
+
   var prePublicationButtonElem = element(by.css(
     '.e2e-test-confirm-pre-publication'));
   await action.click(
@@ -232,7 +248,7 @@ var _addExplorationRole = async function(roleName, username) {
     'Username input',
     element(by.css('.e2e-test-role-username')),
     username);
-  await action.select(
+  await action.matSelect(
     'Role select', element(by.css('.e2e-test-role-select')), roleName);
   await action.click(
     'Save role', element(by.css('.e2e-test-save-role')));
@@ -264,12 +280,8 @@ var addExplorationPlaytester = async function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = async function(roleName) {
-  var itemName = roleName + 'Name';
-  var listName = roleName + 'Names';
-  return await element.all(by.repeater(
-    itemName + ' in $ctrl.ExplorationRightsService.' + listName +
-    ' track by $index'
-  )).map(async function(elem) {
+  var listName = '.e2e-test-' + roleName + '-role-names';
+  return await element.all(by.css(listName)).map(async function(elem) {
     return await elem.getText();
   });
 };

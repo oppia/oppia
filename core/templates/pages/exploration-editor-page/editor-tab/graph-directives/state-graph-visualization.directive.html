@@ -34,6 +34,7 @@ with the same id on the page. -->
     transition: all 0.15s;
   }
   .oppia-graph-resize-button .oppia-material-icons {
+    color: #a9a9a9;
     font-size: larger;
   }
   .oppia-graph-viz .oppia-box-fill {
@@ -88,7 +89,7 @@ with the same id on the page. -->
 <div ng-style="{'height': getGraphHeightInPixels() + 'px'}" ng-show="graphLoaded">
   <button ng-if="!!onMaximizeFunction" ng-click="onMaximizeFunction()"
           class="btn btn-secondary btn-sm oppia-graph-resize-button">
-    <i title="Expand Map" class="material-icons oppia-material-icons">&#xE56B;</i>
+    <i title="Expand Map" class="fas fa-expand-arrows-alt oppia-material-icons"></i>
   </button>
 
   <svg class="oppia-graph-viz" width="100%" height="100%">
@@ -102,13 +103,13 @@ with the same id on the page. -->
         <g>
           <g class="pannable-child" ng-attr-transform="<[innerTransformStr]>">
             <g ng-repeat="link in augmentedLinks">
-              <path class="link e2e-test-link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)" ng-attr-style="<[link.style]>">
+              <path class="link protractor-test-link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)" ng-attr-style="<[link.style]>">
               </path>
             </g>
 
-            <g class="node e2e-test-node" ng-repeat="node in nodeList">
+            <g class="node protractor-test-node" ng-repeat="node in nodeList">
               <rect rx="2" ry="2" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
-                    class="e2e-test-node-background <[node.nodeClass]>"
+                    class="protractor-test-node-background <[node.nodeClass]>"
                     ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
                     ng-class="{'clickable': canNavigateToNode(node.id)}"
                     ng-attr-style="<[node.style]>"
@@ -118,7 +119,7 @@ with the same id on the page. -->
               <title><[getNodeTitle(node)]></title>
               <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>">
                 <tspan ng-if="isCheckpoint(node.id)" alignment-baseline="central">&#11088;</tspan>
-                <tspan class="e2e-test-node-label">
+                <tspan class="protractor-test-node-label">
                   <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
                   <tspan ng-attr-x="<[node.xLabel]>" dy="1em" class="oppia-box-fill"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
                 </tspan>
@@ -140,7 +141,7 @@ with the same id on the page. -->
                   ⚠
                 </text>
               </g>
-              <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="e2e-test-delete-node">
+              <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="protractor-test-delete-node">
                 <rect height="15" width="15" opacity="0" stroke-width="0"
                       ng-attr-x="<[node.x0 + node.width]>" ng-attr-y="<[node.y0]>"
                       transform="translate(0, -15)"

@@ -29,15 +29,18 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import learner_group_models
     from mypy_imports import user_models
 
 (learner_group_models, user_models) = models.Registry.import_models(
-    [models.NAMES.learner_group, models.NAMES.user])
+    [models.Names.LEARNER_GROUP, models.Names.USER])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 def is_learner_group_feature_enabled() -> bool:
@@ -54,7 +57,7 @@ def create_learner_group(
     title: str,
     description: str,
     facilitator_user_ids: List[str],
-    invited_student_ids: List[str],
+    invited_learner_ids: List[str],
     subtopic_page_ids: List[str],
     story_ids: List[str]
 ) -> learner_group_domain.LearnerGroup:
@@ -66,7 +69,7 @@ def create_learner_group(
         description: str. The description of the learner group.
         facilitator_user_ids: str. List of user ids of the facilitators of the
             learner group.
-        invited_student_ids: list(str). List of user ids of the students who
+        invited_learner_ids: list(str). List of user ids of the learners who
             have been invited to join the learner group.
         subtopic_page_ids: list(str). The ids of the subtopics pages that are
             part of the learner group syllabus. Each subtopic page id is
@@ -83,7 +86,7 @@ def create_learner_group(
         description,
         facilitator_user_ids,
         [],
-        invited_student_ids,
+        invited_learner_ids,
         subtopic_page_ids,
         story_ids
     )
@@ -94,8 +97,8 @@ def create_learner_group(
         title=title,
         description=description,
         facilitator_user_ids=facilitator_user_ids,
-        student_user_ids=[],
-        invited_student_user_ids=invited_student_ids,
+        learner_user_ids=[],
+        invited_learner_user_ids=invited_learner_ids,
         subtopic_page_ids=subtopic_page_ids,
         story_ids=story_ids
     )
@@ -103,9 +106,9 @@ def create_learner_group(
     learner_group_model.update_timestamps()
     learner_group_model.put()
 
-    if len(learner_group_model.invited_student_user_ids) > 0:
-        invite_students_to_learner_group(
-            group_id, learner_group_model.invited_student_user_ids)
+    if len(learner_group_model.invited_learner_user_ids) > 0:
+        invite_learners_to_learner_group(
+            group_id, learner_group_model.invited_learner_user_ids)
 
     return learner_group
 
@@ -115,8 +118,8 @@ def update_learner_group(
     title: str,
     description: str,
     facilitator_user_ids: List[str],
-    student_ids: List[str],
-    invited_student_ids: List[str],
+    learner_ids: List[str],
+    invited_learner_ids: List[str],
     subtopic_page_ids: List[str],
     story_ids: List[str]
 ) -> learner_group_domain.LearnerGroup:
@@ -128,9 +131,9 @@ def update_learner_group(
         description: str. The description of the learner group.
         facilitator_user_ids: str. List of user ids of the facilitators of the
             learner group.
-        student_ids: list(str). List of user ids of the students of the
+        learner_ids: list(str). List of user ids of the learners of the
             learner group.
-        invited_student_ids: list(str). List of user ids of the students who
+        invited_learner_ids: list(str). List of user ids of the learners who
             have been invited to join the learner group.
         subtopic_page_ids: list(str). The ids of the subtopics pages that are
             part of the learner group syllabus. Each subtopic page id is
@@ -147,25 +150,34 @@ def update_learner_group(
         group_id, strict=True
     )
 
-    old_invited_student_ids = set(learner_group_model.invited_student_user_ids)
-    new_invited_student_ids = set(invited_student_ids)
-    if new_invited_student_ids != old_invited_student_ids:
+    old_invited_learner_ids = set(learner_group_model.invited_learner_user_ids)
+    new_invited_learner_ids = set(invited_learner_ids)
+    if new_invited_learner_ids != old_invited_learner_ids:
         newly_added_invites = list(
-            new_invited_student_ids - old_invited_student_ids
+            new_invited_learner_ids - old_invited_learner_ids
         )
         newly_removed_invites = list(
-            old_invited_student_ids - new_invited_student_ids
+            old_invited_learner_ids - new_invited_learner_ids
         )
-        invite_students_to_learner_group(
+        invite_learners_to_learner_group(
             group_id, newly_added_invites)
-        remove_invited_students_from_learner_group(
-            group_id, newly_removed_invites)
+        remove_invited_learners_from_learner_group(
+            group_id, newly_removed_invites, False)
+
+    old_learner_ids = set(learner_group_model.learner_user_ids)
+    new_learner_ids = set(learner_ids)
+    if old_learner_ids != new_learner_ids:
+        newly_removed_learners = list(
+            old_learner_ids - new_learner_ids
+        )
+        remove_learners_from_learner_group(
+            group_id, newly_removed_learners, False)
 
     learner_group_model.title = title
     learner_group_model.description = description
     learner_group_model.facilitator_user_ids = facilitator_user_ids
-    learner_group_model.student_user_ids = student_ids
-    learner_group_model.invited_student_user_ids = invited_student_ids
+    learner_group_model.learner_user_ids = learner_ids
+    learner_group_model.invited_learner_user_ids = invited_learner_ids
     learner_group_model.subtopic_page_ids = subtopic_page_ids
     learner_group_model.story_ids = story_ids
 
@@ -241,13 +253,13 @@ def get_matching_learner_group_syllabus_to_add(
     group_subtopic_page_ids: List[str] = []
     group_story_ids: List[str] = []
 
-    learner_group = learner_group_fetchers.get_learner_group_by_id(
-        learner_group_id)
-
     # Case when syllabus is being added to an existing group.
-    if learner_group is not None:
-        group_subtopic_page_ids = learner_group.subtopic_page_ids
-        group_story_ids = learner_group.story_ids
+    if learner_group_id:
+        learner_group_model = learner_group_models.LearnerGroupModel.get(
+            learner_group_id, strict=True
+        )
+        group_subtopic_page_ids = learner_group_model.subtopic_page_ids
+        group_story_ids = learner_group_model.story_ids
 
     matching_topic_ids: List[str] = []
     all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
@@ -261,19 +273,17 @@ def get_matching_learner_group_syllabus_to_add(
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 matching_topic_ids.extend(classroom['topic_ids'])
-        matching_topics_with_none: Sequence[
-            Optional[topic_domain.Topic]
-        ] = (
-            topic_fetchers.get_topics_by_ids(matching_topic_ids)
+        matching_topics: List[topic_domain.Topic] = (
+            topic_fetchers.get_topics_by_ids(matching_topic_ids, strict=True)
         )
     else:
-        matching_topics_with_none = topic_fetchers.get_all_topics()
+        matching_topics = topic_fetchers.get_all_topics()
 
     keyword = keyword.lower()
-    for topic in matching_topics_with_none:
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
-        if language_code and language_code != topic.language_code:
+    for topic in matching_topics:
+        if language_code not in (
+            constants.DEFAULT_ADD_SYLLABUS_FILTER, topic.language_code
+        ):
             continue
 
         if keyword in topic.canonical_name:
@@ -408,7 +418,7 @@ def get_matching_story_syllabus_item_dicts(
         )
     ]
     matching_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
-    stories = story_fetchers.get_stories_by_ids(story_ids)
+    stories = story_fetchers.get_stories_by_ids(story_ids, strict=True)
 
     matching_story_syllabus_item_dicts: List[
         story_domain.LearnerGroupSyllabusStorySummaryDict] = []
@@ -416,8 +426,6 @@ def get_matching_story_syllabus_item_dicts(
     for ind, story_summary in enumerate(matching_stories):
         if keyword is None or keyword in story_summary.title.lower():
             story = stories[ind]
-            # Ruling out the possibility of None for mypy type checking.
-            assert story is not None
             summary_dict = story_summary.to_dict()
             matching_story_syllabus_item_dicts.append({
                 'id': summary_dict['id'],
@@ -446,32 +454,32 @@ def get_matching_story_syllabus_item_dicts(
     return matching_story_syllabus_item_dicts
 
 
-def add_student_to_learner_group(
+def add_learner_to_learner_group(
     group_id: str,
     user_id: str,
     progress_sharing_permission: bool
 ) -> None:
-    """Adds the given student to the given learner group.
+    """Adds the given learner to the given learner group.
 
     Args:
         group_id: str. The id of the learner group.
-        user_id: str. The id of the student.
+        user_id: str. The id of the learner.
         progress_sharing_permission: bool. The progress sharing permission of
             the learner group. True if progress sharing is allowed, False
             otherwise.
 
     Raises:
-        Exception. Student was not invited to join the learner group.
+        Exception. Learner was not invited to join the learner group.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
         group_id, strict=True
     )
 
-    if user_id not in learner_group_model.invited_student_user_ids:
-        raise Exception('Student was not invited to join the learner group.')
+    if user_id not in learner_group_model.invited_learner_user_ids:
+        raise Exception('Learner was not invited to join the learner group.')
 
-    learner_group_model.invited_student_user_ids.remove(user_id)
-    learner_group_model.student_user_ids.append(user_id)
+    learner_group_model.invited_learner_user_ids.remove(user_id)
+    learner_group_model.learner_user_ids.append(user_id)
 
     details_of_learner_group = {
         'group_id': group_id,
@@ -493,28 +501,73 @@ def add_student_to_learner_group(
     learner_group_model.put()
 
 
-def invite_students_to_learner_group(
+def remove_learners_from_learner_group(
     group_id: str,
-    invited_student_ids: List[str]
+    user_ids: List[str],
+    update_group: bool
 ) -> None:
-    """Invites the given students to the given learner group.
+    """Removes the given learner from the given learner group.
 
     Args:
         group_id: str. The id of the learner group.
-        invited_student_ids: list(str). The ids of the students to invite.
+        user_ids: List[str]. The id of the learners to be removed.
+        update_group: bool. Flag indicating whether to update the
+            learner group or not.
     """
-    learner_groups_user_models = (
-        user_models.LearnerGroupsUserModel.get_multi(invited_student_ids))
+    if update_group:
+        learner_group_model = learner_group_models.LearnerGroupModel.get(
+            group_id, strict=True
+        )
+
+        learner_group_model.learner_user_ids = [
+            user_id for user_id in learner_group_model.learner_user_ids
+            if user_id not in user_ids
+        ]
+
+        learner_group_model.update_timestamps()
+        learner_group_model.put()
+
+    learner_grps_users_models = (
+        learner_group_fetchers.get_learner_group_models_by_ids(
+            user_ids, strict=True
+        )
+    )
 
     models_to_put = []
-    for index, student_id in enumerate(invited_student_ids):
+    for learner_grps_user_model in learner_grps_users_models:
+        learner_grps_user_model.learner_groups_user_details = [
+            details for details in
+            learner_grps_user_model.learner_groups_user_details
+            if details['group_id'] != group_id
+        ]
+        models_to_put.append(learner_grps_user_model)
+
+    user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
+    user_models.LearnerGroupsUserModel.put_multi(models_to_put)
+
+
+def invite_learners_to_learner_group(
+    group_id: str,
+    invited_learner_ids: List[str]
+) -> None:
+    """Invites the given learners to the given learner group.
+
+    Args:
+        group_id: str. The id of the learner group.
+        invited_learner_ids: list(str). The ids of the learners to invite.
+    """
+    learner_groups_user_models = (
+        user_models.LearnerGroupsUserModel.get_multi(invited_learner_ids))
+
+    models_to_put = []
+    for index, learner_id in enumerate(invited_learner_ids):
         learner_groups_user_model = learner_groups_user_models[index]
         if learner_groups_user_model:
             learner_groups_user_model.invited_to_learner_groups_ids.append(
                 group_id)
         else:
             learner_groups_user_model = user_models.LearnerGroupsUserModel(
-                id=student_id,
+                id=learner_id,
                 invited_to_learner_groups_ids=[group_id],
                 learner_groups_user_details=[]
             )
@@ -525,23 +578,39 @@ def invite_students_to_learner_group(
     user_models.LearnerGroupsUserModel.put_multi(models_to_put)
 
 
-def remove_invited_students_from_learner_group(
+def remove_invited_learners_from_learner_group(
     group_id: str,
-    student_ids: List[str]
+    learner_ids: List[str],
+    update_group: bool
 ) -> None:
-    """Removes the given invited students from the given learner group.
+    """Removes the given invited learners from the given learner group.
 
     Args:
         group_id: str. The id of the learner group.
-        student_ids: list(str). The ids of the students to remove.
+        learner_ids: list(str). The ids of the learners to remove.
+        update_group: bool. Flag indicating whether to update the
+            learner group or not.
     """
+    if update_group:
+        learner_group_model = learner_group_models.LearnerGroupModel.get(
+            group_id, strict=True
+        )
+        learner_group_model.invited_learner_user_ids = [
+            learner_id for learner_id in
+            learner_group_model.invited_learner_user_ids if
+            learner_id not in learner_ids
+        ]
+        learner_group_model.update_timestamps()
+        learner_group_model.put()
+
     found_models = (
-        user_models.LearnerGroupsUserModel.get_multi(student_ids))
+        learner_group_fetchers.get_learner_group_models_by_ids(
+            learner_ids, strict=True
+        )
+    )
 
     models_to_put = []
     for model in found_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         if group_id in model.invited_to_learner_groups_ids:
             model.invited_to_learner_groups_ids.remove(group_id)
             models_to_put.append(model)
@@ -569,8 +638,103 @@ def get_learner_group_from_model(
         learner_group_model.title,
         learner_group_model.description,
         learner_group_model.facilitator_user_ids,
-        learner_group_model.student_user_ids,
-        learner_group_model.invited_student_user_ids,
+        learner_group_model.learner_user_ids,
+        learner_group_model.invited_learner_user_ids,
         learner_group_model.subtopic_page_ids,
         learner_group_model.story_ids
     )
+
+
+def can_user_be_invited(
+    user_id: str, username: str, group_id: str
+) -> Tuple[bool, str]:
+    """Checks if the user can be invited to the learner group.
+
+    Args:
+        user_id: str. The id of the user.
+        username: str. The username of the user.
+        group_id: str. The id of the learner group.
+
+    Returns:
+        bool. True if the user can be invited to the learner group. False
+        otherwise.
+        str. Error message if the user cannot be invited to the learner group.
+    """
+    # Case of inviting to new learner group.
+    if not group_id:
+        return (True, '')
+
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
+
+    if user_id in learner_group_model.learner_user_ids:
+        return (
+            False, 'User with username %s is already a learner.' % username)
+    elif user_id in learner_group_model.invited_learner_user_ids:
+        return (
+            False, 'User with username %s has been already invited to '
+            'join the group' % username)
+    elif user_id in learner_group_model.facilitator_user_ids:
+        return (
+            False, 'User with username %s is already a facilitator.' % username
+        )
+
+    return (True, '')
+
+
+def remove_story_reference_from_learner_groups(story_id: str) -> None:
+    """Removes a given story id from all learner groups that have it's
+    reference.
+
+    Args:
+        story_id: str. Story id to remove.
+    """
+    found_models: Sequence[learner_group_models.LearnerGroupModel] = (
+        learner_group_models.LearnerGroupModel.get_all().filter(
+            datastore_services.any_of(
+                learner_group_models.LearnerGroupModel.story_ids == story_id
+            )
+        ).fetch()
+    )
+
+    models_to_put = []
+    for model in found_models:
+        model.story_ids.remove(story_id)
+        models_to_put.append(model)
+
+    learner_group_models.LearnerGroupModel.update_timestamps_multi(
+        models_to_put)
+    learner_group_models.LearnerGroupModel.put_multi(models_to_put)
+
+
+def remove_subtopic_page_reference_from_learner_groups(
+    topic_id: str,
+    subtopic_id: int
+) -> None:
+    """Removes a given subtopic page from all learner groups that have it's
+    reference.
+
+    Args:
+        topic_id: str. Id of the topic of the subtopic page.
+        subtopic_id: int. Id of the subtopic of the subtopic page.
+    """
+    subtopic_page_id = '{}:{}'.format(topic_id, subtopic_id)
+
+    learner_group_model_cls = learner_group_models.LearnerGroupModel
+    found_models: Sequence[learner_group_models.LearnerGroupModel] = (
+        learner_group_model_cls.get_all().filter(
+            datastore_services.any_of(
+                learner_group_model_cls.subtopic_page_ids == subtopic_page_id
+            )
+        ).fetch()
+    )
+
+    models_to_put = []
+    for model in found_models:
+        model.subtopic_page_ids.remove(subtopic_page_id)
+        models_to_put.append(model)
+
+    learner_group_models.LearnerGroupModel.update_timestamps_multi(
+        models_to_put)
+    learner_group_models.LearnerGroupModel.put_multi(models_to_put)

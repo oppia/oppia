@@ -36,8 +36,30 @@ import { SolutionValidityService } from 'pages/exploration-editor-page/editor-ta
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+
+interface UpdateActiveAnswerGroupDest {
+  dest: string;
+  refresherExplorationId: string;
+  missingPrerequisiteSkillId: string;
+}
+
+interface UpdateAnswerGroupCorrectnessLabel {
+  labelledAsCorrect: boolean;
+}
+
+interface UpdateAnswerGroupFeedback {
+  feedback: SubtitledHtml;
+}
+
+type UpdateActiveAnswerGroup = (
+  AnswerGroup |
+  UpdateAnswerGroupFeedback |
+  UpdateAnswerGroupCorrectnessLabel |
+  UpdateActiveAnswerGroupDest
+);
 
 @Injectable({
   providedIn: 'root',
@@ -148,6 +170,9 @@ export class ResponsesService {
       }
       if (updates.hasOwnProperty('dest')) {
         answerGroup.outcome.dest = updates.dest;
+      }
+      if (updates.hasOwnProperty('destIfReallyStuck')) {
+        answerGroup.outcome.destIfReallyStuck = updates.destIfReallyStuck;
       }
       if (updates.hasOwnProperty('refresherExplorationId')) {
         answerGroup.outcome.refresherExplorationId = (
@@ -334,7 +359,7 @@ export class ResponsesService {
   }
 
   updateActiveAnswerGroup(
-      updates: AnswerGroup,
+      updates: UpdateActiveAnswerGroup,
       callback: (value: AnswerGroup) => void
   ): void {
     this._updateAnswerGroup(this._activeAnswerGroupIndex, updates, callback);
@@ -350,6 +375,9 @@ export class ResponsesService {
     }
     if (updates.hasOwnProperty('dest')) {
       outcome.dest = updates.dest;
+    }
+    if (updates.hasOwnProperty('destIfReallyStuck')) {
+      outcome.destIfReallyStuck = updates.destIfReallyStuck;
     }
     if (updates.hasOwnProperty('refresherExplorationId')) {
       outcome.refresherExplorationId = updates.refresherExplorationId;

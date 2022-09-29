@@ -24,15 +24,17 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import Dict, List, Mapping, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'state_domain' only for type-checking purpose.
+    from core.domain import state_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
 (base_models, skill_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.skill
+    models.Names.BASE_MODEL, models.Names.SKILL
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -180,14 +182,16 @@ class QuestionModel(base_models.VersionedModel):
             'The id generator for QuestionModel is producing too many '
             'collisions.')
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
-    def compute_models_to_commit(
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with VersionedModel.compute_models_to_commit(). Because argument
+    # `commit_message` of super class can accept Optional[str] but this method
+    # can only accept str.
+    def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -235,12 +239,10 @@ class QuestionModel(base_models.VersionedModel):
             'versioned_model': models_to_put['versioned_model'],
         }
 
-    # TODO(#13523): Change 'question_state_data' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
         cls,
-        question_state_data: Dict[str, Any],
+        question_state_data: state_domain.StateDict,
         language_code: str,
         version: int,
         linked_skill_ids: List[str],
@@ -339,10 +341,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            question_id: str,
-            skill_id: str,
-            skill_difficulty: float
+        cls,
+        question_id: str,
+        skill_id: str,
+        skill_difficulty: float
     ) -> QuestionSkillLinkModel:
         """Creates a new QuestionSkillLinkModel entry.
 
@@ -374,7 +376,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_total_question_count_for_skill_ids(
-            cls, skill_ids: List[str]
+        cls, skill_ids: List[str]
     ) -> int:
         """Returns the number of questions assigned to the given skill_ids.
 
@@ -644,7 +646,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(
-            cls, skill_id: str
+        cls, skill_id: str
     ) -> List[str]:
         """Returns a list of all question ids corresponding to the given skill
         id.

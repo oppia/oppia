@@ -33,7 +33,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
@@ -44,10 +44,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         for entity in base_models.BaseModel.get_all():
             entity.delete()
 
-        super(BaseModelUnitTests, self).tearDown()
+        super().tearDown()
 
     def test_get_deletion_policy(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The get_deletion_policy() method is missing from the '
@@ -55,8 +55,17 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
                 'derived class.')):
             base_models.BaseModel.get_deletion_policy()
 
+    def test_apply_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The apply_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.')):
+            base_models.BaseModel.apply_deletion_policy('test_user_id')
+
     def test_has_reference_to_user_id(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The has_reference_to_user_id() method is missing from the '
@@ -65,11 +74,11 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.has_reference_to_user_id('user_id')
 
     def test_error_cases_for_get_method(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             'Entity for class BaseModel with id Invalid id not found'):
             base_models.BaseModel.get('Invalid id')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             'Entity for class BaseModel with id Invalid id not found'):
             base_models.BaseModel.get('Invalid id', strict=True)
@@ -78,7 +87,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.get('Invalid id', strict=False))
 
     def test_base_model_export_data_raises_not_implemented_error(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The export_data() method is missing from the '
@@ -89,7 +98,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_get_model_association_to_user_raises_not_implemented_error(
             self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The get_model_association_to_user() method is missing from '
@@ -98,7 +107,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.get_model_association_to_user()
 
     def test_export_data(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The export_data() method is missing from the derived '
@@ -176,7 +185,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Immediately calling `put` again fails, because update_timestamps needs
         # to be called first.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, re.escape('did not call update_timestamps()')
         ):
             model.put()
@@ -184,7 +193,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model = base_models.BaseModel.get_by_id(model.id)
 
         # Getting a fresh model requires update_timestamps too.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, re.escape('did not call update_timestamps()')
         ):
             model.put()
@@ -213,6 +222,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
+        # Here we use cast because we are narrowing down the type from
+        # List[Optional[BaseModel]] to List[BaseModel].
         models_2_without_none = cast(
             List[base_models.BaseModel],
             base_models.BaseModel.get_multi(model_ids)
@@ -226,6 +237,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
+        # Here we use cast because we are narrowing down the type from
+        # List[Optional[BaseModel]] to List[BaseModel].
         models_3_without_none = cast(
             List[base_models.BaseModel],
             base_models.BaseModel.get_multi(model_ids)
@@ -306,7 +319,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
     MODEL_ID = 'model1'
 
     def setUp(self) -> None:
-        super(BaseHumanMaintainedModelTests, self).setUp()
+        super().setUp()
         self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
         def mock_put(self: base_models.BaseHumanMaintainedModel) -> None:
             """Function to modify and save the entities used for testing
@@ -333,7 +346,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             self.model_instance.put()
 
     def test_put(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError, 'Use put_for_human or put_for_bot instead'):
             self.model_instance.put()
 
@@ -358,7 +371,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             self.model_instance.last_updated_by_human)
 
     def test_put_multi(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Use put_multi_for_human or put_multi_for_bot instead'):
             TestBaseHumanMaintainedModel.put_multi([])
@@ -448,7 +461,7 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
     ) -> None:
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The get_instance_id() method is missing from the derived '
@@ -510,7 +523,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
     def test_export_data_nontrivial(self) -> None:
         version_model = TestVersionedModel(id='version_model')
         model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
-            'model_id-1', 'committer_id', 'create', None, None)
+            'model_id-1', 'committer_id', 'create', None, [])
         model1.update_timestamps()
         model1.put()
         model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
@@ -536,7 +549,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         version_model = TestVersionedModel(id='version_model')
         model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
             'model_id-1', 'committer_id', 'create',
-            'Test uid_abcdefghijabcdefghijabcdefghijab', None)
+            'Test uid_abcdefghijabcdefghijabcdefghijab', [])
         model1.update_timestamps()
         model1.put()
         model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
@@ -580,7 +593,7 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
     def test_get_commit(self) -> None:
         model1 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            commit_cmds={}, commit_type='create',
+            commit_cmds=[], commit_type='create',
             commit_message='New commit created.', version=1,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
@@ -601,13 +614,13 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
     def test_get_all_commits(self) -> None:
         model1 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            commit_cmds={}, commit_type='create',
+            commit_cmds=[], commit_type='create',
             commit_message='New commit created.', version=1,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
         model2 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            commit_cmds={}, commit_type='edit',
+            commit_cmds=[], commit_type='edit',
             commit_message='New commit created.', version=2,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
@@ -627,7 +640,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
     """Test methods for VersionedModel."""
 
     def test_retrieval_of_multiple_version_models_for_fake_id(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'The given entity_id fake_id is invalid'):
             TestVersionedModel.get_multi_versions(
                 'fake_id', [1, 2, 3])
@@ -637,7 +650,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         model1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This model instance has been deleted.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
@@ -645,37 +658,37 @@ class VersionedModelTests(test_utils.GenericTestBase):
             self
     ) -> None:
         model1 = TestVersionedModel(id='model_id1')
-        # TODO(#13528): Remove this test after the backend is fully
-        # type-annotated. Here ignore[assignment] is used to test method
-        # commit() for invalid SNAPSHOT_METADATA_CLASS.
+        # TODO(#13528): Here we use MyPy ignore because we remove this test
+        # after the backend is fully type-annotated. Here ignore[assignment]
+        # is used to test method commit() for invalid SNAPSHOT_METADATA_CLASS.
         model1.SNAPSHOT_METADATA_CLASS = None # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No snapshot metadata class defined.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         model1 = TestVersionedModel(id='model_id1')
-        # TODO(#13528): Remove this test after the backend is fully
-        # type-annotated. Here ignore[assignment] is used to test method
-        # commit() for invalid SNAPSHOT_CONTENT_CLASS.
+        # TODO(#13528): Here we use MyPy ignore because we remove this test
+        # after the backend is fully type-annotated. Here ignore[assignment]
+        # is used to test method commit() for invalid SNAPSHOT_CONTENT_CLASS.
         model1.SNAPSHOT_CONTENT_CLASS = None # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No snapshot content class defined.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         model1 = TestVersionedModel(id='model_id1')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[arg-type] is used to test method
-            # commit() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. Here ignore[arg-type]
+            # is used to test method commit() for invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', {}) # type: ignore[arg-type]
 
         model1 = TestVersionedModel(id='model_id1')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[list-item] is used to test method
-            # commit() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. Here ignore[list-item]
+            # is used to test method commit() for invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]]) # type: ignore[list-item]
 
     def test_put_raises_not_implemented_error_for_versioned_models(
@@ -683,7 +696,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
     ) -> None:
         model1 = TestVersionedModel(id='model_id1')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The put() method is missing from the derived '
@@ -757,19 +770,19 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1 = TestVersionedModel(id='model_id1')
 
         # Test for invalid commit command.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid commit_cmd:'):
             model1.commit(
                 feconf.SYSTEM_COMMITTER_ID, '', [{'invalid_cmd': 'value'}])
 
         # Test for invalid change list command.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid change list command:'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [{'cmd': 'AUTO'}])
 
     def test_revert_raises_error_when_not_allowed(self) -> None:
         model1 = TestVersionedModel(id='model_id1')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Reverting objects of type TestVersionedModel is not allowed.'):
             model1.revert(model1, feconf.SYSTEM_COMMITTER_ID, '', 1)
@@ -780,7 +793,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Invalid version number 10 for model TestVersionedModel with id '
             'model_id1'):
@@ -798,7 +811,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
         self.assertIsNone(test_version_model)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             'Entity for class TestVersionedModel with id nonexistent_id1 '
             'not found'):
@@ -808,7 +821,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             TestVersionedModel.get_version('model_id1', 4, strict=False))
         self.assertIsNone(test_version_model)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             'Entity for class TestSnapshotContentModel with id model_id1-4 '
             'not found'):
@@ -830,18 +843,19 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Requested version number 3 cannot be higher than the current '
             'version number 2.'):
             TestVersionedModel.get_multi_versions('model_id1', [1, 2, 3])
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'At least one version number is invalid'):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[list-item] is used to test method
-            # get_multi_versions() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. Here ignore[list-item]
+            # is used to test method get_multi_versions() for invalid input
+            # type.
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2]) # type: ignore[list-item]
 
 
@@ -862,7 +876,7 @@ class BaseModelTests(test_utils.GenericTestBase):
             TestBaseModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, TestBaseModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:

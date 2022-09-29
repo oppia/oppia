@@ -90,7 +90,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         'invalid_git_requirements_test.txt')
 
     def setUp(self):
-        super(InstallBackendPythonLibsTests, self).setUp()
+        super().setUp()
         self.print_arr = []
 
         def mock_print(msg):
@@ -185,9 +185,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH)
 
         with swap_requirements:
-            self.assertRaisesRegex(
-                Exception, 'does not match GIT_DIRECT_URL_REQUIREMENT_PATTERN',
-                install_python_prod_dependencies.get_mismatches)
+            with self.assertRaisesRegex(
+                Exception, 'does not match GIT_DIRECT_URL_REQUIREMENT_PATTERN'
+            ):
+                install_python_prod_dependencies.get_mismatches()
 
     def test_multiple_discrepancies_returns_correct_mismatches(self):
         swap_requirements = self.swap(

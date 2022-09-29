@@ -30,7 +30,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import datastore_services
 
-(auth_models,) = (models.Registry.import_models([models.NAMES.auth]))
+(auth_models,) = (models.Registry.import_models([models.Names.AUTH]))
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -40,7 +40,7 @@ class ValidateFirebaseSeedModelId(base_validation.ValidateBaseModelId):
     """Overrides regex to match the single valid FirebaseSeedModel ID."""
 
     def __init__(self) -> None:
-        super(ValidateFirebaseSeedModelId, self).__init__()
+        super().__init__()
         self._pattern = auth_models.ONLY_FIREBASE_SEED_MODEL_ID
 
 
@@ -50,7 +50,7 @@ class ValidateUserIdByFirebaseAuthIdModelId(
     """Overrides regex to match the Firebase account ID pattern."""
 
     def __init__(self) -> None:
-        super(ValidateUserIdByFirebaseAuthIdModelId, self).__init__()
+        super().__init__()
         self._pattern = feconf.FIREBASE_AUTH_ID_REGEX
 
 

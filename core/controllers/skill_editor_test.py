@@ -25,18 +25,19 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 
 class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseSkillEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -83,7 +84,7 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
     """Tests for SkillEditorPage."""
 
     def setUp(self):
-        super(SkillEditorTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id)
 
     def test_access_skill_editor_page(self):
@@ -113,7 +114,7 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillRightsHandler."""
 
     def setUp(self):
-        super(SkillRightsHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (feconf.SKILL_RIGHTS_URL_PREFIX, self.skill_id)
 
     def test_skill_rights_handler_succeeds(self):
@@ -136,7 +137,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     """Tests for EditableSkillDataHandler."""
 
     def setUp(self):
-        super(EditableSkillDataHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (
             feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id)
         self.put_payload = {
@@ -379,7 +380,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillDataHandler."""
 
     def setUp(self):
-        super(SkillDataHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s,%s' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
         self.put_payload = {
@@ -416,7 +417,7 @@ class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
     """Tests for FetchSkillsHandler."""
 
     def setUp(self):
-        super(FetchSkillsHandlerTest, self).setUp()
+        super().setUp()
         self.url = feconf.FETCH_SKILLS_URL_PREFIX
 
     def test_skill_data_handler_get_multiple_skills(self):
@@ -432,7 +433,7 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillDescriptionHandler."""
 
     def setUp(self):
-        super(SkillDescriptionHandlerTest, self).setUp()
+        super().setUp()
         self.skill_description = 'Adding Fractions'
         self.url = '%s/%s' % (
             feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)
@@ -483,3 +484,49 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
         # Skill description exists since we've already published it.
         json_response = self.get_json(self.url)
         self.assertEqual(json_response['skill_description_exists'], True)
+
+
+class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for DiagnosticTestSkillAssignmentHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.url = '%s/%s' % (
+            feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER, 'skill_id_1')
+
+        self.topic = topic_domain.Topic.create_default_topic(
+            'topic_id', 'topic', 'abbrev', 'description', 'fragm')
+        self.topic.thumbnail_filename = 'thumbnail.svg'
+        self.topic.thumbnail_bg_color = '#C6DCDA'
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        self.topic.next_subtopic_id = 2
+
+        topic_services.save_new_topic(self.admin_id, self.topic)
+
+    def test_skill_assignment_handler_for_diagnostic_test_returns_correctly(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['topic_names'], [])
+
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': ['skill_id_1']
+            })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id, self.topic.id, changelist,
+            'Adds skill for the diagnostic test.')
+
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['topic_names'], ['topic'])
+        self.logout()

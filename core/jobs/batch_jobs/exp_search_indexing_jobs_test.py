@@ -25,14 +25,14 @@ from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, List, Tuple, Union # isort:skip
+from typing import Dict, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:
     from mypy_imports import exp_models
     from mypy_imports import search_services as platform_search_services
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 platform_search_services = models.Registry.import_search_services()
 
@@ -41,7 +41,9 @@ StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = exp_search_indexing_jobs.IndexExplorationsInSearchJob
+    JOB_CLASS: Type[
+        exp_search_indexing_jobs.IndexExplorationsInSearchJob
+    ] = exp_search_indexing_jobs.IndexExplorationsInSearchJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()

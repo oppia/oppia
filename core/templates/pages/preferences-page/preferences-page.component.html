@@ -31,13 +31,13 @@
           {{ 'I18N_PREFERENCES_PICTURE' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
-          <div class="oppia-editable-section oppia-profile-picture-container"
+          <div class="oppia-editable-section oppia-editor-profile-picture-container"
                title="{{ 'I18N_PREFERENCES_CHANGE_PICTURE' | translate }}">
             <div class="oppia-click-to-start-editing e2e-test-photo-clickable"
                  (click)="showEditProfilePictureModal()"
                  aria-label="Edit profile picture button">
             </div>
-            <i class="material-icons oppia-editor-edit-icon oppia-editor-edit-icon-pos">&#xE254;</i>
+            <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"></i>
             <img *ngIf="profilePictureDataUrl"
                  [src]="profilePictureDataUrl"
                  class="img-thumbnail e2e-test-custom-photo"
@@ -355,66 +355,3 @@
 
   </mat-card>
 </div>
-<style>
-  .oppia-dashboard-container .checkbox label {
-    font-weight: normal;
-  }
-  .oppia-preferences-page-heading {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 3em;
-    margin-bottom: 10px;
-    margin-top: 0;
-    padding-top: 45px;
-    position: relative;
-    text-align: center;
-  }
-
-  .oppia-preferences-page-heading-subtext {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 1.2em;
-    position: relative;
-    text-align: center;
-  }
-
-  .oppia-bio-border {
-    border-color: rgb(156,156,156);
-    border-radius: 4px;
-    border-width: 0.01em;
-  }
-
-  .oppia-profile-picture-container {
-    height: 150px;
-    width: 150px;
-  }
-
-  .oppia-editor-edit-icon-pos {
-    right: 8px;
-    top: 8px;
-  }
-
-  .oppia-checkbox {
-    padding-top: 0;
-  }
-
-  .oppia-subscription-card.mat-card {
-    padding: 0;
-  }
-
-  .oppia-subscription-list-container {
-    margin: 0 8px 0 0;
-  }
-
-  .oppia-subscription-card-summary-text-container {
-    font-size: 17.5px;
-    margin-bottom: 5px;
-  }
-
-  .oppia-impact-text {
-    font-size: 14.5px;
-  }
-  .oppia-form-text {
-    font-size: smaller;
-  }
-</style>

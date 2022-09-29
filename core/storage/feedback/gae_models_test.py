@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (base_models, feedback_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.feedback, models.NAMES.user])
+    [models.Names.BASE_MODEL, models.Names.FEEDBACK, models.Names.USER])
 
 CREATED_ON_FIELD = 'created_on'
 LAST_UPDATED_FIELD = 'last_updated'
@@ -63,7 +63,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(FeedbackThreadModelTest, self).setUp()
+        super().setUp()
 
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
@@ -104,7 +104,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_raise_exception_by_mocking_collision(self) -> None:
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
         # Test create method.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Feedback thread ID conflict on create.'):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
@@ -116,7 +116,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                     'exploration.exp_id.thread_id')
 
         # Test generate_new_thread_id method.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New thread id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -186,7 +186,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id('id_x'))
 
     def test_raise_exception_by_mocking_collision(self) -> None:
-        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             'exploration', '0', 'test_author', 'subject 1', 'text 1')
         # Simulating the _generate_id function in the
         # GeneralFeedbackMessageModel class.
@@ -196,18 +196,18 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             r'The following feedback message ID\(s\) conflicted on '
             'create: %s' % (instance_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             feedback_models.GeneralFeedbackMessageModel.create(
                 feedback_domain.FullyQualifiedMessageIdentifier(
                     thread_id, 0)
             )
 
     def test_get_all_messages(self) -> None:
-        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
-            'exploration', '0', None, 'subject 1', 'text 1')
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', 'test_author', 'subject 1', 'text 1')
 
-        feedback_services.create_message( # type: ignore[no-untyped-call]
-            thread_id, None, 'open', 'subject 2', 'text 2')
+        feedback_services.create_message(
+            thread_id, 'test_author', 'open', 'subject 2', 'text 2')
 
         model = feedback_models.GeneralFeedbackMessageModel.get(
             thread_id, 0)
@@ -232,11 +232,11 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(all_messages[0][1].updated_subject, 'subject 1')
 
     def test_get_most_recent_message(self) -> None:
-        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
-            'exploration', '0', None, 'subject 1', 'text 1')
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', 'test_author', 'subject 1', 'text 1')
 
-        feedback_services.create_message( # type: ignore[no-untyped-call]
-            thread_id, None, 'open', 'subject 2', 'text 2')
+        feedback_services.create_message(
+            thread_id, 'test_author', 'open', 'subject 2', 'text 2')
 
         model1 = feedback_models.GeneralFeedbackMessageModel.get(
             thread_id, 0)
@@ -270,9 +270,9 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
         self.signup('export_author_1@example.com', 'exportAuthor1')
         test_export_author_id = (
-            self.get_user_id_from_email('export_author_1@example.com')) # type: ignore[no-untyped-call]
+            self.get_user_id_from_email('export_author_1@example.com'))
 
-        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             test_export_thread_type,
             test_export_thread_id,
             test_export_author_id,
@@ -280,7 +280,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             test_export_text
         )
 
-        feedback_services.create_message( # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id,
             test_export_author_id,
             test_export_updated_status,
@@ -327,7 +327,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     MESSAGE_IDS_READ_IN_THREAD_C = [5, 6, 7, 8, 9]
 
     def setUp(self) -> None:
-        super(FeedbackThreadUserModelTest, self).setUp()
+        super().setUp()
         model = feedback_models.GeneralFeedbackThreadUserModel.create(
             self.USER_ID_A, self.THREAD_ID_A)
         model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_A
