@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import functools
 import logging
 
 from core import feconf
@@ -32,6 +33,7 @@ CLIENT = secretmanager.SecretManagerServiceClient(
         if constants.EMULATOR_MODE else auth.default()[0]))
 
 
+@functools.lru_cache(maxsize=64)
 def get_secret(name: str) -> str:
     """Gets the value of a secret.
 
@@ -44,7 +46,4 @@ def get_secret(name: str) -> str:
     secret_name = (
         f'projects/{feconf.OPPIA_PROJECT_ID}/secrets/{name}/versions/latest')
     response = CLIENT.access_secret_version(request={'name': secret_name})
-    logging.info(response)
-    logging.info(response.payload)
-    logging.info(response.payload.data)
     return response.payload.data.decode('utf-8')

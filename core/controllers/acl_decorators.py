@@ -116,7 +116,7 @@ def is_source_mailchimp(handler):
         Returns:
             *. The return value of the decorated function.
         """
-        if email_manager.verify_mailchimp_secret(secret):
+        if not email_manager.verify_mailchimp_secret(secret):
             logging.error(
                 'Invalid Mailchimp webhook request received with secret: %s'
                 % secret)

@@ -121,8 +121,17 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_error_when_mailchimp_webhook_secret_is_none(self):
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        swap_api_key_feconf = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+        swap_api_key_secrets_return_none = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: None,
+            expected_args=[
+                ('MAILCHIMP_WEBHOOK_SECRET',),
+            ]
+        )
 
-        with testapp_swap:
+        with testapp_swap, swap_api_key_feconf, swap_api_key_secrets_return_none:
             response = self.get_json(
                 '/mock_secret_page/%s' % self.secret,
                 expected_status_int=404

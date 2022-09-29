@@ -87,7 +87,7 @@ def send_email_to_recipients(
     """
     mailgun_api_key: Optional[str] = secrets_services.get_secret(
         'MAILGUN_API_KEY')
-    if not mailgun_api_key:
+    if mailgun_api_key is None:
         logging.exception('Cloud Secret Manager is not working.')
         mailgun_api_key = feconf.MAILGUN_API_KEY
         if not mailgun_api_key:
@@ -132,8 +132,8 @@ def send_email_to_recipients(
         auth_str = 'Basic %s' % base64_mailgun_api_key
         header = {'Authorization': auth_str}
         server = (
-            ('https://api.mailgun.net/v3/%s/messages')
-            % feconf.MAILGUN_DOMAIN_NAME)
+            'https://api.mailgun.net/v3/%s/messages'% feconf.MAILGUN_DOMAIN_NAME
+        )
         # The 'ascii' is used here, because only ASCII char are allowed in url,
         # also the docs recommend this approach:
         # https://docs.python.org/3.7/library/urllib.request.html#urllib-examples
