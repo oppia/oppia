@@ -184,9 +184,9 @@ var TopicEditorPage = function() {
   };
 
   this.createQuestionForSkillWithName = async function(skillDescription) {
-    await waitFor.visibilityOf(
-      selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
-    await selectSkillDropdown.selectByVisibleText(skillDescription);
+    await action.click('Select Skill Dropdown', selectSkillDropdown);
+    var dropdownOption = await $(`.mat-option-text=${skillDescription}`);
+    await action.click(skillDescription, dropdownOption);
     await action.click('Create question button', createQuestionButton);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
