@@ -58,12 +58,10 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/pre_push_hook.py',
     'scripts/pre_push_hook_test.py',
     'scripts/run_backend_tests.py',
-    'scripts/run_lighthouse_tests.py',
     'scripts/run_mypy_checks.py',
     'scripts/run_mypy_checks_test.py',
     'scripts/run_portserver.py',
     'scripts/run_presubmit_checks.py',
-    'scripts/script_import_test.py',
     'scripts/linters/',
     'scripts/release_scripts/'
 ]
