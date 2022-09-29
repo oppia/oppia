@@ -37,7 +37,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
@@ -88,7 +88,7 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
             created_on=self.NOW,
             last_updated=self.NOW,
             pseudonymizable_entity_mappings={
-                models.NAMES.audit.value: {'key': 'value'}
+                models.Names.AUDIT.value: {'key': 'value'}
             }
         )
 
@@ -111,7 +111,7 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
             created_on=self.NOW,
             last_updated=self.NOW,
             pseudonymizable_entity_mappings={
-                models.NAMES.collection.value: {'key': 'value'}
+                models.Names.COLLECTION.value: {'key': 'value'}
             }
         )
 
@@ -234,145 +234,145 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_completed_activities_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'CompletedActivitiesModel', 'exploration_ids'),
             ['ExplorationModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'CompletedActivitiesModel', 'collection_ids'),
             ['CollectionModel'])
 
     def test_incomplete_activities_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'IncompleteActivitiesModel', 'exploration_ids'),
             ['ExplorationModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'IncompleteActivitiesModel', 'collection_ids'),
             ['CollectionModel'])
 
     def test_exp_user_last_playthrough_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'ExpUserLastPlaythroughModel', 'exploration_id'),
             ['ExplorationModel'])
 
     def test_learner_playlist_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'LearnerPlaylistModel', 'exploration_ids'),
             ['ExplorationModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'LearnerPlaylistModel', 'collection_ids'),
             ['CollectionModel'])
 
     def test_user_contributions_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserContributionsModel', 'created_exploration_ids'),
             ['ExplorationModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserContributionsModel', 'edited_exploration_ids'),
             ['ExplorationModel'])
 
     def test_user_email_preferences_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserEmailPreferencesModel', 'id'),
             ['UserSettingsModel'])
 
     def test_user_subscriptions_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserSubscriptionsModel', 'exploration_ids'),
             ['ExplorationModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserSubscriptionsModel', 'collection_ids'),
             ['CollectionModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserSubscriptionsModel', 'general_feedback_thread_ids'),
             ['GeneralFeedbackThreadModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserSubscriptionsModel', 'creator_ids'),
             ['UserSubscribersModel'])
 
     def test_user_subscribers_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserSubscribersModel', 'subscriber_ids'),
             ['UserSubscriptionsModel'])
 
     def test_user_recent_changes_batch_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserRecentChangesBatchModel', 'id'),
             ['UserSettingsModel'])
 
     def test_user_stats_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserStatsModel', 'id'),
             ['UserSettingsModel'])
 
     def test_exploration_user_data_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'ExplorationUserDataModel', 'exploration_id'),
             ['ExplorationModel'])
 
     def test_collection_progress_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'CollectionProgressModel', 'collection_id'),
             ['CollectionModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'CollectionProgressModel', 'completed_explorations'),
             ['ExplorationModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'CollectionProgressModel', 'user_id'),
             ['CompletedActivitiesModel'])
 
     def test_story_progress_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'StoryProgressModel', 'story_id'),
             ['StoryModel'])
 
     def test_user_query_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserQueryModel', 'sent_email_model_id'),
             ['BulkEmailModel'])
 
     def test_user_bulk_emails_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserBulkEmailsModel', 'sent_email_model_ids'),
             ['BulkEmailModel'])
 
     def test_user_skill_mastery_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserSkillMasteryModel', 'skill_id'),
             ['SkillModel'])
 
     def test_user_contribution_proficiency_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserContributionProficiencyModel', 'user_id'),
             ['UserSettingsModel'])
 
     def test_user_contribution_rights_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserContributionRightsModel', 'id'),
             ['UserSettingsModel'])

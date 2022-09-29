@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import imghdr
+import itertools
 import logging
 import re
 import urllib
@@ -52,10 +53,10 @@ if MYPY: # pragma: no cover
 
 (auth_models, user_models, audit_models, suggestion_models) = (
     models.Registry.import_models([
-        models.NAMES.auth,
-        models.NAMES.user,
-        models.NAMES.audit,
-        models.NAMES.suggestion
+        models.Names.AUTH,
+        models.Names.USER,
+        models.Names.AUDIT,
+        models.Names.SUGGESTION
     ])
 )
 
@@ -1879,9 +1880,11 @@ def get_users_email_preferences_for_exploration(
         list(UserExplorationPrefs). Representing whether the users has chosen to
         receive email updates for particular exploration.
     """
+    user_id_exp_id_combinations = list(
+        itertools.product(user_ids, [exploration_id]))
     exploration_user_models = (
         user_models.ExplorationUserDataModel.get_multi(
-            user_ids, exploration_id))
+            user_id_exp_id_combinations))
     result = []
 
     for exploration_user_model in exploration_user_models:
@@ -2516,8 +2519,20 @@ def get_contributor_usernames(
         Exception. The language code is not of None for question review
             contribution.
         Exception. Invalid category.
+        Exception. The language_code cannot be None if review category is
+            'translation' or 'voiceover'.
     """
     user_ids = []
+    if (
+        category in (
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+        ) and language_code is None
+    ):
+        raise Exception(
+            'The language_code cannot be None if review category is'
+            ' \'translation\' or \'voiceover\'.'
+        )
     if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
         # Ruling out the possibility of None for mypy type checking.
         assert language_code is not None
@@ -2654,6 +2669,9 @@ def get_checkpoints_in_order(
     Returns:
         list(str). List of all checkpoints of the exploration in sequential
         order.
+
+    Raises:
+        Exception. States with a null destination can never be a checkpoint.
     """
     queue = [init_state_name]
     checkpoint_state_names = []
@@ -2669,10 +2687,20 @@ def get_checkpoints_in_order(
             ):
                 checkpoint_state_names.append(current_state_name)
             for answer_group in current_state.interaction.answer_groups:
+                if answer_group.outcome.dest is None:
+                    raise Exception(
+                        'States with a null destination can never be a'
+                        ' checkpoint.'
+                    )
                 queue.append(answer_group.outcome.dest)
 
             # Add the default outcome destination in the queue.
             if current_state.interaction.default_outcome is not None:
+                if current_state.interaction.default_outcome.dest is None:
+                    raise Exception(
+                        'States with a null destination can never be a'
+                        ' checkpoint.'
+                    )
                 queue.append(current_state.interaction.default_outcome.dest)
 
     return checkpoint_state_names

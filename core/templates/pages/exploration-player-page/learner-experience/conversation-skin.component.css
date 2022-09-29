@@ -82,8 +82,8 @@ oppia-conversation-skin .supplemental-card-parent-container {
   flex-shrink: 1;
   margin-bottom: 200px;
   margin-left: 12px;
+  max-width: 650px;
   position: relative;
-  width: 650px;
   z-index: 2;
 }
 
@@ -129,13 +129,8 @@ oppia-conversation-skin .oppia-button-icon {
   color: #fff;
 }
 
-.oppia-exploration-checkpoints-message .toast-top-center {
-  top: 24px;
-}
-
-.oppia-exploration-checkpoints-message .checkpoints-toast-info {
-  background-color: #337ab7;
-  width: 330px;
+.oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
+  cursor: default;
 }
 
 @media screen and (max-width: 959px) {
@@ -167,11 +162,11 @@ oppia-conversation-skin .oppia-button-icon {
 
   .conversation-skin-supplemental-card-container {
     left: 50%;
-    margin: 0 auto;
-    max-width: 959px;
+    margin: 60px auto 0 auto;
     min-width: 360px;
     position: absolute;
     transform: translateX(-50%);
+    width: 100%;
   }
 
   .conversation-skin-oppia-avatar.show-tutor-card {

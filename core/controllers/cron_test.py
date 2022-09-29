@@ -29,6 +29,7 @@ from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
+from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import suggestion_stats_computation_jobs
@@ -43,8 +44,8 @@ import webtest
     app_feedback_report_models, exp_models, job_models,
     suggestion_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.app_feedback_report, models.NAMES.exploration,
-    models.NAMES.job, models.NAMES.suggestion, models.NAMES.user
+    models.Names.APP_FEEDBACK_REPORT, models.Names.EXPLORATION,
+    models.Names.JOB, models.Names.SUGGESTION, models.Names.USER
 ])
 
 
@@ -55,7 +56,7 @@ class CronJobTests(test_utils.GenericTestBase):
     FOURTEEN_WEEKS = datetime.timedelta(weeks=14)
 
     def setUp(self):
-        super(CronJobTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -293,9 +294,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.reviewers_suggestion_email_infos = reviewers_suggestion_email_infos
 
     def setUp(self):
-        super(
-            CronMailReviewersContributorDashboardSuggestionsHandlerTests,
-            self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -509,9 +508,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             reviewable_suggestion_email_infos)
 
     def setUp(self):
-        super(
-            CronMailAdminContributorDashboardBottlenecksHandlerTests,
-            self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         # This sets the role of the user to admin.
@@ -537,7 +534,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.expected_suggestion_types_needing_reviewers = {
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
-            feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
 
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -696,6 +693,18 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         )
         with swap_with_checks, self.testapp_swap:
             self.get_html_response('/cron/explorations/search_rank')
+
+    def test_cron_blog_post_search_rank_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/blog_posts/search_rank')
 
     def test_cron_dashboard_stats_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)

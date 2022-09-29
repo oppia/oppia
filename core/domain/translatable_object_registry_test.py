@@ -35,22 +35,22 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         """Tests that trying to retrieve a non-translatable class raises an
         error.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'
         ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
                 'Int')
 
     def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
                 'FakeClass')
 
@@ -59,20 +59,20 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         registry.
         """
         assert getattr(objects, 'BaseObject')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
                 'BaseObject')
 
         assert getattr(objects, 'BaseTranslatableObject')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
                 'BaseTranslatableObject')
 

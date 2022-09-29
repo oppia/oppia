@@ -80,13 +80,14 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import google.cloud.logging
-from typing import Any, Dict, Optional, Type, TypeVar, cast
+from typing import Any, Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
+    from mypy_imports import memory_cache_services as cache_services
 
 T = TypeVar('T')  # pylint: disable=invalid-name
 
@@ -113,14 +114,14 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Using Dict[str, Any] because this class inherits this attribute
+    # Here we use type Any because this class inherits this attribute
     # from core.controllers.base.BaseModel.
     URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Using Dict[str, Any] because this class inherits this attribute
+    # Here we use type Any because this class inherits this attribute
     # from core.controllers.base.BaseModel.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
@@ -133,7 +134,7 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "post" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def post(self) -> None:
@@ -145,7 +146,7 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
@@ -156,7 +157,7 @@ class WarmupPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
@@ -212,6 +213,16 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_blog_home_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogHomePageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_blog_post_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogPostPageAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
 
@@ -257,6 +268,13 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
+    get_redirect_route(
+        r'%s/<contribution_type>/<contribution_subtype>/<username>' % (
+            feconf.CONTRIBUTOR_STATS_SUMMARIES_URL),
+        contributor_dashboard.ContributorStatsSummariesHandler),
+    get_redirect_route(
+        r'%s/<username>' % feconf.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL,
+        contributor_dashboard.ContributorAllStatsSummariesHandler),
     get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
@@ -348,8 +366,30 @@ URLS = [
         r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
         skill_editor.SkillDescriptionHandler),
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER,
+        skill_editor.DiagnosticTestSkillAssignmentHandler),
+    get_redirect_route(
+        r'%s/' %
+        feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
+        topics_and_skills_dashboard.TopicIdToDiagnosticTestSkillIdsHandler),
+    get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
+        classroom.ClassroomAdminPage),
+    get_redirect_route(
+        r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
+        classroom.ClassroomAdminDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.CLASSROOM_ID_HANDLER_URL,
+        classroom.NewClassroomIdHandler),
+    get_redirect_route(
+        r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
+        classroom.ClassroomHandler),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_URL_FRAGMENT_HANDLER,
+        classroom.ClassroomUrlFragmentHandler),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -445,15 +485,18 @@ URLS = [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'%s/<author_username>' %
-        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
-        blog_homepage.AuthorsPageHandler),
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogPostDataHandler),
     get_redirect_route(
-        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
-        blog_homepage.BlogPostHandler),
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+        blog_homepage.AuthorsPageHandler),
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_SEARCH_DATA_URL,
+        blog_homepage.BlogPostSearchHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
@@ -629,6 +672,9 @@ URLS = [
     get_redirect_route(
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
+    get_redirect_route(
+        r'/createhandler/check_revert_valid/<exploration_id>/<version>',
+        editor.ExplorationCheckRevertValidHandler),
     get_redirect_route(
         r'/createhandler/revert/<exploration_id>',
         editor.ExplorationRevertHandler),
@@ -960,8 +1006,11 @@ URLS = [
         r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
     get_redirect_route(
+        r'/learner_group_syllabus_handler/<learner_group_id>',
+        learner_group.LearnerGroupSyllabusHandler),
+    get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
-        learner_group.LearnerGroupStudentProgressHandler),
+        learner_group.LearnerGroupLearnerProgressHandler),
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
@@ -969,8 +1018,19 @@ URLS = [
         r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
         learner_group.CreateLearnerGroupPage),
     get_redirect_route(
-        r'/learner_group_search_student_handler',
-        learner_group.LearnerGroupSearchStudentHandler)
+        r'/learner_group_search_learner_handler',
+        learner_group.LearnerGroupSearchLearnerHandler),
+    get_redirect_route(
+        r'/learner_group_learners_info_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnersInfoHandler),
+    get_redirect_route(
+        r'/learner_group_learner_invitation_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnerInvitationHandler),
+    get_redirect_route(
+        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
+    get_redirect_route(
+        r'/user_progress_in_stories_chapters_handler/<username>',
+        learner_group.LearnerStoriesChaptersProgressHandler)
 ]
 
 # Adding redirects for topic landing pages.
@@ -1018,6 +1078,10 @@ URLS.extend((
         r'/learn/<classroom_url_fragment>',
         oppia_root.OppiaLightweightRootPage
     ),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        oppia_root.OppiaRootPage
+    ),
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work
@@ -1045,6 +1109,8 @@ URLS.extend((
     get_redirect_route(
         r'/cron/explorations/search_rank', cron.CronActivitySearchRankHandler),
     get_redirect_route(
+        r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler),
+    get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
     get_redirect_route(
         r'/cron/suggestions/translation_contribution_stats',
@@ -1059,6 +1125,11 @@ URLS.extend((
     get_redirect_route(
         r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
         tasks.SuggestionEmailHandler),
+    get_redirect_route(
+        r'%s' % (
+            feconf
+            .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS),
+        tasks.ContributorDashboardAchievementEmailHandler),
     get_redirect_route(
         r'%s' % feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
         tasks.FlagExplorationEmailHandler),
@@ -1088,12 +1159,9 @@ class NdbWsgiMiddleware:
         start_response: webapp2.Response
     ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
-            cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
+            cache_services.CLOUD_NDB_REDIS_CLIENT)
         with datastore_services.get_ndb_context(global_cache=global_cache):
-            # Cast is needed since webapp2.WSGIApplication is not
-            # correctly typed.
-            return cast(
-                webapp2.Response, self.wsgi_app(environ, start_response))
+            return self.wsgi_app(environ, start_response)
 
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)

@@ -710,6 +710,28 @@ class ExplorationSnapshotsHandler(EditorHandler):
         })
 
 
+class ExplorationCheckRevertValidHandler(EditorHandler):
+    """Checks if an older version of an exploration is valid."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': SCHEMA_FOR_EXPLORATION_ID
+        },
+        'version': {
+            'schema': SCHEMA_FOR_VERSION
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_edit_exploration
+    def get(self, exploration_id, version):
+        """Handles GET requests."""
+        info = exp_services.get_exploration_validation_error(
+            exploration_id, version)
+        self.render_json({'valid': not info, 'details': info})
+
+
 class ExplorationRevertHandler(EditorHandler):
     """Reverts an exploration to an older version."""
 
@@ -825,7 +847,9 @@ class FetchIssuesHandler(EditorHandler):
     def get(self, exp_id):
         """Handles GET requests."""
         exp_version = self.normalized_request.get('exp_version')
-        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        exp_issues = stats_services.get_exp_issues(
+            exp_id, exp_version, strict=False
+        )
         if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid version %s for exploration ID %s'
@@ -899,7 +923,9 @@ class ResolveIssueHandler(EditorHandler):
         exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload.get('exp_version')
 
-        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        exp_issues = stats_services.get_exp_issues(
+            exp_id, exp_version, strict=False
+        )
         if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid exploration ID %s' % (exp_id))

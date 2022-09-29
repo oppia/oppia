@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
@@ -39,6 +39,54 @@ interface ClassroomDataBackendDict {
   'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
   'course_details': string;
   'topic_list_intro': string;
+}
+
+interface ClassroomIdToClassroomNameBackendDict {
+  'classroom_id_to_classroom_name': {
+    [classroomId: string]: string;
+  };
+}
+
+interface ClassroomIdToClassroomNameResponse {
+  [classroomId: string]: string;
+}
+
+interface NewClassroomIdBackendDict {
+  'classroom_id': string;
+}
+
+export interface ClassroomBackendDict {
+  'classroom_id': string;
+  'name': string;
+  'url_fragment': string;
+  'course_details': string;
+  'topic_list_intro': string;
+  'topic_id_to_prerequisite_topic_ids': {
+    [topicId: string]: string[];
+  };
+}
+
+export interface ClassroomDict {
+  classroomId: string;
+  name: string;
+  urlFragment: string;
+  courseDetails: string;
+  topicListIntro: string;
+  topicIdToPrerequisiteTopicIds: {
+    [topicId: string]: string[];
+  };
+}
+
+interface FetchClassroomDataBackendDict {
+  'classroom_dict': ClassroomBackendDict;
+}
+
+interface ClassroomDataResponse {
+  classroomDict: ClassroomDict;
+}
+
+interface DoesClassroomWithUrlFragmentExistBackendResponse {
+  'classroom_url_fragment_exists': boolean;
 }
 
 @Injectable({
@@ -118,6 +166,121 @@ export class ClassroomBackendApiService {
 
   get onInitializeTranslation(): EventEmitter<void> {
     return this._initializeTranslationEventEmitter;
+  }
+
+  async getNewClassroomIdAsync(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.http.get<NewClassroomIdBackendDict>(
+        '/classroom_id_handler').toPromise().then(response => {
+        resolve(response.classroom_id);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async getClassroomDataAsync(
+      classroomId: string
+  ): Promise<ClassroomDataResponse> {
+    return new Promise((resolve, reject) => {
+      let classroomUrl = this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.CLASSROOM_HANDLER_URL_TEMPLATE, {
+          classroom_id: classroomId
+        });
+
+      this.http.get<FetchClassroomDataBackendDict>(
+        classroomUrl).toPromise().then(response => {
+        resolve({
+          classroomDict: {
+            classroomId: response.classroom_dict.classroom_id,
+            name: response.classroom_dict.name,
+            urlFragment: response.classroom_dict.url_fragment,
+            courseDetails: response.classroom_dict.course_details,
+            topicListIntro: response.classroom_dict.topic_list_intro,
+            topicIdToPrerequisiteTopicIds: (
+              response.classroom_dict.topic_id_to_prerequisite_topic_ids)
+          }
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async updateClassroomDataAsync(
+      classroomId: string, classroomDict: ClassroomBackendDict
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let classroomUrl = this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.CLASSROOM_HANDLER_URL_TEMPLATE, {
+          classroom_id: classroomId
+        });
+
+      this.http.put<void>(classroomUrl, {classroom_dict: classroomDict})
+        .toPromise().then(
+          response => {
+            resolve(response);
+          }, errorResponse => {
+            reject(errorResponse.error.error);
+          });
+    });
+  }
+
+  async deleteClassroomAsync(classroomId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let classroomUrl = this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.CLASSROOM_HANDLER_URL_TEMPLATE, {
+          classroom_id: classroomId
+        });
+
+      this.http.delete<void>(classroomUrl).toPromise().then(
+        response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        }
+      );
+    });
+  }
+
+  async getAllClassroomIdToClassroomNameDictAsync(
+  ): Promise<ClassroomIdToClassroomNameResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<ClassroomIdToClassroomNameBackendDict>(
+        '/classroom_admin_data_handler').toPromise().then(response => {
+        resolve(response.classroom_id_to_classroom_name);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  private _doesClassroomWithUrlFragmentExist(
+      classroomUrlFragment: string,
+      successCallback: (value: boolean) => void,
+      errorCallback: (errorResponse: HttpErrorResponse) => void
+  ): void {
+    const classroomUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
+      '/classroom_url_fragment_handler/<classroom_url_fragment>', {
+        classroom_url_fragment: classroomUrlFragment
+      });
+
+    this.http.get<DoesClassroomWithUrlFragmentExistBackendResponse>(
+      classroomUrlFragmentUrl).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback(response.classroom_url_fragment_exists);
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse);
+    });
+  }
+
+  async doesClassroomWithUrlFragmentExistAsync(classroomUrlFragment: string):
+       Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._doesClassroomWithUrlFragmentExist(
+        classroomUrlFragment, resolve, reject);
+    });
   }
 }
 

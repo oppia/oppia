@@ -229,7 +229,7 @@
             <div class="subtopics-list-item">
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
                 <span class="clickable-item" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
-                  <span class="material-icons draggable-icon-indicator">drag_indicator</span>
+                  <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
                   <span class="e2e-test-subtopic"><[subtopic.getTitle()]></span>
                 </span>
                 <div class="subtopic-edit-options-container edit-options-container">
@@ -276,16 +276,91 @@
         </div>
       </div>
     </md-card>
+    <md-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header"
+           ng-click="togglePreviewListCards()">
+        <h3>Diagnostic test</h3>
+      </div>
+      <div>
+        <p>
+          Add up to 3 key skills (the order doesn't matter) that a learner who
+          has completed this topic should have mastered. These skills will be
+          used to generate the diagnostic test that determines whether to
+          recommend this topic to new learners.
+        </p>
+        <p>Note that skills with fewer than two questions are not eligible for
+          getting assigned to the diagnostic test.
+        </p>
+      </div>
+      <div class="oppia-diagnostic-test-skill-list-header"
+           ng-if="selectedSkillSummariesForDiagnosticTest.length">
+        <strong>Diagnostic test skills</strong>
+      </div>
+      <md-list>
+        <md-list-item class="oppia-diagnostic-test-skill_items-container"
+                      ng-repeat="skill in selectedSkillSummariesForDiagnosticTest">
+          <div class="oppia-diagnostic-test-skill-items">
+            <span>
+              {{skill.getDescription()}}
+            </span>
+            <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
+                    ng-click="removeSkillFromDiagnosticTest(skill)"
+                    md-button
+                    md-icon-button
+                    aria-label="Clear">
+              <md-icon>close</md-icon>
+            </button>
+          </div>
+        </md-list-item>
+        <md-list-item ng-show="diagnosticTestSkillsDropdownIsShown">
+          <md-form-field class="oppia-diagnostic-test-skill-items">
+            <select class="form-control oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
+                    ng-model="selectedSkillForDiagnosticTest"
+                    ng-change="addSkillForDiagnosticTest()"
+                    ng-options="skillSummary.getDescription() for skillSummary in availableSkillSummariesForDiagnosticTest"
+                    aria-label="selection dropdown">
+            </select>
+          </md-form-field>
+          <button class="oppia-remove-diagnostic-test-skill-button"
+                  md-button md-icon-button
+                  aria-label="Clear"
+                  ng-click="removeDiagnosticTestSkillDropdown()">
+            <md-icon>close</md-icon>
+          </button>
+        </md-list-item>
+      </md-list>
+      <button class="oppia-add-diagnostic-test-skills-button e2e-test-add-diagnostic-test-skill"
+              md-button
+              ng-click="presentDiagnosticTestSkillDropdown()"
+              ng-show="!diagnosticTestSkillsDropdownIsShown"
+              ng-disabled="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
+        <div class="oppia-flex">
+          <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
+          <h4 class="oppia-button-text">Add diagnostic test skill</h4>
+        </div>
+      </button>
+      <div class="oppia-diagnostic-test-card-note">
+        <span ng-if="!availableSkillSummariesForDiagnosticTest.length && selectedSkillSummariesForDiagnosticTest.length < 3">
+          <em>No more skills left for assignment.</em>
+        </span>
+        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 3">
+          <em>The maximum limit was reached for adding skills to the diagnostic test.</em>
+        </span>
+        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 0 && availableSkillSummariesForDiagnosticTest.length > 0">
+          <em>Please add at least 1 skill for the diagnostic test.</em>
+        </span>
+      </div>
+    </md-card>
   </div>
   <div class="topic-info-container">
     <md-card class="item-list-card topic-item-card topic-bottom-card oppia-mobile-collapsible-card">
       <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(STORY_LIST)">
         <h3>Canonical Stories</h3>
-        <i class="fa fa-caret-down"
+        <i class="fa fa-caret-down e2e-test-story-dropdown"
            ng-if="!storiesListIsShown"
            aria-hidden="true">
         </i>
-        <i class="fa fa-caret-up"
+        <i class="fa fa-caret-up e2e-test-story-dropdown"
            ng-if="storiesListIsShown"
            aria-hidden="true">
         </i>
@@ -626,6 +701,11 @@
     margin-top: 64px;
   }
 
+  .topic-editor .diagnostic-test-card-container {
+    margin-bottom: 64px;
+    margin-top: 64px;
+  }
+
   .topic-editor .practice-tab-info-circle {
     background: #000;
     border-radius: 10px;
@@ -641,6 +721,63 @@
   .topic-editor .practice-tab-text {
     font-weight: normal;
     padding-left: 5px;
+  }
+
+  .oppia-add-diagnostic-test-skills-button {
+    color: #00695e;
+    margin-left: 0;
+    padding-left: 0;
+    width: fit-content;
+  }
+
+  .oppia-flex {
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    width: fit-content;
+  }
+
+  md-icon.md-default-theme, md-icon {
+    color: #00695e;
+  }
+
+  .oppia-button-text {
+    margin-bottom: 0;
+    padding: 10px;
+  }
+
+  .oppia-diagnostic-test-dropdown {
+    width: 50%;
+  }
+
+  .oppia-remove-diagnostic-test-skill-button {
+    border-radius: 25px;
+    position: relative;
+  }
+
+  .oppia-diagnostic-test-skill-description {
+    width: 85%;
+  }
+
+  .oppia-diagnostic-test-skill-list-header {
+    margin-top: 20px;
+  }
+
+  .oppia-diagnostic-test-card-note {
+    display: block;
+  }
+
+  .oppia-diagnostic-test-skill_items-container {
+    background-color: #e3e3e3;
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
+  .oppia-diagnostic-test-skill-items {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: -webkit-fill-available;
   }
 
   @media screen and (max-width: 1200px) {
@@ -685,7 +822,7 @@
 
     .topic-editor .entity-count,
     .topic-editor .draggable-icon-indicator {
-      display: none;
+      padding-right: 5px;
     }
 
     .topic-editor .subtopic-skill-card-container {
@@ -741,6 +878,7 @@
 
     .topic-editor .topic-info-container {
       margin-top: 0;
+      padding-bottom: 50px;
       width: 100%;
     }
 

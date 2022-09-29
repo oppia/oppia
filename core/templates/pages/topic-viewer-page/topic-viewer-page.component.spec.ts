@@ -43,7 +43,7 @@ class MockWindowRef {
       }
     },
     history: {
-      pushState(title: string, url?: string | null) {}
+      pushState(title: string, url: string | null) {}
     }
   };
 

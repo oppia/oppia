@@ -6,14 +6,15 @@
             class="oppia-opportunities-tab-item"
             *ngFor="let item of tabsDetails | keyvalue"
             [attr.aria-label]="item.value.ariaLabel">
-          <div *ngIf="item.value.enabled">
+          <div *ngIf="item.value.enabled"
+               class="oppia-tabs-container">
             <a role="button"
                (click)="onTabClick(item.key)"
                href="#"
                class="oppia-opportunities-tabs-text e2e-test-{{item.key}}">
               {{item.value.tabName}}
             </a>
-            <div class="oppia-active-tab-hilighter"></div>
+            <div class="oppia-active-tab-highlighter"></div>
           </div>
         </li>
       </ul>
@@ -32,26 +33,35 @@
                        alt="User Avatar">
                 </span>
                 <span *ngIf="!profilePictureDataUrl">
-                  <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
+                  <i class="fas fa-user-circle oppia-profile-picture-icon"></i>
                 </span>
               </div>
               <div class="oppia-contributor-username-and-review-rights-container">
                 <div class="oppia-short-contributor-username-container"
-                     *ngIf="userIsLoggedIn || username?.length <= 8"
-                     [attr.data-tab-name]="username">
+                     *ngIf="userIsLoggedIn && username.length <= 8"
+                     [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
                         [hidden]="userInfoIsLoading">
-                    {{userIsLoggedIn ? username : 'Guest'}}
+                    {{ username }}
                   </span>
                 </div>
                 <div class="oppia-long-contributor-username-container"
-                     *ngIf="userIsLoggedIn && username?.length > 8"
-                     [attr.data-tab-name]="username">
+                     *ngIf="userIsLoggedIn && username.length > 8"
+                     [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
                         [hidden]="userInfoIsLoading">
-                    {{userIsLoggedIn ? username : 'Guest'}}
+                    {{ username }}
+                  </span>
+                </div>
+                <div class="oppia-short-contributor-username-container"
+                     *ngIf="!userIsLoggedIn"
+                     [attr.data-tab-name]="'username'">
+                  <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
+                  <span class="e2e-test-username"
+                        [hidden]="userInfoIsLoading">
+                    Guest
                   </span>
                 </div>
                 <div class="oppia-review-right-details-container e2e-test-review-rights"
@@ -59,19 +69,23 @@
                   <strong>Review rights:</strong>
                   <div *ngIf="userCanReviewTranslationSuggestionsInLanguages.length > 0">
                     Translations in languages:
-                    <span *ngFor="let languageDescription of userCanReviewTranslationSuggestionsInLanguages">
-                      <span class="oppia-review-item-detail-container e2e-test-translation-{{provideLanguageForProtractorClass(languageDescription)}}-reviewer">
-                        {{languageDescription}}
+                    <div class="oppia-language-container">
+                      <span *ngFor="let languageDescription of userCanReviewTranslationSuggestionsInLanguages">
+                        <div class="oppia-review-item-detail-container e2e-test-translation-{{provideLanguageForProtractorClass(languageDescription)}}-reviewer">
+                          {{languageDescription}}
+                        </div>
                       </span>
-                    </span>
+                    </div>
                   </div>
                   <div *ngIf="userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
                     Voiceovers in languages:
-                    <span *ngFor="let languageDescription of userCanReviewVoiceoverSuggestionsInLanguages">
-                      <span class="oppia-review-item-detail-container e2e-test-voiceover-{{provideLanguageForProtractorClass(languageDescription)}}-reviewer">
-                        {{languageDescription}}
+                    <div class="oppia-language-container">
+                      <span *ngFor="let languageDescription of userCanReviewVoiceoverSuggestionsInLanguages">
+                        <span class="oppia-review-item-detail-container e2e-test-voiceover-{{provideLanguageForProtractorClass(languageDescription)}}-reviewer">
+                          {{languageDescription}}
+                        </span>
                       </span>
-                    </span>
+                    </div>
                   </div>
                   <div *ngIf="userCanReviewQuestions"
                        class="e2e-test-question-reviewer">
@@ -107,8 +121,10 @@
                 </a>
               </div>
               <div class="oppia-explanation-container">
-                <div class="oppia-opportunities-tabs-explanation"
-                     [attr.data-tab-name]="tabsDetails[activeTabName].tabName">
+                <div class="oppia-opportunities-tabs-explanation">
+                  <div class="oppia-opportunities-tabs-explanation-before">
+                    {{tabsDetails[activeTabName].tabName}}
+                  </div>
                   {{tabsDetails[activeTabName].description}}
                 </div>
               </div>
@@ -147,7 +163,7 @@
                      alt="User Avatar">
               </span>
               <span *ngIf="!profilePictureDataUrl">
-                <i class="material-icons oppia-profile-picture-icon collapsed-oppia-contributor-img">&#xE853;</i>
+                <i class="fas fa-user-circle oppia-profile-picture-icon collapsed-oppia-contributor-img"></i>
               </span>
             </div>
             <div class="collapsed-oppia-contributor-username-container">
@@ -163,19 +179,23 @@
             <strong>Review rights:</strong>
             <div *ngIf="userCanReviewTranslationSuggestionsInLanguages.length > 0">
               Translations in languages:
-              <span *ngFor="let languageDescription of userCanReviewTranslationSuggestionsInLanguages">
-                <span class="oppia-review-item-detail-container e2e-test-translation-{{languageDescription}}-reviewer">
-                  {{languageDescription}}
+              <div class="oppia-language-container">
+                <span *ngFor="let languageDescription of userCanReviewTranslationSuggestionsInLanguages">
+                  <span class="oppia-review-item-detail-container e2e-test-translation-{{languageDescription}}-reviewer">
+                    {{languageDescription}}
+                  </span>
                 </span>
-              </span>
+              </div>
             </div>
             <div *ngIf="userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
               Voiceovers in languages:
-              <span *ngFor="let languageDescription of userCanReviewVoiceoverSuggestionsInLanguages">
-                <span class="oppia-review-item-detail-container e2e-test-voiceover-{{languageDescription}}-reviewer">
-                  {{ languageDescription }}
+              <div class="oppia-language-container">
+                <span *ngFor="let languageDescription of userCanReviewVoiceoverSuggestionsInLanguages">
+                  <span class="oppia-review-item-detail-container e2e-test-voiceover-{{languageDescription}}-reviewer">
+                    {{ languageDescription }}
+                  </span>
                 </span>
-              </span>
+              </div>
             </div>
             <div *ngIf="userCanReviewQuestions"
                  class="e2e-test-question-reviewer">
@@ -236,6 +256,14 @@
   </div>
 </div>
 <style>
+  .oppia-tabs-container {
+    text-align: center;
+  }
+  .oppia-language-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
   .oppia-collapsed-user-info {
     display: flex;
     flex-direction: row;
@@ -300,7 +328,7 @@
     align-items: center;
     color: #4a4a4a;
     display: flex;
-    font-size: 20px;
+    font-size: 18px;
   }
   .oppia-collapsed-dashboard-language-container-label {
     color: #4a4a4a;
@@ -321,17 +349,13 @@
     height: 35px;
   }
   .oppia-opportunities-tabs-explanation {
-    padding-top: 20px;
     position: relative;
   }
-  .oppia-opportunities-tabs-explanation::before {
-    bottom: 65%;
+  .oppia-opportunities-tabs-explanation-before {
     color: #009688;
-    content: attr(data-tab-name);
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
-    margin-bottom: 10px;
-    position: absolute;
+    z-index: 100;
   }
   .oppia-short-contributor-username-container,
   .oppia-long-contributor-username-container {
@@ -399,7 +423,7 @@
     text-align: center;
     width: 80%;
   }
-.oppia-opportunities-tab-item {
+  .oppia-opportunities-tab-item {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -419,6 +443,7 @@
     display: flex;
     flex-grow: 1;
     justify-content: start;
+    padding-left: 25px;
     width: 100%;
   }
   .oppia-opportunities-tab-customization-container {
@@ -442,6 +467,7 @@
     font-size: 18px;
     font-weight: bold;
     padding: 10px;
+    text-align: center;
     text-decoration: none;
     -webkit-transition: color 200ms ease-out;
     -ms-transition: color 200ms ease-out;
@@ -452,15 +478,15 @@
     color: #00645d;
     text-decoration: none;
   }
-  .oppia-active-tab-hilighter {
+  .oppia-active-tab-highlighter {
     height: 0;
     transform: scale(0);
     -webkit-transition: transform 200ms ease-out;
     -ms-transition: transform 200ms ease-out;
     transition: transform 200ms ease-out;
-    width: 60%;
+    width: 100%;
   }
-  .oppia-active-opportunities-tab .oppia-active-tab-hilighter {
+  .oppia-active-opportunities-tab .oppia-active-tab-highlighter {
     background-color: #00645d;
     border: 2px solid #00645d;
     text-decoration: none;
@@ -477,17 +503,16 @@
     background-color: #00645d;
     border-radius: 10%;
     color: #fff;
-    margin: auto 2px;
+    height: 29px;
+    margin: 1px 2px;
     padding: 1px 5px;
+    width: fit-content;
   }
   .oppia-contributor-home {
     position: -webkit-sticky;
     position: sticky;
     top: 56px;
     z-index: 3;
-  }
-  .headroom--unpinned {
-    transform: translateY(0%);
   }
   .collapsed-oppia-contributor-username-container {
     color: #00645d;
@@ -522,9 +547,9 @@
     display: none;
   }
   .oppia-translate-y {
-      -webkit-animation: translate-y 0.5s ease-out alternate;
-      -moz-animation: translate-y 0.5s ease-out alternate;
-      animation: translate-y 0.5s ease-out alternate;
+    -webkit-animation: translate-y 0.5s ease-out alternate;
+    -moz-animation: translate-y 0.5s ease-out alternate;
+    animation: translate-y 0.5s ease-out alternate;
   }
   .oppia-topic-selector {
     width: 100%;
@@ -561,12 +586,18 @@
     }
   }
   @media only screen and (max-width: 700px) {
+    .oppia-opportunities-tabs-explanation {
+      font-size: 18px;
+    }
+    .oppia-opportunities-tabs-explanation-before {
+      font-size: 20px;
+    }
     .oppia-opportunities-tabs {
       padding-bottom: 10px;
     }
     .oppia-collapsed-review-right-details-container {
       display: flex;
-      margin: auto 0;
+      margin: auto 40px;
       width: 500px;
     }
     .oppia-collapsed-opportunities-tab-header {
@@ -589,6 +620,7 @@
     }
     .oppia-outer-container {
       flex-direction: column;
+      margin-top: 0;
       width: 100%;
     }
     .oppia-mascot-container {
@@ -618,15 +650,18 @@
       width: 100%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
-      margin-right: 10px;
+      font-size: 16px;
+      margin-right: 0;
       padding: auto 0;
       width: 175px;
     }
     .oppia-opportunities-tabs-list {
+      padding: 5px;
       width: 100%;
     }
     .oppia-opportunities-tabs-text {
       font-size: 18px;
+      text-align: center;
     }
     .oppia-contributor-username-and-review-rights-container {
       align-items: initial;
@@ -651,6 +686,15 @@
       margin-bottom: 0;
       padding-top: 1%;
     }
+
+    .collapsed-oppia-contributor-username-container,
+    .oppia-collapsed-user-info,
+    .oppia-short-contributor-username-container,
+    .oppia-long-contributor-username-container,
+    .oppia-profile-details-container {
+      display: none;
+    }
+
   }
   @media only screen and (max-width: 510px) {
     .oppia-collapsed-user-info {
@@ -662,10 +706,9 @@
       margin-left: 10px;
     }
     .oppia-opportunities-tabs-text {
-      font-size: 3.5vw;
-    }
-    .oppia-opportunities-tabs-explanation::before {
-      margin-bottom: 20px;
+      font-size: 15px;
+      padding: 10px 5px;
+      text-align: center;
     }
     .oppia-collapsed-opportunities-tab-header {
       align-items: center;
@@ -711,9 +754,12 @@
       width: 90%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
-      font-size: 18px;
+      font-size: 16px;
       margin-right: 2vw;
       width: 90px;
+    }
+    .oppia-dashboard-topic-container-label {
+      margin-right: 0;
     }
     .oppia-mascot-container {
       border-bottom: 1px solid rgba(151, 151, 151, 0.5);

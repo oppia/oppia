@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core.constants import constants
 from core.domain import config_services
@@ -33,7 +35,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class ContributorDashboardPageTest(test_utils.GenericTestBase):
@@ -57,7 +59,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ContributionOpportunitiesHandler."""
 
     def setUp(self):
-        super(ContributionOpportunitiesHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -915,7 +917,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ContributionOpportunitiesHandler."""
 
     def setUp(self):
-        super(TranslatableTextHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -1088,7 +1090,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
     """Tests for MachineTranslationStateTextsHandler"""
 
     def setUp(self):
-        super(MachineTranslationStateTextsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -1373,7 +1375,7 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
     """Test for the TranslatableTopicNamesHandler."""
 
     def setUp(self):
-        super(TranslatableTopicNamesHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -1444,3 +1446,409 @@ class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
 
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
+
+
+class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
+    """Test for the ContributorStatsSummariesHandler."""
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+    def _publish_topic(self, topic_id, topic_name):
+        """Creates and publishes a topic.
+
+        Args:
+            topic_id: str. Topic ID.
+            topic_name: str. Topic name.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, topic_name, 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
+        topic_services.save_new_topic(self.admin_id, topic)
+        topic_services.publish_topic(topic_id, self.admin_id)
+
+    def test_get_translation_contribution_stats(self):
+        # Create and publish a topic.
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code='es',
+            contributor_user_id=self.owner_id,
+            topic_id='topic_id',
+            submitted_translations_count=2,
+            submitted_translation_word_count=100,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=50,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[
+                datetime.date.fromtimestamp(1616173836)
+            ]
+        )
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/translation/submission/%s' % (
+                self.OWNER_USERNAME))
+
+        self.assertEqual(
+            response, {
+                'translation_contribution_stats': [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_translation_review_stats(self):
+        # Create and publish a topic.
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code='es',
+            reviewer_user_id=self.owner_id,
+            topic_id='topic_id',
+            reviewed_translations_count=1,
+            reviewed_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_with_reviewer_edits_count=0,
+            accepted_translation_word_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/translation/review/%s' % (
+                self.OWNER_USERNAME))
+
+        self.assertEqual(
+            response, {
+                'translation_review_stats': [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_question_contribution_stats(self):
+        # Create and publish a topic.
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.owner_id,
+            topic_id='topic_id',
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/question/submission/%s' % (
+                self.OWNER_USERNAME))
+
+        self.assertEqual(
+            response, {
+                'question_contribution_stats': [
+                    {
+                        'topic_name': 'published_topic_name',
+                        'submitted_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_without_reviewer_edits_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_question_review_stats(self):
+        # Create and publish a topic.
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.owner_id,
+            topic_id='topic_id',
+            reviewed_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/question/review/%s' % (
+                self.OWNER_USERNAME))
+
+        self.assertEqual(
+            response, {
+                'question_review_stats': [
+                    {
+                        'topic_name': 'published_topic_name',
+                        'reviewed_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_with_reviewer_edits_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_stats_with_invalid_contribution_type_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            '/contributorstatssummaries/a/review/%s' % (
+                self.OWNER_USERNAME), expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid contribution type a.')
+
+        self.logout()
+
+    def test_get_stats_with_invalid_contribution_subtype_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            '/contributorstatssummaries/question/a/%s' % (
+                self.OWNER_USERNAME), expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid contribution subtype a.')
+
+        self.logout()
+
+    def test_get_stats_without_logging_in_error(self):
+        response = self.get_json(
+            '/contributorstatssummaries/question/a/abc',
+            expected_status_int=401)
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.')
+
+    def test_get_all_stats_of_other_users_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/question/review/abc',
+            expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'The user %s is not allowed to fetch the stats of other users.' % (
+                self.OWNER_USERNAME))
+
+        self.logout()
+
+
+class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
+    """Test for the ContributorAllStatsSummariesHandler."""
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code='es',
+            contributor_user_id=self.owner_id,
+            topic_id='topic_id',
+            submitted_translations_count=2,
+            submitted_translation_word_count=100,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=50,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[
+                datetime.date.fromtimestamp(1616173836)
+            ]
+        )
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code='es',
+            reviewer_user_id=self.owner_id,
+            topic_id='topic_id',
+            reviewed_translations_count=1,
+            reviewed_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_with_reviewer_edits_count=0,
+            accepted_translation_word_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.owner_id,
+            topic_id='topic_id',
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.owner_id,
+            topic_id='topic_id',
+            reviewed_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+
+    def _publish_topic(self, topic_id, topic_name):
+        """Creates and publishes a topic.
+
+        Args:
+            topic_id: str. Topic ID.
+            topic_name: str. Topic name.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, topic_name, 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
+        topic_services.save_new_topic(self.admin_id, topic)
+        topic_services.publish_topic(topic_id, self.admin_id)
+
+    def test_get_all_stats(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorallstatssummaries/%s' % self.OWNER_USERNAME)
+
+        self.assertEqual(
+            response, {
+                'translation_contribution_stats': [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ],
+                'translation_review_stats': [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ],
+                'question_contribution_stats': [
+                    {
+                        'topic_name': 'published_topic_name',
+                        'submitted_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_without_reviewer_edits_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ],
+                'question_review_stats': [
+                    {
+                        'topic_name': 'published_topic_name',
+                        'reviewed_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_with_reviewer_edits_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_stats_without_logging_in_error(self):
+        response = self.get_json(
+            '/contributorallstatssummaries/abc',
+            expected_status_int=401)
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.')
+
+    def test_get_all_stats_of_other_users_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorallstatssummaries/abc', expected_status_int=401
+        )
+
+        self.assertEqual(
+            response['error'],
+            'The user %s is not allowed to fetch the stats of other users.' % (
+                self.OWNER_USERNAME))
+
+        self.logout()

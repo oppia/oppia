@@ -12,8 +12,8 @@
       </i>
     </div>
   </div>
-  <div class="oppia-mobile-collapsible-card-content">
-    <div class="oppia-editor-card-body oppia-editor-concept-container" *ngIf="conceptCardIsShown">
+  <div class="oppia-mobile-collapsible-card-content" *ngIf="conceptCardIsShown">
+    <div class="oppia-editor-card-body oppia-editor-concept-container">
       <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar">
       <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
         <oppia-state-content-editor class="e2e-test-state-content-editor"
@@ -107,17 +107,30 @@
   }
 
   @media screen and (max-width: 768px) {
+    .state-content-editor-parent-container {
+      padding: 0;
+    }
+    .oppia-editor-card-with-avatar {
+      padding: 0;
+    }
     .state-content-header-container {
       display: block;
       padding: 0;
     }
 
     .state-content-header {
-      padding: 18px 15px;
+      padding: 16px;
     }
 
     .state-content-header i {
       display: block;
+    }
+  }
+
+  @media only screen and (max-width: 500px) {
+    .oppia-mobile-collapsible-card-content {
+      padding-left: 10px;
+      padding-right: 10px;
     }
   }
 </style>

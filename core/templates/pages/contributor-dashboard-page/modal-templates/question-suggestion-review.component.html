@@ -1,101 +1,216 @@
 <div class="modal-header e2e-test-question-suggestion-review-modal-header">
   <div>
-    <h3>{{questionHeader}}</h3>
-    <h4 class="author-header">Submitted by {{authorName}}</h4>
+    <h3 class="oppia-question-header">
+      {{questionHeader}}
+    </h3>
+    <h3 class="oppia-mobile-question-header" title="{{questionHeader}}">
+      {{questionHeader.substring(0, 25)}}{{questionHeader.length > 25 ? "...": ""}}
+    </h3>
+    <h4 class="author-header"
+        *ngIf="reviewable">
+      Submitted by {{authorName}}
+    </h4>
   </div>
-  <button type="button" class="close oppia-close-button-position" (click)="cancel()" aria-label="Close">
+  <button type="button"
+          class="close oppia-close-button-position"
+          (click)="cancel()"
+          aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 
 <div class="modal-body">
-  <section class="oppia-suggestion-review-container">
-    <div class="oppia-question-suggestion">
-      <div>
-        <strong>Selected Difficulty: {{skillDifficultyLabel}}</strong>
-        <div *ngIf="skillRubricExplanations.length > 0">
-          <strong title="Use these notes to make sure your question is at the right difficulty.">
-            Notes from Skill Rubric
-          </strong>
-          <ul>
-            <li *ngFor="let explanation of skillRubricExplanations">
-              <span [innerHTML]="explanation"></span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <oppia-question-editor [questionId]="questionId"
-                             [misconceptionsBySkill]="misconceptionsBySkill"
-                             [questionStateData]="questionStateData"
-                             [question]="question"
-                             [userCanEditQuestion]="canEditQuestion"
-                             (questionChange)="questionChanged()">
-      </oppia-question-editor>
+  <div class="oppia-question-details">
+    <strong class="oppia-difficulty-title">
+      Selected Difficulty: {{skillDifficultyLabel}}
+    </strong>
+    <div *ngIf="skillRubricExplanations.length > 0">
+      <strong class="oppia-skill-rubrics"
+              title="Use these notes to make sure your question is at the right difficulty.">
+        Notes from Skill Rubric
+      </strong>
+      <ul>
+        <li *ngFor="let explanation of skillRubricExplanations">
+          <span class="oppia-skill-explanation" [innerHtml]="explanation"></span>
+        </li>
+      </ul>
     </div>
-  </section>
-  <section [hidden]="!reviewable" class="oppia-reviewer-actions">
+  </div>
+  <div *ngIf="showQuestion">
+    <oppia-question-editor [questionId]="questionId"
+                           [misconceptionsBySkill]="misconceptionsBySkill"
+                           [questionStateData]="questionStateData"
+                           [question]="question"
+                           [userCanEditQuestion]="canEditQuestion"
+                           (questionChange)="questionChanged()">
+    </oppia-question-editor>
+  </div>
+  <section [hidden]="!reviewable"
+           class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
       Review message (required if rejecting):
-      <textarea class="e2e-test-suggestion-review-message w-100" rows="3" [(ngModel)]="reviewMessage"></textarea>
+      <textarea class="e2e-test-suggestion-review-message w-100"
+                rows="3"
+                [(ngModel)]="reviewMessage">
+      </textarea>
     </div>
   </section>
   <div [hidden]="!(!reviewable && suggestionIsRejected)"
        class="oppia-suggestion-review-message">
-    <strong>Review message: </strong>{{reviewMessage}}
+    <strong>Review message: </strong>
+    <div class="oppia-review-message">
+      {{reviewMessage}}
+    </div>
   </div>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" *ngIf="!reviewable" (click)="cancel()">Cancel</button>
-  <span ngbTooltip="Enter review message before rejecting" placement="bottom" disableTooltip="!(reviewMessage.length == 0)">
-    <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
-            *ngIf="reviewable"
-            [disabled]="reviewMessage.length == 0"
-            (click)="reject()">Reject
+  <div class="oppia-review-buttons">
+    <div ngbTooltip="Enter review message before rejecting" placement="bottom" disableTooltip="!(reviewMessage.length == 0)">
+      <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
+              *ngIf="reviewable"
+              [disabled]="reviewMessage.length == 0"
+              (click)="reject()">Reject
+      </button>
+    </div>
+    <div tooltip-placement="bottom">
+      <button class="btn btn-secondary oppia-review-button e2e-test-question-suggestion-review-edit-button"
+              *ngIf="reviewable"
+              (click)="edit()">
+        Edit
+      </button>
+    </div>
+    <div tooltip-placement="bottom">
+      <button class="btn btn-success oppia-review-button e2e-test-question-suggestion-review-accept-button"
+              *ngIf="reviewable"
+              (click)="accept()">
+        Accept
+      </button>
+    </div>
+  </div>
+  <div class="oppia-pagination-container">
+    <button type="button"
+            class="oppia-pagination-button"
+            (click)="goToPreviousItem()"
+            [disabled]="isFirstItem">
+      <span class="material-icons">navigate_before</span>Previous
     </button>
-  </span>
-  <span placement="bottom">
-    <button class="btn btn-secondary e2e-test-question-suggestion-review-edit-button"
-            *ngIf="reviewable"
-            (click)="edit()">Edit
+    <button type="button"
+            class="oppia-pagination-button"
+            (click)="goToNextItem()"
+            [disabled]="isLastItem">
+      Next<span class="material-icons">navigate_next</span>
     </button>
-  </span>
-  <span placement="bottom">
-    <button class="btn btn-success e2e-test-question-suggestion-review-accept-button"
-            *ngIf="reviewable"
-            (click)="accept()">Accept
-    </button>
-  </span>
+  </div>
 </div>
 
 <style>
+  .oppia-close-button-position {
+    top: 3px;
+  }
+  .oppia-review-message {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    min-height: 100px;
+    padding: 10px;
+  }
+  .oppia-mobile-question-header {
+    display: none;
+  }
+  .oppia-question-header {
+    display: block;
+  }
+  .oppia-review-button {
+    margin: auto 5px;
+  }
+  .modal-footer {
+    display: flex;
+    flex-direction: column;
+  }
+  .oppia-review-buttons {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+  .oppia-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    width: 100%;
+  }
+  .oppia-pagination-button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: #000;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 40px;
+    min-width: 100px;
+    text-align: center;
+  }
+  .oppia-pagination-button:hover {
+    border: 2px solid #000;
+    border-radius: 5px;
+  }
+  .oppia-pagination-button[disabled] {
+    color: #000;
+    opacity: 0.239;
+  }
+  .oppia-pagination-button[disabled]:hover {
+    border: none;
+  }
   .author-header {
+    display: block;
     margin-top: -12px;
   }
-
   .oppia-question-suggestion-rubric {
     display: flex;
     flex-direction: column;
   }
-
   .oppia-question-suggestion {
     height: 100%;
     overflow: scroll;
   }
-
   .oppia-reviewer-actions {
     border-top: 1px solid #e5e5e5;
     margin-left: -15px;
     margin-right: -15px;
     padding: 0 15px;
   }
-
   .oppia-difficulty-message {
     margin-bottom: 0.5em;
   }
-
   .oppia-suggestion-review-message {
     margin-left: 10px;
     margin-top: 20px;
+  }
+
+  @media only screen and (max-width: 700px) {
+    .oppia-suggestion-review-container {
+      padding: 10px 0;
+    }
+  }
+
+  @media only screen and (max-width: 535px) {
+    .oppia-mobile-question-header {
+      display: block;
+      font-size: 20px;
+    }
+    .modal-header {
+      padding-bottom: 0;
+    }
+    .oppia-question-header {
+      display: none;
+    }
+    .oppia-skill-rubrics {
+      font-size: 18px;
+    }
+    .oppia-suggestion-review-message, .oppia-skill-explanation {
+      font-size: 16px;
+    }
+    .oppia-difficulty-title {
+      font-size: 18px;
+    }
   }
 </style>

@@ -28,27 +28,6 @@ oppia-learner-view-info .oppia-topic-title {
   display: flex;
   font-size: 12px;
   font-weight: 200;
+  margin-top: -3px;
   padding-left: 26px;
-}
-
-oppia-learner-view-info .oppia-topic-title:hover {
-  color: #fff;
-}
-oppia-learner-view-info .oppia-exploration-info-icon {
-  cursor: pointer;
-}
-oppia-learner-view-info .oppia-exploration-info-icon:hover {
-  background: #fff;
-  color: #009688;
-  height: 56px;
-  margin-top: -13px;
-  padding-top: 12px;
-}
-oppia-learner-view-info .oppia-navbar-info-icon {
-  font-size: 20px;
-}
-oppia-learner-view-info .oppia-navbar-breadcrumb-icon {
-  height: 20px;
-  margin: 0 12px 4px 12px;
-  width: 20px;
 }

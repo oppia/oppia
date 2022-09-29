@@ -26,35 +26,44 @@ from core.domain import platform_parameter_registry as registry
 Registry = registry.Registry
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
+class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
-    dummy_feature = 'dummy_feature' # pylint: disable=invalid-name
-    dummy_parameter = 'dummy_parameter' # pylint: disable=invalid-name
+    DUMMY_FEATURE = 'dummy_feature'
+    DUMMY_PARAMETER = 'dummy_parameter'
 
-    end_chapter_celebration = 'end_chapter_celebration' # pylint: disable=invalid-name
+    END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
+    CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
+    ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
 
 
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
-    PARAM_NAMES.dummy_feature,
+    ParamNames.DUMMY_FEATURE,
     'This is a dummy feature flag.',
     platform_parameter_domain.FeatureStages.DEV,
 )
 
 Registry.create_platform_parameter(
-    PARAM_NAMES.dummy_parameter,
+    ParamNames.DUMMY_PARAMETER,
     'This is a dummy platform parameter.',
     platform_parameter_domain.DataTypes.STRING
 )
 
 Registry.create_feature_flag(
-    PARAM_NAMES.end_chapter_celebration,
+    ParamNames.END_CHAPTER_CELEBRATION,
     'This flag is for the end chapter celebration feature.',
     platform_parameter_domain.FeatureStages.PROD,
 )
+
+Registry.create_feature_flag(
+    ParamNames.CHECKPOINT_CELEBRATION,
+    'This flag is for the checkpoint celebration feature.',
+    platform_parameter_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    ParamNames.ANDROID_BETA_LANDING_PAGE,
+    'This flag is for Android beta promo landing page.',
+    platform_parameter_domain.FeatureStages.PROD)

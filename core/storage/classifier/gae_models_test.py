@@ -30,11 +30,14 @@ from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'classifier_services' only for type checking.
+    from core.domain import classifier_services
     from mypy_imports import base_models
     from mypy_imports import classifier_models
 
-(base_models, classifier_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.classifier])
+(base_models, classifier_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.CLASSIFIER
+])
 
 
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
@@ -145,7 +148,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offset, 2)
 
     def test_query_new_and_pending_training_jobs_with_non_zero_offset(
-            self
+        self
     ) -> None:
         with self.swap(
             classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
@@ -234,7 +237,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_multi_jobs(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
-        job_dicts_list = []
+        job_dicts_list: List[classifier_services.JobInfoDict] = []
         job_dicts_list.append({
             'exp_id': u'1',
             'exp_version': 1,
@@ -307,7 +310,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def test_raise_exception_by_mocking_collision(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The id generator for ClassifierTrainingJobModel is '
             'producing too many collisions.'
             ):
@@ -389,7 +392,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             mapping.algorithm_ids_to_job_ids, {'algorithm_id': 'job_id4'})
 
         # Test that exception is raised when creating mapping with same id.
-        with self.assertRaisesRegex(Exception, ( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'A model with the same ID already exists.')):
             mapping_id = (
                 classifier_models.StateTrainingJobsMappingModel.create(

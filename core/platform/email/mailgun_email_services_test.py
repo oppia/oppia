@@ -178,7 +178,7 @@ class EmailTests(test_utils.GenericTestBase):
         unset.
         """
         # Testing no mailgun api key.
-        mailgun_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        mailgun_exception = self.assertRaisesRegex(
             Exception, 'Mailgun API key is not available.')
         with mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
@@ -190,7 +190,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         # Testing no mailgun domain name.
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        mailgun_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        mailgun_exception = self.assertRaisesRegex(
             Exception, 'Mailgun domain name is not set.')
         with swap_api, mailgun_exception:
             mailgun_email_services.send_email_to_recipients(

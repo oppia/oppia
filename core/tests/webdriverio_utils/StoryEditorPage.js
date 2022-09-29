@@ -31,6 +31,7 @@ var StoryEditorPage = function() {
   var commitMessageField = $('.e2e-test-commit-message-input');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var createChapterButton = $('.e2e-test-add-chapter-button');
+  var createChapterButtonMobile = $('.e2e-test-mobile-add-chapter');
   var newChapterTitleField = $('.e2e-test-new-chapter-title-field');
   var newChapterExplorationField = $('.e2e-test-chapter-exploration-input');
   var notesEditor = $('.e2e-test-story-notes-rte');
@@ -47,6 +48,7 @@ var StoryEditorPage = function() {
   var storyMetaTagContentLabel = $('.e2e-test-story-meta-tag-content-label');
   var storyTitleField = $('.e2e-test-story-title-field');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
+  var chapterEditOption = $('.e2e-test-edit-options');
   var chapterEditOptionsSelector = function() {
     return $$('.e2e-test-edit-options');
   };
@@ -54,6 +56,7 @@ var StoryEditorPage = function() {
   var confirmDeleteChapterButton = $('.e2e-test-confirm-delete-chapter-button');
   var cancelChapterCreationButton = $(
     '.e2e-test-cancel-chapter-creation-button');
+  var saveStoryIcon = $('.e2e-test-mobile-options-base');
 
   /*
    * CHAPTER
@@ -63,6 +66,7 @@ var StoryEditorPage = function() {
   var selectSkillModalHeader = $('.e2e-test-skill-select-header');
   var skillNameInputField = $('.e2e-test-skill-name-input');
   var skillSaveButton = $('.e2e-test-confirm-skill-selection-button');
+  var skillListItem = $('.e2e-test-skills-list-item');
   var skillListItemsSelector = function() {
     return $$('.e2e-test-skills-list-item');
   };
@@ -78,6 +82,7 @@ var StoryEditorPage = function() {
   var warningTextElementsSelector = function() {
     return $$('.e2e-test-warnings-text');
   };
+  var chapterTitle = $('.e2e-test-chapter-title');
   var chapterTitlesSelector = function() {
     return $$('.e2e-test-chapter-title');
   };
@@ -104,8 +109,6 @@ var StoryEditorPage = function() {
     '.e2e-test-story-node-thumbnail .e2e-test-custom-photo');
   var chapterThumbnailButton = $(
     '.e2e-test-story-node-thumbnail .e2e-test-photo-button');
-  var createChapterThumbnailButton = $(
-    '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
 
   this.get = async function(storyId) {
     await browser.url(EDITOR_URL_PREFIX + storyId);
@@ -131,7 +134,24 @@ var StoryEditorPage = function() {
   };
 
   this.publishStory = async function() {
-    await action.click('Publish Story Button', publishStoryButton);
+    let width = (await browser.getWindowSize()).width;
+
+    if (width < 1000) {
+      var anchorSelector = function() {
+        return $$('i');
+      };
+      let i = await anchorSelector();
+
+      await action.click('Mobile options', i[11]);
+
+      var publishSelector = function() {
+        return $$('.e2e-test-mobile-publish-button');
+      };
+      let publish = (await publishSelector())[0];
+      await action.click('Publish Story Mobile', publish);
+    } else {
+      await action.click('Publish Story Button', publishStoryButton);
+    }
   };
 
   this.unpublishStory = async function() {
@@ -143,10 +163,10 @@ var StoryEditorPage = function() {
   };
 
   this.deleteChapterWithIndex = async function(index) {
-    var chapterEditOptions = await chapterEditOptionsSelector();
     await waitFor.visibilityOf(
-      chapterEditOptions[0],
+      chapterEditOption,
       'Chapter list taking too long to appear.');
+    var chapterEditOptions = await chapterEditOptionsSelector();
     await action.click('Chapter edit options', chapterEditOptions[index]);
     await action.click('Delete chapter button', deleteChapterButton);
     await action.click(
@@ -155,9 +175,19 @@ var StoryEditorPage = function() {
 
   this.createNewChapter = async function(title, explorationId, imgPath) {
     await general.scrollToTop();
+
+    let width = (await browser.getWindowSize()).width;
+
+    if (width < 831) {
+      await action.click(
+        'Create chapter arrow takes too long to be clickable.',
+        createChapterButtonMobile);
+    }
+
     await action.click(
       'Create chapter button takes too long to be clickable.',
       createChapterButton);
+
     await action.setValue(
       'New chapter title field', newChapterTitleField, title);
     await action.setValue(
@@ -177,6 +207,7 @@ var StoryEditorPage = function() {
   this.discardStoryChanges = async function() {
     await action.click('Show discard option button', discardOption);
     await action.click('Discard changes button', discardChangesButton);
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToChapterWithName = async function(chapterName) {
@@ -220,10 +251,10 @@ var StoryEditorPage = function() {
   };
 
   this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
-    var chapterTitles = await chapterTitlesSelector();
     await waitFor.visibilityOf(
-      chapterTitles[0],
+      chapterTitle,
       'Chapter titles taking too long to appear.');
+    var chapterTitles = await chapterTitlesSelector();
     var matchFound = false;
     for (var i = 0; i < chapterTitles.length; i++) {
       if (await chapterTitles[i].getText() === chapter1) {
@@ -263,7 +294,8 @@ var StoryEditorPage = function() {
   this.expectTitleToBe = async function(title) {
     await waitFor.visibilityOf(
       storyTitleField, 'Story Title Field takes too long to appear');
-    var storyTitleValue = await storyTitleField.getValue();
+    var storyTitleValue = await action.getValue(
+      'Story Title Field', storyTitleField);
     expect(storyTitleValue).toEqual(title);
   };
 
@@ -271,7 +303,8 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       storyDescriptionField,
       'Story Description Field takes too long to appear');
-    var storyDescriptionValue = await storyDescriptionField.getValue();
+    var storyDescriptionValue = await action.getValue(
+      'Story Description Field', storyDescriptionField);
     expect(storyDescriptionValue).toEqual(description);
   };
 
@@ -284,8 +317,18 @@ var StoryEditorPage = function() {
 
   this.returnToTopic = async function() {
     await general.scrollToTop();
-    await action.click('Return to topic button', returnToTopicButton);
     await waitFor.pageToFullyLoad();
+
+    let width = (await browser.getWindowSize()).width;
+    if (width < 1000) {
+      var topicButtonSelector = function() {
+        return $$('.e2e-test-mobile-back-to-topic');
+      };
+      var button = (await topicButtonSelector())[0];
+      await action.click('Return to topic button', button);
+    } else {
+      await action.click('Return to topic button', returnToTopicButton);
+    }
   };
 
   this.changeStoryDescription = async function(storyDescription) {
@@ -309,7 +352,19 @@ var StoryEditorPage = function() {
   };
 
   this.saveStory = async function(commitMessage) {
-    await action.click('Save Story Button', saveStoryButton);
+    let width = (await browser.getWindowSize()).width;
+
+    if (width < 1000) {
+      await action.click('Story Options', saveStoryIcon);
+      var buttonSelector = function() {
+        return $$('.e2e-test-mobile-save-changes');
+      };
+      var button = (await buttonSelector())[1];
+      await action.click('Save Draft Mobile', button);
+    } else {
+      await action.click('Save Story Button', saveStoryButton);
+    }
+
     await waitFor.visibilityOf(
       commitMessageField, 'Commit message modal takes too long to appear.');
     await commitMessageField.setValue(commitMessage);
@@ -319,11 +374,14 @@ var StoryEditorPage = function() {
       closeSaveModalButton,
       'Commit message modal takes too long to disappear.');
     await waitFor.pageToFullyLoad();
+
     // Wait for the "Save Draft" button to be reset.
-    await waitFor.visibilityOf(
-      saveStoryButton, 'Save Story Button taking too long to appear.');
-    await waitFor.textToBePresentInElement(
-      saveStoryButton, 'Save Draft', 'Story could not be saved.');
+    if (width > 1000) {
+      await waitFor.visibilityOf(
+        saveStoryButton, 'Save Story Button taking too long to appear.');
+      await waitFor.textToBePresentInElement(
+        saveStoryButton, 'Save Draft', 'Story could not be saved.');
+    }
   };
 
   this.expectSaveStoryDisabled = async function() {
@@ -437,8 +495,8 @@ var StoryEditorPage = function() {
       },
 
       _selectSkillBasedOnIndex: async function(index) {
+        await waitFor.visibilityOf(skillListItem);
         var skillListItems = await skillListItemsSelector();
-        await waitFor.visibilityOf(skillListItems[0]);
         var selectedSkill = skillListItems[index];
         await action.click('Selected Skill', selectedSkill);
       },
