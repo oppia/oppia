@@ -1889,13 +1889,12 @@ def validate_exploration_for_story(
             choices = (
                 state.interaction.customization_args['choices'].value)
             if len(choices) < 4:
-                error_string = (
+                raise utils.ValidationError(
                     'Exploration in a story having MultipleChoiceInput '
                     'interaction should have at least 4 choices present. '
                     'Exploration with ID %s and state name %s have fewer than'
                     '4 choices.' % (exp.id, state_name)
                 )
-                raise utils.ValidationError(error_string)
 
         if state.classifier_model_id is not None:
             error_string = (

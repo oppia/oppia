@@ -546,10 +546,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
     def test_fetch_next_job(self) -> None:
         """Test the fetch_next_jobs method."""
-        exp1_id = u'1'
+        exp1_id = '1'
         state_name = 'Home'
         interaction_id = 'TextInput'
-        exp2_id = u'0'
+        exp2_id = '0'
 
         job1_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
