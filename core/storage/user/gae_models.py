@@ -27,15 +27,15 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
-from typing_extensions import Literal, TypedDict
+from typing import Dict, List, Optional, Sequence, Tuple, Union, overload
+from typing_extensions import Final, Literal, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -241,7 +241,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(
-            user_id: str
+        user_id: str
     ) -> Dict[str, Union[str, float, bool, List[str], None]]:
         """Exports the data from UserSettingsModel into dict format for Takeout.
 
@@ -700,7 +700,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -1158,6 +1158,9 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         Returns:
             dict. Dictionary of data from UserSubscriptionsModel.
+
+        Raises:
+            Exception. No UserSettingsModel exist for the given creator_id.
         """
         user_model = UserSubscriptionsModel.get(user_id, strict=False)
 
@@ -1166,11 +1169,16 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         # Ruling out the possibility of None for mypy type checking.
         assert user_model is not None
-        creator_user_models = cast(
-            List[UserSettingsModel],
-            UserSettingsModel.get_multi(user_model.creator_ids))
+        creator_user_models = (
+            UserSettingsModel.get_multi(user_model.creator_ids)
+        )
+        filtered_creator_user_models = []
+        for creator_user_model in creator_user_models:
+            if creator_user_model is None:
+                continue
+            filtered_creator_user_models.append(creator_user_model)
         creator_usernames = [
-            creator.username for creator in creator_user_models]
+            creator.username for creator in filtered_creator_user_models]
 
         user_data = {
             'exploration_ids': user_model.exploration_ids,
@@ -1617,7 +1625,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -1638,25 +1646,28 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-        cls, user_ids: List[str], exploration_id: str
+        cls, user_id_exp_id_combinations: List[Tuple[str, str]]
     ) -> List[Optional[ExplorationUserDataModel]]:
-        """Gets the ExplorationUserDataModel for the given user and exploration
-         ids.
+        """Gets all ExplorationUserDataModels for the given pairs of user ids
+        and exploration ids.
 
         Args:
-            user_ids: list(str). A list of user_ids.
-            exploration_id: str. The id of the exploration.
+            user_id_exp_id_combinations: list(tuple(str, str)). A list of
+                combinations of user_id and exploration_id pairs for which
+                ExplorationUserDataModels are to be fetched.
 
         Returns:
             list(ExplorationUserDataModel|None). The ExplorationUserDataModel
-            instance which matches with the given user_ids and exploration_id.
+            instance which matches with the given user_ids and exploration_ids.
         """
         instance_ids = [
-            cls._generate_id(user_id, exploration_id) for user_id in user_ids]
+            cls._generate_id(user_id, exploration_id)
+            for (user_id, exploration_id) in user_id_exp_id_combinations
+        ]
 
         return super(ExplorationUserDataModel, cls).get_multi(instance_ids)
 
@@ -1817,7 +1828,7 @@ class CollectionProgressModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, collection_id=collection_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -1838,7 +1849,7 @@ class CollectionProgressModel(base_models.BaseModel):
         return super(CollectionProgressModel, cls).get(
             instance_id, strict=False)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
@@ -2004,6 +2015,8 @@ class StoryProgressModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, story_id=story_id)
 
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @overload  # type: ignore[override]
     @classmethod
     def get(
@@ -2013,22 +2026,22 @@ class StoryProgressModel(base_models.BaseModel):
     @overload
     @classmethod
     def get(
-        cls, user_id: str, story_id: str, strict: Literal[True]
+        cls, user_id: str, story_id: str, *, strict: Literal[True]
     ) -> StoryProgressModel: ...
 
     @overload
     @classmethod
     def get(
-        cls, user_id: str, story_id: str, strict: Literal[False]
+        cls, user_id: str, story_id: str, *, strict: Literal[False]
     ) -> Optional[StoryProgressModel]: ...
 
     @overload
     @classmethod
     def get(
-        cls, user_id: str, story_id: str, strict: bool = False
+        cls, user_id: str, story_id: str, *, strict: bool = ...
     ) -> Optional[StoryProgressModel]: ...
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -2051,7 +2064,7 @@ class StoryProgressModel(base_models.BaseModel):
         return super(StoryProgressModel, cls).get(
             instance_id, strict=strict)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
@@ -2132,8 +2145,8 @@ class UserQueryModel(base_models.BaseModel):
     shown after each UserQueryOneOffJob.
     """
 
-    _use_cache = False
-    _use_memcache = False
+    _use_cache: bool = False
+    _use_memcache: bool = False
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days. This only returns users who have ever
@@ -2482,8 +2495,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> Dict[str, Dict[str, Union[float, bool]]]:
         """(Takeout) Exports the data from UserContributionProficiencyModel
         into dict format.
@@ -2528,8 +2541,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def get_all_categories_where_user_can_review(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> List[str]:
         """Gets all the score categories where the user has a score above the
         threshold.
@@ -2597,7 +2610,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         """
         return '.'.join([score_category, user_id])
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -2700,8 +2713,8 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> Dict[str, Union[bool, List[str], None]]:
         """(Takeout) Exports the data from UserContributionRightsModel
         into dict format.
@@ -2746,8 +2759,8 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_reviewer_user_ids(
-            cls,
-            language_code: str
+        cls,
+        language_code: str
     ) -> List[str]:
         """Returns the IDs of the users who have rights to review translations
         in the given language code.
@@ -2831,7 +2844,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
     # is grouped under different key (e.g. config, feedback, story, skill,
-    # question), the keys need to be from the core.platform.models.NAMES enum.
+    # question), the keys need to be from the core.platform.models.Names enum.
     # For each entity, we use a different pseudonymous user ID. Note that all
     # these pseudonymous user IDs originate from the same about-to-be-deleted
     # user. If a key is absent from the pseudonymizable_entity_mappings dict,
@@ -2997,7 +3010,7 @@ class DeletedUsernameModel(base_models.BaseModel):
     in the ID of this model.
     """
 
-    ID_LENGTH = 32
+    ID_LENGTH: Final = 32
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -3045,7 +3058,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # List of learner group ids which the student has been invited to join.
+    # List of learner group ids which the learner has been invited to join.
     invited_to_learner_groups_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
@@ -3083,7 +3096,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         """
         cls.delete_by_id(user_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.export_data().
     @classmethod
     def export_data(cls, user_id: str) -> LearnerGroupsUserDataDict: # type: ignore[override]
@@ -3147,7 +3160,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
             if learner_grp_usr_model is None:
                 continue
 
-            # If the user has been invited to join the group as student, delete
+            # If the user has been invited to join the group as learner, delete
             # the group id from the invited_to_learner_groups_ids list.
             if (
                 group_id in learner_grp_usr_model.invited_to_learner_groups_ids
@@ -3155,8 +3168,8 @@ class LearnerGroupsUserModel(base_models.BaseModel):
                 learner_grp_usr_model.invited_to_learner_groups_ids.remove(
                     group_id)
 
-            # If the user is a student of the group, delete the corresponding
-            # learner group details of the student stored in
+            # If the user is a learner of the group, delete the corresponding
+            # learner group details of the learner stored in
             # learner_groups_user_details field.
             updated_details = []
 

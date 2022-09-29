@@ -54,7 +54,7 @@ class BlobUnitTests(test_utils.TestBase):
         self.assertEqual(blob.content_type, 'audio/mp3')
 
     def test_init_blob_with_wrong_mimetype_raise_exception(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
                 Exception, 'Content type contains unknown MIME type.'):
             cloud_storage_emulator.EmulatorBlob('name', b'string', 'png')
 
@@ -111,7 +111,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
     """Tests for CloudStorageEmulator."""
 
     def setUp(self) -> None:
-        super(CloudStorageEmulatorUnitTests, self).setUp()
+        super().setUp()
         self.emulator = cloud_storage_emulator.CloudStorageEmulator()
         self.emulator.namespace = 'namespace'
         self.emulator.reset()
@@ -123,7 +123,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
             '/different/path.png', b'data2', 'image/png')
 
     def tearDown(self) -> None:
-        super(CloudStorageEmulatorUnitTests, self).tearDown()
+        super().tearDown()
         self.emulator.reset()
 
     def test_get_blob_retrieves_correct_blob_from_redis(self) -> None:
@@ -179,12 +179,12 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
             'namespace:/file/path2.png', mapping=self.blob2.to_dict())
         cloud_storage_emulator.REDIS_CLIENT.hset(
             'namespace:/different/path.png', mapping=self.blob3.to_dict())
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             self.emulator.list_blobs('/'),
             [self.blob1, self.blob2, self.blob3])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             self.emulator.list_blobs('/file'), [self.blob1, self.blob2])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             self.emulator.list_blobs('/different'), [self.blob3])
 
     def test_reset_removes_all_values_from_redis(self) -> None:

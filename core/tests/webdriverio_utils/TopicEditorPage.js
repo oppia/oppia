@@ -42,6 +42,10 @@ var TopicEditorPage = function() {
   var newStoryUrlFragmentField = $('.e2e-test-new-story-url-fragment-field');
   var newSubtopicEditorElement = $('.e2e-test-new-subtopic-editor');
   var pageEditor = $('.e2e-test-edit-subtopic-page-contents');
+  var questionItem = $('.e2e-test-question-list-item');
+  var questionItemsSelector = function() {
+    return $$('.e2e-test-question-list-item');
+  };
   var questionsTabButton = $('.e2e-test-questions-tab-button');
   var saveQuestionButton = $('.e2e-test-save-question-button');
   var subtopicColumnsSelector = function() {
@@ -81,6 +85,12 @@ var TopicEditorPage = function() {
   var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
   var saveTopicButton = $('.e2e-test-save-topic-button');
   var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
+  var addNewDiagnosticTestSkillButton = $(
+    '.e2e-test-add-diagnostic-test-skill');
+  var diagnosticTestSkillSelector = $(
+    '.e2e-test-diagnostic-test-skill-selector');
+  var removeDiagnosticTestButtonElement = $(
+    '.e2e-test-remove-skill-from-diagnostic-test');
   var storyListItemsSelector = function() {
     return $$('.e2e-test-story-list-item');
   };
@@ -160,9 +170,9 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
     await selectSkillDropdown.selectByVisibleText(skillDescription);
-    var questionItems = await $$('.e2e-test-question-list-item');
     await waitFor.visibilityOf(
-      questionItems[0], 'Question takes too long to appear');
+      questionItem, 'Question takes too long to appear');
+    var questionItems = await questionItemsSelector();
     expect(questionItems.length).toEqual(count);
   };
 
@@ -199,7 +209,7 @@ var TopicEditorPage = function() {
 
   this.changeSubtopicTitle = async function(title) {
     await action.clear('Subtopic Title field', subtopicTitleField);
-    await action.setValue('Subtopic Title field', subtopicTitleField, 'title');
+    await action.setValue('Subtopic Title field', subtopicTitleField, title);
   };
 
   this.changeSubtopicPageContents = async function(content) {
@@ -260,12 +270,10 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     await action.click('RTE input', subtopicPageContentButton);
-    // The cke buttons classes are dynamically alloted and hence we cannot
-    // a class name to select a particular button. Also using chain selectors
-    // is returning a non interactable element hence we are explicitly using
-    // the dynamically alloted id of the button to select the button.
+    // The cke buttons classes are dynamically alloted so we cannot
+    // add class name starting with 'e2e' to them.
     // eslint-disable-next-line oppia/e2e-practices
-    var conceptCardButton = $('#cke_124');
+    var conceptCardButton = $('.cke_button*=Insert Concept Card Link');
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = $(
       `.e2e-test-rte-skill-selector-item=${skillName}`);
@@ -352,6 +360,16 @@ var TopicEditorPage = function() {
     }
   };
 
+  this.addDiagnosticTestSkill = async function(skillId) {
+    await action.click(
+      'Add new diagnostic test', addNewDiagnosticTestSkillButton);
+    await action.select(
+      'New skill selector', diagnosticTestSkillSelector, skillId);
+    await waitFor.visibilityOf(
+      removeDiagnosticTestButtonElement,
+      'Diagnostic test skill removal button takes too long to appear.');
+  };
+
   this.getTargetMoveSkill = async function(
       subtopicIndex, skillDescription) {
     var fromSubtopicColumn = await subtopicColumnsSelector()[subtopicIndex];
@@ -395,11 +413,11 @@ var TopicEditorPage = function() {
   };
 
   this.expectNumberOfStoriesToBe = async function(count) {
-    var storyListItems = await storyListItemsSelector();
     if (count) {
       await waitFor.visibilityOf(
         storyListTable, 'Story list table takes too long to appear.');
     }
+    var storyListItems = await storyListItemsSelector();
     expect(storyListItems.length).toEqual(count);
   };
 
@@ -449,8 +467,15 @@ var TopicEditorPage = function() {
 
   this.createStory = async function(
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
-    await general.scrollToTop();
-    await action.click('Create Story Button', createStoryButton);
+    let width = (await browser.getWindowSize()).width;
+    if (width < 831) {
+      var storiesDropdown = $('.e2e-test-story-dropdown');
+      await action.click('Story dropdown', storiesDropdown);
+      await action.click('Create Story Button', createStoryButton);
+    } else {
+      await general.scrollToTop();
+      await action.click('Create Story Button', createStoryButton);
+    }
 
     await action.setValue(
       'Create new story title', newStoryTitleField, storyTitle);

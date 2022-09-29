@@ -41,7 +41,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -59,15 +59,18 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
     YEAR_AGO = NOW - datetime.timedelta(weeks=52)
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 
+    # Here we use type Any because we need to match the behavior of super
+    # class's constructor and super class's constructor can accept arbitrary
+    # number of arguments with different types of values.
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(PipelinedTestBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
             options=job_options.JobOptions(namespace=self.namespace))
         self._pipeline_context_stack: Optional[contextlib.ExitStack] = None
 
     def setUp(self) -> None:
-        super(PipelinedTestBase, self).setUp()
+        super().setUp()
         with contextlib.ExitStack() as pipeline_context_stack:
             pipeline_context_stack.enter_context(decorate_beam_errors())
             pipeline_context_stack.enter_context(self.pipeline)
@@ -77,7 +80,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         try:
             self._exit_pipeline_context()
         finally:
-            super(PipelinedTestBase, self).tearDown()
+            super().tearDown()
 
     def assert_pcoll_equal(
         self, actual: beam.PCollection, expected: beam.PCollection
@@ -119,6 +122,9 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         beam_testing_util.assert_that(actual, beam_testing_util.is_empty())
         self._exit_pipeline_context()
 
+    # Here we use type Any because this method can accept different properties
+    # of models and those properties can be of type str, int, bool, Dict and
+    # other types too. So, to allow every type of property we used Any here.
     def create_model(
         self,
         model_class: Type[base_models.SELF_BASE_MODEL],
@@ -180,8 +186,11 @@ class JobTestBase(PipelinedTestBase):
     # NOTE: run() raises a NotImplementedError.
     JOB_CLASS: Type[base_jobs.JobBase] = base_jobs.JobBase
 
+    # Here we use type Any because we need to match the behavior of super
+    # class's constructor and super class's constructor can accept arbitrary
+    # number of arguments with different types of values.
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(JobTestBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.job = self.JOB_CLASS(self.pipeline)
 
     def run_job(self) -> beam.PCollection[job_run_result.JobRunResult]:

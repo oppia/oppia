@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_domain
+from core.domain import stats_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
@@ -75,23 +76,23 @@ if MYPY: # pragma: no cover
     topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.app_feedback_report,
-    models.NAMES.auth,
-    models.NAMES.base_model,
-    models.NAMES.blog,
-    models.NAMES.collection,
-    models.NAMES.config,
-    models.NAMES.exploration,
-    models.NAMES.feedback,
-    models.NAMES.improvements,
-    models.NAMES.learner_group,
-    models.NAMES.question,
-    models.NAMES.skill,
-    models.NAMES.story,
-    models.NAMES.subtopic,
-    models.NAMES.suggestion,
-    models.NAMES.topic,
-    models.NAMES.user
+    models.Names.APP_FEEDBACK_REPORT,
+    models.Names.AUTH,
+    models.Names.BASE_MODEL,
+    models.Names.BLOG,
+    models.Names.COLLECTION,
+    models.Names.CONFIG,
+    models.Names.EXPLORATION,
+    models.Names.FEEDBACK,
+    models.Names.IMPROVEMENTS,
+    models.Names.LEARNER_GROUP,
+    models.Names.QUESTION,
+    models.Names.SKILL,
+    models.Names.STORY,
+    models.Names.SUBTOPIC,
+    models.Names.SUGGESTION,
+    models.Names.TOPIC,
+    models.Names.USER
 ])
 
 
@@ -277,7 +278,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
         self.set_up_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
-        with self.assertRaisesRegex(NotImplementedError, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(NotImplementedError, error_msg):
             takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
     def test_export_data_for_profile_user_nontrivial_raises_error(self) -> None:
@@ -285,7 +286,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
         self.set_up_non_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
-        with self.assertRaisesRegex(NotImplementedError, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(NotImplementedError, error_msg):
             takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
 
@@ -423,11 +424,21 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
     REJECTED_TRANSLATIONS_COUNT: Final = 0
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
+    REVIEWED_TRANSLATIONS_COUNT: Final = 0
+    REVIEWED_TRANSLATION_WORD_COUNT: Final = 0
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    SUBMITTED_QUESTION_COUNT: Final = 20
+    ACCEPTED_QUESTIONS_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    REVIEWED_QUESTIONS_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
     CONTRIBUTION_DATES: Final = [
         datetime.date.fromtimestamp(1616173836),
         datetime.date.fromtimestamp(1616173837)
     ]
+    FIRST_CONTRIBUTION_DATE: Final = datetime.datetime(2021, 5, 20)
+    LAST_CONTRIBUTION_DATE: Final = datetime.datetime(2022, 5, 20)
 
     def set_up_non_trivial(self) -> None:
         """Set up all models for use in testing.
@@ -503,7 +514,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID_1, self.EXPLORATION_IDS[0],
             [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -739,6 +750,44 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             contribution_dates=self.CONTRIBUTION_DATES
         )
 
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            reviewer_user_id=self.USER_ID_1,
+            topic_id=self.TOPIC_ID_1,
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.USER_ID_1,
+            topic_id=self.TOPIC_ID_1,
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.USER_ID_1,
+            topic_id=self.TOPIC_ID_1,
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
         user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
@@ -921,8 +970,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             title='sample title',
             description='sample description',
             facilitator_user_ids=[self.USER_ID_1],
-            student_user_ids=['user_id_2'],
-            invited_student_user_ids=['user_id_3'],
+            learner_user_ids=['user_id_2'],
+            invited_learner_user_ids=['user_id_3'],
             subtopic_page_ids=['subtopic_id_1', 'subtopic_id_2'],
             story_ids=['skill_id_1', 'skill_id_2']
         )
@@ -959,7 +1008,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_full_user_raises_error(self) -> None:
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user_id '
             'not found'):
@@ -1026,9 +1075,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'has_viewed_lesson_info_modal_once': False,
         }
         skill_data: Dict[str, str] = {}
-        # Here, we used Any type because this Dict can contain different
-        # types of values like int, str, bool and other types too.
-        stats_data: Dict[str, Any] = {}
+        stats_data: Dict[str, stats_domain.AggregatedStatsDict] = {}
         story_progress_data: Dict[str, List[str]] = {}
         subscriptions_data: Dict[str, Optional[List[str]]] = {
             'exploration_ids': [],
@@ -1065,6 +1112,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_translation_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
+        expected_translation_review_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_question_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_question_review_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1084,7 +1140,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
 
-        # Here, we used Any type because this dictionary contains other
+        # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
         # to complex Union types. So, to make this Dict generalized for
         # every other Dict. We used Any here.
@@ -1133,6 +1189,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'topic_snapshot_metadata': expected_topic_sm,
             'translation_contribution_stats':
                 expected_translation_contribution_stats,
+            'translation_review_stats':
+                expected_translation_review_stats,
+            'question_contribution_stats':
+                expected_question_contribution_stats,
+            'question_review_stats':
+                expected_question_review_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
@@ -1199,14 +1261,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.put()
 
-        thread_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
             self.THREAD_ENTITY_ID,
             self.USER_ID_1,
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
-        feedback_services.create_message(  # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id,
             self.USER_ID_1,
             self.THREAD_STATUS,
@@ -1217,7 +1279,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in test_utils.get_storage_model_classes()  # type: ignore[no-untyped-call]
+            for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
                 test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
@@ -1264,14 +1326,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.put()
 
-        thread_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
             self.THREAD_ENTITY_ID,
             self.USER_ID_1,
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
-        feedback_services.create_message(  # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id,
             self.USER_ID_1,
             self.THREAD_STATUS,
@@ -1282,7 +1344,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in test_utils.get_storage_model_classes()  # type: ignore[no-untyped-call]
+            for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
                 test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
@@ -1323,10 +1385,20 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   base_models
                   .MODEL_ASSOCIATION_TO_USER
                   .ONE_INSTANCE_SHARED_ACROSS_USERS):
+                # Here we use MyPy ignore because model is of
+                # BaseModel type and BaseModel does not contain
+                # get_field_name_mapping_to_takeout_keys attribute,
+                # so because of this MyPy throws an error. Thus to
+                # avoid the error, we used ignore here.
                 self.assertIsNotNone(
-                    model.get_field_name_mapping_to_takeout_keys)
+                    model.get_field_name_mapping_to_takeout_keys)  # type: ignore[attr-defined]
                 exported_data = model.export_data(self.USER_ID_1)
-                field_mapping = model.get_field_name_mapping_to_takeout_keys()
+                # Here we use MyPy ignore because model is of
+                # BaseModel type and BaseModel does not contain
+                # get_field_name_mapping_to_takeout_keys(), so
+                # because of this MyPy throws an error. Thus to
+                # avoid the error, we used ignore here.
+                field_mapping = model.get_field_name_mapping_to_takeout_keys()  # type: ignore[attr-defined]
                 self.assertEqual(
                     sorted(exported_field_names),
                     sorted(field_mapping.keys())
@@ -1447,14 +1519,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_story_progress_data = {
             self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
         }
-        thread_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
             self.THREAD_ENTITY_ID,
             self.USER_ID_1,
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
-        feedback_services.create_message(  # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id,
             self.USER_ID_1,
             self.THREAD_STATUS,
@@ -1767,6 +1839,63 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         date.isoformat() for date in self.CONTRIBUTION_DATES]
                 }
         }
+        expected_translation_review_stats_data = {
+            '%s.%s.%s' % (
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
+                self.TOPIC_ID_1): {
+                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                    'topic_id': self.TOPIC_ID_1,
+                    'reviewed_translations_count': (
+                        self.REVIEWED_TRANSLATIONS_COUNT),
+                    'reviewed_translation_word_count': (
+                        self.REVIEWED_TRANSLATION_WORD_COUNT),
+                    'accepted_translations_count': (
+                        self.ACCEPTED_TRANSLATIONS_COUNT),
+                    'accepted_translations_with_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                    'accepted_translation_word_count': (
+                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
+        expected_question_contribution_stats_data = {
+            '%s.%s' % (
+                self.USER_ID_1, self.TOPIC_ID_1): {
+                    'topic_id': self.TOPIC_ID_1,
+                    'submitted_questions_count': (
+                        self.SUBMITTED_QUESTION_COUNT),
+                    'accepted_questions_count': (
+                        self.ACCEPTED_QUESTIONS_COUNT),
+                    'accepted_questions_without_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
+        expected_question_review_stats_data = {
+            '%s.%s' % (
+                self.USER_ID_1, self.TOPIC_ID_1): {
+                    'topic_id': self.TOPIC_ID_1,
+                    'reviewed_questions_count': (
+                        self.REVIEWED_QUESTIONS_COUNT),
+                    'accepted_questions_count': (
+                        self.ACCEPTED_QUESTIONS_COUNT),
+                    'accepted_questions_with_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
@@ -1812,6 +1941,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'topic_snapshot_metadata': expected_topic_sm,
             'translation_contribution_stats':
                 expected_translation_contribution_stats_data,
+            'translation_review_stats':
+                expected_translation_review_stats_data,
+            'question_contribution_stats':
+                expected_question_contribution_stats_data,
+            'question_review_stats':
+                expected_question_review_stats_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
@@ -1832,10 +1967,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
-        self.assertItemsEqual(observed_data, expected_user_data)  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(observed_data, expected_user_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_user_data)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(

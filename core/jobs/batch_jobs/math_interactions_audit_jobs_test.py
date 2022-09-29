@@ -32,7 +32,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -60,16 +60,16 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             init_state_name='state',
             states_schema_version=48,
             states={
-                'init_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'init_state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict(),
-                'alg_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'alg_state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict(),
-                'eq_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'eq_state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict(),
-                'end_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'end_state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict(),
             }
@@ -116,13 +116,13 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             init_state_name='state',
             states_schema_version=48,
             states={
-                'init_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'init_state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict(),
-                'num_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'num_state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict(),
-                'end_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'end_state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict()
             }
