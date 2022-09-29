@@ -19,9 +19,9 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.platform import models
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
-from core.platform import models
 
 from mailchimp3 import mailchimpclient
 from typing import Dict
@@ -191,7 +191,12 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             with swap_api_key_secrets_return_none:
                 mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
                 self.assertItemsEqual(
-                    observed_log_messages, ['Cloud Secret Manager is not working.', 'Mailchimp API key is not available.'])
+                    observed_log_messages,
+                    [
+                        'Cloud Secret Manager is not working.',
+                        'Mailchimp API key is not available.'
+                    ]
+                )
 
             observed_log_messages = []
             swap_api_key_secrets_return_key = self.swap_with_checks(
@@ -211,9 +216,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     observed_log_messages, ['Mailchimp username is not set.'])
 
                 # Here we use MyPy ignore because for the below test, the email
-                # ID for the user doesn't matter since the function should return
-                # earlier if mailchimp api key or username is not set.
-                # Permanently deletes returns None when mailchimp keys are not set.
+                # ID for the user doesn't matter since the function should
+                # return earlier if mailchimp api key or username is not set.
+                # Permanently deletes returns None when mailchimp keys
+                # are not set.
                 self.assertIsNone(
                     mailchimp_bulk_email_services
                     .permanently_delete_user_from_list('sample_email')) # type: ignore[func-returns-value]

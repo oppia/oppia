@@ -49,6 +49,7 @@ if MYPY: # pragma: no cover
     [models.Names.EMAIL, models.Names.SUGGESTION])
 secrets_services = models.Registry.import_secrets_services()
 
+
 class FailedMLTest(test_utils.EmailTestBase):
     """Test that email functionality for sending failed ML Job emails
     works.
@@ -6639,7 +6640,8 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
 
 class MailchimpSecretTest(test_utils.GenericTestBase):
-
+    """Tests for the verify_mailchimp_secret."""
+    
     def setUp(self) -> None:
         super().setUp()
         self.swap_webhook_feconf_return_secret = self.swap(
@@ -6677,6 +6679,7 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
                         ],
                         logs
                     )
+
     def test_cloud_secrets_return_secret_passes(self) -> None:
         with self.swap_webhook_secrets_return_secret:
             self.assertTrue(

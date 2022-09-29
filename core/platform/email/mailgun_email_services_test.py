@@ -37,7 +37,7 @@ class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
     def setUp(self) -> None:
-        super(EmailTests, self).setUp()
+        super().setUp()
         self.swapped_request = lambda *args: args
         self.swap_api_key_secrets_return_none = self.swap_to_always_return(
             secrets_services, 'get_secret', None)

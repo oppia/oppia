@@ -131,11 +131,12 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
             ]
         )
 
-        with testapp_swap, swap_api_key_feconf, swap_api_key_secrets_return_none:
-            response = self.get_json(
-                '/mock_secret_page/%s' % self.secret,
-                expected_status_int=404
-            )
+        with testapp_swap, swap_api_key_feconf:
+            with swap_api_key_secrets_return_none:
+                response = self.get_json(
+                    '/mock_secret_page/%s' % self.secret,
+                    expected_status_int=404
+                )
 
         error_msg = (
             'Could not find the page http://localhost'

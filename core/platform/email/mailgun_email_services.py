@@ -131,8 +131,8 @@ def send_email_to_recipients(
         ).strip().decode('utf-8')
         auth_str = 'Basic %s' % base64_mailgun_api_key
         header = {'Authorization': auth_str}
-        server = (
-            'https://api.mailgun.net/v3/%s/messages'% feconf.MAILGUN_DOMAIN_NAME
+        server = 'https://api.mailgun.net/v3/%s/messages' % (
+            feconf.MAILGUN_DOMAIN_NAME
         )
         # The 'ascii' is used here, because only ASCII char are allowed in url,
         # also the docs recommend this approach:
