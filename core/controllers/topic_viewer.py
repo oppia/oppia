@@ -33,30 +33,8 @@ class TopicViewerPage(base.BaseHandler):
     """Renders the topic viewer page."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'topic_url_fragment': {
-          'schema': {
-            'type': 'basestring',
-            'validators': [{
-              'id': 'is_regex_matched',
-              'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
-            }, {
-              'id': 'has_length_at_most',
-              'max_value': 20
-            }]
-          }
-        },
-        'classroom_url_fragment': {
-          'schema': {
-            'type': 'basestring',
-            'validators': [{
-              'id': 'is_regex_matched',
-              'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
-            }, {
-              'id': 'has_length_at_most',
-              'max_value': 20
-            }]
-          }
-        }
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
 
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
