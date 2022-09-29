@@ -108,7 +108,9 @@
                              {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
                         </div>
                       </div>
-                      <div class="des">{{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}</div>
+                      <div class="des">
+                        {{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}
+                      </div>
                     </div>
                     <picture>
                       <source type="image/png"
@@ -139,7 +141,9 @@
                     </div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
+                      <span class="link">
+                        {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
+                      </span>
                       <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
                   </div>
@@ -149,11 +153,17 @@
                      tabindex="0"
                      href="/community-library"
                      (click)="navigateToClassroomPage('/community-library')">
-                    <div class="nav-item-right-head">{{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}</div>
-                    <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
+                    <div class="nav-item-right-head">
+                      {{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}
+                    </div>
+                    <div class="des">
+                      {{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}
+                    </div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
+                      <span class="link">
+                        {{ 'I18N_TOPNAV_LIBRARY' | translate }}
+                      </span>
                       <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
                   </a>
@@ -161,11 +171,15 @@
                      class="nav-content"
                      tabindex="0"
                      href="/android">
-                    <div class="nav-item-right-head">{{ 'I18N_TOPNAV_ANDROID_APP_HEADING' | translate }}</div>
+                    <div class="nav-item-right-head">
+                      {{ 'I18N_TOPNAV_ANDROID_APP_HEADING' | translate }}
+                    </div>
                     <div class="des" [innerHTML]="'I18N_TOPNAV_ANDROID_APP_DESCRIPTION' | translate"></div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <span class="link">{{ 'I18N_TOPNAV_TRY_ANDROID_APP_TEXT' | translate }}</span>
+                      <span class="link">
+                        {{ 'I18N_TOPNAV_TRY_ANDROID_APP_TEXT' | translate }}
+                      </span>
                       <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
                   </a>
@@ -201,7 +215,9 @@
                  class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
                  href="/about"
                  [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
-                <span class="link">{{'I18N_TOPNAV_ABOUT_OPPIA' | translate}}</span>
+                <span class="link">
+                  {{'I18N_TOPNAV_ABOUT_OPPIA' | translate}}
+                </span>
               </a>
             </li>
             <li class="nav-item">
@@ -210,7 +226,9 @@
                  [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
-                <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
+                <span class="link">
+                  {{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}
+                </span>
               </a>
             </li>
             <li class="nav-item">
@@ -219,7 +237,9 @@
                  target="_blank"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
-                <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
+                <span class="link">
+                  {{'I18N_TOPNAV_BLOG' | translate}}
+                </span>
                 <span class="fas fa-external-link-alt launch"></span>
               </a>
             </li>
@@ -255,7 +275,9 @@
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
                     <span class="fas fa-globe language mx-1"></span>
-                    <span class="heading-text">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}</span>
+                    <span class="heading-text">
+                      {{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
+                    </span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
@@ -268,7 +290,9 @@
                    rel="noopener">
                   <div class="heading">
                     <span class="fas fa-user-friends volunteer mx-1"></span>
-                    <span class="heading-text">{{'I18N_HEADING_VOLUNTEER'| translate}}</span>
+                    <span class="heading-text">
+                      {{'I18N_HEADING_VOLUNTEER'| translate}}
+                    </span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_VOLUNTEER_DESCRIPTION' | translate}}
@@ -283,7 +307,9 @@
                    rel="noopener">
                   <div class="heading">
                     <span class="fas fa-envelope contact mx-1"></span>
-                    <span class="heading-text">{{'I18N_TOPNAV_CONTACT_US' | translate}}</span>
+                    <span class="heading-text">
+                      {{'I18N_TOPNAV_CONTACT_US' | translate}}
+                    </span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
@@ -296,7 +322,9 @@
                    rel="noopener">
                   <div class="heading">
                     <span class="fas fa-heart fav mx-1"></span>
-                    <span class="heading-text">{{'I18N_TOPNAV_DONATE' | translate}}</span>
+                    <span class="heading-text">
+                      {{'I18N_TOPNAV_DONATE' | translate}}
+                    </span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_DONATE_DESCRIPTION' | translate}}

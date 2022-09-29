@@ -10,14 +10,16 @@
       </div>
       <div class="oppia-teach-button-container">
         <form action="classroomUrl">
-          <button type="submit" (click)="onClickStartLearningButton()"
+          <button type="submit"
+                  (click)="onClickStartLearningButton()"
                   class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
             {{ 'I18N_ACTION_VISIT_WEB_CLASSROOM' | translate }}
           </button>
         </form>
       </div>
       <div *ngIf="androidPageIsEnabled" class="oppia-teach-button-container">
-        <button type="submit" (click)="onClickAccessAndroidButton()"
+        <button type="submit"
+                (click)="onClickAccessAndroidButton()"
                 class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
           {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
         </button>
@@ -33,14 +35,16 @@
       </h2>
       <div class="oppia-teach-button-container mobile-button">
         <form action="classroomUrl">
-          <button type="submit" (click)="onClickStartLearningButton()"
+          <button type="submit"
+                  (click)="onClickStartLearningButton()"
                   class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
             {{ 'I18N_ACTION_VISIT_WEB_CLASSROOM' | translate }}
           </button>
         </form>
       </div>
       <div *ngIf="androidPageIsEnabled" class="oppia-splash-button-container">
-        <button type="submit" (click)="onClickAccessAndroidButton()"
+        <button type="submit"
+                (click)="onClickAccessAndroidButton()"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200">
           {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
         </button>
