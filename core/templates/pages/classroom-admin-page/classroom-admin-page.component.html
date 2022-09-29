@@ -1,0 +1,253 @@
+<mat-card class="oppia-editor-card-with-avatar">
+  <div class="card-content">
+    <div>
+      <h3>Classroom config properties</h3>
+    </div>
+    <hr>
+    <div>
+      <p>
+        Configure the details of a classroom.
+      </p>
+
+      <p class="existing-classroom-header">
+        <strong>Existing Classrooms</strong>
+      </p>
+
+      <mat-spinner class="loading-spinner"
+                   *ngIf="!pageIsInitialized"
+                   [diameter]="30">
+      </mat-spinner>
+
+      <em *ngIf="pageIsInitialized && classroomCount === 0">
+        No classroom exists at this moment.
+      </em>
+
+      <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
+        <div class="oppia-classroom-tile"
+             (click)="getClassroomData(classroom.key)">
+          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())">
+            {{ classroom.value }}
+          </span>
+          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0">
+            {{ this.tempClassroomData.getClassroomName() }}
+          </span>
+          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length === 0">
+            [New Classroom]
+          </span>
+          <button mat-button matSuffix mat-icon-button
+                  aria-label="Clear"
+                  *ngIf="!classroomEditorMode"
+                  (click)="deleteClassroom(classroom.key); $event.stopPropagation()">
+            <mat-icon matListIcon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="classroom-details"
+             *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.key">
+          <div *ngIf="classroomViewerMode"
+               (click)="openClassroomInEditorMode()">
+            <i class="material-icons oppia-edit-icon" title="Edit Classroom">
+              &#xE254;
+            </i>
+          </div>
+
+          <div class="row oppia-description-text-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Name</strong>
+            </span>
+            <div class="classroom-field">
+              <span *ngIf="classroomViewerMode">
+                {{tempClassroomData.getClassroomName()}}
+              </span>
+              <textarea *ngIf="classroomEditorMode"
+                        [(ngModel)]="tempClassroomData._name"
+                        (blur)="updateClassroomField()"
+                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                        rows="1">
+              </textarea>
+              <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
+                {{ classroomAdminDataService.nameValidationError }}
+              </p>
+            </div>
+          </div>
+
+          <div class="row oppia-description-text-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>URL fragment</strong>
+            </span>
+            <div class="classroom-field">
+              <span *ngIf="classroomViewerMode">
+                {{tempClassroomData.getClassroomUrlFragment()}}
+              </span>
+              <textarea *ngIf="classroomEditorMode"
+                        [(ngModel)]="tempClassroomData._urlFragment"
+                        (blur)="updateClassroomField()"
+                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                        rows="1">
+              </textarea>
+              <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
+                {{ classroomAdminDataService.urlValidationError }}
+              </p>
+            </div>
+          </div>
+
+          <div class="row oppia-description-text-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Course details</strong>
+            </span>
+            <span *ngIf="classroomViewerMode" class="classroom-field">
+              {{ tempClassroomData.getCourseDetails() }}
+            </span>
+            <textarea *ngIf="classroomEditorMode"
+                      [(ngModel)]="tempClassroomData._courseDetails"
+                      (blur)="updateClassroomField()"
+                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                      rows="6"
+                      class="classroom-field">
+            </textarea>
+          </div>
+
+          <div class="row oppia-description-text-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Topic list intro</strong>
+            </span>
+            <span *ngIf="classroomViewerMode" class="classroom-field">
+                {{tempClassroomData.getTopicListIntro()}}
+            </span>
+            <textarea *ngIf="classroomEditorMode"
+                      [(ngModel)]="tempClassroomData._topicListIntro"
+                      (blur)="updateClassroomField()"
+                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                      rows="4"
+                      class="classroom-field">
+            </textarea>
+          </div>
+
+          <div *ngIf="classroomEditorMode" class="action-buttons">
+            <button class="btn btn-secondary cancel-classroom-changes"
+                    (click)="closeClassroomConfigEditor()"
+                    [disabled]="classroomDataSaveInProgress">
+              Cancel
+            </button>
+            <button class="btn btn-success save-classroom-changes"
+                    [disabled]="(!classroomDataIsChanged) || !(tempClassroomData.isClassroomDataValid())"
+                    (click)="saveClassroomData(classroom.key)">
+              <span *ngIf="!classroomDataSaveInProgress">Save</span>
+              <mat-spinner *ngIf="classroomDataSaveInProgress"
+                           class="oppia-save-classroom-spinning-button"
+                           [diameter]="22">
+              </mat-spinner>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div matTooltip="Please save all edits before adding a new classroom"
+         [matTooltipDisabled]="!classroomEditorMode"
+         matTooltipPosition="right"
+         aria-tooltip="Button that creates a new classroom"
+         class="create-new-classroom-button-wrapper">
+      <button class="btn add-new-classroom"
+              (click)="createNewClassroom()"
+              [disabled]="classroomEditorMode">
+        + ADD NEW CLASSROOM
+      </button>
+    </div>
+  </div>
+</mat-card>
+
+<style>
+  /* TODO(#16156): Remove the instances of /deep/ from the codebase. */
+  :host /deep/ .oppia-save-classroom-spinning-button circle {
+    stroke: #fff;
+  }
+  .oppia-save-classroom-spinning-button {
+    margin: 0 5px;
+  }
+  .create-new-classroom-button-wrapper {
+    width: fit-content;
+  }
+  .save-classroom-changes {
+    margin-left: 5px;
+    margin-top: 5px;
+  }
+  .cancel-classroom-changes {
+    margin-right: 5px;
+    margin-top: 5px;
+  }
+  .classroom-field {
+    width: 400px;
+  }
+  .oppia-description-text-container {
+    margin-top: 10px;
+  }
+  .loading-spinner {
+    margin-left: 45%;
+  }
+  .classroom-details {
+    margin: 10px 20px;
+    padding: 0 15px;
+  }
+  .existing-classroom-header {
+    margin-bottom: 0;
+    margin-top: 20px;
+  }
+  .action-buttons {
+    margin-left: 70%;
+    margin-top: 5px;
+  }
+  .oppia-edit-icon {
+    cursor: pointer;
+    font-size: 16px;
+    position: absolute;
+    right: 8%;
+    -webkit-transition: all 200ms;
+    transition: all 200ms;
+  }
+  .oppia-classroom-tile {
+    align-items: center;
+    background: #e0f2f1;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 20px;
+    padding: 10px;
+  }
+  .card-content {
+    padding: 20px
+  }
+  .oppia-editor-card-with-avatar {
+    margin-top: 200px;
+  }
+  .oppia-editor-card-section {
+    display: flex;
+    min-height: 80px;
+  }
+  .classroom-admin-header {
+    padding-top: 20px;
+  }
+  .add-new-classroom {
+    background-color: #00645c;
+    color: #fff;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .add-new-classroom:hover {
+    color: #fff;
+  }
+  .add-new-classroom:disabled {
+    background-color: #e8e7e3;
+    color: rgba(0,0,0,0.87);
+  }
+  .oppia-warning-text {
+    color: #f00;
+    font-size: 0.8em;
+  }
+  @media screen and (max-width: 768px) {
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
+    }
+  }
+</style>
