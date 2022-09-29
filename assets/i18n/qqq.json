@@ -87,7 +87,7 @@
 	"I18N_ANDROID_PAGE_FEATURE_TEXT_3": "Text displayed on the android page to tell the user about a feature of the app.",
 	"I18N_ANDROID_PAGE_FEATURE_TEXT_4": "Text displayed on the android page to tell the user about a feature of the app.",
 	"I18N_ANDROID_PAGE_FEEDBACK_TEXT": "Text displayed on the android page pointing users to an email ID that they can use to share feedback.",
-	"I18N_ANDROID_PAGE_NAME_FIELD_LABEL": "Label for the name field on the android page.",
+	"I18N_ANDROID_PAGE_NAME_FIELD_LABEL": "Label for the name field on the android page.\n{{identical|Name}}",
 	"I18N_ANDROID_PAGE_TITLE": "Title displayed on the browser tab when on the android page.",
 	"I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT": "Text displayed on the android page to tell the user about how to get updates on the app.",
 	"I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "Text displayed on the submit button to subscribe to email updates on the android page.",

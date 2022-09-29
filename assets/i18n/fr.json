@@ -89,7 +89,7 @@
 	"I18N_ANDROID_PAGE_FEEDBACK_TEXT": "Faites-nous savoir à <strong class=\"oppia-android-bold-text\">android@oppia.org</strong><br> si vous avez des commentaires ou souhaitez vous inscrire aux mises à jour.",
 	"I18N_ANDROID_PAGE_NAME_FIELD_LABEL": "Nom",
 	"I18N_ANDROID_PAGE_TITLE": "Android | Oppia",
-	"I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT": "Vous voulez des mises à jour sur<br> Oppia et l’appli cation?",
+	"I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT": "Vous voulez des mises à jour sur<br> Oppia et l’application ?",
 	"I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "Me notifier",
 	"I18N_ANDROID_PAGE_UPDATES_SUBTEXT": "Et vous voulez savoir quand l’application est disponible<br> dans votre langue ? <span class=\"oppia-android-bold-text\">Nous vous informerons !</span>",
 	"I18N_ANDROID_PAGE_VERSIONS_SUPPORTED_TEXT": "Nous prenons en charge toutes les versions d’Android depuis Lollipop (Android 5).",

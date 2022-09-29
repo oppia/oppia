@@ -189,6 +189,6 @@
 	"I18N_TOPNAV_PREFERENCES": "अभिरुचीहरू",
 	"I18N_TOPNAV_SIGN_IN": "प्रवेश",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia को साथमा पढाउनुहोस्",
-	"I18N_TOTAL_SUBSCRIBERS_TEXT": "तपाईँका कूल <[totalSubscribers]> सदस्यहरू छन्।",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "तपाईंको कूल <[totalSubscribers]> सदस्यहरू छन्।",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "सदस्यता खारेज गर्नुहोस्"
 }
