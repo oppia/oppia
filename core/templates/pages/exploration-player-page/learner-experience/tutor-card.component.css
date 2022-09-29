@@ -166,8 +166,6 @@ oppia-tutor-card .conversation-skin-inline-interaction {
   border-bottom-right-radius: 2px;
   padding: 8px 20px 25px;
   position: relative;
-  white-space: normal;
-  word-break: break-word;
 }
 
 oppia-tutor-card .conversation-skin-inline-interaction .conversation-skin-user-avatar {
