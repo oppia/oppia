@@ -789,9 +789,12 @@ class StateCompleteEventHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'NONE EXP VERSION: State Complete')
         event_services.StateCompleteEventHandler.record(
-            exploration_id, exp_version,
-            state_name, session_id,
-            time_spent_in_state_secs)
+            exploration_id, 
+            exp_version,
+            state_name, 
+            session_id,
+            time_spent_in_state_secs
+        )
         self.render_json({})
 
 
