@@ -131,10 +131,10 @@
             <div *ngIf="topicDependencyIsLoaded"
                  cdkDropList
                  (cdkDropListDropped)="drop($event)"
-                 class="nav oppia-option-list nav-stacked nav-pills example-list">
+                 class="nav oppia-option-list nav-stacked nav-pills drag-and-drop-list">
 
               <div *ngFor="let topicName of topicNames"
-                   class="topic-dependency-container oppia-rule-block oppia-prevent-selection example-box"
+                   class="topic-dependency-container oppia-rule-block oppia-prevent-selection drag-and-drop-box"
                    cdkDrag
                    [cdkDragDisabled]="!classroomEditorMode">
 
@@ -279,7 +279,7 @@
   .topic-drag-indicator {
     padding: 10px;
   }
-  .example-list {
+  .drag-and-drop-list {
     background: white;
     border: solid 1px #ccc;
     border-radius: 4px;
@@ -289,7 +289,7 @@
     overflow: hidden;
   }
 
-  .example-box {
+  .drag-and-drop-box {
     align-items: center;
     background: white;
     border-bottom: solid 1px #ccc;
@@ -315,7 +315,7 @@
   .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
-  .example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+  .drag-and-drop-list.cdk-drop-list-dragging .drag-and-drop-box:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
   .topic-and-prerequisites-wrapper {
