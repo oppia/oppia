@@ -30,6 +30,7 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { of } from 'rxjs';
 
 describe('Skill editor main tab Component', () => {
   let component: SkillPrerequisiteSkillsEditorComponent;
@@ -46,6 +47,7 @@ describe('Skill editor main tab Component', () => {
   let topicAndSkillsDashboardDataBackendDict: TopicsAndSkillDashboardData;
   let sampleSkill: Skill;
   let skillSummaryDict: SkillSummaryBackendDict;
+  let resizeEvent = new Event('resize');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -59,7 +61,13 @@ describe('Skill editor main tab Component', () => {
         SkillUpdateService,
         SkillEditorStateService,
         AlertsService,
-        WindowDimensionsService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
+          }
+        },
         NgbModal
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -339,6 +347,9 @@ describe('Skill editor main tab Component', () => {
 
     let desc2 = component.getSkillDescription('BBB6dzfb5pPt');
     expect(desc2).toEqual('Dummy Skill 1');
+
+    let desc3 = component.getSkillDescription(null);
+    expect(desc3).toBeNull();
   }));
 
   describe('while adding a skill', () => {

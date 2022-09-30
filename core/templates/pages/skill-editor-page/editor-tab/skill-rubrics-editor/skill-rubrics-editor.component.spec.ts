@@ -27,6 +27,7 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SkillRubricsEditorComponent } from './skill-rubrics-editor.component';
 import { Rubric } from 'domain/skill/rubric.model';
+import { of } from 'rxjs';
 
 describe('Skill Rubrics Editor Component', () => {
   let component: SkillRubricsEditorComponent;
@@ -37,6 +38,7 @@ describe('Skill Rubrics Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
   let sampleSkill: Skill;
+  let resizeEvent = new Event('resize');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,6 +53,7 @@ describe('Skill Rubrics Editor Component', () => {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
           }
         }
       ],
@@ -145,34 +148,6 @@ describe('Skill Rubrics Editor Component', () => {
 
       expect(component.rubricsListIsShown).toBeFalse();
     });
-
-    // it('should toggle rubrics list on clicking', () => {
-    //   component.rubricsListIsShown = true;
-    //   spyOn(windowDimensionsService, 'isWindowNarrow')
-    //     .and.returnValue(true);
-  
-    //   component.toggleRubricsList();
-  
-    //   expect(component.rubricsListIsShown).toBeFalse();
-  
-    //   component.toggleRubricsList();
-  
-    //   expect(component.rubricsListIsShown).toBeTrue();
-    // });
-
-    // it('should toggle rubrics card on clicking', () => {
-    //   component.rubricsListIsShown = true;
-    //   spyOn(windowDimensionsService, 'isWindowNarrow')
-    //     .and.returnValue(true);
-  
-    //   component.toggleRubricsList();
-  
-    //   expect(component.rubricsListIsShown).toBeFalse();
-  
-    //   component.toggleRubricsList();
-  
-    //   expect(component.rubricsListIsShown).toBeTrue();
-    // });
 
     it('should update skill rubrics when user saves', () => {
       spyOn(skillUpdateService, 'updateRubricForDifficulty');
