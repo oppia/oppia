@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import logging
+from urllib.parse import urlparse   # pylint: disable=import-only-modules
 
 from core import utils
 from core.domain import exp_domain
@@ -27,6 +28,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
 
+import bs4
 from typing import Callable, List, Optional, Union, cast
 
 MYPY = False
@@ -327,6 +329,64 @@ class DraftUpgradeUtil:
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
+
+        for exp_change in draft_change_list:
+            if not exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                continue
+            # The change object has the key 'new_value' only if the
+            # cmd is 'CMD_EDIT_STATE_PROPERTY' or
+            # 'CMD_EDIT_EXPLORATION_PROPERTY'.
+            new_value: AllowedDraftChangeListTypes = exp_change.new_value
+            if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                # Here we use cast because this 'if' condition forces
+                # change to have type EditExpStatePropertyContentCmd.
+                edit_content_property_cmd = cast(
+                    exp_domain.EditExpStatePropertyContentCmd,
+                    exp_change
+                )
+                new_value = edit_content_property_cmd.new_value
+                html_content = new_value['html']
+                soup = bs4.BeautifulSoup(html_content, 'html.parser')
+                links = soup.find_all('oppia-noninteractive-link')
+
+                acceptable_schemes = ['https', '']
+
+                for link in links:
+                    lnk_attr = link.get('url-with-value')
+                    txt_attr = link.get('text-with-value')
+
+                    if lnk_attr is None:
+                        # Delete the link.
+                        link.decompose()
+                        continue
+                    if txt_attr is None:
+                        # Set link text to be the url itself.
+                        link.decompose()
+                        continue
+
+                    lnk = lnk_attr.replace('&quot;', '')
+                    txt = txt_attr.replace('&quot;', '')
+
+                    # If text is empty and the link is not.
+                    if len(lnk) != 0 and len(txt) == 0:
+                        # Delete the link.
+                        link.decompose()
+                        continue
+
+                    # If link is http.
+                    if urlparse(lnk).scheme == 'http':
+                        # Replace http with https.
+                        lnk = lnk.replace('http', 'https')
+
+                    # If link is invalid.
+                    if urlparse(lnk).scheme not in acceptable_schemes:
+                        # Delete the link.
+                        link.decompose()
+                        continue
+
+                    link['url-with-value'] = '&quot;' + lnk + '&quot;'
+                    link['text-with-value'] = '&quot;' + txt + '&quot;'
+
         return draft_change_list
 
     @classmethod

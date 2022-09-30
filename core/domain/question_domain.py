@@ -22,7 +22,7 @@ import collections
 import copy
 import datetime
 import re
-from urllib.parse import urlparse   # pylint: disable=import-only-modules
+from urllib.parse import urlparse  # pylint: disable=import-only-modules
 
 from core import feconf
 from core import schema_utils
@@ -36,9 +36,9 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from extensions import domain
 
+import bs4
 from pylatexenc import latex2text
 
-import bs4
 from typing import Dict, List, Optional, Set, Union, cast, overload
 from typing_extensions import Final, Literal, TypedDict
 
@@ -1614,46 +1614,49 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
-        for question_dict in question_state_dict.values():
-            content_html_list = [question_dict['content']['html']]
+        content_html_list = question_state_dict['content']['html']
 
-            for html_content in content_html_list:
-                soup = bs4.BeautifulSoup(html_content, 'html.parser')
-                links = soup.find_all('oppia-noninteractive-link')
+        for html_content in content_html_list:
+            soup = bs4.BeautifulSoup(html_content, 'html.parser')
+            links = soup.find_all('oppia-noninteractive-link')
 
-                acceptable_schemes = ['https', '']
+            acceptable_schemes = ['https', '']
 
-                for link in links:
-                    lnk_attr = link.get('url-with-value')
-                    txt_attr = link.get('text-with-value')
+            for link in links:
+                lnk_attr = link.get('url-with-value')
+                txt_attr = link.get('text-with-value')
 
-                    if lnk_attr is None:
-                        # Delete the link.
-                        link.decompose()
-                    if txt_attr is None:
-                        # Set link text to be the url itself.
-                        txt_attr = lnk_attr
+                if lnk_attr is None:
+                    # Delete the link.
+                    link.decompose()
+                    continue
+                if txt_attr is None:
+                    # Set link text to be the url itself.
+                    link.decompose()
+                    continue
 
-                    lnk = lnk_attr.replace('&quot;', '')
-                    txt = txt_attr.replace('&quot;', '')
+                lnk = lnk_attr.replace('&quot;', '')
+                txt = txt_attr.replace('&quot;', '')
 
-                    # If text is empty and the link is not.
-                    if len(lnk) != 0 and len(txt) == 0:
-                        # Delete the link.
-                        link.decompose()
+                # If text is empty and the link is not.
+                if len(lnk) != 0 and len(txt) == 0:
+                    # Delete the link.
+                    link.decompose()
+                    continue
 
-                    # If link is http.
-                    if urlparse(lnk).scheme == 'http':
-                        # Replace http with https.
-                        lnk = lnk.replace('http', 'https')
+                # If link is http.
+                if urlparse(lnk).scheme == 'http':
+                    # Replace http with https.
+                    lnk = lnk.replace('http', 'https')
 
-                    # If link is invalid.
-                    if urlparse(lnk).scheme not in acceptable_schemes:
-                        # Delete the link.
-                        link.decompose()
+                # If link is invalid.
+                if urlparse(lnk).scheme not in acceptable_schemes:
+                    # Delete the link.
+                    link.decompose()
+                    continue
 
-                    link['url-with-value'] = '&quot;' + lnk + '&quot;'
-                    link['text-with-value'] = '&quot;' + txt + '&quot;'
+                link['url-with-value'] = '&quot;' + lnk + '&quot;'
+                link['text-with-value'] = '&quot;' + txt + '&quot;'
 
         return question_state_dict
 

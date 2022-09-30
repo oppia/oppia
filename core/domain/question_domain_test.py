@@ -2212,6 +2212,59 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 52)
 
+    def test_question_state_dict_conversion_from_v52_to_v53(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['content']['html'] = (
+            '<p><oppia-noninteractive-link' +
+            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' url-with-value=' +
+            '"&amp;quot;mailto:example@example.com&amp' +
+            ';quot;"></oppia-noninteractive-link></p>' +
+            '<p><oppia-noninteractive-link' +
+            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' url-with-value=' +
+            '"&amp;quot;http://www.google.com&amp' +
+            ';quot;"></oppia-noninteractive-link></p>' +
+            '<p><oppia-noninteractive-link>' +
+            '</oppia-noninteractive-link></p>' +
+            '<p><oppia-noninteractive-link' +
+            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' url-with-value=' +
+            '"&amp;quot;https://www.oppia.org&amp' +
+            ';quot;"></oppia-noninteractive-link></p>'
+        )
+
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_data,
+            'state_schema_version': 52
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 53)
+        self.assertEqual(
+            test_value['state']['content']['html'],
+            '<p><oppia-noninteractive-link' +
+            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' url-with-value=' +
+            '"&amp;quot;mailto:example@example.com&amp' +
+            ';quot;"></oppia-noninteractive-link></p>' +
+            '<p><oppia-noninteractive-link' +
+            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' url-with-value=' +
+            '"&amp;quot;https://www.google.com&amp' +
+            ';quot;"></oppia-noninteractive-link></p>' +
+            '<p></p>' +
+            '<p><oppia-noninteractive-link' +
+            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' url-with-value=' +
+            '"&amp;quot;https://www.oppia.org&amp' +
+            ';quot;"></oppia-noninteractive-link></p>'
+        )
+
 
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
