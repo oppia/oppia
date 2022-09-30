@@ -61,6 +61,7 @@ export class SkillConceptCardEditorComponent implements OnInit {
   workedExamplesListIsShown: boolean = false;
   COMPONENT_NAME_WORKED_EXAMPLE = (
     AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
+
   resizeSubscription!: Subscription;
 
   constructor(
@@ -206,13 +207,13 @@ export class SkillConceptCardEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.resizeSubscription = this.windowDimensionsService.getResizeEvent().subscribe(
+      this.resizeSubscription = 
+      this.windowDimensionsService.getResizeEvent().subscribe(
         () => {
           this.workedExamplesListIsShown = (
             !this.windowDimensionsService.isWindowNarrow());
         }
-      )
-    );
+    ));
     
     this.isEditable = true;
     this.skill = this.skillEditorStateService.getSkill();

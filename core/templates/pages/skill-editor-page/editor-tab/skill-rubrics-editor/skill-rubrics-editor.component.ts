@@ -56,7 +56,7 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if(this.windowDimensionsService.getResizeEvent) {
+    if (this.windowDimensionsService.getResizeEvent) {
       this.directiveSubscriptions.add(
         this.windowDimensionsService.getResizeEvent().subscribe(
           () => {
@@ -66,7 +66,7 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
         )
       );
     }
-    
+
     this.skill = this.skillEditorStateService.getSkill();
     this.rubricsListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());

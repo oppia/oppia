@@ -63,7 +63,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
         }
       )
     );
-    
+
     this.skill = this.skillEditorStateService.getSkill();
     this.misconceptionsListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());

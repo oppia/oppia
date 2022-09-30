@@ -145,7 +145,7 @@ implements OnInit {
         }
       )
     );
-    
+
     this.groupedSkillSummaries = this.skillEditorStateService
       .getGroupedSkillSummaries();
 

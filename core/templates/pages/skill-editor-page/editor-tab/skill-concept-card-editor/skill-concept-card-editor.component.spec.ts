@@ -75,7 +75,7 @@ describe('Skill Concept Card Editor Component', () => {
           }
         },
         UrlInterpolationService,
-        
+
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
