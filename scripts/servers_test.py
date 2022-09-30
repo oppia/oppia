@@ -853,6 +853,20 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('--max-old-space-size=2056', popen_calls[0].program_args)
 
+    def test_managed_webdriverio_server_fails_to_get_chrome_version(self):
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
+        self.exit_stack.enter_context(self.swap_to_always_raise(
+            subprocess, 'check_output', error=OSError))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None, called=False))
+
+        expected_regexp = 'Failed to execute "google-chrome --version" command'
+        with self.assertRaisesRegex(Exception, expected_regexp):
+            self.exit_stack.enter_context(servers.managed_webdriverio_server())
+
+        self.assertEqual(len(popen_calls), 0)
+
     def test_managed_webdriverio_with_invalid_sharding_instances(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
