@@ -60,6 +60,12 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         contents_registry = '<span class="d-inline-block align-middle">\n  <object-editor obj-type="<[objType]>" init-args="initArgs" value="customizationArgs.value" always-editable="true">\n  </object-editor>\n</span>\n'
         self.assertEqual(contents_registry,value_generators_domain.Registry.get_generator_class_by_id('Copier').get_html_template())
 
+    def test_refresh_registry(self) -> None:
+        try:
+            value_generators_domain.Registry._refresh_registry()
+        except:
+            self.fail('_refresh_registry() raised ExceptionType unexpectedly!"')
+        
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
 
     def test_value_generator_names(self) -> None:
