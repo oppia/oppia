@@ -178,7 +178,8 @@ def execute_tasks(
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
     """
-    remaining_tasks: List[TaskThread] = tasks
+    empty_tasks_list: List[TaskThread] = []
+    remaining_tasks: List[TaskThread] = empty_tasks_list + tasks
     currently_running_tasks = []
 
     while remaining_tasks:
