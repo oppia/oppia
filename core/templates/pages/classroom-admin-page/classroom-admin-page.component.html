@@ -54,7 +54,7 @@
               <textarea *ngIf="classroomEditorMode"
                         [(ngModel)]="tempClassroomData._name"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                        (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                         rows="1">
               </textarea>
               <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
@@ -74,7 +74,7 @@
               <textarea *ngIf="classroomEditorMode"
                         [(ngModel)]="tempClassroomData._urlFragment"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                        (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                         rows="1">
               </textarea>
               <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
@@ -93,7 +93,7 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._courseDetails"
                       (blur)="updateClassroomField()"
-                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="6"
                       class="classroom-field">
             </textarea>
@@ -109,7 +109,7 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._topicListIntro"
                       (blur)="updateClassroomField()"
-                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="4"
                       class="classroom-field">
             </textarea>
@@ -124,11 +124,12 @@
               </em>
             </p>
 
-            <p *ngIf="topicsCountInClassroom == 0">
-              <em>No topics are currently added in a classroom</em>
+            <p *ngIf="tempClassroomData.getTopicsCount() == 0">
+              No topics are currently added in the classroom.
             </p>
 
-            <div cdkDropList
+            <div *ngIf="topicDependencyIsLoaded"
+                 cdkDropList
                  (cdkDropListDropped)="drop($event)"
                  class="nav oppia-option-list nav-stacked nav-pills example-list">
 
@@ -148,9 +149,6 @@
 
                     <div class="prerequisite-topics-container">
                       <div *ngIf="!classroomEditorMode">
-                        <span *ngIf="topicNameToPrerequisiteTopicNames[topicName].length === 0">
-                          No prerequisites selected
-                        </span>
                         <mat-chip-list>
                           <mat-chip *ngFor="let prerequisiteTopic of topicNameToPrerequisiteTopicNames[topicName]">
                             {{ prerequisiteTopic }}
@@ -191,11 +189,9 @@
                     </div>
                   </div>
 
-                  <p *ngIf="tempClassroomData.cyclicCheckError && currentTopicOnEdit === topicName"
+                  <p *ngIf="classroomAdminDataService.topicsGraphValidationError.length > 0 && currentTopicOnEdit === topicName"
                      class="oppia-warning-text cyclic-check-error">
-                    There is a cycle in the prerequisite dependencies.
-                    Example: 'A' depends on 'B' and eventually 'B' depends on 'A'.
-                    Please fix this error to save the changes.
+                    {{ classroomAdminDataService.topicsGraphValidationError }}
                   </p>
                 </div>
 
@@ -237,20 +233,19 @@
             </div>
           </div>
 
-          <div>
-            <button (click)="viewGraph()">
+          <div *ngIf="classroomEditorMode" class="action-buttons">
+            <button class="btn btn-secondary view-graph-button"
+                    (click)="viewGraph()"
+                    *ngIf="tempClassroomData.getTopicsCount()">
               View Graph
             </button>
-          </div>
-
-          <div *ngIf="classroomEditorMode" class="action-buttons">
             <button class="btn btn-secondary cancel-classroom-changes"
                     (click)="closeClassroomConfigEditor()"
                     [disabled]="classroomDataSaveInProgress">
               Cancel
             </button>
             <button class="btn btn-success save-classroom-changes"
-                    [disabled]="(!classroomDataIsChanged) || !(tempClassroomData.isClassroomDataValid())"
+                    [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
                     (click)="saveClassroomData(classroom.key)">
               <span *ngIf="!classroomDataSaveInProgress">Save</span>
               <mat-spinner *ngIf="classroomDataSaveInProgress"
@@ -371,6 +366,10 @@
     width: fit-content;
   }
   .save-classroom-changes {
+    margin-top: 5px;
+  }
+  .view-graph-button {
+    margin-right: 5px;
     margin-top: 5px;
   }
   .cancel-classroom-changes {

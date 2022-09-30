@@ -21,7 +21,7 @@ import { NewClassroom, NewClassroomData } from './new-classroom.model';
 import cloneDeep from 'lodash/cloneDeep';
 
 
-interface TopicIdToPrerequisiteTopicIds {
+export interface TopicIdToPrerequisiteTopicIds {
   [topicId: string]: string[];
 }
 
@@ -33,6 +33,8 @@ interface ExistingClassroom extends NewClassroom {
   getCourseDetails: () => string;
   getTopicListIntro: () => string;
   getTopicIdToPrerequisiteTopicId: () => TopicIdToPrerequisiteTopicIds;
+  validateDependencyGraph: () => string;
+  getPrerequisiteTopicIds: (topicId: string) => string[];
 }
 
 export type ClassroomData = ExistingClassroom | NewClassroom;
@@ -43,8 +45,7 @@ export class ExistingClassroomData extends
   _courseDetails: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
-  cyclicCheckError: boolean;
-  topicsGraphIsCorrect: boolean;
+  _topicsCountInClassroom;
 
   constructor(
       classroomId: string,
@@ -58,6 +59,7 @@ export class ExistingClassroomData extends
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
+    this._topicsCountInClassroom = 0;
   }
 
   getCourseDetails(): string {
@@ -111,7 +113,7 @@ export class ExistingClassroomData extends
     return classroomDict;
   }
 
-  validateDependencyGraph(): void {
+  validateDependencyGraph(): string {
     for (let currentTopicId in this._topicIdToPrerequisiteTopicIds) {
       let ancestors = cloneDeep(
         this._topicIdToPrerequisiteTopicIds[currentTopicId]);
@@ -119,9 +121,11 @@ export class ExistingClassroomData extends
       let visitedTopicIdsForCurrentTopic = [];
       while (ancestors.length > 0) {
         if (ancestors.indexOf(currentTopicId) !== -1) {
-          this.cyclicCheckError = true;
-          this.topicsGraphIsCorrect = false;
-          return;
+          return (
+            'There is a cycle in the prerequisite dependencies.' +
+            'Example: \'A\' depends on \'B\' and eventually \'B\' depends' +
+            ' on \'A\'.Please fix this error to save the changes.'
+          );
         }
 
         let lengthOfAncestor = ancestors.length;
@@ -140,7 +144,44 @@ export class ExistingClassroomData extends
         visitedTopicIdsForCurrentTopic.push(lastTopicIdInAncestor);
       }
     }
+    return '';
   }
 
+  addNewTopicId(topicId: string): void {
+    this._topicIdToPrerequisiteTopicIds[topicId] = [];
+    this._topicsCountInClassroom += 1;
+  }
 
+  removeTopic(topicId: string): void {
+    delete this._topicIdToPrerequisiteTopicIds[topicId];
+    this._topicsCountInClassroom -= 1;
+  }
+
+  addPrerequisiteTopicId(
+      currentTopicId: string,
+      prerequisiteTopicId: string
+  ): void {
+    this._topicIdToPrerequisiteTopicIds[currentTopicId].push(
+      prerequisiteTopicId);
+  }
+
+  removeDependency(
+      currentTopicId: string,
+      prerequisiteTopicId: string
+  ): void {
+    const index = (
+      this._topicIdToPrerequisiteTopicIds[currentTopicId].indexOf(
+        prerequisiteTopicId)
+    );
+    this._topicIdToPrerequisiteTopicIds[currentTopicId].splice(
+      index, 1);
+  }
+
+  getPrerequisiteTopicIds(topicId: string): string[] {
+    return this._topicIdToPrerequisiteTopicIds[topicId];
+  }
+
+  getTopicsCount(): number {
+    return this._topicsCountInClassroom;
+  }
 }

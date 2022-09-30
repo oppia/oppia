@@ -21,6 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { ClassroomAdminPageComponent } from 'pages/classroom-admin-page/classroom-admin-page.component';
 import { ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
@@ -49,7 +50,8 @@ describe('Classroom Admin Page component ', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        FormsModule
+        FormsModule,
+        MatAutocompleteModule
       ],
       declarations: [ClassroomAdminPageComponent],
       providers: [
@@ -635,16 +637,18 @@ describe('Classroom Admin Page component ', () => {
 
   it(
     'should be able to add new topic ID to classroom', fakeAsync(() => {
-      component.tempClassroomData = ClassroomData.createNewClassroomFromDict({
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {}
-      });
-      expect(component.topicsCountInClassroom).toEqual(0);
-      expect(component.topicIdToPrerequisiteTopicIds).toEqual({});
+      component.tempClassroomData = (
+        ExistingClassroomData.createClassroomFromDict({
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {}
+        }));
+      expect(component.tempClassroomData.getTopicsCount()).toEqual(0);
+      expect(component.tempClassroomData.getTopicIdToPrerequisiteTopicId())
+        .toEqual({});
       expect(component.topicNameToPrerequisiteTopicNames).toEqual({});
       const topicIdToTopicName = {
         topicId1: 'Dummy topic 1'
@@ -657,13 +661,12 @@ describe('Classroom Admin Page component ', () => {
 
       tick();
 
-      expect(component.topicIdToPrerequisiteTopicIds).toEqual({
-        topicId1: []
-      });
+      expect(component.tempClassroomData.getTopicIdToPrerequisiteTopicId())
+        .toEqual({topicId1: []});
       expect(component.topicNameToPrerequisiteTopicNames).toEqual({
         'Dummy topic 1': []
       });
-      expect(component.topicsCountInClassroom).toEqual(1);
+      expect(component.tempClassroomData.getTopicsCount()).toEqual(1);
     }));
 
   it(
@@ -701,60 +704,6 @@ describe('Classroom Admin Page component ', () => {
     expect(component.topicWithGivenIdExists).toBeTrue();
   });
 
-  it('should not present error for valid dependency graph', () => {
-    component.cyclicCheckError = false;
-    component.topicsGraphIsCorrect = true;
-
-    component.topicIdToPrerequisiteTopicIds = {
-      topic_id_1: ['topic_id_2', 'topic_id_3'],
-      topic_id_2: [],
-      topic_id_3: ['topic_id_2']
-    };
-
-    component.tempClassroomData.validateDependencyGraph();
-
-    expect(component.cyclicCheckError).toBeFalse();
-    expect(component.topicsGraphIsCorrect).toBeTrue();
-
-    component.topicIdToPrerequisiteTopicIds = {
-      topic_id_1: [],
-      topic_id_2: ['topic_id_1'],
-      topic_id_3: ['topic_id_2']
-    };
-
-    component.tempClassroomData.validateDependencyGraph();
-
-    expect(component.cyclicCheckError).toBeFalse();
-    expect(component.topicsGraphIsCorrect).toBeTrue();
-
-    component.topicIdToPrerequisiteTopicIds = {
-      topic_id_1: [],
-      topic_id_2: ['topic_id_1'],
-      topic_id_3: ['topic_id_2', 'topic_id_1']
-    };
-
-    component.tempClassroomData.validateDependencyGraph();
-
-    expect(component.cyclicCheckError).toBeFalse();
-    expect(component.topicsGraphIsCorrect).toBeTrue();
-  });
-
-  it('should be able to present error for invalid dependency graph', () => {
-    component.cyclicCheckError = false;
-    component.topicsGraphIsCorrect = true;
-
-    component.topicIdToPrerequisiteTopicIds = {
-      topic_id_1: ['topic_id_3'],
-      topic_id_2: ['topic_id_1'],
-      topic_id_3: ['topic_id_2']
-    };
-
-    component.tempClassroomData.validateDependencyGraph();
-
-    expect(component.cyclicCheckError).toBeTrue();
-    expect(component.topicsGraphIsCorrect).toBeFalse();
-  });
-
   it('should be able to add prerequisite for a topic', () => {
     component.topicIdsToTopicName = {
       topicId1: 'Dummy topic 1',
@@ -762,26 +711,27 @@ describe('Classroom Admin Page component ', () => {
       topicId3: 'Dummy topic 3'
     };
 
-    component.topicIdToPrerequisiteTopicIds = {
+    component.tempClassroomData.setTopicIdToPrerequisiteTopicId({
       topicId1: [],
       topicId2: ['topicId1'],
       topicId3: ['topicId2']
-    };
+    });
     component.topicNameToPrerequisiteTopicNames = {
       'Dummy topic 1': [],
       'Dummy topic 2': ['Dummy topic 1'],
       'Dummy topic 3': ['Dummy topic 2']
     };
 
-    component.tempClassroomData = ClassroomData.createNewClassroomFromDict({
-      classroomId: 'classroomId',
-      name: 'math',
-      urlFragment: 'math',
-      courseDetails: '',
-      topicListIntro: '',
-      topicIdToPrerequisiteTopicIds: component.topicNameToPrerequisiteTopicNames
-    });
-
+    component.tempClassroomData = (
+      ExistingClassroomData.createClassroomFromDict({
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: (
+          component.topicNameToPrerequisiteTopicNames)
+      }));
 
     const expectedTopicNameToPrerequisiteTopicNames = {
       'Dummy topic 1': [],
@@ -795,8 +745,8 @@ describe('Classroom Admin Page component ', () => {
       topicId3: ['topicId2', 'topicId1']
     };
 
-    expect(component.topicIdToPrerequisiteTopicIds).toEqual(
-      expectedTopicIdToPrerequisiteTopicIds);
+    expect(component.tempClassroomData.getTopicIdToPrerequisiteTopicId())
+      .toEqual(expectedTopicIdToPrerequisiteTopicIds);
     expect(component.topicNameToPrerequisiteTopicNames).toEqual(
       expectedTopicNameToPrerequisiteTopicNames);
   });
@@ -808,26 +758,27 @@ describe('Classroom Admin Page component ', () => {
       topicId3: 'Dummy topic 3'
     };
 
-    component.topicIdToPrerequisiteTopicIds = {
+    component.tempClassroomData.setTopicIdToPrerequisiteTopicId({
       topicId1: [],
       topicId2: ['topicId1'],
       topicId3: ['topicId2', 'topicId1']
-    };
+    });
     component.topicNameToPrerequisiteTopicNames = {
       'Dummy topic 1': [],
       'Dummy topic 2': ['Dummy topic 1'],
       'Dummy topic 3': ['Dummy topic 2', 'Dummy topic 1']
     };
 
-    component.tempClassroomData = ClassroomData.createNewClassroomFromDict({
-      classroomId: 'classroomId',
-      name: 'math',
-      urlFragment: 'math',
-      courseDetails: '',
-      topicListIntro: '',
-      topicIdToPrerequisiteTopicIds: component.topicNameToPrerequisiteTopicNames
-    });
-    //add
+    component.tempClassroomData = (
+      ExistingClassroomData.createClassroomFromDict({
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: (
+          component.topicNameToPrerequisiteTopicNames)
+      }));
 
     const expectedTopicIdToPrerequisiteTopicIds = {
       topicId1: [],
@@ -840,24 +791,10 @@ describe('Classroom Admin Page component ', () => {
       'Dummy topic 3': ['Dummy topic 2']
     };
 
-    expect(component.topicIdToPrerequisiteTopicIds).toEqual(
-      expectedTopicIdToPrerequisiteTopicIds);
+    expect(component.tempClassroomData.getTopicIdToPrerequisiteTopicId())
+      .toEqual(expectedTopicIdToPrerequisiteTopicIds);
     expect(component.topicNameToPrerequisiteTopicNames).toEqual(
       expectedTopicNameToPrerequisiteTopicNames);
-  });
-
-  it('should correctly display dependency dropdown input field', () => {
-    component.dependencyGraphDropdownIsShown = false;
-    component.currentTopicOnEdit = '';
-
-    component.showDependencyGraphDropdown('Dummy topic 1');
-
-    expect(component.dependencyGraphDropdownIsShown).toBeTrue();
-    expect(component.currentTopicOnEdit).toEqual('Dummy topic 1');
-
-    component.closeDependencyGraphDropdown();
-
-    expect(component.dependencyGraphDropdownIsShown).toBeFalse();
   });
 
   it('should be able to get available prerequisite for topic names', () => {
@@ -867,7 +804,7 @@ describe('Classroom Admin Page component ', () => {
       'Dummy topic 3': ['Dummy topic 2']
     };
 
-    component.getAvailablePrerequisiteTopicNamesForDropdown('Dummy topic 2');
+    component.getEligibleTopicPrerequisites('Dummy topic 2');
 
     expect(component.eligibleTopicNames).toEqual(
       ['Dummy topic 3']);
@@ -887,18 +824,6 @@ describe('Classroom Admin Page component ', () => {
       expect(component.topicDependencyEditOptionIsShown).toBeFalse();
     });
 
-  it('should be able to edit prerequisites for a topic', () => {
-    component.topicDependencyEditOptionIsShown = true;
-    component.dependencyGraphDropdownIsShown = false;
-    component.editTopicOptionIsShown = true;
-
-    component.editPrerequisite();
-
-    expect(component.topicDependencyEditOptionIsShown).toBeFalse();
-    expect(component.dependencyGraphDropdownIsShown).toBeTrue();
-    expect(component.editTopicOptionIsShown).toBeFalse();
-  });
-
   it(
     'should be able to delete a topic from the classroom on modal confirmation',
     fakeAsync(() => {
@@ -915,11 +840,11 @@ describe('Classroom Admin Page component ', () => {
         topicId3: 'Dummy topic 3'
       };
 
-      component.topicIdToPrerequisiteTopicIds = {
+      component.tempClassroomData.setTopicIdToPrerequisiteTopicId({
         topicId1: [],
         topicId2: ['topicId1'],
         topicId3: ['topicId2', 'topicId1']
-      };
+      });
 
       component.topicNameToPrerequisiteTopicNames = {
         'Dummy topic 1': [],
@@ -927,15 +852,16 @@ describe('Classroom Admin Page component ', () => {
         'Dummy topic 3': ['Dummy topic 2', 'Dummy topic 1']
       };
 
-      component.tempClassroomData = ClassroomData.createNewClassroomFromDict({
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: (
-          component.topicNameToPrerequisiteTopicNames)
-      });
+      component.tempClassroomData = (
+        ExistingClassroomData.createClassroomFromDict({
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: (
+            component.topicNameToPrerequisiteTopicNames)
+        }));
 
       const expectedTopicIdToPrerequisiteTopicIds = {
         topicId1: [],
@@ -950,8 +876,8 @@ describe('Classroom Admin Page component ', () => {
       component.deleteTopic('Dummy topic 3');
       tick();
 
-      expect(component.topicIdToPrerequisiteTopicIds).toEqual(
-        expectedTopicIdToPrerequisiteTopicIds);
+      expect(component.tempClassroomData.getTopicIdToPrerequisiteTopicId())
+        .toEqual(expectedTopicIdToPrerequisiteTopicIds);
       expect(component.topicNameToPrerequisiteTopicNames).toEqual(
         expectedTopicNameToPrerequisiteTopicNames);
     }));
@@ -972,11 +898,11 @@ describe('Classroom Admin Page component ', () => {
         topicId3: 'Dummy topic 3'
       };
 
-      component.topicIdToPrerequisiteTopicIds = {
+      component.tempClassroomData.setTopicIdToPrerequisiteTopicId({
         topicId1: [],
         topicId2: ['topicId1'],
         topicId3: ['topicId2', 'topicId1']
-      };
+      });
 
       component.topicNameToPrerequisiteTopicNames = {
         'Dummy topic 1': [],
@@ -984,15 +910,16 @@ describe('Classroom Admin Page component ', () => {
         'Dummy topic 3': ['Dummy topic 2', 'Dummy topic 1']
       };
 
-      component.tempClassroomData = ClassroomData.createNewClassroomFromDict({
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: (
-          component.topicNameToPrerequisiteTopicNames)
-      });
+      component.tempClassroomData = (
+        ExistingClassroomData.createClassroomFromDict({
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: (
+            component.topicNameToPrerequisiteTopicNames)
+        }));
 
       const expectedTopicIdToPrerequisiteTopicIds = {
         topicId1: [],
@@ -1009,8 +936,8 @@ describe('Classroom Admin Page component ', () => {
       component.deleteTopic('Dummy topic 1');
       tick();
 
-      expect(component.topicIdToPrerequisiteTopicIds).toEqual(
-        expectedTopicIdToPrerequisiteTopicIds);
+      expect(component.tempClassroomData.getTopicIdToPrerequisiteTopicId())
+        .toEqual(expectedTopicIdToPrerequisiteTopicIds);
       expect(component.topicNameToPrerequisiteTopicNames).toEqual(
         expectedTopicNameToPrerequisiteTopicNames);
     }));

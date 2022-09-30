@@ -24,6 +24,8 @@ import { GraphNodes, GraphLink, GraphData } from 'services/compute-graph.service
 import { AppConstants } from 'app.constants';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import cloneDeep from 'lodash/cloneDeep';
+import { TopicIdToPrerequisiteTopicIds } from '../existing-classroom.model';
+import { TopicIdToTopicName } from '../classroom-admin-page.component';
 
 
 interface NodeData {
@@ -50,30 +52,32 @@ export class TopicsDependencyGraphModalComponent
   ) {
     super(ngbActiveModal);
   }
+
   graphBounds = {
     bottom: 0,
     left: 0,
     top: 0,
     right: 0
   };
-  graphData: GraphData;
-  initStateId: string;
-  finalStateIds: string[];
-  nodeData: NodeDataDict;
-  GRAPH_WIDTH: number;
-  GRAPH_HEIGHT: number;
-  augmentedLinks: AugmentedLink[];
-  nodeList: NodeData[];
 
-  topicIdToPrerequisiteTopicIds = {};
-  topicIdToTopicName = {};
+  graphData!: GraphData;
+  initStateId!: string;
+  finalStateIds!: string[];
+  nodeData!: NodeDataDict;
+  GRAPH_WIDTH!: number;
+  GRAPH_HEIGHT!: number;
+  augmentedLinks: AugmentedLink[] | undefined = [];
+  nodeList!: NodeData[];
+
+  topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds = {};
+  topicIdToTopicName: TopicIdToTopicName = {};
 
   close(): void {
     this.ngbActiveModal.close();
   }
 
   ngOnInit(): void {
-    this.normalizeTopicDependencyGraph()
+    this.normalizeTopicDependencyGraph();
     this.drawGraph(
       this.graphData.nodes, this.graphData.links,
       this.graphData.initStateId, this.graphData.finalStateIds
@@ -118,7 +122,7 @@ export class TopicsDependencyGraphModalComponent
       AppConstants.MAX_NODE_LABEL_LENGTH);
   }
 
-  normalizeTopicDependencyGraph() {
+  normalizeTopicDependencyGraph(): void {
     const intialTopicIds = this.computeInitialTopicIds(
       this.topicIdToPrerequisiteTopicIds);
     const finalTopics = this.computeFinalTopicIds(
@@ -131,21 +135,27 @@ export class TopicsDependencyGraphModalComponent
       initStateId: intialTopicIds[0],
       links: links,
       nodes: nodes
-    }
+    };
   }
 
-  computeInitialTopicIds(topicIdToPrerequisiteTopicIds) {
+  computeInitialTopicIds(
+      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+  ): string[] {
     let initialTopicIds = [];
     for (let topicId in topicIdToPrerequisiteTopicIds) {
       if (topicIdToPrerequisiteTopicIds[topicId].length === 0) {
         initialTopicIds.push(topicId);
       }
     }
+    if (initialTopicIds.length === 0) {
+      initialTopicIds = Object.keys(this.topicIdToTopicName);
+    }
     return initialTopicIds;
   }
 
-
-  computeEdges(topicIdToPrerequisiteTopicIds) {
+  computeEdges(
+      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+  ): GraphLink[] {
     let edgeSet = [];
     for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
       let prerequisiteTopics = (
@@ -159,16 +169,19 @@ export class TopicsDependencyGraphModalComponent
     return edgeSet;
   }
 
-  computeSingleEdge(sourceTopic, destTopic) {
+  computeSingleEdge(sourceTopic: string, destTopic: string): GraphLink {
     return {
       source: sourceTopic,
       target: destTopic,
       linkProperty: null,
+      connectsDestIfStuck: false
     };
   }
 
-  computeFinalTopicIds(topicIdToPrerequisiteTopicIds) {
-    let prerequisitesOfAllTopics = [];
+  computeFinalTopicIds(
+      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+  ): string[] {
+    let prerequisitesOfAllTopics: string[] = [];
     let finalTopicIds = [];
     for (let topicId in topicIdToPrerequisiteTopicIds) {
       prerequisitesOfAllTopics = prerequisitesOfAllTopics.concat(
