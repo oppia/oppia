@@ -56,8 +56,11 @@ var LibraryPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {
-    var allExplorationSummaryTile = allExplorationSummaryTileSelector();
-    return await allExplorationSummaryTile.filter(
+    await waitFor.visibilityOf(
+      allExplorationSummaryTile,
+      'All Exploration summary tile is taking too long to appear');
+    var allExplorationSummaryTiles = allExplorationSummaryTileSelector();
+    return await allExplorationSummaryTiles.filter(
       async function(tile) {
         var tileTitle = await action.getText('Exp Summary Title', tile.$(
           expSummaryTileTitleLocator));
