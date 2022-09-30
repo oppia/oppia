@@ -1,5 +1,5 @@
-<div class="uid-btn-message-box">{{ 'I18N_SAVE_PROGRESS_COPY_TOOLTIP' | translate }}</div>
-<div class="uid-btn-message-arrow"></div>
+<span class="uid-btn-message-box" *ngIf="show">{{ 'I18N_SAVE_PROGRESS_COPY_TOOLTIP' | translate }}</span>
+<div class="uid-btn-message-arrow" *ngIf="show"></div>
 
 <style>
 .uid-btn-message-box {
@@ -10,9 +10,8 @@
   font-size: 14px;
   font-style: Roboto, Arial, sans-serif;
   padding: 8px 10px;
-  position: absolute;
-  right: 0;
-  top: -45px;
+  position: relative;
+  top: -5px;
 }
 
 .uid-btn-message-arrow {
@@ -20,9 +19,9 @@
   color: #fff;
   cursor: default;
   height: 10px;
-  position: absolute;
-  right: 28px;
-  top: -15px;
+  position: relative;
+  right: -45px;
+  top: -7px;
   transform: rotate(45deg);
   width: 10px;
 }

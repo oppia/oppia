@@ -328,7 +328,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
     ReviewTestPageComponent,
-    // ComponentOverviewComponent
+    ComponentOverviewComponent,
   ],
 
   entryComponents: [
@@ -449,7 +449,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent
+    ReviewTestPageComponent,
+    ComponentOverviewComponent
   ],
 
   exports: [
@@ -582,7 +583,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
     ReviewTestPageComponent,
-    // ComponentOverviewComponent
+    ComponentOverviewComponent
   ],
 })
 

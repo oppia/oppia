@@ -245,16 +245,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   copyProgressUrl(): void {
     this.clipboard.copy(this.loggedOutProgressUniqueUrl);
-    this.ngbModal.open(
-      ComponentOverviewComponent
-    ).result.then(() => {}, () => {});
-    
+    this.showTooltip = true;
     setTimeout(() => {
-      this.ngbModal.dismissAll();
-        // ComponentOverviewComponent
-      // ).result.then(() => {}, () => {
-        // this.showTooltip = false;
-      // });
+      this.showTooltip = false;
     }, 1000);
   }
 

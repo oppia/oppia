@@ -65,7 +65,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     RouterModule.forRoot([]),
     SharedComponentsModule,
     NgbPopoverModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -77,7 +77,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
-    ComponentOverviewComponent
+    // ComponentOverviewComponent
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -89,7 +89,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
-    ComponentOverviewComponent
+    // ComponentOverviewComponent
   ],
   providers: [
     {

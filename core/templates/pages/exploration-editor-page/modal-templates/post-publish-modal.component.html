@@ -9,9 +9,15 @@
       Now that you're a published Oppia teacher, you can share your creation.
     </p>
     <div class="oppia-share-publish-link">
-      Here's your exploration link: <br>
-      <div (click)="selectText($event)">{{explorationLink}}</div>
-      <span *ngIf="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
+      <p>Here's your exploration link:</p>
+      <div class="oppia-share-link-container"
+           [ngClass]="{ 'copy-tooltip-margin' : showTooltip }">
+        <div class="oppia-share-link-box" id="exploration-link">{{ explorationLink }}</div>
+        <div class="oppia-share-link-tooltip">
+          <copy-exploration-url [show]="showTooltip"></copy-exploration-url>
+          <button type="button" class="btn btn-secondary oppia-share-copy-btn" (click)="selectText($event)">{{ 'I18N_SAVE_PROGRESS_BUTTON_TEXT' | translate }}</button>
+        </div>
+      </div>
     </div>
     <sharing-links layoutType="row post-publish-modal-sharing-links"
                    layoutAlignType="center center"
@@ -67,23 +73,41 @@
     display: inline;
   }
 
+  .oppia-share-publish-body .oppia-share-publish-link .oppia-share-link-container {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 10px;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link .copy-tooltip-margin {
+    margin-top: -34px;
+  }
+
   .oppia-share-publish-body .oppia-share-publish-link div {
-    background-color: #fcfcfc;
-    border: 1px solid #d9d9d9;
     border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
-    margin-bottom: 2px;
-    margin-top: 10px;
-    max-width: 350px;
-    overflow: hidden;
-    padding: 10px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .oppia-share-publish-body .oppia-share-publish-link div:hover {
-    background-color: #f9f9f9;
+  .oppia-share-publish-body .oppia-share-publish-link .oppia-share-link-box {
+    border: 1px solid black;
+    font-size: 14px;
+    padding: 10px;
+    padding-left: 20px;
+    text-align: left;
+    width: 70%;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link .oppia-share-link-container .oppia-share-copy-btn {
+    box-shadow: 1px 1px 2px 0 rgba(0, 100, 92, 0.8);
+    color: #00645c;
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 auto;
+    padding: 10px;
+    width: 100px;
   }
 
   .oppia-share-publish-body .oppia-share-publish-link span {

@@ -40,6 +40,7 @@ export class PostPublishModalComponent
   explorationLink!: string;
   explorationId!: string;
   explorationLinkCopied: boolean = false;
+  showTooltip: boolean;
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
@@ -67,8 +68,7 @@ export class PostPublishModalComponent
   selectText(event: MouseEvent): void {
     let codeDiv = event.currentTarget;
     let range = document.createRange();
-    range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
-    range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
+    range.selectNode(document.getElementById('exploration-link'));
     let selection = window.getSelection();
     if (selection === null) {
       throw new Error('Selection cannot be null');
@@ -77,6 +77,10 @@ export class PostPublishModalComponent
     selection.addRange(range);
     document.execCommand('copy');
     this.explorationLinkCopied = true;
+    this.showTooltip = true;
+    setTimeout(() => {
+      this.showTooltip = false;
+    }, 1000);
   }
 }
 
