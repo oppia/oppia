@@ -205,8 +205,48 @@ def validate_rte_tags(
             validate tags inside `Tabs` or `Collapsible` tag.
 
     Raises:
-        utils.ValidationError. Raises the validation error in case the
-            content is not valid.
+        ValidationError. Image does not have alt-with-value attribute.
+        ValidationError. Image alt-with-value attribute have less
+            than 5 characters.
+        ValidationError. Image does not have caption-with-value attribute.
+        ValidationError. Image caption-with-value attribute have more
+            than 500 characters.
+        ValidationError. Image does not have filepath-with-value attribute.
+        ValidationError. Image filepath-with-value attribute should not be
+            empty.
+        ValidationError. SkillReview does not have text-with-value attribute.
+        ValidationError. SkillReview text-with-value attribute should not be
+            empty.
+        ValidationError. SkillReview does not have skill_id-with-value
+            attribute.
+        ValidationError. SkillReview skill_id-with-value attribute should not be
+            empty.
+        ValidationError. Video does not have start-with-value attribute.
+        ValidationError. Video start-with-value attribute should not be empty.
+        ValidationError. Video does not have end-with-value attribute.
+        ValidationError. Video end-with-value attribute should not be empty.
+        ValidationError. Start value is greater than end value.
+        ValidationError. Video does not have autoplay-with-value attribute.
+        ValidationError. Video autoplay-with-value attribute should be boolean.
+        ValidationError. Video does not have video_id-with-value attribute.
+        ValidationError. Link does not have text-with-value attribute.
+        ValidationError. Link text-with-value attribute should not be empty.
+        ValidationError. Link does not have url-with-value attribute.
+        ValidationError. Link url-with-value attribute should not be empty.
+        ValidationError. Math does not have math_content-with-value attribute.
+        ValidationError. Math math_content-with-value attribute should not be
+            empty.
+        ValidationError. Math does not have raw_latex-with-value attribute.
+        ValidationError. Math raw_latex-with-value attribute should not be
+            empty.
+        ValidationError. Math does not have svg_filename-with-value attribute.
+        ValidationError. Math svg_filename-with-value attribute should not be
+            empty.
+        ValidationError. Math svg_filename attribute does not have svg
+            extension.
+        ValidationError. Tabs tag present inside another tabs or collapsible.
+        ValidationError. Collapsible tag present inside tabs or another
+            collapsible.
     """
     soup = bs4.BeautifulSoup(html, 'html.parser')
     empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
@@ -438,8 +478,18 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
         html: str. The RTE content of the state.
 
     Raises:
-        utils.ValidationError. Raises the validation error in case the
-            `Tabs` or `Collapsible` tag is not valid.
+        ValidationError. No tabs present inside the tab_contents attribute.
+        ValidationError. No title present inside the tab_contents attribute.
+        ValidationError. Title inside the tag is empty.
+        ValidationError. No content present inside the tab_contents attribute.
+        ValidationError. Content inside the tag is empty.
+        ValidationError. No content attributes present inside the tabs tag.
+        ValidationError. No collapsible content is present inside the tag.
+        ValidationError. Collapsible content-with-value attribute is not
+            present.
+        ValidationError. Collapsible heading-with-value attribute is not
+            present.
+        ValidationError. Collapsible heading-with-value attribute is empty.
     """
     soup = bs4.BeautifulSoup(html, 'html.parser')
     empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
