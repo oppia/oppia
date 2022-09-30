@@ -27,8 +27,11 @@ import sys
 from scripts import common
 from scripts import install_third_party_libs
 
+from typing import List, Optional, Tuple
+from typing_extensions import Final
+
 # List of directories whose files won't be type-annotated ever.
-EXCLUDED_DIRECTORIES = [
+EXCLUDED_DIRECTORIES: Final = [
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
@@ -41,7 +44,7 @@ EXCLUDED_DIRECTORIES = [
 ]
 
 # List of files who should be type-annotated but are not.
-NOT_FULLY_COVERED_FILES = [
+NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
@@ -58,8 +61,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/pre_push_hook.py',
     'scripts/pre_push_hook_test.py',
     'scripts/run_backend_tests.py',
-    'scripts/run_mypy_checks.py',
-    'scripts/run_mypy_checks_test.py',
     'scripts/run_portserver.py',
     'scripts/run_presubmit_checks.py',
     'scripts/linters/',
@@ -67,14 +68,14 @@ NOT_FULLY_COVERED_FILES = [
 ]
 
 
-CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
-MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
-MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
-PYTHON3_CMD = 'python3'
+CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
+MYPY_REQUIREMENTS_FILE_PATH: Final = os.path.join('.', 'mypy_requirements.txt')
+MYPY_TOOLS_DIR: Final = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
+PYTHON3_CMD: Final = 'python3'
 
-_PATHS_TO_INSERT = [MYPY_TOOLS_DIR, ]
+_PATHS_TO_INSERT: Final = [MYPY_TOOLS_DIR, ]
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description='Python type checking using mypy script.'
 )
 
@@ -108,11 +109,16 @@ def install_third_party_libraries(skip_install: bool) -> None:
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, mypy_exec_path, using_global_mypy):
+def get_mypy_cmd(
+    files: Optional[List[str]],
+    mypy_exec_path: str,
+    using_global_mypy: bool
+) -> List[str]:
     """Return the appropriate command to be run.
 
     Args:
-        files: list(list(str)). List having first element as list of string.
+        files: Optional[List[str]]. List of files provided to check for MyPy
+            type checking, or None if no file is provided explicitly.
         mypy_exec_path: str. Path of mypy executable.
         using_global_mypy: bool. Whether generated command should run using
             global mypy.
@@ -136,7 +142,7 @@ def get_mypy_cmd(files, mypy_exec_path, using_global_mypy):
     return cmd
 
 
-def install_mypy_prerequisites(install_globally):
+def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
     """Install mypy and type stubs from mypy_requirements.txt.
 
     Args:
@@ -170,6 +176,10 @@ def install_mypy_prerequisites(install_globally):
             cmd + uextention_text, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         new_process.communicate()
+        if site.USER_BASE is None:
+            raise Exception(
+                'No user base found for the user.'
+            )
         _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
         mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
         return (new_process.returncode, mypy_exec_path)
@@ -179,7 +189,7 @@ def install_mypy_prerequisites(install_globally):
         return (process.returncode, mypy_exec_path)
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> int:
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
