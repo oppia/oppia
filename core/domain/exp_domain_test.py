@@ -5725,6 +5725,11 @@ title: Title
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
+    def test_fixing_invalid_exploration_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid data from version less than 58."""
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""

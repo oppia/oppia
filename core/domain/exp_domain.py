@@ -3564,7 +3564,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if language_code in lang_code_to_unicode_str_dict:
                 state_dict['interaction']['customization_args'][
                     'buttonText']['value']['unicode_str'] = (
-                        lang_code_to_unicode_str_dict['language_code'])
+                        lang_code_to_unicode_str_dict[language_code])
             else:
                 state_dict['interaction']['customization_args'][
                     'buttonText']['value']['unicode_str'] = 'Continue'
@@ -3829,8 +3829,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     earlier_rule = answer_groups[range_ele[
                         'ans_group_index']]['rule_specs'][
                             range_ele['rule_spec_index']]
-                    if cls._should_check_range_criteria(
-                        earlier_rule, rule_spec and
+                    if (cls._should_check_range_criteria(
+                        earlier_rule, rule_spec) and
                         cls._is_enclosed_by(range_var, range_ele)
                     ):
                         invalid_rules.append(rule_spec)
