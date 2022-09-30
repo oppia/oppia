@@ -48,6 +48,9 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
                 'generate_value() method has not yet been implemented')):
             base_generator.generate_value()
 
+    def test_class_name_of_value_generator(self) -> None:
+        class_object = value_generators_domain.BaseValueGenerator()
+        self.assertEqual('BaseValueGenerator',class_object.__class__.__name__)
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
 
