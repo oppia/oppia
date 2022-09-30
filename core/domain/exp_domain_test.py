@@ -5748,7 +5748,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: '<p>Content of RTE</p>'
+      html: '<oppia-noninteractive-video video_id-with-value=\"&amp;quot;l1XhAUhP5JY&amp;quot;\"></oppia-noninteractive-video>'
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6823,7 +6823,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: <p>Content of RTE</p>
+      html: <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0" video_id-with-value="&amp;quot;l1XhAUhP5JY&amp;quot;"></oppia-noninteractive-video>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
