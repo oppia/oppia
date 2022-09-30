@@ -5,8 +5,8 @@
   <svg class="oppia-graph-viz" [attr.width]="GRAPH_WIDTH" [attr.height]="GRAPH_HEIGHT">
     <g>
       <g class="widthLocation" *ngFor="let link of augmentedLinks">
-          <path class="link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)">
-          </path>
+        <path class="link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)">
+        </path>
       </g>
       <g class="node" *ngFor="let node of nodeList">
         <rect [attr.rx]="2" [attr.ry]="2" [attr.height]="node.height" [attr.width]="node.width"

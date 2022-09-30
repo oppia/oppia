@@ -60,6 +60,8 @@ export class ExistingClassroomData extends
     this._topicListIntro = topicListIntro;
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
     this._topicsCountInClassroom = 0;
+    this._topicsCountInClassroom = Object.keys(
+      this._topicIdToPrerequisiteTopicIds).length;
   }
 
   getCourseDetails(): string {

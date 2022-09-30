@@ -236,7 +236,7 @@
           <div *ngIf="classroomEditorMode" class="action-buttons">
             <button class="btn btn-secondary view-graph-button"
                     (click)="viewGraph()"
-                    *ngIf="tempClassroomData.getTopicsCount()">
+                    *ngIf="tempClassroomData.getTopicsCount() > 0">
               View Graph
             </button>
             <button class="btn btn-secondary cancel-classroom-changes"

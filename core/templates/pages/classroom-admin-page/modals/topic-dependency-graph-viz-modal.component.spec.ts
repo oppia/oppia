@@ -52,22 +52,4 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
     componentInstance.close();
     expect(closeSpy).toHaveBeenCalled();
   });
-
-  it('should be able to get graph data from topic dependency', () => {
-    let topicIdToTopicName: {
-      id1: 'Topic1',
-      id2: 'Topic2'
-      id3: 'Topic3'
-      id4: 'Topic4'
-      id5: 'Topic5'
-    }
-    let topicIdToPrerequisiteTopicIds = {
-      id1: [],
-      id2: ['id1'],
-      id3: ['id1'],
-      id4: ['id2'],
-      id5: ['id3'],
-    }
-  });
-
-})
+});
