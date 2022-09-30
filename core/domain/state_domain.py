@@ -2931,10 +2931,7 @@ class SubtitledHtml:
 
         self.html = html_cleaner.clean(self.html)
 
-        # Validates the RTE tags.
         html_cleaner.validate_rte_tags(self.html)
-
-        # Validate tabs and collapsible RTE tags.
         html_cleaner.validate_tabs_and_collapsible_rte_tags(self.html)
 
     @classmethod

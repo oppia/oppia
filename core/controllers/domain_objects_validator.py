@@ -245,7 +245,9 @@ def validate_suggestion_images(files):
     return files
 
 
-def get_exp_change_from_dict(exp_change_dict):
+def get_exp_change_from_dict(
+    exp_change_dict: dict
+) -> exp_domain.ExplorationChange:
     """Validate the exploration change dictionary and return
     the exploration change domain object.
 
@@ -267,8 +269,10 @@ def get_exp_change_from_dict(exp_change_dict):
     ]
     if exp_change_dict['cmd'] in allowed_exp_change_commands:
         if exp_change_dict['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
-            if exp_change_dict[
-                'property_name'] == exp_domain.STATE_PROPERTY_CONTENT:
+            if (
+                exp_change_dict['property_name'] ==
+                exp_domain.STATE_PROPERTY_CONTENT
+            ):
                 content_obj = state_domain.SubtitledHtml.from_dict(
                     exp_change_dict['new_value'])
                 content_obj.validate()
@@ -279,7 +283,8 @@ def get_exp_change_from_dict(exp_change_dict):
                 written_translations = exp_change_dict['new_value']
                 for translations in written_translations.values():
                     for language_code_to_written_translation in (
-                        translations.values()):
+                        translations.values()
+                    ):
                         for written_translation in (
                             language_code_to_written_translation.values()):
                             written_translation_obj = (

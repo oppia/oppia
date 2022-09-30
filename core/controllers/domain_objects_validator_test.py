@@ -291,7 +291,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-image>').to_dict()
         }
         with self.assertRaisesRegex(
-            Exception, 'The length of the image tag \'alt-with-value\' '
+            Exception,
+            'The length of the image tag \'alt-with-value\' '
             'attribute value should be at least 5 characters.'
         ):
             domain_objects_validator.get_exp_change_from_dict(
@@ -325,7 +326,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             }).to_dict()
         }
         with self.assertRaisesRegex(
-            Exception, 'The length of the image tag \'alt-with-value\' '
+            Exception,
+            'The length of the image tag \'alt-with-value\' '
             'attribute value should be at least 5 characters.'
         ):
             domain_objects_validator.get_exp_change_from_dict(
@@ -355,18 +357,8 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             domain_objects_validator.get_exp_change_from_dict(
                 correct_change_dict))
         self.assertEqual('edit_state_property', returned_domain_obj.cmd)
-        self.assertEqual(
-            'content',
-            returned_domain_obj.property_name)
-        self.assertEqual(
-            'content',
-            returned_domain_obj.old_value['content_id'])
-        self.assertEqual(
-            '',
-            returned_domain_obj.old_value['html'])
-        self.assertEqual(
-            'content',
-            returned_domain_obj.new_value['content_id'])
-        self.assertEqual(
-            math_tag,
-            returned_domain_obj.new_value['html'])
+        self.assertEqual('content', returned_domain_obj.property_name)
+        self.assertEqual('content', returned_domain_obj.old_value['content_id'])
+        self.assertEqual('', returned_domain_obj.old_value['html'])
+        self.assertEqual('content', returned_domain_obj.new_value['content_id'])
+        self.assertEqual(math_tag, returned_domain_obj.new_value['html'])
