@@ -648,7 +648,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
         # Allow all emails.
         self.put_json(
-            '/preferenceshandler/email_preferences',
+            feconf.EMAIL_PREFFERENCES,
             payload,
             csrf_token=csrf_token
         )
@@ -670,7 +670,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
         # Disallow all emails.
         self.put_json(
-            '/preferenceshandler/email_preferences',
+            feconf.EMAIL_PREFFERENCES,
             payload,
             csrf_token=csrf_token
         )

@@ -151,6 +151,39 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
 class EmailPreferencesHandler(base.BaseHandler):
     """Handles requests for the email preferences."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'data': {
+                'schema': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'can_receive_email_updates',
+                        'schema': {
+                            'type': 'bool'
+                        }
+                    }, {
+                        'name': 'can_receive_editor_role_email',
+                        'schema': {
+                            'type': 'bool'
+                        }
+                    }, {
+                        'name': 'can_receive_feedback_message_email',
+                        'schema': {
+                            'type': 'bool'
+                        }
+                    }, {
+                        'name': 'can_receive_subscription_email',
+                        'schema': {
+                            'type': 'bool'
+                        }
+                    }]
+                }
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_account
@@ -173,7 +206,7 @@ class EmailPreferencesHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        data = self.payload.get('data')
+        data = self.normalized_payload.get('data')
         bulk_email_signup_message_should_be_shown = False
 
         bulk_email_signup_message_should_be_shown = (
@@ -193,6 +226,18 @@ class EmailPreferencesHandler(base.BaseHandler):
 
 class ProfilePictureDataUrlHandler(base.BaseHandler):
     """Handles requests for the profile picture data url."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'data': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -227,7 +272,7 @@ class ProfilePictureDataUrlHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        data = self.payload.get('data')
+        data = self.normalized_payload.get('data')
         user_services.update_profile_picture_data_url(self.user_id, data)
 
         self.render_json({'data': data})
