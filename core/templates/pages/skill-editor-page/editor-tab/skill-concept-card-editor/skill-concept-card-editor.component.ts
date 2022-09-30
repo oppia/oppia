@@ -207,14 +207,14 @@ export class SkillConceptCardEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.resizeSubscription = 
+      this.resizeSubscription =
       this.windowDimensionsService.getResizeEvent().subscribe(
         () => {
           this.workedExamplesListIsShown = (
             !this.windowDimensionsService.isWindowNarrow());
         }
-    ));
-    
+      ));
+
     this.isEditable = true;
     this.skill = this.skillEditorStateService.getSkill();
     this.initBindableFieldsDict();
