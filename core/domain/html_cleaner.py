@@ -250,7 +250,6 @@ def validate_rte_tags(
     """
     soup = bs4.BeautifulSoup(html, 'html.parser')
     empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
-
     for tag in soup.find_all('oppia-noninteractive-image'):
         if not tag.has_attr('alt-with-value'):
             raise utils.ValidationError(
@@ -493,7 +492,6 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
     """
     soup = bs4.BeautifulSoup(html, 'html.parser')
     empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
-
     tabs_tags = soup.find_all('oppia-noninteractive-tabs')
     for tag in tabs_tags:
         if tag.has_attr('tab_contents-with-value'):
@@ -541,7 +539,6 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
             collapsible_content_json = (
                 utils.unescape_html(tag['content-with-value'])
             )
-
             collapsible_content = json.loads(
                 collapsible_content_json).replace('\\"', '')
             if collapsible_content.strip() in empty_values:
