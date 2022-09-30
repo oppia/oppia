@@ -77,7 +77,6 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
-    // ComponentOverviewComponent
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -89,7 +88,6 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
-    // ComponentOverviewComponent
   ],
   providers: [
     {
@@ -124,7 +122,6 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
 import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
-import { ComponentOverviewComponent } from 'components/copy-exploration-url/copy-exploration-url.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
