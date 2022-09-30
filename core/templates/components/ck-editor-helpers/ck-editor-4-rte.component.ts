@@ -536,13 +536,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     });
   }
 
-// Returns true if a rte component should not be shown in blog post editor RTE.
+  // Returns true if a rte component should not be shown in blog post editor RTE.
   isInvalidForBlogPostEditorRTE(): boolean {
     return (
       this.contextService.isInBlogPostEditorPage() && (
         AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR.indexOf(
-        componentDefn.id) !== -1)
-    )
+          componentDefn.id) !== -1)
+    );
   }
 
   ngOnDestroy(): void {
