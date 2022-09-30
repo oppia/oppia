@@ -276,12 +276,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         this.contextService.isExplorationLinkedToStory() &&
               AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
                 componentDefn.id) === -1);
-      var InvalidForBlogPostEditor = (
-        this.contextService.isInBlogPostEditorPage() &&
-        AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR.indexOf(
-          componentDefn.id) !== -1);
       if (!(
-        hideComplexExtensionFlag || notSupportedOnAndroidFlag || InvalidForBlogPostEditor // eslint-disable-line max-len
+        hideComplexExtensionFlag ||
+        notSupportedOnAndroidFlag || isInvalidForBlogPostEditorRTE()
       )) {
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
@@ -537,6 +534,15 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         buttons[i].style.pointerEvents = '';
       }
     });
+  }
+
+// Returns true if a rte component should not be shown in blog post editor RTE.
+  isInvalidForBlogPostEditorRTE(): boolean {
+    return (
+      this.contextService.isInBlogPostEditorPage() && (
+        AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR.indexOf(
+        componentDefn.id) !== -1)
+    )
   }
 
   ngOnDestroy(): void {
