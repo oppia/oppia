@@ -860,10 +860,13 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
             'time_spent_in_state_secs')
 
         event_services.LeaveForRefresherExpEventHandler.record(
-            exploration_id, refresher_exp_id,
-            exp_version, state_name,
+            exploration_id, 
+            refresher_exp_id,
+            exp_version, 
+            state_name,
             session_id,
-            time_spent_in_state_secs)
+            time_spent_in_state_secs
+        )
         self.render_json({})
 
 
