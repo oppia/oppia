@@ -56,14 +56,16 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.directiveSubscriptions.add(
-      this.windowDimensionsService.getResizeEvent().subscribe(
-        () => {
-          this.rubricsListIsShown = (
-            !this.windowDimensionsService.isWindowNarrow());
-        }
-      )
-    )
+    if(this.windowDimensionsService.getResizeEvent) {
+      this.directiveSubscriptions.add(
+        this.windowDimensionsService.getResizeEvent().subscribe(
+          () => {
+            this.rubricsListIsShown = (
+              !this.windowDimensionsService.isWindowNarrow());
+          }
+        )
+      );
+    }
     
     this.skill = this.skillEditorStateService.getSkill();
     this.rubricsListIsShown = (

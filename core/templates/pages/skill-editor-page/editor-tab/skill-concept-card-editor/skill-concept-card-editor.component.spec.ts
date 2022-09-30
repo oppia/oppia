@@ -32,6 +32,7 @@ import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { CdkDragSortEvent } from '@angular/cdk/drag-drop';
 import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
+import { of } from 'rxjs';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -55,6 +56,8 @@ describe('Skill Concept Card Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
   let sampleSkill: Skill;
+  let testEvent = new Event('test event');
+  let mockResizeEventEmitter = of(testEvent);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -307,4 +310,22 @@ describe('Skill Concept Card Editor Component', () => {
 
     expect(result).toBe('Worked Example');
   });
+
+  it('should handle resizing events of window', () => {
+    const windowResizeSpy = spyOn(
+      windowDimensionsService, 'getResizeEvent').and.callThrough();
+    component.ngOnInit();
+    expect(windowResizeSpy).toHaveBeenCalled();
+    expect(component.workedExamplesListIsShown).toBe(true);
+    // expect(component.workedExamplesListIsShown).toBeFalse();
+    
+    expect(component.resizeSubscription).not.toBe(undefined);
+    // spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+    //   mockResizeEventEmitter);
+    // spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+  });
+  
+  // it('should not toggle on window resize', fakeAsync(() => {
+  //   spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+  // }));
 });
