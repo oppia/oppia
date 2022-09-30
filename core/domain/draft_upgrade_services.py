@@ -356,36 +356,28 @@ class DraftUpgradeUtil:
                     txt_attr = link.get('text-with-value')
 
                     if lnk_attr is None:
-                        # Delete the link.
-                        link.decompose()
-                        continue
+                        # Invalidate draft.
+                        raise InvalidDraftConversionException(
+                            'Conversion cannot be completed.')
                     if txt_attr is None:
-                        # Set link text to be the url itself.
-                        link.decompose()
-                        continue
+                        # Invalidate Draft.
+                        raise InvalidDraftConversionException(
+                            'Conversion cannot be completed.')
 
                     lnk = lnk_attr.replace('&quot;', '')
                     txt = txt_attr.replace('&quot;', '')
 
                     # If text is empty and the link is not.
                     if len(lnk) != 0 and len(txt) == 0:
-                        # Delete the link.
-                        link.decompose()
-                        continue
-
-                    # If link is http.
-                    if urlparse(lnk).scheme == 'http':
-                        # Replace http with https.
-                        lnk = lnk.replace('http', 'https')
+                        # Invalidate draft.
+                        raise InvalidDraftConversionException(
+                            'Conversion cannot be completed.')
 
                     # If link is invalid.
                     if urlparse(lnk).scheme not in acceptable_schemes:
-                        # Delete the link.
-                        link.decompose()
-                        continue
-
-                    link['url-with-value'] = '&quot;' + lnk + '&quot;'
-                    link['text-with-value'] = '&quot;' + txt + '&quot;'
+                        # Invalidate draft.
+                        raise InvalidDraftConversionException(
+                            'Conversion cannot be completed.')
 
         return draft_change_list
 

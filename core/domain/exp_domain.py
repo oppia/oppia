@@ -1349,6 +1349,60 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.edits_allowed = edits_allowed
 
+    @classmethod
+    def fix_non_interactive_links(cls, html_content: str) -> str:
+        """Returns html with valid links
+        
+        Args:
+            html_content: str. HTML string that needs to be fixed.
+
+        Returns:
+            str. HTML string with valid links.        
+        """
+
+        soup = bs4.BeautifulSoup(html_content, 'html.parser')
+        links = soup.find_all('oppia-noninteractive-link')
+
+        acceptable_schemes = ['https', '']
+
+        for link in links:
+            lnk_attr = link.get('url-with-value')
+            txt_attr = link.get('text-with-value')
+
+            if lnk_attr is None:
+                # Delete the link.
+                link.decompose()
+                continue
+            if txt_attr is None:
+                # Set link text to be the url itself.
+                link.decompose()
+                continue
+
+            lnk = lnk_attr.replace('&quot;', '')
+            txt = txt_attr.replace('&quot;', '')
+
+            # If text is empty and the link is not.
+            if len(lnk) != 0 and len(txt) == 0:
+                # Delete the link.
+                link.decompose()
+                continue
+
+            # If link is http.
+            if urlparse(lnk).scheme == 'http':
+                # Replace http with https.
+                lnk = lnk.replace('http', 'https')
+
+            # If link is invalid.
+            if urlparse(lnk).scheme not in acceptable_schemes:
+                # Delete the link.
+                link.decompose()
+                continue
+
+            link['url-with-value'] = '&quot;' + lnk + '&quot;'
+            link['text-with-value'] = '&quot;' + txt + '&quot;'
+
+        return html_content
+
     def get_translatable_contents_collection(
         self
     ) -> translation_domain.TranslatableContentsCollection:
@@ -3160,46 +3214,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             content_html_list = [state_dict['content']['html']]
 
             for html_content in content_html_list:
-                soup = bs4.BeautifulSoup(html_content, 'html.parser')
-                links = soup.find_all('oppia-noninteractive-link')
-
-                acceptable_schemes = ['https', '']
-
-                for link in links:
-                    lnk_attr = link.get('url-with-value')
-                    txt_attr = link.get('text-with-value')
-
-                    if lnk_attr is None:
-                        # Delete the link.
-                        link.decompose()
-                        continue
-                    if txt_attr is None:
-                        # Set link text to be the url itself.
-                        link.decompose()
-                        continue
-
-                    lnk = lnk_attr.replace('&quot;', '')
-                    txt = txt_attr.replace('&quot;', '')
-
-                    # If text is empty and the link is not.
-                    if len(lnk) != 0 and len(txt) == 0:
-                        # Delete the link.
-                        link.decompose()
-                        continue
-
-                    # If link is http.
-                    if urlparse(lnk).scheme == 'http':
-                        # Replace http with https.
-                        lnk = lnk.replace('http', 'https')
-
-                    # If link is invalid.
-                    if urlparse(lnk).scheme not in acceptable_schemes:
-                        # Delete the link.
-                        link.decompose()
-                        continue
-
-                    link['url-with-value'] = '&quot;' + lnk + '&quot;'
-                    link['text-with-value'] = '&quot;' + txt + '&quot;'
+                html_content = cls.fix_non_interactive_links(html_content)
 
         return states_dict
 
