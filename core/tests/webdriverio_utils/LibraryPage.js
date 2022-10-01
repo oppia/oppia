@@ -55,10 +55,12 @@ var LibraryPage = function() {
     $('.e2e-test-search-bar-language-selector'));
 
   // Returns a promise of all explorations with the given name.
-  var _getExplorationElements = async function(name) {
-    await waitFor.visibilityOf(
-      allExplorationSummaryTile,
-      'All Exploration summary tile is taking too long to appear');
+  var _getExplorationElements = async function(name, isHidden = false) {
+    if (!isHidden) {
+      await waitFor.visibilityOf(
+        allExplorationSummaryTile,
+        'All Exploration summary tile is taking too long to appear');
+    }
     var allExplorationSummaryTiles = allExplorationSummaryTileSelector();
     return await allExplorationSummaryTiles.filter(
       async function(tile) {
@@ -148,7 +150,7 @@ var LibraryPage = function() {
   };
 
   this.expectExplorationToBeHidden = async function(name) {
-    var elems = await _getExplorationElements(name);
+    var elems = await _getExplorationElements(name, true);
     expect(elems.length).toBe(0);
   };
 
