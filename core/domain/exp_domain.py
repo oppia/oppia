@@ -3502,6 +3502,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         answer_group['outcome']['dest'] == state_name
                     ):
                         answer_group['rule_specs'].remove(rule_to_remove)
+                        break
 
                 if (
                     len(answer_group['rule_specs']) == 0 and
@@ -3517,6 +3518,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         answer_group['outcome']['dest'] != state_name
                     ):
                         answer_group['rule_specs'].remove(rule_to_remove)
+                        break
 
                 if (
                     len(answer_group['rule_specs']) == 0 and
