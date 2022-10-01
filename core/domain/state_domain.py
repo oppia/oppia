@@ -1054,7 +1054,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             bool. Returns True if the rules passes the range criteria check.
         """
         if earlier_rule.rule_type in (
-            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan'
+            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan',
             'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
         ):
             return True
