@@ -43,6 +43,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { RteComponentSpecs } from './ck-editor-4-widgets.initializer';
 import { Subscription } from 'rxjs';
 
 interface UiConfig {
@@ -277,8 +278,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
               AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
                 componentDefn.id) === -1);
       if (!(
-        hideComplexExtensionFlag ||
-        notSupportedOnAndroidFlag || isInvalidForBlogPostEditorRTE()
+        hideComplexExtensionFlag || notSupportedOnAndroidFlag ||
+        this.isInvalidForBlogPostEditorRTE(componentDefn)
       )) {
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
@@ -536,12 +537,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     });
   }
 
-  // Returns true if a rte component should not be shown in blog post editor RTE.
-  isInvalidForBlogPostEditorRTE(): boolean {
+  // Returns true if a rte component should not be shown in blog post editor
+  // RTE to remove it from rte configuration for the blog post editor RTE.
+  isInvalidForBlogPostEditorRTE(compDefn: RteComponentSpecs): boolean {
     return (
       this.contextService.isInBlogPostEditorPage() && (
-        AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR.indexOf(
-          componentDefn.id) !== -1)
+        compDefn.id in AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR
+      )
     );
   }
 
