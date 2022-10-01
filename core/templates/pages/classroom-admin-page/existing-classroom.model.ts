@@ -34,7 +34,7 @@ interface ExistingClassroom extends NewClassroom {
   _courseDetails: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
-  _topicIdToTopicName: {[topicId: string]: string};
+  _topicIdToTopicName: TopicIdToTopicName;
   getClassroomDict: () => ClassroomDict;
   getCourseDetails: () => string;
   getTopicListIntro: () => string;
@@ -52,7 +52,7 @@ export class ExistingClassroomData extends
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
   _topicsCountInClassroom: number;
-  _topicIdToTopicName: TopicIdToTopicName;
+  _topicIdToTopicName!: TopicIdToTopicName;
 
   constructor(
       classroomId: string,
@@ -136,8 +136,9 @@ export class ExistingClassroomData extends
   }
 
   validateDependencyGraph(): string {
+    let topicIdToChildTopicId: {[topicId: string]: string};
     for (let currentTopicId in this._topicIdToPrerequisiteTopicIds) {
-      let topicIdToChildTopicId = {};
+      topicIdToChildTopicId = {};
       let ancestors = cloneDeep(
         this._topicIdToPrerequisiteTopicIds[currentTopicId]);
 

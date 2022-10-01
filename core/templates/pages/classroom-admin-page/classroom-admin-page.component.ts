@@ -35,7 +35,6 @@ import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-back
 import { TopicsDependencyGraphModalComponent } from './modals/topic-dependency-graph-viz-modal.component';
 import { ExistingClassroomData, TopicIdToPrerequisiteTopicIds, TopicIdToTopicName } from './existing-classroom.model';
 import { ClassroomAdminDataService } from './services/classroom-admin-data.service';
-import { MatChipList } from '@angular/material/chips';
 
 
 export interface TopicNameToPrerequisiteTopicNames {

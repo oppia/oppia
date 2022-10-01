@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -30,6 +30,7 @@ import { ExistingClassroomData } from './existing-classroom.model';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import cloneDeep from 'lodash/cloneDeep';
 
 
@@ -409,10 +410,6 @@ describe('Classroom Admin Page component ', () => {
       classroomBackendApiService,
       'updateClassroomDataAsync'
     ).and.returnValue(Promise.resolve());
-    spyOn(
-      classroomBackendApiService,
-      'doesClassroomWithUrlFragmentExistAsync'
-    ).and.returnValue(Promise.resolve(false));
 
     component.saveClassroomData('classroomId');
     tick();
@@ -421,6 +418,35 @@ describe('Classroom Admin Page component ', () => {
     expect(component.classroomEditorMode).toBeFalse();
     expect(component.classroomDataIsChanged).toBeFalse();
   }));
+
+  it(
+    'should be able handle rejection handler while saving classroom data',
+    fakeAsync(() => {
+      let classroomDict = {
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: 'Oppia\'s curated maths lesson.',
+        topicListIntro: 'Start from the basics with our first topic.',
+        topicIdToPrerequisiteTopicIds: {}
+      };
+      component.tempClassroomData = (
+        ExistingClassroomData.createClassroomFromDict(classroomDict));
+      component.classroomData = ExistingClassroomData.createClassroomFromDict(
+        classroomDict);
+
+      spyOn(
+        classroomBackendApiService,
+        'updateClassroomDataAsync'
+      ).and.returnValue(Promise.reject());
+
+      component.tempClassroomData.setClassroomName('Discrete maths');
+
+      component.saveClassroomData('classroomId');
+      tick();
+
+      expect(component.tempClassroomData).toEqual(component.classroomData);
+    }));
 
   it(
     'should present a confirmation modal before exiting editor mode if ' +
@@ -772,6 +798,54 @@ describe('Classroom Admin Page component ', () => {
       expectedTopicNameToPrerequisiteTopicNames);
   });
 
+  it('should not add prerequisite that is already added for a topic', () => {
+    component.topicIdsToTopicName = {
+      topicId1: 'Dummy topic 1',
+      topicId2: 'Dummy topic 2',
+      topicId3: 'Dummy topic 3'
+    };
+
+    component.topicNameToPrerequisiteTopicNames = {
+      'Dummy topic 1': [],
+      'Dummy topic 2': ['Dummy topic 1'],
+      'Dummy topic 3': ['Dummy topic 2']
+    };
+
+    component.tempClassroomData = (
+      ExistingClassroomData.createClassroomFromDict({
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: {
+          topicId1: [],
+          topicId2: ['topicId1'],
+          topicId3: ['topicId2']
+        }
+      }));
+    component.classroomData = cloneDeep(component.tempClassroomData);
+
+    const expectedTopicNameToPrerequisiteTopicNames = {
+      'Dummy topic 1': [],
+      'Dummy topic 2': ['Dummy topic 1'],
+      'Dummy topic 3': ['Dummy topic 2']
+    };
+
+    component.addDependencyForTopic('Dummy topic 3', 'Dummy topic 2');
+
+    const expectedTopicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: ['topicId1'],
+      topicId3: ['topicId2']
+    };
+
+    expect(component.tempClassroomData.getTopicIdToPrerequisiteTopicId())
+      .toEqual(expectedTopicIdToPrerequisiteTopicIds);
+    expect(component.topicNameToPrerequisiteTopicNames).toEqual(
+      expectedTopicNameToPrerequisiteTopicNames);
+  });
+
   it('should be able to remove prerequisite from a topic', () => {
     component.topicIdsToTopicName = {
       topicId1: 'Dummy topic 1',
@@ -826,6 +900,26 @@ describe('Classroom Admin Page component ', () => {
       'Dummy topic 2': ['Dummy topic 1'],
       'Dummy topic 3': ['Dummy topic 2']
     };
+
+    fixture.detectChanges();
+    let input = '';
+    component.topicsFilter = {
+      valueChanges: {
+        pipe: (callb: (value: string) => void) => {
+          callb(input);
+        }
+      }
+    } as FormControl;
+    component.ngOnInit();
+    input = 'Dum';
+    component.topicsFilter = {
+      valueChanges: {
+        pipe(callb: (val: string) => void) {
+          callb(input);
+        }
+      }
+    } as FormControl;
+    component.ngOnInit();
 
     component.getEligibleTopicPrerequisites('Dummy topic 2');
 
@@ -960,5 +1054,114 @@ describe('Classroom Admin Page component ', () => {
         .toEqual(expectedTopicIdToPrerequisiteTopicIds);
       expect(component.topicNameToPrerequisiteTopicNames).toEqual(
         expectedTopicNameToPrerequisiteTopicNames);
+    }));
+
+  it('should change list oder', () => {
+    component.tempClassroomData = (
+      ExistingClassroomData.createClassroomFromDict({
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: {
+          topicId1: [],
+          topicId2: ['topicId1'],
+          topicId3: ['topicId2', 'topicId1']
+        }
+      }));
+    component.topicIdsToTopicName = {
+      topicId1: 'Topic1',
+      topicId2: 'Topic2',
+      topicId3: 'Topic3'
+    };
+    component.topicNameToPrerequisiteTopicNames = {
+      Topic1: [],
+      Topic2: ['Topic1'],
+      Topic3: ['Topic2', 'Topic1']
+    };
+    component.topicNames = ['Topic1', 'Topic2', 'Topic3'];
+    component.classroomData = cloneDeep(component.tempClassroomData);
+
+    spyOn(component.tempClassroomData, 'setTopicIdToPrerequisiteTopicId');
+
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+    } as CdkDragDrop<string[]>;
+    component.drop(event);
+
+    expect(
+      component.tempClassroomData.setTopicIdToPrerequisiteTopicId
+    ).toHaveBeenCalled();
+  });
+
+  it(
+    'should present a graph modal before topics dependency visualization',
+    fakeAsync(() => {
+      component.tempClassroomData = (
+        ExistingClassroomData.createClassroomFromDict({
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {
+            topicId1: [],
+            topicId2: ['topicId1'],
+            topicId3: ['topicId2', 'topicId1']
+          }
+        }));
+      component.topicIdsToTopicName = {
+        topicId1: 'Topic 1',
+        topicId2: 'Topic 2',
+        topicId3: 'Topic 3'
+      };
+
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.resolve()
+        } as NgbModalRef
+      );
+
+      component.viewGraph();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
+
+  it(
+    'should be able to cancel the topics graph visualization', fakeAsync(() => {
+      component.tempClassroomData = (
+        ExistingClassroomData.createClassroomFromDict({
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {
+            topicId1: [],
+            topicId2: ['topicId1'],
+            topicId3: ['topicId2', 'topicId1']
+          }
+        }));
+      component.topicIdsToTopicName = {
+        topicId1: 'Topic 1',
+        topicId2: 'Topic 2',
+        topicId3: 'Topic 3'
+      };
+
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.reject()
+        } as NgbModalRef
+      );
+
+      component.viewGraph();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
     }));
 });
