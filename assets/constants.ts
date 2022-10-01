@@ -5922,6 +5922,7 @@ export default {
   // classroom in the classroom page URL. E.g. in /learn/math/...,
   // 'math' is the 'classroom URL fragment'.
   "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
+  "MAX_CHARS_IN_CLASSROOM_NAME": 39,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 12,
   // This represents the maximum number of characters in the URL fragment for
@@ -6329,6 +6330,24 @@ export default {
     "ABOUT_FOUNDATION": {
       "ROUTE": "about-foundation",
       "TITLE": "About the Oppia Foundation | Oppia",
+      "META": []
+    },
+    "EXPLORATION_PLAYER": {
+      "ROUTE": "explore/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "EXPLORATION_PLAYER_EMBED": {
+      "ROUTE": "embed/exploration/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": []
     },
     "ANDROID": {
