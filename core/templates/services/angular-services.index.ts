@@ -433,6 +433,7 @@ import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
 import { SuggestionModalForExplorationEditorService } from 'pages/exploration-editor-page/suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
+import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -899,5 +900,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['CompareVersionsService', CompareVersionsService],
   ['SuggestionModalForExplorationEditorService',
     SuggestionModalForExplorationEditorService],
-  ['EntityCreationService', EntityCreationService]
+  ['EntityCreationService', EntityCreationService],
+  ['ClassroomAdminDataService', ClassroomAdminDataService]
 ];
