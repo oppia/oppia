@@ -3942,9 +3942,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
         init_state.update_interaction_hints(hints_list)
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
-            'correct_answer': [0, 0],
+            'correct_answer': [0, 0],  # type: ignore[typeddict-item]
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
