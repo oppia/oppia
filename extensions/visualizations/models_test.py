@@ -26,12 +26,12 @@ from . import models
 
 class BaseVisualizationTests(test_utils.GenericTestBase):
 
-    def test_get_class_name_correctly(self):
+    def test_get_class_name_correctly(self) -> None:
         self.assertEqual(
             models.BaseVisualization(
-                'AnswerFrequencies', [], True).id, 'BaseVisualization')
+                'AnswerFrequencies', {}, True).id, 'BaseVisualization')
 
-    def test_valid_options_dict_raises_no_error(self):
+    def test_valid_options_dict_raises_no_error(self) -> None:
         base_obj = models.BaseVisualization('AnswerFrequencies', {}, True)
         base_obj.validate()
         sorted_tiles_obj = models.SortedTiles(
@@ -42,7 +42,7 @@ class BaseVisualizationTests(test_utils.GenericTestBase):
             }, True)
         sorted_tiles_obj.validate()
 
-    def test_invalid_options_dict_raises_error(self):
+    def test_invalid_options_dict_raises_error(self) -> None:
         error_message = (
             'For visualization BaseVisualization, expected option names %s;'
             ' received names %s' % ([], ['key1']))
@@ -50,10 +50,13 @@ class BaseVisualizationTests(test_utils.GenericTestBase):
             models.BaseVisualization(
                 'AnswerFrequencies', {'key1': 'value1'}, True).validate()
 
-    def test_invalid_addressed_info_is_supported_raises_error(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_invalid_addressed_info_is_supported_raises_error(self) -> None:
         error_message = (
             'For visualization BaseVisualization, expected a bool value for '
             'addressed_info_is_supported; received false')
         with self.assertRaisesRegex(utils.ValidationError, error_message):
             models.BaseVisualization(
-                'AnswerFrequencies', {}, 'false').validate()
+                'AnswerFrequencies', {}, 'false').validate()  # type: ignore[arg-type]

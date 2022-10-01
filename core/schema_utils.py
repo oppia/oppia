@@ -140,7 +140,7 @@ def normalize_against_schema(
             normalized_obj = normalize_against_schema(
                 obj, obj_class.get_schema(), apply_custom_validators=False)
         else:
-            normalized_obj = obj_class.normalize(obj)  # type: ignore[no-untyped-call]
+            normalized_obj = obj_class.normalize(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [

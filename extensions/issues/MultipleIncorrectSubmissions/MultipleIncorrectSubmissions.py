@@ -20,13 +20,19 @@ from __future__ import annotations
 
 from extensions.issues import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class MultipleIncorrectSubmissions(base.BaseExplorationIssueSpec):
     """Issue that's recorded when the learner answers multiple times incorrectly
     in the same card and quits the exploration.
     """
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'state_name',
         'description': 'State name',
         'schema': {

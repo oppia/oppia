@@ -22,11 +22,17 @@ from __future__ import annotations
 
 from extensions.actions import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class AnswerSubmit(base.BaseLearnerActionSpec):
     """Learner action that's recorded when an answer is submitted."""
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'state_name',
         'description': 'State name',
         'schema': {

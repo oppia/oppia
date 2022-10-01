@@ -20,56 +20,66 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class GraphInput(base.BaseInteraction):
     """Interaction for evaluating graphs."""
 
-    name = 'Graph Theory'
-    description = 'Allows learners to create and manipulate graphs.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = False
-    _dependency_ids = []
-    answer_type = 'Graph'
-    instructions = 'I18N_INTERACTIONS_GRAPH_INPUT_INSTRUCTION'
-    narrow_instructions = 'I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION'
-    needs_summary = True
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Graph Theory'
+    description: str = 'Allows learners to create and manipulate graphs.'
+    display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable: bool = False
+    _dependency_ids: List[str] = []
+    answer_type: str = 'Graph'
+    instructions: str = 'I18N_INTERACTIONS_GRAPH_INPUT_INSTRUCTION'
+    narrow_instructions: str = (
+        'I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION'
+    )
+    needs_summary: bool = True
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
-    _customization_arg_specs = [{
+    _graph_default_value: domain.GraphDict = {
+        'vertices': [{
+            'x': 150.0,
+            'y': 50.0,
+            'label': '',
+        }, {
+            'x': 200.0,
+            'y': 50.0,
+            'label': '',
+        }, {
+            'x': 150.0,
+            'y': 100.0,
+            'label': '',
+        }],
+        'edges': [{
+            'src': 0,
+            'dst': 1,
+            'weight': 1,
+        }, {
+            'src': 1,
+            'dst': 2,
+            'weight': 1,
+        }],
+        'isLabeled': False,
+        'isDirected': False,
+        'isWeighted': False,
+    }
+
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'graph',
         'description': 'Initial graph',
         'schema': {
             'type': 'custom',
             'obj_type': 'Graph',
         },
-        'default_value': {
-            'vertices': [{
-                'x': 150.0,
-                'y': 50.0,
-                'label': '',
-            }, {
-                'x': 200.0,
-                'y': 50.0,
-                'label': '',
-            }, {
-                'x': 150.0,
-                'y': 100.0,
-                'label': '',
-            }],
-            'edges': [{
-                'src': 0,
-                'dst': 1,
-                'weight': 1,
-            }, {
-                'src': 1,
-                'dst': 2,
-                'weight': 1,
-            }],
-            'isLabeled': False,
-            'isDirected': False,
-            'isWeighted': False,
-        }
+        'default_value': _graph_default_value
     }, {
         'name': 'canAddVertex',
         'description': 'Allow learner to add vertices',

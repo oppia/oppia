@@ -18,23 +18,29 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class RatioExpressionInput(base.BaseInteraction):
     """Interaction for ratio input."""
 
-    name = 'Ratio Expression Input'
-    description = 'Allow learners to enter ratios.'
-    display_mode = base.DISPLAY_MODE_INLINE
-    is_trainable = False
-    _dependency_ids = []
-    answer_type = 'RatioExpression'
-    instructions = None
-    narrow_instructions = None
-    needs_summary = False
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Ratio Expression Input'
+    description: str = 'Allow learners to enter ratios.'
+    display_mode: str = base.DISPLAY_MODE_INLINE
+    is_trainable: bool = False
+    _dependency_ids: List[str] = []
+    answer_type: str = 'RatioExpression'
+    instructions: Optional[str] = None
+    narrow_instructions: Optional[str] = None
+    needs_summary: bool = False
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'placeholder',
         'description': 'Custom placeholder text (optional)',
         'schema': {
@@ -64,4 +70,4 @@ class RatioExpressionInput(base.BaseInteraction):
         'default_value': 0,
     }]
 
-    _answer_visualization_specs = []
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = []
