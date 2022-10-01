@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -29,6 +29,8 @@ describe('Oppia click hexbins visualization', function() {
   let fixture: ComponentFixture<OppiaVisualizationClickHexbinsComponent>;
   let imagePreloaderService: ImagePreloaderService;
   let assetsBackendApiService: AssetsBackendApiService;
+  let bannerDe: DebugElement;
+  let bannerEl: HTMLElement;
   let tooltipTarget = {
     x: 0,
     y: 0,
@@ -70,13 +72,25 @@ describe('Oppia click hexbins visualization', function() {
     ];
     component.interactionArgs = {
       imageAndRegions: {
-        value: {
-          imagePath: ''
-        }
+        value: { imagePath: 'solar-system.png' },
       }
     };
 
+    bannerDe = fixture.debugElement;
+    bannerEl = bannerDe.nativeElement;
+
     fixture.detectChanges();
+  });
+
+  it('should group the two answers as two distinct hexagons', () => {
+    expect(
+      bannerEl.querySelectorAll('.click-hexbin-hexagon').length).toEqual(2);
+  });
+
+  it('should be hidden by default', () => {
+    expect(
+      bannerEl.querySelectorAll(
+        '.click-hexbin-chart-tooltip').length).toEqual(0);
   });
 
   it('should showTooltip', fakeAsync(() => {
