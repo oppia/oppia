@@ -36,7 +36,8 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast, overload
+    Any, Callable, Dict, List, Mapping, Optional, Tuple, Type, Union,
+    cast, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 
@@ -47,6 +48,7 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from extensions import domain
     from extensions.interactions import base
 
 # TODO(#14537): Refactor this file and remove imports marked
@@ -97,7 +99,7 @@ class StateVersionHistoryDict(TypedDict):
 
 
 AcceptableCorrectAnswerTypes = Union[
-    List[List[str]], List[str], str, Dict[str, str], int, List[int]
+    List[List[str]], List[str], str, Dict[str, str], int, None
 ]
 
 
@@ -242,7 +244,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
             rule_spec.validate(
-                interaction.get_rule_param_list(rule_spec.rule_type),  # type: ignore[no-untyped-call]
+                interaction.get_rule_param_list(rule_spec.rule_type),
                 exp_param_specs_dict)
 
         self.outcome.validate()
@@ -491,7 +493,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         """
         self.answer_is_exclusive = answer_is_exclusive
         self.correct_answer = (
-            interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+            interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).normalize_answer(correct_answer))
         self.explanation = explanation
 
@@ -545,7 +547,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         return cls(
             interaction_id,
             solution_dict['answer_is_exclusive'],
-            interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+            interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).normalize_answer(
                     solution_dict['correct_answer']),
             explanation)
@@ -564,7 +566,7 @@ class Solution(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected answer_is_exclusive to be bool, received %s' %
                 self.answer_is_exclusive)
-        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+        interaction_registry.Registry.get_interaction_by_id(
             interaction_id).normalize_answer(self.correct_answer)
         self.explanation.validate()
 
@@ -2041,11 +2043,21 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         if (
                                 html_type ==
                                 feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
-                            for value in self.solution.correct_answer:
-                                html_list += value
+                            # Here we use cast because above 'if' clause forces
+                            # 'correct_answer' to be of type List[List[str]].
+                            list_of_set_of_html_answer = cast(
+                                List[List[str]], self.solution.correct_answer
+                            )
+                            for set_of_html_value in list_of_set_of_html_answer:
+                                html_list += set_of_html_value
                         elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
-                            for value in self.solution.correct_answer:
-                                html_list += [value]
+                            # Here we use cast because above 'elif' clause
+                            # forces 'correct_answer' to be of type List[str].
+                            set_of_html_answer = cast(
+                                List[str], self.solution.correct_answer
+                            )
+                            for html_value in set_of_html_answer:
+                                html_list += [html_value]
                         else:
                             raise Exception(
                                 'The solution does not have a valid '
@@ -2059,7 +2071,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     @staticmethod
     def convert_html_in_interaction(
         interaction_dict: InteractionInstanceDict,
-        ca_specs_dict: List[base.CustomizationArgSpecsDict],
+        ca_specs_dict: List[domain.CustomizationArgSpecsDict],
         conversion_fn: Callable[[str], str]
     ) -> InteractionInstanceDict:
         """Checks for HTML fields in the interaction and converts it
@@ -2541,7 +2553,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     @staticmethod
     def convert_cust_args_dict_to_cust_args_based_on_specs(
         ca_dict: CustomizationArgsDictType,
-        ca_specs_dict: List[base.CustomizationArgSpecsDict]
+        ca_specs_dict: List[domain.CustomizationArgSpecsDict]
     ) -> Dict[str, InteractionCustomizationArg]:
         """Converts customization arguments dictionary to customization
         arguments. This is done by converting each customization argument to a
@@ -2987,7 +2999,7 @@ class WrittenTranslation:
         translatable_obj_class = (
             translatable_object_registry.Registry.get_object_class(
                 translatable_class_name))
-        self.translation = translatable_obj_class.normalize_value(  # type: ignore[no-untyped-call]
+        self.translation = translatable_obj_class.normalize_value(
             self.translation)
 
         if not isinstance(self.needs_update, bool):
@@ -3595,7 +3607,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
 
     def validate(
         self,
-        rule_params_list: List[Tuple[str, objects.BaseObject]],
+        rule_params_list: List[Tuple[str, Type[objects.BaseObject]]],
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
     ) -> None:
         """Validates a RuleSpec value object. It ensures the inputs dict does
@@ -3664,7 +3676,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
             else:
                 # Otherwise, a simple parameter value needs to be normalizable
                 # by the parameter object in order to be valid.
-                param_obj.normalize(param_value)  # type: ignore[no-untyped-call]
+                param_obj.normalize(param_value)
 
     @staticmethod
     def convert_html_in_rule_spec(
@@ -4201,7 +4213,7 @@ class State(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group.rule_specs:
                 for param_name, value in rule_spec.inputs.items():
                     param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+                        interaction_registry.Registry.get_interaction_by_id(
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
@@ -4577,7 +4589,7 @@ class State(translation_domain.BaseTranslatableObject):
                 for rule_spec in answer_group.rule_specs:
                     for param_name, value in rule_spec.inputs.items():
                         param_type = (
-                            interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+                            interaction_registry.Registry.get_interaction_by_id(
                                 self.interaction.id
                             ).get_rule_param_type(
                                 rule_spec.rule_type, param_name))
@@ -4673,7 +4685,7 @@ class State(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group.rule_specs:
                 for param_name, value in rule_spec.inputs.items():
                     param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+                        interaction_registry.Registry.get_interaction_by_id(
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
@@ -4702,7 +4714,7 @@ class State(translation_domain.BaseTranslatableObject):
                         % rule_inputs)
                 for param_name, value in rule_inputs.items():
                     param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+                        interaction_registry.Registry.get_interaction_by_id(
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
