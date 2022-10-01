@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.io.job_run_results_io."""
+"""Unit tests for jobs.io.job_io."""
 
 from __future__ import annotations
 

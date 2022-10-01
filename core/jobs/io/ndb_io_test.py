@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides an Apache Beam API for operating on NDB models."""
+"""Unit tests for jobs.io.ndb_io."""
 
 from __future__ import annotations
 
