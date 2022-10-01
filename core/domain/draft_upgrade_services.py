@@ -128,6 +128,51 @@ class DraftUpgradeUtil:
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _invalidate_drafts_with_invalid_links(cls, html_content: str) -> None:
+        """Invalidates all drafts with invalid links.
+
+        Args:
+            html_content: str. HTML content of the draft.
+
+        Returns:
+            None.
+        """
+
+        soup = bs4.BeautifulSoup(html_content, 'html.parser')
+        links = soup.find_all('oppia-noninteractive-link')
+
+        acceptable_schemes = ['https', '']
+
+        for link in links:
+            lnk_attr = link.get('url-with-value')
+            txt_attr = link.get('text-with-value')
+
+            if lnk_attr is None:
+                # Invalidate draft.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+            if txt_attr is None:
+                # Invalidate Draft.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+
+            lnk = lnk_attr.replace('&quot;', '')
+            txt = txt_attr.replace('&quot;', '')
+
+            # If text is empty and the link is not.
+            if len(lnk) != 0 and len(txt) == 0:
+                # Invalidate draft.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+
+            # If link is invalid.
+            if urlparse(lnk).scheme not in acceptable_schemes:
+                # Invalidate draft.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+
+
+    @classmethod
     def _convert_html_in_draft_change_list(
         cls,
         draft_change_list: List[exp_domain.ExplorationChange],
@@ -346,39 +391,28 @@ class DraftUpgradeUtil:
                 )
                 new_value = edit_content_property_cmd.new_value
                 html_content = new_value['html']
-                soup = bs4.BeautifulSoup(html_content, 'html.parser')
-                links = soup.find_all('oppia-noninteractive-link')
+                
+                cls._invalidate_drafts_with_invalid_links(html_content)
 
-                acceptable_schemes = ['https', '']
-
-                for link in links:
-                    lnk_attr = link.get('url-with-value')
-                    txt_attr = link.get('text-with-value')
-
-                    if lnk_attr is None:
-                        # Invalidate draft.
-                        raise InvalidDraftConversionException(
-                            'Conversion cannot be completed.')
-                    if txt_attr is None:
-                        # Invalidate Draft.
-                        raise InvalidDraftConversionException(
-                            'Conversion cannot be completed.')
-
-                    lnk = lnk_attr.replace('&quot;', '')
-                    txt = txt_attr.replace('&quot;', '')
-
-                    # If text is empty and the link is not.
-                    if len(lnk) != 0 and len(txt) == 0:
-                        # Invalidate draft.
-                        raise InvalidDraftConversionException(
-                            'Conversion cannot be completed.')
-
-                    # If link is invalid.
-                    if urlparse(lnk).scheme not in acceptable_schemes:
-                        # Invalidate draft.
-                        raise InvalidDraftConversionException(
-                            'Conversion cannot be completed.')
-
+            elif exp_change.property_name == (
+                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                assert isinstance(exp_change.new_value, dict)
+                
+                written_translations = exp_change.new_value
+                for translations in (
+                    written_translations['translations_mapping'].values()
+                ):
+                    for written_translation in translations.values():
+                        if isinstance(
+                            written_translation['translation'], List):
+                            for element in written_translation[
+                                'translation']:
+                                cls._invalidate_drafts_with_invalid_links(element)
+                        else:
+                            cls._invalidate_drafts_with_invalid_links(
+                                written_translation['translation']
+                            )                
+    
         return draft_change_list
 
     @classmethod

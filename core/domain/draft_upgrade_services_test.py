@@ -169,7 +169,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
     def test_convert_states_v52_dict_to_v53_dict(self) -> None:
-        draft_change_list_v52 = [
+        draft_change_list_v52_1 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -196,25 +196,52 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 ).to_dict()
             })]
 
+        draft_change_list_v52_2 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
+                'state_name': 'New state',
+                'old_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html', '', False)
+                    }
+                }).to_dict(),
+                'new_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html',
+                            (
+                                '<p><oppia-noninteractive-link' +
+                                ' text-with-value="&amp;quot;&amp;quot;"' +
+                                ' url-with-value=' +
+                                '"&amp;quot;mailto:example@example.com&amp' +
+                                ';quot;"></oppia-noninteractive-link></p>'
+                            ),
+                            True
+                        )
+                    }
+                }).to_dict()
+            })
+        ]
+
         # Migrate exploration to state schema version 53.
         self.create_and_migrate_new_exploration('52', '53')
         migrated_draft_change_list_v53 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v52, 1, 2, self.EXP_ID)
+                draft_change_list_v52_1, 1, 2, self.EXP_ID)
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert migrated_draft_change_list_v53 is not None
-        # Change draft change lists into a list of dicts so that it is
-        # easy to compare the whole draft change list.
-        draft_change_list_v52_dict_list = [
-            change.to_dict() for change in draft_change_list_v52
-        ]
-        migrated_draft_change_list_v53_dict_list = [
-            change.to_dict() for change in migrated_draft_change_list_v53
-        ]
-        self.assertEqual(
-            draft_change_list_v52_dict_list,
-            migrated_draft_change_list_v53_dict_list)
+        # As invalid drafts are rejected, this draft will be None.
+        assert migrated_draft_change_list_v53 is None
+
+
+        migrated_draft_change_list_v53 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52_2, 1, 2, self.EXP_ID)
+        )
+        # As invalid drafts are rejected, this draft will be None.
+        assert migrated_draft_change_list_v53 is None
 
     def test_convert_states_v51_dict_to_v52_dict(self) -> None:
         draft_change_list_v51_1 = [

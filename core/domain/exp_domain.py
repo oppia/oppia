@@ -3216,6 +3216,25 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for html_content in content_html_list:
                 html_content = cls.fix_non_interactive_links(html_content)
 
+            translations_mapping = (
+            state_dict['written_translations']['translations_mapping'])
+
+            for translations in translations_mapping.values():
+                for written_translation in translations.values():
+                    if isinstance(written_translation['translation'], List):
+                        translated_element_list = []
+                        for element in written_translation['translation']:
+                            element = cls.fix_non_interactive_links(element)
+                            translated_element_list.append(element)
+                        written_translation['translation'] = (
+                                translated_element_list)
+                    else:
+                        fixed_translation = (
+                                cls.fix_non_interactive_links(
+                                written_translation['translation']))
+                        written_translation['translation'] = (
+                                fixed_translation)
+
         return states_dict
 
     @classmethod
