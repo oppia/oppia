@@ -21,6 +21,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
+export type ChartLegendPosition = (
+  'bottom' | 'left' | 'in' | 'none' | 'right' | 'top');
+
 @Component({
   selector: 'oppia-pie-chart',
   templateUrl: './pie-chart.component.html'
@@ -48,7 +51,7 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
 
    directiveSubscriptions = new Subscription();
    // TODO(#13015): Remove use of unknown as a type.
-   chart: unknown;
+   chart: google.visualization.PieChart;
 
    constructor(
      private windowDimensionsService: WindowDimensionsService,
@@ -56,7 +59,7 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
 
    redrawChart(): void {
      if (this.chart !== null) {
-       (this.chart as {draw: (data1, data2) => {}})
+       (this.chart)
          .draw(google.visualization.arrayToDataTable(this.data), {
            title: this.options.title,
            pieHole: this.options.pieHole,
@@ -72,7 +75,8 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
            colors: this.options.colors,
            height: this.options.height,
            legend: {
-             position: this.options.legendPosition || 'none'
+             position: (
+               this.options.legendPosition || 'none') as ChartLegendPosition
            },
            width: this.options.width
          });

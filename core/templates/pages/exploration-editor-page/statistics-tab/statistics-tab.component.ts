@@ -51,7 +51,7 @@ interface PieChartOptions {
   templateUrl: './statistics-tab.component.html'
 })
 export class StatisticsTabComponent implements
-   OnInit, OnDestroy {
+    OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   stateStatsModalIsOpen: boolean;
   explorationHasBeenVisited: boolean;

@@ -29,11 +29,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ExplorationImprovementsTaskRegistryService, StateTasks } from 'services/exploration-improvements-task-registry.service';
 import { RouterService } from '../services/router.service';
 
-type HbrTask = HighBounceRateTask;
-type IflTask = IneffectiveFeedbackLoopTask;
-type NgrTask = NeedsGuidingResponsesTask;
-type SiaTask = SuccessiveIncorrectAnswersTask;
-
 @Component({
   selector: 'oppia-improvements-tab',
   templateUrl: './improvements-tab.component.html'
@@ -44,10 +39,10 @@ export class ImprovementsTabComponent implements OnInit {
   timeMachineImageUrl: string;
   completionRate: number;
   completionRateAsPercent: string;
-  hbrTasks: HbrTask[];
-  iflTasks: IflTask[];
-  ngrTasks: NgrTask[];
-  siaTasks: SiaTask[];
+  hbrTasks: HighBounceRateTask[];
+  iflTasks: IneffectiveFeedbackLoopTask[];
+  ngrTasks: NeedsGuidingResponsesTask[];
+  siaTasks: SuccessiveIncorrectAnswersTask[];
   allStateTasks: StateTasks[];
 
   constructor(

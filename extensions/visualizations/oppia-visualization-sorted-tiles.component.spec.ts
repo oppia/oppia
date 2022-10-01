@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,9 +74,13 @@ describe('Oppia sorted tiles visualization', function() {
     component.isSelected = [false, true];
     component.select(0);
     component.unselect(1);
-    tick();
+    component.isAnswerTooLong(null);
 
-    expect(component.isAnswerTooLong(0)).toBe(true);
+    tick();
+    expect(component.isAnswerTooLong(
+      {
+        innerHTML: 'inner-html'
+      } as HTMLElement)).toBe(true);
     expect(component.isSelected).toEqual([true, false]);
 
     component.openAnswerContentModal(0);

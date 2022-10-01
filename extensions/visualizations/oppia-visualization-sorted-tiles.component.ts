@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * @fileoverview Component for the SortedTiles visualization.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChildren } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AnswerContentModalComponent } from 'components/common-layout-directives/common-elements/answer-content-modal.component';
@@ -31,6 +31,9 @@ import './oppia-visualization-sorted-tiles.component.css';
   templateUrl: './oppia-visualization-sorted-tiles.component.html'
 })
 export class VisualizationSortedTilesComponent implements OnInit {
+  @ViewChildren('oppiaVisualizationSortedTileAnswers')
+    oppiaVisualizationSortedTileAnswers;
+
   @Input() data: AnswerStats[];
   @Input() totalFrequency: number;
   @Input() options: {
@@ -45,9 +48,13 @@ export class VisualizationSortedTilesComponent implements OnInit {
      private ngbModal: NgbModal,
   ) {}
 
-  isAnswerTooLong(index: number): boolean {
+  isAnswerTooLong(visualizationSortedTileAnswersElement: HTMLElement): boolean {
+    if (!visualizationSortedTileAnswersElement) {
+      return;
+    }
+
     return this.utilsService.isOverflowing(
-      $('.oppia-visualization-sorted-tile-answer.answer-' + index).get(0)
+      visualizationSortedTileAnswersElement
     );
   }
 
