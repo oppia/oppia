@@ -5942,6 +5942,265 @@ title: ''
             exploration.to_yaml(),
             latest_sample_yaml_content_for_lab_as_correct)
 
+    def test_fixing_of_rte_content_by_migrating_to_v_58(
+        self
+    ) -> None:
+        """Tests the fixing of RTE content data from version less than 58."""
+
+        sample_yaml_content_for_cont_and_end_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: '<p>Content of RTE</p>
+
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+
+
+        <p></p>
+
+
+        <p><oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link></p>
+
+
+        <p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math></p>
+
+
+        <p><oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;"
+        text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview></p><oppia-noninteractive-video
+        autoplay-with-value="&amp;quot;&amp;quot;" end-with-value="&amp;quot;&amp;quot;"
+        start-with-value="&amp;quot;&amp;quot;" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video><oppia-noninteractive-collapsible
+        content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible
+        block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;img_20220923_044008_0djfosh7hw_height_374_width_490.svg&amp;amp;amp;quot;\&amp;quot;
+        ng-version=\&amp;quot;11.2.14\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;"
+        heading-with-value="&amp;quot;Sample Header&amp;quot;"></oppia-noninteractive-collapsible><oppia-noninteractive-tabs
+        tab_contents-with-value="[{&amp;quot;title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This
+        set of tabs shows some hints. Click on the other tabs to display the relevant
+        hints.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;img_20220923_044114_vpquhnqwr5_height_150_width_289.svg&amp;amp;amp;quot;\&amp;quot;
+        ng-version=\&amp;quot;11.2.14\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;oppia-noninteractive-video
+        _nghost-egv-c35=\&amp;quot;\&amp;quot; autoplay-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        end-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        ng-version=\&amp;quot;11.2.14\&amp;quot; start-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        video_id-with-value=\&amp;quot;&amp;amp;amp;quot;mhlEfHv-LHo&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;Hint
+        1&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This is
+        a first hint.&amp;lt;/p&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>'
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continueeeeeeeeeeeeeeeeeeeeeee
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+          - id4
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_cont_and_end_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: '<p>Content of RTE</p>
+
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+ 
+
+        <p></p>
+ 
+ 
+        <p></p>
+ 
+        <p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math></p>
+ 
+        <p></p><oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video><oppia-noninteractive-collapsible
+        content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible
+        block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;img_20220923_044008_0djfosh7hw_height_374_width_490.svg&amp;amp;amp;quot;\&amp;quot;
+        ng-version=\&amp;quot;11.2.14\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;"
+        heading-with-value="&amp;quot;Sample Header&amp;quot;"></oppia-noninteractive-collapsible><oppia-noninteractive-tabs
+        tab_contents-with-value="[{&amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;,
+        &amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;This set of tabs shows
+        some hints. Click on the other tabs to display the relevant hints.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image
+        alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;img_20220923_044114_vpquhnqwr5_height_150_width_289.svg&amp;amp;amp;quot;\&amp;quot;
+        ng-version=\&amp;quot;11.2.14\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;oppia-noninteractive-video
+        _nghost-egv-c35=\&amp;quot;\&amp;quot; autoplay-with-value=\&amp;quot;false\&amp;quot;
+        end-with-value=\&amp;quot;0\&amp;quot; ng-version=\&amp;quot;11.2.14\&amp;quot;
+        start-with-value=\&amp;quot;0\&amp;quot; video_id-with-value=\&amp;quot;&amp;amp;amp;quot;mhlEfHv-LHo&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;},
+        {&amp;quot;title&amp;quot;: &amp;quot;Hint 1&amp;quot;, &amp;quot;content&amp;quot;:
+        &amp;quot;&amp;lt;p&amp;gt;This is a first hint.&amp;lt;/p&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>'
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        self.maxDiff = None
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_cont_and_end_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_cont_and_end_interac)
+
     def test_fixing_invalid_continue_and_end_exp_data_by_migrating_to_v58(
         self
     ) -> None:
