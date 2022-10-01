@@ -412,10 +412,9 @@
 }
 
 .save-progress-menu .uid-box .uid-copy {
-  align-items: center;
+  align-items: flex-end;
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
   margin-bottom: 30px;
   width: 100%;
 }

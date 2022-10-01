@@ -35,7 +35,6 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ComponentOverviewComponent } from '../../../components/copy-exploration-url/copy-exploration-url.component'
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -80,7 +79,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   lessonAuthorsSubmenuIsShown: boolean = false;
   loggedOutProgressUniqueUrlId: string;
   loggedOutProgressUniqueUrl: string;
-  saveProgressMenuIsShown: boolean = false;   
+  saveProgressMenuIsShown: boolean = false;
   // The below property is defined only when the learner is on a
   // checkpointed state, and is undefined otherwise.
   translatedCongratulatoryCheckpointMessage: string | undefined;
@@ -120,7 +119,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.infoCardBackgroundCss = {
       'background-color': this.expInfo.thumbnail_bg_color
     };
-    this.infoCardBackgroundImageUrl = this.expInfo.thumbnail_icon_url
+    this.infoCardBackgroundImageUrl = this.expInfo.thumbnail_icon_url;
 
     this.expTitleTranslationKey = (
       this.i18nLanguageCodeService.

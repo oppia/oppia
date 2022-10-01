@@ -154,7 +154,7 @@ import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashbo
 import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
-import { ComponentOverviewComponent } from './copy-exploration-url/copy-exploration-url.component'
+import { ComponentOverviewComponent } from './copy-exploration-url/copy-exploration-url.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';

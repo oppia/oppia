@@ -223,9 +223,8 @@ export class SkillConceptCardEditorComponent implements OnInit {
           this.workedExamplesListIsShown = (
             !this.windowDimensionsService.isWindowNarrow());
         }
-      )
-    )
-    
+      ));
+
   }
 
   ngOnDestroy(): void {

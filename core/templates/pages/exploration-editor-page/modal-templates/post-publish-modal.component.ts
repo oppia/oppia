@@ -66,7 +66,6 @@ export class PostPublishModalComponent
   }
 
   selectText(event: MouseEvent): void {
-    let codeDiv = event.currentTarget;
     let range = document.createRange();
     range.selectNode(document.getElementById('exploration-link'));
     let selection = window.getSelection();
