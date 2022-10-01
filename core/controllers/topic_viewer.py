@@ -20,6 +20,7 @@ import logging
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -30,6 +31,13 @@ from core.domain import topic_fetchers
 
 class TopicViewerPage(base.BaseHandler):
     """Renders the topic viewer page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+    }
+
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
