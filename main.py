@@ -381,6 +381,9 @@ URLS = [
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
+        r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
+        classroom.ClassroomAdminPage),
+    get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
     get_redirect_route(
@@ -389,6 +392,9 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
         classroom.ClassroomHandler),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_URL_FRAGMENT_HANDLER,
+        classroom.ClassroomUrlFragmentHandler),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
