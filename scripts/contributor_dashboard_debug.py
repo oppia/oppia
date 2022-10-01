@@ -40,7 +40,6 @@ from core.constants import constants
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
-
 import requests
 from typing import Dict, Iterator, List
 from typing_extensions import Final
@@ -218,7 +217,8 @@ class ContributorDashboardDebugInitializer:
         self._make_request('POST', '/adminhandler', params=params)
 
     def _add_topics_to_classroom(
-            self, classroom_name: str, classroom_url_fragment: str) -> None:
+        self, classroom_name: str, classroom_url_fragment: str
+    ) -> None:
         """Adds all dummy topics to a classroom."""
         response = self._make_request(
             'GET', '/topics_and_skills_dashboard/data')
@@ -247,12 +247,12 @@ class ContributorDashboardDebugInitializer:
         self._make_request('POST', '/adminhandler', params=params)
 
     def _make_request(
-            self,
-            method: str,
-            url: str,
-            params: Dict[str, str] | None = None,
-            headers: Dict[str, str] | None = None
-        ) -> requests.Response:
+        self,
+        method: str,
+        url: str,
+        params: Dict[str, str] | None = None,
+        headers: Dict[str, str] | None = None
+    ) -> requests.Response:
         """Makes a request to the Oppia server."""
         if params is None:
             params = {}
