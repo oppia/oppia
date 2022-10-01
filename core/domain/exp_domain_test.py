@@ -5729,16 +5729,18 @@ title: Title
         self
     ) -> None:
         """Tests the migration of invalid data from version less than 58."""
-        sample_yaml_content: str = (
+
+    # Migration test for Continue and End interaction.
+        sample_yaml_content_for_cont_and_end_interac: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
-category: Algorithms
+category: ''
 correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
-objective: learn testing and earn
+objective: ''
 param_changes: []
 param_specs: {}
 schema_version: 57
@@ -5748,7 +5750,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: '<oppia-noninteractive-video video_id-with-value=\"&amp;quot;l1XhAUhP5JY&amp;quot;\"></oppia-noninteractive-video>'
+      html: <p>Continue and End interaction validation</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -5756,9 +5758,9 @@ states:
         buttonText:
           value:
             content_id: ca_buttonText_0
-            unicode_str: Continueeeeeeeeeeeeeeeeeeeeee
+            unicode_str: Continueeeeeeeeeeeeeeeeeeeeeee
       default_outcome:
-        dest: numeric
+        dest: end
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
@@ -5784,199 +5786,22 @@ states:
         ca_buttonText_0: {}
         content: {}
         default_outcome: {}
-  drag:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: drag
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_4
-            html: <p>fd</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - - ca_choices_0
-              - ca_choices_1
-            - - ca_choices_2
-            - - ca_choices_3
-          rule_type: IsEqualToOrdering
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: drag
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_5
-            html: <p>dfdf</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - - ca_choices_0
-            - - ca_choices_1
-            - - ca_choices_2
-            - - ca_choices_3
-          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: drag
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_6
-            html: <p>f</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: ca_choices_0
-            y: ca_choices_0
-          rule_type: HasElementXBeforeElementY
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: drag
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_7
-            html: <p>cvdf</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: ca_choices_3
-            y: 1
-          rule_type: HasElementXAtPositionY
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: drag
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_8
-            html: <p>ddsdf</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - - ca_choices_3
-            - - ca_choices_2
-            - - ca_choices_1
-            - - ca_choices_0
-          rule_type: IsEqualToOrdering
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: text
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_9
-            html: ''
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - - ca_choices_0
-            - - ca_choices_1
-            - - ca_choices_2
-            - - ca_choices_3
-          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        allowMultipleItemsInSamePosition:
-          value: false
-        choices:
-          value:
-          - content_id: ca_choices_0
-            html: <p>1</p>
-          - content_id: ca_choices_1
-            html: <p>2</p>
-          - content_id: ca_choices_2
-            html: <p>3</p>
-          - content_id: ca_choices_3
-            html: <p>4</p>
-      default_outcome:
-        dest: drag
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>nbb</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: DragAndDropSortInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 10
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_4: {}
-        feedback_5: {}
-        feedback_6: {}
-        feedback_7: {}
-        feedback_8: {}
-        feedback_9: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_4: {}
-        feedback_5: {}
-        feedback_6: {}
-        feedback_7: {}
-        feedback_8: {}
-        feedback_9: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
-      html: Congratulations, you have finished!
+      html: <p>End interaction</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
-          value: []
+          value:
+          - id1
+          - id2
+          - id3
+          - id4
       default_outcome: null
       hints: []
       id: EndExploration
@@ -5991,829 +5816,21 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-  fraction:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: fraction
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_1
-            html: <p>kk</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 53
-              wholeNumber: 0
-          rule_type: IsGreaterThan
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 87
-              wholeNumber: 0
-          rule_type: IsExactlyEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: fraction
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_2
-            html: <p>kj</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 87
-              wholeNumber: 0
-          rule_type: IsExactlyEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: fraction
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_3
-            html: <p>jh</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 5
-              wholeNumber: 0
-          rule_type: IsLessThan
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 3
-              wholeNumber: 0
-          rule_type: IsExactlyEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: fraction
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_4
-            html: <p>nmmn</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 3
-              wholeNumber: 0
-          rule_type: IsExactlyEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: fraction
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_5
-            html: <p>nb</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 2
-          rule_type: HasDenominatorEqualTo
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 33
-              wholeNumber: 0
-          rule_type: HasFractionalPartExactlyEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: multiple
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_6
-            html: ''
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 33
-              wholeNumber: 0
-          rule_type: IsExactlyEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        allowImproperFraction:
-          value: true
-        allowNonzeroIntegerPart:
-          value: true
-        customPlaceholder:
-          value:
-            content_id: ca_customPlaceholder_0
-            unicode_str: ''
-        requireSimplestForm:
-          value: false
-      default_outcome:
-        dest: fraction
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>km</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: FractionInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 7
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_customPlaceholder_0: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_4: {}
-        feedback_5: {}
-        feedback_6: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_customPlaceholder_0: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_4: {}
-        feedback_5: {}
-        feedback_6: {}
-  item:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: drag
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_4
-            html: <p>ddf</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - ca_choices_0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - content_id: ca_choices_0
-            html: ''
-          - content_id: ca_choices_1
-            html: ''
-          - content_id: ca_choices_2
-            html: <p>1</p>
-          - content_id: ca_choices_3
-            html: <p>1</p>
-        maxAllowableSelectionCount:
-          value: 5
-        minAllowableSelectionCount:
-          value: 10
-      default_outcome:
-        dest: item
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>sd</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: ItemSelectionInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 5
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_4: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_4: {}
-  multiple:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: multiple
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_6
-            html: <p>fgfg</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        - inputs:
-            x: 0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: multiple
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_7
-            html: <p>gf</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: multiple
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_8
-            html: <p>fgfg</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 4
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: item
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_9
-            html: ''
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - content_id: ca_choices_0
-            html: ''
-          - content_id: ca_choices_1
-            html: ''
-          - content_id: ca_choices_2
-            html: ''
-          - content_id: ca_choices_3
-            html: <p>1</p>
-          - content_id: ca_choices_4
-            html: <p>1</p>
-          - content_id: ca_choices_5
-            html: <p>2</p>
-        showChoicesInShuffledOrder:
-          value: true
-      default_outcome:
-        dest: multiple
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>fg</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: MultipleChoiceInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 10
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content: {}
-        default_outcome: {}
-        feedback_6: {}
-        feedback_7: {}
-        feedback_8: {}
-        feedback_9: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content: {}
-        default_outcome: {}
-        feedback_6: {}
-        feedback_7: {}
-        feedback_8: {}
-        feedback_9: {}
-  numeric:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Numeric</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: numeric
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_0
-            html: <p>jjkjjkj</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 10.0
-          rule_type: IsLessThanOrEqualTo
-        - inputs:
-            x: 5.0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: numeric
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_1
-            html: <p>sd</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 5.0
-          rule_type: IsLessThan
-        - inputs:
-            x: 5.0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: numeric
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_2
-            html: <p>sdds</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 20.0
-          rule_type: IsGreaterThanOrEqualTo
-        - inputs:
-            x: 30.0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: numeric
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_3
-            html: <p>kj</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 30.0
-          rule_type: IsGreaterThan
-        - inputs:
-            x: 30.0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: numeric
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_4
-            html: <p>nm</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            tol: -1.0
-            x: -2.0
-          rule_type: IsWithinTolerance
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: numeric
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_5
-            html: <p>mn</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            a: 10.0
-            b: 10.0
-          rule_type: IsInclusivelyBetween
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: fraction
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_6
-            html: ''
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 15.0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        requireNonnegativeInput:
-          value: false
-      default_outcome:
-        dest: numeric
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>m</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: NumericInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 7
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_0: {}
-        feedback_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_4: {}
-        feedback_5: {}
-        feedback_6: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_0: {}
-        feedback_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_4: {}
-        feedback_5: {}
-        feedback_6: {}
-  text:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: text
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_1
-            html: <p>xdfdf</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_2
-              normalizedStrSet:
-              - abc
-          rule_type: Contains
-        - inputs:
-            x:
-              contentId: rule_input_3
-              normalizedStrSet:
-              - kjkjjkabc
-          rule_type: Contains
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: text
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_4
-            html: <p>dffd</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_5
-              normalizedStrSet:
-              - xyz
-          rule_type: StartsWith
-        - inputs:
-            x:
-              contentId: rule_input_6
-              normalizedStrSet:
-              - xyzw
-          rule_type: StartsWith
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: text
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_7
-            html: <p>sdds</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_8
-              normalizedStrSet:
-              - hello
-          rule_type: Contains
-        - inputs:
-            x:
-              contentId: rule_input_9
-              normalizedStrSet:
-              - hellooo
-          rule_type: StartsWith
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: text
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_10
-            html: <p>bvbv</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_11
-              normalizedStrSet:
-              - exce
-          rule_type: Contains
-        - inputs:
-            x:
-              contentId: rule_input_12
-              normalizedStrSet:
-              - excellent
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: text
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_13
-            html: <p>jhhhj</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_14
-              normalizedStrSet:
-              - awes
-          rule_type: StartsWith
-        - inputs:
-            x:
-              contentId: rule_input_15
-              normalizedStrSet:
-              - awesome
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: end
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_16
-            html: ''
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_17
-              normalizedStrSet:
-              - done
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value:
-            content_id: ca_placeholder_0
-            unicode_str: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: text
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>nbn</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 18
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_10: {}
-        feedback_13: {}
-        feedback_16: {}
-        feedback_4: {}
-        feedback_7: {}
-        rule_input_11: {}
-        rule_input_12: {}
-        rule_input_14: {}
-        rule_input_15: {}
-        rule_input_17: {}
-        rule_input_2: {}
-        rule_input_3: {}
-        rule_input_5: {}
-        rule_input_6: {}
-        rule_input_8: {}
-        rule_input_9: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_10: {}
-        feedback_13: {}
-        feedback_16: {}
-        feedback_4: {}
-        feedback_7: {}
-        rule_input_11: {}
-        rule_input_12: {}
-        rule_input_14: {}
-        rule_input_15: {}
-        rule_input_17: {}
-        rule_input_2: {}
-        rule_input_3: {}
-        rule_input_5: {}
-        rule_input_6: {}
-        rule_input_8: {}
-        rule_input_9: {}
 states_schema_version: 52
 tags: []
-title: exploration title
+title: ''
 """)
 
-        latest_sample_yaml_content: str = (
+        latest_sample_yaml_content_for_cont_and_end_interac: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
-category: Algorithms
+category: ''
 correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
-objective: learn testing and earn
+objective: ''
 param_changes: []
 param_specs: {}
 schema_version: 58
@@ -6823,7 +5840,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0" video_id-with-value="&amp;quot;l1XhAUhP5JY&amp;quot;"></oppia-noninteractive-video>
+      html: <p>Continue and End interaction validation</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6833,7 +5850,7 @@ states:
             content_id: ca_buttonText_0
             unicode_str: Continue
       default_outcome:
-        dest: numeric
+        dest: end
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
@@ -6859,86 +5876,279 @@ states:
         ca_buttonText_0: {}
         content: {}
         default_outcome: {}
-  drag:
+  end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
-      html: ''
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        self.maxDiff = None
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_cont_and_end_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_cont_and_end_interac)
+
+    # Migration test for NumericInput interaction.
+        sample_yaml_content_for_numeric_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
       - outcome:
-          dest: drag
+          dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_7
-            html: <p>cvdf</p>
+            content_id: feedback_1
+            html: <p>fdfdf</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: ca_choices_3
-            y: 1
-          rule_type: HasElementXAtPositionY
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: IsLessThanOrEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_4
+            html: <p>cc</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 15.0
+          rule_type: IsLessThanOrEqualTo
+        - inputs:
+            x: 10.0
+          rule_type: Equals
+        - inputs:
+            x: 5.0
+          rule_type: IsLessThan
+        - inputs:
+            a: 5.0
+            b: 9.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            tol: 2.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_5
+            html: <p>cv</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 40.0
+          rule_type: IsGreaterThanOrEqualTo
+        - inputs:
+            x: 50.0
+          rule_type: Equals
+        - inputs:
+            x: 40.0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_6
+            html: <p>vb</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: string
+          rule_type: IsLessThanOrEqualTo
+        - inputs:
+            x: string
+          rule_type: Equals
+        - inputs:
+            x: string
+          rule_type: IsLessThan
+        - inputs:
+            a: string
+            b: 9.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            tol: string
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            x: string
+          rule_type: IsGreaterThanOrEqualTo
+        - inputs:
+            x: string
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_7
+            html: <p>vb</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            tol: string
+            x: 60.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: string
+            b: 10.0
+          rule_type: IsInclusivelyBetween
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        allowMultipleItemsInSamePosition:
+        requireNonnegativeInput:
           value: false
-        choices:
-          value:
-          - content_id: ca_choices_0
-            html: <p>1</p>
-          - content_id: ca_choices_1
-            html: <p>2</p>
-          - content_id: ca_choices_2
-            html: <p>3</p>
-          - content_id: ca_choices_3
-            html: <p>4</p>
       default_outcome:
-        dest: drag
+        dest: end
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
-          html: <p>nbb</p>
+          html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: DragAndDropSortInput
+      id: NumericInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 10
+    next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
         content: {}
         default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
         feedback_7: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
         content: {}
         default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
         feedback_7: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
-      html: Congratulations, you have finished!
+      html: <p>End interaction</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6959,75 +6169,54 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-  fraction:
-    card_is_checkpoint: false
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_numeric_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
-      html: Congratulations, you have finished!
+      html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
       - outcome:
-          dest: fraction
+          dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_1
-            html: <p>kk</p>
+            content_id: feedback_2
+            html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 53
-              wholeNumber: 0
-          rule_type: IsGreaterThan
+            x: 25.0
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
-          dest: fraction
+          dest: end
           dest_if_really_stuck: null
           feedback:
             content_id: feedback_3
-            html: <p>jh</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 5
-              wholeNumber: 0
-          rule_type: IsLessThan
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: fraction
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_5
-            html: <p>nb</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 2
-          rule_type: HasDenominatorEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: multiple
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_6
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -7035,264 +6224,24 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            f:
-              denominator: 2
-              isNegative: false
-              numerator: 33
-              wholeNumber: 0
-          rule_type: IsExactlyEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        allowImproperFraction:
-          value: true
-        allowNonzeroIntegerPart:
-          value: true
-        customPlaceholder:
-          value:
-            content_id: ca_customPlaceholder_0
-            unicode_str: ''
-        requireSimplestForm:
-          value: false
-      default_outcome:
-        dest: fraction
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>km</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: FractionInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 7
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_customPlaceholder_0: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_3: {}
-        feedback_5: {}
-        feedback_6: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_customPlaceholder_0: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_3: {}
-        feedback_5: {}
-        feedback_6: {}
-  item:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: drag
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_4
-            html: <p>ddf</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - ca_choices_0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - content_id: ca_choices_0
-            html: <p>Choice 1</p>
-          - content_id: ca_choices_1
-            html: <p>Choice 2</p>
-          - content_id: ca_choices_2
-            html: <p>1</p>
-        maxAllowableSelectionCount:
-          value: 5
-        minAllowableSelectionCount:
-          value: 1
-      default_outcome:
-        dest: item
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>sd</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: ItemSelectionInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 5
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        content: {}
-        default_outcome: {}
-        feedback_4: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        content: {}
-        default_outcome: {}
-        feedback_4: {}
-  multiple:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: item
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_9
-            html: ''
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - content_id: ca_choices_0
-            html: <p>Choice 1</p>
-          - content_id: ca_choices_1
-            html: <p>Choice 2</p>
-          - content_id: ca_choices_2
-            html: <p>Choice 3</p>
-          - content_id: ca_choices_3
-            html: <p>1</p>
-          - content_id: ca_choices_5
-            html: <p>2</p>
-        showChoicesInShuffledOrder:
-          value: true
-      default_outcome:
-        dest: multiple
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: <p>fg</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: MultipleChoiceInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 10
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
-        ca_choices_5: {}
-        content: {}
-        default_outcome: {}
-        feedback_9: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_0: {}
-        ca_choices_1: {}
-        ca_choices_2: {}
-        ca_choices_3: {}
-        ca_choices_5: {}
-        content: {}
-        default_outcome: {}
-        feedback_9: {}
-  numeric:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Numeric</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: numeric
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_0
-            html: <p>jjkjjkj</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 10.0
+            x: 25.0
           rule_type: IsLessThanOrEqualTo
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
-          dest: numeric
+          dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_2
-            html: <p>sdds</p>
+            content_id: feedback_5
+            html: <p>cv</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 20.0
+            x: 40.0
           rule_type: IsGreaterThanOrEqualTo
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: fraction
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_6
-            html: ''
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 15.0
-          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7300,11 +6249,11 @@ states:
         requireNonnegativeInput:
           value: false
       default_outcome:
-        dest: numeric
+        dest: end
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
-          html: <p>m</p>
+          html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -7319,107 +6268,797 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
-        feedback_0: {}
         feedback_2: {}
-        feedback_6: {}
+        feedback_3: {}
+        feedback_5: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
-        feedback_0: {}
         feedback_2: {}
-        feedback_6: {}
-  text:
+        feedback_3: {}
+        feedback_5: {}
+  end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
-      html: ''
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        self.maxDiff = None
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_numeric_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_numeric_interac)
+
+    # Migration test for FractionInput interaction.
+        sample_yaml_content_for_fraction_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
       - outcome:
-          dest: text
+          dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_1
-            html: <p>xdfdf</p>
+            content_id: feedback_8
+            html: <p>jj</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x:
-              contentId: rule_input_2
-              normalizedStrSet:
-              - abc
-          rule_type: Contains
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
-          dest: text
+          dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_4
-            html: <p>dffd</p>
+            content_id: feedback_9
+            html: <p>dfd</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x:
-              contentId: rule_input_5
-              normalizedStrSet:
-              - xyz
-          rule_type: StartsWith
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
-          dest: text
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_7
-            html: <p>sdds</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_8
-              normalizedStrSet:
-              - hello
-          rule_type: Contains
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: text
+          dest: Introduction
           dest_if_really_stuck: null
           feedback:
             content_id: feedback_10
-            html: <p>bvbv</p>
+            html: <p>hj</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x:
-              contentId: rule_input_11
-              normalizedStrSet:
-              - exce
-          rule_type: Contains
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsGreaterThan
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 14
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
-          dest: text
+          dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_13
-            html: <p>jhhhj</p>
+            content_id: feedback_11
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsLessThan
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 7
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_12
+            html: <p>ll</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: HasDenominatorEqualTo
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: HasFractionalPartExactlyEqualTo
+        - inputs:
+            x: string
+          rule_type: HasDenominatorEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 13
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+        feedback_9: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_fraction_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_10
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_11
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsLessThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_12
+            html: <p>ll</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: HasDenominatorEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 13
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        self.maxDiff = None
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_fraction_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_fraction_interac)
+
+    # Migration test for MultipleChoice interaction.
+        sample_yaml_content_for_multiple_choice_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_17
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_18
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_19
+            html: <p>aa</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_13
+            html: ''
+          - content_id: ca_choices_14
+            html: ''
+          - content_id: ca_choices_15
+            html: <p>1</p>
+          - content_id: ca_choices_16
+            html: <p>1</p>
+        showChoicesInShuffledOrder:
+          value: true
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 20
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_13: {}
+        ca_choices_14: {}
+        ca_choices_15: {}
+        ca_choices_16: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+        feedback_19: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_13: {}
+        ca_choices_14: {}
+        ca_choices_15: {}
+        ca_choices_16: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+        feedback_19: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_multiple_choice_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_17
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_18
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_13
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_14
+            html: <p>Choice 2</p>
+          - content_id: ca_choices_15
+            html: <p>1</p>
+        showChoicesInShuffledOrder:
+          value: true
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 20
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_13: {}
+        ca_choices_14: {}
+        ca_choices_15: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_13: {}
+        ca_choices_14: {}
+        ca_choices_15: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        self.maxDiff = None
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_multiple_choice_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_multiple_choice_interac)
+
+    # Migration test for ItemSelection interaction.
+        sample_yaml_content_for_item_selection_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -7427,17 +7066,625 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_14
-              normalizedStrSet:
-              - awes
-          rule_type: StartsWith
+            - ca_choices_20
+            - ca_choices_21
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_16
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+            - ca_choices_22
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 3
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_item_selection_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+            - ca_choices_22
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        self.maxDiff = None
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac)
+
+    # Migration test for DragAndDrop interaction.
+        sample_yaml_content_for_drag_and_drop_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_30
+            html: <p>as</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_26
+              - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_26
+              - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_31
+            html: <p>ff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_26
+            y: ca_choices_26
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_32
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: []
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 2
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: false
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p>1</p>
+          - content_id: ca_choices_27
+            html: <p>2</p>
+          - content_id: ca_choices_28
+            html: <p>3</p>
+          - content_id: ca_choices_29
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_30: {}
+        feedback_31: {}
+        feedback_32: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_30: {}
+        feedback_31: {}
+        feedback_32: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_drag_and_drop_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 2
+          rule_type: HasElementXAtPositionY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: false
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p>1</p>
+          - content_id: ca_choices_27
+            html: <p>2</p>
+          - content_id: ca_choices_28
+            html: <p>3</p>
+          - content_id: ca_choices_29
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        self.maxDiff = None
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_drag_and_drop_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_drag_and_drop_interac)
+
+    # Migration test for TextInput interaction.
+        sample_yaml_content_for_text_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 53
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_35
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -7446,9 +7693,116 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_17
+              contentId: rule_input_36
               normalizedStrSet:
-              - done
+              - and
+              - drop
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_37
+              normalizedStrSet:
+              - Draganddrop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_38
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_39
+              normalizedStrSet:
+              - ze
+          rule_type: StartsWith
+        - inputs:
+            x:
+              contentId: rule_input_40
+              normalizedStrSet:
+              - zebra
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_41
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_42
+              normalizedStrSet:
+              - he
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_43
+              normalizedStrSet:
+              - hello
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_44
+            html: <p>ssd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_45
+              normalizedStrSet:
+              - abc
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_46
+              normalizedStrSet:
+              - abcd
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_47
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_48
+              normalizedStrSet:
+              - dog
+          rule_type: StartsWith
+        - inputs:
+            x:
+              contentId: rule_input_49
+              normalizedStrSet:
+              - dogs
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7456,16 +7810,16 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_0
+            content_id: ca_placeholder_34
             unicode_str: ''
         rows:
-          value: 1
+          value: 15
       default_outcome:
-        dest: text
+        dest: end
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
-          html: <p>nbn</p>
+          html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -7474,52 +7828,290 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 18
+    next_content_id_index: 50
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_0: {}
+        ca_placeholder_34: {}
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        feedback_10: {}
-        feedback_13: {}
-        feedback_16: {}
-        feedback_4: {}
-        feedback_7: {}
-        rule_input_11: {}
-        rule_input_14: {}
-        rule_input_17: {}
-        rule_input_2: {}
-        rule_input_5: {}
-        rule_input_8: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        rule_input_36: {}
+        rule_input_37: {}
+        rule_input_39: {}
+        rule_input_40: {}
+        rule_input_42: {}
+        rule_input_43: {}
+        rule_input_45: {}
+        rule_input_46: {}
+        rule_input_48: {}
+        rule_input_49: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_placeholder_0: {}
+        ca_placeholder_34: {}
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        feedback_10: {}
-        feedback_13: {}
-        feedback_16: {}
-        feedback_4: {}
-        feedback_7: {}
-        rule_input_11: {}
-        rule_input_14: {}
-        rule_input_17: {}
-        rule_input_2: {}
-        rule_input_5: {}
-        rule_input_8: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        rule_input_36: {}
+        rule_input_37: {}
+        rule_input_39: {}
+        rule_input_40: {}
+        rule_input_42: {}
+        rule_input_43: {}
+        rule_input_45: {}
+        rule_input_46: {}
+        rule_input_48: {}
+        rule_input_49: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_text_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_35
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_36
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_38
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_39
+              normalizedStrSet:
+              - ze
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_41
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_42
+              normalizedStrSet:
+              - he
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_44
+            html: <p>ssd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_45
+              normalizedStrSet:
+              - abc
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_47
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_48
+              normalizedStrSet:
+              - dog
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_34
+            unicode_str: ''
+        rows:
+          value: 10
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 50
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        rule_input_36: {}
+        rule_input_39: {}
+        rule_input_42: {}
+        rule_input_45: {}
+        rule_input_48: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        rule_input_36: {}
+        rule_input_39: {}
+        rule_input_42: {}
+        rule_input_45: {}
+        rule_input_48: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
 states_schema_version: 53
 tags: []
-title: exploration title
+title: ''
 """)
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content)
-        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
+            'eid', sample_yaml_content_for_text_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_text_interac)
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
