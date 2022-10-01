@@ -39,6 +39,8 @@ import { ExplorationPlayerPageRootComponent } from './exploration-player-page-ro
 import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
 import { HintAndSolutionModalService } from './services/hint-and-solution-modal.service';
 
+import 'third-party-imports/guppy.import';
+import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 
 @NgModule({
