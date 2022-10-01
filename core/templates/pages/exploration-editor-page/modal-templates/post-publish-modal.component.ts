@@ -67,8 +67,9 @@ export class PostPublishModalComponent
   }
 
   selectText(event: MouseEvent): void {
+    let codeDiv = document.getElementById('exploration-link') as HTMLElement;
     let range = document.createRange();
-    range.selectNode(document.getElementById('exploration-link'));
+    range.selectNode(codeDiv);
     let selection = window.getSelection();
     if (selection === null) {
       throw new Error('Selection cannot be null');
