@@ -41,7 +41,6 @@ export class PostPublishModalComponent
   explorationId!: string;
   explorationLinkCopied: boolean = false;
   showTooltip: boolean;
-  makes: any[] = [];
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
