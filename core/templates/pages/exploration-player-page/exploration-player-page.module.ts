@@ -43,7 +43,6 @@ import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 
-
 @NgModule({
   imports: [
     CommonModule,
@@ -54,8 +53,6 @@ import 'third-party-imports/skulpt.import';
     MaterialModule,
     NgbPopoverModule,
     SharedComponentsModule,
-    NgbPopoverModule,
-    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
