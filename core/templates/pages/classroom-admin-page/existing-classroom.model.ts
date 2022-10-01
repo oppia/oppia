@@ -25,10 +25,16 @@ export interface TopicIdToPrerequisiteTopicIds {
   [topicId: string]: string[];
 }
 
+export interface TopicIdToTopicName {
+  [topicId: string]: string;
+}
+
+
 interface ExistingClassroom extends NewClassroom {
   _courseDetails: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
+  _topicIdToTopicName: {[topicId: string]: string};
   getClassroomDict: () => ClassroomDict;
   getCourseDetails: () => string;
   getTopicListIntro: () => string;
@@ -45,7 +51,8 @@ export class ExistingClassroomData extends
   _courseDetails: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
-  _topicsCountInClassroom;
+  _topicsCountInClassroom: number;
+  _topicIdToTopicName: TopicIdToTopicName;
 
   constructor(
       classroomId: string,
@@ -115,19 +122,49 @@ export class ExistingClassroomData extends
     return classroomDict;
   }
 
+  generateGraphErrorMsg(circularlyDependentTopics: string[]): string {
+    let errorMsg = 'There is a cycle in the prerequisite dependencies. \n';
+    for (let topicName of circularlyDependentTopics) {
+      errorMsg += (topicName + ' \u2192 ');
+    }
+    errorMsg += (circularlyDependentTopics[0] + '.');
+    errorMsg += (
+      ' Please remove the circular dependency. You can click ' +
+      'on "View Graph" below to see a visualization of the dependencies.'
+    );
+    return errorMsg;
+  }
+
   validateDependencyGraph(): string {
     for (let currentTopicId in this._topicIdToPrerequisiteTopicIds) {
+      let topicIdToChildTopicId = {};
       let ancestors = cloneDeep(
         this._topicIdToPrerequisiteTopicIds[currentTopicId]);
+
+      for (let topicId of ancestors) {
+        topicIdToChildTopicId[topicId] = currentTopicId;
+      }
 
       let visitedTopicIdsForCurrentTopic = [];
       while (ancestors.length > 0) {
         if (ancestors.indexOf(currentTopicId) !== -1) {
-          return (
-            'There is a cycle in the prerequisite dependencies.' +
-            'Example: \'A\' depends on \'B\' and eventually \'B\' depends' +
-            ' on \'A\'.Please fix this error to save the changes.'
+          let nextTopic = currentTopicId;
+          let circularlyDependentTopics = [];
+
+          circularlyDependentTopics.push(
+            this._topicIdToTopicName[topicIdToChildTopicId[nextTopic]]
           );
+          while (true) {
+            if (topicIdToChildTopicId[nextTopic] === currentTopicId) {
+              break;
+            }
+            nextTopic = topicIdToChildTopicId[nextTopic];
+            circularlyDependentTopics.push(
+              this._topicIdToTopicName[topicIdToChildTopicId[nextTopic]]
+            );
+          }
+
+          return this.generateGraphErrorMsg(circularlyDependentTopics);
         }
 
         let lengthOfAncestor = ancestors.length;
@@ -144,6 +181,13 @@ export class ExistingClassroomData extends
         ancestors = ancestors.concat(
           this._topicIdToPrerequisiteTopicIds[lastTopicIdInAncestor]);
         visitedTopicIdsForCurrentTopic.push(lastTopicIdInAncestor);
+
+        for (
+          let topicId of
+          this._topicIdToPrerequisiteTopicIds[lastTopicIdInAncestor]
+        ) {
+          topicIdToChildTopicId[topicId] = lastTopicIdInAncestor;
+        }
       }
     }
     return '';
@@ -185,5 +229,9 @@ export class ExistingClassroomData extends
 
   getTopicsCount(): number {
     return this._topicsCountInClassroom;
+  }
+
+  setTopicIdToTopicName(topicIdToTopicName: TopicIdToTopicName): void {
+    this._topicIdToTopicName = topicIdToTopicName;
   }
 }

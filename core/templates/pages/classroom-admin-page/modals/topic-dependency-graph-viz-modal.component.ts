@@ -25,7 +25,7 @@ import { AppConstants } from 'app.constants';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import cloneDeep from 'lodash/cloneDeep';
 import { TopicIdToPrerequisiteTopicIds } from '../existing-classroom.model';
-import { TopicIdToTopicName } from '../classroom-admin-page.component';
+import { TopicIdToTopicName } from '../existing-classroom.model';
 
 
 interface NodeData {

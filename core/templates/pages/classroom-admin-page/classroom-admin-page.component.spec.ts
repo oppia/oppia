@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -27,6 +27,10 @@ import { ClassroomAdminPageComponent } from 'pages/classroom-admin-page/classroo
 import { ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { ExistingClassroomData } from './existing-classroom.model';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from 'modules/material.module';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import cloneDeep from 'lodash/cloneDeep';
 
 
 class MockNgbModal {
@@ -50,10 +54,16 @@ describe('Classroom Admin Page component ', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
+        BrowserAnimationsModule,
+        MaterialModule,
         FormsModule,
-        MatAutocompleteModule
+        MatAutocompleteModule,
+        ReactiveFormsModule,
       ],
-      declarations: [ClassroomAdminPageComponent],
+      declarations: [
+        ClassroomAdminPageComponent,
+        MockTranslatePipe
+      ],
       providers: [
         AlertsService,
         ClassroomBackendApiService,
@@ -624,10 +634,20 @@ describe('Classroom Admin Page component ', () => {
         'Dummy topic 3': ['Dummy topic 1']
       };
 
+      component.tempClassroomData = (
+        ExistingClassroomData.createClassroomFromDict({
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {}
+        }));
+
       spyOn(editableTopicBackendApiService, 'getTopicIdToTopicNameAsync')
         .and.returnValue(Promise.resolve(topicIdTotopicName));
 
-      component.getTopicDependencyByTopicName(topicIdToPrerequisiteTopicIds);
+      component.setTopicDependencyByTopicName(topicIdToPrerequisiteTopicIds);
 
       tick();
 
@@ -685,15 +705,15 @@ describe('Classroom Admin Page component ', () => {
     }));
 
   it('should be able to show and remove new topic input field', () => {
-    expect(component.addNewTopicInputIsShown).toBeFalse();
+    expect(component.newTopicCanBeAdded).toBeFalse();
 
     component.showNewTopicInputField();
 
-    expect(component.addNewTopicInputIsShown).toBeTrue();
+    expect(component.newTopicCanBeAdded).toBeTrue();
 
     component.removeNewTopicInputField();
 
-    expect(component.addNewTopicInputIsShown).toBeFalse();
+    expect(component.newTopicCanBeAdded).toBeFalse();
   });
 
   it('should remove existing error for topic ID model change', () => {
@@ -711,11 +731,6 @@ describe('Classroom Admin Page component ', () => {
       topicId3: 'Dummy topic 3'
     };
 
-    component.tempClassroomData.setTopicIdToPrerequisiteTopicId({
-      topicId1: [],
-      topicId2: ['topicId1'],
-      topicId3: ['topicId2']
-    });
     component.topicNameToPrerequisiteTopicNames = {
       'Dummy topic 1': [],
       'Dummy topic 2': ['Dummy topic 1'],
@@ -729,15 +744,21 @@ describe('Classroom Admin Page component ', () => {
         urlFragment: 'math',
         courseDetails: '',
         topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: (
-          component.topicNameToPrerequisiteTopicNames)
+        topicIdToPrerequisiteTopicIds: {
+          topicId1: [],
+          topicId2: ['topicId1'],
+          topicId3: ['topicId2']
+        }
       }));
+    component.classroomData = cloneDeep(component.tempClassroomData);
 
     const expectedTopicNameToPrerequisiteTopicNames = {
       'Dummy topic 1': [],
       'Dummy topic 2': ['Dummy topic 1'],
       'Dummy topic 3': ['Dummy topic 1', 'Dummy topic 2']
     };
+
+    component.addDependencyForTopic('Dummy topic 3', 'Dummy topic 1');
 
     const expectedTopicIdToPrerequisiteTopicIds = {
       topicId1: [],
@@ -758,11 +779,6 @@ describe('Classroom Admin Page component ', () => {
       topicId3: 'Dummy topic 3'
     };
 
-    component.tempClassroomData.setTopicIdToPrerequisiteTopicId({
-      topicId1: [],
-      topicId2: ['topicId1'],
-      topicId3: ['topicId2', 'topicId1']
-    });
     component.topicNameToPrerequisiteTopicNames = {
       'Dummy topic 1': [],
       'Dummy topic 2': ['Dummy topic 1'],
@@ -776,9 +792,16 @@ describe('Classroom Admin Page component ', () => {
         urlFragment: 'math',
         courseDetails: '',
         topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: (
-          component.topicNameToPrerequisiteTopicNames)
+        topicIdToPrerequisiteTopicIds: {
+          topicId1: [],
+          topicId2: ['topicId1'],
+          topicId3: ['topicId2', 'topicId1']
+        }
       }));
+
+    component.classroomData = cloneDeep(component.tempClassroomData);
+
+    component.removeDependencyFromTopic('Dummy topic 3', 'Dummy topic 1');
 
     const expectedTopicIdToPrerequisiteTopicIds = {
       topicId1: [],
@@ -806,7 +829,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.getEligibleTopicPrerequisites('Dummy topic 2');
 
-    expect(component.eligibleTopicNames).toEqual(
+    expect(component.eligibleTopicNamesForPrerequisites).toEqual(
       ['Dummy topic 3']);
   });
 
@@ -840,12 +863,6 @@ describe('Classroom Admin Page component ', () => {
         topicId3: 'Dummy topic 3'
       };
 
-      component.tempClassroomData.setTopicIdToPrerequisiteTopicId({
-        topicId1: [],
-        topicId2: ['topicId1'],
-        topicId3: ['topicId2', 'topicId1']
-      });
-
       component.topicNameToPrerequisiteTopicNames = {
         'Dummy topic 1': [],
         'Dummy topic 2': ['Dummy topic 1'],
@@ -859,9 +876,15 @@ describe('Classroom Admin Page component ', () => {
           urlFragment: 'math',
           courseDetails: '',
           topicListIntro: '',
-          topicIdToPrerequisiteTopicIds: (
-            component.topicNameToPrerequisiteTopicNames)
+          topicIdToPrerequisiteTopicIds: {
+            topicId1: [],
+            topicId2: ['topicId1'],
+            topicId3: ['topicId2', 'topicId1']
+          }
         }));
+      component.classroomData = cloneDeep(component.tempClassroomData);
+
+      component.deleteTopic('Dummy topic 3');
 
       const expectedTopicIdToPrerequisiteTopicIds = {
         topicId1: [],
@@ -898,12 +921,6 @@ describe('Classroom Admin Page component ', () => {
         topicId3: 'Dummy topic 3'
       };
 
-      component.tempClassroomData.setTopicIdToPrerequisiteTopicId({
-        topicId1: [],
-        topicId2: ['topicId1'],
-        topicId3: ['topicId2', 'topicId1']
-      });
-
       component.topicNameToPrerequisiteTopicNames = {
         'Dummy topic 1': [],
         'Dummy topic 2': ['Dummy topic 1'],
@@ -917,8 +934,11 @@ describe('Classroom Admin Page component ', () => {
           urlFragment: 'math',
           courseDetails: '',
           topicListIntro: '',
-          topicIdToPrerequisiteTopicIds: (
-            component.topicNameToPrerequisiteTopicNames)
+          topicIdToPrerequisiteTopicIds: {
+            topicId1: [],
+            topicId2: ['topicId1'],
+            topicId3: ['topicId2', 'topicId1']
+          }
         }));
 
       const expectedTopicIdToPrerequisiteTopicIds = {

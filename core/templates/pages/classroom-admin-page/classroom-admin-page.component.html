@@ -169,7 +169,7 @@
                             </mat-chip>
 
                             <input placeholder="Select prerequisites"
-                                   [formControl]="myControl"
+                                   [formControl]="topicsFilter"
                                    [matAutocomplete]="auto"
                                    [matChipInputFor]="chipList"
                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
@@ -206,24 +206,23 @@
             </div>
 
             <div *ngIf="classroomEditorMode">
-              <input *ngIf="addNewTopicInputIsShown"
-                     [(ngModel)]="newTopicId"
-                     class="form-control new-topic-input"
-                     (ngModelChange)="onNewTopicInputModelChange()">
-              <button *ngIf="addNewTopicInputIsShown"
-                      (click)="removeNewTopicInputField()"
-                      class="btn btn-secondary">
-                Cancel
-              </button>
-              <button *ngIf="addNewTopicInputIsShown"
-                      (click)="addTopicId(newTopicId)"
-                      class="btn btn-success"
-                      [disabled]="newTopicId.length === 0">
-                Submit
-              </button>
+              <div class="new-topic-input-container" *ngIf="newTopicCanBeAdded">
+                <input [(ngModel)]="newTopicId"
+                       class="form-control new-topic-input"
+                       (ngModelChange)="onNewTopicInputModelChange()">
+                <button (click)="removeNewTopicInputField()"
+                        class="btn btn-secondary">
+                  Cancel
+                </button>
+                <button (click)="addTopicId(newTopicId)"
+                        class="btn btn-success"
+                        [disabled]="newTopicId.length === 0">
+                  Submit
+                </button>
+              </div>
 
               <button (click)="showNewTopicInputField()"
-                      *ngIf="!addNewTopicInputIsShown"
+                      *ngIf="!newTopicCanBeAdded"
                       class="btn btn-secondary add-new-topic">
                 Add Topic
               </button>
@@ -273,6 +272,9 @@
 </mat-card>
 
 <style>
+  .new-topic-input-container {
+    margin-top: 10px;
+  }
   .topics-form-field {
     width: 400px;
   }
@@ -280,7 +282,7 @@
     padding: 10px;
   }
   .drag-and-drop-list {
-    background: white;
+    background: #fff;
     border: solid 1px #ccc;
     border-radius: 4px;
     display: block;
@@ -291,7 +293,7 @@
 
   .drag-and-drop-box {
     align-items: center;
-    background: white;
+    background: fff;
     border-bottom: solid 1px #ccc;
     box-sizing: border-box;
     color: rgba(0, 0, 0, 0.87);

@@ -33,18 +33,14 @@ import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-
 import { DeleteTopicFromClassroomModalComponent } from './modals/delete-topic-from-classroom-modal.component';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicsDependencyGraphModalComponent } from './modals/topic-dependency-graph-viz-modal.component';
-import { ExistingClassroomData, TopicIdToPrerequisiteTopicIds } from './existing-classroom.model';
+import { ExistingClassroomData, TopicIdToPrerequisiteTopicIds, TopicIdToTopicName } from './existing-classroom.model';
 import { ClassroomAdminDataService } from './services/classroom-admin-data.service';
+import { MatChipList } from '@angular/material/chips';
 
 
 export interface TopicNameToPrerequisiteTopicNames {
   [topicName: string]: string[];
 }
-
-export interface TopicIdToTopicName {
-  [topicId: string]: string;
-}
-
 
 @Component({
   selector: 'oppia-classroom-admin-page',
@@ -69,13 +65,12 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomIdToClassroomName: {[classroomId: string]: string} = {};
   existingClassroomNames: string[] = [];
 
-  myControl = new FormControl('');
+  topicsFilter = new FormControl('');
   filteredOptions!: Observable<string[]>;
   currentTopicOnEdit!: string;
-  eligibleTopicNamesForPrerequisites!: string[];
+  eligibleTopicNamesForPrerequisites: string[] = [];
 
   topicIds: string[] = [];
-  eligibleTopicNames: string[] = [];
   newTopicId: string = '';
 
   topicNameToPrerequisiteTopicNames: TopicNameToPrerequisiteTopicNames = {};
@@ -90,7 +85,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomEditorMode: boolean = false;
   classroomDataSaveInProgress: boolean = false;
 
-  addNewTopicInputIsShown: boolean = false;
+  newTopicCanBeAdded: boolean = false;
   topicWithGivenIdExists: boolean = true;
   topicDependencyEditOptionIsShown: boolean = false;
   editTopicOptionIsShown: boolean = true;
@@ -98,12 +93,12 @@ export class ClassroomAdminPageComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.eligibleTopicNames.filter(
+    return this.eligibleTopicNamesForPrerequisites.filter(
       option => option.toLowerCase().includes(filterValue));
   }
 
   getEligibleTopicPrerequisites(currentTopicName: string): void {
-    this.eligibleTopicNames = [];
+    this.eligibleTopicNamesForPrerequisites = [];
     let topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
     for (let topicName of topicNames) {
       if (
@@ -111,10 +106,10 @@ export class ClassroomAdminPageComponent implements OnInit {
           this.topicNameToPrerequisiteTopicNames[currentTopicName]
             .indexOf(topicName) === -1
       ) {
-        this.eligibleTopicNames.push(topicName);
+        this.eligibleTopicNamesForPrerequisites.push(topicName);
       }
     }
-    this.filteredOptions = this.myControl.valueChanges.pipe(
+    this.filteredOptions = this.topicsFilter.valueChanges.pipe(
       startWith(''),
       map(value => this._filter(value || '')),
     );
@@ -162,7 +157,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomAdminDataService.validateClassroom(
           this.tempClassroomData, this.classroomData);
 
-        this.getTopicDependencyByTopicName(
+        this.setTopicDependencyByTopicName(
           this.tempClassroomData.getTopicIdToPrerequisiteTopicId());
       }, (errorResponse) => {
         if (
@@ -250,7 +245,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.classroomDataSaveInProgress = false;
     }, () => {
       this.tempClassroomData = cloneDeep(this.classroomData);
-      this.getTopicDependencyByTopicName(
+      this.setTopicDependencyByTopicName(
         this.tempClassroomData.getTopicIdToPrerequisiteTopicId());
     });
   }
@@ -291,7 +286,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         });
       modalRef.result.then(() => {
         this.tempClassroomData = cloneDeep(this.classroomData);
-        this.getTopicDependencyByTopicName(
+        this.setTopicDependencyByTopicName(
           this.tempClassroomData.getTopicIdToPrerequisiteTopicId());
 
         this.classroomDataIsChanged = false;
@@ -305,6 +300,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     } else {
       this.openClassroomInViewerMode();
     }
+    this.removeNewTopicInputField();
   }
 
   createNewClassroom(): void {
@@ -330,7 +326,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.getAllClassroomIdToClassroomName();
   }
 
-  getTopicDependencyByTopicName(
+  setTopicDependencyByTopicName(
       topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ): void {
     this.topicDependencyIsLoaded = false;
@@ -352,6 +348,8 @@ export class ClassroomAdminPageComponent implements OnInit {
             topicIdsToTopicName[topicId]);
         }
 
+        this.tempClassroomData._topicIdToTopicName = topicIdsToTopicName;
+
         this.topicNameToPrerequisiteTopicNames[currentTopicName] = (
           prerequisiteTopicNames);
         this.topicIdsToTopicName = topicIdsToTopicName;
@@ -368,9 +366,10 @@ export class ClassroomAdminPageComponent implements OnInit {
 
       this.tempClassroomData.addNewTopicId(topicId);
       this.topicNameToPrerequisiteTopicNames[topicName] = [];
+      this.topicNames.push(topicName);
 
       this.classroomDataIsChanged = true;
-      this.addNewTopicInputIsShown = false;
+      this.newTopicCanBeAdded = false;
       this.topicWithGivenIdExists = true;
 
       this.newTopicId = '';
@@ -380,11 +379,12 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   showNewTopicInputField(): void {
-    this.addNewTopicInputIsShown = true;
+    this.newTopicCanBeAdded = true;
   }
 
   removeNewTopicInputField(): void {
-    this.addNewTopicInputIsShown = false;
+    this.newTopicCanBeAdded = false;
+    this.topicWithGivenIdExists = true;
     this.newTopicId = '';
   }
 
