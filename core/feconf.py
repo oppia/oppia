@@ -846,7 +846,8 @@ DEMO_EXPLORATIONS = {
     # described in #1376.
     u'6': 'boot_verbs.yaml',
     u'7': 'hola.yaml',
-    u'8': 'adventure.yaml',
+    # Exploration with ID 8 was removed as it contained string values inside
+    # NumericInput interaction.
     u'9': 'pitch_perfect.yaml',
     u'10': 'test_interactions',
     u'11': 'modeling_graphs',

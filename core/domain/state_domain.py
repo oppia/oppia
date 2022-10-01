@@ -1082,7 +1082,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             rule_value_f['wholeNumber'] +
             float(rule_value_f['numerator']) / rule_value_f['denominator']
         )
-
         return value
 
     def _validate_numeric_input(self) -> None:
@@ -2190,8 +2189,11 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     # because it can be of type SubtitledHtmlDict, SubtitledUnicodeDict
     # and so on.
     def __init__(
-        self, value: Any, schema: Dict[str, Union[
-            SubtitledHtmlDict, SubtitledUnicodeDict, str]]
+        self,
+        value: Any,
+        schema: Dict[
+            str, Union[SubtitledHtmlDict, SubtitledUnicodeDict, str]
+        ]
     ) -> None:
         """Initializes a InteractionCustomizationArg domain object.
 
