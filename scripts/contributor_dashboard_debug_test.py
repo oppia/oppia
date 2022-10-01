@@ -39,7 +39,7 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 
 import requests
-from typing import Dict, List
+from typing import Dict, List, Optional
 import webtest
 
 auth_services = models.Registry.import_auth_services()
@@ -76,7 +76,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             firebase_auth_services_test.FirebaseAdminSdkStub())
         self.firebase_sdk_stub.install(self)
         self.token_by_email: Dict[str, str] = {}
-        self.token_of_current_user: str | None = None
+        self.token_of_current_user: Optional[str] = None
         self.initializer = (
             contributor_dashboard_debug.ContributorDashboardDebugInitializer(
                 base_url=''))
@@ -137,7 +137,8 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
                         self._mock_login_as_admin(email)
                         break
             with self.swap(
-                base, 'load_template', test_utils.mock_load_template):
+                base, 'load_template', test_utils.mock_load_template
+            ):
                 return self.testapp.get(url, params=params, headers=headers)
         if method == 'POST':
             return self.testapp.post(url, params=params, headers=headers)
@@ -269,9 +270,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         sign_in_swap = self.swap_with_checks(
             requests, 'post', self._mock_firebase_auth_sign_in,
             expected_args=[
-                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, ),
-                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, ),
-                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, )
+                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL,),
+                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL,),
+                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL,)
             ]
         )
 
