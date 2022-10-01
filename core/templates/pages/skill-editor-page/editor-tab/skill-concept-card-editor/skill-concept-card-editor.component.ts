@@ -225,7 +225,6 @@ export class SkillConceptCardEditorComponent implements OnInit {
         }
       )
     );
-
   }
 
   ngOnDestroy(): void {
