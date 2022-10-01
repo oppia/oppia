@@ -141,7 +141,7 @@ class ExplorationEmbedPage(base.BaseHandler):
 
         self.iframed = True
         self.render_template(
-            'exploration-player-page.mainpage.html', iframe_restriction=None)
+            'oppia-root.mainpage.html', iframe_restriction=None)
 
 
 class ExplorationPage(base.BaseHandler):
@@ -223,7 +223,7 @@ class ExplorationPage(base.BaseHandler):
         if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
 
-        self.render_template('exploration-player-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class ExplorationHandler(base.BaseHandler):

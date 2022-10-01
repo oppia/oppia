@@ -38,6 +38,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
 import * as hammer from 'hammerjs';
 import { AppErrorHandlerProvider } from './app-error-handler';
+import { I18nModule } from 'i18n/i18n.module';
 
 
 // Config for ToastrModule (helps in flashing messages and alerts).
@@ -79,6 +80,7 @@ export class MyHammerConfig extends HammerGestureConfig {
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
     AppRoutingModule,
+    I18nModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [

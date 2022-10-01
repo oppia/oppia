@@ -16,21 +16,11 @@
  * @fileoverview Module for the exploration player page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -42,33 +32,32 @@ import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/explorati
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { ToastrModule } from 'ngx-toastr';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
+import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
+import { ExplorationPlayerPageRoutingModule } from './exploration-player-page-routing.module';
+import { ExplorationPlayerPageRootComponent } from './exploration-player-page-root.component';
+import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
+import { HintAndSolutionModalService } from './services/hint-and-solution-modal.service';
+
+import 'third-party-imports/guppy.import';
+import 'third-party-imports/midi-js.import';
+import 'third-party-imports/skulpt.import';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
+    ExplorationPlayerPageRoutingModule,
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
     SharedComponentsModule,
-    NgbPopoverModule,
-    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
+    ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     LessonInformationCardModalComponent,
     ProgressReminderModalComponent,
@@ -80,6 +69,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
+    ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     LessonInformationCardModalComponent,
     ProgressReminderModalComponent,
@@ -89,53 +79,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     RefresherExplorationConfirmationModal,
   ],
   providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
+    HintAndSolutionModalService
   ]
 })
-class ExplorationPlayerPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
-import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
-import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ExplorationPlayerPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class ExplorationPlayerPageModule {}
