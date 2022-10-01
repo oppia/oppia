@@ -20,7 +20,7 @@ jobs:
           standard-test-runs: 1
           flakes-test-runs: 50
         run: |
-          if ${{ github.event_name == 'push' && github.repository == 'gp201/oppia' && github.ref == 'refs/heads/develop'}}
+          if ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
           then
             JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.flakes-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
             echo "::set-output name=job-strategy-matrix::$JOB_STRATEGY_MATRIX"
