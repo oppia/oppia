@@ -239,7 +239,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 
 
 class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
-    """Migrate question dict in question suggestion to latest schema."""
+    """Migrate question dict in question suggestion to the latest schema."""
     @staticmethod
     def _migrate_question_dict(
         question_suggestion_model: suggestion_models.GeneralSuggestionModel
@@ -247,7 +247,8 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
         suggestion_models.GeneralSuggestionModel,
         Tuple[str, Exception]
     ]:
-        """
+        """Migrates question dict in the question suggestion model to the latest
+        schema.
         """
         question_dict = question_suggestion_model.change_cmd['question_dict']
         versioned_question_state: question_domain.VersionedQuestionStateDict = {
