@@ -190,7 +190,7 @@ class MigrateTopicJob(base_jobs.JobBase):
 
     @staticmethod
     def _check_migration_errors(
-        migrated_topic: topic_domain.Topic,
+        migrated_topic: topic_domain.Topic, # pylint: disable=unused-argument
         is_no_migration_error: beam.pvalue.AsSingleton
     ) -> bool:
         """Checks if any migration errors have occured.
@@ -198,16 +198,12 @@ class MigrateTopicJob(base_jobs.JobBase):
         Args:
             migrated_topic: Topic. The migrated topic domain object.
             is_no_migration_error: beam.pvalue.AsSingleton. Side input data
-            specifying non-zero erros during migration.
+                specifying non-zero erros during migration.
 
         Returns:
             bool. Specifies whether any migration errors were found.
         """
-        if is_no_migration_error:
-            return True
-        else:
-            return False
-
+        return bool(is_no_migration_error)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the topic migration.
