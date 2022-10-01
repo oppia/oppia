@@ -1374,15 +1374,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 link.decompose()
                 continue
             if txt_attr is None:
-                # Set link text to be the url itself.
+                # Delete the link.
                 link.decompose()
                 continue
 
             lnk = lnk_attr.replace('&quot;', '')
             txt = txt_attr.replace('&quot;', '')
 
-            # If text is empty and the link is not.
-            if len(lnk) != 0 and len(txt) == 0:
+            # If the text or the link is empty.
+            if len(lnk) == 0 or len(txt) == 0:
                 # Delete the link.
                 link.decompose()
                 continue
@@ -1401,7 +1401,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             link['url-with-value'] = '&quot;' + lnk + '&quot;'
             link['text-with-value'] = '&quot;' + txt + '&quot;'
 
-        return html_content
+        return str(soup)
 
     def get_translatable_contents_collection(
         self

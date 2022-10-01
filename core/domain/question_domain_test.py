@@ -2218,19 +2218,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_data['content']['html'] = (
             '<p><oppia-noninteractive-link' +
-            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' text-with-value="&amp;quot;Test&amp;quot;"' +
             ' url-with-value=' +
             '"&amp;quot;mailto:example@example.com&amp' +
             ';quot;"></oppia-noninteractive-link></p>' +
             '<p><oppia-noninteractive-link' +
-            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' text-with-value="&amp;quot;Google&amp;quot;"' +
             ' url-with-value=' +
             '"&amp;quot;http://www.google.com&amp' +
             ';quot;"></oppia-noninteractive-link></p>' +
             '<p><oppia-noninteractive-link>' +
             '</oppia-noninteractive-link></p>' +
             '<p><oppia-noninteractive-link' +
-            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' text-with-value="&amp;quot;Oppia&amp;quot;"' +
             ' url-with-value=' +
             '"&amp;quot;https://www.oppia.org&amp' +
             ';quot;"></oppia-noninteractive-link></p>'
@@ -2247,19 +2247,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 53)
         self.assertEqual(
             test_value['state']['content']['html'],
-            '<p><oppia-noninteractive-link' +
-            ' text-with-value="&amp;quot;&amp;quot;"' +
-            ' url-with-value=' +
-            '"&amp;quot;mailto:example@example.com&amp' +
-            ';quot;"></oppia-noninteractive-link></p>' +
-            '<p><oppia-noninteractive-link' +
-            ' text-with-value="&amp;quot;&amp;quot;"' +
+            '<p></p><p><oppia-noninteractive-link' +
+            ' text-with-value="&amp;quot;Google&amp;quot;"' +
             ' url-with-value=' +
             '"&amp;quot;https://www.google.com&amp' +
             ';quot;"></oppia-noninteractive-link></p>' +
             '<p></p>' +
             '<p><oppia-noninteractive-link' +
-            ' text-with-value="&amp;quot;&amp;quot;"' +
+            ' text-with-value="&amp;quot;Oppia&amp;quot;"' +
             ' url-with-value=' +
             '"&amp;quot;https://www.oppia.org&amp' +
             ';quot;"></oppia-noninteractive-link></p>'
