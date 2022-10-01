@@ -437,11 +437,11 @@
 }
 
 .save-progress-menu .uid-box .uid-copy .uid-btn-container {
+  display: flex;
+  flex-direction: column;
   margin-left: 2%;
   position: relative;
   width: 20%;
-  display: flex;
-  flex-direction: column;
 }
 
 .save-progress-menu .uid-box .uid-copy .uid-copy-btn {
