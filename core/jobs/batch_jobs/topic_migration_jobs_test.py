@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2022 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,10 +45,11 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
     ] = topic_migration_jobs.MigrateTopicJob
 
     TOPIC_1_ID: Final = 'topic_1_id'
+    TOPIC_2_ID: Final = 'topic_2_id'
 
     def setUp(self) -> None:
         super().setUp()
-        topic_summary_model = self.create_model(
+        first_topic_summary_model = self.create_model(
             topic_models.TopicSummaryModel,
             id=self.TOPIC_1_ID,
             name='topic summary',
@@ -66,15 +67,47 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             subtopic_count=0,
             version=1
         )
-        topic_summary_model.update_timestamps()
-        topic_summary_model.put()
+        first_topic_summary_model.update_timestamps()
+        first_topic_summary_model.put()
 
-        topic_rights_model = self.create_model(
+        second_topic_summary_model = self.create_model(
+            topic_models.TopicSummaryModel,
+            id=self.TOPIC_2_ID,
+            name='topic summary',
+            canonical_name='topic summary',
+            language_code='cs',
+            description='description',
+            url_fragment='/fragm',
+            topic_model_last_updated=datetime.datetime.utcnow(),
+            topic_model_created_on=datetime.datetime.utcnow(),
+            canonical_story_count=0,
+            additional_story_count=0,
+            total_skill_count=0,
+            total_published_node_count=0,
+            uncategorized_skill_count=0,
+            subtopic_count=0,
+            version=1
+        )
+        second_topic_summary_model.update_timestamps()
+        second_topic_summary_model.put()
+
+        first_topic_rights_model = self.create_model(
             topic_models.TopicRightsModel,
             id=self.TOPIC_1_ID,
             topic_is_published=False
         )
-        topic_rights_model.commit(
+        first_topic_rights_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+        )
+
+        second_topic_rights_model = self.create_model(
+            topic_models.TopicRightsModel,
+            id=self.TOPIC_2_ID,
+            topic_is_published=False
+        )
+        second_topic_rights_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}]
@@ -185,8 +218,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
         self.assertEqual(migrated_topic_model.version, 2)
 
-    def test_broken_topic_is_not_migrated(self) -> None:
-        unmigrated_topic_model = self.create_model(
+    def test_broken_topic_leads_to_no_migration(self) -> None:
+        first_unmigrated_topic_model = self.create_model(
             topic_models.TopicModel,
             id=self.TOPIC_1_ID,
             name='topic title',
@@ -199,8 +232,28 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             url_fragment='topic',
             page_title_fragment_for_web='fragm',
         )
-        unmigrated_topic_model.update_timestamps()
-        unmigrated_topic_model.commit(
+        first_unmigrated_topic_model.update_timestamps()
+        first_unmigrated_topic_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create topic',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+        )
+
+        second_unmigrated_topic_model = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_2_ID,
+            name='topic title',
+            canonical_name='topic title',
+            description='description',
+            subtopic_schema_version=3,
+            story_reference_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic',
+            page_title_fragment_for_web='fragm',
+        )
+        second_unmigrated_topic_model.update_timestamps()
+        second_unmigrated_topic_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic',
             [{'cmd': topic_domain.CMD_CREATE_NEW}]
@@ -213,10 +266,18 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
                     '\'Invalid language code: abc\''
                     '))": 1'
                 )
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOPIC PROCESSED SUCCESS: 1'
             )
         ])
-        migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
-        self.assertEqual(migrated_topic_model.version, 1)
+        first_migrated_topic_model = topic_models.TopicModel.get(
+            self.TOPIC_1_ID)
+        self.assertEqual(first_migrated_topic_model.version, 1)
+
+        second_migrated_topic_model = topic_models.TopicModel.get(
+            self.TOPIC_2_ID)
+        self.assertEqual(second_migrated_topic_model.version, 1)
 
     def test_migrated_topic_is_not_migrated(self) -> None:
         unmigrated_topic_model = self.create_model(
@@ -241,9 +302,9 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
+                        job_run_result.JobRunResult(
                 stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
-            )
+            ),
         ])
 
         migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)

@@ -188,6 +188,27 @@ class MigrateTopicJob(base_jobs.JobBase):
         )
         return updated_topic_summary_model
 
+    @staticmethod
+    def _check_migration_errors(
+        migrated_topic: topic_domain.Topic,
+        is_no_migration_error: beam.pvalue.AsSingleton
+    ) -> bool:
+        """Checks if any migration errors have occured.
+
+        Args:
+            migrated_topic: Topic. The migrated topic domain object.
+            is_no_migration_error: beam.pvalue.AsSingleton. Side input data
+            specifying non-zero erros during migration.
+
+        Returns:
+            bool. Specifies whether any migration errors were found.
+        """
+        if is_no_migration_error:
+            return True
+        else:
+            return False
+
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the topic migration.
 
@@ -213,22 +234,43 @@ class MigrateTopicJob(base_jobs.JobBase):
             | 'Add topic summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda topic_summary_model: topic_summary_model.id)
         )
-        migrated_topic_results = (
+
+        all_migrated_topic_results = (
             unmigrated_topic_models
             | 'Transform and migrate model' >> beam.MapTuple(
                 self._migrate_topic)
         )
+
+        migrated_topic_job_run_results = (
+            all_migrated_topic_results
+            | 'Generates results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'TOPIC PROCESSED'))
+        )
+
+        migrated_topic_error_results = (
+            all_migrated_topic_results
+            | 'Filter errors' >> beam.Filter(
+                lambda result_item: result_item.is_err())
+        )
+
+        migration_error_check = (
+            migrated_topic_error_results
+            | 'Count number of errors' >> beam.combiners.Count.Globally()
+            | 'Check if error count is zero' >> beam.Map(lambda x: x == 0)
+        )
+
+        migrated_topic_results = (
+            all_migrated_topic_results
+            | 'Remove all results in case of migration errors' >> beam.Filter(
+                self._check_migration_errors,
+                beam.pvalue.AsSingleton(migration_error_check))
+        )
+
         migrated_topics = (
             migrated_topic_results
-            | 'Filter oks' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
-        )
-        migrated_topic_job_run_results = (
-            migrated_topic_results
-            | 'Generates results for migration' >> (
-                job_result_transforms.ResultsToJobRunResults('TOPIC PROCESSED'))
         )
 
         topic_changes = (
