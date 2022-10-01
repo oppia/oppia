@@ -59,6 +59,7 @@ export class PostPublishModalComponent
      this.windowRef.nativeWindow.location.protocol + '//' +
       this.windowRef.nativeWindow.location.host +
        '/explore/' + this.explorationId;
+    this.showTooltip = false;
   }
 
   cancel(): void {
