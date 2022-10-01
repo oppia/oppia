@@ -215,6 +215,22 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                 .verify_target_version_compatible_with_latest_release(
                     '1.2.3'))
 
+    def test_invalid_target_version_raises_error(self):
+        def mock_load(unused_response):
+            return {'tag_name': 'v2.1.1', 'test': 'release-test'}
+
+        load_swap = self.swap(json, 'load', mock_load)
+        with self.url_open_swap, load_swap, self.assertRaisesRegex(
+            Exception,
+            'ERROR: Could not parse target version.'
+        ):
+            (
+                cut_release_or_hotfix_branch
+                .verify_target_version_compatible_with_latest_release(
+                    '123'
+                )
+            )
+
     def test_invalid_difference_between_patch_versions(self):
         def mock_load(unused_response):
             return {'tag_name': 'v1.2.1', 'test': 'release-test'}

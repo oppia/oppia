@@ -64,7 +64,13 @@ NOT_FULLY_COVERED_FILES: Final = [
     'scripts/run_portserver.py',
     'scripts/run_presubmit_checks.py',
     'scripts/linters/',
-    'scripts/release_scripts/'
+    'scripts/release_scripts/update_configs.py',
+    'scripts/release_scripts/update_configs_test.py',
+    'scripts/release_scripts/update_changelog_and_credits.py',
+    'scripts/release_scripts/update_changelog_and_credits_test.py',
+    'scripts/release_scripts/repo_specific_changes_fetcher.py',
+    'scripts/release_scripts/repo_specific_changes_fetcher_test.py',
+    'scripts/release_scripts/cut_release_or_hotfix_branch_test.py'
 ]
 
 
