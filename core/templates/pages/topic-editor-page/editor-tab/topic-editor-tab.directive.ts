@@ -39,7 +39,8 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
-  'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
+  'pages/topic-editor-page/modal-templates/' +
+  'rearrange-skills-in-subtopics-modal.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
