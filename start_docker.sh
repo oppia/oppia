@@ -5,6 +5,6 @@
 args=($@)
 oppia_loc=${args[0]}
 
-docker build -t oppia -f Dockerfile .
+docker build -t oppia -f ubuntu_dockerfile .
 
 docker run -p 8181:8181 -v ${oppia_loc}:/home/opensource/oppia -it oppia /bin/bash
