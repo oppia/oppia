@@ -898,6 +898,9 @@ TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_SUGGESTION_EMAILS = (
     '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS = (
+    '%s/email/contributordashboardachievementnotificationemailhandler' % (
+        TASKQUEUE_URL_PREFIX))
 TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
@@ -906,6 +909,7 @@ ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_PAGE_URL = '/blog-admin'
+CLASSROOM_ADMIN_PAGE_URL = '/classroom-admin'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
@@ -915,6 +919,7 @@ BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
 BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
 AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
+AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX = '/blog/author/data'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -926,6 +931,8 @@ COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_STATS_SUMMARIES_URL = '/contributorstatssummaries'
+CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = '/contributorallstatssummaries'
 CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
@@ -1081,6 +1088,7 @@ EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
+CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1593,6 +1601,7 @@ CONTRIBUTION_TYPE_QUESTION: Final = 'question'
 CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
 CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
+CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
