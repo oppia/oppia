@@ -15,7 +15,8 @@ jobs:
     outputs:
       job-strategy-matrix: ${{ steps.generate.outputs.job-strategy-matrix }}
     steps:
-      - id: generate
+      - name: Generate job strategy matrix
+        id: generate
         env:
           standard-test-runs: 1
           flakes-test-runs: 50
