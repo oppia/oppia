@@ -19,6 +19,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { OppiaVisualizationEnumeratedFrequencyTableComponent } from './oppia-visualization-enumerated-frequency-table.directive';
 
 describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
@@ -28,9 +30,12 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        RichTextComponentsModule
+      ],
       declarations: [
-        OppiaVisualizationEnumeratedFrequencyTableComponent
+        OppiaVisualizationEnumeratedFrequencyTableComponent,
       ],
       providers: [
       ],
@@ -42,9 +47,70 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
     fixture = TestBed.createComponent(
       OppiaVisualizationEnumeratedFrequencyTableComponent);
     component = fixture.componentInstance;
-
-    component.data = [1, 0, 0];
+    component.answerVisible = [true, false];
+    let data = [
+      {answer: ['foo'], frequency: 3},
+      {answer: ['bar'], frequency: 1}];
+    component.options = {
+      title: 'title',
+      column_headers: 'column_headers',
+    };
+    component.addressedInfoIsSupported = ['addressedInfoIsSupported'];
+    component.data = (data.map(d => AnswerStats.createFromBackendDict(d)));
+    fixture.detectChanges();
   });
+
+  it('should display first answer and hide the second answer', fakeAsync(() => {
+    const bannerDe = fixture.debugElement;
+    const bannerEl = bannerDe.nativeElement;
+    const answersList = [];
+    bannerEl.querySelectorAll('.answer-rank').forEach(
+      (el) => {
+        answersList.push(el.textContent);
+      }
+    );
+
+    tick();
+    expect(answersList).toEqual(['Answer Set #1', 'Answer Set #2']);
+
+    let values = bannerEl.querySelectorAll('.answers');
+
+    expect(values[0].textContent).toBe('foo');
+    expect(values[1].textContent).toBe('3');
+    expect(values[2].textContent).toBe('bar');
+    expect(values[3].textContent).toBe('1');
+
+    component.toggleAnswerVisibility(2);
+
+    const hiddenRows = [];
+    bannerEl.querySelectorAll(
+      '.item-table'
+    ).forEach(
+      (el) => hiddenRows.push(el.hidden)
+    );
+    tick();
+
+    expect(hiddenRows).toEqual([false, true]);
+  }));
+
+  it('should display second answer and hide the first answer', fakeAsync(() => {
+    const bannerDe = fixture.debugElement;
+    const bannerEl = bannerDe.nativeElement;
+
+    component.toggleAnswerVisibility(1);
+    fixture.detectChanges();
+    tick();
+
+    const hiddenRows = [];
+    bannerEl.querySelectorAll(
+      '.item-table'
+    ).forEach(
+      (el) => hiddenRows.push(el.hidden)
+    );
+    tick();
+
+    expect(hiddenRows).toEqual([false, false]);
+  }));
 
   it('should intialize component properly', fakeAsync(() => {
     tick();
