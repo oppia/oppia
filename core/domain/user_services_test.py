@@ -2286,7 +2286,7 @@ states:
         rows:
           value: 1
         catchMisspellings:
-          value: False
+          value: false
       default_outcome:
         dest: Introduction
         feedback:

@@ -466,7 +466,7 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         catchMisspellings:
-          value: False
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
