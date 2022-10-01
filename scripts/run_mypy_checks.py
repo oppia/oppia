@@ -175,10 +175,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/linters/',
     'scripts/release_scripts/update_configs.py',
     'scripts/release_scripts/update_configs_test.py',
-    'scripts/release_scripts/update_changelog_and_credits.py',
-    'scripts/release_scripts/update_changelog_and_credits_test.py',
-    'scripts/release_scripts/repo_specific_changes_fetcher.py',
-    'scripts/release_scripts/repo_specific_changes_fetcher_test.py',
 ]
 
 
