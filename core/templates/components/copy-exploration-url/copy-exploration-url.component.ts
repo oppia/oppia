@@ -24,5 +24,5 @@ import { Component, Input } from '@angular/core';
 })
 
 export class ComponentOverviewComponent {
-  @Input() show;
+  @Input() show !: boolean;
 }
