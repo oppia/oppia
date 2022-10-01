@@ -40,7 +40,7 @@ export class PostPublishModalComponent
   explorationLink!: string;
   explorationId!: string;
   explorationLinkCopied: boolean = false;
-  showTooltip: boolean;
+  showTooltip: boolean = false;
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
@@ -59,7 +59,6 @@ export class PostPublishModalComponent
      this.windowRef.nativeWindow.location.protocol + '//' +
       this.windowRef.nativeWindow.location.host +
        '/explore/' + this.explorationId;
-    this.showTooltip = false;
   }
 
   cancel(): void {
