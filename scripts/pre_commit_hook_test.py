@@ -23,16 +23,15 @@ import os
 import shutil
 import subprocess
 import tempfile
-import psutil
 
 from core import utils
 from core.tests import test_utils
-
 from scripts import common
 
-from . import pre_commit_hook
-
+import psutil
 from typing import List, Tuple
+
+from . import pre_commit_hook
 
 
 class PreCommitHookTests(test_utils.GenericTestBase):
@@ -71,10 +70,13 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def test_install_hook_with_error_in_making_pre_push_executable(
         self
     ) -> None:
+
         def mock_islink(unused_file: str) -> bool:
             return True
+
         def mock_exists(unused_file: str) -> bool:
             return True
+
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
         ) -> Tuple[str, str]:

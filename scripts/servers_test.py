@@ -38,7 +38,7 @@ from scripts import servers
 
 import psutil
 
-from typing import Callable, Iterator, List, Tuple
+from typing import Callable, Iterator, List, Sequence, Tuple
 
 
 class ManagedProcessTests(test_utils.TestBase):
@@ -62,7 +62,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self,
         unresponsive: bool = False,
         num_children: int = 0,
-        outputs: List[bytes] = []
+        outputs: Sequence[bytes] = ()
     ) -> Iterator[List[POPEN_CALL]]:
         """Returns values for inspecting and mocking calls to psutil.Popen.
 

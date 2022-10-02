@@ -22,6 +22,9 @@ import os
 import subprocess
 import sys
 
+from typing import List, Optional, Tuple
+from typing_extensions import Final
+
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -32,9 +35,6 @@ from scripts import build  # isort:skip
 from scripts import flake_checker  # isort:skip
 from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
-
-from typing import List, Optional, Tuple
-from typing_extensions import Final
 
 MAX_RETRY_COUNT: Final = 3
 GOOGLE_APP_ENGINE_PORT: Final = 9001

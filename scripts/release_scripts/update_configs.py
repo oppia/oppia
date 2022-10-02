@@ -27,17 +27,16 @@ import argparse
 import getpass
 import os
 import re
-from typing import List, Optional
 
 import github
+from typing import List, Optional
+from typing_extensions import Final
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
 from .. import common  # isort:skip  # pylint: disable=wrong-import-position
 from core import utils  # isort:skip  # pylint: disable=wrong-import-position
-
-from typing_extensions import Final
 
 CONSTANTS_CONFIG_PATH: Final = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
@@ -181,7 +180,7 @@ def update_app_yaml(
         feconf_config_path: str. Absolute path of the feconf config file.
 
     Raises:
-        Exception: No OPPIA_SITE_URL key found.
+        Exception. No OPPIA_SITE_URL key found.
     """
     with utils.open_file(feconf_config_path, 'r') as feconf_config_file:
         feconf_config_contents = feconf_config_file.read()
@@ -328,6 +327,12 @@ def update_analytics_constants_based_on_config(
     Args:
         release_analytics_constants_path: str. The path to constants file.
         analytics_constants_config_path: str. The path to constants config file.
+
+    Raises:
+        Exception. No GA_ANALYTICS_ID key found.
+        Exception. No UA_ANALYTICS_ID key found.
+        Exception. No SITE_NAME_FOR_ANALYTICS key found.
+        Exception. No CAN_SEND_ANALYTICS_EVENTS key found.
     """
     with utils.open_file(analytics_constants_config_path, 'r') as config_file:
         config_file_contents = config_file.read()

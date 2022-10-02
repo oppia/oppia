@@ -33,10 +33,10 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_changelog_and_credits
 
-import github  # isort:skip pylint: disable=wrong-import-position
-
 from typing import List, Union
 from typing_extensions import Final
+
+import github  # isort:skip pylint: disable=wrong-import-position
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_RELEASE_SUMMARY_FILEPATH: Final = os.path.join(
@@ -44,9 +44,13 @@ MOCK_RELEASE_SUMMARY_FILEPATH: Final = os.path.join(
 
 MOCK_CHANGELOG_FILEPATH: Final = os.path.join(RELEASE_TEST_DIR, 'CHANGELOG')
 MOCK_AUTHORS_FILEPATH: Final = os.path.join(RELEASE_TEST_DIR, 'AUTHORS')
-MOCK_CONTRIBUTORS_FILEPATH: Final = os.path.join(RELEASE_TEST_DIR, 'CONTRIBUTORS')
+MOCK_CONTRIBUTORS_FILEPATH: Final = os.path.join(
+    RELEASE_TEST_DIR, 'CONTRIBUTORS'
+)
 MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH: Final = 'about_temp_file.ts'
-MOCK_PACKAGE_JSON_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'mock_package.json')
+MOCK_PACKAGE_JSON_PATH: Final = os.path.join(
+    RELEASE_TEST_DIR, 'mock_package.json'
+)
 MOCK_FECONF_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 
 MOCK_UPDATED_CHANGELOG_FILEPATH: Final = os.path.join(
@@ -589,8 +593,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             unused_msg: str,
             unused_content: str,
             unused_sha: str,
-            branch: str
-        ) -> None:  # pylint: disable=unused-argument
+            unused_branch: str
+        ) -> None:
             check_function_calls['update_file_gets_called'] = True
         def mock_run_cmd(unused_cmd: str) -> None:
             check_function_calls['run_cmd_gets_called'] = True

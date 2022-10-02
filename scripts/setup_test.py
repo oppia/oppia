@@ -27,12 +27,12 @@ import tarfile
 
 from core.tests import test_utils
 
+from typing import List
+from typing_extensions import Final
+
 from . import clean
 from . import common
 from . import setup
-
-from typing import List
-from typing_extensions import Final
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNTAR_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
@@ -169,10 +169,13 @@ class SetupTests(test_utils.GenericTestBase):
         self
     ) -> None:
         print_arr: List[str] = []
+
         def mock_print(msg_list: List[str]) -> None:
             print_arr.extend(msg_list)
+
         def mock_uname() -> List[str]:
             return ['Linux']
+
         print_swap = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
         uname_swap = self.swap(os, 'uname', mock_uname)
@@ -189,8 +192,10 @@ class SetupTests(test_utils.GenericTestBase):
         self
     ) -> None:
         print_arr: List[str] = []
+
         def mock_print(msg_list: List[str]) -> None:
             print_arr.extend(msg_list)
+
         print_swap = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')

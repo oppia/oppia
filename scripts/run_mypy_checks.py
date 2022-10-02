@@ -260,6 +260,9 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
     Returns:
         tuple(int, str). The return code from installing prerequisites and the
         path of the mypy executable.
+
+    Raises:
+        Exception. No USER_BASE found for the user.
     """
     # TODO(#13398): Change MyPy installation after Python3 migration. Now, we
     # install packages globally for CI. In CI, pip installation is not in a way
@@ -286,7 +289,7 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
         new_process.communicate()
         if site.USER_BASE is None:
             raise Exception(
-                'No user base found for the user.'
+                'No USER_BASE found for the user.'
             )
         _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
         mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')

@@ -132,6 +132,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         num_var = 0
+
         def mock_is_port_in_use(unused_port: int) -> bool:
             nonlocal num_var
             num_var += 1

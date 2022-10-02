@@ -23,6 +23,9 @@ import os
 import subprocess
 import sys
 
+from typing import List, Optional
+from typing_extensions import Final
+
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -31,9 +34,6 @@ from scripts import common  # isort:skip pylint: disable=wrong-import-position
 from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
 from scripts import servers  # isort:skip
-
-from typing import List, Optional
-from typing_extensions import Final
 
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'

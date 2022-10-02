@@ -92,11 +92,11 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            url: str,
-            json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
-        ) -> None: # pylint: disable=unused-argument
+            unused_url: str,
+            unused_json: Dict[str, str],
+            unused_allow_redirects: List[str],
+            unused_headers: List[str]
+        ) -> None:
             pass
 
         expected_payload = {
@@ -139,10 +139,10 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            url: str,
-            json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            unused_url: str,
+            unused_json: Dict[str, str],
+            unused_allow_redirects: List[str],
+            unused_headers: List[str]
         ) -> None:
             pass
 
@@ -221,7 +221,7 @@ class ReportPassTests(test_utils.GenericTestBase):
 
     def test_unknown_build_environment(self) -> None:
 
-        def mock_getenv(variable: str) -> None:
+        def mock_getenv(unused_variable: str) -> None:
             return None
 
         def mock_post(
@@ -309,10 +309,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            url: str,
-            json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            unused_url: str,
+            unused_json: Dict[str, str],
+            unused_allow_redirects: List[str],
+            unused_headers: List[str]
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -368,10 +368,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            url: str,
-            json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            unused_url: str,
+            unused_json: Dict[str, str],
+            unused_allow_redirects: List[str],
+            unused_headers: List[str]
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -428,10 +428,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            url: str,
-            json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            unused_url: str,
+            unused_json: Dict[str, str],
+            unused_allow_redirects: List[str],
+            unused_headers: List[str]
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -536,10 +536,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            url: str,
-            json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            unused_url: str,
+            unused_json: Dict[str, str],
+            unused_allow_redirects: List[str],
+            unused_headers: List[str]
         ) -> MockResponse:
             return MockResponse(False, None)
 
@@ -585,10 +585,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            url: str,
-            json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            unused_url: str,
+            unused_json: Dict[str, str],
+            unused_allow_redirects: List[str],
+            unused_headers: List[str]
         ) -> MockResponse:
             return MockResponse(True, 'not json')
 

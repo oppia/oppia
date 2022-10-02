@@ -52,22 +52,22 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen_success(
             unused_cmd: str,
-            stdout: Optional[str] = None,
-            stdin: Optional[str] = None,
-            stderr: Optional[str] = None,
-            env: Optional[str] = None
-        ) -> subprocess.Popen[bytes]:
+            unused_stdout: Optional[str] = None,
+            unused_stdin: Optional[str] = None,
+            unused_stderr: Optional[str] = None,
+            unused_env: Optional[str] = None
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_success
 
         process_failure = subprocess.Popen(
             ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen_failure(
             unused_cmd: str,
-            stdout: Optional[str] = None,
-            stdin: Optional[str] = None,
-            stderr: Optional[str] = None,
-            env: Optional[str] = None
-        ) -> subprocess.Popen[bytes]:
+            unused_stdout: Optional[str] = None,
+            unused_stdin: Optional[str] = None,
+            unused_stderr: Optional[str] = None,
+            unused_env: Optional[str] = None
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_failure
 
         self.popen_swap_success = self.swap(
@@ -202,7 +202,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             with self.swap(site, 'USER_BASE', None):
                 with self.assertRaisesRegex(
                     Exception,
-                    'No user base found for the user.'
+                    'No USER_BASE found for the user.'
                 ):
                     run_mypy_checks.install_mypy_prerequisites(False)
 

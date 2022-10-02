@@ -22,11 +22,11 @@ import subprocess
 import sys
 import tarfile
 
-from . import clean
-from . import common
-
 from typing import List, Optional
 from typing_extensions import Final
+
+from . import clean
+from . import common
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""

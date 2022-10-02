@@ -27,15 +27,15 @@ import subprocess
 
 import github
 
+from typing import List
+from typing_extensions import Final
+
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 from core import constants  # isort:skip  # pylint: disable=wrong-import-position
 from core import utils  # isort:skip  # pylint: disable=wrong-import-position
-
-from typing import List
-from typing_extensions import Final
 
 ABOUT_PAGE_CONSTANTS_FILEPATH: Final = os.path.join(
     'core', 'templates', 'pages', 'about-page',

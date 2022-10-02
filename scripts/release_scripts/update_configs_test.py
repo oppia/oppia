@@ -28,10 +28,10 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_configs
 
-import github  # isort:skip pylint: disable=wrong-import-position
-
 from typing import List
 from typing_extensions import Final
+
+import github  # isort:skip pylint: disable=wrong-import-position
 
 INVALID_FECONF_CONFIG_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
@@ -609,7 +609,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with utils.open_file(temp_app_yaml_path, 'w') as f:
             f.write(app_yaml_text)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Error: No OPPIA_SITE_URL key found.'
         ):
@@ -678,15 +678,19 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'mailchimp_api_key_is_to_be_verified': True,
             'update_analytics_constants_based_on_config': True
         }
+
         def mock_check_updates(
             unused_release_feconf_path: str, unused_personal_access_token: str
         ) -> None:
             check_function_calls[
                 'check_updates_to_terms_of_service_gets_called'] = True
+
         def mock_add_mailgun_api_key(unused_release_feconf_path: str) -> None:
             check_function_calls['add_mailgun_api_key_gets_called'] = True
+
         def mock_add_mailchimp_api_key(unused_release_feconf_path: str) -> None:
             check_function_calls['add_mailchimp_api_key_gets_called'] = True
+
         def mock_apply_changes(
             unused_local_filepath: str,
             unused_config_filepath: str,
@@ -694,6 +698,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         ) -> None:
             check_function_calls[
                 'apply_changes_based_on_config_gets_called'] = True
+
         def mock_verify_config_files(
             unused_release_feconf_path: str,
             unused_release_app_dev_yaml_path: str,
@@ -769,6 +774,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'mailchimp_api_key_is_to_be_verified': False,
             'update_analytics_constants_based_on_config': True
         }
+
         def mock_apply_changes(
             unused_local_filepath: str,
             unused_config_filepath: str,
@@ -882,7 +888,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Error: No UA_ANALYTICS_ID key found.'
         ):
@@ -900,7 +906,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Error: No GA_ANALYTICS_ID key found.'
         ):
@@ -918,7 +924,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Error: No SITE_NAME_FOR_ANALYTICS key found.'
         ):
@@ -936,7 +942,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'
         ):
