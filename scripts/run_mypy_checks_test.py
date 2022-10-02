@@ -56,7 +56,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             stdin: Optional[str] = None,  # pylint: disable=unused-argument
             stderr: Optional[str] = None,  # pylint: disable=unused-argument
             env: Optional[str] = None  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_success
 
         process_failure = subprocess.Popen(
@@ -67,7 +67,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             stdin: Optional[str] = None,  # pylint: disable=unused-argument
             stderr: Optional[str] = None,  # pylint: disable=unused-argument
             env: Optional[str] = None  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_failure
 
         self.popen_swap_success = self.swap(
