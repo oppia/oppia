@@ -1091,8 +1091,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Duplicate rules are present.
             ValidationError. Rule having a solution that is subset of previous
                 rules' solution.
-            ValidationError. 'tol' value in 'IsWithinTolerance' is negetive.
-            ValidationError. 'a' is greater than or equal to 'b' in
+            ValidationError. The 'tol' value in 'IsWithinTolerance' is negetive.
+            ValidationError. The 'a' is greater than or equal to 'b' in
                 'IsInclusivelyBetween' rule.
         """
         lower_infinity = float('-inf')
@@ -1215,13 +1215,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 like 1 2/3 when the 'proper form' setting is turned on.
             ValidationError. Solution is not in proper form, when the 'proper
                 form' setting is turned on.
-            ValidationError. 'IsExactlyEqualTo' rule have integral value when
-                'allow non zero integers' setting is off.
+            ValidationError. The 'IsExactlyEqualTo' rule have integral value
+                when 'allow non zero integers' setting is off.
             ValidationError. Rule have solution that is subset of previous
                 rules' solutions.
-            ValidationError. 'HasFractionalPartExactlyEqualTo' rule comes after
-                'HasDenominatorEqualTo' rule where the fractional denominator is
-                equal to 'HasDenominatorEqualTo' rule value.
+            ValidationError. The 'HasFractionalPartExactlyEqualTo' rule comes
+                after 'HasDenominatorEqualTo' rule where the fractional
+                denominator is equal to 'HasDenominatorEqualTo' rule value.
         """
         ranges: List[InteractionInstance.RangeVariableDict] = []
         matched_denominator_list: List[
@@ -1392,8 +1392,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         Raises:
             ValidationError. Duplicate rules are present.
-            ValidationError. 'IsEqualTo' rule comes after 'IsEquivalentTo' rule
-                having same values.
+            ValidationError. The 'IsEqualTo' rule comes after 'IsEquivalentTo'
+                rule having same values.
         """
         number_with_units_rules = []
         rule_spec_till_now: List[RuleSpecDict] = []
@@ -1475,8 +1475,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         Raises:
             ValidationError. Duplicate rules are present.
-            ValidationError. 'Equals' rule does not have value between min and
-                max number of selections.
+            ValidationError. The 'Equals' rule does not have value between min
+                and max number of selections.
             ValidationError. Minimum number of selections value is greater
                 than maximum number of selections value.
             ValidationError. Not enough choices to have minimum number of
@@ -1546,13 +1546,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Duplicate rules are present.
             ValidationError. Multiple items at the same place when the setting
                 is turned off.
-            ValidationError. 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-                rule present when 'multiple items at same place' setting
-                turned off.
+            ValidationError. The 'IsEqualToOrderingWithOneItemAtIncorrect
+                Position' rule present when 'multiple items at same place'
+                setting turned off.
             ValidationError. In 'HasElementXBeforeElementY' rule, 'X' value
                 is equal to 'Y' value.
-            ValidationError. 'IsEqualToOrdering' rule have empty values.
-            ValidationError. 'IsEqualToOrdering' rule comes after
+            ValidationError. The 'IsEqualToOrdering' rule have empty values.
+            ValidationError. The 'IsEqualToOrdering' rule comes after
                 'HasElementXAtPositionY' where element 'X' is present at
                 position 'Y' in 'IsEqualToOrdering' rule.
             ValidationError. Less than 2 items are present.
@@ -1699,19 +1699,19 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Raises:
             ValidationError. Text input height is not >= 1 and <= 10.
             ValidationError. Duplicate rules are present.
-            ValidationError. 'Contains' rule comes before another 'Contains'
+            ValidationError. The 'Contains' rule comes before another 'Contains'
                 rule, where 'Contains' rule string is a substring of other
                 rules string.
-            ValidationError. 'Contains' rule comes before 'StartsWith'
+            ValidationError. The 'Contains' rule comes before 'StartsWith'
                 rule, where 'Contains' rule string is a substring of other
                 rules string.
-            ValidationError. 'Contains' rule comes before 'Equals'
+            ValidationError. The 'Contains' rule comes before 'Equals'
                 rule, where 'Contains' rule string is a substring of other
                 rules string.
-            ValidationError. 'StartsWith' rule comes before the 'Equals'
+            ValidationError. The 'StartsWith' rule comes before the 'Equals'
                 rule where the 'StartsWith' rule string is a prefix of other
                 rules string.
-            ValidationError. 'StartsWith' rule comes before the another
+            ValidationError. The 'StartsWith' rule comes before the another
                 'StartsWith' rule where the 'StartsWith' rule string is
                 a prefix of other rules string.
         """

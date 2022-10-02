@@ -1144,12 +1144,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state = self.new_exploration.states['Introduction']
 
     def tests_continue_interaction(self) -> None:
-        """Tests Continue interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests Continue interaction."""
         self.set_interaction_for_state(self.state, 'Continue')
         self.state.interaction.customization_args[
             'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeeeeeeee'
@@ -1158,12 +1153,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'most 20 characters.')
 
     def tests_numeric_interaction(self) -> None:
-        """Tests Numeric interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests Numeric interaction."""
         self.set_interaction_for_state(self.state, 'NumericInput')
         test_ans_group_for_numeric_interaction = [
             state_domain.AnswerGroup.from_dict({
@@ -1199,6 +1189,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'IsLessThanOrEqualTo',
                     'inputs': {
                         'x': 7
+                    }
+                },
+                {
+                    'rule_type': 'IsGreaterThanOrEqualTo',
+                    'inputs': {
+                        'x': 10
                     }
                 }
             ],
@@ -1245,12 +1241,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'feedback_0')
 
     def tests_fraction_interaction(self) -> None:
-        """Tests Fraction interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests Fraction interaction."""
         state = self.new_exploration.states['Introduction']
         self.set_interaction_for_state(state, 'FractionInput')
         test_ans_group_for_fraction_interaction = [
@@ -1360,6 +1351,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                             'denominator': 4
                         }
                     }
+                },
+                {
+                    'rule_type': 'IsLessThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 5,
+                            'denominator': 2
+                        }
+                    }
                 }
             ],
             'outcome': {
@@ -1428,12 +1430,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state.written_translations.add_content_id_for_translation('feedback_0')
 
     def tests_number_with_units_interaction(self) -> None:
-        """Tests NumberWithUnits interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests NumberWithUnits interaction."""
         self.set_interaction_for_state(self.state, 'NumberWithUnits')
         test_ans_group_for_number_with_units_interaction = [
             state_domain.AnswerGroup.from_dict({
@@ -1548,12 +1545,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def tests_multiple_choice_interaction(self) -> None:
-        """Tests MultipleChoice interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests MultipleChoice interaction."""
         self.set_interaction_for_state(self.state, 'MultipleChoiceInput')
         test_ans_group_for_multiple_choice_interaction = [
             state_domain.AnswerGroup.from_dict({
@@ -1612,12 +1604,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'choices'].value[2].html = '<p>2</p>'
 
     def tests_item_selection_choice_interaction(self) -> None:
-        """Tests ItemSelection interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests ItemSelection interaction."""
         self.set_interaction_for_state(self.state, 'ItemSelectionInput')
         self.state.interaction.customization_args[
             'minAllowableSelectionCount'].value = 1
@@ -1721,12 +1708,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'choices'].value[2].html = '<p>2</p>'
 
     def tests_drag_and_drop_interaction(self) -> None:
-        """Tests DragAndDrop interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests DragAndDrop interaction."""
         self.state.recorded_voiceovers.add_content_id_for_voiceover(
             'ca_choices_2')
         self.state.written_translations.add_content_id_for_translation(
@@ -1917,12 +1899,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'choices'].value[2].html = '<p>2</p>'
 
     def tests_text_interaction(self) -> None:
-        """Tests Text interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests Text interaction."""
         self.state.recorded_voiceovers.add_content_id_for_voiceover(
             'feedback_0')
         self.state.written_translations.add_content_id_for_translation(
@@ -2130,12 +2107,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'TextInput interaction is already present.')
 
     def tests_end_interaction(self) -> None:
-        """Tests End interaction.
-
-        Args:
-            state: state_domain.State. The exploration state.
-            new_exploration: exp_domain.Exploration. The exploration.
-        """
+        """Tests End interaction."""
         self.set_interaction_for_state(self.state, 'EndExploration')
         self.state.update_interaction_default_outcome(None)
         self.state.interaction.customization_args[
