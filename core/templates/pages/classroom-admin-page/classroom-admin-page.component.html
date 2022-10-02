@@ -172,17 +172,18 @@
                             </mat-chip>
 
                             <input placeholder="Select prerequisites"
-                                   [formControl]="topicsFilter"
                                    [matAutocomplete]="auto"
                                    [matChipInputFor]="chipList"
                                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                   [(ngModel)]="prerequisiteInput"
+                                   (ngModelChange)="onPrerequisiteInputChange()"
                                    (click)="getEligibleTopicPrerequisites(topicName)">
                           </mat-chip-list>
 
                           <mat-autocomplete #auto="matAutocomplete"
                                             (optionSelected)="addDependencyForTopic(topicName, $event.option.value)">
 
-                            <mat-option *ngFor="let option of filteredOptions | async"
+                            <mat-option *ngFor="let option of tempEligibleTopicNamesForPrerequisites"
                                         [value]="option">
                               {{ option }}
                             </mat-option>

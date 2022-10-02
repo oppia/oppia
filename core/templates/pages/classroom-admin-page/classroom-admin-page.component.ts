@@ -17,9 +17,6 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-import { map, startWith } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -64,10 +61,10 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomIdToClassroomName: {[classroomId: string]: string} = {};
   existingClassroomNames: string[] = [];
 
-  topicsFilter = new FormControl('');
-  filteredOptions!: Observable<string[]>;
   currentTopicOnEdit!: string;
   eligibleTopicNamesForPrerequisites: string[] = [];
+  tempEligibleTopicNamesForPrerequisites: string[] = [];
+  prerequisiteInput!: string;
 
   topicIds: string[] = [];
   newTopicId: string = '';
@@ -89,16 +86,11 @@ export class ClassroomAdminPageComponent implements OnInit {
   topicDependencyEditOptionIsShown: boolean = false;
   editTopicOptionIsShown: boolean = true;
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.eligibleTopicNamesForPrerequisites.filter(
-      option => option.toLowerCase().includes(filterValue));
-  }
-
   getEligibleTopicPrerequisites(currentTopicName: string): void {
     this.eligibleTopicNamesForPrerequisites = [];
+    this.prerequisiteInput = '';
     let topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
+
     for (let topicName of topicNames) {
       if (
         topicName !== currentTopicName &&
@@ -108,11 +100,17 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.eligibleTopicNamesForPrerequisites.push(topicName);
       }
     }
-    this.filteredOptions = this.topicsFilter.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || '')),
-    );
+    this.tempEligibleTopicNamesForPrerequisites = (
+      this.eligibleTopicNamesForPrerequisites);
     this.currentTopicOnEdit = currentTopicName;
+  }
+
+  onPrerequisiteInputChange(): void {
+    this.tempEligibleTopicNamesForPrerequisites = (
+      this.eligibleTopicNamesForPrerequisites.filter(
+        option => option.includes(this.prerequisiteInput)
+      )
+    );
   }
 
   getClassroomData(classroomId: string): void {

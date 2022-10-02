@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -901,30 +901,36 @@ describe('Classroom Admin Page component ', () => {
       'Dummy topic 3': ['Dummy topic 2']
     };
 
-    fixture.detectChanges();
-    let input = '';
-    component.topicsFilter = {
-      valueChanges: {
-        pipe: (callb: (value: string) => void) => {
-          callb(input);
-        }
-      }
-    } as FormControl;
-    component.ngOnInit();
-    input = 'Dum';
-    component.topicsFilter = {
-      valueChanges: {
-        pipe(callb: (val: string) => void) {
-          callb(input);
-        }
-      }
-    } as FormControl;
-    component.ngOnInit();
-
     component.getEligibleTopicPrerequisites('Dummy topic 2');
 
     expect(component.eligibleTopicNamesForPrerequisites).toEqual(
       ['Dummy topic 3']);
+    expect(component.tempEligibleTopicNamesForPrerequisites).toEqual(
+      ['Dummy topic 3']);
+  });
+
+  it('should be able to filter prerequisite dropdown as input changes', () => {
+    component.eligibleTopicNamesForPrerequisites = (
+      ['Dummy topic 1', 'Topic 2']);
+    component.tempEligibleTopicNamesForPrerequisites = (
+      ['Dummy topic 1', 'Topic 2']);
+
+    component.prerequisiteInput = 'Dummy';
+    component.onPrerequisiteInputChange();
+
+    expect(component.tempEligibleTopicNamesForPrerequisites).toEqual(
+      ['Dummy topic 1']);
+
+    component.prerequisiteInput = 'Topic';
+    component.onPrerequisiteInputChange();
+
+    expect(component.tempEligibleTopicNamesForPrerequisites).toEqual(
+      ['Topic 2']);
+
+    component.prerequisiteInput = 'xyz';
+    component.onPrerequisiteInputChange();
+
+    expect(component.tempEligibleTopicNamesForPrerequisites).toEqual([]);
   });
 
   it(
