@@ -434,6 +434,7 @@ import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
+import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -901,5 +902,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['EntityTranslationBackendApiService', EntityTranslationBackendApiService],
   ['ExplorationNextContentIdIndexService',
     ExplorationNextContentIdIndexService],
-  ['EntityCreationService', EntityCreationService]
+  ['EntityCreationService', EntityCreationService],
+  ['ClassroomAdminDataService', ClassroomAdminDataService]
 ];

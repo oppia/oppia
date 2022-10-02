@@ -465,4 +465,47 @@ describe('Classroom backend API service', function() {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   }));
+
+  it('should check if a classroom url fragment already exists',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
+        'classroom-url-fragment').then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/classroom_url_fragment_handler/classroom-url-fragment');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        classroom_url_fragment_exists: true
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should use the rejection handler if the url fragment already exists',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
+        'classroom-url-fragment').then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/classroom_url_fragment_handler/classroom-url-fragment');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error: Failed to check classroom url fragment.', {
+        status: 500,
+        statusText: 'Error: Failed to check classroom url fragment.'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
 });

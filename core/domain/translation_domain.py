@@ -829,7 +829,7 @@ class WrittenTranslation:
         translatable_obj_class = (
             translatable_object_registry.Registry.get_object_class(
                 translatable_class_name))
-        self.translation = translatable_obj_class.normalize_value(  # type: ignore[no-untyped-call]
+        self.translation = translatable_obj_class.normalize_value(
             self.translation)
 
         if not isinstance(self.needs_update, bool):
