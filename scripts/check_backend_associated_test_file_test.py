@@ -20,7 +20,9 @@ import builtins
 import logging
 import os
 import sys
+import tempfile
 
+from core import utils
 from core.tests import test_utils
 from scripts import check_backend_associated_test_file
 
@@ -44,26 +46,30 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(builtins, 'print', mock_print)
         self.swap_logging = self.swap(logging, 'error', mock_error)
         self.swap_exit = self.swap(sys, 'exit', lambda _: None)
-        # Creating a backend file.
-        with open(self.backend_file, 'w', encoding='utf8') as f:
-            f.write('Example code')
-        # Creating a frontend file.
-        with open(self.frontend_file, 'w', encoding='utf8') as f:
-            f.write('Example code')
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        os.remove(os.path.join(os.getcwd(), self.backend_file))
-        os.remove(os.path.join(os.getcwd(), self.frontend_file))
-        backend_test_file_path = os.path.join(
-            os.getcwd(), self.backend_test_file)
-        if os.path.exists(backend_test_file_path):
-            os.remove(backend_test_file_path)
 
     def test_checks_fail_when_a_backend_file_lacks_associated_test_file(
             self) -> None:
+        # Creating a backend file.
+        temp_file1 = tempfile.NamedTemporaryFile()
+        setattr(temp_file1, 'name', self.backend_file)
+        # Creating a frontend file.
+        temp_file2 = tempfile.NamedTemporaryFile()
+        setattr(temp_file2, 'name', self.frontend_file)
+        with utils.open_file(self.backend_file, 'w', encoding='utf8') as f:
+            f.write('Example code')
+        with utils.open_file(self.frontend_file, 'w', encoding='utf8') as f:
+            f.write('Example code')
+        
         with self.print_swap, self.swap_logging, self.swap_exit:
             check_backend_associated_test_file.main()
+
+        temp_file1.close()
+        temp_file2.close()
+        # On Windows system, occasionally this temp file is not deleted.
+        if os.path.isfile(self.backend_file):
+            os.remove(self.backend_file)
+        if os.path.isfile(self.frontend_file):
+            os.remove(self.frontend_file)
 
         self.assertIn(
             'Backend associated test file checks failed.', self.print_arr)
@@ -76,12 +82,19 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
 
     def test_pass_when_file_in_exclusion_list_lacks_associated_test(
             self) -> None:
+        # Creating a backend file.
+        temp_file = tempfile.NamedTemporaryFile()
+        setattr(temp_file, 'name', self.backend_file)
         (
             check_backend_associated_test_file.
                 FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(self.backend_file))
         with self.print_swap, self.swap_logging, self.swap_exit:
             check_backend_associated_test_file.main()
 
+        temp_file.close()
+        # On Windows system, occasionally this temp file is not deleted.
+        if os.path.isfile(self.backend_file):
+            os.remove(self.backend_file)
         self.assertIn(
             'Backend associated test file checks passed.', self.print_arr)
         self.assertNotIn(
@@ -93,12 +106,23 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
 
     def test_checks_pass_when_all_backend_files_have_an_associated_test_file(
             self) -> None:
+        temp_file1 = tempfile.NamedTemporaryFile()
+        setattr(temp_file1, 'name', self.backend_file)
         # Creating the associated test file of the backend file.
+        temp_file2 = tempfile.NamedTemporaryFile()
+        setattr(temp_file2, 'name', self.backend_test_file)
         with open(self.backend_test_file, 'w', encoding='utf8') as f:
             f.write('Example code')
         with self.print_swap, self.swap_logging, self.swap_exit:
             check_backend_associated_test_file.main()
 
+        temp_file1.close()
+        temp_file2.close()
+        # On Windows system, occasionally this temp file is not deleted.
+        if os.path.isfile(self.backend_file):
+            os.remove(self.backend_file)
+        if os.path.isfile(self.backend_test_file):
+            os.remove(self.backend_test_file)
         self.assertIn(
             'Backend associated test file checks passed.', self.print_arr)
         self.assertEqual(self.error_arr, [])
