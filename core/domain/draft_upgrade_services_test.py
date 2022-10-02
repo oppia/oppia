@@ -235,7 +235,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # As invalid drafts are rejected, this draft will be None.
         assert migrated_draft_change_list_v53 is None
 
-
         migrated_draft_change_list_v53 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v52_2, 1, 2, self.EXP_ID)

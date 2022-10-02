@@ -135,7 +135,11 @@ class DraftUpgradeUtil:
             html_content: str. HTML content of the draft.
 
         Returns:
-            None.
+            None. This function doesn't return anything.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
         """
 
         soup = bs4.BeautifulSoup(html_content, 'html.parser')
@@ -169,8 +173,8 @@ class DraftUpgradeUtil:
             if urlparse(lnk).scheme not in acceptable_schemes:
                 # Invalidate draft.
                 raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.')
-
+                    'Conversion cannot be completed.'
+                )
 
     @classmethod
     def _convert_html_in_draft_change_list(
@@ -391,13 +395,13 @@ class DraftUpgradeUtil:
                 )
                 new_value = edit_content_property_cmd.new_value
                 html_content = new_value['html']
-                
+
                 cls._invalidate_drafts_with_invalid_links(html_content)
 
             elif exp_change.property_name == (
                 exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                 assert isinstance(exp_change.new_value, dict)
-                
+
                 written_translations = exp_change.new_value
                 for translations in (
                     written_translations['translations_mapping'].values()
@@ -407,12 +411,13 @@ class DraftUpgradeUtil:
                             written_translation['translation'], List):
                             for element in written_translation[
                                 'translation']:
-                                cls._invalidate_drafts_with_invalid_links(element)
+                                cls._invalidate_drafts_with_invalid_links(
+                                    element)
                         else:
                             cls._invalidate_drafts_with_invalid_links(
                                 written_translation['translation']
-                            )                
-    
+                            )
+
         return draft_change_list
 
     @classmethod

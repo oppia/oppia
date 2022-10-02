@@ -5299,7 +5299,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5558,7 +5558,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5789,7 +5789,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true

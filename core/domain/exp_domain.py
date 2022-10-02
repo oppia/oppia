@@ -1351,13 +1351,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def fix_non_interactive_links(cls, html_content: str) -> str:
-        """Returns html with valid links
-        
+        """Returns html with valid links.
+
         Args:
             html_content: str. HTML string that needs to be fixed.
 
         Returns:
-            str. HTML string with valid links.        
+            str. HTML string with valid links.
         """
 
         soup = bs4.BeautifulSoup(html_content, 'html.parser')

@@ -22,7 +22,6 @@ import collections
 import copy
 import datetime
 import re
-from urllib.parse import urlparse  # pylint: disable=import-only-modules
 
 from core import feconf
 from core import schema_utils
