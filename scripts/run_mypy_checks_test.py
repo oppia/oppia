@@ -52,10 +52,10 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen_success(
             unused_cmd: str,
-            unused_stdout: Optional[str] = None,
-            unused_stdin: Optional[str] = None,
-            unused_stderr: Optional[str] = None,
-            unused_env: Optional[str] = None
+            stdout: Optional[str] = None,
+            stdin: Optional[str] = None,
+            stderr: Optional[str] = None,
+            env: Optional[str] = None
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_success
 
@@ -63,10 +63,10 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen_failure(
             unused_cmd: str,
-            unused_stdout: Optional[str] = None,
-            unused_stdin: Optional[str] = None,
-            unused_stderr: Optional[str] = None,
-            unused_env: Optional[str] = None
+            stdout: Optional[str] = None,
+            stdin: Optional[str] = None,
+            stderr: Optional[str] = None,
+            env: Optional[str] = None
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_failure
 
