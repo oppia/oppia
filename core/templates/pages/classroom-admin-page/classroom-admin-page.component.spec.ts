@@ -1164,4 +1164,16 @@ describe('Classroom Admin Page component ', () => {
 
       expect(ngbModal.open).toHaveBeenCalled();
     }));
+
+  it('should be able to get length of prerequisites', () => {
+    component.topicNameToPrerequisiteTopicNames = {
+      'Dummy topic 1': [],
+      'Dummy topic 2': ['Dummy topic 1'],
+      'Dummy topic 3': ['Dummy topic 1']
+    };
+
+    expect(component.getPrerequisiteLength('Dummy topic 1')).toEqual(0);
+    expect(component.getPrerequisiteLength('Dummy topic 2')).toEqual(1);
+    expect(component.getPrerequisiteLength('Dummy topic 3')).toEqual(1);
+  });
 });

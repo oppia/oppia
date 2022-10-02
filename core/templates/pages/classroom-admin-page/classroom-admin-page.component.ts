@@ -532,6 +532,10 @@ export class ClassroomAdminPageComponent implements OnInit {
       // clicked. No further action is needed.
     });
   }
+
+  getPrerequisiteLength(topicName: string): number {
+    return this.topicNameToPrerequisiteTopicNames[topicName].length;
+  }
 }
 
 angular.module('oppia').directive(

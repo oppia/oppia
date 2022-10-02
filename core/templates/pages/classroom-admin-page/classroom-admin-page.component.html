@@ -149,6 +149,9 @@
 
                     <div class="prerequisite-topics-container">
                       <div *ngIf="!classroomEditorMode">
+                        <span *ngIf="getPrerequisiteLength(topicName) === 0">
+                          <em>No Prerequisites</em>
+                        </span>
                         <mat-chip-list>
                           <mat-chip *ngFor="let prerequisiteTopic of topicNameToPrerequisiteTopicNames[topicName]">
                             {{ prerequisiteTopic }}
