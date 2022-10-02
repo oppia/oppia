@@ -159,3 +159,17 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
     });
   };
 }
+
+// Create a polyfill for Object.entries() for Chrome.
+if (!Object.entries) {
+  Object.entries = function(obj) {
+    var ownProps = Object.keys(obj),
+      i = ownProps.length,
+      resArray = new Array(i); // Preallocate the array.
+
+    while (i--) {
+      resArray[i] = [ownProps[i], obj[ownProps[i]]];
+      return resArray;
+    }
+  };
+}
