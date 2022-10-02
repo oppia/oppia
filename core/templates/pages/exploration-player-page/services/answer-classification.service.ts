@@ -223,11 +223,11 @@ export class AnswerClassificationService {
   }
 
   isAnswerOnlyMisspelled(
-      interactionInOldState: Interaction,
+      interaction: Interaction,
       answer: string
     ): boolean {
     var answerIsMisspelled = false;
-    const answerGroups = interactionInOldState.answerGroups;
+    const answerGroups = interaction.answerGroups;
     for (var i = 0; i < answerGroups.length; ++i) {
       const answerGroup = answerGroups[i];
       if (answerGroup.outcome.labelledAsCorrect) {

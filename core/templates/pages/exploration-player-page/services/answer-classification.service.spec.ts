@@ -66,7 +66,7 @@ fdescribe('Answer Classification Service', () => {
     textInputRulesService = TestBed.get(TextInputRulesService);
   });
 
-  describe('with string classifier disabled', () => {
+  fdescribe('with string classifier disabled', () => {
     let stateDict;
     let expId = '0';
 
@@ -282,7 +282,7 @@ fdescribe('Answer Classification Service', () => {
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
-          2, 0,
+          3, 0,
           ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
         )
       );
@@ -346,20 +346,85 @@ fdescribe('Answer Classification Service', () => {
 
       it('should check for misspellings correctly.', () => {
 
+      stateDict.interaction.answer_groups = [{
+        outcome: {
+          dest: 'outcome 1',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'feedback_1',
+            html: ''
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        rule_specs: [{
+          rule_type: 'Equals',
+          inputs: {
+            x: {
+              contentId: 'rule_input_0',
+              normalizedStrSet: ['IncorrectAnswer']
+            }
+          }
+        }],
+      }, {
+        outcome: {
+          dest: 'outcome 2',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'feedback_2',
+            html: ''
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        rule_specs: [{
+          rule_type: 'Equals',
+          inputs: {
+            x: {
+              contentId: 'rule_input_1',
+              normalizedStrSet: ['Answer']
+            }
+          }
+        }, {
+          rule_type: 'Equals',
+          inputs: {
+            x: {
+              contentId: 'rule_input_2',
+              normalizedStrSet: ['MaybeCorrect']
+            }
+          }
+        }, {
+          rule_type: 'FuzzyEquals',
+          inputs: {
+            x: {
+              contentId: 'rule_input_3',
+              normalizedStrSet: ['FuzzilyCorrect']
+            }
+          }
+        }],
+      }]
+
       const state = (
         stateObjectFactory.createFromBackendDict(stateName, stateDict));
-      });
+      
+        expect(answerClassificationService.isAnswerOnlyMisspelled(
+          state.interaction, "anSwkp")).toEqual(true);
+        
+        expect(answerClassificationService.isAnswerOnlyMisspelled(
+          state.interaction, "anSwer")).toEqual(true);
+        
+        expect(answerClassificationService.isAnswerOnlyMisspelled(
+          state.interaction, "fuZZilyCeerect")).toEqual(true);
+        
+        expect(answerClassificationService.isAnswerOnlyMisspelled(
+          state.interaction, "InCORrectAnkwpr")).toEqual(false);
 
-      expect(
-        answerClassificationService.isAnswerOnlyMisspelled(state.interaction,
-          "")
-      ).toEqual(
-        new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
-          2, 0,
-          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
-        )
-      );      
+      });
+    
 
 
   });
