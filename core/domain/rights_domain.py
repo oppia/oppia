@@ -163,10 +163,10 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': True,
-                'owner_names': [],
-                'editor_names': [],
-                'voice_artist_names': [],
-                'viewer_names': [],
+                'owner_ids': [],
+                'editor_ids': [],
+                'voice_artist_ids': [],
+                'viewer_ids': [],
                 'viewable_if_private': self.viewable_if_private,
             }
         else:
@@ -174,10 +174,10 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': self.owner_ids,
-                'editor_names': self.editor_ids,
-                'voice_artist_names': self.voice_artist_ids,
-                'viewer_names': self.viewer_ids,
+                'owner_ids': self.owner_ids,
+                'editor_ids': self.editor_ids,
+                'voice_artist_ids': self.voice_artist_ids,
+                'viewer_ids': self.viewer_ids,
                 'viewable_if_private': self.viewable_if_private,
             }
 
