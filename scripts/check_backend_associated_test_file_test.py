@@ -59,7 +59,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             f.write('Example code')
         with utils.open_file(self.frontend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
-        
+
         with self.print_swap, self.swap_logging, self.swap_exit:
             check_backend_associated_test_file.main()
 
