@@ -2016,7 +2016,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             % (', '.join(['']))
         )
         with self.assertRaisesRegex(Exception, error_msg):
-            topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+            topic_services.get_topic_id_to_topic_name_dict(
                 [additions_id, 'incorrect_topic_id'])
 
 
