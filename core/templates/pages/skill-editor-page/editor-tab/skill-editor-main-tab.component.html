@@ -24,13 +24,13 @@
           <select class="form-control"
                   [(ngModel)]="topicName"
                   (change)="changeSelectedTopic(topicName)"
-                  [disabled]="!isTopicDropdownEnabled()">
+                  [disabled]="!topicDropdownEnabled">
             <option *ngFor="let topic of getAssignedSkillTopicData() | keyvalue" [value]="topic.key">
               {{topic.key}}
             </option>
           </select>
         </div>
-        <div class="status-box" *ngIf="isTopicDropdownEnabled()">
+        <div class="status-box" *ngIf="topicDropdownEnabled">
           <strong class="status-key">
             Subtopic:
           </strong>

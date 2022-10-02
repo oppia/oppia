@@ -38,6 +38,7 @@ export class SkillEditorMainTabComponent implements OnInit {
   assignedSkillTopicData: AssignedSkillTopicData;
   skill: Skill;
   selectedTopic: Topic;
+  topicDropdownEnabled: boolean;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -108,6 +109,7 @@ export class SkillEditorMainTabComponent implements OnInit {
   ngOnInit(): void {
     this.pageTitleService.setNavbarTitleForMobileView('Skill Editor');
     this.skill = this.skillEditorStateService.getSkill();
+    this.topicDropdownEnabled = this.isTopicDropdownEnabled();
     // To ensure that the focus event function executes only after
     // all the functions in the main thread have executed,
     // $timeout is required.
