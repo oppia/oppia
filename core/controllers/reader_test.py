@@ -2591,10 +2591,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
                 'collection_id': self.COL_ID
             }
         )
-        self.assertIn(
-            b'<oppia-exploration-player-page></oppia-exploration-player-page>',
-            response.body
-        )
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
         self.logout()
 

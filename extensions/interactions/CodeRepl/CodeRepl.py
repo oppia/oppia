@@ -20,25 +20,31 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class CodeRepl(base.BaseInteraction):
     """Interaction that allows programs to be input."""
 
-    name = 'Code Editor'
-    description = 'Allows learners to enter code and get it evaluated.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = True
-    _dependency_ids = ['skulpt', 'codemirror']
-    answer_type = 'CodeEvaluation'
-    instructions = 'I18N_INTERACTIONS_CODE_REPL_INSTRUCTION'
-    narrow_instructions = 'I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION'
-    needs_summary = True
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Code Editor'
+    description: str = 'Allows learners to enter code and get it evaluated.'
+    display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable: bool = True
+    _dependency_ids: List[str] = ['skulpt', 'codemirror']
+    answer_type: str = 'CodeEvaluation'
+    instructions: str = 'I18N_INTERACTIONS_CODE_REPL_INSTRUCTION'
+    narrow_instructions: str = 'I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION'
+    needs_summary: bool = True
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
     # Language options 'lua', 'scheme', 'coffeescript', 'javascript', and
     # 'ruby' have been removed for possible later re-release.
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'language',
         'description': 'Programming language',
         'schema': {
@@ -80,7 +86,7 @@ class CodeRepl(base.BaseInteraction):
         'default_value': ''
     }]
 
-    _answer_visualization_specs = [{
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
         'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],

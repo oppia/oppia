@@ -1,0 +1,76 @@
+<div class="modal-header">
+  <h3>Graph visualization</h3>
+</div>
+<div class="modal-body">
+  <svg class="oppia-graph-viz" [attr.width]="GRAPH_WIDTH" [attr.height]="GRAPH_HEIGHT">
+    <g>
+      <g class="widthLocation" *ngFor="let link of augmentedLinks">
+        <path class="link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)">
+        </path>
+      </g>
+      <g class="node" *ngFor="let node of nodeList">
+        <rect [attr.rx]="2" [attr.ry]="2" [attr.height]="node.height" [attr.width]="node.width"
+              [attr.x]="node.x0" [attr.y]="node.y0"
+              [ngClass]="{'clickable': false}"
+              [attr.aria-label]="'Topics node'">
+        </rect>
+        <text text-anchor="middle" [attr.x]="node.xLabel" [attr.y]="node.yLabel">
+          <tspan>
+            <tspan alignment-baseline="central">{{getTruncatedLabel(node.label) + ' '}}</tspan>
+          </tspan>
+        </text>
+      </g>
+    </g>
+    <defs>
+      <marker id="arrowhead" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="grey"></path>
+      </marker>
+    </defs>
+  </svg>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary"
+          (click)="cancel()">
+    Cancel
+  </button>
+</div>
+
+<style>
+  .oppia-graph-viz path.link {
+    fill: none;
+    stroke: rgb(179, 179, 179);
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz text {
+    font: 12px sans-serif;
+    pointer-events: none;
+  }
+  .oppia-graph-viz text.shadow {
+    stroke: #fff;
+    stroke-opacity: .8;
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz .node rect {
+    fill: #fff;
+    pointer-events: all;
+    stroke: rgb(0, 0, 0);
+    -moz-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+    -o-transition: all 0.15s;
+    transition: all 0.15s;
+  }
+  .oppia-graph-viz .oppia-box-fill {
+    fill: #e0f2f1;
+  }
+  .modal-dialog {
+    border: none;
+    margin: 0;
+    width: 100vw;
+  }
+  .modal-content {
+    border: 0;
+    border-radius: 0;
+    height: 100vh;
+  }
+</style>
