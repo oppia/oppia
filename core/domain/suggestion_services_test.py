@@ -51,6 +51,7 @@ from typing_extensions import Final
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
+    from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
 
@@ -68,7 +69,9 @@ if MYPY:  # pragma: no cover
 
 class BaseSuggestionServicesTest(test_utils.GenericTestBase):
 
-    def _publish_valid_topic(self, topic, uncategorized_skill_ids):
+    def _publish_valid_topic(
+        self, topic: topic_domain.Topic,
+        uncategorized_skill_ids: List[str]) -> None:
         """Saves and publishes a valid topic with linked skills and subtopic.
 
         Args:
@@ -108,7 +111,7 @@ class BaseSuggestionServicesTest(test_utils.GenericTestBase):
             topic_services.add_uncategorized_skill(
                 self.admin_id, topic.id, skill_id)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(BaseSuggestionServicesTest, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1017,7 +1020,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': state.interaction.solution.explanation.content_id,
+                'content_id': 'solution_5',
                 'html': '<p>This is the updated solution.</p>',
             },
         }

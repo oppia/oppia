@@ -924,7 +924,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
 
-    def test_delete_skill_model_with_linked_suggestion(self):
+    def test_delete_skill_model_with_linked_suggestion(self) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change: SuggestionChangeDictType = {
             'cmd': (

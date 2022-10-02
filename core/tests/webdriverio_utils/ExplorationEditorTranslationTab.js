@@ -138,11 +138,9 @@ var ExplorationEditorTranslationTab = function() {
   var languageSelectorElement = $('.e2e-test-translation-language-selector');
   var languageSelectorLabelElement = $('.e2e-test-language-selector-label');
   var progressBarLabelElement = $('.e2e-test-progress-info');
-  var translationModeButton = $('.e2e-test-translation-mode');
   var voiceoverModeButton = $('.e2e-test-voiceover-mode');
   var saveTranslationButton = $('.e2e-test-save-translation');
   var editTranslationButtton = $('.e2e-test-edit-translation');
-  var translationDisplay = $('.e2e-test-translation-display');
   var stateGraph = $('.e2e-test-translation-graph');
   var feedbackListSelector = function() {
     return $$('.e2e-test-translation-feedback');
@@ -330,36 +328,9 @@ var ExplorationEditorTranslationTab = function() {
     }
   };
 
-  this.expectTranslationToMatch = async function(richTextInstructions) {
-    await forms.expectRichText(translationDisplay).toMatch(
-      richTextInstructions);
-  };
-
   this.switchToVoiceoverMode = async function() {
     await action.click('Voiceover mode button', voiceoverModeButton);
     await waitFor.pageToFullyLoad();
-  };
-
-  this.switchToTranslationMode = async function() {
-    await action.click('Translation mode button', translationModeButton);
-    await waitFor.pageToFullyLoad();
-  };
-
-  this.expectToBeInTranslationMode = async function() {
-    expect(await action.getText(
-      'Language selector label element',
-      languageSelectorLabelElement)).toBe('Translations for language:');
-    expect(await action.getText(
-      'Progress selector label element',
-      progressBarLabelElement)).toBe('Exploration translation progress:');
-    expect(await action.getAttribute(
-      'Translation mode button',
-      translationModeButton,
-      'class')).toMatch('oppia-active-mode');
-    expect(await action.getAttribute(
-      'Voiceover mode button',
-      voiceoverModeButton,
-      'class')).not.toMatch('oppia-active-mode');
   };
 
   this.expectToBeInVoiceoverMode = async function() {
@@ -369,14 +340,6 @@ var ExplorationEditorTranslationTab = function() {
     expect(await action.getText(
       'Progress bar element',
       progressBarLabelElement)).toBe('Exploration voiceover progress:');
-    expect(await action.getAttribute(
-      'Translation mode button',
-      translationModeButton,
-      'class')).not.toMatch('oppia-active-mode');
-    expect(await action.getAttribute(
-      'Voiceover mode button',
-      voiceoverModeButton,
-      'class')).toMatch('oppia-active-mode');
   };
 
   this.expectContentTabContentToMatch = async function(content) {

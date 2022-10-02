@@ -37,6 +37,8 @@ from typing_extensions import Final
 MYPY = False
 if MYPY:
     from mypy_imports import datastore_services
+    from mypy_imports import exp_models
+    from mypy_imports import suggestion_models
 
 (exp_models, suggestion_models) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.SUGGESTION
@@ -143,7 +145,7 @@ class MigrateQuestionSuggestionsJobTests(
 
     AUTHOR_EMAIL: Final = 'author@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(MigrateQuestionSuggestionsJobTests, self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -156,7 +158,8 @@ class MigrateQuestionSuggestionsJobTests(
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        state = self._create_valid_question_data(None, content_id_generator)
+        state = self._create_valid_question_data(
+            'default-state', content_id_generator)
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {

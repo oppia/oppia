@@ -49,7 +49,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
                 'My name is Nikhil.',
-                translation_domain.TranslatableContentFormat,
+                translation_domain.TranslatableContentFormat.HTML,
                 True
             )
         }
@@ -437,7 +437,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ValueError, 'Content ID Invalid id does not exist'):
             init_state.get_content_html('Invalid id')
 
-    def test_state_operations(self):
+    def test_state_operations(self) -> None:
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -487,10 +487,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(ValueError, 'Duplicate state name'):
             exploration.rename_state('State 2', 'END')
 
+        default_outcome = exploration.states[
+            'Renamed state'].interaction.default_outcome
+        assert not default_outcome is None
         # Ensure the other states are connected to END.
-        exploration.states[
-            'Renamed state'].interaction.default_outcome.dest = 'State 2'
-        exploration.states['State 2'].interaction.default_outcome.dest = 'END'
+        default_outcome.dest = 'State 2'
+
+        default_outcome = exploration.states[
+            'State 2'].interaction.default_outcome
+        assert not default_outcome is None
+        default_outcome.dest = 'END'
 
         # Ensure the other states have interactions.
         self.set_interaction_for_state(
@@ -759,6 +765,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
             }
         }
 
@@ -1011,11 +1020,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
 
         state_dict_with_new_math_schema = {
@@ -1089,11 +1094,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
         interaction_registry.Registry.get_all_specs_for_state_schema_version(
             41)['ItemSelectionInput']['can_have_solution'] = True
@@ -1225,11 +1226,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
 
         state_dict_with_new_math_schema = {
@@ -1292,11 +1289,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -1414,11 +1407,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
 
         state_dict_with_new_math_schema = {
@@ -1471,11 +1460,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -1492,7 +1477,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         html_with_old_math_schema = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
-        answer_group_with_old_math_schema = [{
+        answer_group_with_old_math_schema: List[
+            state_domain.AnswerGroupDict
+        ] = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {
@@ -1572,11 +1559,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
@@ -1695,11 +1678,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
@@ -1799,11 +1778,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
@@ -1888,11 +1863,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
 
         state_dict_with_new_math_schema: state_domain.StateDict = {
@@ -1938,11 +1909,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
+            }
         }
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,

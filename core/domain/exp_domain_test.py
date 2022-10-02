@@ -5976,7 +5976,7 @@ class ExplorationChangesMergeabilityUnitTests(
         test_utils.EmailTestBase):
     """Test methods related to exploration changes mergeability."""
 
-    def  setUp(self):
+    def  setUp(self) -> None:
         super().setUp()
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
@@ -5985,14 +5985,17 @@ class ExplorationChangesMergeabilityUnitTests(
         )
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-    def append_next_content_id_index_change(self, change_list):
+    def append_next_content_id_index_change(
+      self, change_list: List[exp_domain.ExplorationChange]
+      ) -> List[exp_domain.ExplorationChange]:
         """Appends the next_content_id_index change in the change list."""
-        return change_list.append(exp_domain.ExplorationChange({
+        change_list.append(exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'next_content_id_index',
             'new_value': self.content_id_generator.next_content_id_index,
             'old_value': 0
         }))
+        return change_list
 
     def test_changes_are_mergeable_when_content_changes_do_not_conflict(
         self
@@ -10882,9 +10885,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID,
-                self.append_next_content_id_index_change(change_list_3_dict),
-                1, 3)
+                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
             )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
@@ -10980,9 +10981,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID,
-                self.append_next_content_id_index_change(change_list_3_dict),
-                2, 3)
+                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
             )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
@@ -11023,9 +11022,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID,
-                self.append_next_content_id_index_change(change_list_4_dict),
-                2, 3)
+                'Thanks!' % (self.EXP_0_ID, change_list_4_dict, 2, 3)
             )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)

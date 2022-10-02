@@ -223,7 +223,7 @@ class ExplorationOpportunitySummary:
                 'Expected set of all languages available in '
                 'incomplete_translation, needs_voiceover and assigned_voiceover'
                 ' to be the same as the supported audio languages, '
-                'received %s' % list(sorted(expected_set_of_all_languages)))
+                'received %s %s' % (list(sorted(expected_set_of_all_languages)), list(sorted(allowed_language_codes))))
 
     def _validate_translation_counts(
         self, translation_counts: Dict[str, int]

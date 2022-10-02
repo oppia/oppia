@@ -403,6 +403,7 @@ class BaseTranslatableObject:
         for translatable_content in translatable_contents:
             if translatable_content.content_format == (
                 TranslatableContentFormat.HTML):
+                assert isinstance(translatable_content.content_value, str)
                 html_list.append(translatable_content.content_value)
 
         return html_list

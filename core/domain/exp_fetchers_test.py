@@ -167,7 +167,6 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def test_retrieval_of_exp_versions_for_invalid_state_schema_version(
         self
     ) -> None:
-        self.maxDiff = None
         error_regex = (
             'Exploration\\(id=%s, version=%s, states_schema_version=%s\\) '
                 'does not match the latest schema version %s' % (

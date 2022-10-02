@@ -3430,6 +3430,20 @@ class State(translation_domain.BaseTranslatableObject):
             content-ids.
         """
         PossibleContentIdsType = Union[str, List[str], List[List[str]]]
+        def _replace_content_id(
+            old_id: PossibleContentIdsType,
+            id_mapping: Dict[str, str]
+        ) -> str:
+            """Replace old Id with the new Id."""
+            assert isinstance(old_id, str)
+
+            # INVALID_CONTENT_ID doesn't corresponds to any existing content in
+            # the state. Such Ids cannot be replaced with any new id.
+            if old_id != feconf.INVALID_CONTENT_ID:
+                return old_id
+
+            return id_mapping[old_id]
+
         OBJECT_CONTENT_IDS_REPLACERS: Dict[
             str,
             Callable[
@@ -3438,55 +3452,50 @@ class State(translation_domain.BaseTranslatableObject):
         ] = {}
 
         OBJECT_CONTENT_IDS_REPLACERS['TranslatableHtmlContentId'] = (
-            lambda old_id, id_mapping: (
-                # INVALID_CONTENT_ID doesn't corresponds to any existing
-                # content in the state.
-                # Such Ids cannot be replaced with any new id.
-                id_mapping[old_id]
-                if old_id != feconf.INVALID_CONTENT_ID else
-                old_id
-            )
-        )
+           _replace_content_id)
+
         OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'] = (
             lambda ids_set, id_mapping: [
-                OBJECT_CONTENT_IDS_REPLACERS['TranslatableHtmlContentId'](
-                    old_id, id_mapping)
+                _replace_content_id(old_id, id_mapping)
                 for old_id in ids_set
             ]
         )
         OBJECT_CONTENT_IDS_REPLACERS[
                 'ListOfSetsOfTranslatableHtmlContentIds'] = (
             lambda items, id_mapping: [
-                OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'](
-                    ids_set, id_mapping)
+                [_replace_content_id(old_id, id_mapping)for old_id in ids_set]
                 for ids_set in items
             ]
         )
         content_id_generator = translation_domain.ContentIdGenerator()
-        old_to_new_content_id = {}
         for state_name in sorted(states_dict.keys()):
-            state = states_dict[state_name]
-            voiceovers = []
+            state: StateDict = states_dict[state_name]
+            voiceovers: List[Tuple[str, Dict[str, VoiceoverDict]]] = []
+            old_to_new_content_id: Dict[str, str] = {}
+
             for content, content_type, extra_prefix in (
                 cls.traverse_v52_state_dict_for_contents(state)
             ):
+                new_content_id = content_id_generator.generate(
+                    content_type, extra_prefix=extra_prefix)
                 content_id_key = 'content_id'
                 if content_type == translation_domain.ContentType.RULE:
                     content_id_key = 'contentId'
-                old_content_id = content[content_id_key]
-                new_content_id = content_id_generator.generate(
-                    content_type, extra_prefix=extra_prefix)
+
+                old_content_id = content[content_id_key]  # type: ignore[misc]
+                content[content_id_key] = new_content_id  # type: ignore[index]
+
+                assert isinstance(old_content_id, str)
                 old_to_new_content_id[old_content_id] = new_content_id
 
-                voiceovers_mapping = (
-                    state['recorded_voiceovers'][
-                        'voiceovers_mapping'])
+                voiceovers_mapping = state[
+                    'recorded_voiceovers']['voiceovers_mapping']
 
                 voiceovers.append((
                     new_content_id,
                     copy.deepcopy(voiceovers_mapping[old_content_id])
                 ))
-                content[content_id_key] = new_content_id
+
             state['recorded_voiceovers']['voiceovers_mapping'] = {
                 content_id: voiceover
                 for content_id, voiceover in voiceovers
@@ -3509,7 +3518,7 @@ class State(translation_domain.BaseTranslatableObject):
                 'rule_descriptions']
             answer_type = interaction_specs[interaction_id]['answer_type']
 
-            if interaction['solution']:
+            if not interaction['solution'] is None:
                 solution_dict =  interaction['solution']
                 if answer_type in OBJECT_CONTENT_IDS_REPLACERS:
                     solution_dict['correct_answer'] = (
@@ -3561,19 +3570,20 @@ class State(translation_domain.BaseTranslatableObject):
         states_to_content_id = {}
 
         for state_name in sorted(states_dict.keys()):
-            old_id_to_new_id = {}
+            old_id_to_new_id: Dict[str, str] = {}
 
             for content, content_type, extra_prefix in (
                 cls.traverse_v52_state_dict_for_contents(
                     states_dict[state_name])
             ):
                 if content_type == translation_domain.ContentType.RULE:
-                    old_id_to_new_id[content['contentId']] = (
-                        content_id_generator.generate(content_type))
+                    content_id = content['contentId']  # type: ignore[misc]
                 else:
-                    old_id_to_new_id[content['content_id']] = (
-                        content_id_generator.generate(
-                            content_type, extra_prefix=extra_prefix))
+                    content_id = content['content_id']
+
+                assert isinstance(content_id, str)
+                old_id_to_new_id[content_id] = content_id_generator.generate(
+                    content_type, extra_prefix=extra_prefix)
 
             states_to_content_id[state_name] = old_id_to_new_id
 

@@ -737,10 +737,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 # to avoid the error, we used ignore here.
                 translations_mapping[
                     content_id][lang_code]['translation'] = (
-                        translations_mapping[content_id][lang_code]['html'])  # type: ignore[misc]
+                        translations_mapping[content_id][lang_code]['html'])
                 # Here we use MyPy ignore because MyPy doesn't allow key
                 # deletion from TypedDict.
-                del translations_mapping[content_id][lang_code]['html']  # type: ignore[misc]
+                del translations_mapping[content_id][lang_code]['html']
 
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id is None:

@@ -38,6 +38,8 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List, Sequence
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
@@ -419,14 +421,15 @@ class MigrateExplorationJobTests(
                 {}
             ).put()
 
-        all_translation_models = (
+        all_translation_models: (
+            Sequence[translation_models.EntityTranslationsModel]) = (
             translation_models.EntityTranslationsModel.get_all().fetch())
 
         self.assertEqual(len(all_translation_models), 2)
 
         owner_action = user_services.get_user_actions_info(
             feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles( # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             owner_action, self.NEW_EXP_ID)
         opportunity_model = (
             opportunity_models.ExplorationOpportunitySummaryModel(
@@ -667,7 +670,8 @@ class AuditExplorationMigrationJobTests(
             {}
         ).put()
 
-        all_translation_models = (
+        all_translation_models: (
+            Sequence[translation_models.EntityTranslationsModel]) = (
             translation_models.EntityTranslationsModel.get_all().fetch())
 
         self.assertEqual(
@@ -675,7 +679,7 @@ class AuditExplorationMigrationJobTests(
 
         owner_action = user_services.get_user_actions_info(
             feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles( # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             owner_action, self.NEW_EXP_ID)
         opportunity_model = (
             opportunity_models.ExplorationOpportunitySummaryModel(

@@ -312,7 +312,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             ).to_dict())
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.', 'html', True)
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True
+            )
         }
         self.dummy_entity_translations = translation_domain.EntityTranslation(
             'question_id', feconf.TranslatableEntityType.QUESTION, 1, 'hi',
@@ -965,7 +968,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
-        self.question_state_dict['written_translations'] = {
+        self.question_state_dict['written_translations'] = { # type: ignore[misc]
             'translations_mapping': {
                 'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
             }
@@ -1135,7 +1138,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        self.question_state_dict['written_translations'] = {
+        self.question_state_dict['written_translations'] = { # type: ignore[misc]
             'translations_mapping': {
                 'temp_id_1': {
                     'en': {
@@ -1157,15 +1160,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'state_schema_version': 35
         }
 
-        self.assertEqual(test_value['state']['next_content_id_index'], 0)
+        self.assertEqual(test_value['state']['next_content_id_index'], 0) # type: ignore[misc]
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 36)
-        self.assertEqual(test_value['state']['next_content_id_index'], 3)
+        self.assertEqual(test_value['state']['next_content_id_index'], 3) # type: ignore[misc]
 
-        t_map = test_value['state']['written_translations'][
+        t_map = test_value['state']['written_translations'][ # type: ignore[misc]
             'translations_mapping']
         self.assertEqual(t_map['temp_id_1']['en']['data_format'], 'html')
         self.assertEqual(t_map['temp_id_2']['en']['data_format'], 'html')
@@ -1189,7 +1192,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = {
+        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -1214,7 +1217,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'initialCode': {}}
         )
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'],
+            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1240,7 +1243,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = {
+        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -1279,7 +1282,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = {
+        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -1329,7 +1332,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'],
+            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1354,7 +1357,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = {
+        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -1397,7 +1400,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'ca_choices_3': {}}
         )
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'],
+            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1499,7 +1502,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question_state_dict['interaction']['customization_args'] = {}
         self.question_state_dict[
             'recorded_voiceovers']['voiceovers_mapping'] = {}
-        self.question_state_dict['written_translations'] = {
+        self.question_state_dict['written_translations'] = { # type: ignore[misc]
             'translations_mapping': {}
         }
 
@@ -1529,7 +1532,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'ca_placeholder_0': {}}
         )
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'],
+            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
             {'ca_placeholder_0': {}}
         )
 
@@ -1578,7 +1581,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v40_to_v41(self) -> None:
-        self.question_state_dict['written_translations'] = {
+        self.question_state_dict['written_translations'] = { # type: ignore[misc]
             'translations_mapping': {}
         }
         self.question_state_dict['interaction']['id'] = 'TextInput'
@@ -1604,7 +1607,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        self.question_state_dict['next_content_id_index'] = 0
+        self.question_state_dict['next_content_id_index'] = 0 # type: ignore[misc]
         self.question_state_dict[
             'recorded_voiceovers']['voiceovers_mapping'] = {}
 
@@ -1617,7 +1620,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 41)
-        self.assertEqual(test_value['state']['next_content_id_index'], 1)
+        self.assertEqual(test_value['state']['next_content_id_index'], 1) # type: ignore[misc]
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0][
                 'rule_specs'][0]['inputs']['x'],
@@ -1655,7 +1658,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        test_value['state']['next_content_id_index'] = 0
+        test_value['state']['next_content_id_index'] = 0 # type: ignore[misc]
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
         test_value['state_schema_version'] = 40
 
@@ -1663,7 +1666,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 41)
-        self.assertEqual(test_value['state']['next_content_id_index'], 1)
+        self.assertEqual(test_value['state']['next_content_id_index'], 1) # type: ignore[misc]
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0][
                 'rule_specs'][0]['inputs']['x'],

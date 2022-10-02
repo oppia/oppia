@@ -42,7 +42,8 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
                 'exp_id', 1, 'hi', {
                     '123': {
                         'content_value': 'Hello world!',
-                        'needs_update': False
+                        'needs_update': False,
+                        'content_format': 'html'
                     }
                 })
         )
@@ -63,7 +64,8 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             'exp_id', 1, 'hi', {
                 '123': {
                     'content_value': 'Hello world!',
-                    'needs_update': False
+                    'needs_update': False,
+                    'content_format': 'html'
                 }
             }
         ).put()
@@ -87,7 +89,8 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             'exp_id', 1, 'en', {
                 '123': {
                     'content_value': 'Hey I am Jhon.',
-                    'needs_update': False
+                    'needs_update': False,
+                    'content_format': 'html'
                 }
             }
         ).put()
@@ -96,7 +99,8 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             'exp_id2', 2, 'hi', {
                 '123': {
                     'content_value': 'Hello world!',
-                    'needs_update': False
+                    'needs_update': False,
+                    'content_format': 'html'
                 }
             }
         ).put()
@@ -105,7 +109,8 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             'exp_id', 1, 'hi', {
                 '123': {
                     'content_value': 'Hey I am Nikhil.',
-                    'needs_update': False
+                    'needs_update': False,
+                    'content_format': 'html'
                 }
             }
         ).put()

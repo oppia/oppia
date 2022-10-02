@@ -79,7 +79,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             exp_id_to_content_id_mapping[suggestion.target_id]
         )
 
-        suggestion_content_id = suggestion.change.new_value['content_id']
+        suggestion_content_id = suggestion.change.new_value['content_id']  # type: ignore[index]
         old_to_new_content_ids_in_state = old_to_new_content_id_mapping[
             suggestion.change.state_name
         ]
@@ -91,7 +91,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
                     % suggestion_content_id
                 )
             )
-        suggestion.change.new_value['content_id'] = (
+        suggestion.change.new_value['content_id'] = (  # type: ignore[index]
             old_to_new_content_ids_in_state[
                 suggestion_content_id
             ]

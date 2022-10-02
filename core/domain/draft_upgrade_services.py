@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 
 from typing import Callable, List, Optional, Union, cast
@@ -179,39 +180,20 @@ class DraftUpgradeUtil:
                         elif isinstance(value, str):
                             new_value['choices']['value'][value_index] = (
                                 conversion_fn(value))
-            elif (change.property_name == 'written_translations'):
-                # Here we use cast because this 'elif' condition forces change
-                # to have type EditExpStatePropertyWrittenTranslationsCmd.
-                edit_written_translations_dict_cmd = cast(
-                    exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
-                    change
-                )
-                new_value = edit_written_translations_dict_cmd.new_value
+            elif change.property_name == 'written_translations':
+                translations_mapping = change.new_value['translations_mapping'] # type: ignore[index]
+                assert isinstance(translations_mapping, dict)
                 for content_id, language_code_to_written_translation in (
-                        new_value['translations_mapping'].items()):
+                        translations_mapping.items()):
                     for language_code in (
                             language_code_to_written_translation.keys()):
-                        translation_dict = new_value['translations_mapping'][
+                        translation_dict = translations_mapping[
                             content_id][language_code]
                         if 'html' in translation_dict:
-                            # Here we use MyPy ignore because in _convert_*
-                            # functions, we allow less strict typing because
-                            # here we are working with previous versions of
-                            # the domain object and in previous versions of
-                            # the domain object there are some fields that
-                            # are discontinued in the latest domain object
-                            # and here 'html' field is discontinued. So,
-                            # while accessing this discontinued 'html' field
-                            # MyPy throws an error. Thus to avoid the error,
-                            # we used ignore here.
-                            new_value['translations_mapping'][
-                                content_id][language_code]['html'] = (  # type: ignore[misc]
-                                    # Here we use MyPy ignore because here we
-                                    # are accessing deprecated 'html' key which
-                                    # causes MyPy to throw an error. Thus, to
-                                    # avoid the error, we used ignore here.
-                                    conversion_fn(new_value[
-                                        'translations_mapping'][content_id][
+                            translations_mapping[
+                                content_id][language_code]['html'] = (
+                                    conversion_fn(
+                                        translations_mapping[content_id][
                                             language_code]['html'])
                                 )
             elif (change.property_name ==

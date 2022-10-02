@@ -648,7 +648,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         server should be the same as the string that is set to the testing cache
         on the testing server.
         """
-        self.maxDiff = None
         exploration_id = 'h51Bu72rDIqO'
 
         self.assertEqual(

@@ -571,18 +571,6 @@ class EditExpStatePropertyRecordedVoiceoversCmd(ExplorationChange):
     old_value: state_domain.RecordedVoiceoversDict
 
 
-class EditExpStatePropertyWrittenTranslationsCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_WRITTEN_TRANSLATIONS as allowed value.
-    """
-
-    property_name: Literal['written_translations']
-    state_name: str
-    new_value: translation_domain.WrittenTranslationsDict
-    old_value: translation_domain.WrittenTranslationsDict
-
-
 class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
     """Class representing the ExplorationChange's
     CMD_EDIT_STATE_PROPERTY command with
@@ -593,18 +581,6 @@ class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
     state_name: str
     new_value: str
     old_value: str
-
-
-class EditExpStatePropertyNextContentIdIndexCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_NEXT_CONTENT_ID_INDEX as allowed value.
-    """
-
-    property_name: Literal['next_content_id_index']
-    state_name: str
-    new_value: int
-    old_value: int
 
 
 class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):

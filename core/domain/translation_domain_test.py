@@ -24,6 +24,8 @@ from core.domain import exp_domain
 from core.domain import translation_domain
 from core.tests import test_utils
 
+from typing import Optional
+
 
 class DummyTranslatableObjectWithTwoParams(
         translation_domain.BaseTranslatableObject):
@@ -41,15 +43,15 @@ class DummyTranslatableObjectWithTwoParams(
 
     def get_translatable_contents_collection(
         self,
-        **kwargs: Dict[str, str]
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
             'content_id_1',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param1)
         translatable_contents_collection.add_fields_from_translatable_object(
             self.param2)
@@ -70,15 +72,15 @@ class DummyTranslatableObjectWithSingleParam(
 
     def get_translatable_contents_collection(
         self,
-        **kwargs: Dict[str, str]
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
             'content_id_2',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param3)
         return translatable_contents_collection
 
@@ -99,20 +101,20 @@ class DummyTranslatableObjectWithDuplicateContentIdForParams(
 
     def get_translatable_contents_collection(
         self,
-        **kwargs: Dict[str, str]
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
             'content_id_2',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param1)
         translatable_contents_collection.add_translatable_field(
             'content_id_2',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param2)
         return translatable_contents_collection
 
@@ -152,30 +154,30 @@ class DummyTranslatableObjectWithFourParams(
 
     def get_translatable_contents_collection(
         self,
-        **kwargs: Dict[str, str]
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
             'content_id_1',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             translation_domain.ContentType.HINT,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param1)
         translatable_contents_collection.add_translatable_field(
             'content_id_2',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             translation_domain.ContentType.DEFAULT_OUTCOME,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param2)
         translatable_contents_collection.add_translatable_field(
             'content_id_3',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param3)
         translatable_contents_collection.add_translatable_field(
             'content_id_4',
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param4)
         return translatable_contents_collection
 
@@ -226,7 +228,9 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
     def test_get_all_contents_which_need_translations(self) -> None:
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.', 'html', True)
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True)
         }
         entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
@@ -258,7 +262,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
     def test_creation_of_object(self) -> None:
         translation_dict = {
             'content_id_1': translation_domain.TranslatedContent(
-                'My name is Nikhil.', 'html', False)
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                False)
         }
         entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',

@@ -76,11 +76,14 @@ class MachineTranslationFetchersTests(test_utils.GenericTestBase):
 class EntityTranslationFetchersTests(test_utils.GenericTestBase):
 
     def test_get_all_entity_translation_objects_for_entity_returns_correclty(
-            self):
+        self
+    ) -> None:
         pass
 
-    def test_get_unique_entity_translation_object_returns_none(self):
+    def test_get_unique_entity_translation_object_returns_none(self) -> None:
         pass
 
-    def test_get_unique_entity_translation_object_returns_correctly(self):
+    def test_get_unique_entity_translation_object_returns_correctly(
+        self
+    ) -> None:
         pass

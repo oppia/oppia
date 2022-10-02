@@ -21,6 +21,7 @@ import os
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import config_services
 from core.domain import exp_domain
@@ -35,7 +36,9 @@ from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import translation_domain
+from core.domain import translation_fetchers
 from core.platform import models
+from core.storage import opportunity
 from core.tests import test_utils
 
 from typing import Dict, List, Optional, Union, cast
@@ -44,8 +47,13 @@ from typing_extensions import Final, TypedDict
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
+    from mypy_imports import opportunity_models
 
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+(
+    suggestion_models, opportunity_models
+) = models.Registry.import_models([
+    models.Names.SUGGESTION, models.Names.OPPORTUNITY
+])
 
 ChangeType = Dict[
     str, Union[str, float, Dict[str, Union[str, int, state_domain.StateDict]]]
@@ -606,7 +614,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # this MyPy is unable to recognize `state_name` as an attribute of
         # change and throwing `"ExplorationChange" has no attribute
         # "state_name"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.state_name = 'Introduction'  # type: ignore[attr-defined]
+        suggestion.change.state_name = 'Introduction'
 
         suggestion.pre_accept_validate()
 
@@ -926,6 +934,22 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
+
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp1',
+            topic_id='Topic1',
+            topic_name='New Topic',
+            story_id='Story1',
+            story_title='New Story',
+            chapter_title='New chapter',
+            content_count=10,
+            translation_counts={},
+            incomplete_translation_language_codes=[
+                language['id']
+                for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            ],
+            language_codes_needing_voice_artists=['en']
+        ).put()
 
     def test_pre_update_validate_fails_for_invalid_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -1495,7 +1519,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # this MyPy is unable to recognize `state_name` as an attribute of
         # change and throwing `"ExplorationChange" has no attribute
         # "state_name"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.state_name = 'Introduction'  # type: ignore[attr-defined]
+        suggestion.change.state_name = 'Introduction'
 
         suggestion.pre_accept_validate()
 
@@ -1507,9 +1531,12 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             suggestion.pre_accept_validate()
 
     def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
-        self.save_new_default_exploration('exp1', self.author_id)
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exp.id, exp.version))
+        self.assertEqual(len(translations), 0)
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1522,17 +1549,23 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1
-        })
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exp.id, exp.version))
+        self.assertEqual(len(translations), 1)
+        self.assertEqual(translations[0].language_code, 'hi')
+        self.assertEqual(translations[0].get_translation_count(), 1)
 
     def test_accept_suggestion_with_set_of_string_adds_translation(
         self
     ) -> None:
-        self.save_new_default_exploration('exp1', self.author_id)
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exp.id, exp.version))
+        self.assertEqual(len(translations), 0)
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1554,18 +1587,24 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1
-        })
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version
+            )
+        )
+        self.assertEqual(len(translations), 1)
+        self.assertEqual(translations[0].language_code, 'hi')
+        self.assertEqual(translations[0].get_translation_count(), 1)
 
     def test_accept_suggestion_with_psedonymous_author_adds_translation(
         self
     ) -> None:
-        self.save_new_default_exploration('exp1', self.author_id)
-
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version)
+        )
+        self.assertEqual(len(translations), 0)
 
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1580,11 +1619,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1
-        })
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version
+            )
+        )
+        self.assertEqual(len(translations), 1)
+        self.assertEqual(translations[0].language_code, 'hi')
+        self.assertEqual(translations[0].get_translation_count(), 1)
 
     def test_get_all_html_content_strings(self) -> None:
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -2477,15 +2519,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'solution': {}
                 }
             },
-            'written_translations': {
-                'translations_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'solution': {}
-                }
-            },
             'interaction': {
                 'answer_groups': [answer_group],
                 'confirmed_unclassified_answers': [],
@@ -2741,15 +2774,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'feedback_0': {},
-                    'hint_1': {}
-                }
-            },
-            'next_content_id_index': 2
         }
         suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'skill1.thread1',

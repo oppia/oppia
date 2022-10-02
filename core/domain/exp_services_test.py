@@ -2649,7 +2649,6 @@ title: A title
 
     def test_export_to_zip_file(self) -> None:
         """Test the export_to_zip_file() method."""
-        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
             category='Algebra')
@@ -2746,7 +2745,6 @@ title: A title
 
     def test_export_to_zip_file_with_unpublished_exploration(self) -> None:
         """Test the export_to_zip_file() method."""
-        self.maxDiff = None
         self.save_new_default_exploration(
             self.EXP_0_ID, self.owner_id, title='')
 
@@ -2757,7 +2755,6 @@ title: A title
 
     def test_export_to_zip_file_with_assets(self) -> None:
         """Test exporting an exploration with assets to a zip file."""
-        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
             category='Algebra')
@@ -2862,7 +2859,6 @@ title: A title
 
     def test_export_by_versions(self) -> None:
         """Test export_to_zip_file() for different versions."""
-        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
             category='Algebra')
@@ -3107,7 +3103,6 @@ solicit_answer_details: false
 
     def test_export_to_dict(self) -> None:
         """Test the export_to_dict() method."""
-        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective')
         content_id_generator = translation_domain.ContentIdGenerator(
