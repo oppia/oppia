@@ -43,7 +43,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
         self.semaphore = threading.Semaphore(1)
         self.task_stdout: List[str] = []
 
-        def mock_print(*args: List[str]) -> None:
+        def mock_print(*args: str) -> None:
             """Mock for print. Append the values to print to
             task_stdout list.
 

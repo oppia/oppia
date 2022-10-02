@@ -427,6 +427,11 @@ def create_branch(
 
     for filepath in LIST_OF_FILEPATHS_TO_MODIFY:
         contents = repo_fork.get_contents(filepath, ref=target_branch)
+        # The return type of 'get_contents' method is Union[Content,
+        # List[Content]], but as we are providing single filepath every
+        # time to this 'get_contents' method, the return type is always
+        # going to be 'Content'. So, to rule out the list type for MyPy
+        # type checking, we used assert here.
         assert not isinstance(contents, list)
         with utils.open_file(filepath, 'r') as f:
             repo_fork.update_file(

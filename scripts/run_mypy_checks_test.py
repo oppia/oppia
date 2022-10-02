@@ -38,6 +38,20 @@ def mock_install_third_party_libs_main() -> None:
     return
 
 
+class Ret:
+    """Return object that gives user-prefix error."""
+
+    def __init__(self, cmd_tokens: List[str]) -> None:
+        if '--user' in cmd_tokens:
+            self.returncode = 0
+        else:
+            self.returncode = 1
+
+    def communicate(self) -> Tuple[bytes, bytes]:
+        """Return user-prefix error as stderr."""
+        return b'', b'can\'t combine user with prefix'
+
+
 class MypyScriptChecks(test_utils.GenericTestBase):
     """Tests for MyPy type check runner script."""
 
@@ -101,18 +115,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.swap_install_success = self.swap(
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites_success)
-
-        class Ret:
-            """Return object that gives user-prefix error."""
-
-            def __init__(self, cmd_tokens: List[str]) -> None:
-                if '--user' in cmd_tokens:
-                    self.returncode = 0
-                else:
-                    self.returncode = 1
-            def communicate(self) -> Tuple[bytes, bytes]:
-                """Return user-prefix error as stderr."""
-                return b'', b'can\'t combine user with prefix'
 
         def mock_popen_user_prefix_error_call(
             cmd_tokens: List[str], *unused_args: str, **unused_kwargs: str

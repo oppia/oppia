@@ -44,7 +44,7 @@ EXCLUDED_DIRECTORIES: Final = [
 ]
 
 # List of files who should be type-annotated but are not.
-NOT_FULLY_COVERED_FILES = [
+NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/access_validators.py',
     'core/controllers/access_validators_test.py',
     'core/controllers/acl_decorators.py',

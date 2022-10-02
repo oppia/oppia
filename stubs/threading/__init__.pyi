@@ -82,7 +82,7 @@ class Thread:
     def join(self, timeout: Optional[float] = ...) -> None: ...
     if sys.version_info >= (3, 8):
         @property
-        def native_id(self) -> int | None: ...  # only available on some platforms
+        def native_id(self) -> Optional[int]: ...  # only available on some platforms
 
     def is_alive(self) -> bool: ...
     if sys.version_info < (3, 9):

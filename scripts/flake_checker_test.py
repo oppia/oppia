@@ -94,8 +94,8 @@ class ReportPassTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,  # pylint: disable=unused-argument
             json: Dict[str, str],  # pylint: disable=unused-argument
-            allow_redirects: List[str],  # pylint: disable=unused-argument
-            headers: List[str]  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> None:
             pass
 
@@ -141,8 +141,8 @@ class ReportPassTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,  # pylint: disable=unused-argument
             json: Dict[str, str],  # pylint: disable=unused-argument
-            allow_redirects: List[str],  # pylint: disable=unused-argument
-            headers: List[str]  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> None:
             pass
 
@@ -187,8 +187,8 @@ class ReportPassTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,
             json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            allow_redirects: bool,
+            headers: Dict[str, str]
         ) -> None:
             raise requests.HTTPError()
 
@@ -227,8 +227,8 @@ class ReportPassTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,
             json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            allow_redirects: bool,
+            headers: Dict[str, str]
         ) -> None:
             raise AssertionError('requests.post called.')
 
@@ -253,8 +253,8 @@ class ReportPassTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,
             json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            allow_redirects: bool,
+            headers: Dict[str, str]
         ) -> None:
             raise AssertionError('requests.post called.')
 
@@ -311,8 +311,8 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,  # pylint: disable=unused-argument
             json: Dict[str, str],  # pylint: disable=unused-argument
-            allow_redirects: List[str],  # pylint: disable=unused-argument
-            headers: List[str]  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -370,8 +370,8 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,  # pylint: disable=unused-argument
             json: Dict[str, str],  # pylint: disable=unused-argument
-            allow_redirects: List[str],  # pylint: disable=unused-argument
-            headers: List[str]  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -430,8 +430,8 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,  # pylint: disable=unused-argument
             json: Dict[str, str],  # pylint: disable=unused-argument
-            allow_redirects: List[str],  # pylint: disable=unused-argument
-            headers: List[str]  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -489,8 +489,8 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,
             json: Dict[str, str],
-            allow_redirects: List[str],
-            headers: List[str]
+            allow_redirects: bool,
+            headers: Dict[str, str]
         ) -> None:
             raise requests.HTTPError()
 
@@ -538,8 +538,8 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,  # pylint: disable=unused-argument
             json: Dict[str, str],  # pylint: disable=unused-argument
-            allow_redirects: List[str],  # pylint: disable=unused-argument
-            headers: List[str]  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             return MockResponse(False, None)
 
@@ -587,8 +587,8 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
         def mock_post(
             url: str,  # pylint: disable=unused-argument
             json: Dict[str, str],  # pylint: disable=unused-argument
-            allow_redirects: List[str],  # pylint: disable=unused-argument
-            headers: List[str]  # pylint: disable=unused-argument
+            allow_redirects: bool,  # pylint: disable=unused-argument
+            headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             return MockResponse(True, 'not json')
 
