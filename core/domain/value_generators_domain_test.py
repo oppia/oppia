@@ -56,25 +56,21 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         contents_registry = ('<schema-based-editor [schema]="$ctrl.SCHEMA"'
             ' ng-model="$ctrl.customizationArgs.list_of_values">\n</schema-'
             'based-editor>\n')
-
-        self.assertEqual(contents_registry,
-        (value_generators_domain.Registry.
-            get_generator_class_by_id('RandomSelector').get_html_template()))
+        class_object = value_generators_domain.Registry()
+        self.assertEqual(
+            contents_registry,(class_object.get_generator_class_by_id(
+                'RandomSelector').get_html_template()))
 
     def test_registry_template_copier_contents(self) -> None:
         contents_registry = ('<span class="d-inline-block align-middle">\n  '
             '<object-editor obj-type="<[objType]>" init-args="initArgs" valu'
             'e="customizationArgs.value" always-editable="true">\n  </obje'
             'ct-editor>\n</span>\n')
+        class_object = value_generators_domain.Registry()
 
-        self.assertEqual((contents_registry,
-        value_generators_domain.Registry.get_generator_class_by_id('Copier').get_html_template()))
-
-    def test_refresh_registry(self) -> None:
-        try:
-            value_generators_domain.Registry._refresh_registry()
-        except all:
-            self.fail('_refresh_registry() raised ExceptionType unexpectedly!"')
+        self.assertEqual(
+            contents_registry,class_object.get_generator_class_by_id(
+                'Copier').get_html_template())
 
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
