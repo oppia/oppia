@@ -4457,10 +4457,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             ):
                 tag.decompose()
             else:
-                if (
-                    tag['text-with-value'].strip() in empty_values or
-                    tag['url-with-value'].strip() in empty_values
-                ):
+                if tag['url-with-value'].strip() in empty_values:
                     tag.decompose()
 
         for tag in soup.find_all('oppia-noninteractive-math'):
