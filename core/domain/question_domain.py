@@ -1774,7 +1774,15 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        self.question_state_data.validate({}, False)
+        # Here the variable `tagged_skill_misconecrption_id_part_of_exp` and
+        # `rule_specs_part_of_exp` represents that if they are part of
+        # Exploration or not. Valdation for these two variables are different
+        # that is why we require to pass these to state validation.
+        self.question_state_data.validate(
+            {},
+            False,
+            tagged_skill_misconecrption_id_part_of_exp=False,
+            rule_specs_part_of_exp=False)
 
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""

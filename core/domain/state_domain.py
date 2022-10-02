@@ -209,7 +209,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
-            tagged_skill_misconecrption_id_part_of_exp: bool. 'tagged_skill_
+            tagged_skill_misconecrption_id_part_of_exp: bool. The 'tagged_skill_
                 misconecrption_id' belongs to an exploration state.
             rule_specs_part_of_exp: bool. Rule specs belongs to an exploration
                 state.
@@ -239,6 +239,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
                     'received %s' % self.tagged_skill_misconception_id)
+
             if not re.match(
                     constants.VALID_SKILL_MISCONCEPTION_ID_REGEX,
                     self.tagged_skill_misconception_id):
@@ -953,7 +954,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 the exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property(obj_type).
                 Is used to validate AnswerGroup objects.
-            tagged_skill_misconecrption_id_part_of_exp: bool. 'tagged_skill_
+            tagged_skill_misconecrption_id_part_of_exp: bool. The 'tagged_skill_
                 misconecrption_id' belongs to an exploration state.
             rule_specs_part_of_exp: bool. Rule specs belongs to an exploration
                 state.
@@ -3270,7 +3271,7 @@ class State(translation_domain.BaseTranslatableObject):
                 question.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
-            tagged_skill_misconecrption_id_part_of_exp: bool. 'tagged_skill_
+            tagged_skill_misconecrption_id_part_of_exp: bool. The 'tagged_skill_
                 misconecrption_id' belongs to an exploration state.
             rule_specs_part_of_exp: bool. Rule specs belongs to an exploration
                 state.
@@ -3293,7 +3294,7 @@ class State(translation_domain.BaseTranslatableObject):
         if self.interaction.id is not None:
             self.interaction.validate(
                 exp_param_specs_dict,
-                validation_from_exploration=(
+                tagged_skill_misconecrption_id_part_of_exp=(
                     tagged_skill_misconecrption_id_part_of_exp),
                 rule_specs_part_of_exp=rule_specs_part_of_exp)
 
