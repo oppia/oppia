@@ -1,18 +1,10 @@
 <mat-card class="oppia-editor-card-with-avatar">
   <div class="card-content">
     <div>
-      <h3>Classroom config properties</h3>
+      <h3>Classroom details</h3>
     </div>
     <hr>
     <div>
-      <p>
-        Configure the details of a classroom.
-      </p>
-
-      <p class="existing-classroom-header">
-        <strong>Existing Classrooms</strong>
-      </p>
-
       <mat-spinner class="loading-spinner"
                    *ngIf="!pageIsInitialized"
                    [diameter]="30">
@@ -62,7 +54,7 @@
               <textarea *ngIf="classroomEditorMode"
                         [(ngModel)]="tempClassroomData._name"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                        (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                         rows="1">
               </textarea>
               <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
@@ -82,7 +74,7 @@
               <textarea *ngIf="classroomEditorMode"
                         [(ngModel)]="tempClassroomData._urlFragment"
                         (blur)="updateClassroomField()"
-                        (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                        (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                         rows="1">
               </textarea>
               <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
@@ -101,7 +93,7 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._courseDetails"
                       (blur)="updateClassroomField()"
-                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="6"
                       class="classroom-field">
             </textarea>
@@ -117,20 +109,146 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._topicListIntro"
                       (blur)="updateClassroomField()"
-                      (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroomData, classroomData)"
+                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="4"
                       class="classroom-field">
             </textarea>
           </div>
 
+          <div>
+            <hr>
+            <p><strong>Topics and their prerequisites</strong></p>
+            <p class="topic-dependency-description">
+              <em>
+                The prerequisite topics below are used to generate the diagnostic test.
+              </em>
+            </p>
+
+            <p *ngIf="tempClassroomData.getTopicsCount() == 0">
+              No topics are currently added in the classroom.
+            </p>
+
+            <div *ngIf="topicDependencyIsLoaded"
+                 cdkDropList
+                 (cdkDropListDropped)="drop($event)"
+                 class="nav oppia-option-list nav-stacked nav-pills drag-and-drop-list">
+
+              <div *ngFor="let topicName of topicNames"
+                   class="topic-dependency-container oppia-rule-block oppia-prevent-selection drag-and-drop-box"
+                   cdkDrag
+                   [cdkDragDisabled]="!classroomEditorMode">
+
+                <div>
+                  <div class="topic-and-prerequisites-wrapper">
+                    <span *ngIf="classroomEditorMode"
+                          class="fas fa-grip-vertical draggable-icon-indicator topic-drag-indicator">
+                    </span>
+                    <span class="topics-name">
+                      <strong>{{ topicName }}</strong>
+                    </span>
+
+                    <div class="prerequisite-topics-container">
+                      <div *ngIf="!classroomEditorMode">
+                        <span *ngIf="getPrerequisiteLength(topicName) === 0">
+                          <em>No Prerequisites</em>
+                        </span>
+                        <mat-chip-list>
+                          <mat-chip *ngFor="let prerequisiteTopic of topicNameToPrerequisiteTopicNames[topicName]">
+                            {{ prerequisiteTopic }}
+                          </mat-chip>
+                        </mat-chip-list>
+                      </div>
+
+                      <div *ngIf="classroomEditorMode">
+                        <mat-form-field class="topics-form-field"
+                                        appearance="fill">
+                          <mat-label>Prerequisites</mat-label>
+
+                          <mat-chip-list #chipList aria-label="Prerequisites list">
+                            <mat-chip *ngFor="let prerequisiteTopic of topicNameToPrerequisiteTopicNames[topicName]"
+                                      (removed)="removeDependencyFromTopic(topicName, prerequisiteTopic)">
+                              {{ prerequisiteTopic }}
+                              <mat-icon matChipRemove>cancel</mat-icon>
+                            </mat-chip>
+
+                            <input placeholder="Select prerequisites"
+                                   [matAutocomplete]="auto"
+                                   [matChipInputFor]="chipList"
+                                   [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                   [(ngModel)]="prerequisiteInput"
+                                   (ngModelChange)="onPrerequisiteInputChange()"
+                                   (click)="getEligibleTopicPrerequisites(topicName)">
+                          </mat-chip-list>
+
+                          <mat-autocomplete #auto="matAutocomplete"
+                                            (optionSelected)="addDependencyForTopic(topicName, $event.option.value)">
+
+                            <mat-option *ngFor="let option of tempEligibleTopicNamesForPrerequisites"
+                                        [value]="option">
+                              {{ option }}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p *ngIf="classroomAdminDataService.topicsGraphValidationError.length > 0 && currentTopicOnEdit === topicName"
+                     class="oppia-warning-text cyclic-check-error">
+                    {{ classroomAdminDataService.topicsGraphValidationError }}
+                  </p>
+                </div>
+
+                <div *ngIf="classroomEditorMode">
+                  <button (click)="deleteTopic(topicName)"
+                          mat-button matSuffix mat-icon-button
+                          aria-label="Clear">
+                    <mat-icon matListIcon>close</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="classroomEditorMode">
+              <div class="new-topic-input-container" *ngIf="newTopicCanBeAdded">
+                <input [(ngModel)]="newTopicId"
+                       class="form-control new-topic-input"
+                       (ngModelChange)="onNewTopicInputModelChange()">
+                <button (click)="removeNewTopicInputField()"
+                        class="btn btn-secondary">
+                  Cancel
+                </button>
+                <button (click)="addTopicId(newTopicId)"
+                        class="btn btn-success"
+                        [disabled]="newTopicId.length === 0">
+                  Submit
+                </button>
+              </div>
+
+              <button (click)="showNewTopicInputField()"
+                      *ngIf="!newTopicCanBeAdded"
+                      class="btn btn-secondary add-new-topic">
+                Add Topic
+              </button>
+              <p *ngIf="!topicWithGivenIdExists" class="oppia-warning-text" >
+                Topic with given ID does not exist.
+              </p>
+            </div>
+          </div>
+
           <div *ngIf="classroomEditorMode" class="action-buttons">
+            <button class="btn btn-secondary view-graph-button"
+                    (click)="viewGraph()"
+                    *ngIf="tempClassroomData.getTopicsCount() > 0">
+              View Graph
+            </button>
             <button class="btn btn-secondary cancel-classroom-changes"
                     (click)="closeClassroomConfigEditor()"
                     [disabled]="classroomDataSaveInProgress">
               Cancel
             </button>
             <button class="btn btn-success save-classroom-changes"
-                    [disabled]="(!classroomDataIsChanged) || !(tempClassroomData.isClassroomDataValid())"
+                    [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
                     (click)="saveClassroomData(classroom.key)">
               <span *ngIf="!classroomDataSaveInProgress">Save</span>
               <mat-spinner *ngIf="classroomDataSaveInProgress"
@@ -158,6 +276,91 @@
 </mat-card>
 
 <style>
+  .new-topic-input-container {
+    margin-top: 10px;
+  }
+  .topics-form-field {
+    width: 400px;
+  }
+  .topic-drag-indicator {
+    padding: 10px;
+  }
+  .drag-and-drop-list {
+    background: #fff;
+    border: solid 1px #ccc;
+    border-radius: 4px;
+    display: block;
+    max-width: 100%;
+    min-height: 60px;
+    overflow: hidden;
+  }
+
+  .drag-and-drop-box {
+    align-items: center;
+    background: fff;
+    border-bottom: solid 1px #ccc;
+    box-sizing: border-box;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: move;
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    justify-content: space-between;
+    padding: 10px 10px;
+  }
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+  }
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .drag-and-drop-list.cdk-drop-list-dragging .drag-and-drop-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .topic-and-prerequisites-wrapper {
+    display: flex;
+  }
+  .cyclic-check-error {
+    margin: 0 10px;
+  }
+  .add-new-topic {
+    margin-top: 10px;
+  }
+  .new-topic-input {
+    display: inline;
+    margin-right: 10px;
+    width: 200px;
+  }
+  .topics-name {
+    padding: 10px;
+    width: 33%;
+  }
+  .topic-dependency-description {
+    margin: 10px 0;
+  }
+  .prerequisite-topics-container {
+    display: -webkit-inline-box;
+    padding: 10px;
+    width: 450px;
+  }
+  .topic-dependency-container-header {
+    display: flex;
+    justify-content: space-around;
+  }
+  .topic-dependency-container {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+  }
   /* TODO(#16156): Remove the instances of /deep/ from the codebase. */
   :host /deep/ .oppia-save-classroom-spinning-button circle {
     stroke: #fff;
@@ -169,7 +372,10 @@
     width: fit-content;
   }
   .save-classroom-changes {
-    margin-left: 5px;
+    margin-top: 5px;
+  }
+  .view-graph-button {
+    margin-right: 5px;
     margin-top: 5px;
   }
   .cancel-classroom-changes {
@@ -189,13 +395,9 @@
     margin: 10px 20px;
     padding: 0 15px;
   }
-  .existing-classroom-header {
-    margin-bottom: 0;
-    margin-top: 20px;
-  }
   .action-buttons {
-    margin-left: 70%;
-    margin-top: 5px;
+    float: right;
+    margin: 10px;
   }
   .oppia-edit-icon {
     cursor: pointer;
@@ -213,19 +415,14 @@
     justify-content: space-between;
     margin: 10px 20px;
     padding: 10px;
+    width: 94%;
   }
   .card-content {
     padding: 20px
   }
   .oppia-editor-card-with-avatar {
+    margin-bottom: 200px;
     margin-top: 200px;
-  }
-  .oppia-editor-card-section {
-    display: flex;
-    min-height: 80px;
-  }
-  .classroom-admin-header {
-    padding-top: 20px;
   }
   .add-new-classroom {
     background-color: #00645c;
@@ -244,6 +441,7 @@
   .oppia-warning-text {
     color: #f00;
     font-size: 0.8em;
+    width: 500px
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {

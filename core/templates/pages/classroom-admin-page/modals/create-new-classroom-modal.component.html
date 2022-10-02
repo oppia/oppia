@@ -9,7 +9,7 @@
     <div class="new-classroom-name-input">
       <textarea [(ngModel)]="tempClassroom._name"
                 rows="1"
-                (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroom, classroom)">
+                (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
       </textarea>
       <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
         {{ classroomAdminDataService.nameValidationError }}
@@ -22,7 +22,7 @@
     <div class="new-classroom-name-input">
       <textarea [(ngModel)]="tempClassroom._urlFragment"
                 rows="1"
-                (ngModelChange)="classroomAdminDataService.isClassroomValid(tempClassroom, classroom)">
+                (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
       </textarea>
       <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
         {{ classroomAdminDataService.urlValidationError }}
