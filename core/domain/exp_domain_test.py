@@ -1651,8 +1651,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected tagged skill misconception id to be a str, received 1'
         ):
             exploration.init_state.validate(
-                exploration.param_specs, allow_null_interaction=False,
-                validation_from_exploration=False)
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconecrption_id_part_of_exp=False,
+                rule_specs_part_of_exp=False)
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -1686,8 +1688,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'invalid_tagged_skill_misconception_id'
         ):
             exploration.init_state.validate(
-                exploration.param_specs, allow_null_interaction=False,
-                validation_from_exploration=False)
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconecrption_id_part_of_exp=False,
+                rule_specs_part_of_exp=False)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
@@ -1708,8 +1712,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'answer group.'
         ):
             exploration.init_state.validate(
-                exploration.param_specs, allow_null_interaction=False,
-                validation_from_exploration=False)
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconecrption_id_part_of_exp=False,
+                rule_specs_part_of_exp=False)
 
         exploration.states = {
             exploration.init_state_name: (
