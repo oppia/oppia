@@ -602,7 +602,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             unused_msg: str,
             unused_content: str,
             unused_sha: str,
-            branch: str
+            branch: str  # pylint: disable=unused-argument
         ) -> None:
             check_function_calls['update_file_gets_called'] = True
         def mock_run_cmd(unused_cmd: str) -> None:
