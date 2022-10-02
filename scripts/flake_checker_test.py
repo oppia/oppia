@@ -96,7 +96,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             json: Dict[str, str],
             allow_redirects: List[str],
             headers: List[str]
-        ) -> None:
+        ) -> None: # pylint: disable=unused-argument
             pass
 
         expected_payload = {

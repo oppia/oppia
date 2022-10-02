@@ -30,9 +30,9 @@ from typing import Callable, List
 
 
 def test_function(unused_arg: str) -> Callable[[], None]:
-    def foo() -> None:
+    def task_func() -> None:
         pass
-    return foo
+    return task_func
 
 
 class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
