@@ -6130,6 +6130,9 @@ export default {
     "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
   ],
 
+  // Supported functions for math interactions.
+  "SUPPORTED_FUNCTION_NAMES": ["sqrt", "abs"],
+
   "OSK_MAIN_TAB": "mainTab",
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",

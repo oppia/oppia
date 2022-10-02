@@ -191,4 +191,25 @@ describe('NumericExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
+
+  it('should warn if there are inputs with unsupported functions', function() {
+    answerGroups[0].rules = [
+      rof.createFromBackendDict({
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: '2+log(3)'
+        }
+      }, 'NumericExpressionInput')
+    ];
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Input for rule 1 from answer group 1 uses these function(s) that ' +
+        'aren\'t supported: [log] The supported functions are: [sqrt,abs]')
+    }]);
+  });
 });

@@ -40,6 +40,8 @@ import { NumericExpressionInputRulesService } from 'interactions/NumericExpressi
   providedIn: 'root'
 })
 export class MathEquationInputValidationService {
+  private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
+
   constructor(
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
@@ -115,6 +117,28 @@ export class MathEquationInputValidationService {
           if (seenVariables.indexOf(variable) === -1) {
             seenVariables.push(variable);
           }
+        }
+
+        let unsupportedFunctions = (
+          mathInteractionsService.checkUnsupportedFunctions(
+            splitInput[0]
+          ).concat(
+            mathInteractionsService.checkUnsupportedFunctions(
+              splitInput[1]
+            )
+          )
+        );
+        if (unsupportedFunctions.length > 0) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              'Input for rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+              ' uses these function(s) that aren\'t supported: ' +
+              '[' + unsupportedFunctions + ']' +
+              ' The supported functions are: ' +
+              '[' + this.supportedFunctionNames + ']'
+            )
+          });
         }
 
         for (let seenRule of seenRules) {

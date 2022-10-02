@@ -23,6 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
 import { NumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { NumericExpressionInputRulesService } from
@@ -35,6 +36,8 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class NumericExpressionInputValidationService {
+  private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
+
   constructor(
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
@@ -51,6 +54,7 @@ export class NumericExpressionInputValidationService {
     let warningsList: Warning[] = [];
     let algebraicRulesService = (
       new NumericExpressionInputRulesService());
+    let mathInteractionsService = new MathInteractionsService();
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -73,6 +77,21 @@ export class NumericExpressionInputValidationService {
       for (let j = 0; j < rules.length; j++) {
         let currentInput = rules[j].inputs.x as string;
         let currentRuleType = rules[j].type as string;
+
+        let unsupportedFunctions = (
+          mathInteractionsService.checkUnsupportedFunctions(currentInput));
+        if (unsupportedFunctions.length > 0) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              'Input for rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+              ' uses these function(s) that aren\'t supported: ' +
+              '[' + unsupportedFunctions + ']' +
+              ' The supported functions are: ' +
+              '[' + this.supportedFunctionNames + ']'
+            )
+          });
+        }
 
         for (let seenRule of seenRules) {
           let seenInput = seenRule.inputs.x as string;
