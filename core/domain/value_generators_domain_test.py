@@ -53,19 +53,20 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         self.assertEqual('BaseValueGenerator', class_object.__class__.__name__)
 
     def test_registry_template_random_selector_contents(self) -> None:
-        contents_registry = '<schema-based-editor [schema]="$ctrl.SCHEMA"' \
-            ' ng-model="$ctrl.customizationArgs.list_of_values">\n</schema-' \
-            'based-editor>\n'
-        self.assertEqual(contents_registry, 
+        contents_registry = ('<schema-based-editor [schema]="$ctrl.SCHEMA"' 
+            ' ng-model="$ctrl.customizationArgs.list_of_values">\n</schema-' 
+            'based-editor>\n')
+        self.assertEqual(contents_registry,
         (value_generators_domain.Registry.
             get_generator_class_by_id('RandomSelector').get_html_template()))
-    
+
     def test_registry_template_copier_contents(self) -> None:
-        contents_registry = '<span class="d-inline-block align-middle">\n  ' \
-            '<object-editor obj-type="<[objType]>" init-args="initArgs" valu' \
-            'e="customizationArgs.value" always-editable="true">\n  </object-ed' \
-            'itor>\n</span>\n'
-        self.assertEqual(contents_registry, value_generators_domain.Registry.get_generator_class_by_id('Copier').get_html_template())
+        contents_registry = ('<span class="d-inline-block align-middle">\n  '
+            '<object-editor obj-type="<[objType]>" init-args="initArgs" valu'
+            'e="customizationArgs.value" always-editable="true">\n  </obje'
+            'ct-editor>\n</span>\n')
+        self.assertEqual((contents_registry,value_generators_domain.Registry.
+            get_generator_class_by_id('Copier').get_html_template()))
 
     def test_refresh_registry(self) -> None:
         try:
