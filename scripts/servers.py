@@ -37,6 +37,8 @@ from typing import (
 )
 
 
+# Here we use type Any because the argument 'popen_kwargs' can accept an
+# arbitrary number of keyword arguments with different types of values.
 @contextlib.contextmanager
 def managed_process(
     command_args: Sequence[Union[int, str]],
@@ -644,6 +646,8 @@ def managed_webdriver_server(
         yield proc
 
 
+# Here we use type Any because the argument 'kwargs' can accept an arbitrary
+# number of keyword arguments with different types of values.
 @contextlib.contextmanager
 def managed_protractor_server(
     suite_name: str = 'full',
@@ -714,6 +718,8 @@ def managed_protractor_server(
         del os.environ['MOBILE']
 
 
+# Here we use type Any because the argument 'kwargs' can accept an arbitrary
+# number of keyword arguments with different types of values.
 @contextlib.contextmanager
 def managed_webdriverio_server(
     suite_name: str = 'full',

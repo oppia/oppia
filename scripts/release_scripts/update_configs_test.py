@@ -46,7 +46,12 @@ MOCK_LOCAL_FECONF_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
     'feconf.txt')
 
-MOCK_REQUESTER = github.Requester.Requester(  # type: ignore
+# Here we use MyPy ignore because the pool_size argument is required by
+# Requester.__init__(), but it is missing from the typing definition in
+# Requester.pyi. We therefore disable type checking here. Here is the
+# type definition:
+# https://github.com/PyGithub/PyGithub/blob/001970d4a828017f704f6744a5775b4207a6523c/github/Requester.pyi#L97
+MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
     login_or_token=None,
     password=None,
     jwt=None,

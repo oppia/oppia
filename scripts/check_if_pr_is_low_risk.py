@@ -162,6 +162,9 @@ def lookup_pr(owner: str, repo: str, pull_number: str) -> PRDict:
         {'Accept': 'application/vnd.github.v3+json'})
     response = utils.url_open(request)
     if response.getcode() != 200:
+        # Here we use cast because here we are returning an empty dict that has
+        # Dict[Any, Any] type. Thus, to return an appropriate ( or expected )
+        # type from the function, we used cast here.
         return cast(PRDict, {})
     pr: PRDict = json.load(response)
     response.close()

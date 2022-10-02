@@ -190,6 +190,8 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_failure_to_fetch_release_info(self) -> None:
         def mock_getcode() -> str:
             return '404'
+        # Here we use MyPy ignore because here 'getcode' is a method and
+        # assignment to a method is not allowed by MyPy.
         self.mock_response.getcode = mock_getcode  # type: ignore[assignment]
         with self.url_open_swap, self.assertRaisesRegex(
             Exception,
