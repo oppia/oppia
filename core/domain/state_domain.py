@@ -34,7 +34,6 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-import bs4
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Tuple, Type, Union,
     cast, overload

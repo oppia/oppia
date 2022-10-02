@@ -195,12 +195,12 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
 
 
 def validate_rte_tags(
-    html: str, is_tag_nested_inside_tabs_or_collapsible: bool = False
+    html_data: str, is_tag_nested_inside_tabs_or_collapsible: bool = False
 ) -> None:
     """Validate all the RTE tags.
 
     Args:
-        html: str. The RTE content of the state.
+        html_data: str. The RTE content of the state.
         is_tag_nested_inside_tabs_or_collapsible: bool. True when we
             validate tags inside `Tabs` or `Collapsible` tag.
 
@@ -248,7 +248,7 @@ def validate_rte_tags(
         ValidationError. Collapsible tag present inside tabs or another
             collapsible.
     """
-    soup = bs4.BeautifulSoup(html, 'html.parser')
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
     empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
     for tag in soup.find_all('oppia-noninteractive-image'):
         if not tag.has_attr('alt-with-value'):
@@ -470,11 +470,11 @@ def validate_rte_tags(
             )
 
 
-def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
+def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
     """Validates `Tabs` and `Collapsible` RTE tags
 
     Args:
-        html: str. The RTE content of the state.
+        html_data: str. The RTE content of the state.
 
     Raises:
         ValidationError. No tabs present inside the tab_contents attribute.
@@ -490,7 +490,7 @@ def validate_tabs_and_collapsible_rte_tags(html: str) -> None:
             present.
         ValidationError. Collapsible heading-with-value attribute is empty.
     """
-    soup = bs4.BeautifulSoup(html, 'html.parser')
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
     empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
     tabs_tags = soup.find_all('oppia-noninteractive-tabs')
     for tag in tabs_tags:

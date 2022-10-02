@@ -54,7 +54,7 @@ describe('rich-text components', function() {
       // TODO(Jacob): Add test for image RTE component.
       await richTextEditor.addRteComponent('Link', 'https://google.com/', true);
       await richTextEditor.addRteComponent(
-        'Video', 'M7lc1UVf-VE', 10, 100, false);
+        'Video', 'M7lc1UVf-VE', 10, 100, true);
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
       await richTextEditor.addRteComponent(
