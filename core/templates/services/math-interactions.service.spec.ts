@@ -645,6 +645,9 @@ describe('MathInteractionsService', () => {
   });
 
   it('should correctly check for unsupported functions', function() {
+    // Currently, the supported functions are 'sqrt' and 'abs', so any
+    // other function usages should raise a validation error which
+    // should be caught using the checkUnsupportedFunctions function.
     expect(mathInteractionsService.checkUnsupportedFunctions(
       'a + sqrt(b) + abs(3)')).toEqual([]);
     expect(mathInteractionsService.checkUnsupportedFunctions(

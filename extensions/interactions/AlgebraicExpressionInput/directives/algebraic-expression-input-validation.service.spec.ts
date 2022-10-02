@@ -257,6 +257,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
