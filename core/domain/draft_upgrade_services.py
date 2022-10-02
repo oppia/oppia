@@ -341,6 +341,8 @@ class DraftUpgradeUtil:
                 exp_change.property_name ==
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
             ):
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
                 assert isinstance(exp_change.new_value, list)
                 answer_group_dicts = exp_change.new_value
                 for answer_group in answer_group_dicts:
@@ -351,6 +353,8 @@ class DraftUpgradeUtil:
                     if answer_group['outcome']['dest'] == exp_change.state_name:
                         answer_group['outcome']['labelled_as_correct'] = False
             elif exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
                 assert isinstance(exp_change.new_value, dict)
                 html = exp_change.new_value['html']
                 html = exp_domain.Exploration.fix_rte_tags(html)
@@ -360,37 +364,32 @@ class DraftUpgradeUtil:
             elif exp_change.property_name == (
                 exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
             ):
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
                 assert isinstance(exp_change.new_value, dict)
                 written_translations = exp_change.new_value
                 for translations in (
                     written_translations['translations_mapping'].values()
                 ):
                     for written_translation in translations.values():
-                        if isinstance(
-                            written_translation['translation'], List):
-                            translated_element_list = []
-                            for element in written_translation[
-                                'translation']:
-                                element = (
+                        if written_translation['data_format'] == 'html':
+                            if isinstance(
+                                written_translation['translation'], list):
+                                # Translation of type html should only be str,
+                                # cannot be of type list.
+                                raise InvalidDraftConversionException(
+                                    'Conversion cannot be completed.')
+                            else:
+                                fixed_translation = (
                                     exp_domain.Exploration.fix_rte_tags(
-                                        element))
-                                element = (
+                                    written_translation['translation']))
+                                fixed_translation = (
                                     exp_domain.Exploration.
-                                    fix_tabs_and_collapsible_tags(element))
-                                translated_element_list.append(element)
-                            written_translation['translation'] = (
-                                translated_element_list)
-                        else:
-                            fixed_translation = (
-                                exp_domain.Exploration.fix_rte_tags(
-                                written_translation['translation']))
-                            fixed_translation = (
-                                exp_domain.Exploration.
-                                fix_tabs_and_collapsible_tags(
+                                    fix_tabs_and_collapsible_tags(
+                                        fixed_translation)
+                                )
+                                written_translation['translation'] = (
                                     fixed_translation)
-                            )
-                            written_translation['translation'] = (
-                                fixed_translation)
         return draft_change_list
 
     @classmethod

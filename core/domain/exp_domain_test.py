@@ -5970,17 +5970,8 @@ states:
 
         <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
         filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
-
-
-        <p></p>
-
-
-        <p><oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link></p>
-
-
-        <p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math></p>
-
-
+        <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
         <p><oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;"
         text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview></p><oppia-noninteractive-video
         autoplay-with-value="&amp;quot;&amp;quot;" end-with-value="&amp;quot;&amp;quot;"
@@ -6095,16 +6086,9 @@ states:
       html: '<p>Content of RTE</p>
 
         <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
-        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
- 
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image> 
 
-        <p></p>
- 
- 
-        <p></p>
- 
-        <p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math></p>
- 
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
         <p></p><oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
         start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video><oppia-noninteractive-collapsible
         content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible

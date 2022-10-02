@@ -3979,7 +3979,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if len(choices) < min_value:
             min_value = 1
 
-        # All choices should be unique and empty.
+        # All choices should be unique and non-empty.
         cls._choices_should_be_unique_and_non_empty(
             choices, answer_groups, True)
 
@@ -4387,9 +4387,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             if not tag.has_attr('filepath-with-value'):
                 tag.decompose()
+                continue
             else:
                 if tag['filepath-with-value'] in empty_values:
                     tag.decompose()
+                    continue
 
             if not tag.has_attr('caption-with-value'):
                 tag['caption-with-value'] = '&quot;&quot;'
@@ -4397,19 +4399,25 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for tag in soup.find_all('oppia-noninteractive-skillreview'):
             if not tag.has_attr('text-with-value'):
                 tag.decompose()
+                continue
             else:
                 if tag['text-with-value'] is None:
                     tag.decompose()
+                    continue
                 elif tag['text-with-value'].strip() in empty_values:
                     tag.decompose()
+                    continue
 
             if not tag.has_attr('skill_id-with-value'):
                 tag.decompose()
+                continue
             else:
                 if tag['skill_id-with-value'] is None:
                     tag.decompose()
+                    continue
                 elif tag['skill_id-with-value'].strip() in empty_values:
                     tag.decompose()
+                    continue
 
         for tag in soup.find_all('oppia-noninteractive-video'):
             if not tag.has_attr('start-with-value'):
@@ -4435,11 +4443,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             if not tag.has_attr('video_id-with-value'):
                 tag.decompose()
+                continue
             else:
                 if tag['video_id-with-value'] is None:
                     tag.decompose()
+                    continue
                 elif tag['video_id-with-value'].strip() in empty_values:
                     tag.decompose()
+                    continue
 
             start_value = float(tag['start-with-value'])
             end_value = float(tag['end-with-value'])
@@ -4456,36 +4467,45 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 not tag.has_attr('url-with-value')
             ):
                 tag.decompose()
+                continue
             else:
                 if tag['url-with-value'].strip() in empty_values:
                     tag.decompose()
+                    continue
 
         for tag in soup.find_all('oppia-noninteractive-math'):
             if not tag.has_attr('math_content-with-value'):
                 tag.decompose()
+                continue
             else:
                 if tag['math_content-with-value'] in empty_values:
                     tag.decompose()
+                    continue
                 math_content_json = utils.unescape_html(
                     tag['math_content-with-value'])
                 math_content_list = json.loads(math_content_json)
 
                 if 'raw_latex' not in math_content_list:
                     tag.decompose()
+                    continue
                 elif math_content_list['raw_latex'] is None:
                     tag.decompose()
+                    continue
                 elif math_content_list['raw_latex'].strip() in empty_values:
                     tag.decompose()
+                    continue
 
         if is_tags_nested_inside_tabs_or_collapsible:
             tabs_tags = soup.find_all('oppia-noninteractive-tabs')
             if len(tabs_tags) > 0:
                 for tabs_tag in tabs_tags:
                     tabs_tag.decompose()
+                    continue
             collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
             if len(collapsible_tags) > 0:
                 for collapsible_tag in collapsible_tags:
                     collapsible_tag.decompose()
+                    continue
 
         return str(soup).replace('<br/>', '<br>')
 
@@ -4518,6 +4538,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 if len(tab_content_list) == 0:
                     tag.decompose()
+                    continue
                 for tab_content in tab_content_list:
                     tab_content['content'] = cls.fix_rte_tags(
                         tab_content['content'],
@@ -4528,6 +4549,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     tab_content_json)
             else:
                 tag.decompose()
+                continue
 
         collapsibles_tags = soup.find_all(
             'oppia-noninteractive-collapsible')
@@ -4540,6 +4562,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     collapsible_content_json)
                 if len(collapsible_content_list) == 0:
                     tag.decompose()
+                    continue
 
                 collapsible_content_list = cls.fix_rte_tags(
                     collapsible_content_list,
@@ -4550,6 +4573,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     collapsible_content_json)
             else:
                 tag.decompose()
+                continue
 
             if tag.has_attr('heading-with-value'):
                 collapsible_heading_json = (
@@ -4558,8 +4582,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     collapsible_heading_json)
                 if len(collapsible_heading_list) == 0:
                     tag.decompose()
+                    continue
             else:
                 tag.decompose()
+                continue
 
         return str(soup).replace('<br/>', '<br>')
 
