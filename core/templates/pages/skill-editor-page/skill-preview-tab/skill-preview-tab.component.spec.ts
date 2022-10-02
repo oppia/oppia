@@ -27,6 +27,7 @@ import { ExplorationPlayerStateService } from 'pages/exploration-player-page/ser
 import { UrlService } from 'services/contextual/url.service';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 import { SkillPreviewTabComponent } from './skill-preview-tab.component';
+import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 
 const questionDict = {
   id: 'question_id',
@@ -54,7 +55,14 @@ const questionDict = {
         }],
       }],
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        placeholder: {
+          value: 'abc'
+        },
+        rows: {
+          value: 1
+        }
+      },
       default_outcome: {
         dest: null,
         dest_if_really_stuck: null,
@@ -105,7 +113,7 @@ class MockQuestionBackendApiService {
   }
 }
 
-describe('Skill preview tab', () => {
+describe('Skill Preview Tab Component', () => {
   let component: SkillPreviewTabComponent;
   let fixture: ComponentFixture<SkillPreviewTabComponent>;
   let urlService: UrlService;
@@ -114,6 +122,7 @@ describe('Skill preview tab', () => {
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let mockOnSkillChangeEmitter = new EventEmitter();
   let mockInteractionRule: InteractionRulesService;
+  let questionPlayerEngineService: QuestionPlayerEngineService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -124,6 +133,7 @@ describe('Skill preview tab', () => {
         UrlService,
         CurrentInteractionService,
         ExplorationPlayerStateService,
+        QuestionPlayerEngineService,
         {
           provide: QuestionBackendApiService,
           useClass: MockQuestionBackendApiService
@@ -178,9 +188,14 @@ describe('Skill preview tab', () => {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
+    questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
+    questionPlayerEngineService = (questionPlayerEngineService as unknown) as
+      jasmine.SpyObj<QuestionPlayerEngineService>;
     let skillId = 'df432fe';
+    spyOn(questionPlayerEngineService, 'init').and.callFake((
+        questionObject, successCallback, errorCallback
+    ) => {});
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue(skillId);
-
     component.ngOnInit();
   });
 

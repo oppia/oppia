@@ -182,7 +182,7 @@ export class SkillEditorPageComponent implements OnInit {
     this.skillEditorStalenessDetectionService.init();
     this.windowRef.nativeWindow.addEventListener(
       'beforeunload', (event) => {
-        this.onCreateOrUpdateSkillEditorBrowserTabsInfo(event);
+        this.onClosingSkillEditorBrowserTab();
       });
     this.windowRef.nativeWindow.addEventListener(
       'storage', (event) => {

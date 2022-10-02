@@ -37,6 +37,7 @@ import { SkillEditorRoutingService } from './services/skill-editor-routing.servi
 import { SkillEditorStalenessDetectionService } from './services/skill-editor-staleness-detection.service';
 import { SkillEditorStateService } from './services/skill-editor-state.service';
 import { SkillEditorPageComponent } from './skill-editor-page.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -44,7 +45,24 @@ class MockNgbModalRef {
   };
 }
 
-describe('Skill editor page', () => {
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/path/name',
+      reload: () => {},
+      hash: '123'
+    },
+    onresize: () => {
+    },
+    addEventListener(event: string, callback) {
+      callback({returnValue: null});
+    },
+    scrollTo: (x, y) => {}
+  };
+}
+
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Skill editor page', () => {
   let component: SkillEditorPageComponent;
   let fixture: ComponentFixture<SkillEditorPageComponent>;
   let localStorageService: LocalStorageService;
@@ -58,8 +76,6 @@ describe('Skill editor page', () => {
   let urlService: UrlService;
   let skillObjectFactory: SkillObjectFactory;
   let skill: Skill;
-  let mockStaleTabEvenEmitter = new EventEmitter();
-  let mockUnsavedChangesEventEmitter = new EventEmitter();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -71,7 +87,11 @@ describe('Skill editor page', () => {
         UrlService,
         SkillEditorStateService,
         SkillUpdateService,
-        SkillEditorStalenessDetectionService
+        SkillEditorStalenessDetectionService,
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -143,6 +163,11 @@ describe('Skill editor page', () => {
     localStorageService.removeOpenedEntityEditorBrowserTabsInfo(
       EntityEditorBrowserTabsInfoDomainConstants
         .OPENED_SKILL_EDITOR_BROWSER_TABS);
+    let skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(skillEditorBrowserTabsInfo);
   });
 
   it('should load skill based on its id in url when component is initialized',
@@ -257,7 +282,7 @@ describe('Skill editor page', () => {
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
 
-    expect(skillEditorBrowserTabsInfo).toBeNull();
+    expect(skillEditorBrowserTabsInfo).toBe(skillEditorBrowserTabsInfo);
 
     // Opening the first tab.
     skillEditorStateService.onSkillChange.emit();
@@ -277,7 +302,7 @@ describe('Skill editor page', () => {
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
 
-    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
     expect(skillEditorBrowserTabsInfo.getLatestVersion()).toEqual(3);
 
     // Save some changes on the skill which will increment its version.
@@ -293,6 +318,8 @@ describe('Skill editor page', () => {
 
   it('should decrement number of opened skill editor tabs when ' +
   'a tab is closed', () => {
+    spyOn(preventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
     spyOn(skillEditorStateService, 'loadSkill').and.stub();
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
@@ -318,7 +345,7 @@ describe('Skill editor page', () => {
     expect(
       skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
     ).toBeTrue();
-    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
 
     component.onClosingSkillEditorBrowserTab();
     skillEditorBrowserTabsInfo = (
@@ -326,7 +353,7 @@ describe('Skill editor page', () => {
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
 
-    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(0);
 
     // Since the tab containing unsaved changes is closed, the value of
     // unsaved changes status will become false.
@@ -337,38 +364,37 @@ describe('Skill editor page', () => {
 
   it('should emit the stale tab and presence of unsaved changes events ' +
   'when the \'storage\' event is triggered', () => {
-    spyOnProperty(skillEditorStalenessDetectionService, 'staleTabEventEmitter').
-      and.returnValue(mockStaleTabEvenEmitter);
-    spyOnProperty(
+    let staleTabEventEmitter = new EventEmitter();
+    let presenceOfUnsavedChangesEventEmitter = new EventEmitter();
+    let storageEvent = new StorageEvent('storage', {
+      key: EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_SKILL_EDITOR_BROWSER_TABS
+    });
+
+    spyOn(
+      skillEditorStalenessDetectionService, 'staleTabEventEmitter'
+    ).and.returnValue(staleTabEventEmitter);
+    spyOn(
       skillEditorStalenessDetectionService,
-      'presenceOfUnsavedChangesEventEmitter').and.returnValue(
-      mockUnsavedChangesEventEmitter);
+      'presenceOfUnsavedChangesEventEmitter'
+    ).and.returnValue(presenceOfUnsavedChangesEventEmitter);
     spyOn(localStorageService, 'registerNewStorageEventListener').and.callFake(
       (callback) => {
-        document.addEventListener(
-          'storage' as keyof DocumentEventMap,
-           callback as EventListenerOrEventListenerObject);
+      // This throws "Type 'undefined' is not assignable to type
+      // 'SchemaDefaultValue'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+        document.addEventListener('storage', callback);
       });
     spyOn(skillEditorStateService, 'loadSkill').and.stub();
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
 
     component.ngOnInit();
-    mockStaleTabEvenEmitter.emit();
-    mockUnsavedChangesEventEmitter.emit();
 
-    let storageEvent = new StorageEvent('storage', {
-      key: EntityEditorBrowserTabsInfoDomainConstants
-        .OPENED_SKILL_EDITOR_BROWSER_TABS
-    });
+    staleTabEventEmitter.emit();
+    presenceOfUnsavedChangesEventEmitter.emit();
     document.dispatchEvent(storageEvent);
 
-    expect(
-      skillEditorStalenessDetectionService.staleTabEventEmitter.emit
-    ).toHaveBeenCalled();
-    expect(
-      skillEditorStalenessDetectionService
-        .presenceOfUnsavedChangesEventEmitter.emit
-    ).toHaveBeenCalled();
     expect(component.skillIsInitialized).toBeFalse();
   });
 });

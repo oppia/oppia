@@ -149,8 +149,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
           this.displayedQuestions[index]
         )
       ],
-      this.initializeQuestionCard.bind(this),
-      () => {}
+      this.initializeQuestionCard.bind(this)
     );
   }
 
