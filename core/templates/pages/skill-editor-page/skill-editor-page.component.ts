@@ -132,7 +132,7 @@ export class SkillEditorPageComponent implements OnInit {
       skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
       skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
     } else {
-      if (skillEditorBrowserTabsInfo) {
+      if (skillEditorBrowserTabsInfo !== null) {
         skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
         skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
       } else {
@@ -148,14 +148,7 @@ export class SkillEditorPageComponent implements OnInit {
         .OPENED_SKILL_EDITOR_BROWSER_TABS);
   }
 
-  onCreateOrUpdateSkillEditorBrowserTabsInfo(
-      event: BeforeUnloadEvent | StorageEvent
-  ): void {
-    // This throws "Property 'key' does not exist on type 'BeforeUnloadEvent'".
-    // We need to suppress this error because 'BeforeUnloadEvent' does not have
-    // 'key' property but it is needed for 'StorageEvent' to check if any extra
-    // duplicate tabs are opened.
-    // @ts-ignore
+  onCreateOrUpdateSkillEditorBrowserTabsInfo(event: StorageEvent): void {
     if (event.key === (
       EntityEditorBrowserTabsInfoDomainConstants
         .OPENED_SKILL_EDITOR_BROWSER_TABS)

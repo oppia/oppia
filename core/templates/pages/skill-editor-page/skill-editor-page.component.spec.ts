@@ -54,6 +54,7 @@ class MockWindowRef {
     },
     onresize: () => {
     },
+    dispatchEvent: (ev: Event) => true,
     addEventListener(event: string, callback) {
       callback({returnValue: null});
     },
@@ -61,8 +62,7 @@ class MockWindowRef {
   };
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Skill editor page', () => {
+describe('Skill editor page', () => {
   let component: SkillEditorPageComponent;
   let fixture: ComponentFixture<SkillEditorPageComponent>;
   let localStorageService: LocalStorageService;
@@ -76,6 +76,7 @@ fdescribe('Skill editor page', () => {
   let urlService: UrlService;
   let skillObjectFactory: SkillObjectFactory;
   let skill: Skill;
+  let windowRef: WindowRef;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -111,6 +112,7 @@ fdescribe('Skill editor page', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     urlService = TestBed.inject(UrlService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    windowRef = TestBed.inject(WindowRef);
   });
 
   beforeEach(() => {
@@ -163,15 +165,15 @@ fdescribe('Skill editor page', () => {
     localStorageService.removeOpenedEntityEditorBrowserTabsInfo(
       EntityEditorBrowserTabsInfoDomainConstants
         .OPENED_SKILL_EDITOR_BROWSER_TABS);
-    let skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-      'skill', 'skill_id', 2, 1, false);
-    spyOn(
-      localStorageService, 'getEntityEditorBrowserTabsInfo'
-    ).and.returnValue(skillEditorBrowserTabsInfo);
   });
 
   it('should load skill based on its id in url when component is initialized',
     fakeAsync(() => {
+      let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+        'skill', 'skill_id', 2, 1, false);
+      spyOn(
+        localStorageService, 'getEntityEditorBrowserTabsInfo'
+      ).and.returnValue(BrowserTabsInfo);
       spyOn(skillEditorStateService, 'loadSkill').and.stub();
       spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
 
@@ -183,6 +185,11 @@ fdescribe('Skill editor page', () => {
 
   it('should addListener by passing getChangeCount to ' +
   'PreventPageUnloadEventService', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
     spyOn(skillEditorStateService, 'loadSkill').and.stub();
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
@@ -197,12 +204,22 @@ fdescribe('Skill editor page', () => {
 
   it('should get active tab name from skill editor routing service',
     () => {
+      let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+        'skill', 'skill_id', 2, 1, false);
+      spyOn(
+        localStorageService, 'getEntityEditorBrowserTabsInfo'
+      ).and.returnValue(BrowserTabsInfo);
       spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
         'questions');
       expect(component.getActiveTabName()).toBe('questions');
     });
 
   it('should go to main tab when selecting main tab', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
     let routingSpy = spyOn(
       skillEditorRoutingService, 'navigateToMainTab');
     component.selectMainTab();
@@ -210,6 +227,11 @@ fdescribe('Skill editor page', () => {
   });
 
   it('should go to preview tab when selecting preview tab', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
     let routingSpy = spyOn(
       skillEditorRoutingService, 'navigateToPreviewTab');
     component.selectPreviewTab();
@@ -218,6 +240,11 @@ fdescribe('Skill editor page', () => {
 
   it('should open save changes modal with ngbModal when unsaved changes are' +
     ' present', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
       () => {
@@ -233,6 +260,11 @@ fdescribe('Skill editor page', () => {
 
   it('should close save changes modal when somewhere outside is clicked',
     () => {
+      let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+        'skill', 'skill_id', 2, 1, false);
+      spyOn(
+        localStorageService, 'getEntityEditorBrowserTabsInfo'
+      ).and.returnValue(BrowserTabsInfo);
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
       const modalSpy = spyOn(ngbModal, 'open').and.callFake(
         () => {
@@ -248,6 +280,11 @@ fdescribe('Skill editor page', () => {
 
   it('should navigate to questions tab when unsaved changes are not present',
     () => {
+      let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+        'skill', 'skill_id', 2, 1, false);
+      spyOn(
+        localStorageService, 'getEntityEditorBrowserTabsInfo'
+      ).and.returnValue(BrowserTabsInfo);
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
       let routingSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
@@ -256,6 +293,11 @@ fdescribe('Skill editor page', () => {
     });
 
   it('should return warnings count for the skill', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
         'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
@@ -273,6 +315,11 @@ fdescribe('Skill editor page', () => {
 
   it('should create or update skill editor browser tabs info on ' +
   'local storage when a new tab opens', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
     spyOn(skillEditorStateService, 'loadSkill').and.stub();
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
     component.ngOnInit();
@@ -316,8 +363,24 @@ fdescribe('Skill editor page', () => {
     expect(skillEditorBrowserTabsInfo.getLatestVersion()).toEqual(4);
   });
 
+  it('should create or update skill editor browser tabs info if browser' +
+  'tabs info is null', () => {
+    spyOn(localStorageService, 'getEntityEditorBrowserTabsInfo')
+      .and.returnValue(null);
+
+    component.skillIsInitialized = false;
+    component.createOrUpdateSkillEditorBrowserTabsInfo();
+
+    expect(component.skillIsInitialized).toBeTrue();
+  });
+
   it('should decrement number of opened skill editor tabs when ' +
   'a tab is closed', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
     spyOn(preventPageUnloadEventService, 'addListener').and
       .callFake((callback) => callback());
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
@@ -364,6 +427,11 @@ fdescribe('Skill editor page', () => {
 
   it('should emit the stale tab and presence of unsaved changes events ' +
   'when the \'storage\' event is triggered', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
     let staleTabEventEmitter = new EventEmitter();
     let presenceOfUnsavedChangesEventEmitter = new EventEmitter();
     let storageEvent = new StorageEvent('storage', {
@@ -378,14 +446,6 @@ fdescribe('Skill editor page', () => {
       skillEditorStalenessDetectionService,
       'presenceOfUnsavedChangesEventEmitter'
     ).and.returnValue(presenceOfUnsavedChangesEventEmitter);
-    spyOn(localStorageService, 'registerNewStorageEventListener').and.callFake(
-      (callback) => {
-      // This throws "Type 'undefined' is not assignable to type
-      // 'SchemaDefaultValue'." We need to suppress this error
-      // because of the need to test validations.
-      // @ts-ignore
-        document.addEventListener('storage', callback);
-      });
     spyOn(skillEditorStateService, 'loadSkill').and.stub();
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
 
@@ -393,8 +453,34 @@ fdescribe('Skill editor page', () => {
 
     staleTabEventEmitter.emit();
     presenceOfUnsavedChangesEventEmitter.emit();
-    document.dispatchEvent(storageEvent);
+    windowRef.nativeWindow.dispatchEvent(storageEvent);
 
     expect(component.skillIsInitialized).toBeFalse();
+  });
+
+  it('should emit events if the duplicate tab opened is stale or' +
+  'there are some unsaved changes present', () => {
+    let BrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(BrowserTabsInfo);
+    spyOn(skillEditorStalenessDetectionService.staleTabEventEmitter, 'emit');
+    spyOn(
+      skillEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter, 'emit');
+    let storageEvent = new StorageEvent('storage', {
+      key: EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_SKILL_EDITOR_BROWSER_TABS
+    });
+    component.onCreateOrUpdateSkillEditorBrowserTabsInfo(storageEvent);
+
+    expect(
+      skillEditorStalenessDetectionService.staleTabEventEmitter.emit
+    ).toHaveBeenCalled();
+    expect(
+      skillEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter.emit
+    ).toHaveBeenCalled();
   });
 });
