@@ -6332,6 +6332,24 @@ export default {
       "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
     },
+    "EXPLORATION_PLAYER": {
+      "ROUTE": "explore/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "EXPLORATION_PLAYER_EMBED": {
+      "ROUTE": "embed/exploration/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
     "ANDROID": {
       "ROUTE": "android",
       "TITLE": "Android | Oppia",
