@@ -52,6 +52,7 @@ import webtest
 
 auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
+secrets_services = models.Registry.import_secrets_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
@@ -168,13 +169,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Test that no GET request results in a 500 error."""
 
         for route in main.URLS:
-            # This was needed for the Django tests to pass (at the time we had
-            # a Django branch of the codebase).
-            if isinstance(route, tuple):
-                continue
-            else:
-                url = route.template
-            url = re.sub('<([^/^:]+)>', 'abc123', url)
+            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
             # This url is ignored since it is only needed for a protractor test.
             # The backend tests fetch templates from
@@ -184,6 +179,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             # core/templates/tests and we want one canonical
             # directory for retrieving templates so we ignore this url.
             if url == '/console_errors':
+                continue
+
+            if 'bulk_email_webhook_endpoint' in url:
+                with self.swap_to_always_return(
+                    secrets_services, 'get_secret', 'secret'
+                ):
+                    self.get_response_without_checking_for_errors(url, [404])
                 continue
 
             # Some of these will 404 or 302. This is expected.
