@@ -66,7 +66,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
             '<object-editor obj-type="<[objType]>" init-args="initArgs" valu'
             'e="customizationArgs.value" always-editable="true">\n  </obje'
             'ct-editor>\n</span>\n')
-            
+
         self.assertEqual((contents_registry,
         value_generators_domain.Registry.get_generator_class_by_id('Copier').get_html_template()))
 
