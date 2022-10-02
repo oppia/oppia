@@ -24,7 +24,7 @@ from scripts import flake_checker
 
 import requests
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
 AllowedMockJsonTypes = Union[
     flake_checker.FlakeReportDict, Dict[str, str], str, None
