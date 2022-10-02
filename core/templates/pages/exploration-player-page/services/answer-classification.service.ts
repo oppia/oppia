@@ -32,7 +32,6 @@ import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-pag
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { InteractionRuleInputs, TextInputRuleInputs } from 'interactions/rule-input-defs';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 
 export interface InteractionRulesService {
   [ruleName: string]: (
@@ -45,7 +44,6 @@ export class AnswerClassificationService {
       private alertsService: AlertsService,
       private appService: AppService,
       private interactionSpecsService: InteractionSpecsService,
-      private nws: NormalizeWhitespacePipe,
       private predictionAlgorithmRegistryService:
         PredictionAlgorithmRegistryService,
       private stateClassifierMappingService: StateClassifierMappingService) {}
@@ -187,10 +185,12 @@ export class AnswerClassificationService {
     return answerClassificationResult;
   }
 
-  checkForMisspellings(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
-    const normalizedAnswer = this.nws.transform(answer).toLowerCase();
+  checkForMisspellings(
+      answer: TextInputAnswer, inputs: TextInputRuleInputs
+  ): boolean {
+    const normalizedAnswer = answer.toLowerCase();
     const normalizedInput = inputs.x.normalizedStrSet.map(
-      input => this.nws.transform(input).toLowerCase());
+      input => input.toLowerCase());
 
     const hasEditDistanceEqualToTwo = (
         inputString: string, matchString: string) => {
@@ -225,7 +225,7 @@ export class AnswerClassificationService {
   isAnswerOnlyMisspelled(
       interaction: Interaction,
       answer: string
-    ): boolean {
+  ): boolean {
     var answerIsMisspelled = false;
     const answerGroups = interaction.answerGroups;
     for (var i = 0; i < answerGroups.length; ++i) {
@@ -235,7 +235,7 @@ export class AnswerClassificationService {
           const ruleInputs = answerGroup.rules[j].inputs;
           if (this.checkForMisspellings(
             answer,
-            ruleInputs as any //!ISSUE
+            ruleInputs as any
           )) {
             return true;
           }

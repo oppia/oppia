@@ -35,7 +35,7 @@ import { TextInputRulesService } from 'interactions/TextInput/directives/text-in
 import { AlertsService } from 'services/alerts.service';
 import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
 
-fdescribe('Answer Classification Service', () => {
+describe('Answer Classification Service', () => {
   const stateName = 'Test State';
 
   let alertsService: AlertsService;
@@ -66,7 +66,7 @@ fdescribe('Answer Classification Service', () => {
     textInputRulesService = TestBed.get(TextInputRulesService);
   });
 
-  fdescribe('with string classifier disabled', () => {
+  describe('with string classifier disabled', () => {
     let stateDict;
     let expId = '0';
 
@@ -344,8 +344,7 @@ fdescribe('Answer Classification Service', () => {
           'No interactionRulesService was available to classify the answer.');
       });
 
-      it('should check for misspellings correctly.', () => {
-
+    it('should check for misspellings correctly.', () => {
       stateDict.interaction.answer_groups = [{
         outcome: {
           dest: 'outcome 1',
@@ -406,27 +405,23 @@ fdescribe('Answer Classification Service', () => {
             }
           }
         }],
-      }]
+      }];
 
       const state = (
         stateObjectFactory.createFromBackendDict(stateName, stateDict));
-      
-        expect(answerClassificationService.isAnswerOnlyMisspelled(
-          state.interaction, "anSwkp")).toEqual(true);
-        
-        expect(answerClassificationService.isAnswerOnlyMisspelled(
-          state.interaction, "anSwer")).toEqual(true);
-        
-        expect(answerClassificationService.isAnswerOnlyMisspelled(
-          state.interaction, "fuZZilyCeerect")).toEqual(true);
-        
-        expect(answerClassificationService.isAnswerOnlyMisspelled(
-          state.interaction, "InCORrectAnkwpr")).toEqual(false);
 
-      });
-    
+      expect(answerClassificationService.isAnswerOnlyMisspelled(
+        state.interaction, 'anSwkp')).toEqual(true);
 
+      expect(answerClassificationService.isAnswerOnlyMisspelled(
+        state.interaction, 'anSwer')).toEqual(true);
 
+      expect(answerClassificationService.isAnswerOnlyMisspelled(
+        state.interaction, 'fuZZilyCeerect')).toEqual(true);
+
+      expect(answerClassificationService.isAnswerOnlyMisspelled(
+        state.interaction, 'InCORrectAnkwpr')).toEqual(false);
+    });
   });
 
   describe('with string classifier enabled', () => {
