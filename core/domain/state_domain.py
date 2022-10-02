@@ -2066,11 +2066,6 @@ class WrittenTranslation:
 
         # Validate translations.
         if self.data_format == 'html':
-            if isinstance(self.translation, list):
-                raise utils.ValidationError(
-                    'Translation of type html should not be in the '
-                    'form of a list.'
-                )
             html_cleaner.validate_rte_tags(self.translation)
             html_cleaner.validate_tabs_and_collapsible_rte_tags(
                 self.translation)

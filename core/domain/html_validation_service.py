@@ -812,7 +812,7 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                     json.loads(utils.unescape_html(
                         math_tag['svg_filename-with-value'])))
                 normalized_svg_filename = (
-                    objects.UnicodeString.normalize(svg_filename))  # type: ignore[no-untyped-call]
+                    objects.UnicodeString.normalize(svg_filename))
                 math_content_dict = {
                     'raw_latex': normalized_raw_latex,
                     'svg_filename': normalized_svg_filename
