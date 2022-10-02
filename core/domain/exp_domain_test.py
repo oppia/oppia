@@ -1339,16 +1339,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-link'
-            ' text-with-value=\"&amp;quot;&amp;quot;\"'
-            ' url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">'
-            '</oppia-noninteractive-link>'
-        )
-        self._assert_validation_error(
-            self.new_exploration, 'Link tag \'text-with-value\' attribute '
-            'should not be empty.')
-
-        self.state.content.html = (
-            '<oppia-noninteractive-link'
             ' text-with-value=\"&amp;quot;something&amp;quot;\">'
             '</oppia-noninteractive-link>'
         )

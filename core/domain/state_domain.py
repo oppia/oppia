@@ -2066,6 +2066,9 @@ class WrittenTranslation:
 
         # Validate translations.
         if self.data_format == 'html':
+            # Ruling out the possibility of different types for mypy
+            # type checking.
+            assert isinstance(self.translation, str)
             html_cleaner.validate_rte_tags(self.translation)
             html_cleaner.validate_tabs_and_collapsible_rte_tags(
                 self.translation)

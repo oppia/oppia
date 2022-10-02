@@ -230,7 +230,6 @@ def validate_rte_tags(
         ValidationError. Video autoplay-with-value attribute should be boolean.
         ValidationError. Video does not have video_id-with-value attribute.
         ValidationError. Link does not have text-with-value attribute.
-        ValidationError. Link text-with-value attribute should not be empty.
         ValidationError. Link does not have url-with-value attribute.
         ValidationError. Link url-with-value attribute should not be empty.
         ValidationError. Math does not have math_content-with-value attribute.
@@ -385,14 +384,6 @@ def validate_rte_tags(
             raise utils.ValidationError(
                 'Link tag does not have \'text-with-value\' '
                 'attribute.'
-            )
-
-        text_value = utils.unescape_html(
-                tag['text-with-value'])[1:-1].replace('\\"', '')
-        if text_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'Link tag \'text-with-value\' attribute should not '
-                'be empty.'
             )
 
         if not tag.has_attr('url-with-value'):
