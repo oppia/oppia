@@ -53,8 +53,7 @@ ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
 # are annotated completely, we can remove these dirs from this list and fix
 # the lint errors accordingly.
 EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
-    'core/controllers/',
-    'scripts/'
+    'core/controllers/'
 ]
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
