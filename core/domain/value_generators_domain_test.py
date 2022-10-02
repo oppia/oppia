@@ -53,23 +53,24 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         self.assertEqual('BaseValueGenerator', class_object.__class__.__name__)
 
     def test_registry_template_random_selector_contents(self) -> None:
-        contents_registry = ('<schema-based-editor [schema]="$ctrl.SCHEMA"'
+        contents_registry = (
+            '<schema-based-editor [schema]="$ctrl.SCHEMA"'
             ' ng-model="$ctrl.customizationArgs.list_of_values">\n</schema-'
             'based-editor>\n')
         class_object = value_generators_domain.Registry()
         self.assertEqual(
-            contents_registry,(class_object.get_generator_class_by_id(
+            contents_registry, (class_object.get_generator_class_by_id(
                 'RandomSelector').get_html_template()))
 
     def test_registry_template_copier_contents(self) -> None:
-        contents_registry = ('<span class="d-inline-block align-middle">\n  '
+        contents_registry = (
+            '<span class="d-inline-block align-middle">\n  '
             '<object-editor obj-type="<[objType]>" init-args="initArgs" valu'
             'e="customizationArgs.value" always-editable="true">\n  </obje'
             'ct-editor>\n</span>\n')
         class_object = value_generators_domain.Registry()
-
         self.assertEqual(
-            contents_registry,class_object.get_generator_class_by_id(
+            contents_registry, class_object.get_generator_class_by_id(
                 'Copier').get_html_template())
 
 
