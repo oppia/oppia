@@ -92,10 +92,10 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            unused_url: str,
-            unused_json: Dict[str, str],
-            unused_allow_redirects: List[str],
-            unused_headers: List[str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, str],  # pylint: disable=unused-argument
+            allow_redirects: List[str],  # pylint: disable=unused-argument
+            headers: List[str]  # pylint: disable=unused-argument
         ) -> None:
             pass
 
@@ -139,10 +139,10 @@ class ReportPassTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            unused_url: str,
-            unused_json: Dict[str, str],
-            unused_allow_redirects: List[str],
-            unused_headers: List[str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, str],  # pylint: disable=unused-argument
+            allow_redirects: List[str],  # pylint: disable=unused-argument
+            headers: List[str]  # pylint: disable=unused-argument
         ) -> None:
             pass
 
@@ -309,10 +309,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            unused_url: str,
-            unused_json: Dict[str, str],
-            unused_allow_redirects: List[str],
-            unused_headers: List[str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, str],  # pylint: disable=unused-argument
+            allow_redirects: List[str],  # pylint: disable=unused-argument
+            headers: List[str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -368,10 +368,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            unused_url: str,
-            unused_json: Dict[str, str],
-            unused_allow_redirects: List[str],
-            unused_headers: List[str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, str],  # pylint: disable=unused-argument
+            allow_redirects: List[str],  # pylint: disable=unused-argument
+            headers: List[str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -428,10 +428,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            unused_url: str,
-            unused_json: Dict[str, str],
-            unused_allow_redirects: List[str],
-            unused_headers: List[str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, str],  # pylint: disable=unused-argument
+            allow_redirects: List[str],  # pylint: disable=unused-argument
+            headers: List[str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             response: flake_checker.FlakeReportDict = {
                 'log': ['log1', 'log2'],
@@ -536,10 +536,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            unused_url: str,
-            unused_json: Dict[str, str],
-            unused_allow_redirects: List[str],
-            unused_headers: List[str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, str],  # pylint: disable=unused-argument
+            allow_redirects: List[str],  # pylint: disable=unused-argument
+            headers: List[str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             return MockResponse(False, None)
 
@@ -585,10 +585,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(
-            unused_url: str,
-            unused_json: Dict[str, str],
-            unused_allow_redirects: List[str],
-            unused_headers: List[str]
+            url: str,  # pylint: disable=unused-argument
+            json: Dict[str, str],  # pylint: disable=unused-argument
+            allow_redirects: List[str],  # pylint: disable=unused-argument
+            headers: List[str]  # pylint: disable=unused-argument
         ) -> MockResponse:
             return MockResponse(True, 'not json')
 
