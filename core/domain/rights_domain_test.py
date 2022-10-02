@@ -198,7 +198,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             'cloned_from': None,
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
             'community_owned': False,
-            'owner_ids': ['owner'],
+            'owner_ids': [],
             'editor_ids': [],
             'voice_artist_ids': [],
             'viewer_ids': [],
