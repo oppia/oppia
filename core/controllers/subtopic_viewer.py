@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 from core.constants import constants
-from core import android_validation_constants, feconf
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import subtopic_page_services
@@ -29,20 +29,19 @@ class SubtopicViewerPage(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'subtopic_url_fragment':{
+        'subtopic_url_fragment': {
             'schema': {
                 'type': 'basestring',
-                'validators':[{
-                    "id": "is_regex_matched",
+                'validators': [{
+                    'id': 'is_regex_matched',
                     'regex_pattern': '[a-z]+(-[a-z]+)*$'
                 }, {
-                    "id": "has_length_at_most",
-                    'max_value': android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
                 }]
             }
         }
     }
-
 
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
