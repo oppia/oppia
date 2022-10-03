@@ -15,7 +15,7 @@
 """Controllers for the subtopic viewer page."""
 
 from __future__ import annotations
-from core.constants import constants
+
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
