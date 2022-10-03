@@ -2,7 +2,7 @@ name: Send info about commit to develop
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   send_notifications:
