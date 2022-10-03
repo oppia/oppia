@@ -484,7 +484,53 @@ class SuggestionListHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
 
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
+        'GET': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                }
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                }
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'status': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'author_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'final_reviewer_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'score_category': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                }
+            }
+        }
     }
 
     @acl_decorators.open_access
