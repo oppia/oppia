@@ -458,6 +458,30 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                         i, commit_log_models[i-1].commit_cmds
                                     )
                                 )
+                                change_list: List[exp_domain.ExplorationChange] = []
+                                for change_dict in commit_log_models[i-1].commit_cmds:
+                                    try:
+                                        change_list.append(exp_domain.ExplorationChange(
+                                            change_dict
+                                        ))
+                                    except Exception:
+                                        continue
+                                exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+                                logging.info(
+                                    'Added states at version %d: %s' % (
+                                        i, exp_versions_diff.added_state_names
+                                    )
+                                )
+                                logging.info(
+                                    'Deleted states at version %d: %s' % (
+                                        i, exp_versions_diff.deleted_state_names
+                                    )
+                                )
+                                logging.info(
+                                    'Renamed states at version %d: %s' % (
+                                        i, exp_versions_diff.old_to_new_state_names
+                                    )
+                                )
                             for i in range(1, version):
                                 logging.info(
                                     'State version history at version %d: %s' % (
