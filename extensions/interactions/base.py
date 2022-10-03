@@ -52,7 +52,6 @@ from typing import Dict, Final, List, Optional, Tuple, Type, TypedDict
 MYPY = False
 if MYPY:  # pragma: no cover
     from core.domain import state_domain
->>>>>>> c17d6cd6d435306b7b856cebec1822ce5a31c8e6
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.
