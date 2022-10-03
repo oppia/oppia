@@ -88,7 +88,9 @@ def send_email_to_recipients(
     mailgun_api_key: Optional[str] = secrets_services.get_secret(
         'MAILGUN_API_KEY')
     if mailgun_api_key is None:
-        logging.exception('Cloud Secret Manager is not working.')
+        logging.exception(
+            'Cloud Secret Manager is not able to get MAILGUN_API_KEY.')
+        # TODO(#16197): Remove from feconf after we verify that secrets work.
         mailgun_api_key = feconf.MAILGUN_API_KEY
         if not mailgun_api_key:
             raise Exception('Mailgun API key is not available.')

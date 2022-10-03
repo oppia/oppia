@@ -25,6 +25,8 @@ from core.constants import constants
 from google import auth
 from google.cloud import translate_v2 as translate
 
+# The 'auth.default()' returns tuple of credentials and project ID. As we are only
+# interested in credentials, we are using '[0]' to access it.
 CLIENT = translate.Client(
     credentials=(
         auth.credentials.AnonymousCredentials()

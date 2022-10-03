@@ -26,6 +26,7 @@ from core.jobs.batch_jobs import mailchimp_population_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+import mailchimp3
 from mailchimp3 import mailchimpclient
 
 from typing import Dict, List, Mapping, Type, Union
@@ -34,11 +35,13 @@ from typing_extensions import Final, TypedDict
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
+    from mypy_imports import secrets_services
     from mypy_imports import user_models
 
 (config_models, user_models) = models.Registry.import_models([
     models.Names.CONFIG, models.Names.USER
 ])
+secrets_services = models.Registry.import_secrets_services()
 
 
 class MailChimpListsDataDict(TypedDict):
@@ -179,10 +182,10 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
 
     def test_job_runs_correctly_for_second_batch(self) -> None:
         config_model = self.create_model(
-                config_models.ConfigPropertyModel,
-                id='batch_index_for_mailchimp',
-                value=1
-            )
+            config_models.ConfigPropertyModel,
+            id='batch_index_for_mailchimp',
+            value=1
+        )
         config_model.update_timestamps()
         config_model.commit('user_id_0', [])
 
@@ -199,6 +202,36 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
 
             self.assertItemsEqual(
                 mailchimp.lists.parent_emails, self.second_batch_emails)
+
+    def test_job_runs_correctly_with_mailchimp_api_key_missing(self) -> None:
+        config_model = self.create_model(
+            config_models.ConfigPropertyModel,
+            id='batch_index_for_mailchimp',
+            value=1
+        )
+        config_model.update_timestamps()
+        config_model.commit('user_id_0', [])
+
+        mailchimp = self.MockMailchimpClass()
+        swap_api_key_secrets_return_none = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: None,
+            expected_args=[('MAILCHIMP_API_KEY',)]
+        )
+        swap_api_key_feconf = self.swap(
+            feconf, 'MAILCHIMP_API_KEY', 'abcdefabcdefabcdefabcdefabcdef12')
+        swap_mailchimp_class = self.swap_to_always_return(
+            mailchimp3, 'MailChimp', self.MockMailchimpClass)
+
+        with swap_api_key_secrets_return_none, self.swap_audience_id:
+            with swap_api_key_feconf, swap_mailchimp_class:
+                self.assert_job_output_is([
+                    job_run_result.JobRunResult(stdout='Request successful')
+                ])
+
+                self.assertItemsEqual(
+                    mailchimp.lists.parent_emails, self.second_batch_emails)
 
     def test_job_runs_correctly_with_invalid_email(self) -> None:
         user_model = self.create_model(

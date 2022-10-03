@@ -31,6 +31,8 @@ from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 from typing import Any, Dict, Optional
 
+# The 'auth.default()' returns tuple of credentials and project ID. As we are only
+# interested in credentials, we are using '[0]' to access it.
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
         auth.credentials.AnonymousCredentials()

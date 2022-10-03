@@ -95,7 +95,9 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
     mailchimp_api_key: Optional[str] = secrets_services.get_secret(
         'MAILCHIMP_API_KEY')
     if not mailchimp_api_key:
-        logging.exception('Cloud Secret Manager is not working.')
+        logging.exception(
+            'Cloud Secret Manager is not able to get MAILCHIMP_API_KEY.')
+        # TODO(#16197): Remove from feconf after we verify that secrets work.
         mailchimp_api_key = feconf.MAILCHIMP_API_KEY
 
     return mailchimp3.MailChimp(    # pragma: no cover

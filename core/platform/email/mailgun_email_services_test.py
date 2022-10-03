@@ -216,6 +216,8 @@ class EmailTests(test_utils.GenericTestBase):
                     'Hola 😂 - invitation to collaborate',
                     'plaintext_body 😂',
                     'Hi abc,<br> 😂')
+                # The '\nNoneType: None' represents the stacktrace which is not
+                # available in the backend tests.
                 self.assertIn(
                     'Cloud Secret Manager is not working.\nNoneType: None', logs
                 )
@@ -233,6 +235,8 @@ class EmailTests(test_utils.GenericTestBase):
                     'Hola 😂 - invitation to collaborate',
                     'plaintext_body 😂',
                     'Hi abc,<br> 😂')
+                # The '\nNoneType: None' represents the stacktrace which is not
+                # available in the backend tests.
                 self.assertIn(
                     'Cloud Secret Manager is not working.\nNoneType: None', logs
                 )

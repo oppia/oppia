@@ -464,6 +464,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 response.body
             )
 
+        # The '\nNoneType: None' represents the stacktrace which is
+        # not available in the backend tests.
         self.assert_matches_regexps(
             logs,
             [

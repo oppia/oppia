@@ -461,6 +461,8 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
                 response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
 
                 self.assertEqual(len(logs), 1)
+                # The '\nNoneType: None' represents the stacktrace which is
+                # not available in the backend tests.
                 self.assertEqual(
                     logs[0],
                     '2 blog post summaries were fetched to load the search'

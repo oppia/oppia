@@ -6670,6 +6670,8 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
                         email_manager.verify_mailchimp_secret('secret'))
                     self.assertFalse(
                         email_manager.verify_mailchimp_secret('not-secret'))
+                    # The '\nNoneType: None' represents the stacktrace which is
+                    # not available in the backend tests.
                     self.assertEqual(
                         [
                             'Cloud Secret Manager is not working.'
@@ -6693,6 +6695,8 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
                 with self.capture_logging(min_level=logging.WARNING) as logs:
                     self.assertFalse(
                         email_manager.verify_mailchimp_secret('secret'))
+                    # The '\nNoneType: None' represents the stacktrace which is
+                    # not available in the backend tests.
                     self.assertEqual(
                         [
                             'Cloud Secret Manager is not working.'
