@@ -160,10 +160,10 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
   };
 }
 
-// Create a polyfill for Object.entries() for Chrome.
+// Add Object.entries() polyfill for Chrome 53 and below.
 if (!Object.entries) {
   Object.entries = function(obj) {
-    var ownProps = Object.keys(obj),
+    let ownProps = Object.keys(obj),
       i = ownProps.length,
       resArray = new Array(i); // Preallocate the array.
 
