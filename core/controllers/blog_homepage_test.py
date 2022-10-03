@@ -44,6 +44,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
+        self.change_dict = {}
 
     def test_get_homepage_data(self):
         self.login(self.user_email)

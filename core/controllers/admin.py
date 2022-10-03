@@ -866,8 +866,7 @@ class TopicManagerRoleHandler(base.BaseHandler):
             # caught before in topic_services.deassign_manager_role_from_topic
             # method and the else part of the if condition given below will
             # never execute.
-            if not topic_fetchers.get_topic_rights_with_user( # pragma: no branch
-                    user_id):
+            if not topic_fetchers.get_topic_rights_with_user(user_id): # pragma: no branch pylint: disable=line-too-long
                 user_services.remove_user_role(
                     user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
