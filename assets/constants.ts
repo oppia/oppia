@@ -5687,9 +5687,9 @@ export default {
       // eslint-disable-next-line max-len
       "Use respectful pronouns (like “आप” instead of “तुम/तू ”) and a corresponding respectful tone like “करिये, करेंगे”.",
       // eslint-disable-next-line max-len
-      "Feel free to change the voice and order of phrases to make the text readable",
+      "Feel free to change the voice and order of phrases to make the text more readable",
       // eslint-disable-next-line max-len
-      "Refer to Glossary - https://docs.google.com/spreadsheets/d/13NMEnYqLZuMbeX1Z6XXG-femHkKNAN8KwjhaC67EkxI/edit#gid=0",
+      "Refer to Glossary -https://dub.sh/oppia",
       // eslint-disable-next-line max-len
       "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Hindi as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
       // eslint-disable-next-line max-len
