@@ -1627,6 +1627,8 @@ def populate_topic_summary_model_fields(
             **topic_summary_dict)
 
     return topic_summary_model
+
+
 def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:
     """Returns a dict with topic ID as key and topic name as value, for all
     given topic IDs.
