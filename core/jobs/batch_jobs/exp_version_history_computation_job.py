@@ -489,8 +489,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                     )
                                 )
                         return (exp_id, [], e, version)
-
-
             return (exp_id, version_history_models) # type: ignore[return-value]
 
     def generate_exploration_from_snapshot(
