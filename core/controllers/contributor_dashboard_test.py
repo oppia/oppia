@@ -1782,7 +1782,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             translation_review_stats = None
             question_contribution_stats = None
             question_review_stats = None
-        
+
         swap_get_stats = self.swap_with_checks(
             suggestion_services, 'get_all_contributor_stats',
             lambda _: MockStats(), expected_args=((self.new_user_id,),))
