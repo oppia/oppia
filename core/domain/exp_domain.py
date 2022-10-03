@@ -3211,11 +3211,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
 
         for state_dict in states_dict.values():
-            content_html_list = [state_dict['content']['html']]
+            valid_html = (
+                cls.fix_non_interactive_links(state_dict['content']['html']))
 
-            for html_content in content_html_list:
-                html_content = cls.fix_non_interactive_links(html_content)
+            state_dict['content']['html'] = valid_html
 
+        for state_dict in states_dict.values():
             translations_mapping = (
             state_dict['written_translations']['translations_mapping'])
 
@@ -3223,15 +3224,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for written_translation in translations.values():
                     if isinstance(written_translation['translation'], List):
                         translated_element_list = []
+
                         for element in written_translation['translation']:
                             element = cls.fix_non_interactive_links(element)
                             translated_element_list.append(element)
+
                         written_translation['translation'] = (
                                 translated_element_list)
                     else:
                         fixed_translation = (
                                 cls.fix_non_interactive_links(
                                 written_translation['translation']))
+
                         written_translation['translation'] = (
                                 fixed_translation)
 
@@ -3672,7 +3676,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_schema_version = 57
 
         if exploration_schema_version == 57:
-            exploration_dict = cls._convert_v56_dict_to_v57_dict(
+            exploration_dict = cls._convert_v57_dict_to_v58_dict(
                 exploration_dict)
             exploration_schema_version = 58
 

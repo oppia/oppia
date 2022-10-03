@@ -22,7 +22,7 @@ import logging
 from urllib.parse import urlparse   # pylint: disable=import-only-modules
 
 from core import utils
-from core.domain import exp_domain
+from core.domain import change_domain, exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain
@@ -377,6 +377,10 @@ class DraftUpgradeUtil:
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
         """
 
         for exp_change in draft_change_list:
@@ -387,16 +391,21 @@ class DraftUpgradeUtil:
             # 'CMD_EDIT_EXPLORATION_PROPERTY'.
             new_value: AllowedDraftChangeListTypes = exp_change.new_value
             if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                assert isinstance(
-                    exp_change, exp_domain.EditExpStatePropertyContentCmd)
-
-                new_value = exp_change.new_value
+                # Here we use cast because this 'if' condition forces
+                # change to have type EditExpStatePropertyContentCmd.
+                edit_content_property_cmd = cast(
+                    exp_domain.EditExpStatePropertyContentCmd,
+                    exp_change
+                )
+                new_value = edit_content_property_cmd.new_value
                 html_content = new_value['html']
 
                 cls._invalidate_drafts_with_invalid_links(html_content)
 
             elif exp_change.property_name == (
                 exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                # Ruling out the possibility of different types
+                # for mypy type checking.
                 assert isinstance(exp_change.new_value, dict)
 
                 written_translations = exp_change.new_value
@@ -406,10 +415,10 @@ class DraftUpgradeUtil:
                     for written_translation in translations.values():
                         if written_translation['data_format'] != 'html':
                             raise InvalidDraftConversionException
-                        else:
-                            cls._invalidate_drafts_with_invalid_links(
-                                written_translation['translation']
-                            )
+
+                        cls._invalidate_drafts_with_invalid_links(
+                            written_translation['translation']
+                        )
 
         return draft_change_list
 

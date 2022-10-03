@@ -175,7 +175,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': state_domain.SubtitledHtml(
-                    'content',(
+                    'content', (
                         '<p><oppia-noninteractive-link'
                         ' text-with-value="&amp;quot;&amp;quot;"'
                         ' url-with-value='
