@@ -108,7 +108,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                             ca_spec['schema']['obj_type']))
                     self.assertEqual(
                         ca_spec['default_value'],
-                        obj_class.normalize(ca_spec['default_value']))  # type: ignore[no-untyped-call]
+                        obj_class.normalize(ca_spec['default_value']))
 
     def _listdir_omit_ignored(self, directory: str) -> List[str]:
         """List all files and directories within 'directory', omitting the ones

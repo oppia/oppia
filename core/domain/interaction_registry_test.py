@@ -60,15 +60,6 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
                 ['CodeRepl', 'AlgebraicExpressionInput']),
             ['skulpt', 'codemirror', 'guppy', 'nerdamer'])
 
-    def test_dependency_loads_in_exploration_player_page(self) -> None:
-        exp_id = '0'
-
-        exp_services.load_demo(exp_id)
-
-        # Ensure that dependencies are added in the exploration reader page.
-        response = self.get_html_response('/explore/%s' % exp_id)
-        response.mustcontain('dependency_html.html')
-
     def test_no_dependencies_in_non_exploration_pages(self) -> None:
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain(no=['dependency_html.html'])

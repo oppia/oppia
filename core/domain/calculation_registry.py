@@ -83,6 +83,12 @@ class Registry:
         cls, calculation_id: Literal['TopNUnresolvedAnswersByFrequency']
     ) -> models.TopNUnresolvedAnswersByFrequency: ...
 
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: str
+    ) -> models.BaseCalculation: ...
+
     @classmethod
     def get_calculation_by_id(
         cls, calculation_id: str
