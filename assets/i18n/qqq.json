@@ -998,6 +998,7 @@
 	"I18N_RESTART_EXPLORATION_BUTTON": "Text which appears on the Restart button in the lesson info modal of the learner checkpoints progress.",
 	"I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Text displayed in the review test page. - Text shown in the top left corner of the nav bar.",
 	"I18N_REVIEW_TEST_PAGE_TITLE": "Text displayed on the browser tab when on the review test page.",
+	"I18N_SAVE_BUTTON_ALERT_TOOLTIP": "Text displayed when logged-out user tries to save the exploration progress and didn't even reached the first checkpoint.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1": "Text displayed on the save progress menu of exploration lesson info modal telling users that their progress will be automatically saved if they sign in.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "Text displayed on the save progress menu of exploration lesson info modal asking the users whether they already have an account.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3": "Text displayed on the save progress menu of exploration lesson info modal telling the users to use the generated progress URL to save their exploration progress.",
