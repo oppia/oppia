@@ -1262,7 +1262,7 @@ class SerializableExplorationDict(ExplorationDict):
 
 class RangeVariableDict(TypedDict):
     """Dictionary representing the range variable for the NumericInput
-    interaction
+    interaction.
     """
 
     ans_group_index: int
@@ -1275,7 +1275,7 @@ class RangeVariableDict(TypedDict):
 
 class MatchedDenominatorDict(TypedDict):
     """Dictionary representing the matched denominator variable for the
-    FractionInput interaction
+    FractionInput interaction.
     """
 
     ans_group_index: int
@@ -3067,11 +3067,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _remove_unwanted_content_ids_from_translations_and_voiceovers(
-        cls,
-        state_dict: state_domain.StateDict
+        cls, state_dict: state_domain.StateDict
     ) -> None:
         """Helper function to remove the content IDs from the translations
-        and voiceovers which are deleted from the state
+        and voiceovers which are deleted from the state.
 
         Args:
             state_dict: state_domain.StateDict. The state dictionary.
@@ -3249,6 +3248,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls,
         choices: List[state_domain.SubtitledHtmlDict],
         answer_groups: List[state_domain.AnswerGroupDict],
+        *,
         is_item_selection_interaction: bool = False
     ) -> None:
         """Handles choices present in the ItemSelectionInput or
@@ -3531,8 +3531,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_continue_interaction(
-        cls, state_dict: state_domain.StateDict,
-        language_code: str
+        cls, state_dict: state_domain.StateDict, language_code: str
     ) -> None:
         """Fixes Continue interaction where the length of the text value
         is more than 20. We simply replace them with the word `Continue`
@@ -3542,7 +3541,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict: state_domain.StateDict. The state dictionary.
             language_code: str. The language code of the exploration.
         """
-        # Text should have a max-length of 20.
         text_value = state_dict['interaction'][
             'customization_args']['buttonText']['value']['unicode_str']
         lang_code_to_unicode_str_dict = {
@@ -3582,17 +3580,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Should be at most 3 recommended explorations.
         recc_exp_ids = state_dict['interaction'][
             'customization_args']['recommendedExplorationIds']['value']
-        if len(recc_exp_ids) > 3:
-            recc_exp_ids = recc_exp_ids[:3]
-
         state_dict['interaction']['customization_args'][
-            'recommendedExplorationIds']['value'] = recc_exp_ids
+            'recommendedExplorationIds']['value'] = recc_exp_ids[:3]
 
     @classmethod
     def _fix_numeric_input_interaction(
-        cls,
-        state_dict: state_domain.StateDict,
-        state_name: str
+        cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
         """Fixes NumericInput interaction for the following cases:
         - The rules should not be duplicate else the one with not pointing to
@@ -3744,17 +3737,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_fraction_input_interaction(
-        cls,
-        state_dict: state_domain.StateDict,
-        state_name: str
+        cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
-        """Fixes FractionInput interaction where rule should not match previous
-        rules solution means it should not be in the range of previous rules
-        solution otherwise the later answer group will be redundant and will
-        never be matched. Simply the invalid rule will be removed and if only
-        one rule is present then the complete answer group is removed.
-        The rules should not be duplicate else the one with not pointing to
+        """Fixes FractionInput interaction for the following cases:
+        - The rules should not be duplicate else the one with not pointing to
         different state will be deleted
+        - The rule should not match previous rules solution means it should
+        not be in the range of previous rules solution. Invalid rules will
+        be removed.
 
         Args:
             state_dict: state_domain.StateDict. The state dictionary that needs
@@ -3868,9 +3858,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_multiple_choice_input_interaction(
-        cls,
-        state_dict: state_domain.StateDict,
-        state_name: str
+        cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
         """Fixes MultipleChoiceInput interaction for the following cases:
         - The rules should not be duplicate else the one with not pointing to
@@ -3889,7 +3877,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         empty_ans_groups = []
         answer_groups = state_dict['interaction']['answer_groups']
 
-        # Answer choices should be non-empty and unique.
         choices: List[state_domain.SubtitledHtmlDict] = (
             state_dict['interaction']['customization_args'][
                 'choices']['value']
@@ -3930,9 +3917,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_item_selection_input_interaction(
-        cls,
-        state_dict: state_domain.StateDict,
-        state_name: str
+        cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
         """Fixes ItemSelectionInput interaction for the following cases:
         - The rules should not be duplicate else the one with not pointing to
@@ -3981,7 +3966,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # All choices should be unique and non-empty.
         cls._choices_should_be_unique_and_non_empty(
-            choices, answer_groups, True)
+            choices, answer_groups, is_item_selection_interaction=True)
 
         empty_ans_groups = []
         for answer_group in answer_groups:
@@ -3997,10 +3982,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         if answer_group['outcome']['dest'] == state_name:
                             invalid_rules.append(rule_spec)
                         else:
-                            if len(rule_value) < min_value:
-                                min_value = len(rule_value)
-                            elif len(rule_value) > max_value:
-                                max_value = len(rule_value)
+                            min_value = min(min_value, len(rule_value))
+                            max_value = max(max_value, len(rule_value))
 
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
@@ -4024,9 +4007,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_drag_and_drop_input_interaction(
-        cls,
-        state_dict: state_domain.StateDict,
-        state_name: str
+        cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
         """Fixes the DragAndDropInput interaction with following checks:
         - The rules should not be duplicate else the one with not pointing to
@@ -4068,10 +4049,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group['rule_specs']:
                 # Multiple items cannot be in the same place iff the
                 # setting is turned off.
-                if not multi_item_value:
-                    for ele in rule_spec['inputs']['x']:
-                        if len(ele) > 1:
-                            invalid_rules.append(rule_spec)
+                for ele in rule_spec['inputs']['x']:
+                    if not multi_item_value and len(ele) > 1:
+                        invalid_rules.append(rule_spec)
 
                 if (
                     rule_spec['rule_type'] ==
@@ -4162,9 +4142,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fix_text_input_interaction(
-        cls,
-        state_dict: state_domain.StateDict,
-        state_name: str
+        cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
         """Fixes the TextInput interaction with following checks:
         - The rules should not be duplicate else the one with not pointing to
@@ -4333,6 +4311,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def fix_rte_tags(
         cls, html: str,
+        *,
         is_tags_nested_inside_tabs_or_collapsible: bool = False
     ) -> str:
         """Handles all the invalid RTE tags, performs the following:
@@ -4455,8 +4434,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             start_value = float(tag['start-with-value'])
             end_value = float(tag['end-with-value'])
             if (
-                start_value > end_value and start_value != 0.0
-                and end_value != 0.0
+                start_value > end_value and
+                start_value != 0.0 and
+                end_value != 0.0
             ):
                 tag['end-with-value'] = '0'
                 tag['start-with-value'] = '0'
@@ -4590,6 +4570,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return str(soup).replace('<br/>', '<br>')
 
     @classmethod
+    def _fix_content(cls, html: str) -> str:
+        """Helper function to fix the html.
+
+        Args:
+            hmtl: str. The html data to fix.
+
+        Returns:
+            hmtl: str. The fixed html data.
+        """
+        html = cls.fix_rte_tags(
+            html, is_tags_nested_inside_tabs_or_collapsible=False)
+        html = cls.fix_tabs_and_collapsible_tags(html)
+        return html
+
+    @classmethod
     def _update_state_rte(
         cls,
         states_dict: Dict[str, state_domain.StateDict]
@@ -4606,30 +4601,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state in states_dict.values():
             # Fix tags for state content.
-            html: str = state['content']['html']
-            html = cls.fix_rte_tags(html)
-            html = cls.fix_tabs_and_collapsible_tags(html)
-            state['content']['html'] = html
+            html = state['content']['html']
+            state['content']['html'] = cls._fix_content(html)
             # Fix tags for written translations.
             written_translations = (
                 state['written_translations']['translations_mapping'])
             for translation_item in written_translations.values():
                 for translation in translation_item.values():
-                    if isinstance(translation['translation'], List):
+                    if isinstance(translation['translation'], list):
                         translated_element_list = []
                         for element in translation['translation']:
-                            element = cls.fix_rte_tags(element)
-                            element = cls.fix_tabs_and_collapsible_tags(element)
-                            translated_element_list.append(element)
+                            translated_element_list.append(
+                                cls._fix_content(element))
                         translation['translation'] = translated_element_list
                     else:
-                        fixed_translation = cls.fix_rte_tags(
-                            translation['translation'])
-                        fixed_translation = (
-                            cls.fix_tabs_and_collapsible_tags(
-                                fixed_translation)
-                        )
-                        translation['translation'] = fixed_translation
+                        html = translation['translation']
+                        translation['translation'] = cls._fix_content(html)
         return states_dict
 
     @classmethod
