@@ -37,7 +37,7 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   rubrics!: Rubric[];
   rubricsListIsShown: boolean = false;
   directiveSubscriptions = new Subscription();
-  windowIsNarrow: boolean;
+  windowIsNarrow!: boolean;
 
   constructor(
     private skillEditorStateService: SkillEditorStateService,
