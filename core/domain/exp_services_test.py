@@ -2438,14 +2438,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: %s
         dest_if_really_stuck: null
@@ -2483,14 +2483,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: New state
         dest_if_really_stuck: null
@@ -2553,14 +2553,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: %s
         dest_if_really_stuck: null
@@ -2598,14 +2598,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: Renamed state
         dest_if_really_stuck: null
@@ -2950,14 +2950,14 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
-    catchMisspellings:
-        value: false
   default_outcome:
     dest: %s
     dest_if_really_stuck: null
@@ -3050,7 +3050,7 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     catchMisspellings:
-        value: false
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -7968,7 +7968,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 51,
+            'from_version': 52,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
