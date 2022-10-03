@@ -30,18 +30,7 @@ class SubtopicViewerPage(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'subtopic_url_fragment': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': '[a-z]+(-[a-z]+)*$'
-                }, {
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
-                }]
-            }
-        }
+        'subtopic_url_fragment': constants.VALID_URL_FRAGMENT_REGEX
     }
 
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
