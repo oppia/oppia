@@ -239,7 +239,7 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     }
 
     @acl_decorators.is_from_oppia_android
-    def post(self): # type: ignore[no-untyped-def]
+    def post(self):
         """Handles POST requests.
 
         Verifies that the incoming message is from Oppia Android based on the
