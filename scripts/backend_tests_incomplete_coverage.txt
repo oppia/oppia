@@ -40,6 +40,7 @@ core.domain.config_domain_test
 core.domain.draft_upgrade_services_test
 core.domain.email_manager_test
 core.domain.event_services_test
+core.domain.exp_domain_test
 core.domain.exp_services_test
 core.domain.feedback_domain_test
 core.domain.feedback_services_test

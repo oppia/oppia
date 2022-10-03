@@ -317,8 +317,10 @@ class DraftUpgradeUtil:
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 52 to 53. State
-        version 52 adds catchMisspellings customization_arg to
-        TextInput interaction.
+        version 52 adds catchMisspellings customization_arg to TextInput
+        interaction. As this is a new property and therefore
+        doesn't affect any pre-existing drafts, there should be
+        no changes to drafts.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

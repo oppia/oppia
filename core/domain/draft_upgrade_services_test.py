@@ -177,7 +177,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': 'TextInput'
             })
         ]
-        # Migrate exploration to state schema version 52.
+        # Migrate exploration to state schema version 53.
         self.create_and_migrate_new_exploration('52', '53')
         migrated_draft_change_list_v53 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
