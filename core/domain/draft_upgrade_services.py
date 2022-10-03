@@ -387,13 +387,10 @@ class DraftUpgradeUtil:
             # 'CMD_EDIT_EXPLORATION_PROPERTY'.
             new_value: AllowedDraftChangeListTypes = exp_change.new_value
             if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                # Here we use cast because this 'if' condition forces
-                # change to have type EditExpStatePropertyContentCmd.
-                edit_content_property_cmd = cast(
-                    exp_domain.EditExpStatePropertyContentCmd,
-                    exp_change
-                )
-                new_value = edit_content_property_cmd.new_value
+                assert isinstance(
+                    exp_change, exp_domain.EditExpStatePropertyContentCmd)
+
+                new_value = exp_change.new_value
                 html_content = new_value['html']
 
                 cls._invalidate_drafts_with_invalid_links(html_content)
@@ -407,12 +404,8 @@ class DraftUpgradeUtil:
                     written_translations['translations_mapping'].values()
                 ):
                     for written_translation in translations.values():
-                        if isinstance(
-                            written_translation['translation'], List):
-                            for element in written_translation[
-                                'translation']:
-                                cls._invalidate_drafts_with_invalid_links(
-                                    element)
+                        if written_translation['data_format'] != 'html':
+                            raise InvalidDraftConversionException
                         else:
                             cls._invalidate_drafts_with_invalid_links(
                                 written_translation['translation']

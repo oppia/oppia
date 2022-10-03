@@ -175,24 +175,29 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': state_domain.SubtitledHtml(
-                    'content',
-                    '<p><oppia-noninteractive-link' +
-                    ' text-with-value="&amp;quot;&amp;quot;"' +
-                    ' url-with-value=' +
-                    '"&amp;quot;mailto:example@example.com&amp' +
-                    ';quot;"></oppia-noninteractive-link></p>' +
-                    '<p><oppia-noninteractive-link' +
-                    ' text-with-value="&amp;quot;&amp;quot;"' +
-                    ' url-with-value=' +
-                    '"&amp;quot;http://www.google.com&amp' +
-                    ';quot;"></oppia-noninteractive-link></p>' +
-                    '<p><oppia-noninteractive-link>' +
-                    '</oppia-noninteractive-link></p>' +
-                    '<p><oppia-noninteractive-link' +
-                    ' text-with-value="&amp;quot;&amp;quot;"' +
-                    ' url-with-value=' +
-                    '"&amp;quot;https://www.oppia.org&amp' +
-                    ';quot;"></oppia-noninteractive-link></p>'
+                    'content',(
+                        '<p><oppia-noninteractive-link'
+                        ' text-with-value="&amp;quot;&amp;quot;"'
+                        ' url-with-value='
+                        '"&amp;quot;mailto:example@example.com&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                        '<p><oppia-noninteractive-link'
+                        ' text-with-value="&amp;quot;&amp;quot;"'
+                        ' url-with-value='
+                        '"&amp;quot;http://www.google.com&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                        '<p><oppia-noninteractive-link>'
+                        '</oppia-noninteractive-link></p>'
+                        '<p><oppia-noninteractive-link'
+                        ' text-with-value="&amp;quot;&amp;quot;"'
+                        ' url-with-value='
+                        '"&amp;quot;https://www.oppia.org&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                        '<p><oppia-noninteractive-link'
+                        ' url-with-value='
+                        '"&amp;quot;https://www.test.com&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                    )
                 ).to_dict()
             })]
 
