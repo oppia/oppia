@@ -285,6 +285,7 @@ describe('Skill Concept Card Editor Component', () => {
 
   it('should toggle worked example on clicking', () => {
     component.workedExamplesListIsShown = true;
+    mockEventEmitter.emit();
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
@@ -299,6 +300,7 @@ describe('Skill Concept Card Editor Component', () => {
 
   it('should toggle skill editor card on clicking', () => {
     component.skillEditorCardIsShown = true;
+    mockEventEmitter.emit();
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 

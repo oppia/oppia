@@ -348,7 +348,7 @@ describe('Skill editor main tab Component', () => {
     let desc2 = component.getSkillDescription('BBB6dzfb5pPt');
     expect(desc2).toEqual('Dummy Skill 1');
 
-    let desc3 = component.getSkillDescription('');
+    let desc3 = component.getSkillDescription('nonexistentSkill');
     expect(desc3).toBeNull();
   }));
 
