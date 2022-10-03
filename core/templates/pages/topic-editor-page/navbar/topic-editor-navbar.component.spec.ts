@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,128 +16,152 @@
  * @fileoverview Unit tests for the navbar of the topic editor.
  */
 
-import { EventEmitter } from '@angular/core';
-import { fakeAsync, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { TopicRightsBackendApiService, TopicRightsBackendResponse } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { TopicEditorSaveModalComponent } from '../modal-templates/topic-editor-save-modal.component';
+import { TopicEditorSendMailComponent } from '../modal-templates/topic-editor-send-mail-modal.component';
+import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { TopicEditorNavbarComponent } from './topic-editor-navbar.component';
 
-describe('topicEditorNavbar', () => {
-  let ctrl = null;
-  let $scope = null;
-  let $rootScope = null;
-  let $window = null;
-  let $uibModal = null;
-  let TopicEditorStateService = null;
-  let TopicObjectFactory = null;
-  let UrlService = null;
-  let topic = null;
-  let UndoRedoService = null;
-  let AlertsService = null;
-  let ngbModal: NgbModal = null;
-  let TopicEditorRoutingService = null;
-  let TopicRightsBackendApiService = null;
+class MockWindowRef {
+  _window = {
+    location: {
+      hash: '123',
+      href: '',
+      replace: (val: string) => {}
+    },
+    open: (url: string) => {},
+    gtag: () => {}
+  };
+
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
+describe('Topic Editor Navbar', () => {
+  let fixture: ComponentFixture<TopicEditorNavbarComponent>;
+  let componentInstance: TopicEditorNavbarComponent;
+  let topicEditorStateService: TopicEditorStateService;
+  let topicObjectFactory: TopicObjectFactory;
+  let urlService: UrlService;
+  let topic: Topic;
+  let undoRedoService: UndoRedoService;
+  let alertsService: AlertsService;
+  let ngbModal: NgbModal;
+  let windowRef: MockWindowRef;
+  let topicEditorRoutingService: TopicEditorRoutingService;
+  let topicRightsBackendApiService: TopicRightsBackendApiService;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
   let undoRedoChangeAppliedEventEmitter = new EventEmitter();
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
+  beforeEach(waitForAsync(() => {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        TopicEditorNavbarComponent,
+        TopicEditorSaveModalComponent,
+        TopicEditorSendMailComponent
+      ],
+      providers: [
+        TopicEditorStateService,
+        UrlService,
+        UndoRedoService,
+        TopicRightsBackendApiService,
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    let mockWindow = {
-      location: '',
-      open: () => {}
-    };
-    $provide.value('$window', mockWindow);
-  }));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopicEditorNavbarComponent);
+    componentInstance = fixture.componentInstance;
+    topicEditorStateService = TestBed.inject(TopicEditorStateService);
+    ngbModal = TestBed.inject(NgbModal);
+    topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
+    urlService = TestBed.inject(UrlService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    alertsService = TestBed.inject(AlertsService);
+    topicRightsBackendApiService =
+      TestBed.inject(TopicRightsBackendApiService);
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    ngbModal = $injector.get('NgbModal');
-    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
-    UrlService = $injector.get('UrlService');
-    UndoRedoService = $injector.get('UndoRedoService');
-    $window = $injector.get('$window');
-    AlertsService = $injector.get('AlertsService');
-    TopicRightsBackendApiService =
-      $injector.get('TopicRightsBackendApiService');
-    $uibModal = $injector.get('$uibModal');
-    ngbModal = $injector.get('NgbModal');
-
-    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
+    let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');
     let skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
-    topic = TopicObjectFactory.createInterstitialTopic();
+    topic = topicObjectFactory.createInterstitialTopic();
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
     topic._skillSummariesForDiagnosticTest = [skillSummary];
-
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('topicEditorNavbar', {
-      $scope: $scope
-    });
-  }));
+  });
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    componentInstance.ngOnDestroy();
+    fixture.destroy();
   });
 
   it('should initialise when user open the topic editor', () => {
-    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
 
-    ctrl.$onInit();
+    componentInstance.ngOnInit();
 
-    expect($scope.topicId).toBe('topic_1');
-    expect($scope.navigationChoices).toEqual(['Topic', 'Questions', 'Preview']);
-    expect($scope.activeTab).toEqual('Editor');
-    expect($scope.showNavigationOptions).toBeFalse();
-    expect($scope.warningsAreShown).toBeFalse();
-    expect($scope.showTopicEditOptions).toBeFalse();
-    expect($scope.topic).toEqual(topic);
-    expect($scope.topicSkillIds).toEqual(['skill_1']);
-    expect($scope.discardChangesButtonIsShown).toBeFalse();
-    expect($scope.validationIssues).toEqual([]);
-    expect($scope.topicRights).toEqual(
+    expect(componentInstance.topicId).toBe('topic_1');
+    expect(componentInstance.navigationChoices).toEqual(
+      ['Topic', 'Questions', 'Preview']);
+    expect(componentInstance.activeTab).toEqual('Editor');
+    expect(componentInstance.showNavigationOptions).toBeFalse();
+    expect(componentInstance.warningsAreShown).toBeFalse();
+    expect(componentInstance.showTopicEditOptions).toBeFalse();
+    expect(componentInstance.topic).toEqual(topic);
+    expect(componentInstance.topicSkillIds).toEqual(['skill_1']);
+    expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
+    expect(componentInstance.validationIssues).toEqual([]);
+    expect(componentInstance.topicRights).toEqual(
       TopicRights.createInterstitialRights()
     );
   });
 
   it('should validate topic when topic is initialised', () => {
-    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOnProperty(topicEditorStateService, 'onTopicInitialized').and
       .returnValue(topicInitializedEventEmitter);
-    spyOn(TopicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
       false);
-    spyOn(TopicEditorStateService, 'getTopicWithUrlFragmentExists').and
+    spyOn(topicEditorStateService, 'getTopicWithUrlFragmentExists').and
       .returnValue(false);
-    ctrl.$onInit();
+    componentInstance.ngOnInit();
 
-    expect($scope.validationIssues).toEqual([]);
-    expect($scope.prepublishValidationIssues).toEqual([]);
+    expect(componentInstance.validationIssues).toEqual([]);
+    expect(componentInstance.prepublishValidationIssues).toEqual([]);
 
     topicInitializedEventEmitter.emit();
 
-    expect($scope.validationIssues).toEqual([
+    expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.'
     ]);
-    expect($scope.prepublishValidationIssues).toEqual([
+    expect(componentInstance.prepublishValidationIssues).toEqual([
       'Topic should have a thumbnail.',
       'Subtopic with title subtopic1 does not have any skill IDs linked.',
       'Topic should have page title fragment.',
@@ -147,27 +171,27 @@ describe('topicEditorNavbar', () => {
   });
 
   it('should validate topic when topic is reinitialised', () => {
-    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOnProperty(TopicEditorStateService, 'onTopicReinitialized').and
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOnProperty(topicEditorStateService, 'onTopicReinitialized').and
       .returnValue(topicReinitializedEventEmitter);
-    spyOn(TopicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
       true);
-    spyOn(TopicEditorStateService, 'getTopicWithUrlFragmentExists').and
+    spyOn(topicEditorStateService, 'getTopicWithUrlFragmentExists').and
       .returnValue(true);
-    ctrl.$onInit();
+    componentInstance.ngOnInit();
 
-    expect($scope.validationIssues).toEqual([]);
-    expect($scope.prepublishValidationIssues).toEqual([]);
+    expect(componentInstance.validationIssues).toEqual([]);
+    expect(componentInstance.prepublishValidationIssues).toEqual([]);
 
     topicReinitializedEventEmitter.emit();
 
-    expect($scope.validationIssues).toEqual([
+    expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.',
       'A topic with this name already exists.',
       'Topic URL fragment already exists.'
     ]);
-    expect($scope.prepublishValidationIssues).toEqual([
+    expect(componentInstance.prepublishValidationIssues).toEqual([
       'Topic should have a thumbnail.',
       'Subtopic with title subtopic1 does not have any skill IDs linked.',
       'Topic should have page title fragment.',
@@ -177,25 +201,25 @@ describe('topicEditorNavbar', () => {
   });
 
   it('should validate topic when user undo or redo changes', () => {
-    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOn(UndoRedoService, 'getUndoRedoChangeEventEmitter').and
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(undoRedoService, 'getUndoRedoChangeEventEmitter').and
       .returnValue(undoRedoChangeAppliedEventEmitter);
-    spyOn(TopicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
       false);
-    spyOn(TopicEditorStateService, 'getTopicWithUrlFragmentExists').and
+    spyOn(topicEditorStateService, 'getTopicWithUrlFragmentExists').and
       .returnValue(false);
-    ctrl.$onInit();
+    componentInstance.ngOnInit();
 
-    expect($scope.validationIssues).toEqual([]);
-    expect($scope.prepublishValidationIssues).toEqual([]);
+    expect(componentInstance.validationIssues).toEqual([]);
+    expect(componentInstance.prepublishValidationIssues).toEqual([]);
 
     undoRedoChangeAppliedEventEmitter.emit();
 
-    expect($scope.validationIssues).toEqual([
+    expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.'
     ]);
-    expect($scope.prepublishValidationIssues).toEqual([
+    expect(componentInstance.prepublishValidationIssues).toEqual([
       'Topic should have a thumbnail.',
       'Subtopic with title subtopic1 does not have any skill IDs linked.',
       'Topic should have page title fragment.',
@@ -205,347 +229,314 @@ describe('topicEditorNavbar', () => {
   });
 
   it('should return true when topic saving is in progress', () => {
-    spyOn(TopicEditorStateService, 'isSavingTopic').and.returnValue(true);
+    spyOn(topicEditorStateService, 'isSavingTopic').and.returnValue(true);
 
-    expect($scope.isSaveInProgress()).toBeTrue();
+    expect(componentInstance.isSaveInProgress()).toBeTrue();
   });
 
   it('should return false when topic saving is not in progress', () => {
-    spyOn(TopicEditorStateService, 'isSavingTopic').and.returnValue(false);
+    spyOn(topicEditorStateService, 'isSavingTopic').and.returnValue(false);
 
-    expect($scope.isSaveInProgress()).toBeFalse();
+    expect(componentInstance.isSaveInProgress()).toBeFalse();
   });
 
   it('should return active tab name when called', () => {
-    spyOn(TopicEditorRoutingService, 'getActiveTabName').and
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and
       .returnValue('topic_editor');
 
-    expect($scope.getActiveTabName()).toBe('topic_editor');
+    expect(componentInstance.getActiveTabName()).toBe('topic_editor');
   });
 
   it('should navigate to main tab when user clicks the \'Editor\' ' +
   'option', () => {
-    spyOn(TopicEditorRoutingService, 'navigateToMainTab');
-    $scope.activeTab = 'Question';
-    $scope.showNavigationOptions = true;
+    spyOn(topicEditorRoutingService, 'navigateToMainTab');
+    componentInstance.activeTab = 'Question';
+    componentInstance.showNavigationOptions = true;
 
-    $scope.selectMainTab();
+    componentInstance.selectMainTab();
 
-    expect($scope.activeTab).toBe('Editor');
-    expect($scope.showNavigationOptions).toBe(false);
-    expect(TopicEditorRoutingService.navigateToMainTab).toHaveBeenCalled();
+    expect(componentInstance.activeTab).toBe('Editor');
+    expect(componentInstance.showNavigationOptions).toBe(false);
+    expect(topicEditorRoutingService.navigateToMainTab).toHaveBeenCalled();
   });
 
   it('should navigate to main tab when user clicks the \'Questions\' ' +
   'option', () => {
-    spyOn(TopicEditorRoutingService, 'navigateToQuestionsTab');
-    $scope.activeTab = 'Editor';
-    $scope.showNavigationOptions = true;
+    spyOn(topicEditorRoutingService, 'navigateToQuestionsTab');
+    componentInstance.activeTab = 'Editor';
+    componentInstance.showNavigationOptions = true;
 
-    $scope.selectQuestionsTab();
+    componentInstance.selectQuestionsTab();
 
-    expect($scope.activeTab).toBe('Question');
-    expect($scope.showNavigationOptions).toBe(false);
-    expect(TopicEditorRoutingService.navigateToQuestionsTab).toHaveBeenCalled();
+    expect(componentInstance.activeTab).toBe('Question');
+    expect(componentInstance.showNavigationOptions).toBe(false);
+    expect(topicEditorRoutingService.navigateToQuestionsTab).toHaveBeenCalled();
   });
 
   it('should open topic viewer when user clicks the \'preview\' button', () => {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
-    spyOn(TopicEditorRoutingService, 'getActiveTabName').and
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and
       .returnValue('topic_editor');
-    spyOn(TopicEditorStateService, 'getClassroomUrlFragment').and
+    spyOn(topicEditorStateService, 'getClassroomUrlFragment').and
       .returnValue('classroom_url');
-    spyOn($window, 'open');
-    $scope.topic = topic;
+    spyOn(windowRef.nativeWindow, 'open');
+    componentInstance.topic = topic;
 
-    $scope.openTopicViewer();
+    componentInstance.openTopicViewer();
 
-    expect($window.open).toHaveBeenCalledWith(
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
       '/learn/classroom_url/Url%20Fragment%20loading', 'blank');
   });
 
   it('should alert user to save changes when user clicks the ' +
   '\'preview\' button with unsaved changes', () => {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    spyOn(TopicEditorRoutingService, 'getActiveTabName').and
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and
       .returnValue('topic_editor');
-    spyOn(AlertsService, 'addInfoMessage');
-    $scope.topic = topic;
+    spyOn(alertsService, 'addInfoMessage');
+    componentInstance.topic = topic;
 
-    $scope.openTopicViewer();
+    componentInstance.openTopicViewer();
 
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'Please save all pending changes to preview the topic ' +
       'with the changes', 2000);
   });
 
   it('should open subtopic preview when user clicks the \'preview\' ' +
   'button in the subtopic editor page', () => {
-    spyOn(TopicEditorRoutingService, 'getActiveTabName').and
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and
       .returnValue('subtopic_editor');
-    spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl').and
-      .returnValue('subtopicId');
-    spyOn(TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
-    $scope.topic = topic;
+    spyOn(topicEditorRoutingService, 'getSubtopicIdFromUrl').and
+      .returnValue(1);
+    spyOn(topicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+    componentInstance.topic = topic;
 
-    $scope.openTopicViewer();
+    componentInstance.openTopicViewer();
 
-    expect($scope.activeTab).toBe('Preview');
-    expect(TopicEditorRoutingService.navigateToSubtopicPreviewTab)
-      .toHaveBeenCalledWith('subtopicId');
+    expect(componentInstance.activeTab).toBe('Preview');
+    expect(topicEditorRoutingService.navigateToSubtopicPreviewTab)
+      .toHaveBeenCalledWith(1);
   });
-
-  it('should publish topic when user clicks the \'publish\' button',
-    fakeAsync(() => {
-      spyOn(TopicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
-        Promise.resolve());
-      spyOn(AlertsService, 'addSuccessMessage');
-      $scope.topicRights = TopicRights.createFromBackendDict({
-        published: false,
-        can_publish_topic: true,
-        can_edit_topic: true
-      });
-
-      $scope.publishTopic();
-      tick();
-
-      expect(AlertsService.addSuccessMessage)
-        .toHaveBeenCalledWith('Topic published.', 1000);
-      expect($scope.topicRights.isPublished()).toBeTrue();
-      expect($window.location).toBe('/topics-and-skills-dashboard');
-    }));
-
-  it('should send email when user who doesn\'t have publishing rights' +
-  ' clicks the \'publish\' button', fakeAsync(() => {
-    spyOn(TopicRightsBackendApiService, 'sendMailAsync').and.returnValue(
-      Promise.resolve());
-    spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.resolve()
-    });
-    spyOn(AlertsService, 'addSuccessMessage');
-    $scope.topicRights = TopicRights.createFromBackendDict({
-      published: false,
-      can_publish_topic: false,
-      can_edit_topic: true
-    });
-
-    $scope.publishTopic();
-    tick();
-
-    expect(AlertsService.addSuccessMessage)
-      .toHaveBeenCalledWith('Mail Sent.', 1000);
-  }));
 
   it('should not send email when user who doesn\'t have publishing rights' +
   ' clicks the \'publish\' button and then cancels', fakeAsync(() => {
-    spyOn(TopicRightsBackendApiService, 'sendMailAsync').and.returnValue(
+    spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
       Promise.resolve());
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: Promise.reject()
       } as NgbModalRef
     );
-    spyOn(AlertsService, 'addSuccessMessage');
-    $scope.topicRights = TopicRights.createFromBackendDict({
+    spyOn(alertsService, 'addSuccessMessage');
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: false,
       can_publish_topic: false,
       can_edit_topic: true
     });
 
-    $scope.publishTopic();
+    componentInstance.publishTopic();
     tick();
 
-    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
   it('should discard changes when user clicks \'Discard Changes\'' +
   ' button', () => {
-    spyOn(TopicEditorStateService, 'loadTopic');
-    spyOn(UndoRedoService, 'clearChanges');
-    $scope.discardChangesButtonIsShown = true;
-    $scope.topicId = 'topicId';
+    spyOn(topicEditorStateService, 'loadTopic');
+    spyOn(undoRedoService, 'clearChanges');
+    componentInstance.discardChangesButtonIsShown = true;
+    componentInstance.topicId = 'topicId';
 
-    $scope.discardChanges();
+    componentInstance.discardChanges();
 
-    expect(UndoRedoService.clearChanges).toHaveBeenCalled();
-    expect($scope.discardChangesButtonIsShown).toBe(false);
-    expect(TopicEditorStateService.loadTopic).toHaveBeenCalledWith('topicId');
+    expect(undoRedoService.clearChanges).toHaveBeenCalled();
+    expect(componentInstance.discardChangesButtonIsShown).toBe(false);
+    expect(topicEditorStateService.loadTopic).toHaveBeenCalledWith('topicId');
   });
 
   it('should return the number of changes when called', () => {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
-    expect($scope.getChangeListLength()).toBe(1);
+    expect(componentInstance.getChangeListLength()).toBe(1);
   });
 
   it('should return true when user can save topic', () => {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    $scope.topicRights = TopicRights.createFromBackendDict({
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: false,
       can_publish_topic: true,
       can_edit_topic: true
     });
-    $scope.validationIssues = [];
-    $scope.prepublishValidationIssues = [];
+    componentInstance.validationIssues = [];
+    componentInstance.prepublishValidationIssues = [];
 
-    expect($scope.isTopicSaveable()).toBeTrue();
+    expect(componentInstance.isTopicSaveable()).toBeTrue();
   });
 
   it('should return false when there are no changes', () => {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
-    $scope.topicRights = TopicRights.createFromBackendDict({
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: false,
       can_publish_topic: true,
       can_edit_topic: true
     });
-    $scope.validationIssues = [];
-    $scope.prepublishValidationIssues = [];
+    componentInstance.validationIssues = [];
+    componentInstance.prepublishValidationIssues = [];
 
-    expect($scope.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBeFalse();
   });
 
   it('should return false when topic has wranings', () => {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    $scope.topicRights = TopicRights.createFromBackendDict({
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true
     });
-    $scope.validationIssues = ['warn1'];
-    $scope.prepublishValidationIssues = [];
+    componentInstance.validationIssues = ['warn1'];
+    componentInstance.prepublishValidationIssues = [];
 
-    expect($scope.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBeFalse();
   });
 
   it('should return false when topic has pre publish validation issues', () => {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    $scope.topicRights = TopicRights.createFromBackendDict({
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true
     });
-    $scope.validationIssues = [];
-    $scope.prepublishValidationIssues = ['warn1'];
+    componentInstance.validationIssues = [];
+    componentInstance.prepublishValidationIssues = ['warn1'];
 
-    expect($scope.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBeFalse();
   });
 
   it('should show discard button when changes are present', () => {
-    $scope.showTopicEditOptions = true;
-    $scope.discardChangesButtonIsShown = false;
+    componentInstance.showTopicEditOptions = true;
+    componentInstance.discardChangesButtonIsShown = false;
 
-    $scope.toggleDiscardChangeButton();
+    componentInstance.toggleDiscardChangeButton();
 
-    expect($scope.showTopicEditOptions).toBeFalse();
-    expect($scope.discardChangesButtonIsShown).toBeTrue();
+    expect(componentInstance.showTopicEditOptions).toBeFalse();
+    expect(componentInstance.discardChangesButtonIsShown).toBeTrue();
   });
 
   it('should disable discard button when changes are present', () => {
-    $scope.showTopicEditOptions = true;
-    $scope.discardChangesButtonIsShown = true;
+    componentInstance.showTopicEditOptions = true;
+    componentInstance.discardChangesButtonIsShown = true;
 
-    $scope.toggleDiscardChangeButton();
+    componentInstance.toggleDiscardChangeButton();
 
-    expect($scope.showTopicEditOptions).toBeFalse();
-    expect($scope.discardChangesButtonIsShown).toBeFalse();
+    expect(componentInstance.showTopicEditOptions).toBeFalse();
+    expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
   });
 
   it('should save topic when user saves topic changes', fakeAsync(() => {
     const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return ({
-        componentInstance: NgbModalRef,
+        componentInstance: {
+          topicIsPublished: true
+        },
         result: Promise.resolve('commitMessage')
       } as NgbModalRef);
     });
-    TopicEditorStateService.setTopic(topic);
-    $scope.topicRights = TopicRights.createFromBackendDict({
+    topicEditorStateService.setTopic(topic);
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true
     });
-    spyOn(AlertsService, 'addSuccessMessage');
-    spyOn(TopicEditorStateService, 'saveTopic').and.callFake(
-      (msg, callback) => {
-        callback();
-        expect(msg).toBe('commitMessage');
+    spyOn(alertsService, 'addSuccessMessage');
+    spyOn(topicEditorStateService, 'saveTopic').and.callFake(
+      // This throws "Cannot set properties of undefined (setting
+      // 'topicIsPublished')". We need to suppress this error because
+      // we can't return a true value here for spyOn.
+      // @ts-ignore
+      (commitMessage: string, successCallback: () => void) => {
+        successCallback();
+        expect(commitMessage).toBe('commitMessage');
       });
-    $scope.saveChanges();
+    componentInstance.saveChanges();
     tick();
 
     expect(modalspy).toHaveBeenCalled();
-    expect(AlertsService.addSuccessMessage)
+    expect(alertsService.addSuccessMessage)
       .toHaveBeenCalledWith('Changes Saved.');
   }));
 
   it('should close save topic modal when user clicks cancel', fakeAsync(() => {
     const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return ({
-        componentInstance: NgbModalRef,
+        componentInstance: {
+          topicIsPublished: true
+        },
         result: Promise.reject()
       } as NgbModalRef);
     });
-    TopicEditorStateService.setTopic(topic);
-    $scope.topicRights = TopicRights.createFromBackendDict({
+    topicEditorStateService.setTopic(topic);
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true
     });
-    spyOn(AlertsService, 'addSuccessMessage');
-    $scope.saveChanges();
+    spyOn(alertsService, 'addSuccessMessage');
+    componentInstance.saveChanges();
     tick();
 
     expect(modalspy).toHaveBeenCalled();
-    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
   it('should toggle navigation option when user clicks the drop down' +
   ' button next to navigation options in mobile', () => {
-    $scope.showNavigationOptions = true;
+    componentInstance.showNavigationOptions = true;
 
-    $scope.toggleNavigationOptions();
+    componentInstance.toggleNavigationOptions();
 
-    expect($scope.showNavigationOptions).toBeFalse();
+    expect(componentInstance.showNavigationOptions).toBeFalse();
 
-    $scope.toggleNavigationOptions();
+    componentInstance.toggleNavigationOptions();
 
-    expect($scope.showNavigationOptions).toBeTrue();
+    expect(componentInstance.showNavigationOptions).toBeTrue();
   });
 
   it('should toggle topic edit option when user clicks the drop down' +
   ' button next to topic edit options in mobile', () => {
-    $scope.showTopicEditOptions = true;
+    componentInstance.showTopicEditOptions = true;
 
-    $scope.toggleTopicEditOptions();
+    componentInstance.toggleTopicEditOptions();
 
-    expect($scope.showTopicEditOptions).toBeFalse();
+    expect(componentInstance.showTopicEditOptions).toBeFalse();
 
-    $scope.toggleTopicEditOptions();
+    componentInstance.toggleTopicEditOptions();
 
-    expect($scope.showTopicEditOptions).toBeTrue();
+    expect(componentInstance.showTopicEditOptions).toBeTrue();
   });
 
   it('should toggle warnings when user clicks the warning symbol in' +
   ' mobile', () => {
-    $scope.warningsAreShown = true;
+    componentInstance.warningsAreShown = true;
 
-    $scope.toggleWarningText();
+    componentInstance.toggleWarningText();
 
-    expect($scope.warningsAreShown).toBeFalse();
+    expect(componentInstance.warningsAreShown).toBeFalse();
 
-    $scope.toggleWarningText();
+    componentInstance.toggleWarningText();
 
-    expect($scope.warningsAreShown).toBeTrue();
+    expect(componentInstance.warningsAreShown).toBeTrue();
   });
 
   it('should validate topic when called', () => {
-    $scope.topic = topic;
+    componentInstance.topic = topic;
 
-    $scope._validateTopic();
+    componentInstance._validateTopic();
 
-    expect($scope.validationIssues).toEqual([
+    expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.'
     ]);
-    expect($scope.prepublishValidationIssues).toEqual([
+    expect(componentInstance.prepublishValidationIssues).toEqual([
       'Topic should have a thumbnail.',
       'Subtopic with title subtopic1 does not have any skill IDs linked.',
       'Topic should have page title fragment.',
@@ -555,12 +546,12 @@ describe('topicEditorNavbar', () => {
   });
 
   it('should return the total number of warnings when called', () => {
-    $scope.topic = topic;
-    $scope._validateTopic();
-    expect($scope.validationIssues).toEqual([
+    componentInstance.topic = topic;
+    componentInstance._validateTopic();
+    expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.'
     ]);
-    expect($scope.prepublishValidationIssues).toEqual([
+    expect(componentInstance.prepublishValidationIssues).toEqual([
       'Topic should have a thumbnail.',
       'Subtopic with title subtopic1 does not have any skill IDs linked.',
       'Topic should have page title fragment.',
@@ -568,27 +559,28 @@ describe('topicEditorNavbar', () => {
       'Subtopic subtopic1 should have a thumbnail.'
     ]);
 
-    expect($scope.getTotalWarningsCount()).toBe(6);
+    expect(componentInstance.getTotalWarningsCount()).toBe(6);
   });
 
   it('should unpublish topic when user clicks the \'Unpublish\' button',
     fakeAsync(() => {
-      $scope.topicRights = TopicRights.createFromBackendDict({
+      componentInstance.topicRights = TopicRights.createFromBackendDict({
         published: true,
         can_publish_topic: true,
         can_edit_topic: true
       });
-      $scope.showTopicEditOptions = true;
-      spyOn(TopicRightsBackendApiService, 'unpublishTopicAsync').and
-        .returnValue(Promise.resolve());
-      spyOn(TopicEditorStateService, 'setTopicRights');
+      componentInstance.showTopicEditOptions = true;
+      spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and
+        .returnValue(
+          Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
+      spyOn(topicEditorStateService, 'setTopicRights');
 
-      $scope.unpublishTopic();
+      componentInstance.unpublishTopic();
       tick();
 
-      expect($scope.showTopicEditOptions).toBeFalse();
-      expect($scope.topicRights.isPublished()).toBe(false);
-      expect(TopicEditorStateService.setTopicRights).toHaveBeenCalledWith(
+      expect(componentInstance.showTopicEditOptions).toBeFalse();
+      expect(componentInstance.topicRights.isPublished()).toBe(false);
+      expect(topicEditorStateService.setTopicRights).toHaveBeenCalledWith(
         TopicRights.createFromBackendDict({
           published: false,
           can_publish_topic: true,
@@ -599,17 +591,63 @@ describe('topicEditorNavbar', () => {
 
   it('should not unpublish topic if topic has not been published',
     fakeAsync(() => {
-      $scope.topicRights = TopicRights.createFromBackendDict({
+      componentInstance.topicRights = TopicRights.createFromBackendDict({
         published: false,
         can_publish_topic: false,
         can_edit_topic: true
       });
-      spyOn(TopicRightsBackendApiService, 'unpublishTopicAsync').and
-        .returnValue(Promise.resolve());
+      spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and
+        .returnValue(
+          Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
 
-      $scope.unpublishTopic();
+      componentInstance.unpublishTopic();
       tick();
 
-      expect($scope.topicRights.isPublished()).toBe(false);
+      expect(componentInstance.topicRights.isPublished()).toBe(false);
     }));
+
+  it('should publish topic when user clicks the \'publish\' button',
+    fakeAsync(() => {
+      spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
+        Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
+      spyOn(alertsService, 'addSuccessMessage');
+      componentInstance.topicRights = TopicRights.createFromBackendDict({
+        published: false,
+        can_publish_topic: true,
+        can_edit_topic: true
+      });
+
+      componentInstance.publishTopic();
+      tick(100);
+
+      expect(alertsService.addSuccessMessage)
+        .toHaveBeenCalledWith('Topic published.', 1000);
+      expect(componentInstance.topicRights.isPublished()).toBeTrue();
+      expect(
+        windowRef.nativeWindow.location.href).toBe(
+        '/topics-and-skills-dashboard');
+    }));
+
+  it('should send email when user who doesn\'t have publishing rights' +
+  ' clicks the \'publish\' button', fakeAsync(() => {
+    spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
+      Promise.resolve());
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.resolve('success')
+      } as NgbModalRef);
+    });
+    spyOn(alertsService, 'addSuccessMessage');
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: true
+    });
+
+    componentInstance.publishTopic();
+    tick(100);
+
+    expect(alertsService.addSuccessMessage)
+      .toHaveBeenCalledWith('Mail Sent.', 1000);
+  }));
 });
