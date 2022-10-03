@@ -49,7 +49,7 @@ WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
 MERGE_STEP = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
     'backend_tests.yml', 'pending-review-notification.yml',
-    'revert-web-wiki-updates.yml')
+    'revert-web-wiki-updates.yml', 'frontend_tests.yml')
 
 THIRD_PARTY_LIBS = [
     {
@@ -289,12 +289,8 @@ class CustomLintChecksManager:
         """
         jobs_without_merge = []
         for job, job_dict in workflow_dict['jobs'].items():
-            # Ensure that atleast 1 job in a workflow uses the merge action.
             if MERGE_STEP not in job_dict['steps']:
                 jobs_without_merge.append(job)
-            else:
-                jobs_without_merge = []
-                break
         error_messages = [
             '%s --> Job %s does not use the .github/actions/merge action.' % (
                 workflow_path, job)
