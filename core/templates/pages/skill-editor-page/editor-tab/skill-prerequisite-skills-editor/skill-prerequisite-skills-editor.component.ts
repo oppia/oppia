@@ -49,6 +49,7 @@ implements OnInit {
   prerequisiteSkillsAreShown: boolean = false;
   allAvailableSkills: SkillSummary[] = [];
   directiveSubscriptions = new Subscription();
+  windowIsNarrow!: boolean;
 
   constructor(
     private skillUpdateService: SkillUpdateService,
@@ -137,9 +138,11 @@ implements OnInit {
   }
 
   ngOnInit(): void {
+    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionsService.getResizeEvent().subscribe(
         () => {
+          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
           this.prerequisiteSkillsAreShown = (
             !this.windowDimensionsService.isWindowNarrow());
         }

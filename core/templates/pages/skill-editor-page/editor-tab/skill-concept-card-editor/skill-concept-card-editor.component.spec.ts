@@ -285,7 +285,6 @@ describe('Skill Concept Card Editor Component', () => {
 
   it('should toggle worked example on clicking', () => {
     component.workedExamplesListIsShown = true;
-    mockEventEmitter.emit();
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
@@ -300,7 +299,6 @@ describe('Skill Concept Card Editor Component', () => {
 
   it('should toggle skill editor card on clicking', () => {
     component.skillEditorCardIsShown = true;
-    mockEventEmitter.emit();
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
@@ -317,5 +315,20 @@ describe('Skill Concept Card Editor Component', () => {
     let result = component.getWorkedExampleSummary('<p>Worked Example</p>');
 
     expect(result).toBe('Worked Example');
+  });
+
+  it('should check if window is narrow when user resizes window', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+      mockEventEmitter);
+
+    expect(component.workedExamplesListIsShown).toBeFalse();
+
+    component.windowIsNarrow = true;
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.windowIsNarrow).toBeFalse();
   });
 });

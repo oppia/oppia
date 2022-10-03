@@ -46,6 +46,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   activeMisconceptionIndex!: number | null;
   misconceptionsListIsShown: boolean = false;
   isEditable: boolean = true;
+  windowIsNarrow!: boolean;
 
   constructor(
     private ngbModal: NgbModal,
@@ -55,9 +56,11 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionsService.getResizeEvent().subscribe(
         () => {
+          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
           this.misconceptionsListIsShown = (
             !this.windowDimensionsService.isWindowNarrow());
         }

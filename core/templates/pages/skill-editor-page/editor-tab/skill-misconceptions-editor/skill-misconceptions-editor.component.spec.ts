@@ -45,6 +45,7 @@ describe('Skill Misconceptions Editor Component', () => {
   let testSubscriptions: Subscription;
   const skillChangeSpy = jasmine.createSpy('saveOutcomeDestDetails');
   let resizeEvent = new Event('resize');
+  let mockEventEmitter = new EventEmitter();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -231,5 +232,20 @@ describe('Skill Misconceptions Editor Component', () => {
     component.changeActiveMisconceptionIndex(1);
 
     expect(component.activeMisconceptionIndex).toBe(null);
+  });
+
+  it('should check if window is narrow when user resizes window', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+      mockEventEmitter);
+
+    expect(component.misconceptionsListIsShown).toBeFalse();
+
+    component.windowIsNarrow = true;
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.windowIsNarrow).toBeFalse();
   });
 });

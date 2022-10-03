@@ -186,4 +186,19 @@ describe('Skill Rubrics Editor Component', () => {
       expect(component.rubricsListIsShown).toBeTrue();
     });
   });
+
+  it('should check if window is narrow when user resizes window', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+      mockEventEmitter);
+
+    expect(component.rubricsListIsShown).toBeFalse();
+
+    component.windowIsNarrow = true;
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.windowIsNarrow).toBeFalse();
+  });
 });

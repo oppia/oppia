@@ -17,7 +17,7 @@
  * @fileoverview Unit tests for the skill prerequisite skills editor.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { SkillPrerequisiteSkillsEditorComponent } from './skill-prerequisite-skills-editor.component';
@@ -48,6 +48,7 @@ describe('Skill editor main tab Component', () => {
   let sampleSkill: Skill;
   let skillSummaryDict: SkillSummaryBackendDict;
   let resizeEvent = new Event('resize');
+  let mockEventEmitter = new EventEmitter();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -413,5 +414,20 @@ describe('Skill editor main tab Component', () => {
 
       expect(modalSpy).toHaveBeenCalled();
     }));
+  });
+
+  it('should check if window is narrow when user resizes window', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+      mockEventEmitter);
+
+    expect(component.prerequisiteSkillsAreShown).toBeFalse();
+
+    component.windowIsNarrow = true;
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.windowIsNarrow).toBeFalse();
   });
 });

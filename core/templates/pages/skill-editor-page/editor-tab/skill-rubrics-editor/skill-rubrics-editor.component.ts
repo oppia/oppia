@@ -37,6 +37,7 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   rubrics!: Rubric[];
   rubricsListIsShown: boolean = false;
   directiveSubscriptions = new Subscription();
+  windowIsNarrow: boolean;
 
   constructor(
     private skillEditorStateService: SkillEditorStateService,
@@ -56,10 +57,12 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     if (this.windowDimensionsService.getResizeEvent) {
       this.directiveSubscriptions.add(
         this.windowDimensionsService.getResizeEvent().subscribe(
           () => {
+            this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
             this.rubricsListIsShown = (
               !this.windowDimensionsService.isWindowNarrow());
           }
