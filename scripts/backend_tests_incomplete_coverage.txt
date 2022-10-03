@@ -1,10 +1,5 @@
 core.controllers.acl_decorators_test
 core.controllers.base_test
-core.controllers.blog_admin_test
-core.controllers.blog_homepage_test
-core.controllers.classroom_test
-core.controllers.contributor_dashboard_admin_test
-core.controllers.contributor_dashboard_test
 core.controllers.creator_dashboard_test
 core.controllers.domain_objects_validator_test
 core.controllers.editor_test

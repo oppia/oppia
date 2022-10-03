@@ -111,7 +111,7 @@ class ContributionRightsHandler(base.BaseHandler):
                     'User %s already has rights to review question.' % (
                         username))
             user_services.allow_user_to_review_question(user_id)
-        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
+        else:
             if user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to submit question.' % (
@@ -153,8 +153,7 @@ class ContributionRightsHandler(base.BaseHandler):
                     '%s does not have rights to review question.' % (
                         username))
             user_services.remove_question_review_rights(user_id)
-        elif category == (
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
+        else:
             if not user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     '%s does not have rights to submit question.' % (

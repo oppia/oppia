@@ -980,6 +980,9 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 })], 'Changes.')
 
     def test_handler_with_invalid_language_code_raise_exception(self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.owner_id, 'hi')
+        self.login(self.OWNER_EMAIL)
         self.get_json('/gettranslatabletexthandler', params={
             'language_code': 'hi',
             'exp_id': '0'
@@ -1013,7 +1016,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'state_name': 'Introduction',
                 'new_value': {
                     'content_id': 'content',
-                    'html': '<p>A content to translate.</p>'
+                    'image': ''
                 }
             })], 'Changes content.')
 
@@ -1028,8 +1031,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'Introduction': {
                     'content': {
                         'content': (
-                            '<p>A content to translate.</p>'),
-                        'data_format': 'html',
+                            ''),
+                        'data_format': 'image',
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None
@@ -1694,9 +1697,11 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -1769,6 +1774,23 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
+
+    def test_stats_for_new_user_are_empty(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        class MockStats:
+            translation_contribution_stats = None
+            translation_review_stats = None
+            question_contribution_stats = None
+            question_review_stats = None
+        
+        swap_get_stats = self.swap_with_checks(
+            suggestion_services, 'get_all_contributor_stats',
+            lambda _: MockStats(), expected_args=((self.new_user_id,),))
+
+        with swap_get_stats:
+            response = self.get_json(
+                '/contributorallstatssummaries/%s' % self.NEW_USER_USERNAME)
+        self.assertEqual(response, {})
 
     def test_get_all_stats(self):
         self.login(self.OWNER_EMAIL)

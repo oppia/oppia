@@ -62,6 +62,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
+        topic_id_3 = topic_fetchers.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
             topic_id_1, 'private_topic_name',
             'private-topic-name', 'description', 'fragm')
@@ -86,7 +87,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{
             'name': 'math',
-            'topic_ids': [topic_id_1, topic_id_2],
+            'topic_ids': [topic_id_1, topic_id_2, topic_id_3],
             'course_details': 'Course details for classroom.',
             'topic_list_intro': 'Topics covered for classroom',
             'url_fragment': 'math',

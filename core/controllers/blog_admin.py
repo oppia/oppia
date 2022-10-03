@@ -116,8 +116,7 @@ class BlogAdminHandler(base.BaseHandler):
             logging.info(
                 '[BLOG ADMIN] %s saved config property values: %s' %
                 (self.user_id, new_config_property_values))
-        elif self.normalized_payload.get(
-                'action') == 'revert_config_property':
+        else:
             config_property_id = (
                 self.normalized_payload.get('config_property_id'))
             config_services.revert_property(

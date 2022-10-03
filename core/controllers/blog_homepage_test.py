@@ -44,15 +44,6 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
-        blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
-        self.change_dict = {
-            'title': 'Sample Title',
-            'thumbnail_filename': 'thumbnail.svg',
-            'content': '<p>Hello Bloggers<p>',
-            'tags': ['Newsletter', 'Learners']
-        }
-        blog_services.update_blog_post(blog_post.id, self.change_dict)
-        blog_services.publish_blog_post(blog_post.id)
 
     def test_get_homepage_data(self):
         self.login(self.user_email)
@@ -62,6 +53,18 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         default_tags = config_domain.Registry.get_config_property(
             'list_of_default_tags_for_blog_post').value
         self.assertEqual(default_tags, json_response['list_of_default_tags'])
+        self.assertEqual(json_response['blog_post_summary_dicts'], [])
+        blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
+        self.change_dict = {
+            'title': 'Sample Title',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': '<p>Hello Bloggers<p>',
+            'tags': ['Newsletter', 'Learners']
+        }
+        blog_services.update_blog_post(blog_post.id, self.change_dict)
+        blog_services.publish_blog_post(blog_post.id)
+        json_response = self.get_json(
+            '%s' % (feconf.BLOG_HOMEPAGE_DATA_URL),)
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
             json_response['blog_post_summary_dicts'][0]['author_name'])
