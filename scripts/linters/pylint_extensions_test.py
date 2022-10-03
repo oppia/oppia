@@ -1472,10 +1472,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         valid_indentation_with_kw_args_node = astroid.extract_node(
         """
         def func( #@
-            test_var_one, 
-            *, 
+            test_var_one,
+            *,
             test_var_two
-        ): 
+        ):
             \"\"\"Function to test docstring parameters.
 
             Args:
