@@ -4070,7 +4070,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 # In `HasElementXBeforeElementY` rule, `X` value
                 # should not be equal to `Y` value.
                 elif (
-                    rule_spec['rule_type'] =='HasElementXBeforeElementY' and
+                    rule_spec['rule_type'] == 'HasElementXBeforeElementY' and
                     rule_spec['inputs']['x'] == rule_spec['inputs']['y']
                 ):
                     invalid_rules.append(rule_spec)
@@ -4367,10 +4367,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('filepath-with-value'):
                 tag.decompose()
                 continue
-            else:
-                if tag['filepath-with-value'] in empty_values:
-                    tag.decompose()
-                    continue
+
+            if tag['filepath-with-value'] in empty_values:
+                tag.decompose()
+                continue
 
             if not tag.has_attr('caption-with-value'):
                 tag['caption-with-value'] = '&quot;&quot;'
@@ -4379,24 +4379,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('text-with-value'):
                 tag.decompose()
                 continue
-            else:
-                if tag['text-with-value'] is None:
-                    tag.decompose()
-                    continue
-                elif tag['text-with-value'].strip() in empty_values:
-                    tag.decompose()
-                    continue
+
+            if tag['text-with-value'] is None:
+                tag.decompose()
+                continue
+            if tag['text-with-value'].strip() in empty_values:
+                tag.decompose()
+                continue
 
             if not tag.has_attr('skill_id-with-value'):
                 tag.decompose()
                 continue
-            else:
-                if tag['skill_id-with-value'] is None:
-                    tag.decompose()
-                    continue
-                elif tag['skill_id-with-value'].strip() in empty_values:
-                    tag.decompose()
-                    continue
+
+            if tag['skill_id-with-value'] is None:
+                tag.decompose()
+                continue
+            if tag['skill_id-with-value'].strip() in empty_values:
+                tag.decompose()
+                continue
 
         for tag in soup.find_all('oppia-noninteractive-video'):
             if not tag.has_attr('start-with-value'):
@@ -4423,13 +4423,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('video_id-with-value'):
                 tag.decompose()
                 continue
-            else:
-                if tag['video_id-with-value'] is None:
-                    tag.decompose()
-                    continue
-                elif tag['video_id-with-value'].strip() in empty_values:
-                    tag.decompose()
-                    continue
+            if tag['video_id-with-value'] is None:
+                tag.decompose()
+                continue
+            if tag['video_id-with-value'].strip() in empty_values:
+                tag.decompose()
+                continue
 
             start_value = float(tag['start-with-value'])
             end_value = float(tag['end-with-value'])
@@ -4448,32 +4447,32 @@ class Exploration(translation_domain.BaseTranslatableObject):
             ):
                 tag.decompose()
                 continue
-            else:
-                if tag['url-with-value'].strip() in empty_values:
-                    tag.decompose()
-                    continue
+
+            if tag['url-with-value'].strip() in empty_values:
+                tag.decompose()
+                continue
 
         for tag in soup.find_all('oppia-noninteractive-math'):
             if not tag.has_attr('math_content-with-value'):
                 tag.decompose()
                 continue
-            else:
-                if tag['math_content-with-value'] in empty_values:
-                    tag.decompose()
-                    continue
-                math_content_json = utils.unescape_html(
-                    tag['math_content-with-value'])
-                math_content_list = json.loads(math_content_json)
 
-                if 'raw_latex' not in math_content_list:
-                    tag.decompose()
-                    continue
-                elif math_content_list['raw_latex'] is None:
-                    tag.decompose()
-                    continue
-                elif math_content_list['raw_latex'].strip() in empty_values:
-                    tag.decompose()
-                    continue
+            if tag['math_content-with-value'] in empty_values:
+                tag.decompose()
+                continue
+            math_content_json = utils.unescape_html(
+                tag['math_content-with-value'])
+            math_content_list = json.loads(math_content_json)
+
+            if 'raw_latex' not in math_content_list:
+                tag.decompose()
+                continue
+            if math_content_list['raw_latex'] is None:
+                tag.decompose()
+                continue
+            if math_content_list['raw_latex'].strip() in empty_values:
+                tag.decompose()
+                continue
 
         if is_tags_nested_inside_tabs_or_collapsible:
             tabs_tags = soup.find_all('oppia-noninteractive-tabs')
@@ -4574,10 +4573,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Helper function to fix the html.
 
         Args:
-            hmtl: str. The html data to fix.
+            html: str. The html data to fix.
 
         Returns:
-            hmtl: str. The fixed html data.
+            html: str. The fixed html data.
         """
         html = cls.fix_rte_tags(
             html, is_tags_nested_inside_tabs_or_collapsible=False)

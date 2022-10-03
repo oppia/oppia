@@ -5729,7 +5729,7 @@ title: Title
         self
     ) -> None:
         """Tests if the answer group's destination is state itself then
-        `labelled_as_correct` should be false. Migrates the invalid data
+        `labelled_as_correct` should be false. Migrates the invalid data.
         """
 
         sample_yaml_content_for_lab_as_correct: str = (
@@ -8569,6 +8569,7 @@ title: ''
         self.assertEqual(
             exploration.to_yaml(),
             latest_sample_yaml_content_for_text_interac)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
