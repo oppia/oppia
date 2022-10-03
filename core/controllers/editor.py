@@ -17,6 +17,7 @@
 """Controllers for the editor view."""
 
 from __future__ import annotations
+import copy
 
 import datetime
 import logging
@@ -40,6 +41,12 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
+from core.platform import models
+
+MYPY = False
+if MYPY:
+    from mypy_imports import exp_models
+(exp_models, ) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -1308,3 +1315,134 @@ class LearnerAnswerInfoHandler(EditorHandler):
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
         self.render_json({})
+
+
+class VersionHistoryLogsDownloader(EditorHandler):
+    """Downloads an exploration as a zip file, or dict of YAML strings
+    representing states.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False)
+        response_dict = {}
+        if exploration is not None:
+            commit_log_models = (
+                exp_models.ExplorationCommitLogEntryModel.get_multi(
+                    exploration_id,
+                    [i for i in range(1, exploration.version + 1)]
+                )
+            )
+            snapshot_models = (
+                exp_models.ExplorationSnapshotContentModel.get_multi([
+                    exp_models.ExplorationModel.get_snapshot_id(
+                        exploration_id, i
+                    ) for i in range(1, exploration.version + 1)
+                ])
+            )
+            versioned_explorations = []
+            for snapshot_model in snapshot_models:
+                snapshot_dict = snapshot_model.content
+                exp_id = snapshot_model.get_unversioned_instance_id()
+                model_class = exp_models.ExplorationModel
+                reconstituted_model = model_class(id=exp_id)._reconstitute(
+                    snapshot_dict
+                )
+                reconstituted_model.created_on = snapshot_model.created_on
+                reconstituted_model.last_updated = snapshot_model.last_updated
+                reconstituted_exp = exp_fetchers.get_exploration_from_model(
+                    reconstituted_model
+                )
+                versioned_explorations.append(reconstituted_exp)
+
+            version_histories = []
+            commit_log_model_v1 = commit_log_models[0]
+            committer_id_v1 = commit_log_model_v1.user_id
+            states_vh_at_v1 = {
+                state_name: state_domain.StateVersionHistory(
+                    None, None, committer_id_v1
+                )
+                for state_name in versioned_explorations[0].states
+            }
+            version_histories.append(states_vh_at_v1)
+
+            for version in range(2, exploration.version + 1):
+                commit_log_model = commit_log_models[version - 1]
+                committer_id: str = commit_log_model.user_id
+                change_list = []
+                for change_dict in commit_log_model.commit_cmds:
+                    try:
+                        change_list.append(exp_domain.ExplorationChange(
+                            change_dict
+                        ))
+                    except Exception:
+                        continue
+                old_exploration = versioned_explorations[version - 2]
+                new_exploration = versioned_explorations[version - 1]
+                revert_to_version = None
+                for change in change_list:
+                    if change.cmd == feconf.CMD_REVERT_COMMIT:
+                        revert_to_version = int(change.version_number)
+                if revert_to_version is not None:
+                    version_histories[version - 1] = copy.deepcopy(
+                        version_histories[revert_to_version - 1])
+                else:
+                    old_states_dict = {
+                        state_name: state.to_dict()
+                        for state_name, state in old_exploration.states.items()
+                    }
+                    new_states_dict = {
+                        state_name: state.to_dict()
+                        for state_name, state in new_exploration.states.items()
+                    }
+                    old_states_vh = copy.deepcopy(version_histories[version - 2])
+                    try:
+                        new_states_vh = (
+                            exp_services.update_states_version_history(
+                                old_states_vh, change_list, old_states_dict,
+                                new_states_dict, version, committer_id
+                            )
+                        )
+                        version_histories.append(new_states_vh)
+                    except Exception as e:
+                        commit_cmds = []
+                        added_states = []
+                        deleted_states = []
+                        renamed_states = []
+                        state_vhs = []
+                        for i in range(1, version + 1):
+                            commit_cmds.append(commit_log_models[i-1].commit_cmds)
+                            change_list = []
+                            for change_dict in commit_log_models[i-1].commit_cmds:
+                                try:
+                                    change_list.append(exp_domain.ExplorationChange(
+                                        change_dict
+                                    ))
+                                except Exception:
+                                    continue
+                            exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+                            added_states.append(exp_versions_diff.added_state_names)
+                            deleted_states.append(exp_versions_diff.deleted_state_names)
+                            renamed_states.append(exp_versions_diff.old_to_new_state_names)
+                        for i in range(1, version):
+                            state_vh = {
+                                state_name: vh.to_dict()
+                                for state_name, vh in version_histories[i-1].items()
+                            }
+                            state_vhs.append(state_vh)
+                        response_dict['commit_cmds'] = commit_cmds
+                        response_dict['added_states'] = added_states
+                        response_dict['deleted_states'] = deleted_states
+                        response_dict['renamed_states'] = renamed_states
+                        response_dict['state_vhs'] = state_vhs
+        self.render_json(response_dict)

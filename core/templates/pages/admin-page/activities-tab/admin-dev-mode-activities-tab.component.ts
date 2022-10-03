@@ -38,6 +38,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
   expIdForVersionHistoryLogs: string = '';
+  versionHistoryLogsDownloadUrl = '/version-history-logs/';
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -200,7 +201,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   }
 
   generateVersionHistoryLogs(): void {
-    return;
+    this.windowRef.nativeWindow.open(
+      this.versionHistoryLogsDownloadUrl + this.expIdForVersionHistoryLogs
+    );
   }
 
   async getDataAsync(): Promise<void> {

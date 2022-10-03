@@ -122,7 +122,7 @@
           <input
               type="text"
               placeholder="Exploration ID"
-              (change)="onChangeExplorationId($event.value)"
+              (change)="onChangeExplorationId($event.target.value)"
               [value]="expIdForVersionHistoryLogs"
           >
         </span>
