@@ -29,7 +29,7 @@ from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, List
+from typing import Dict, List
 from typing_extensions import Final
 
 MYPY = False
@@ -430,9 +430,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_invalid_status_is_successful(self) -> None:
-        # TODO(#13523): Use of Any in the type annotation below will be
-        # removed when model_dict is converted to TypedDicts/domain objects.
-        broken_dict: Dict[str, Any] = dict(**self.original_dict)
+        broken_dict = dict(**self.original_dict)
         broken_dict['status'] = 'publicized'
 
         snapshot_model = (
@@ -459,9 +457,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     def test_revert_to_version_with_translator_ids_field_is_successful(
         self
     ) -> None:
-        # TODO(#13523): Use of Any in the type annotation below will be
-        # removed when model_dict is converted to TypedDicts/domain objects.
-        broken_dict: Dict[str, Any] = dict(**self.original_dict)
+        broken_dict = dict(**self.original_dict)
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_2]
 
@@ -534,9 +530,10 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[arg-type] is used to test method
-            # get_all_non_private_commits() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. Here ignore[arg-type]
+            # is used to test method get_all_non_private_commits() for invalid
+            # input type.
             (
                 collection_models.CollectionCommitLogEntryModel
                 .get_all_non_private_commits(

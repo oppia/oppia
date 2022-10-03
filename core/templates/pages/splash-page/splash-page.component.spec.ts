@@ -32,6 +32,39 @@ import { UserService } from 'services/user.service';
 import { SplashPageComponent } from './splash-page.component';
 import { of } from 'rxjs';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    AndroidBetaLandingPage: {
+      isEnabled: false
+    }
+  };
+}
+
+class MockWindowRef {
+  _window = {
+    location: {
+      _href: '',
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      replace: (val: string) => {}
+    },
+    sessionStorage: {
+      last_uploaded_audio_lang: 'en',
+      removeItem: (name: string) => {}
+    },
+    gtag: () => {}
+  };
+
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmitter = new EventEmitter<string>();
@@ -54,6 +87,9 @@ describe('Splash Page', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
+  let mockWindowRef = new MockWindowRef();
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [SplashPageComponent, MockTranslatePipe],
@@ -73,14 +109,11 @@ describe('Splash Page', () => {
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              location: {
-                href: ''
-              },
-              gtag: () => {}
-            }
-          }
+          useValue: mockWindowRef
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         }
       ]
     }).compileComponents();
@@ -114,6 +147,14 @@ describe('Splash Page', () => {
     component.onClickBrowseLessonsButton();
     expect(siteAnalyticsService.registerClickBrowseLessonsButtonEvent)
       .toHaveBeenCalled();
+  });
+
+  it('should direct users to the android page on click', function() {
+    expect(mockWindowRef.nativeWindow.location.href).not.toEqual('/android');
+
+    component.onClickAccessAndroidButton();
+
+    expect(mockWindowRef.nativeWindow.location.href).toEqual('/android');
   });
 
   it('should record analytics when Start Contributing is clicked', function() {
@@ -212,5 +253,16 @@ describe('Splash Page', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.isWindowNarrow).toBe(true);
+  });
+
+  it('should show android button if the feature is enabled', () => {
+    // The androidPageIsEnabled property is set when the component is
+    // constructed and the value is not modified after that so there is no
+    // pre-check for this test.
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
+
+    const component = TestBed.createComponent(SplashPageComponent);
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });
