@@ -2671,6 +2671,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],
