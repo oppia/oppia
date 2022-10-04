@@ -1470,6 +1470,59 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.validate_exploration_for_story(
                 updated_exploration, True)
 
+    def test_validation_fail_for_multiple_choice_exploration(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
+        error_string = (
+            'Exploration in a story having MultipleChoiceInput '
+            'interaction should have at least 4 choices present. '
+            'Exploration with ID %s and state name %s have fewer than '
+            '4 choices.' % (exploration.id, exploration.init_state_name))
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            {
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>1</p>'
+                            },
+                            {
+                                'content_id': 'ca_choices_1',
+                                'html': '<p>2</p>'
+                            }
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': True
+                    }
+                }
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            change_list, 'Changed to MultipleChoiceInput')
+        updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        errors = exp_services.validate_exploration_for_story(
+            updated_exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(
+                updated_exploration, True)
+
     def test_validation_fail_for_android_rte_content(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
