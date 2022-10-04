@@ -181,7 +181,10 @@ var ExplorationEditorTranslationTab = function() {
     await action.click(
       'Confirm delete record button',
       confirmDeleteRecordButton);
-    await waitFor.pageToFullyLoad();
+    // We need to explicitly wait till the audio is deleted, in order
+    // to make sure there is no unsaved changes left in the exploration.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.uploadAudioRecord = async function(audioPath) {
