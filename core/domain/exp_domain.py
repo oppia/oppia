@@ -3197,8 +3197,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted states_dict.
         """
-        # Update general state validations.
-        states_dict = cls._update_general_state(states_dict)
+        states_dict = cls._fix_labelled_as_correct_value_in_state_dict(
+            states_dict)
 
         # Update state interaction validations.
         states_dict = cls._update_state_interaction(
@@ -3209,16 +3209,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
-    # ############################################.
-    # Fix validation errors for exploration state.
-    # ############################################.
     @classmethod
-    def _update_general_state(
+    def _fix_labelled_as_correct_value_in_state_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
-        """Handles errored data for the general exploration state, performs the
-        following:
-            - If destination is `try again` and the value of labelled_as_correct
+        """If destination is `try again` and the value of labelled_as_correct
             is True, replaces it with False
 
         Args:
