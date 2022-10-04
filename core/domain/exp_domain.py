@@ -3330,6 +3330,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         range_var: RangeVariableDict,
         lower_bound: Optional[float],
         upper_bound: Optional[float],
+        *,
         lb_inclusive: bool,
         ub_inclusive: bool
     ) -> None:
@@ -3632,8 +3633,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
                         cls._set_lower_and_upper_bounds(
-                            range_var, lower_infinity,
-                            rule_value, False, True
+                            range_var,
+                            lower_infinity,
+                            rule_value,
+                            lb_inclusive=False,
+                            ub_inclusive=True
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
@@ -3642,8 +3646,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
                         cls._set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            upper_infinity, True, False
+                            range_var,
+                            rule_value,
+                            upper_infinity,
+                            lb_inclusive=True,
+                            ub_inclusive=False
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
@@ -3652,8 +3659,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
                         cls._set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            rule_value, True, True
+                            range_var,
+                            rule_value,
+                            rule_value,
+                            lb_inclusive=True,
+                            ub_inclusive=True
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
@@ -3662,8 +3672,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
                         cls._set_lower_and_upper_bounds(
-                            range_var, lower_infinity,
-                            rule_value, False, False
+                            range_var,
+                            lower_infinity,
+                            rule_value,
+                            lb_inclusive=False,
+                            ub_inclusive=False
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
@@ -3678,8 +3691,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_value_x = float(rule_value_x)
                         rule_value_tol = float(rule_value_tol)
                         cls._set_lower_and_upper_bounds(
-                            range_var, rule_value_x - rule_value_tol,
-                            rule_value_x + rule_value_tol, True, True
+                            range_var,
+                            rule_value_x - rule_value_tol,
+                            rule_value_x + rule_value_tol,
+                            lb_inclusive=True,
+                            ub_inclusive=True
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
@@ -3688,8 +3704,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
                         cls._set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            upper_infinity, False, False
+                            range_var,
+                            rule_value,
+                            upper_infinity,
+                            lb_inclusive=False,
+                            ub_inclusive=False
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
@@ -3705,8 +3724,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_value_a = float(rule_value_a)
                         rule_value_b = float(rule_value_b)
                         cls._set_lower_and_upper_bounds(
-                            range_var, rule_value_a,
-                            rule_value_b, True, True
+                            range_var,
+                            rule_value_a,
+                            rule_value_b,
+                            lb_inclusive=True,
+                            ub_inclusive=True
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
@@ -3787,8 +3809,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     rule_value_f: float = (
                         cls._get_rule_value_of_fraction_interaction(rule_spec))
                     cls._set_lower_and_upper_bounds(
-                        range_var, rule_value_f,
-                        rule_value_f, True, True
+                        range_var,
+                        rule_value_f,
+                        rule_value_f,
+                        lb_inclusive=True,
+                        ub_inclusive=True
                     )
 
                 elif rule_spec['rule_type'] == 'IsGreaterThan':
@@ -3796,8 +3821,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         cls._get_rule_value_of_fraction_interaction(rule_spec))
 
                     cls._set_lower_and_upper_bounds(
-                        range_var, rule_value_f,
-                        upper_infinity, False, False
+                        range_var,
+                        rule_value_f,
+                        upper_infinity,
+                        lb_inclusive=False,
+                        ub_inclusive=False
                     )
 
                 elif rule_spec['rule_type'] == 'IsLessThan':
@@ -3805,8 +3833,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         cls._get_rule_value_of_fraction_interaction(rule_spec))
 
                     cls._set_lower_and_upper_bounds(
-                        range_var, lower_infinity,
-                        rule_value_f, False, False
+                        range_var,
+                        lower_infinity,
+                        rule_value_f,
+                        lb_inclusive=False,
+                        ub_inclusive=False
                     )
 
                 elif rule_spec['rule_type'] == 'HasDenominatorEqualTo':
