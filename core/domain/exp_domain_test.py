@@ -5849,7 +5849,6 @@ title: ''
 """)
         # pylint: enable=line-too-long
  
-        self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
