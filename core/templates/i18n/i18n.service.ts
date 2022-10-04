@@ -34,7 +34,6 @@ export class I18nService {
   private _directionChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
 
-  prevLangDirection: string = localStorage.getItem('direction');
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   url!: URL;
   // Check that local storage exists and works as expected.
@@ -89,6 +88,11 @@ export class I18nService {
           this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
         const langDirection = (
           this.i18nLanguageCodeService.isLanguageRTL(code) ? 'rtl' : 'ltr');
+        const prevLangDirection = (
+          this.i18nLanguageCodeService.isLanguageRTL(
+            I18nLanguageCodeService.prevLangCode
+          ) ? 'rtl' : 'ltr');
+        this.translateService.use(code);
         if (!!cookieSetDateMsecs &&
           +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
         ) {
@@ -97,11 +101,20 @@ export class I18nService {
             langDirection
           );
           this.cookieService.put('lang', code);
-        }
-        this.translateService.use(code);
-        this.documentAttributeCustomizationService.addAttribute('lang', code);
-        if (this.prevLangDirection !== langDirection) {
-          window.location.reload();
+          this.documentAttributeCustomizationService.addAttribute('lang', code);
+          if (prevLangDirection !== langDirection) {
+            window.location.reload();
+          }
+        } else {
+          const parser = new URL(window.location.href);
+          const urlParamDir = parser.searchParams.get('dir');
+          if (urlParamDir === langDirection) {
+            return;
+          }
+          parser.searchParams.set('dir', langDirection);
+          if (urlParamDir !== null) {
+            window.location = parser.href as unknown as Location;
+          }
         }
       }
     );
@@ -157,17 +170,8 @@ export class I18nService {
 
 
   updateUserPreferredLanguage(newLangCode: string): void {
-    let oldLangDirection = (
-      this.i18nLanguageCodeService.getCurrentLanguageDirection());
-    let reloadPage = (
-      oldLangDirection !== this.supportedSiteLanguageCodes[newLangCode]);
     this.setLocalStorageKeys(newLangCode);
 
-    // When we know that the page will be reloaded we don't need to switch
-    // the language now.
-    if (!reloadPage) {
-      this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
-    }
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       // If user is logged in first save the language and then reload,
@@ -176,16 +180,10 @@ export class I18nService {
         this.userBackendApiService.updatePreferredSiteLanguageAsync(
           newLangCode
         ).then(() => {
-          if (reloadPage) {
-            this.windowRef.nativeWindow.location.reload();
-            return;
-          }
+          this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
         });
       } else {
-        if (reloadPage) {
-          this.windowRef.nativeWindow.location.reload();
-          return;
-        }
+        this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
       }
     });
 

@@ -46,7 +46,7 @@
                 "input": "src/index.prod.html",
                 "output": "index.html"
               },
-              "baseHref": "/dist/oppia-angular-prod",
+              "baseHref": "/dist/oppia-angular-prod/",
               "outputPath": "dist/oppia-angular-prod",
               "aot": true,
               "optimization": true,

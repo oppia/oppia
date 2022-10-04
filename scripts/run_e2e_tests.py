@@ -182,7 +182,7 @@ def run_ng_compilation():
     for _ in range(max_tries):
         try:
             managed_ng_compiler = (
-                servers.managed_ng_compiler())
+                servers.managed_ng_build())
             with managed_ng_compiler as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:

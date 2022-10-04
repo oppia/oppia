@@ -59,7 +59,7 @@ AUTH_HANDLER_PATHS = (
 
 
 @functools.lru_cache(maxsize=128)
-def load_template(filename):
+def load_template(filename, template_is_aot_compiled):
     """Return the HTML file contents at filepath.
 
     Args:
@@ -69,8 +69,8 @@ def load_template(filename):
         str. The HTML file content.
     """
     filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
-    if filename == 'index.html':
-        filepath = os.path.join('dist', 'oppia-angular', filename)
+    if template_is_aot_compiled:
+        filepath = os.path.join(feconf.FRONTEND_AOT_DIR, filename)
     with utils.open_file(filepath, 'r') as f:
         html_text = f.read()
     return html_text
@@ -569,7 +569,7 @@ class BaseHandler(webapp2.RequestHandler):
         # bytes.
         super(webapp2.Response, self.response).write(file.getvalue())  # pylint: disable=bad-super-call
 
-    def render_template(self, filepath, iframe_restriction='DENY'):
+    def render_template(self, filepath, iframe_restriction='DENY', template_is_aot_compiled=False):
         """Prepares an HTML response to be sent to the client.
 
         Args:
@@ -604,8 +604,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
-
-        self.response.write(load_template(filepath))
+        self.response.write(load_template(filepath, template_is_aot_compiled))
 
     def _render_exception_json_or_html(self, return_type, values):
         """Renders an error page, or an error JSON response.
