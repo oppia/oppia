@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
  * @fileoverview End-to-end tests for the functionality of voiceover upload.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var ExplorationEditorPage =
-    require('../protractor_utils/ExplorationEditorPage.js');
+    require('../webdriverio_utils/ExplorationEditorPage.js');
 var CreatorDashboardPage =
-    require('../protractor_utils/CreatorDashboardPage.js');
+    require('../webdriverio_utils/CreatorDashboardPage.js');
 
 describe('Voiceover upload features', function() {
   var TEST_USERNAME = 'uploadUser';
