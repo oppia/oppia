@@ -1143,7 +1143,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.create_default_exploration('test_id'))
         self.state = self.new_exploration.states['Introduction']
 
-    def tests_continue_interaction(self) -> None:
+    def test_continue_interaction(self) -> None:
         """Tests Continue interaction."""
         self.set_interaction_for_state(self.state, 'Continue')
         self.state.interaction.customization_args[
@@ -1151,8 +1151,47 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.new_exploration, 'The Continue button text should be at '
             'most 20 characters.')
+        self.state.interaction.customization_args[
+            'buttonText'].value.unicode_str = 'Continue'
 
-    def tests_numeric_interaction(self) -> None:
+        def mock_ans_group_validate(self, _, __):
+            """Empty function to swap the answer group validation function so
+            it does not raise an error when we create an answer group for
+            `Continue` interaction.
+            """
+
+        test_ans_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', None, state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        with self.swap(
+          state_domain.AnswerGroup, 'validate', mock_ans_group_validate
+        ):
+            self.state.interaction.answer_groups = test_ans_group
+            self._assert_validation_error(
+                self.new_exploration,
+                'The Continue button does not require answer groups.')
+        self.state.interaction.answer_groups = []
+
+    def test_numeric_interaction(self) -> None:
         """Tests Numeric interaction."""
         self.set_interaction_for_state(self.state, 'NumericInput')
         test_ans_group_for_numeric_interaction = [
@@ -1201,8 +1240,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'outcome': {
                 'dest': 'EXP_1_STATE_1',
                 'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1240,7 +1279,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.written_translations.add_content_id_for_translation(
             'feedback_0')
 
-    def tests_fraction_interaction(self) -> None:
+    def test_fraction_interaction(self) -> None:
         """Tests Fraction interaction."""
         state = self.new_exploration.states['Introduction']
         self.set_interaction_for_state(state, 'FractionInput')
@@ -1367,8 +1406,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'outcome': {
                 'dest': 'EXP_1_STATE_1',
                 'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1429,7 +1468,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
         state.written_translations.add_content_id_for_translation('feedback_0')
 
-    def tests_number_with_units_interaction(self) -> None:
+    def test_number_with_units_interaction(self) -> None:
         """Tests NumberWithUnits interaction."""
         self.set_interaction_for_state(self.state, 'NumberWithUnits')
         test_ans_group_for_number_with_units_interaction = [
@@ -1517,8 +1556,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'outcome': {
                 'dest': 'EXP_1_STATE_1',
                 'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1544,7 +1583,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'NumberWithUnitsInput interaction is already present.'
         )
 
-    def tests_multiple_choice_interaction(self) -> None:
+    def test_multiple_choice_interaction(self) -> None:
         """Tests MultipleChoice interaction."""
         self.set_interaction_for_state(self.state, 'MultipleChoiceInput')
         test_ans_group_for_multiple_choice_interaction = [
@@ -1566,8 +1605,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'outcome': {
                 'dest': 'EXP_1_STATE_1',
                 'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1603,7 +1642,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.customization_args[
             'choices'].value[2].html = '<p>2</p>'
 
-    def tests_item_selection_choice_interaction(self) -> None:
+    def test_item_selection_choice_interaction(self) -> None:
         """Tests ItemSelection interaction."""
         self.set_interaction_for_state(self.state, 'ItemSelectionInput')
         self.state.interaction.customization_args[
@@ -1616,29 +1655,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 {
                     'rule_type': 'Equals',
                     'inputs': {
-                        'x': [
-                        'ca_choices_0',
-                        'ca_choices_1',
-                        'ca_choices_2'
-                        ]
+                        'x': ['ca_choices_0', 'ca_choices_1', 'ca_choices_2']
                     }
                 },
                 {
                     'rule_type': 'Equals',
                     'inputs': {
-                        'x': [
-                        'ca_choices_0',
-                        'ca_choices_1',
-                        'ca_choices_2'
-                        ]
+                        'x': ['ca_choices_0', 'ca_choices_1', 'ca_choices_2']
                     }
                 }
             ],
             'outcome': {
                 'dest': 'EXP_1_STATE_1',
                 'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1707,7 +1738,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.customization_args[
             'choices'].value[2].html = '<p>2</p>'
 
-    def tests_drag_and_drop_interaction(self) -> None:
+    def test_drag_and_drop_interaction(self) -> None:
         """Tests DragAndDrop interaction."""
         self.state.recorded_voiceovers.add_content_id_for_voiceover(
             'ca_choices_2')
@@ -1824,8 +1855,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'outcome': {
                 'dest': 'EXP_1_STATE_1',
                 'feedback': {
-                'content_id': 'feedback_0',
-                'html': '<p>good</p>'
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1898,7 +1929,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.customization_args[
             'choices'].value[2].html = '<p>2</p>'
 
-    def tests_text_interaction(self) -> None:
+    def test_text_interaction(self) -> None:
         """Tests Text interaction."""
         self.state.recorded_voiceovers.add_content_id_for_voiceover(
             'feedback_0')
@@ -1927,13 +1958,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 {
                     'rule_type': 'Contains',
                     'inputs': {
-                        'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello',
-                            'abc',
-                            'def'
-                        ]
+                          'x': {
+                              'contentId': 'rule_input_27',
+                              'normalizedStrSet': [
+                                'hello',
+                                'abc',
+                                'def'
+                            ]
                         }
                     }
                 },
@@ -1941,10 +1972,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'Contains',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'helloooooo'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'helloooooo'
+                            ]
                         }
                     }
                 },
@@ -1952,10 +1983,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'StartsWith',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'exci'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'exci'
+                            ]
                         }
                     }
                 },
@@ -1963,10 +1994,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'StartsWith',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'excitement'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'excitement'
+                            ]
                         }
                     }
                 },
@@ -1974,10 +2005,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'Contains',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'he'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
                         }
                     }
                 },
@@ -1985,10 +2016,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'StartsWith',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
                         }
                     }
                 },
@@ -1996,10 +2027,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'Contains',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'he'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
                         }
                     }
                 },
@@ -2007,10 +2038,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'Equals',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
                         }
                     }
                 },
@@ -2018,10 +2049,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'StartsWith',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'he'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
                         }
                     }
                 },
@@ -2029,10 +2060,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'Equals',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
                         }
                     }
                 },
@@ -2040,10 +2071,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'rule_type': 'Equals',
                     'inputs': {
                         'x': {
-                        'contentId': 'rule_input_27',
-                        'normalizedStrSet': [
-                            'hello'
-                        ]
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
                         }
                     }
                 }
@@ -2106,7 +2137,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'TextInput interaction is already present.')
 
-    def tests_end_interaction(self) -> None:
+    def test_end_interaction(self) -> None:
         """Tests End interaction."""
         self.set_interaction_for_state(self.state, 'EndExploration')
         self.state.update_interaction_default_outcome(None)

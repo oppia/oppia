@@ -1126,36 +1126,51 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 if rule_spec.rule_type == 'IsLessThanOrEqualTo':
                     rule_value = float(rule_spec.inputs['x'])
                     self._set_lower_and_upper_bounds(
-                        range_var, lower_infinity,
-                        rule_value, lb_inclusive=False, ub_inclusive=True
+                        range_var,
+                        lower_infinity,
+                        rule_value,
+                        lb_inclusive=False,
+                        ub_inclusive=True
                     )
 
                 elif rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
                     rule_value = float(rule_spec.inputs['x'])
                     self._set_lower_and_upper_bounds(
-                        range_var, rule_value,
-                        upper_infinity, lb_inclusive=True, ub_inclusive=False
+                        range_var,
+                        rule_value,
+                        upper_infinity,
+                        lb_inclusive=True,
+                        ub_inclusive=False
                     )
 
                 elif rule_spec.rule_type == 'Equals':
                     rule_value = float(rule_spec.inputs['x'])
                     self._set_lower_and_upper_bounds(
-                        range_var, rule_value,
-                        rule_value, lb_inclusive=True, ub_inclusive=True
+                        range_var,
+                        rule_value,
+                        rule_value,
+                        lb_inclusive=True,
+                        ub_inclusive=True
                     )
 
                 elif rule_spec.rule_type == 'IsLessThan':
                     rule_value = float(rule_spec.inputs['x'])
                     self._set_lower_and_upper_bounds(
-                        range_var, lower_infinity,
-                        rule_value, lb_inclusive=False, ub_inclusive=False
+                        range_var,
+                        lower_infinity,
+                        rule_value,
+                        lb_inclusive=False,
+                        ub_inclusive=False
                     )
 
                 elif rule_spec.rule_type == 'IsGreaterThan':
                     rule_value = float(rule_spec.inputs['x'])
                     self._set_lower_and_upper_bounds(
-                        range_var, rule_value,
-                        upper_infinity, lb_inclusive=False, ub_inclusive=False
+                        range_var,
+                        rule_value,
+                        upper_infinity,
+                        lb_inclusive=False,
+                        ub_inclusive=False
                     )
 
                 elif rule_spec.rule_type == 'IsWithinTolerance':
@@ -1189,8 +1204,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'in NumericInput interaction.'
                         )
                     self._set_lower_and_upper_bounds(
-                        range_var, rule_value_a,
-                        rule_value_b, lb_inclusive=True, ub_inclusive=True
+                        range_var,
+                        rule_value_a,
+                        rule_value_b,
+                        lb_inclusive=True,
+                        ub_inclusive=True
                     )
 
                 for range_ele in ranges:
@@ -1299,10 +1317,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     'lb_inclusive': False,
                     'ub_inclusive': False
                 }
-                matched_denominator: InteractionInstance.MatchedDenominatorDict = { # pylint: disable=line-too-long
-                    'ans_group_index': int(ans_group_index),
-                    'rule_spec_index': int(rule_spec_index),
-                    'denominator': 0
+                matched_denominator: (
+                    InteractionInstance.MatchedDenominatorDict
+                ) = {
+                        'ans_group_index': int(ans_group_index),
+                        'rule_spec_index': int(rule_spec_index),
+                        'denominator': 0
                 }
 
                 if rule_spec.rule_type in (
@@ -1311,7 +1331,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 ):
                     if (
                         rule_spec.rule_type == 'IsExactlyEqualTo' and
-                        not allow_non_zero_integ_part and whole != 0
+                        not allow_non_zero_integ_part and
+                        whole != 0
                     ):
                         raise utils.ValidationError(
                             f'The rule \'{rule_spec_index}\' of '
@@ -1322,24 +1343,33 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     rule_value_f = (
                         self._get_rule_value_of_fraction_interaction(rule_spec))
                     self._set_lower_and_upper_bounds(
-                        range_var, rule_value_f,
-                        rule_value_f, lb_inclusive=True, ub_inclusive=True
+                        range_var,
+                        rule_value_f,
+                        rule_value_f,
+                        lb_inclusive=True,
+                        ub_inclusive=True
                     )
 
                 if rule_spec.rule_type == 'IsGreaterThan':
                     rule_value_f = (
                         self._get_rule_value_of_fraction_interaction(rule_spec))
                     self._set_lower_and_upper_bounds(
-                        range_var, rule_value_f,
-                        upper_infinity, lb_inclusive=False, ub_inclusive=False
+                        range_var,
+                        rule_value_f,
+                        upper_infinity,
+                        lb_inclusive=False,
+                        ub_inclusive=False
                     )
 
                 if rule_spec.rule_type == 'IsLessThan':
                     rule_value_f = (
                         self._get_rule_value_of_fraction_interaction(rule_spec))
                     self._set_lower_and_upper_bounds(
-                        range_var, lower_infinity,
-                        rule_value_f, lb_inclusive=False, ub_inclusive=False
+                        range_var,
+                        lower_infinity,
+                        rule_value_f,
+                        lb_inclusive=False,
+                        ub_inclusive=False
                     )
 
                 if rule_spec.rule_type == 'HasDenominatorEqualTo':
@@ -1577,6 +1607,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         f'interaction is already present.'
                     )
                 rule_spec_till_now.append(rule_spec.to_dict())
+
                 if not multi_item_value and (
                     rule_spec.rule_type ==
                     'IsEqualToOrderingWithOneItemAtIncorrectPosition'
@@ -1591,6 +1622,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         f'setting is turned off '
                         f'in DragAndDropSortInput interaction.'
                     )
+
                 # Multiple items cannot be in the same place iff the
                 # `allow multiple items at same place` setting is turned off.
                 if not multi_item_value:
@@ -4167,6 +4199,7 @@ class State(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        *,
         allow_null_interaction: bool,
         validation_from_exploration: bool = False
     ) -> None:
