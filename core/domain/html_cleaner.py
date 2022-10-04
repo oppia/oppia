@@ -75,6 +75,7 @@ ATTRS_WHITELIST: Final = {
     'code': [],
     'div': [],
     'em': [],
+    'h1': [],
     'hr': [],
     'i': [],
     'li': [],
