@@ -89,7 +89,7 @@
                  (click)="showFullResultsPage(group.categories, group.full_results_url)"
                  tabindex="0">
                 <span [translate]="group.header_i18n_id"></span>
-                <span *ngIf="!libraryWindowIsNarrow && activeGroupIndex === idx"><i class="material-icons md-32">&#xE315;</i></span>
+                <span *ngIf="!libraryWindowIsNarrow && activeGroupIndex === idx"><i class="fas fal fa-angle-right md-32"></i></span>
               </a>
               <span *ngIf="!group.has_full_results_page" [translate]="group.header_i18n_id">
               </span>
@@ -101,7 +101,7 @@
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
                     (click)="scroll(idx, true)"
                     *ngIf="leftmostCardIndices[idx] != 0">
-              <i class="material-icons">&#xE314;</i>
+              <i class="fas fal fa-angle-left"></i>
             </button>
             <div class="oppia-library-carousel-scroller" *ngIf="leftmostCardIndices[idx] == 0" aria-hidden="true">
             </div>
@@ -145,7 +145,7 @@
                     (click)="scroll(idx, false)"
                     [hidden]="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[idx]"
                     aria-hidden="true">
-              <i class="material-icons">&#xE315;</i>
+              <i class="fas fal fa-angle-right"></i>
             </button>
             <div class="oppia-library-carousel-scroller"
                  *ngIf="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]">
