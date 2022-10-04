@@ -382,6 +382,15 @@ describe('Context service', () => {
 
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
+
+    it('should check if rte is in blog post editor', () => {
+      expect(ecs.isInBlogPostEditorPage()).toBe(false);
+
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/blog-dashboard');
+
+      expect(ecs.isInBlogPostEditorPage()).toBe(true);
+    });
   });
 
   describe('behavior in the edit learner group page', () => {

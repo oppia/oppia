@@ -43,6 +43,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { RteComponentSpecs } from './ck-editor-4-widgets.initializer';
 import { Subscription } from 'rxjs';
 
 interface UiConfig {
@@ -67,12 +68,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     OnDestroy, OnInit {
   @Input() uiConfig: UiConfig;
   @Input() value;
-  @Input() headersEnabled = false;
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
   currentValue: string;
   connectedToInternet = true;
+  headersEnabled = false;
+  windowIsNarrow = false;
   componentsThatRequireInternet: string[] = [];
   subscriptions: Subscription;
   // A RegExp for matching rich text components.
@@ -275,7 +277,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         this.contextService.isExplorationLinkedToStory() &&
               AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
                 componentDefn.id) === -1);
-      if (!(hideComplexExtensionFlag || notSupportedOnAndroidFlag)) {
+      if (!(
+        hideComplexExtensionFlag || notSupportedOnAndroidFlag ||
+        this.isInvalidForBlogPostEditorRTE(componentDefn)
+      )) {
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
       }
@@ -335,6 +340,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       });
     }
     buttonNames.pop();
+
+    // Enable format headers in CKE editor for blog post editor rte.
+    this.headersEnabled = this.contextService.isInBlogPostEditorPage();
 
     // Add external plugins.
     CKEDITOR.plugins.addExternal(
@@ -416,6 +424,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       $('.cke_combo_button')
         .css('height', '29px')
         .css('width', '62px')
+        .css('margin-right', '25px')
         .on('click', () => {
           // Timeout is required to ensure that the format dropdown
           // has been initialized and the iframe has been loaded into DOM.
@@ -433,9 +442,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
       if (!this.headersEnabled) {
         // TODO(#12882): Remove the use of jQuery.
-        $('.cke_combo_button')
+        $('.cke_combo__format')
           .css('display', 'none');
       }
+
       if (!this.internetConnectivityService.isOnline()) {
         this.connectedToInternet = false;
         this.disableRTEicons();
@@ -525,6 +535,16 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         buttons[i].style.pointerEvents = '';
       }
     });
+  }
+
+  // Returns true if a rte component should not be shown in blog post editor
+  // RTE to remove it from rte configuration for the blog post editor RTE.
+  isInvalidForBlogPostEditorRTE(compDefn: RteComponentSpecs): boolean {
+    return (
+      this.contextService.isInBlogPostEditorPage() && (
+        compDefn.id in AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR
+      )
+    );
   }
 
   ngOnDestroy(): void {

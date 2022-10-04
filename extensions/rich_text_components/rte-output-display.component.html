@@ -16,6 +16,12 @@
     </ng-container>
   </p>
 </ng-template>
+<ng-template #h1 let-childNode>
+  <h1>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </h1>
+</ng-template>
 <ng-template #span let-childNode>
   <span>
     <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">

@@ -105,17 +105,6 @@ describe('Blog Post Object Factory', () => {
     ]);
   });
 
-  it('should be able to create an interstitial blog post object', () => {
-    let blogPost = BlogPostData.createInterstitialBlogPost();
-    expect(blogPost.id).toEqual(null);
-    expect(blogPost.authorUsername).toEqual('loading');
-    expect(blogPost.title).toEqual('Blog Post Title loading');
-    expect(blogPost.content).toEqual('');
-    expect(blogPost.tags).toEqual([]);
-    expect(blogPost.thumbnailFilename).toEqual(null);
-    expect(blogPost.urlFragment).toEqual('Url Fragment loading');
-  });
-
   it('should return correct property values', () => {
     expect(sampleBlogPostData.lastUpdated).toEqual('3454354354');
     expect(sampleBlogPostData.publishedOn).toEqual('3454354354');
