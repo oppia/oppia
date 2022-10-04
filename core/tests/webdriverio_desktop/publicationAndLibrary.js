@@ -101,7 +101,7 @@ describe('Library index page', function() {
 
     await users.login('varda@publicationAndLibrary.com');
     await libraryPage.get();
-    await libraryPage.selectLanguages(['Deutsch']);
+    await libraryPage.selectLanguages([LANGUAGE_DEUTSC]);
     await libraryPage.findExploration(EXPLORATION_VINGILOT);
     await libraryPage.playExploration(EXPLORATION_VINGILOT);
     await general.moveToEditor(true);

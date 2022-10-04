@@ -55,6 +55,8 @@ var LibraryPage = function() {
     $('.e2e-test-search-bar-language-selector'));
 
   // Returns a promise of all explorations with the given name.
+  // When there is no exploration present on the Library page 'isHidden'
+  // will be true and we do not need to wait for the visiblity of explorations.
   var _getExplorationElements = async function(name, isHidden = false) {
     if (!isHidden) {
       await waitFor.visibilityOf(
