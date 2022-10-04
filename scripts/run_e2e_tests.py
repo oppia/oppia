@@ -74,18 +74,18 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--suite', default='full',
     help='Performs test for different suites, here suites are the '
-         'name of the test files present in core/tests/protractor_desktop/ and '
-         'core/test/protractor/ dirs. e.g. for the file '
-         'core/tests/protractor/accessibility.js use --suite=accessibility. '
+         'name of the test files present in core/tests/webdriverio_desktop/ '
+         'and core/test/webdriverio/ dirs. e.g. for the file '
+         'core/tests/webdriverio/accessibility.js use --suite=accessibility. '
          'For performing a full test, no argument is required.')
 _PARSER.add_argument(
     '--chrome_driver_version',
     help='Uses the specified version of the chrome driver')
 _PARSER.add_argument(
     '--debug_mode',
-    help='Runs the protractor test in debugging mode. Follow the instruction '
+    help='Runs the webdriverio test in debugging mode. Follow the instruction '
          'provided in following URL to run e2e tests in debugging mode: '
-         'https://www.protractortest.org/#/debugging#disabled-control-flow',
+         'https://webdriver.io/docs/debugging/',
     action='store_true')
 _PARSER.add_argument(
     '--server_log_level',
@@ -102,52 +102,6 @@ _PARSER.add_argument(
     help='Run e2e test in mobile viewport.',
     action='store_true')
 
-
-SUITES_MIGRATED_TO_WEBDRIVERIO = [
-    'accessibility',
-    'additionalEditorFeatures',
-    'additionalEditorFeaturesModals',
-    'additionalPlayerFeatures',
-    'adminPage',
-    'blogDashboard',
-    'checkpointFeatures',
-    'classroomPage',
-    'classroomPageFileUploadFeatures',
-    'collections',
-    'contributorDashboard',
-    'coreEditorAndPlayerFeatures',
-    'creatorDashboard',
-    'extensions',
-    'embedding',
-    'explorationFeedbackTab',
-    'explorationHistoryTab',
-    'explorationImprovementsTab',
-    'explorationStatisticsTab',
-    'explorationTranslationTab',
-    'learner',
-    'learnerDashboard',
-    'navigation',
-    'preferences',
-    'profileFeatures',
-    'profileMenu',
-    'skillEditor',
-    'subscriptions',
-    'topicsAndSkillsDashboard',
-    'topicAndStoryEditor',
-    'topicAndStoryEditorFileUploadFeatures',
-    'topicAndStoryViewer',
-    'users',
-    'wipeout',
-]
-
-SUITES_STILL_IN_PROTRACTOR = [
-    'featureGating',
-    'fileUploadFeatures',
-    'fileUploadExtensions',
-    'library',
-    'playVoiceovers',
-    'publication',
-]
 
 MOBILE_SUITES = [
     'contributorDashboard'
@@ -301,21 +255,7 @@ def run_tests(args):
                 )
             sys.exit(1)
 
-        if args.suite == 'full':
-            stack.enter_context(servers.managed_webdriver_server(
-                chrome_version=args.chrome_driver_version))
-
-            print('Protractor suites are starting to run')
-            proc = stack.enter_context(servers.managed_protractor_server(
-                suite_name=args.suite,
-                dev_mode=dev_mode,
-                debug_mode=args.debug_mode,
-                sharding_instances=args.sharding_instances,
-                mobile=args.mobile,
-                stdout=subprocess.PIPE))
-
-            print('WebdriverIO suites are starting to run')
-            proc = stack.enter_context(servers.managed_webdriverio_server(
+        proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
@@ -324,43 +264,10 @@ def run_tests(args):
                 mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
-        elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
-            proc = stack.enter_context(servers.managed_webdriverio_server(
-                suite_name=args.suite,
-                dev_mode=dev_mode,
-                debug_mode=args.debug_mode,
-                chrome_version=args.chrome_driver_version,
-                sharding_instances=args.sharding_instances,
-                mobile=args.mobile,
-                stdout=subprocess.PIPE))
-
-            print(
-                'Servers have come up.\n'
-                'Note: You can view screenshots of failed tests '
-                'in ../webdriverio-screenshots/')
-
-        elif args.suite in SUITES_STILL_IN_PROTRACTOR:
-            stack.enter_context(servers.managed_webdriver_server(
-                chrome_version=args.chrome_driver_version))
-
-            proc = stack.enter_context(servers.managed_protractor_server(
-                suite_name=args.suite,
-                dev_mode=dev_mode,
-                debug_mode=args.debug_mode,
-                sharding_instances=args.sharding_instances,
-                mobile=args.mobile,
-                stdout=subprocess.PIPE))
-
-            print(
-                'Servers have come up.\n'
-                'Note: You can view screenshots of the failed tests '
-                'in ../protractor-screenshots/')
-
-        else:
-            print(
-                'The suite requested to run does not exist'
-                'Please provide a valid suite name')
-            sys.exit(1)
+        print(
+            'Servers have come up.\n'
+            'Note: You can view screenshots of failed tests '
+            'in ../webdriverio-screenshots/')
 
         output_lines = []
         while True:

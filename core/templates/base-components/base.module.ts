@@ -41,6 +41,7 @@ import {
   BaseContentComponent,
   BaseContentNavBarBreadCrumbDirective,
   BaseContentNavBarPreLogoActionDirective,
+  BaseContentNavOptionsDirective,
   BaseContentPageFooterDirective
 } from './base-content.component';
 
@@ -67,6 +68,7 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
     BaseContentNavBarPreLogoActionDirective,
+    BaseContentNavOptionsDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
@@ -105,6 +107,7 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
     BaseContentNavBarPreLogoActionDirective,
+    BaseContentNavOptionsDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,

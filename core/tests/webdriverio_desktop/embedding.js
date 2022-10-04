@@ -55,7 +55,7 @@ describe('Embedding', function() {
     // Correct but why.
     await explorationEditorMainTab.moveToState('correct but why');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Right! Why do you think it is 6?'));
+      await forms.toRichText('Right! Why do you think it is 6?'), true);
     await explorationEditorMainTab.setInteraction(
       'TextInput', 'Type your answer here.', 5);
     await explorationEditorMainTab.addResponse(
@@ -75,7 +75,7 @@ describe('Embedding', function() {
     // Not 6.
     await explorationEditorMainTab.moveToState('Not 6');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('List the different ways?'));
+      await forms.toRichText('List the different ways?'), true);
     await explorationEditorMainTab.setInteraction('Continue', 'try again');
     defaultResponseEditor = await explorationEditorMainTab
       .getResponseEditor('default');
@@ -84,7 +84,7 @@ describe('Embedding', function() {
     // END.
     await explorationEditorMainTab.moveToState('END');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Congratulations, you have finished!'));
+      await forms.toRichText('Congratulations, you have finished!'), true);
     await explorationEditorMainTab.setInteraction('EndExploration');
 
     // Save changes.
