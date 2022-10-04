@@ -162,7 +162,7 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
 
 // Add Object.entries() polyfill for Chrome 53 and below.
 if (!Object.entries) {
-  Object.entries = function(obj) {
+  Object.entries = (obj: Object) => {
     let ownProps = Object.keys(obj),
       i = ownProps.length,
       resArray = new Array(i); // Preallocate the array.
