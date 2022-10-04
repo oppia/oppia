@@ -1214,7 +1214,7 @@ class ExpSummaryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
-        because because noteworthy details that belong to this model have
+        because noteworthy details that belong to this model have
         already been exported as a part of the ExplorationModel.
         """
         return dict(super(cls, cls).get_export_policy(), **{
