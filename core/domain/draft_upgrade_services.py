@@ -19,10 +19,10 @@
 from __future__ import annotations
 
 import logging
-from urllib.parse import urlparse   # pylint: disable=import-only-modules
+from urllib.parse import urlparse  # pylint: disable=import-only-modules
 
 from core import utils
-from core.domain import change_domain, exp_domain
+from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain

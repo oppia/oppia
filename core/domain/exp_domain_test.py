@@ -5747,14 +5747,33 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: '<p><oppia-noninteractive-link text-with-value="&amp;quotLink;&amp;quot;" url-with-value="&amp;quot;mailto:example@example.com&amp;quot;"></oppia-noninteractive-link></p>
-            <p><oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;" url-with-value="&amp;quot;http://www.google.com&amp;quot;"></oppia-noninteractive-link></p>
+      html: '<p><oppia-noninteractive-link
+             text-with-value="&amp;quotLink;&amp;quot;"
+              url-with-value="&amp;quot;mailto:example@example.com&amp;quot;">
+            </oppia-noninteractive-link></p>
+            <p><oppia-noninteractive-link
+             text-with-value="&amp;quot;Google&amp;quot;"
+              url-with-value="&amp;quot;http://www.google.com&amp;quot;">
+            </oppia-noninteractive-link></p>
             <p><oppia-noninteractive-link></oppia-noninteractive-link></p>
-            <p><oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org&amp;quot;"></oppia-noninteractive-link></p>
-            <p><oppia-noninteractive-link url-with-value="&amp;quot;https://www.test.com&amp;quot;"></oppia-noninteractive-link></p>
-            <p><oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;"></oppia-noninteractive-link></p>
-            <p><oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.test.com&amp;quot;"></oppia-noninteractive-link></p>
-            <p><oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;" url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link></p>'
+            <p><oppia-noninteractive-link
+             text-with-value="&amp;quot;Oppia&amp;quot;"
+             url-with-value="&amp;quot;https://www.oppia.org&amp;quot;">
+            </oppia-noninteractive-link></p>
+            <p><oppia-noninteractive-link
+             url-with-value="&amp;quot;https://www.test.com&amp;quot;">
+            </oppia-noninteractive-link></p>
+            <p><oppia-noninteractive-link
+             text-with-value="&amp;quot;Oppia&amp;quot;">
+            </oppia-noninteractive-link></p>
+            <p><oppia-noninteractive-link
+             text-with-value="&amp;quot;&amp;quot;"
+              url-with-value="&amp;quot;https://www.test.com&amp;quot;">
+            </oppia-noninteractive-link></p>
+            <p><oppia-noninteractive-link
+             text-with-value="&amp;quot;Oppia&amp;quot;"
+              url-with-value="&amp;quot;&amp;quot;">
+            </oppia-noninteractive-link></p>'
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -5779,7 +5798,7 @@ states_schema_version: 52
 tags: []
 title: ''
 """)
-
+        # pylint: disable=line-too-long
         latest_sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -5828,7 +5847,7 @@ states_schema_version: 53
 tags: []
 title: ''
 """)
-
+        # pylint: enable=line-too-long
  
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
