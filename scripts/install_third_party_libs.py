@@ -132,8 +132,7 @@ def compile_protobuf_files(proto_files_paths):
         BUF_DIR,
         BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])
     for path in proto_files_paths:
-        command = [
-            buf_path, 'generate', path]
+        command = [buf_path, 'generate', path]
         process = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             env=proto_env)
