@@ -3218,26 +3218,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         for state_dict in states_dict.values():
             translations_mapping = (
-            state_dict['written_translations']['translations_mapping'])
-
-            for translations in translations_mapping.values():
-                for written_translation in translations.values():
-                    if isinstance(written_translation['translation'], List):
-                        translated_element_list = []
-
-                        for element in written_translation['translation']:
-                            element = cls.fix_non_interactive_links(element)
-                            translated_element_list.append(element)
-
-                        written_translation['translation'] = (
-                                translated_element_list)
-                    else:
-                        fixed_translation = (
-                                cls.fix_non_interactive_links(
-                                written_translation['translation']))
-
-                        written_translation['translation'] = (
-                                fixed_translation)
+                    state_dict['written_translations']['translations_mapping'])
+            for language_code in translations_mapping['content']:
+                written_translation = (
+                    translations_mapping['content'][language_code])
+                # Here, we are narrowing down the type from
+                # Union[List[str], str] to str.
+                assert isinstance(
+                    written_translation['translation'],
+                    str
+                )
+                written_translation['translation'] = (
+                    cls.fix_non_interactive_links(
+                        written_translation['translation']))
 
         return states_dict
 

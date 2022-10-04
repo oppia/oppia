@@ -5725,7 +5725,7 @@ title: Title
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-    def test_load_from_v57_with_invalid_links(self) -> None:
+    def test_load_from_v57_to_v58_with_invalid_links(self) -> None:
         """Tests the migration of exploration with invalid links."""
 
         sample_yaml_content: str = (
@@ -5793,8 +5793,38 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content: {}
-states_schema_version: 52
+        content:
+            bn:
+                data_format: html
+                needs_update: false
+                translation: '<p><oppia-noninteractive-link
+                     text-with-value="&amp;quotLink;&amp;quot;"
+                      url-with-value="&amp;quot;mailto:example@example.com&amp;quot;">
+                    </oppia-noninteractive-link></p>
+                    <p><oppia-noninteractive-link
+                     text-with-value="&amp;quot;Google&amp;quot;"
+                      url-with-value="&amp;quot;http://www.google.com&amp;quot;">
+                    </oppia-noninteractive-link></p>
+                    <p><oppia-noninteractive-link></oppia-noninteractive-link></p>
+                    <p><oppia-noninteractive-link
+                     text-with-value="&amp;quot;Oppia&amp;quot;"
+                     url-with-value="&amp;quot;https://www.oppia.org&amp;quot;">
+                    </oppia-noninteractive-link></p>
+                    <p><oppia-noninteractive-link
+                     url-with-value="&amp;quot;https://www.test.com&amp;quot;">
+                    </oppia-noninteractive-link></p>
+                    <p><oppia-noninteractive-link
+                     text-with-value="&amp;quot;Oppia&amp;quot;">
+                    </oppia-noninteractive-link></p>
+                    <p><oppia-noninteractive-link
+                     text-with-value="&amp;quot;&amp;quot;"
+                      url-with-value="&amp;quot;https://www.test.com&amp;quot;">
+                    </oppia-noninteractive-link></p>
+                    <p><oppia-noninteractive-link
+                     text-with-value="&amp;quot;Oppia&amp;quot;"
+                      url-with-value="&amp;quot;&amp;quot;">
+                    </oppia-noninteractive-link></p>'
+states_schema_version: 41
 tags: []
 title: ''
 """)
@@ -5819,9 +5849,9 @@ states:
     content:
       content_id: content
       html: <p></p> <p><oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;"
-        url-with-value="&amp;quot;https://www.google.com&amp;quot;"></oppia-noninteractive-link></p>
+        url-with-value="&amp;quot;https://www.google.com&amp;quot;"> </oppia-noninteractive-link></p>
         <p></p> <p><oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;"
-        url-with-value="&amp;quot;https://www.oppia.org&amp;quot;"></oppia-noninteractive-link></p>
+        url-with-value="&amp;quot;https://www.oppia.org&amp;quot;"> </oppia-noninteractive-link></p>
         <p></p> <p></p> <p></p> <p></p>
     interaction:
       answer_groups: []
@@ -5842,13 +5872,21 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content: {}
+        content:
+          bn:
+            data_format: html
+            needs_update: false
+            translation: <p></p> <p><oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;"
+              url-with-value="&amp;quot;https://www.google.com&amp;quot;"> </oppia-noninteractive-link></p>
+              <p></p> <p><oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;"
+              url-with-value="&amp;quot;https://www.oppia.org&amp;quot;"> </oppia-noninteractive-link></p>
+              <p></p> <p></p> <p></p> <p></p>
 states_schema_version: 53
 tags: []
 title: ''
 """)
         # pylint: enable=line-too-long
- 
+        self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
