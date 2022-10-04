@@ -292,6 +292,7 @@ class LookupPrTests(test_utils.GenericTestBase):
             'a': 'foo',
             'b': 10,
         }
+        assert pr is not None
         self.assertDictEqual(pr, expected_pr)
 
     def test_pr_not_found(self) -> None:
@@ -308,7 +309,7 @@ class LookupPrTests(test_utils.GenericTestBase):
             pr = check_if_pr_is_low_risk.lookup_pr(
                 'oppia', 'oppia', '1')
 
-        self.assertDictEqual(pr, {})
+        self.assertEqual(pr, None)
 
 
 def _make_pr(

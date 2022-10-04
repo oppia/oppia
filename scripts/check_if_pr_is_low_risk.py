@@ -30,7 +30,7 @@ import urllib
 from core import utils
 from scripts import common
 
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Optional, Tuple
 from typing_extensions import Final, TypedDict
 
 GITHUB_API_PR_ENDPOINT: Final = (
@@ -143,7 +143,7 @@ def load_diff(
     return diff_files, file_diffs
 
 
-def lookup_pr(owner: str, repo: str, pull_number: str) -> PRDict:
+def lookup_pr(owner: str, repo: str, pull_number: str) -> Optional[PRDict]:
     """Lookup a PR using the GitHub API.
 
     Args:
@@ -162,10 +162,7 @@ def lookup_pr(owner: str, repo: str, pull_number: str) -> PRDict:
         {'Accept': 'application/vnd.github.v3+json'})
     response = utils.url_open(request)
     if response.getcode() != 200:
-        # Here we use cast because here we are returning an empty dict that has
-        # Dict[Any, Any] type. Thus, to return an appropriate ( or expected )
-        # type from the function, we used cast here.
-        return cast(PRDict, {})
+        return None
     pr: PRDict = json.load(response)
     response.close()
     return pr
