@@ -41,8 +41,16 @@ import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
+import { TranslateService } from '@ngx-translate/core';
 
-describe('Exploration engine service ', () => {
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams: Object | undefined): string {
+    return key;
+  }
+}
+
+fdescribe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
@@ -372,7 +380,13 @@ describe('Exploration engine service ', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
+      ],
     });
 
     alertsService = TestBed.inject(AlertsService);
@@ -510,6 +524,49 @@ describe('Exploration engine service ', () => {
       expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
       expect(isAnswerCorrect).toBe(true);
     });
+
+    it('should check for misspellings if the answer ' +
+      'is incorrect', () => {
+        let initSuccessCb = jasmine.createSpy('success');
+        let submitAnswerSuccessCb = jasmine.createSpy('success');
+        let answer = 'answoo';
+        let answerClassificationResult = new AnswerClassificationResult(
+          outcomeObjectFactory.createFromBackendDict({
+            dest: 'Start',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: 'feedback_1',
+              html: 'Answer is not correct!'
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          }), 1, 0, 'default_outcome');
+
+        let lastCard = StateCard.createNewCard(
+          'Card 1', 'Content html', 'Interaction text', null,
+          null, null, 'content_id', audioTranslationLanguageService);
+
+        spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+        spyOn(playerTranscriptService, 'getLastStateName')
+          .and.returnValue('Start');
+        spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+        spyOn(answerClassificationService, 'getMatchingClassificationResult')
+          .and.returnValue(answerClassificationResult);
+
+        explorationEngineService.init(
+          explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+        const isAnswerCorrect = explorationEngineService.submitAnswer(
+          answer, textInputService, submitAnswerSuccessCb);
+
+
+        expect(submitAnswerSuccessCb).toHaveBeenCalled();
+        expect(answerClassificationService.isAnswerOnlyMisspelled(explorationEngineService.getStateCardByName('Start').getInteraction(), answer)).toBe(true);
+        expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
+        expect(isAnswerCorrect).toBe(false);
+    })
 
     it('should not submit answer again if the answer ' +
       'is already being processed', () => {
@@ -924,6 +981,13 @@ describe('Exploration engine service ', () => {
     expect(() => {
       explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
     }).toThrowError('Cannot populate exploration in learner mode.');
+  });
+
+  it('should get a random i18n key', () => {
+    spyOn(Math, 'random').and.returnValue(0.45);
+
+    expect(explorationEngineService.getRandomI18nKey(
+      'KEY_PREFIX', 3)).toEqual('KEY_PREFIX_2');
   });
 
   it('should return state when calling \'getStateFromStateName\'', () => {

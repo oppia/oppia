@@ -18,6 +18,8 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { AppConstants } from 'app.constants';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
@@ -89,7 +91,8 @@ export class ExplorationEngineService {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private translateService: TranslateService
   ) {
     this.setExplorationProperties();
   }
@@ -553,8 +556,10 @@ export class ExplorationEngineService {
     isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
       if (answerIsOnlyMisspelled) {
         // Change the feedbackHtml.
-        // !TODO: Add in object of responses (To be internationalized).
-        feedbackHtml = "Oops you misspelled. Mind correcting it?"
+        let i18NKeyPrefix = 'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT'
+        feedbackHtml = this.translateService.instant(
+          this.getRandomI18nKey(i18NKeyPrefix, 3)
+        )
       }
     }
 
@@ -572,6 +577,14 @@ export class ExplorationEngineService {
       (oldStateName === this.exploration.initStateName), isFirstHit, false,
       _nextFocusLabel);
     return answerIsCorrect;
+  }
+
+  getRandomI18nKey(
+      i18nKeyPrefix: string,
+      availableKeyCount: number,
+  ): string {
+    const randomValue = Math.floor(Math.random() * availableKeyCount) + 1;
+    return i18nKeyPrefix + '_' + randomValue.toString();
   }
 
   isAnswerBeingProcessed(): boolean {
