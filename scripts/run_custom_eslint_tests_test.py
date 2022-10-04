@@ -40,7 +40,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         nyc_path = os.path.join('node_modules', 'nyc', 'bin', 'nyc.js')
-        mocha_path = os.path.join('node_modules', 'mocha', 'bin', 'mocha')
+        mocha_path = os.path.join('node_modules', 'mocha', 'bin', 'mocha.js')
         filepath = 'scripts/linters/custom_eslint_checks/rules/'
         self.proc_args = [node_path, nyc_path, mocha_path, filepath]
 
