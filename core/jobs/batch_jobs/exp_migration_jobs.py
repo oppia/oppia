@@ -207,10 +207,18 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_new_translation_model(
-            exp_translation_model: translation_models.EntityTranslationsModel
-        ) -> result.Result[translation_models.EntityTranslationsModel]:
+        exp_translation_model: translation_models.EntityTranslationsModel
+    ) -> translation_models.EntityTranslationsModel:
         """Generates new translation models for the given exploration
         model.
+
+        Args:
+            exp_translation_model: EntityTranslationsModel. The old translation
+                model for generating new model.
+
+        Returns:
+            EntityTranslationsModel. The new translation model with updated
+            version number.
         """
         with datastore_services.get_ndb_context():
             new_model = translation_models.EntityTranslationsModel.create_new(
@@ -222,7 +230,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             )
             datastore_services.update_timestamps_multi([new_model])
 
-        return result.Ok(new_model)
+        return new_model
 
     @staticmethod
     def _update_exploration(
@@ -429,7 +437,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
-        translation_models_results = (
+        translation_models_to_put = (
             transformed_exp_objects_list
             | 'Fetch translation models' >> beam.FlatMap(
                 lambda x: x['exp_translation_models'])
@@ -438,18 +446,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         translation_models_job_run_results = (
-            translation_models_results
+            translation_models_to_put
             | 'Generate results for new translation models' >> (
-                job_result_transforms.ResultsToJobRunResults(
+                job_result_transforms.CountObjectsToJobRunResult(
                     'TRANSLATION MODELS GENERATED'))
-        )
-
-        translation_models_to_put = (
-            translation_models_results
-            | 'Filter models generated with Ok status' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
-            | 'Unwrap models from the result' >> beam.Map(
-                lambda result_item: result_item.unwrap())
         )
 
         unused_put_results = (
