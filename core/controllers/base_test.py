@@ -181,16 +181,12 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             if url == '/console_errors':
                 continue
 
-            if 'bulk_email_webhook_endpoint' in url:
-                with self.swap_to_always_return(
+            with self.swap_to_always_return(
                     secrets_services, 'get_secret', 'secret'
-                ):
-                    self.get_response_without_checking_for_errors(url, [404])
-                continue
-
-            # Some of these will 404 or 302. This is expected.
-            self.get_response_without_checking_for_errors(
-                url, [200, 301, 302, 400, 401, 404])
+            ):
+                # Some of these will 404 or 302. This is expected.
+                self.get_response_without_checking_for_errors(
+                    url, [200, 301, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
