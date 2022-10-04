@@ -22,7 +22,6 @@ import os
 import sys
 import tempfile
 
-from core import utils
 from core.tests import test_utils
 from scripts import check_backend_associated_test_file
 
@@ -79,7 +78,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             f.write('Example code')
         (
             check_backend_associated_test_file.
-                FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(os.path.relpath(self.backend_file)))
+                FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(
+                    os.path.relpath(self.backend_file)))
         with self.print_swap, self.swap_logging, self.swap_exit:
             check_backend_associated_test_file.main()
 
@@ -94,7 +94,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             self) -> None:
         tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
         self.backend_file = os.path.join(tempdir.name, 'backend_file.py')
-        self.backend_test_file = os.path.join(tempdir.name, 'backend_file_test.py')
+        self.backend_test_file = os.path.join(
+            tempdir.name, 'backend_file_test.py')
 
         with open(self.backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
