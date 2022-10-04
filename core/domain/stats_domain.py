@@ -32,12 +32,15 @@ from core.domain import exp_domain
 from typing import Any, Dict, List, Optional, Union
 from typing_extensions import Final, Literal, TypedDict
 
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
 
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
+MYPY = False
+if MYPY:  # pragma: no cover
+    from core.domain import state_domain
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
@@ -66,6 +69,7 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
 
+# TODO(#15995): Narrow down this Dict type to each issue customization arg type.
 IssuesCustomizationArgsDictType = Dict[
     str, Dict[str, Union[str, int, List[str]]]
 ]
@@ -74,7 +78,7 @@ IssuesCustomizationArgsDictType = Dict[
 class SubmittedAnswerDict(TypedDict):
     """Dictionary representing the SubmittedAnswer object."""
 
-    answer: Optional[str]
+    answer: state_domain.AcceptableCorrectAnswerTypes
     time_spent_in_sec: float
     answer_group_index: int
     rule_spec_index: int
@@ -84,6 +88,16 @@ class SubmittedAnswerDict(TypedDict):
     params: Dict[str, Union[str, int]]
     rule_spec_str: Optional[str]
     answer_str: Optional[str]
+
+
+class StateAnswersDict(TypedDict):
+    """Dictionary representing the StateAnswers object."""
+
+    exploration_id: str
+    exploration_version: int
+    state_name: str
+    interaction_id: str
+    submitted_answer_list: List[SubmittedAnswerDict]
 
 
 class ExplorationIssueDict(TypedDict):
@@ -166,7 +180,7 @@ class LearnerActionDict(TypedDict):
 class AnswerOccurrenceDict(TypedDict):
     """Dictionary representing the AnswerOccurrence object."""
 
-    answer: str
+    answer: state_domain.AcceptableCorrectAnswerTypes
     frequency: int
 
 
@@ -610,7 +624,7 @@ class StateStats:
             self.__class__.__name__,
             ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         """Implements == comparison between two StateStats instances, returning
@@ -800,16 +814,20 @@ class SessionStateStats:
             'num_times_solution_viewed',
             'num_completions'
         ]
-        # Use ignore[misc] here because mypy does not recognize that keys
-        # represented by the variable exp_stats_property are string literals.
         for exp_stats_property in exploration_stats_properties:
             if exp_stats_property not in aggregated_stats:
                 raise utils.ValidationError(
                     '%s not in aggregated stats dict.' % (exp_stats_property))
+            # Here we use MyPy ignore because MyPy does not recognize
+            # that keys represented by the variable exp_stats_property
+            # are string literals.
             if not isinstance(aggregated_stats[exp_stats_property], int): # type: ignore[misc]
                 raise utils.ValidationError(
                     'Expected %s to be an int, received %s' % (
                         exp_stats_property,
+                        # Here we use MyPy ignore because MyPy does not
+                        # recognize that keys represented by the variable
+                        # exp_stats_property are string literals.
                         aggregated_stats[exp_stats_property] # type: ignore[misc]
                     )
                 )
@@ -835,7 +853,7 @@ class SessionStateStats:
         # hence dict form of the data is returned from here.
         return aggregated_stats
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         """Implements == comparison between two SessionStateStats instances,
@@ -1132,7 +1150,7 @@ class ExplorationIssue:
         self.schema_version = schema_version
         self.is_valid = is_valid
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         if not isinstance(other, ExplorationIssue):
@@ -1468,7 +1486,7 @@ class SubmittedAnswer:
 
     def __init__(
         self,
-        answer: Optional[str],
+        answer: state_domain.AcceptableCorrectAnswerTypes,
         interaction_id: str,
         answer_group_index: int,
         rule_spec_index: int,
@@ -1623,7 +1641,10 @@ class AnswerOccurrence:
     of times.
     """
 
-    def __init__(self, answer: str, frequency: int) -> None:
+    def __init__(
+        self, answer: state_domain.AcceptableCorrectAnswerTypes,
+        frequency: int
+    ) -> None:
         """Initialize domain object for answer occurrences."""
         self.answer = answer
         self.frequency = frequency
@@ -1806,7 +1827,9 @@ class StateAnswersCalcOutput:
         state_name: str,
         interaction_id: str,
         calculation_id: str,
-        calculation_output: AnswerCalculationOutput
+        calculation_output: Union[
+            AnswerFrequencyList, CategorizedAnswerFrequencyLists
+        ]
     ) -> None:
         """Initialize domain object for state answers calculation output.
 

@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,17 +17,17 @@
  * the exploration editor.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
+  require('../webdriverio_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('ExplorationFeedback', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
@@ -216,6 +216,7 @@ describe('ExplorationFeedback', function() {
     await explorationEditorPage.navigateToFeedbackTab();
     await explorationEditorFeedbackTab.sendResponseToLatestFeedback(
       feedbackResponse);
+    await explorationEditorFeedbackTab.expectNumberOfFeedbackMessagesToBe(2);
     messages = (
       await explorationEditorFeedbackTab.readFeedbackMessagesFromThread());
     expect(messages.length).toEqual(2);
@@ -223,6 +224,7 @@ describe('ExplorationFeedback', function() {
     expect(await messages[1].getText()).toEqual(feedbackResponse);
     await browser.refresh();
     await explorationEditorFeedbackTab.selectLatestFeedbackThread();
+    await explorationEditorFeedbackTab.expectNumberOfFeedbackMessagesToBe(2);
     messages = (
       await explorationEditorFeedbackTab.readFeedbackMessagesFromThread());
     expect(messages.length).toEqual(2);

@@ -1595,9 +1595,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update topic name')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_url_fragment_existence_fails_for_non_string_url_fragment(
         self
     ) -> None:
@@ -1605,9 +1605,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Topic URL fragment should be a string.'):
             topic_services.does_topic_with_url_fragment_exist(123)  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_name_existence_fails_for_non_string_name(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Name should be a string.'):
@@ -1959,6 +1959,64 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(Exception, error_msg):
             topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+                [additions_id, 'incorrect_topic_id'])
+
+    def test_get_topic_id_to_topic_name_dict(self) -> None:
+        fractions_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            fractions_id, self.user_id, name='Fractions',
+            url_fragment='fractions', description='Description of fraction',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        old_value: List[str] = []
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': old_value,
+                'new_value': [self.skill_id_1]
+            })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, fractions_id, changelist,
+            'Adds diagnostic test.')
+
+        additions_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            additions_id, self.user_id, name='Additions',
+            url_fragment='additions', description='Description of addition.',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': old_value,
+                'new_value': [self.skill_id_2]
+            })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, additions_id, changelist,
+            'Adds diagnostic test.')
+
+        expected_dict = {
+            fractions_id: 'Fractions',
+            additions_id: 'Additions'
+        }
+        self.assertEqual(
+            topic_services.get_topic_id_to_topic_name_dict(
+                [fractions_id, additions_id]), expected_dict)
+
+        error_msg = (
+            'No corresponding topic models exist for these topic IDs: %s.'
+            % (', '.join(['']))
+        )
+        with self.assertRaisesRegex(Exception, error_msg):
+            topic_services.get_topic_id_to_topic_name_dict(
                 [additions_id, 'incorrect_topic_id'])
 
 
