@@ -12,10 +12,10 @@
   <div class="modal-body">
     <div class="oppia-question-editor-section">
       <h3>Selected Difficulty: {{skillDifficultyString}}
-        <i role="button"
-           class="material-icons oppia-editor-edit-icon select-difficulty-icon oppia-editable-section"
+        <i role="button"          
+           class="fas fa-pen oppia-editor-edit-icon select-difficulty-icon oppia-editable-section"
            (click)="onClickChangeDifficulty()"
-           title="Edit Skill Difficulty">&#xE254;
+           title="Edit Skill Difficulty">
         </i>
       </h3>
       <div *ngIf="skill.getRubricExplanations(skillDifficultyString).length > 0">
@@ -92,6 +92,7 @@
 
   .select-difficulty-icon.oppia-editor-edit-icon {
     position: unset;
+    font-size:12px
   }
 
   .select-difficulty-icon.oppia-editor-edit-icon:hover {
