@@ -52,7 +52,7 @@ jobs:
           cache-name: cache-build-files
         with:
           path: /home/runner/work/oppia/
-          key: ${{ env.GIT_COMMIT_SHORT_SHA }}
+          key: ${{ env.GITHUB_SHA }}
 
   e2e_user_features_and_library:
     runs-on:  ${{ matrix.os }}
@@ -73,7 +73,7 @@ jobs:
           cache-name: cache-build-files
         with:
           path: /home/runner/work/oppia/
-          key: ${{ env.GIT_COMMIT_SHORT_SHA }}
+          key: ${{ env.GITHUB_SHA }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -91,9 +91,9 @@ jobs:
           cache-name: cache-build-files
         with:
           path: /home/runner/work/oppia/
-          key: ${{ env.GIT_COMMIT_SHORT_SHA }}
+          key: ${{ env.GITHUB_SHA }}
           restore-keys: |
-                        ${{ env.GIT_COMMIT_SHORT_SHA }}
+                        ${{ env.GITHUB_SHA}}
       - id: check-risk
         name: Check if PR is low-risk
         uses: ./.github/actions/check-if-pr-is-low-risk
