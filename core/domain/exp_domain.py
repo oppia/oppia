@@ -4538,6 +4538,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str. Returns the updated html value.
         """
         soup = bs4.BeautifulSoup(html, 'html.parser')
+        empty_values = [
+            '&quot;&quot;', '\\"&quot;&quot;\\"', '', '\'\'', '\"\"', '<p></p>']
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
         for tag in tabs_tags:
             if tag.has_attr('tab_contents-with-value'):
@@ -4586,11 +4588,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 continue
 
             if tag.has_attr('heading-with-value'):
-                collapsible_heading_json = (
-                    utils.unescape_html(tag['heading-with-value']))
-                collapsible_heading_list = json.loads(
-                    collapsible_heading_json)
-                if len(collapsible_heading_list) == 0:
+                if tag['heading-with-value'].strip() in empty_values:
                     tag.decompose()
                     continue
             else:
