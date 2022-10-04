@@ -5799,16 +5799,20 @@ states:
                 needs_update: false
                 translation: '<p><oppia-noninteractive-link
                      text-with-value="&amp;quotLink;&amp;quot;"
-                      url-with-value="&amp;quot;mailto:example@example.com&amp;quot;">
+                      url-with-value="
+                    &amp;quot;mailto:example@example.com&amp;quot;">
                     </oppia-noninteractive-link></p>
                     <p><oppia-noninteractive-link
                      text-with-value="&amp;quot;Google&amp;quot;"
-                      url-with-value="&amp;quot;http://www.google.com&amp;quot;">
+                      url-with-value="&amp;quot;
+                    http://www.google.com&amp;quot;">
                     </oppia-noninteractive-link></p>
-                    <p><oppia-noninteractive-link></oppia-noninteractive-link></p>
+                    <p><oppia-noninteractive-link>
+                    </oppia-noninteractive-link></p>
                     <p><oppia-noninteractive-link
                      text-with-value="&amp;quot;Oppia&amp;quot;"
-                     url-with-value="&amp;quot;https://www.oppia.org&amp;quot;">
+                     url-with-value="&amp;quot;
+                    https://www.oppia.org&amp;quot;">
                     </oppia-noninteractive-link></p>
                     <p><oppia-noninteractive-link
                      url-with-value="&amp;quot;https://www.test.com&amp;quot;">
@@ -5828,7 +5832,7 @@ states_schema_version: 41
 tags: []
 title: ''
 """)
-        # pylint: disable=line-too-long
+        # pylint: disable=line-too-long  # pylint: disable=single-line-pragma
         latest_sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -5885,8 +5889,7 @@ states_schema_version: 53
 tags: []
 title: ''
 """)
-        # pylint: enable=line-too-long
-        self.maxDiff = None
+        # pylint: enable=line-too-long  # pylint: disable=single-line-pragma
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
