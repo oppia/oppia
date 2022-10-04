@@ -402,7 +402,11 @@ class BaseTranslatableObject:
             content_collection.content_id_to_translatable_content.values())
         for translatable_content in translatable_contents:
             if translatable_content.content_format == (
-                TranslatableContentFormat.HTML):
+                TranslatableContentFormat.HTML
+            ):
+                # Ruling out the possibility of any other type for MyPy type
+                # checking because content_value for rules can be a list of
+                # strings.
                 assert isinstance(translatable_content.content_value, str)
                 html_list.append(translatable_content.content_value)
 
@@ -411,18 +415,22 @@ class BaseTranslatableObject:
     def validate_translatable_contents(
         self, next_content_id_index: int
     ) -> None:
-        """Validates the content Ids of the translatable contents."""
+        """Validates the content Ids of the translatable contents.
+
+        Args:
+            next_content_id_index: int. The index for generating the Id
+                for a content.
+        """
         content_id_to_translatable_content = (
             self.get_translatable_contents_collection()
             .content_id_to_translatable_content)
 
-        for content_id, _ in (
-                content_id_to_translatable_content.items()):
+        for content_id in content_id_to_translatable_content.keys():
             content_id_suffix = content_id.split('_')[-1]
 
             if (
-                    content_id_suffix.isdigit() and
-                    int(content_id_suffix) > next_content_id_index
+                content_id_suffix.isdigit() and
+                int(content_id_suffix) > next_content_id_index
             ):
                 raise utils.ValidationError(
                     'Expected all content id indexes to be less than the "next '
@@ -472,10 +480,10 @@ class EntityTranslation:
         self.translations = translations
 
     def to_dict(self) -> EntityTranslationDict:
-        translations_dict = {}
-        for content_id, translated_content in (
-                self.translations.items()):
-            translations_dict[content_id] = translated_content.to_dict()
+        translations_dict = {
+            content_id: translated_content.to_dict()
+            for content_id, translated_content in self.translations.items()
+        }
 
         return {
             'entity_id': self.entity_id,
@@ -487,8 +495,7 @@ class EntityTranslation:
 
     @classmethod
     def from_dict(
-        cls,
-        entity_translation_dict: EntityTranslationDict
+        cls, entity_translation_dict: EntityTranslationDict
     ) -> EntityTranslation:
         """Creates the EntityTranslation from the given dict.
 
@@ -557,7 +564,8 @@ class EntityTranslation:
         content_id: str,
         content_value: feconf.ContentValueType,
         content_format: TranslatableContentFormat,
-        needs_update: bool) -> None:
+        needs_update: bool
+    ) -> None:
         """Adds new TranslatedContent in the object.
 
         Args:
@@ -572,21 +580,19 @@ class EntityTranslation:
 
     def get_translation_count(self) -> int:
         """Returs the number of updated translations avialable."""
-        count = 0
-        for translated_content in self.translations.values():
-            if not translated_content.needs_update:
-                count += 1
-
-        return count
+        return len(
+            translated_content
+            for translated_content in self.translations.values()
+            if not translated_content.needs_update
+        )
 
     def get_translation_needs_update_count(self) -> int:
         """Returs the number of translations needs update."""
-        count = 0
-        for translated_content in self.translations.values():
-            if translated_content.needs_update:
-                count += 1
-
-        return count
+        return len(
+            translated_content
+            for translated_content in self.translations.values()
+            if translated_content.needs_update
+        )
 
     def remove_translations(self, content_ids: List[str]) -> None:
         """Remove translations for the given list of content Ids.

@@ -71,6 +71,9 @@ def _migrate_states_schema(
                 this dict are state names.
         init_state_name: str. Name of initial state.
 
+    Returns:
+        None|int. The next content Id index for generating new content Id.
+
     Raises:
         Exception. The given states_schema_version is invalid.
     """

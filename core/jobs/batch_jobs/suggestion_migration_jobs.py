@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -142,17 +142,19 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         unmigrated_translation_suggestion_models = (
             self.pipeline
-            | 'Get all GeneralSuggestionModels' >> ndb_io.GetModels(
+            | 'Get translation suggestion models in review' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False))
-            | 'Filter translation suggestions in review' >> (
-                beam.Filter(
-                    lambda model: (
-                        model.suggestion_type ==
-                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                        and model.status == suggestion_models.STATUS_IN_REVIEW
-                    ),
-                ))
+                    include_deleted=False).filter(
+                        (
+                            suggestion_models
+                            .GeneralSuggestionModel.suggestion_type
+                        ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                    ).filter(
+                        suggestion_models.GeneralSuggestionModel.status == (
+                            suggestion_models.STATUS_IN_REVIEW
+                        )
+                    )
+            )
         )
 
         explorations = (

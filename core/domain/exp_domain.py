@@ -27,7 +27,6 @@ import collections
 import copy
 import datetime
 import json
-import logging
 import re
 import string
 
@@ -3158,6 +3157,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             current_states_schema_version: int. The current states
                 schema version.
             init_state_name: str. Name of initial state.
+
+        Returns:
+            None|int. The next content Id index for generating new content Id.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)

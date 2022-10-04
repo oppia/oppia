@@ -460,10 +460,10 @@ def main(args=None):
                 print('Redirecting to its corresponding test file...')
                 all_test_targets = [parsed_args.test_target + '_test']
         elif parsed_args.test_shard:
-            # validation_error = check_shards_match_tests(
-            #     include_load_tests=True)
-            # if validation_error:
-            #     raise Exception(validation_error)
+            validation_error = check_shards_match_tests(
+                include_load_tests=True)
+            if validation_error:
+                raise Exception(validation_error)
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
         else:

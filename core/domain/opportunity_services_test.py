@@ -1043,11 +1043,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
 class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
         test_utils.GenericTestBase):
-    """TODO
+    """Unit test validating opportunity gets updated after accepting translation
+    suggetion.
     """
 
     def setUp(self) -> None:
-        super(OpportunityUpdateOnAcceeptingSuggestionUnitTest, self).setUp()
+        super().setUp()
         supported_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
         self.new_incomplete_translation_language_codes = list(

@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import caching_services, exp_fetchers
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
@@ -238,7 +238,7 @@ class MigrateExplorationJobTests(
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, "", [])
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(**{
             'id': self.NEW_EXP_ID,
             'title': exp_model.title,
@@ -386,7 +386,7 @@ class MigrateExplorationJobTests(
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, "", [])
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(**{
             'id': self.NEW_EXP_ID,
             'title': exp_model.title,
@@ -636,7 +636,7 @@ class AuditExplorationMigrationJobTests(
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, "", [])
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(**{
             'id': self.NEW_EXP_ID,
             'title': exp_model.title,

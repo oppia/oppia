@@ -265,6 +265,8 @@ class QuestionModel(base_models.VersionedModel):
             inapplicable_skill_misconception_ids: list(str). The optional
                 skill misconception ids marked as not applicable to the
                 question.
+            next_content_id_index: int. The next content Id indext to generate
+                new content Id.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.

@@ -481,7 +481,8 @@ class SubtopicPage:
 
     def update_page_contents_written_translations(
         self,
-        new_page_written_translations_dict: translation_domain.WrittenTranslationsDict
+        new_page_written_translations_dict: (
+            translation_domain.WrittenTranslationsDict)
     ) -> None:
         """The new value for the written_translations data field.
 

@@ -137,6 +137,7 @@ def get_all_entity_translations_for_entity(
 
     return entity_translation_objects
 
+
 def get_entity_translation(
     entity_type: feconf.TranslatableEntityType,
     entity_id: str,

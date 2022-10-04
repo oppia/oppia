@@ -187,8 +187,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _extract_required_translation_model(
-        exp_translation_models: List[List[
-            translation_models.EntityTranslationsModel]],
+        exp_translation_models: List[
+            translation_models.EntityTranslationsModel],
         exp_version: int
     ) -> List[translation_models.EntityTranslationsModel]:
         """Extracts all the latets translation models from the given list of
@@ -199,14 +199,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 given entity translation models.
             exp_version: int. The latest version number of the exploration.
         """
-        if not exp_translation_models:
-            return []
-
-        all_models = []
-        for translation_model in list(exp_translation_models[0]):
-            if translation_model.entity_version == exp_version:
-                all_models.append(translation_model)
-        return all_models
+        return [
+            translation_model
+            for translation_model in list(exp_translation_models)
+            if translation_model.entity_version == exp_version
+        ]
 
     @staticmethod
     def _generate_new_translation_model(
@@ -377,9 +374,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exp_changes': objects['exp_changes'],
                 'exp_translation_models': (
                     self._extract_required_translation_model(
-                        objects['exp_translation_models'],
+                        objects['exp_translation_models'][0],
                         objects['exp_model'][0].version
-                    )
+                    ) if len(objects['exp_translation_models']) > 0 else []
                 )
             })
         )
@@ -434,9 +431,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
         translation_models_results = (
             transformed_exp_objects_list
-            | 'Fetch translation models' >> beam.Map(
+            | 'Fetch translation models' >> beam.FlatMap(
                 lambda x: x['exp_translation_models'])
-            | 'Create list of models' >> beam.FlatMap(lambda x: x)
             | 'Generate new translation models to put' >> beam.Map(
                 self._generate_new_translation_model)
         )

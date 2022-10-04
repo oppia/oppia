@@ -660,7 +660,15 @@ class Question(translation_domain.BaseTranslatableObject):
                         del question_state_dict['recorded_voiceovers'][
                             'voiceovers_mapping'][content_id]
                     if content_id in question_state_dict[
+                            # Here we use MyPy ignore because this is a
+                            # conversion function for old schema and the
+                            # StateDict doesn't have the writtent translation
+                            # property in the latest schema.
                             'written_translations']['translations_mapping']: # type: ignore[misc]
+                            # Here we use MyPy ignore because this is a
+                            # conversion function for old schema and the
+                            # StateDict doesn't have the writtent translation
+                            # property in the latest schema.
                         del question_state_dict['written_translations'][ # type: ignore[misc]
                             'translations_mapping'][content_id]
 
@@ -1649,7 +1657,18 @@ class Question(translation_domain.BaseTranslatableObject):
         and WrittenTranslation from State. This version also updates the
         content-ids for each translatable field in the state with its new
         content-id.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
         """
+        # Here we use MyPy ignore because this is a conversion function for old
+        # schema and the StateDict doesn't have the writtent translation
+        # property in the latest schema.
         del question_state_dict['next_content_id_index'] # type: ignore[misc]
         del question_state_dict['written_translations'] # type: ignore[misc]
         states_dict, next_content_id_index = (

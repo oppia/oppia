@@ -582,115 +582,115 @@ title: Old Title
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     STATES_AT_V41 = {
-        "Introduction": {
-            "classifier_model_id": None,
-            "content": {"content_id": "content", "html": ""},
-            "interaction": {
-                "answer_groups": [
+        'Introduction': {
+            'classifier_model_id': None,
+            'content': {'content_id': 'content', 'html': ''},
+            'interaction': {
+                'answer_groups': [
                     {
-                        "outcome": {
-                            "dest": "End",
-                            "feedback": {
-                                "content_id": "feedback_1",
-                                "html": "<p>Correct!</p>",
+                        'outcome': {
+                            'dest': 'End',
+                            'feedback': {
+                                'content_id': 'feedback_1',
+                                'html': '<p>Correct!</p>',
                             },
-                            "labelled_as_correct": False,
-                            "missing_prerequisite_skill_id": None,
-                            "param_changes": [],
-                            "refresher_exploration_id": None,
+                            'labelled_as_correct': False,
+                            'missing_prerequisite_skill_id': None,
+                            'param_changes': [],
+                            'refresher_exploration_id': None,
                         },
-                        "rule_specs": [
+                        'rule_specs': [
                             {
-                                "inputs": {
-                                    "x": {
-                                        "contentId": "rule_input_3",
-                                        "normalizedStrSet": ["InputString"],
+                                'inputs': {
+                                    'x': {
+                                        'contentId': 'rule_input_3',
+                                        'normalizedStrSet': ['InputString'],
                                     }
                                 },
-                                "rule_type": "Equals",
+                                'rule_type': 'Equals',
                             }
                         ],
-                        "tagged_skill_misconception_id": None,
-                        "training_data": [],
+                        'tagged_skill_misconception_id': None,
+                        'training_data': [],
                     }
                 ],
-                "confirmed_unclassified_answers": [],
-                "customization_args": {
-                    "placeholder": {
-                        "value": {
-                            "content_id": "ca_placeholder_2",
-                            "unicode_str": ""
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_2',
+                            'unicode_str': ''
                         }
                     },
-                    "rows": {"value": 1},
+                    'rows': {'value': 1},
                 },
-                "default_outcome": {
-                    "dest": "Introduction",
-                    "feedback": {
-                        "content_id": "default_outcome",
-                        "html": ""
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': ''
                     },
-                    "labelled_as_correct": False,
-                    "missing_prerequisite_skill_id": None,
-                    "param_changes": [],
-                    "refresher_exploration_id": None,
+                    'labelled_as_correct': False,
+                    'missing_prerequisite_skill_id': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
-                "hints": [],
-                "id": "TextInput",
-                "solution": None,
+                'hints': [],
+                'id': 'TextInput',
+                'solution': None,
             },
-            "next_content_id_index": 4,
-            "param_changes": [],
-            "recorded_voiceovers": {
-                "voiceovers_mapping": {
-                    "ca_placeholder_2": {},
-                    "content": {},
-                    "default_outcome": {},
-                    "feedback_1": {},
-                    "rule_input_3": {},
+            'next_content_id_index': 4,
+            'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'ca_placeholder_2': {},
+                    'content': {},
+                    'default_outcome': {},
+                    'feedback_1': {},
+                    'rule_input_3': {},
                 }
             },
-            "solicit_answer_details": False,
-            "written_translations": {
-                "translations_mapping": {
-                    "ca_placeholder_2": {},
-                    "content": {},
-                    "default_outcome": {},
-                    "feedback_1": {},
-                    "rule_input_3": {},
+            'solicit_answer_details': False,
+            'written_translations': {
+                'translations_mapping': {
+                    'ca_placeholder_2': {},
+                    'content': {},
+                    'default_outcome': {},
+                    'feedback_1': {},
+                    'rule_input_3': {},
                 }
             },
         },
-        "End": {
-            "classifier_model_id": None,
-            "content": {
-                "content_id": "content",
-                "html": "<p>Congratulations, you have finished!</p>",
+        'End': {
+            'classifier_model_id': None,
+            'content': {
+                'content_id': 'content',
+                'html': '<p>Congratulations, you have finished!</p>',
             },
-            "interaction": {
-                "answer_groups": [],
-                "confirmed_unclassified_answers": [],
-                "customization_args": {
-                    "recommendedExplorationIds": {
-                        "value": []
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'recommendedExplorationIds': {
+                        'value': []
                     }
                 },
-                "default_outcome": None,
-                "hints": [],
-                "id": "EndExploration",
-                "solution": None,
+                'default_outcome': None,
+                'hints': [],
+                'id': 'EndExploration',
+                'solution': None,
             },
-            "next_content_id_index": 0,
-            "param_changes": [],
-            "recorded_voiceovers": {
-                "voiceovers_mapping": {
-                    "content": {}
+            'next_content_id_index': 0,
+            'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
                 }
             },
-            "solicit_answer_details": False,
-            "written_translations": {
-                "translations_mapping": {
-                    "content": {}
+            'solicit_answer_details': False,
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {}
                 }
             },
         },

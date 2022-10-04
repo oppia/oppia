@@ -36,7 +36,6 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
-from core.domain import opportunity_services
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -46,7 +45,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
-from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.domain import translation_services
 from core.domain import user_services
@@ -417,6 +415,7 @@ class EntityTranslationHandler(base.BaseHandler):
     """The handler to fetch translations for a given entity in a given
     language.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'entity_type': {
@@ -463,7 +462,7 @@ class EntityTranslationHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, entity_type, entity_id, entity_version, language_code):
         entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType.EXPLORATION, entity_id,
+            feconf.TranslatableEntityType(entity_type), entity_id,
             entity_version, language_code)
 
         self.render_json(entity_translation.to_dict())

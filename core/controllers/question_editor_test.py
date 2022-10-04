@@ -662,7 +662,6 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_put_with_long_commit_message_fails(self):
         payload = {}
-        content_id_generator = translation_domain.ContentIdGenerator()
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator)
         change_list = [{

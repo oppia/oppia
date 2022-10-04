@@ -254,7 +254,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         content_id_generator = translation_domain.ContentIdGenerator()
         state = state_domain.State.create_default_state(
             'ABC',
-            content_id_generator.generate(translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME),
             is_initial_state=True)
