@@ -196,6 +196,8 @@ var TopicEditorPage = function() {
   };
 
   this.expectSubtopicPageContentsToMatch = async function(contents) {
+    await action.click(
+      'Subtopic Page Content Button', subtopicPageContentButton);
     var text = await action.getText(
       'Subtopic Content Text', subtopicContentText);
     expect(text).toMatch(contents);

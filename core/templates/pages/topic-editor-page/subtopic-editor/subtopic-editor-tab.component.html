@@ -176,11 +176,11 @@
             </div>
             <div cdkDropList (cdkDropListDropped)="drop($event)">
               <div *ngFor="let skillSummary of subtopic?.getSkillSummaries();index as idx"
-                  class="skill-list-item"
-                  cdkDrag>
+                   class="skill-list-item"
+                   cdkDrag>
                 <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
                 <a *ngIf="!isSkillDeleted(skillSummary)"
-                  [href]="getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
+                   [href]="getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
                   {{ skillSummary.getDescription() }}
                 </a>
                 <div class="skill-options-box">
@@ -188,16 +188,16 @@
                   <i class="fa fa-ellipsis-v" (click)="showSkillEditOptions(idx)"></i>
                 </div>
                 <div class="skill-option-box"
-                    *ngIf="selectedSkillEditOptionsIndex === idx"
-                    (mouseleave)="showSkillEditOptions(null)"
-                    (click)="showSkillEditOptions(null)">
+                     *ngIf="selectedSkillEditOptionsIndex === idx"
+                     (mouseleave)="showSkillEditOptions(null)"
+                     (click)="showSkillEditOptions(null)">
                   <div class="skill-edit-option"
-                      (click)="removeSkillFromSubtopic(skillSummary)">
+                       (click)="removeSkillFromSubtopic(skillSummary)">
                     <i class="fa fa-trash"></i>
                     <span>Remove from subtopic</span>
                   </div>
                   <div class="skill-edit-option remove-from-topic-option"
-                      (click)="removeSkillFromTopic(skillSummary)">
+                       (click)="removeSkillFromTopic(skillSummary)">
                     <i class="fa fa-trash"></i>
                     <span>Remove from topic</span>
                   </div>
@@ -209,16 +209,16 @@
       </mat-card>
     </div>
     <div class="subtopic-right-box">
-        <div class="entity-count">
-          <div class="skill-count">
-            <span class="skill-count-value">{{ skillIds?.length }}</span>
-            <span class="skill-count-text">Skills</span>
-          </div>
-          <div class="question-count">
-            <span class="question-count-value">{{ questionCount }}</span>
-            <span class="question-count-text">Questions</span>
-          </div>
+      <div class="entity-count">
+        <div class="skill-count">
+          <span class="skill-count-value">{{ skillIds?.length }}</span>
+          <span class="skill-count-text">Skills</span>
         </div>
+        <div class="question-count">
+          <span class="question-count-value">{{ questionCount }}</span>
+          <span class="question-count-text">Questions</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
