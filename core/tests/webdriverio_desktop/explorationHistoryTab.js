@@ -81,7 +81,7 @@ describe('Exploration history', function() {
       'NumericInput', null, 'second', true, 'Equals', 6);
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 2'));
+      await forms.toRichText('this is card 2'), true);
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -588,7 +588,7 @@ describe('Exploration history', function() {
     await responseEditor.setDestination('second', true, null);
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 2'));
+      await forms.toRichText('this is card 2'), true);
     await explorationEditorMainTab.setInteraction('Continue');
 
     var responseEditor = await explorationEditorMainTab.getResponseEditor(

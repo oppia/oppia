@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,32 +16,15 @@
  * @fileoverview End-to-end tests to login, enable feature and re-login.
  */
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
 
 describe('Feature Gating Flow', function() {
   var ADMIN_USER1_EMAIL = 'admin1@featureGatingFlow.com';
   var ADMIN_USERNAME1 = 'featuregating1';
   var ADMIN_USER2_EMAIL = 'admin2@featureGatingFlow.com';
   var ADMIN_USERNAME2 = 'featuregating2';
-
-  // Indicator in Angular component that is visible if the dummy_feature
-  // is enabled, and the feature status is successfully loaded in the
-  // Angular component.
-  var agDummyFeatureIndicator = element(
-    by.css('.e2e-test-angular-dummy-feature-indicator'));
-
-  // Indicator in Angular component that is visible if the dummy_feature
-  // is enabled, and the backend dummy handler is also enabled.
-  var agDummyHandlerIndicator = agDummyFeatureIndicator.element(
-    by.css('.e2e-test-angular-dummy-handler-indicator'));
-
-  // Indicator in AngularJS directive that is visible if the dummy_feature
-  // is enabled, and the feature status is successfully loaded in the
-  // AngularJS directive.
-  var ajsDummyFeatureIndicator = element(
-    by.css('.e2e-test-angularjs-dummy-feature-indicator'));
 
   let adminPage = null;
 
@@ -77,8 +60,20 @@ describe('Feature Gating Flow', function() {
       await users.login(ADMIN_USER1_EMAIL, true);
       await adminPage.getFeaturesTab();
 
-      expect(await agDummyFeatureIndicator.isPresent()).toBe(false);
-      expect(await ajsDummyFeatureIndicator.isPresent()).toBe(false);
+      // Indicator in Angular component that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // Angular component.
+      var agDummyFeatureIndicator = $(
+        '.e2e-test-angular-dummy-feature-indicator');
+
+      // Indicator in AngularJS directive that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // AngularJS directive.
+      var ajsDummyFeatureIndicator = $(
+        '.e2e-test-angularjs-dummy-feature-indicator');
+
+      expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
+      expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
       await users.logout();
     }
   );
@@ -90,7 +85,7 @@ describe('Feature Gating Flow', function() {
 
     var dummy = await adminPage.getDummyFeatureElement();
 
-    expect(await dummy.isPresent()).toBe(true);
+    expect(await dummy.isExisting()).toBe(true);
     await users.logout();
   });
 
@@ -107,9 +102,26 @@ describe('Feature Gating Flow', function() {
 
       await adminPage.getFeaturesTab();
 
-      expect(await agDummyFeatureIndicator.isPresent()).toBe(false);
-      expect(await agDummyHandlerIndicator.isPresent()).toBe(false);
-      expect(await ajsDummyFeatureIndicator.isPresent()).toBe(false);
+      // Indicator in Angular component that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // Angular component.
+      var agDummyFeatureIndicator = $(
+        '.e2e-test-angular-dummy-feature-indicator');
+
+      // Indicator in Angular component that is visible if the dummy_feature
+      // is enabled, and the backend dummy handler is also enabled.
+      var agDummyHandlerIndicator = $(
+        '.e2e-test-angular-dummy-handler-indicator');
+
+      // Indicator in AngularJS directive that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // AngularJS directive.
+      var ajsDummyFeatureIndicator = $(
+        '.e2e-test-angularjs-dummy-feature-indicator');
+
+      expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
+      expect(await agDummyHandlerIndicator.isExisting()).toBe(false);
+      expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
       await users.logout();
     });
 });

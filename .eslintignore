@@ -1,7 +1,6 @@
 core/templates/expressions/parser.js
 core/templates/google-analytics.initializer.ts
 backend_prod_files/*
-core/tests/protractor.conf.js
 integrations/*
 integrations_dev/*
 assets/scripts/*

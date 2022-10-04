@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
  * the resultant display of explorations in the library.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Library index page', function() {
   var adminPage = null;
@@ -64,8 +64,10 @@ describe('Library index page', function() {
     var CATEGORY_ARCHITECTURE = 'Architecture';
     var CATEGORY_BUSINESS = 'Business';
     var LANGUAGE_ENGLISH = 'English';
-    var LANGUAGE_FRANCAIS = 'français';
-    var LANGUAGE_DEUTSCH = 'Deutsch';
+    var LANGUAGE_FRANCAIS = 'français (French)';
+    var LANGUAGE_FRANCAI = 'français';
+    var LANGUAGE_DEUTSCH = 'Deutsch (German)';
+    var LANGUAGE_DEUTSC = 'Deutsch';
 
     await users.createModerator(
       'varda@publicationAndLibrary.com', 'vardaPublicationAndLibrary');
@@ -99,7 +101,7 @@ describe('Library index page', function() {
 
     await users.login('varda@publicationAndLibrary.com');
     await libraryPage.get();
-    await libraryPage.selectLanguages([LANGUAGE_DEUTSCH]);
+    await libraryPage.selectLanguages([LANGUAGE_DEUTSC]);
     await libraryPage.findExploration(EXPLORATION_VINGILOT);
     await libraryPage.playExploration(EXPLORATION_VINGILOT);
     await general.moveToEditor(true);
@@ -135,11 +137,11 @@ describe('Library index page', function() {
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
       categories: [],
-      languages: [LANGUAGE_ENGLISH, LANGUAGE_FRANCAIS],
+      languages: [LANGUAGE_ENGLISH, LANGUAGE_FRANCAI],
       expectVisible: [EXPLORATION_VINGILOT]
     }, {
       categories: [],
-      languages: [LANGUAGE_ENGLISH, LANGUAGE_DEUTSCH, LANGUAGE_FRANCAIS],
+      languages: [LANGUAGE_ENGLISH, LANGUAGE_DEUTSC, LANGUAGE_FRANCAI],
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
       categories: [CATEGORY_ARCHITECTURE],
@@ -151,16 +153,16 @@ describe('Library index page', function() {
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
       categories: [CATEGORY_ARCHITECTURE],
-      languages: [LANGUAGE_DEUTSCH],
+      languages: [LANGUAGE_DEUTSC],
       expectVisible: [EXPLORATION_SILMARILS]
     }, {
       categories: [CATEGORY_ARCHITECTURE],
-      languages: [LANGUAGE_FRANCAIS],
+      languages: [LANGUAGE_FRANCAI],
       expectVisible: []
     }];
 
     // We now check explorations are visible under the right conditions.
-    await browser.get('/search/find?q=&language_code=("en")');
+    await browser.url('/search/find?q=&language_code=("en")');
     // The initial language selection should be just English.
     await libraryPage.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
     // At the start, no categories are selected.
@@ -204,7 +206,8 @@ describe('Library index page', function() {
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_ENVIRONMENT = 'Environment';
     var CATEGORY_BUSINESS = 'Business';
-    var LANGUAGE_FRANCAIS = 'français';
+    var LANGUAGE_FRANCAIS = 'français (French)';
+    var LANGUAGE_FRANCAI = 'français';
     await users.createUser('aule@example.com', 'Aule');
 
     await users.login('aule@example.com');
@@ -230,7 +233,7 @@ describe('Library index page', function() {
     await general.ensurePageHasNoTranslationIds();
 
     // Filter library explorations.
-    await libraryPage.selectLanguages([LANGUAGE_FRANCAIS]);
+    await libraryPage.selectLanguages([LANGUAGE_FRANCAI]);
     await general.ensurePageHasNoTranslationIds();
   });
 
@@ -287,7 +290,7 @@ describe('Permissions for private explorations', function() {
       ['alicePrivileges']);
     expect(await workflow.getExplorationCollaborators()).toEqual(
       ['bobPrivileges']);
-    expect(await workflow.getExplorationPlaytesters()).toEqual([]);
+    expect(await workflow.getExplorationPlaytesters(true)).toEqual([]);
     var explorationId = await general.getExplorationIdFromEditor();
     await users.logout();
 

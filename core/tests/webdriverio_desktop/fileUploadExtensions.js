@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
  * upload.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
 
 describe('rich-text components', function() {
   var explorationEditorPage = null;

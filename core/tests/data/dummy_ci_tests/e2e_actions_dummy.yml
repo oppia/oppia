@@ -4,12 +4,6 @@ jobs:
     steps:
       - name: Run Additional Editor E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --suite="oneword" --prod_env
-      - name: Run Additional Player E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --suite="twoWords" --prod_env
-      - name: Run Additional Editor E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_e2e_tests --suite="threeWords" --prod_env
       - name: Run Additional Player E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false

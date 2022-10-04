@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
  * @fileoverview End-to-end tests for library flow.
  */
 
-var action = require('../protractor_utils/action.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var action = require('../webdriverio_utils/action.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ExplorationPlayerPage = require(
-  '../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+  '../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 describe('Library pages tour', function() {
   var EXPLORATION_TITLE = 'Test Exploration';
@@ -42,7 +42,7 @@ describe('Library pages tour', function() {
   });
 
   var visitRecentlyPublishedPage = async function() {
-    await browser.get('community-library/recently-published');
+    await browser.url('community-library/recently-published');
     await waitFor.pageToFullyLoad();
   };
 
@@ -72,7 +72,8 @@ describe('Library pages tour', function() {
   it('should visit the search page', async function() {
     await libraryPage.get();
     await libraryPage.findExploration(SEARCH_TERM);
-    expect(await browser.getCurrentUrl()).toContain('search/find?q=python');
+    await waitFor.urlToBe(
+      'http://localhost:9001/search/find?q=python&language_code=(%22en%22)');
   });
 
   it('should visit the library index page', async function() {
@@ -84,16 +85,16 @@ describe('Library pages tour', function() {
     // exploration has to be rated by the user.
     await rateExploration();
     await libraryPage.get();
-    var topRatedButton = element(by.css('.e2e-test-library-top-rated'));
+    var topRatedButton = $('.e2e-test-library-top-rated');
     await action.click('Top Rated Button', topRatedButton);
     await waitFor.pageToFullyLoad();
-    expect(await browser.getCurrentUrl()).toContain(
+    expect(await browser.getUrl()).toContain(
       'community-library/top-rated');
   });
 
   it('should visit the recent explorations page', async function() {
     await visitRecentlyPublishedPage();
-    expect(await browser.getCurrentUrl()).toContain(
+    expect(await browser.getUrl()).toContain(
       'community-library/recently-published');
   });
 
