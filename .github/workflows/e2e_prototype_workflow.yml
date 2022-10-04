@@ -46,11 +46,14 @@ jobs:
       - name: Build Webpack
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.build --prod_env
-      - name: Uploading webpack as an artifact
-        uses: actions/upload-artifact@v2
+      - name: Cache build files
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-build-files
         with:
-          name: built-webpack
-          path: /home/runner/work/oppia/oppia/build
+          path: /home/runner/work/oppia/
+          key: ${{ env.GIT_COMMIT_SHORT_SHA }}
+
   e2e_user_features_and_library:
     runs-on:  ${{ matrix.os }}
     strategy:
@@ -64,6 +67,13 @@ jobs:
           python-version: '3.7'
           architecture: 'x64'
       - uses: ./.github/actions/merge
+      - name: Cache build files
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-build-files
+        with:
+          path: /home/runner/work/oppia/
+          key: ${{ env.GIT_COMMIT_SHORT_SHA }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -75,7 +85,15 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Cache build files
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-build-files
+        with:
+          path: /home/runner/work/oppia/
+          key: ${{ env.GIT_COMMIT_SHORT_SHA }}
+          restore-keys: |
+                        ${{ env.GIT_COMMIT_SHORT_SHA }}
       - id: check-risk
         name: Check if PR is low-risk
         uses: ./.github/actions/check-if-pr-is-low-risk
@@ -85,11 +103,6 @@ jobs:
       - name: Install ffmpeg
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
-      - name: Download webpack artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: built-webpack
-          path: /home/runner/work/oppia/oppia/build
       - name: Run Library E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
