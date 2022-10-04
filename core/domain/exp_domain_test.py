@@ -5947,7 +5947,7 @@ title: ''
     ) -> None:
         """Tests the fixing of RTE content data from version less than 58."""
 
-        sample_yaml_content_for_cont_and_end_interac: str = (
+        sample_yaml_content_for_rte: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -6045,7 +6045,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_cont_and_end_interac: str = (
+        latest_sample_yaml_content_for_rte: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -6148,10 +6148,10 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_cont_and_end_interac)
+            'eid', sample_yaml_content_for_rte)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_cont_and_end_interac)
+            latest_sample_yaml_content_for_rte)
 
     def test_fixing_invalid_continue_and_end_exp_data_by_migrating_to_v58(
         self

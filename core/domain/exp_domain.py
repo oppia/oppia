@@ -3248,6 +3248,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls,
         choices: List[state_domain.SubtitledHtmlDict],
         answer_groups: List[state_domain.AnswerGroupDict],
+        state_dict: state_domain.StateDict,
         *,
         is_item_selection_interaction: bool = False
     ) -> None:
@@ -3271,6 +3272,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         choices_to_remove: List[state_domain.SubtitledHtmlDict] = []
         invalid_choices_index = []
         invalid_choices_content_ids = []
+        content_ids_of_choices_to_update = []
         for choice in choices:
             if choice['html'].strip() in ('<p></p>', ''):
                 empty_choices.append(choice)
@@ -3284,6 +3286,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 empty_choice['html'] = (
                     '<p>' + 'Choice ' + str(idx + 1) + '</p>'
                 )
+                content_ids_of_choices_to_update.append(
+                    empty_choice['content_id'])
 
         # Duplicate choices.
         for choice in choices:
@@ -3323,6 +3327,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         for choice_to_remove in choices_to_remove:
             choices.remove(choice_to_remove)
+
+        # Marking the content ids that needs update.
+        for content_id in content_ids_of_choices_to_update:
+            choice_translations = state_dict['written_translations'][
+                'translations_mapping'][content_id]
+            for translation in choice_translations.values():
+                translation['needs_update'] = True
 
     @classmethod
     def _set_lower_and_upper_bounds(
@@ -3544,6 +3555,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         text_value = state_dict['interaction'][
             'customization_args']['buttonText']['value']['unicode_str']
+        content_id = state_dict['interaction'][
+            'customization_args']['buttonText']['value']['content_id']
         lang_code_to_unicode_str_dict = {
             'en': 'Continue',
             'es': 'Continuar',
@@ -3568,6 +3581,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             else:
                 state_dict['interaction']['customization_args'][
                     'buttonText']['value']['unicode_str'] = 'Continue'
+
+            continue_button_translations = state_dict['written_translations'][
+                'translations_mapping'][content_id]
+            for translation in continue_button_translations.values():
+                translation['needs_update'] = True
 
     @classmethod
     def _fix_end_interaction(cls, state_dict: state_domain.StateDict) -> None:
@@ -3913,7 +3931,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'choices']['value']
         )
         cls._choices_should_be_unique_and_non_empty(
-            choices, answer_groups)
+            choices,
+            answer_groups,
+            state_dict,
+            is_item_selection_interaction=False)
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -3997,7 +4018,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # All choices should be unique and non-empty.
         cls._choices_should_be_unique_and_non_empty(
-            choices, answer_groups, is_item_selection_interaction=True)
+            choices,
+            answer_groups,
+            state_dict,
+            is_item_selection_interaction=True)
 
         empty_ans_groups = []
         for answer_group in answer_groups:
