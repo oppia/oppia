@@ -2839,8 +2839,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             csrf_token=self.csrf_token, expected_status_int=400)
 
         error_msg = (
-            'Schema validation for \'change_list\' failed: '
-            'edit_exploration_propert cmd is not allowed.'
+            'Schema validation for \'change_list\' failed: Command '
+            'edit_exploration_propert is not allowed'
         )
         self.assertEqual(response['error'], error_msg)
 
