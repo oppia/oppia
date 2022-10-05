@@ -1021,7 +1021,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': 'solution_5',
+                'content_id': 'solution_2',
                 'html': '<p>This is the updated solution.</p>',
             },
         }

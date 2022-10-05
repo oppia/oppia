@@ -844,7 +844,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
-            'recorded_voiceovers': { 'voiceovers_mapping': {}}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            }
         }
 
         self.assertEqual(

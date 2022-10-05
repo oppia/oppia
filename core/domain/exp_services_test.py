@@ -1493,7 +1493,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
         with self.assertRaisesRegex(
-            utils.ValidationError, error_string):
+            exp_services.UnsupportedRTEContentValidationError, error_string
+        ):
             exp_services.validate_exploration_for_story(
                 exploration, True)
 
@@ -2218,16 +2219,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }
         state1.update_content(
             state_domain.SubtitledHtml.from_dict(content1_dict))
-        state1.recorded_voiceovers.add_content_id_for_voiceover(
-            state1.content.content_id)
         state2.update_content(
             state_domain.SubtitledHtml.from_dict(content2_dict))
-        state2.recorded_voiceovers.add_content_id_for_voiceover(
-            state2.content.content_id)
         state3.update_content(
             state_domain.SubtitledHtml.from_dict(content3_dict))
-        state3.recorded_voiceovers.add_content_id_for_voiceover(
-            state3.content.content_id)
 
         self.set_interaction_for_state(
             state1, 'ImageClickInput', content_id_generator)
