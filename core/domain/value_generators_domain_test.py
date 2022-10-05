@@ -54,9 +54,10 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
     def test_registry_template_random_selector_contents(self) -> None:
         contents_registry = (
-            '<schema-based-editor [schema]="$ctrl.SCHEMA"'
-            ' ng-model="$ctrl.customizationArgs.list_of_values">\n</schema-'
-            'based-editor>\n')
+            '<schema-based-editor [schema]="$ctrl.SCHEMA" '
+            'ng-model="$ctrl.customizationArgs.list_of_values">\n
+            '</schema-based-editor>\n'
+        )
         class_object = value_generators_domain.Registry()
         self.assertEqual(
             contents_registry, (class_object.get_generator_class_by_id(
