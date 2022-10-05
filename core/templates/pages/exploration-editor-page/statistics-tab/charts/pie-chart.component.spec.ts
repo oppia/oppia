@@ -17,22 +17,21 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { of } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { PieChartComponent } from './pie-chart.component';
 
 describe('Pie Chart component', () => {
   let component: PieChartComponent;
   let fixture: ComponentFixture<PieChartComponent>;
-  let resizeEvent = new Event('resize');
+  let resizeEvent = new EventEmitter();
   let mockedChart = null;
 
   class MockWindowDimensionsService {
     getResizeEvent() {
-      return of(resizeEvent);
+      return resizeEvent;
     }
   }
 
@@ -61,7 +60,8 @@ describe('Pie Chart component', () => {
     component = fixture.componentInstance;
 
     mockedChart = {
-      draw: () => {}
+      draw: () => {},
+      data: 1
     };
 
     // This approach was choosen because spyOnProperty() doesn't work on
@@ -136,6 +136,53 @@ describe('Pie Chart component', () => {
     };
     component.chart = null;
     component.ngAfterViewInit();
+    tick();
+
+    expect(component.redrawChart).toHaveBeenCalled();
+  }));
+
+  it('should not redraw chart', fakeAsync(() => {
+    spyOnProperty(window, 'google').and.returnValue({
+      visualization: {
+        PieChart: class Mockdraw {
+          constructor(value) {}
+          draw() {}
+        }
+      },
+      charts: {
+        setOnLoadCallback: (callback) => {
+          callback();
+        }
+      }
+    });
+    spyOn(component, 'redrawChart').and.stub();
+    component.chart = mockedChart;
+
+    component.ngAfterViewInit();
+    tick();
+
+    expect(component.redrawChart).not.toHaveBeenCalled();
+  }));
+
+  it('should redraw chart', fakeAsync(() => {
+    spyOnProperty(window, 'google').and.returnValue({
+      visualization: {
+        PieChart: class Mockdraw {
+          constructor(value) {}
+          draw() {}
+        }
+      },
+      charts: {
+        setOnLoadCallback: (callback) => {
+          callback();
+        }
+      }
+    });
+    spyOn(component, 'redrawChart').and.stub();
+
+    component.ngOnInit();
+    tick();
+    resizeEvent.emit();
     tick();
 
     expect(component.redrawChart).toHaveBeenCalled();
