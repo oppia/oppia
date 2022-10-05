@@ -17,6 +17,7 @@
   <input type="file" id="image-file-input" (click)="this.value = null"
          (change)="handleFile()"
          class="image-uploader-file-input e2e-test-photo-upload-input"
+         accept=".jpg,.jpeg,.png,.svg"
          [ngClass]="fileInputClassName" #imageInput>
   <label *ngIf="isBlogPostThumbnailUploader"
          class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
@@ -53,6 +54,11 @@
     width: 100%;
   }
 
+  .image-uploader-drop-area:hover {
+    background: #bbb;
+    cursor: pointer;
+  }
+
   .image-uploader-text {
     display: block;
     font-size: 16px;
@@ -86,7 +92,7 @@
     border: solid #707070 1px;
     border-radius: 2px;
     bottom: 6px;
-    cursor: default;
+    cursor: pointer;
     display: inline;
     font-size: 16px;
     font-weight: normal;
@@ -131,6 +137,7 @@
   }
 
   .blog-post-thumbnail-uploader {
+    cursor: pointer;
     height: 200px;
     width: 100%;
   }
