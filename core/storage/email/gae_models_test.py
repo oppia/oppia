@@ -217,14 +217,14 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             email_models.SentEmailModel.check_duplicate_message(
                 'recipient_id', 'Email Subject', 'Email Body'))
-        
+
         email_models.SentEmailModel.create(
             'recipient_id2', 'recipient@email.com', self.SENDER_ID,
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject', 'Email Body',
             datetime.datetime.utcnow() - datetime.timedelta(
                 minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS))
-        
+
         self.assertFalse(
             email_models.SentEmailModel.check_duplicate_message(
                 'recipient_id2', 'Email Subject', 'Email Body'))
@@ -285,7 +285,7 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
     ) -> None:
         email_models.BulkEmailModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
-    
+
     def test_get_export_policy(self) -> None:
         expected_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
