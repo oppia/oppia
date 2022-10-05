@@ -23,7 +23,7 @@ from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
 
 from mailchimp3 import mailchimpclient
-from typing import Dict
+from typing import Dict, List
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):
@@ -50,9 +50,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     """Class to mock Mailchimp tags object."""
 
                     def __init__(self) -> None:
-                        self.tag_names = []
+                        self.tag_names: List[str] = []
 
-                    def update(self, _id, _hash, tag_data) -> None:
+                    def update(
+                            self, _id: str, _hash: str,
+                            tag_data: Dict[str, List[Dict[str, str]]]) -> None:
                         """Mocks the tag update function in mailchimp api.
 
                         Args:
@@ -197,11 +199,6 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 Exception, 'Invalid Merge Field: INVALID'):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     'valid@example.com', True, {'INVALID': 'value'}, 'Android')
-
-            with self.assertRaisesRegex(
-                Exception, 'Invalid Merge Value: 5'):
-                mailchimp_bulk_email_services.add_or_update_user_status(
-                    'valid@example.com', True, {'NAME': 5}, 'Android')
 
             with self.assertRaisesRegex(
                 Exception, 'Invalid tag: Invalid'):

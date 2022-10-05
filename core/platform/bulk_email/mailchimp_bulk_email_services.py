@@ -27,7 +27,7 @@ from core import feconf
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
-from typing import Optional
+from typing import Dict, Optional, Sequence
 
 
 def _get_subscriber_hash(email: str) -> str:
@@ -77,7 +77,8 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
 
 
 def _create_user_in_mailchimp_db(
-    client: mailchimp3.MailChimp, subscribed_mailchimp_data: dict
+    client: mailchimp3.MailChimp,
+    subscribed_mailchimp_data: Dict[str, Sequence[str]]
 ) -> bool:
     """Creates a new user in the mailchimp database and handles the case where
     the user was permanently deleted from the database.
@@ -97,8 +98,11 @@ def _create_user_in_mailchimp_db(
             mailchimp API.
     """
     try:
+        # Here we use MyPy ignore because the following is a function in the
+        # mailchimp api but mypy is throwing an error that the arg type
+        # for subscriber data is not correct.
         client.lists.members.create(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data)
+            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data) # type: ignore[arg-type]
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the
@@ -155,8 +159,8 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
 
 def add_or_update_user_status(
-        user_email: str, can_receive_email_updates: bool, merge_fields: dict,
-        tag: str
+        user_email: str, can_receive_email_updates: bool,
+        merge_fields: Dict[str, str], tag: str
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
@@ -190,14 +194,9 @@ def add_or_update_user_status(
     if tag not in feconf.VALID_MAILCHIMP_TAGS:
         raise Exception('Invalid tag: %s' % tag)
 
-    for key, value in merge_fields.items():
+    for key, _ in merge_fields.items():
         if key not in feconf.VALID_MAILCHIMP_FIELD_KEYS:
             raise Exception('Invalid Merge Field: %s' % key)
-
-        if (
-                key == feconf.VALID_MAILCHIMP_FIELD_KEYS[0] and
-                not isinstance(value, str)):
-            raise Exception('Invalid Merge Value: %s' % value)
 
     new_user_mailchimp_data = {
         'email_address': user_email,
@@ -224,10 +223,15 @@ def add_or_update_user_status(
 
     # Additional fields for the Android tag.
     if tag == 'Android':
-        new_user_mailchimp_data['merge_fields'] = {
+        new_user_mailchimp_data = {
+            'email_address': user_email,
+            'status': 'subscribed',
+            'tags': [tag],
             'NAME': merge_fields['NAME']
         }
-        subscribed_mailchimp_data['merge_fields'] = {
+        subscribed_mailchimp_data = {
+            'email_address': user_email,
+            'status': 'subscribed',
             'NAME': merge_fields['NAME']
         }
 
@@ -239,7 +243,10 @@ def add_or_update_user_status(
         # delete a list member, since they cannot be programmatically added
         # back, so we change their status based on preference.
         if can_receive_email_updates:
-            client.lists.members.tags.update(
+            # Here we use MyPy ignore because the following is a function in the
+            # mailchimp api but mypy is throwing an error that the 'tags'
+            # atrribute is not defined.
+            client.lists.members.tags.update( # type: ignore[attr-defined]
                 feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash, tag_data)
             client.lists.members.update(
                 feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
