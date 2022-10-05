@@ -71,7 +71,7 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
     );
 
     tick();
-    expect(answersList).toEqual([' Answer Set #1 ', ' Answer Set #2 ']);
+    expect(answersList).toEqual(['Answer Set #1', 'Answer Set #2']);
 
     let values = bannerEl.querySelectorAll('.answers');
 
