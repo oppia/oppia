@@ -28,11 +28,6 @@ from core.constants import constants
 from typing import Callable, Dict, List, Union
 from typing_extensions import Final, TypedDict
 
-MYPY = False
-if MYPY:  # pragma: no cover
-    # Here, we are importing 'state_domain' only for type checking.
-    from core.domain import state_domain
-
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'

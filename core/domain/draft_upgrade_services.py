@@ -25,7 +25,6 @@ from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
 from core.domain import state_domain
-from core.domain import translation_domain
 from core.platform import models
 
 from typing import Callable, List, Optional, Union, cast
@@ -299,7 +298,6 @@ class DraftUpgradeUtil:
         """Converts draft change list from state version 50 to 51. Version 51
         changes content ids for content and removes written_translation property
         form the state, converting draft to anew version won't be possible.
-
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

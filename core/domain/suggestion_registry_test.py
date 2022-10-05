@@ -25,7 +25,6 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import config_services
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_validation_service
@@ -38,7 +37,6 @@ from core.domain import suggestion_services
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
-from core.storage import opportunity
 from core.tests import test_utils
 
 from typing import Dict, List, Optional, Union, cast
@@ -46,8 +44,8 @@ from typing_extensions import Final, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import suggestion_models
     from mypy_imports import opportunity_models
+    from mypy_imports import suggestion_models
 
 (
     suggestion_models, opportunity_models

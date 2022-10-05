@@ -22,10 +22,10 @@ import collections
 import logging
 
 from core import feconf
-from core.domain import exp_domain, opportunity_services
-from core.domain import translation_fetchers
+from core.domain import exp_domain
+from core.domain import opportunity_services
 from core.domain import translation_domain
-from core.domain.translation_domain import TranslatableContent
+from core.domain import translation_fetchers
 from core.platform import models
 
 from typing import Dict, List, Optional
@@ -117,7 +117,6 @@ def add_new_translation(
 
     entity_translation.translations[content_id] = translated_content
 
-
     entity_translation.validate()
 
     model = translation_models.EntityTranslationsModel.create_new(
@@ -130,6 +129,7 @@ def add_new_translation(
 
     model.update_timestamps()
     model.put()
+
 
 def update_translation_related_change(
     exploration_id: str,
@@ -267,12 +267,12 @@ def get_translation_counts(
 def get_translatable_text(
     exploration: exp_domain.Exploration,
     language_code: str
-) -> Dict[str, Dict[str, TranslatableContent]]:
+) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
     """Returns all the contents which needs translation in the given
     language.
 
     Args:
-        exp_id: Exploration. The Exploration object.
+        exploration: Exploration. The Exploration object.
         language_code: str. The language code in which translation is
             required.
 

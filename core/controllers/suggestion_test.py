@@ -50,7 +50,7 @@ from core.tests import test_utils
     models.Names.SUGGESTION, models.Names.FEEDBACK])
 
 
-class SuggestionUnitTests_test(test_utils.GenericTestBase):
+class SuggestionUnitTests(test_utils.GenericTestBase):
 
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
     EXP_ID = 'exp1'
@@ -640,7 +640,7 @@ class SuggestionUnitTests_test(test_utils.GenericTestBase):
 
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.resubmit_change_content_html = (
+        resubmit_change_content_html = (
             '<p>resubmit change content html</p>')
         self.put_json('%s/resubmit/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX, suggestion.suggestion_id), {
@@ -660,7 +660,7 @@ class SuggestionUnitTests_test(test_utils.GenericTestBase):
                         'content_id': (
                             self.exploration.states['State 1']
                             .content.content_id),
-                        'html': self.resubmit_change_content_html
+                        'html': resubmit_change_content_html
                     }
                 }
             }, csrf_token=csrf_token)
@@ -671,7 +671,7 @@ class SuggestionUnitTests_test(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(
             suggestion.change.new_value['html'],
-            self.resubmit_change_content_html)
+            resubmit_change_content_html)
         self.assertEqual(
             suggestion.change.cmd, exp_domain.CMD_EDIT_STATE_PROPERTY)
         self.assertEqual(

@@ -68,6 +68,7 @@ if MYPY:  # pragma: no cover
 
 
 class BaseSuggestionServicesTest(test_utils.GenericTestBase):
+    """Base class for the suggestion services test."""
 
     def _publish_valid_topic(
         self, topic: topic_domain.Topic,
@@ -112,7 +113,7 @@ class BaseSuggestionServicesTest(test_utils.GenericTestBase):
                 self.admin_id, topic.id, skill_id)
 
     def setUp(self) -> None:
-        super(BaseSuggestionServicesTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -1228,6 +1229,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_suggestion.change.skill_difficulty,
             0.6)
+
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category: str = (
@@ -4339,7 +4341,6 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
 
-        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         audio_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
         model = opportunity_models.ExplorationOpportunitySummaryModel(

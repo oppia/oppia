@@ -20,13 +20,14 @@ from __future__ import annotations
 
 import enum
 
-from core.constants import constants
-from core.domain import translatable_object_registry
 from core import feconf
 from core import utils
+from core.constants import constants
 
 from typing import Callable, Dict, List, Optional, Union
 from typing_extensions import Final, TypedDict
+
+from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 
 class ContentType(enum.Enum):
@@ -81,13 +82,6 @@ class TranslatableContentDict(TypedDict):
 class TranslatableContent:
     """TranslatableContent represents a content of a translatable object which
     can be translated into multiple languages.
-
-    Args:
-        content_id: str. The id of the corresponding translatable content value.
-        content_value: ContentValueType. The content value which can be
-            translated.
-        content_type: TranslatableContentFormat. The type of the
-            corresponding content value.
     """
 
     def __init__(
@@ -99,6 +93,22 @@ class TranslatableContent:
         interaction_id: Union[str, None] = None,
         rule_type: Union[str, None] = None
     ) -> None:
+        """Constructs an TranslatableContent domain object.
+
+        Args:
+            content_id: str. The id of the corresponding translatable content
+                value.
+            content_type: TranslatableContentFormat. The type of the
+                corresponding content value.
+            content_format: TranslatableContentFormat. The format of the
+                content.
+            content_value: ContentValueType. The content value which can be
+                translated.
+            interaction_id: str|None. The Id of the interaction in which the
+                content is used.
+            rule_type: str|None. The rule type of the answer group in which the
+                content is used.
+        """
         self.content_id = content_id
         self.content_type = content_type
         self.content_format = content_format
@@ -142,6 +152,7 @@ class TranslatedContent:
     Args:
         content_value: ContentValueType. Represents translation of translatable
             content.
+        content_format: TranslatableContentFormat. The format of the content.
         needs_update: bool. Whether the translation needs an update or not.
     """
 
@@ -151,6 +162,15 @@ class TranslatedContent:
         content_format: TranslatableContentFormat,
         needs_update: bool
     ) -> None:
+        """Constructor for the TranslatedContent object.
+
+        Args:
+            content_value: ContentValueType. The content value which can be
+                translated.
+            content_format: TranslatableContentFormat. The format of the
+                content.
+            needs_update: bool. Whether the translated content needs update.
+        """
         self.content_value = content_value
         self.content_format = content_format
         self.needs_update = needs_update
@@ -207,11 +227,18 @@ class TranslatableContentsCollection:
         'content_id_to_translatable_content' dict.
 
         Args:
-            field_type: TranslatableContentFormat. The type of the
-                corresponding translatable content.
-            content_id: str. The id of the corresponding translatable content.
-            content_value: ContentValueType. Value of the content which
-                is translatable.
+            content_id: str. The id of the corresponding translatable content
+                value.
+            content_type: TranslatableContentFormat. The type of the
+                corresponding content value.
+            content_format: TranslatableContentFormat. The format of the
+                content.
+            content_value: ContentValueType. The content value which can be
+                translated.
+            interaction_id: str|None. The Id of the interaction in which the
+                content is used.
+            rule_type: str|None. The rule type of the answer group in which the
+                content is used.
 
         Raises:
             Exception. The content_id_to_translatable_content dict already
@@ -249,6 +276,7 @@ class TranslatableContentsCollection:
         Args:
             translatable_object: BaseTranslatableObject. An instance of
                 BaseTranslatableObject class.
+            kwargs: str. The extra args for registrying translatable object.
         """
         self.content_id_to_translatable_content.update(
             translatable_object.get_translatable_contents_collection(**kwargs)
@@ -374,7 +402,7 @@ class BaseTranslatableObject:
             entity_translation.get_translation_needs_update_count())
 
         return translations_missing_count + translation_needs_update_count < (
-                min_non_displayable_translation_count)
+            min_non_displayable_translation_count)
 
     def get_content_count(self) ->  int:
         """Returns the total number of distinct content fields available in the
@@ -388,7 +416,6 @@ class BaseTranslatableObject:
             the exploration.
         """
         return len(self.get_all_contents_which_need_translations())
-
 
     def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in the object.
@@ -473,6 +500,17 @@ class EntityTranslation:
         language_code: str,
         translations: Dict[str, TranslatedContent]
     ):
+        """Constructs an TranslatableContent domain object.
+
+        Args:
+            entity_id: str. The Id of the entity.
+            entity_type: TranslatableEntityType. The type of the entity.
+            entity_version: int. The version of the entity.
+            language_code: str. The langauge code for the translated contents
+                language.
+            translations: dict(str, TranslatedContent). The translations dict
+                containing content_id as key and TranslatedContent as value.
+        """
         self.entity_id = entity_id
         self.entity_type = entity_type.value
         self.entity_version = entity_version
@@ -480,6 +518,12 @@ class EntityTranslation:
         self.translations = translations
 
     def to_dict(self) -> EntityTranslationDict:
+        """Returns the dict representation of the EntityTranslation object.
+
+        Returns:
+            EntityTranslationDict. The dict representation of the
+            EntityTranslation object.
+        """
         translations_dict = {
             content_id: translated_content.to_dict()
             for content_id, translated_content in self.translations.items()
@@ -580,19 +624,19 @@ class EntityTranslation:
 
     def get_translation_count(self) -> int:
         """Returs the number of updated translations avialable."""
-        return len(
+        return len([
             translated_content
             for translated_content in self.translations.values()
             if not translated_content.needs_update
-        )
+        ])
 
     def get_translation_needs_update_count(self) -> int:
         """Returs the number of translations needs update."""
-        return len(
+        return len([
             translated_content
             for translated_content in self.translations.values()
             if translated_content.needs_update
-        )
+        ])
 
     def remove_translations(self, content_ids: List[str]) -> None:
         """Remove translations for the given list of content Ids.

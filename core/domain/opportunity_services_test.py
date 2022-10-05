@@ -22,7 +22,8 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain, exp_fetchers
+from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_domain
 from core.domain import opportunity_services

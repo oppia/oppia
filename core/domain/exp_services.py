@@ -91,6 +91,7 @@ AcceptableActivityModelTypes = Union[
     user_models.IncompleteActivitiesModel
 ]
 
+
 class UnsupportedRTEContentValidationError(Exception):
     """Error class for when exploration fails validation check for Unsupported
     RTE content for android.
@@ -1750,6 +1751,8 @@ def validate_exploration_for_story(
             the default outcome of any state interaction.
         ValidationError. Expected no exploration to have video tags.
         ValidationError. Expected no exploration to have link tags.
+        UnsupportedRTEContentValidationError. Expected exploration content to
+            support in mobile view for android devices.
     """
     validation_error_messages = []
     if (
@@ -1926,7 +1929,6 @@ def update_exploration(
         if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
             content_ids_corresponding_translations_to_remove.append(
                 change.content_id)
-
 
     discard_draft(exploration_id, committer_id)
 

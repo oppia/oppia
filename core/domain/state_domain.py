@@ -37,12 +37,11 @@ from typing import (
     Any, Callable, Dict, Iterator, List, Mapping, Optional, Tuple, Type, Union,
     cast, overload
 )
-from typing_extensions import Final, Literal, TypedDict
+from typing_extensions import Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3129,6 +3128,7 @@ class State(translation_domain.BaseTranslatableObject):
             content_id_for_state_content: str. The content id for the content.
             content_id_for_default_outcome: str. The content id for the default
                 outcome.
+
         Returns:
             State. The corresponding State domain object.
         """
@@ -3324,7 +3324,7 @@ class State(translation_domain.BaseTranslatableObject):
         the content-ids for the fields in the state in their respective methods.
 
         Args:
-            state_dict: State object represented in the dict format.
+            state_dict: StateDict. State object represented in the dict format.
 
         Yields:
             (str|list(str), str). A tuple containing content and content-id.
@@ -3430,6 +3430,7 @@ class State(translation_domain.BaseTranslatableObject):
             content-ids.
         """
         PossibleContentIdsType = Union[str, List[str], List[List[str]]]
+
         def _replace_content_id(
             old_id: PossibleContentIdsType,
             id_mapping: Dict[str, str]
@@ -3444,23 +3445,23 @@ class State(translation_domain.BaseTranslatableObject):
 
             return id_mapping[old_id]
 
-        OBJECT_CONTENT_IDS_REPLACERS: Dict[
+        object_content_ids_replacers: Dict[
             str,
             Callable[
                 [PossibleContentIdsType, Dict[str, str]], PossibleContentIdsType
             ]
         ] = {}
 
-        OBJECT_CONTENT_IDS_REPLACERS['TranslatableHtmlContentId'] = (
+        object_content_ids_replacers['TranslatableHtmlContentId'] = (
            _replace_content_id)
 
-        OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'] = (
+        object_content_ids_replacers['SetOfTranslatableHtmlContentIds'] = (
             lambda ids_set, id_mapping: [
                 _replace_content_id(old_id, id_mapping)
                 for old_id in ids_set
             ]
         )
-        OBJECT_CONTENT_IDS_REPLACERS[
+        object_content_ids_replacers[
                 'ListOfSetsOfTranslatableHtmlContentIds'] = (
             lambda items, id_mapping: [
                 [_replace_content_id(old_id, id_mapping)for old_id in ids_set]
@@ -3470,8 +3471,10 @@ class State(translation_domain.BaseTranslatableObject):
         content_id_generator = translation_domain.ContentIdGenerator()
         for state_name in sorted(states_dict.keys()):
             state: StateDict = states_dict[state_name]
-            voiceovers: List[Tuple[str, Dict[str, VoiceoverDict]]] = []
+            new_voiceovers_mapping: Dict[str, VoiceoverDict] = {}
             old_to_new_content_id: Dict[str, str] = {}
+            old_voiceovers_mapping = state['recorded_voiceovers'][
+                'voiceovers_mapping']
 
             for content, content_type, extra_prefix in (
                 cls.traverse_v52_state_dict_for_contents(state)
@@ -3488,18 +3491,12 @@ class State(translation_domain.BaseTranslatableObject):
                 assert isinstance(old_content_id, str)
                 old_to_new_content_id[old_content_id] = new_content_id
 
-                voiceovers_mapping = state[
-                    'recorded_voiceovers']['voiceovers_mapping']
+                new_voiceovers_mapping[new_content_id] = old_voiceovers_mapping[
+                    old_content_id]
 
-                voiceovers.append((
-                    new_content_id,
-                    copy.deepcopy(voiceovers_mapping[old_content_id])
-                ))
-
-            state['recorded_voiceovers']['voiceovers_mapping'] = {
-                content_id: voiceover
-                for content_id, voiceover in voiceovers
-            }
+            state['recorded_voiceovers']['voiceovers_mapping'] = (
+                new_voiceovers_mapping
+            )
 
             interaction_specs = (
                 interaction_registry.Registry
@@ -3519,10 +3516,10 @@ class State(translation_domain.BaseTranslatableObject):
             answer_type = interaction_specs[interaction_id]['answer_type']
 
             if not interaction['solution'] is None:
-                solution_dict =  interaction['solution']
-                if answer_type in OBJECT_CONTENT_IDS_REPLACERS:
+                solution_dict = interaction['solution']
+                if answer_type in object_content_ids_replacers:
                     solution_dict['correct_answer'] = (
-                        OBJECT_CONTENT_IDS_REPLACERS[answer_type](
+                        object_content_ids_replacers[answer_type](
                             solution_dict['correct_answer'], # type: ignore[arg-type]
                             old_to_new_content_id)
                     )
@@ -3540,10 +3537,10 @@ class State(translation_domain.BaseTranslatableObject):
                     rule_input = rule_spec['inputs']
                     rule_type = rule_spec['rule_type']
                     for key, value_class in rules_variables[rule_type]:
-                        if value_class not in OBJECT_CONTENT_IDS_REPLACERS:
+                        if value_class not in object_content_ids_replacers:
                             continue
 
-                        rule_input[key] = OBJECT_CONTENT_IDS_REPLACERS[
+                        rule_input[key] = object_content_ids_replacers[
                             value_class](rule_input[key], old_to_new_content_id) # type: ignore[arg-type]
 
         return states_dict, content_id_generator.next_content_id_index
@@ -3595,9 +3592,11 @@ class State(translation_domain.BaseTranslatableObject):
     def has_content_id(self, content_id: str) -> bool:
         """Returns whether a given content ID is available in the translatable
         content.
+
         Args:
             content_id: str. The content ID that needs to be checked for the
                 availability.
+
         Returns:
             bool. A boolean that indicates the availability of the content ID
             in the translatable content.

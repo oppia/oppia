@@ -34,7 +34,7 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -109,8 +109,8 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 
         Returns:
             Tuple(str, Dict). Consists of a Tuple where the first element is
-                the exploration id and the second element being the mapping
-                of old content ids to new content ids.
+            the exploration id and the second element being the mapping
+            of old content ids to new content ids.
         """
         states_dict = {}
         for state_name in exploration.states:
@@ -242,6 +242,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 
 class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
     """Migrate question dict in question suggestion to the latest schema."""
+
     @staticmethod
     def _migrate_question_dict(
         question_suggestion_model: suggestion_models.GeneralSuggestionModel

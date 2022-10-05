@@ -93,7 +93,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import email_services
-    from mypy_imports import exp_models
     from mypy_imports import feedback_models
     from mypy_imports import memory_cache_services
     from mypy_imports import platform_auth_services
@@ -3082,7 +3081,7 @@ title: Title
         # other types too. Also, Any is used for schema because values in schema
         # dictionary can be of type str, List, Dict and other types too.
         def traverse_schema_and_assign_content_ids(
-            value: Any, schema: Dict[str, Any], contentId: str
+            value: Any, schema: Dict[str, Any], ca_name: str
         ) -> None:
             """Generates content_id from recursively traversing the schema, and
             assigning to the current value.
@@ -3290,7 +3289,7 @@ title: Title
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
-    def publish_exploration(self,  owner_id: str, exploration_id: str) -> None:
+    def publish_exploration(self, owner_id: str, exploration_id: str) -> None:
         """Publish the exploration with the given exploration_id.
 
         Args:
@@ -3834,6 +3833,8 @@ title: Title
                 misconceptions ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
+            next_content_id_index: int. The next content Id index for generating
+                new content Id.
 
         Returns:
             Question. A newly-created question.

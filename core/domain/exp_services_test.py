@@ -2902,8 +2902,9 @@ title: A title
                     'value': {
                         'content_id': (
                             content_id_generator.generate(
-                                translation_domain.ContentType.CUSTOMIZATION_ARG
-                                 , extra_prefix='placeholder')
+                                translation_domain.ContentType
+                                .CUSTOMIZATION_ARG,
+                                extra_prefix='placeholder')
                         ),
                         'unicode_str': ''
                     }

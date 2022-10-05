@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
@@ -191,13 +190,17 @@ class MigrateExplorationJob(base_jobs.JobBase):
             translation_models.EntityTranslationsModel],
         exp_version: int
     ) -> List[translation_models.EntityTranslationsModel]:
-        """Extracts all the latets translation models from the given list of
+        """Extracts all the latest translation models from the given list of
         translation models.
 
         Args:
             exp_translation_models: list(EntityTranslationsModel). The list of
                 given entity translation models.
             exp_version: int. The latest version number of the exploration.
+
+        Returns:
+            list(EntityTranslationsModel). The latest translation models from
+            the given list of translation models.
         """
         return [
             translation_model
@@ -320,13 +323,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
         exp_translation_models = (
             self.pipeline
-            | 'Get all translation models' >> (
-                ndb_io.GetModels(translation_models.EntityTranslationsModel.get_all()))
+            | 'Get all translation models' >> (ndb_io.GetModels(
+                translation_models.EntityTranslationsModel.get_all()))
             | 'Add entity ID from translation model' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
                 lambda translation_model: translation_model.entity_id)
             | 'Group all translation of exploration' >> beam.GroupByKey()
         )
-
 
         migrated_exp_results = (
             unmigrated_exploration_models

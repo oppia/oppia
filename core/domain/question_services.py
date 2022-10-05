@@ -680,7 +680,8 @@ def apply_change_list(
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX):
                     # Here we use cast because this 'if' condition forces
-                    # change to have type UpdateQuestionPropertyNextContentIdIndexCmd.
+                    # change to have type
+                    # UpdateQuestionPropertyNextContentIdIndexCmd.
                     cmd = cast(
                         question_domain
                         .UpdateQuestionPropertyNextContentIdIndexCmd,

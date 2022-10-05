@@ -836,6 +836,7 @@ class EditExplorationPropertyCorrectnessFeedbackEnabledCmd(ExplorationChange):
     new_value: bool
     old_value: bool
 
+
 class EditExplorationPropertyNextContentIdIndexCmd(ExplorationChange):
     """Class representing the ExplorationChange's
     CMD_EDIT_EXPLORATION_PROPERTY command with
@@ -845,6 +846,7 @@ class EditExplorationPropertyNextContentIdIndexCmd(ExplorationChange):
     property_name: Literal['next_content_id_index']
     new_value: int
     old_value: int
+
 
 class EditExplorationPropertyEditsAllowedCmd(ExplorationChange):
     """Class representing the ExplorationChange's
@@ -1412,7 +1414,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         content_id_generator = translation_domain.ContentIdGenerator()
         init_state_dict = state_domain.State.create_default_state(
             init_state_name,
-            content_id_generator.generate(translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME),
             is_initial_state=True).to_dict()
@@ -2309,7 +2312,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Adds new states in the exploration with the given state names.
 
         Args:
-            state_names: list(str).The new state name.
+            state_names: list(str). The new state name.
         """
         content_id_generator = translation_domain.ContentIdGenerator(
             self.next_content_id_index)
@@ -2331,14 +2334,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Adds new state in the exploration with the given state name.
 
         Args:
-            state_name: The new state name.
-            content_id_for_state_content: The content_id for the new state
+            state_name: str. The new state name.
+            content_id_for_state_content: str. The content_id for the new state
                 content.
-            content_id_for_default_outcome: The content_id for the default
+            content_id_for_default_outcome: str. The content_id for the default
                 outcome of the new state.
+
+        Raises:
+            ValueError. State names cannot be duplicate.
         """
         if state_name in self.states:
-                raise ValueError('Duplicate state name %s' % state_name)
+            raise ValueError('Duplicate state name %s' % state_name)
 
         self.states[state_name] = state_domain.State.create_default_state(
             state_name, content_id_for_state_content,

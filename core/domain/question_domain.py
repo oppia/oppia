@@ -736,13 +736,6 @@ class Question(translation_domain.BaseTranslatableObject):
             for lang_code in translations_mapping[content_id]:
                 translations_mapping[
                     content_id][lang_code]['data_format'] = 'html'
-                # Here we use MyPy ignore because in _convert_* functions, we
-                # allow less strict typing because here we are working with
-                # previous versions of the domain object and in previous
-                # versions of the domain object there are some fields (eg. html)
-                # that are discontinued in the latest domain object. So, while
-                # accessing these discontinued fields MyPy throws an error. Thus
-                # to avoid the error, we used ignore here.
                 translations_mapping[
                     content_id][lang_code]['translation'] = (
                         translations_mapping[content_id][lang_code]['html'])
@@ -1700,6 +1693,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     state data.
             current_state_schema_version: int. The current state
                 schema version.
+
+        Returns:
+            int|None. The next content id index if the current state schema
+            version is 52 else None.
         """
         versioned_question_state['state_schema_version'] = (
             current_state_schema_version + 1)

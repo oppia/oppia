@@ -38,7 +38,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Sequence
+from typing import Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -910,7 +910,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                    │    End    │
         #                    └───────────┘.
 
-
         a_state = state_domain.State.create_default_state(
             'A',
             self.content_id_generator.generate(
@@ -2134,7 +2133,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(
-            init_state, 'TextInput',content_id_generator)
+            init_state, 'TextInput', content_id_generator)
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -5976,7 +5975,7 @@ class ExplorationChangesMergeabilityUnitTests(
         test_utils.EmailTestBase):
     """Test methods related to exploration changes mergeability."""
 
-    def  setUp(self) -> None:
+    def setUp(self) -> None:
         super().setUp()
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
@@ -7044,7 +7043,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'rule_type': 'StartsWith',
                     'inputs': {
                         'x': {
-                            'contentId':  self.content_id_generator.generate(
+                            'contentId': self.content_id_generator.generate(
                                 translation_domain.ContentType.RULE),
                             'normalizedStrSet': ['Hello', 'Hola']
                         }
@@ -10632,8 +10631,11 @@ class ExplorationChangesMergeabilityUnitTests(
                             'dest_if_really_stuck': None,
                             'missing_prerequisite_skill_id': None,
                             'feedback': {
-                                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                                'content_id': (
+                                    self.content_id_generator.generate(
+                                        translation_domain.ContentType.FEEDBACK
+                                    )
+                                ),
                                 'html': ''
                             },
                             'labelled_as_correct': False,

@@ -1198,8 +1198,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'html': 'html_body_1'
                 }
             },
-            # Here we use MyPy ignore because we are defining an older version
-            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
@@ -1249,8 +1247,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'html': 'html_body_1'
                 }
             },
-            # Here we use MyPy ignore because we are defining an older version
-            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
@@ -1288,8 +1284,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'html': 'html_body_1'
                 }
             },
-            # Here we use MyPy ignore because we are defining an older version
-            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
@@ -1363,8 +1357,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'html': 'html_body_1'
                 }
             },
-            # Here we use MyPy ignore because we are defining an older version
-            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'

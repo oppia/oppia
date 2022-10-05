@@ -36,7 +36,6 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translation_domain
 from core.tests import test_utils
-from extensions.interactions import base
 
 from typing import Dict, List, Optional, Tuple, Type, Union
 
@@ -489,13 +488,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         default_outcome = exploration.states[
             'Renamed state'].interaction.default_outcome
-        assert not default_outcome is None
+        assert default_outcome is not None
         # Ensure the other states are connected to END.
         default_outcome.dest = 'State 2'
 
         default_outcome = exploration.states[
             'State 2'].interaction.default_outcome
-        assert not default_outcome is None
+        assert default_outcome is not None
         default_outcome.dest = 'END'
 
         # Ensure the other states have interactions.

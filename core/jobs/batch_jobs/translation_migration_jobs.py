@@ -59,6 +59,10 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
 
         Args:
             exploration: ExplorationModel. The exploration model.
+
+        Returns:
+            Result(list(EntityTranslation), (str, Exception)). Result containing
+            list of EntityTranslation objects.
         """
         try:
             language_code_to_translation = {}
@@ -111,14 +115,13 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
         object.
 
         Args:
-            suggestion_model: GeneralSuggestionModel. The suggestion model.
-            migrated_suggestion: Suggestion. The suggestion domain object.
+            entity_translation: EntityTranslation. The EntityTranslation object.
 
         Returns:
-            list(suggestion_model). List of suggestion models to update.
+            Result(EntityTranslationModel, (str, Exception)). Result containing
+            the EntityTranslationModel for the given EntityTranslation opbject.
         """
         try:
-
             with datastore_services.get_ndb_context():
                 translation_model = (
                     translation_models.EntityTranslationsModel.create_new(
@@ -157,7 +160,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
                 self._create_entity_translation_model)
         )
 
-        (
+        unused_data = (
             new_translation_models_results
             | 'Filter model results with OK status' >> beam.Filter(
                 lambda result: result.is_ok())
