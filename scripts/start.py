@@ -37,6 +37,7 @@ from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-posit
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -76,6 +77,11 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--source_maps',
     help='optional; if specified, build webpack with source maps.',
+    action='store_true')
+_PARSER.add_argument(
+    '--contributor_dashboard_debug',
+    help='optional; if specified, populate sample data that can be used to help'
+         'develop for the contributor dashboard.',
     action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
@@ -177,6 +183,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             automatic_restart=not parsed_args.no_auto_restart,
             skip_sdk_update_check=True,
             port=PORT_NUMBER_FOR_GAE_SERVER))
+
+        if parsed_args.contributor_dashboard_debug:
+            initializer = (
+                contributor_dashboard_debug
+                .ContributorDashboardDebugInitializer(
+                    base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER)
+            )
+            initializer.populate_debug_data()
 
         managed_web_browser = (
             None if parsed_args.no_browser else
