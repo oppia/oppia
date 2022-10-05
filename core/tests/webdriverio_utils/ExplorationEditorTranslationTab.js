@@ -183,7 +183,10 @@ var ExplorationEditorTranslationTab = function() {
     await action.click(
       'Confirm delete record button',
       confirmDeleteRecordButton);
-    await waitFor.pageToFullyLoad();
+    // We need to explicitly wait till the audio is deleted, in order
+    // to make sure there is no unsaved changes left in the exploration.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.uploadAudioRecord = async function(audioPath) {
@@ -499,10 +502,10 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectFeedbackTabToBeActive = function() {
-    expect(
-      feedbackTabButton[0]
-    ).toEqual(activeTranslationTabElement[0]);
+  this.expectFeedbackTabToBeActive = async function() {
+    var activeTabName = await action.getText(
+      'Active Transalation Tab', activeTranslationTabElement);
+    expect(activeTabName).toEqual('Feedback');
   };
 
   this.moveToState = async function(targetName) {
@@ -539,7 +542,8 @@ var ExplorationEditorTranslationTab = function() {
       if (listOfNames[i] === stateName) {
         var stateBackgroundNodes = await stateGraph.$$(
           '.e2e-test-node-background');
-        expect(await stateBackgroundNodes[i].getCSSProperty('fill')).toBe(
+        expect(
+          (await stateBackgroundNodes[i].getCSSProperty('fill')).value).toBe(
           expectedColor);
         matched = true;
       }
