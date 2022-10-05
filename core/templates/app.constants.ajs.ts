@@ -49,9 +49,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
   AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE);
-angular.module('oppia').constant(
-  'ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE',
-  AppConstants.ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE);
 
 angular.module('oppia').constant('WARNING_TYPES', AppConstants.WARNING_TYPES);
 
