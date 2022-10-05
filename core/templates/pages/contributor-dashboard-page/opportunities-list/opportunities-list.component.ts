@@ -63,6 +63,7 @@ export class OpportunitiesListComponent {
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
   more: boolean = false;
   userIsOnLastPage: boolean = true;
+  languageCode: string;
 
   constructor(
     private zone: NgZone,
@@ -176,6 +177,11 @@ export class OpportunitiesListComponent {
       moreResults: boolean): boolean {
     const lastPageNumber = Math.ceil(opportunities.length / pageSize);
     return activePageNumber >= lastPageNumber && !moreResults;
+  }
+
+  onChangeLanguage(languageCode: string): void {
+    this.languageCode = languageCode;
+    console.log('opportunities list -- change language to ' + languageCode);
   }
 }
 

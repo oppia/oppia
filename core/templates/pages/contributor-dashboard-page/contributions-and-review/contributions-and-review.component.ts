@@ -16,7 +16,7 @@
  * @fileoverview Component for showing and reviewing contributions.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -36,6 +36,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 
 export interface Suggestion {
   change: {
@@ -100,6 +101,9 @@ export interface TabDetails {
 })
 export class ContributionsAndReview
    implements OnInit, OnDestroy {
+  @ViewChild('opportunitiesList') opportunitiesListRef!:
+    OpportunitiesListComponent;
+
   directiveSubscriptions = new Subscription();
 
   SUGGESTION_TYPE_QUESTION: string;
@@ -610,6 +614,7 @@ export class ContributionsAndReview
   onChangeLanguage(languageCode: string): void {
     this.languageCode = languageCode;
     console.log('change language to ' + languageCode);
+    this.opportunitiesListRef.onChangeLanguage(languageCode);
   }
 
   ngOnDestroy(): void {
