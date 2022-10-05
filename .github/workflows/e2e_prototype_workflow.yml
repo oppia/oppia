@@ -21,9 +21,9 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
-      - name: echo env.GITHUB_SHA
+      - name: echo github sha
         run: |
-          ${{ github.sha }}
+          echo ${{ github.sha }}
       - uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v2
