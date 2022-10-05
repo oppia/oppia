@@ -7298,7 +7298,11 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_choices_13: {}
+        ca_choices_13:
+          hi:
+            data_format: html
+            translation: <p>choicewa</p>
+            needs_update: false
         ca_choices_14: {}
         ca_choices_15: {}
         ca_choices_16: {}
@@ -7432,7 +7436,11 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_choices_13: {}
+        ca_choices_13:
+          hi:
+            data_format: html
+            needs_update: true
+            translation: <p>choicewa</p>
         ca_choices_14: {}
         ca_choices_15: {}
         content: {}
@@ -7752,6 +7760,320 @@ states:
         content: {}
         default_outcome: {}
         feedback_24: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        self.maxDiff = None
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac)
+
+        sample_yaml_content_for_item_selection_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_26
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_27
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p></p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 28
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+        feedback_26: {}
+        feedback_27: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+        feedback_26: {}
+        feedback_27: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_item_selection_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 28
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        content: {}
+        default_outcome: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        content: {}
+        default_outcome: {}
         feedback_25: {}
   end:
     card_is_checkpoint: false

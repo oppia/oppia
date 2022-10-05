@@ -3502,12 +3502,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         empty_ans_groups = []
         for rule_to_remove in rules_to_remove_with_try_again_dest_node:
+            removed_try_again_rule = False
             for answer_group in reversed(answer_groups):
                 for rule_spec in reversed(answer_group['rule_specs']):
                     if (
                         rule_spec == rule_to_remove and
                         answer_group['outcome']['dest'] == state_name
                     ):
+                        removed_try_again_rule = True
                         answer_group['rule_specs'].remove(rule_to_remove)
                         break
 
@@ -3517,13 +3519,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ):
                     empty_ans_groups.append(answer_group)
 
+                if removed_try_again_rule:
+                    break
+
         for rule_to_remove in rules_to_remove_with_diff_dest_node:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
+            removed_dest_rule = False
+            for answer_group in reversed(answer_groups):
+                for rule_spec in reversed(answer_group['rule_specs']):
                     if (
                         rule_spec == rule_to_remove and
                         answer_group['outcome']['dest'] != state_name
                     ):
+                        removed_dest_rule = True
                         answer_group['rule_specs'].remove(rule_to_remove)
                         break
 
@@ -3532,6 +3539,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     answer_group not in empty_ans_groups
                 ):
                     empty_ans_groups.append(answer_group)
+
+                if removed_dest_rule:
+                    break
 
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
