@@ -671,6 +671,8 @@
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @oppia/lace-backend-reviewers
 
+# Android Updates
+/core/templates/domain/android-updates/android-updates-backend-api.service*.ts @oppia/lace-frontend-reviewers
 
 # Data stability.
 /core/controllers/domain_objects_validator*.py @oppia/data-and-stability-reviewers

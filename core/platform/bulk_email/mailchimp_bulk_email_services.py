@@ -77,7 +77,7 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
 
 
 def _create_user_in_mailchimp_db(
-    client: mailchimp3.MailChimp, user_email: str
+    client: mailchimp3.MailChimp, subscribed_mailchimp_data: dict
 ) -> bool:
     """Creates a new user in the mailchimp database and handles the case where
     the user was permanently deleted from the database.
@@ -85,8 +85,7 @@ def _create_user_in_mailchimp_db(
     Args:
         client: mailchimp3.MailChimp. A mailchimp instance with the API key and
             username initialized.
-        user_email: str. Email ID of the user. Email is used to uniquely
-            identify the user in the mailchimp DB.
+        subscribed_mailchimp_data: dict. Post body with required fields.
 
     Returns:
         bool. Whether the user was successfully added to the db. (This will be
@@ -97,13 +96,9 @@ def _create_user_in_mailchimp_db(
         Exception. Any error (other than the one mentioned below) raised by the
             mailchimp API.
     """
-    post_data = {
-        'email_address': user_email,
-        'status': 'subscribed'
-    }
-
     try:
-        client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)
+        client.lists.members.create(
+            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data)
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the
@@ -160,7 +155,8 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
 
 def add_or_update_user_status(
-        user_email: str, can_receive_email_updates: bool
+        user_email: str, can_receive_email_updates: bool, merge_fields: dict,
+        tag: str
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
@@ -173,6 +169,9 @@ def add_or_update_user_status(
             identify the user in the mailchimp DB.
         can_receive_email_updates: bool. Whether they want to be subscribed to
             the bulk email list or not.
+        merge_fields: dict. Additional 'merge fields' used for Android signups
+            currently, which can be expanded in the future.
+        tag: str. Tag to add to user in mailchimp.
 
     Returns:
         bool. Whether the user was successfully added to the db. (This will be
@@ -188,6 +187,24 @@ def add_or_update_user_status(
         return False
     subscriber_hash = _get_subscriber_hash(user_email)
 
+    if tag not in feconf.VALID_MAILCHIMP_TAGS:
+        raise Exception('Invalid tag: %s' % tag)
+
+    for key, value in merge_fields.items():
+        if key not in feconf.VALID_MAILCHIMP_FIELD_KEYS:
+            raise Exception('Invalid Merge Field: %s' % key)
+
+        if (
+                key == feconf.VALID_MAILCHIMP_FIELD_KEYS[0] and
+                not isinstance(value, str)):
+            raise Exception('Invalid Merge Value: %s' % value)
+
+    new_user_mailchimp_data = {
+        'email_address': user_email,
+        'status': 'subscribed',
+        'tags': [tag]
+    }
+
     subscribed_mailchimp_data = {
         'email_address': user_email,
         'status': 'subscribed'
@@ -198,22 +215,36 @@ def add_or_update_user_status(
         'status': 'unsubscribed'
     }
 
+    tag_data = {
+        'tags': [{
+            'name': tag,
+            'status': 'active'
+        }]
+    }
+
+    # Additional fields for the Android tag.
+    if tag == 'Android':
+        new_user_mailchimp_data['merge_fields'] = {
+            'NAME': merge_fields['NAME']
+        }
+        subscribed_mailchimp_data['merge_fields'] = {
+            'NAME': merge_fields['NAME']
+        }
+
     try:
-        member_details = client.lists.members.get(
+        _ = client.lists.members.get(
             feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
 
         # If member is already added to mailchimp list, we cannot permanently
         # delete a list member, since they cannot be programmatically added
         # back, so we change their status based on preference.
-        if (
-                can_receive_email_updates and
-                member_details['status'] != 'subscribed'):
+        if can_receive_email_updates:
+            client.lists.members.tags.update(
+                feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash, tag_data)
             client.lists.members.update(
                 feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
                 subscribed_mailchimp_data)
-        elif (
-                not can_receive_email_updates and
-                member_details['status'] == 'subscribed'):
+        else:
             client.lists.members.update(
                 feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
                 unsubscribed_mailchimp_data)
@@ -227,11 +258,11 @@ def add_or_update_user_status(
         # workaround for Python2, the 'message' attribute is obtained by
         # str() and then it is converted to dict. This works in Python3 as well.
         error_message = ast.literal_eval(str(error))
-        # Error 404 corresponds to "User does not exist".
+        # Error 404 corresponds to 'User does not exist'.
         if error_message['status'] == 404:
             if can_receive_email_updates:
                 user_creation_successful = _create_user_in_mailchimp_db(
-                    client, user_email)
+                    client, new_user_mailchimp_data)
                 if not user_creation_successful:
                     return False
         else:

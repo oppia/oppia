@@ -547,6 +547,10 @@ MAILCHIMP_API_KEY = None
 MAILCHIMP_USERNAME = None
 # Mailchimp secret, used to authenticate webhook requests.
 MAILCHIMP_WEBHOOK_SECRET = None
+# Valid Mailchimp merge keys.
+VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
+# Valid Mailchimp tags.
+VALID_MAILCHIMP_TAGS = ['Android', 'Web']
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch

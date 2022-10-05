@@ -690,7 +690,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
              'API, since this is a dev environment.' % user_email])
 
         def _mock_add_or_update_user_status(
-            _email: str, _can_receive_updates: bool
+            _email: str, _can_receive_updates: bool, _merge_fields: dict,
+            _tag: str
         ) -> bool:
             """Mocks bulk_email_services.add_or_update_user_status()."""
             return False

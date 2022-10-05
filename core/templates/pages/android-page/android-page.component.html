@@ -126,7 +126,7 @@
       <div class="oppia-android-empty-div"></div>
     </div>
     <div #androidUpdatesSection class="oppia-android-app-updates-container oppia-android-app-updates-background">
-      <div *ngIf="false" class="d-flex">
+      <div class="d-flex">
         <div class="oppia-android-updates-text-container">
           <div class="oppia-android-updates-main-text">
             Want updates on<br>
@@ -144,7 +144,7 @@
               <span class="oppia-android-updates-asterisk-color">*</span>
             </div>
             <input class="oppia-android-updates-input"
-                   type="text"
+                   type="email"
                    [(ngModel)]="emailAddress"
                    [ngModelOptions]="{standalone: true}"
                    required="true">
@@ -158,7 +158,7 @@
                    required="true">
           </div>
           <div class="oppia-android-updates-input-padding">
-            <input class="oppia-android-updates-checkbox" type="checkbox">
+            <input class="oppia-android-updates-checkbox" [(ngModel)]="userCanSubscribe" type="checkbox">
             <span class="oppia-android-updates-checkbox-label">
               You confirm that you are over the age of 18 or that you have consent
               and approval from your legal parent or guardian.
@@ -166,7 +166,7 @@
             </span>
           </div>
           <div class="oppia-android-updates-input-padding text-center">
-            <button class="btn oppia-android-updates-button">Notify Me</button>
+            <button [disabled]="!userCanSubscribe || !validateEmailAddress()" (click)="subscribeToAndroidList()" class="btn oppia-android-updates-button">Notify Me</button>
           </div>
         </div>
       </div>

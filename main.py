@@ -522,6 +522,8 @@ URLS = [
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(
+        r'/subscribetoandroidlist', profile.SubscribeToAndroidList),
+    get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
     get_redirect_route(
