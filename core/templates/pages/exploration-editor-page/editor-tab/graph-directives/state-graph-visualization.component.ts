@@ -325,6 +325,8 @@ export class StateGraphVisualization
       warning = (
         'Warning: there is no path from this state to the END state.'
       );
+    } else {
+      warning = this.getNodeErrorMessage(node.label);
     }
 
     let tooltip = node.label;

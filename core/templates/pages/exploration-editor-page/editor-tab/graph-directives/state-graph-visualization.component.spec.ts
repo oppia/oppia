@@ -113,6 +113,24 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       style: 'string',
       nodeClass: 'string',
       canDelete: true
+    },
+    state_4: {
+      depth: 3,
+      offset: 0,
+      reachable: true,
+      y0: 10,
+      x0: 10,
+      yLabel: 5,
+      xLabel: 5,
+      height: 10,
+      width: 100,
+      id: 'node_1',
+      label: 'This is a label for node 4',
+      reachableFromEnd: true,
+      secondaryLabel: '2nd',
+      style: 'string',
+      nodeClass: 'string',
+      canDelete: true
     }
   };
 
@@ -283,6 +301,9 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
 
   it('should get node complete title with its secondary label and' +
       ' warnings', () => {
+    spyOn(component, 'getNodeErrorMessage')
+      .and.returnValue('warning');
+
     expect(component.getNodeTitle(nodes.state_1)).toBe(
       'This is a label for node 1 Second label for node 1 ' +
         '(Warning: this state is unreachable.)');
@@ -291,6 +312,10 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       'This is a label for node 3 This is a secondary label for ' +
         'state_3 (Warning: there is no path from this state to the ' +
         'END state.)');
+
+    expect(component.getNodeTitle(nodes.state_4)).toBe(
+      'This is a label for node 4 This is a secondary label for ' +
+        'state_3 (warning)');
   });
 
   it('should get truncated label with truncate filter', () => {
