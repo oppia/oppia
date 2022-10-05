@@ -94,12 +94,8 @@ core.platform.email.dev_mode_email_services_test
 core.platform.taskqueue.cloud_taskqueue_services_test
 core.platform.taskqueue.cloud_tasks_emulator_test
 core.schema_utils_test
-core.storage.audit.gae_models_test
 core.storage.base_model.gae_models_test
-core.storage.blog.gae_models_test
-core.storage.classifier.gae_models_test
 core.storage.collection.gae_models_test
-core.storage.email.gae_models_test
 core.storage.exploration.gae_models_test
 core.storage.feedback.gae_models_test
 core.storage.job.gae_models_test

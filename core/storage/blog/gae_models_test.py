@@ -490,3 +490,11 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         blog_post_rights_models = blog_models.BlogPostRightsModel.get_all()
         for model in blog_post_rights_models:
             self.assertTrue(self.USER_ID_NEW not in model.editor_ids)
+
+    def test_deassign_user_from_blog_post_handles_invalid_user_id(self) -> None:
+        # Raises no error.
+        blog_models.BlogPostRightsModel.deassign_user_from_all_blog_posts(
+            self.NONEXISTENT_USER_ID)
+        blog_post_rights_models = blog_models.BlogPostRightsModel.get_all()
+        for model in blog_post_rights_models:
+            self.assertTrue(self.NONEXISTENT_USER_ID not in model.editor_ids)

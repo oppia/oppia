@@ -184,6 +184,51 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'Email Hash',
                 sent_datetime_lower_bound='Not a datetime object') # type: ignore[arg-type]
 
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'recipient_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'recipient_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subject': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'html_body': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sent_datetime': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'email_hash': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = email_models.SentEmailModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = email_models.SentEmailModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_check_dupliacte_message(self) -> None:
+        email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', self.SENDER_ID,
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+        self.assertTrue(
+            email_models.SentEmailModel.check_duplicate_message(
+                'recipient_id', 'Email Subject', 'Email Body'))
+        
+        email_models.SentEmailModel.create(
+            'recipient_id2', 'recipient@email.com', self.SENDER_ID,
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body',
+            datetime.datetime.utcnow() - datetime.timedelta(
+                minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS))
+        
+        self.assertFalse(
+            email_models.SentEmailModel.check_duplicate_message(
+                'recipient_id2', 'Email Subject', 'Email Body'))
+
     def test_raise_exception_by_mocking_collision(self) -> None:
         # Test Exception for SentEmailModel.
         with self.assertRaisesRegex(
@@ -240,6 +285,28 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
     ) -> None:
         email_models.BulkEmailModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
+    
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subject': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'html_body': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sent_datetime': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = email_models.BulkEmailModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = email_models.BulkEmailModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
