@@ -27,7 +27,7 @@
       </a>
     </div>
   </div>
-  <div class="oppia-android-app-button">
-    <a href="https://play.google.com/store/apps/details?id=org.oppia.android" target="_blank" rel="noopener">ANDROID APP</a>
+  <div *ngIf="androidAppButtonIsShown" class="oppia-android-app-button">
+    <a href="https://play.google.com/store/apps/details?id=org.oppia.android" target="_blank" rel="noopener">{{ 'I18N_FOOTER_ANDROID_APP' | translate }}</a>
   </div>
 </div>

@@ -1181,3 +1181,52 @@ class TopicNameHandlerTest(BaseTopicEditorControllerTests):
         self.assertEqual(json_response['topic_name_exists'], True)
 
         self.logout()
+
+
+class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
+    """Tests for TopicIdToTopicNameHandlerTest."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.topic = topic_domain.Topic.create_default_topic(
+            'topic_id', 'Dummy Topic', 'abbrev', 'description', 'fragm')
+        self.topic.thumbnail_filename = 'thumbnail.svg'
+        self.topic.thumbnail_bg_color = '#C6DCDA'
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(self.admin_id, self.topic)
+
+    def test_topic_id_to_topic_name_handler_returns_correctly(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_TOPIC_NAME, 'topic_id'
+        )
+        json_response = self.get_json(url)
+        self.assertEqual(
+            json_response['topic_id_to_topic_name'],
+            {'topic_id': 'Dummy Topic'}
+        )
+
+        url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_TOPIC_NAME, 'incorrect_topic_id')
+        json_response = self.get_json(url, expected_status_int=500)
+        self.assertEqual(
+            json_response['error'],
+            'No corresponding topic models exist for these topic IDs: '
+            'incorrect_topic_id.'
+        )
+
+        url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_TOPIC_NAME, '')
+        json_response = self.get_json(url)
+        self.assertEqual(
+            json_response['topic_id_to_topic_name'], {})
