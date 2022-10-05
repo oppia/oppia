@@ -137,9 +137,7 @@ class ExplorationHandler(EditorHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change
-                        )
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }
