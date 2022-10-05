@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -569,3 +570,611 @@ class RegenerateMissingExplorationStatsModelsJobTests(
         self.assertIsNotNone(
             stats_models.ExplorationStatsModel.get_model(exp_id, 1)
         )
+
+
+class ExpSnapshotsMigrationAuditJobTests(
+    job_test_utils.JobTestBase,
+    test_utils.GenericTestBase
+):
+    """Tests for ExplorationMigrationAuditJob."""
+
+    JOB_CLASS = exp_migration_jobs.ExpSnapshotsMigrationAuditJob
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExpSnapshotsMigrationAuditJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+
+    def create_exploration_with_states_schema_version(
+            self, states_schema_version, exp_id, user_id, states_dict):
+        """Saves a new default exploration with the given states dictionary in
+        the given state schema version. All passed state dictionaries in
+        'states_dict' must have the states schema version indicated by
+        'states_schema_version'.
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+        Args:
+            states_schema_version: int. The state schema version.
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states, in the
+                given states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=states_schema_version,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+    def test_migration_audit_job_does_not_convert_up_to_date_exp(self):
+        """Tests that the snapshot migration audit job does not convert a
+        snapshot that is already the latest states schema version.
+        """
+        # Create a new, default exploration whose snapshots should not be
+        # affected by the job.
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        init_state = exploration.states[exploration.init_state_name]
+        self.set_interaction_for_state(init_state, 'EndExploration')
+        init_state.update_interaction_default_outcome(None)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        # Start migration job on sample exploration.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='EXP PROCESSED SUCCESS: 1',
+                stderr=''
+            )
+        ])
+        # job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+        # exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+        # self.process_and_flush_pending_mapreduce_tasks()
+
+        # actual_output = (
+        #     exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(job_id))
+        # expected_output = [
+        #     '[u\'SUCCESS - Snapshot is already at latest schema version\', 1]']
+        # self.assertEqual(actual_output, expected_output)
+
+    # def test_migration_audit_job_skips_deleted_explorations(self):
+    #     """Tests that the snapshot migration job skips deleted explorations
+    #     and does not attempt to migrate any of the snapshots.
+    #     """
+    #     self.save_new_exp_with_states_schema_v0(
+    #         self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+
+    #     # Note: This creates a summary based on the upgraded model (which is
+    #     # fine). A summary is needed to delete the exploration.
+    #     exp_services.regenerate_exploration_and_contributors_summaries(
+    #         self.NEW_EXP_ID)
+
+    #     # Delete the exploration before migration occurs.
+    #     exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
+
+    #     # Ensure the exploration is deleted.
+    #     with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+    #         exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+    #     # Start migration job on sample exploration.
+    #     job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+    #     exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+
+    #     # This running without errors indicates the deleted exploration is
+    #     # being ignored, since otherwise exp_fetchers.get_exploration_by_id
+    #     # (used within the job) will raise an error.
+    #     self.process_and_flush_pending_mapreduce_tasks()
+
+    #     actual_output = (
+    #         exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
+    #             job_id))
+    #     expected_output_choices = [
+    #         '[u\'INFO - Exploration does not exist\', [u\'%s-1\', u\'%s-2\']]' %
+    #         (self.NEW_EXP_ID, self.NEW_EXP_ID),
+    #         '[u\'INFO - Exploration does not exist\', [u\'%s-2\', u\'%s-1\']]' %
+    #         (self.NEW_EXP_ID, self.NEW_EXP_ID)
+    #     ]
+    #     self.assertEqual(len(actual_output), 1)
+    #     self.assertIn(actual_output[0], expected_output_choices)
+
+    #     # Ensure the exploration is still deleted.
+    #     with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+    #         exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+    # def test_migration_job_audit_success(self):
+    #     """Test that the audit job runs correctly on snapshots that use a
+    #     previous state schema.
+    #     """
+    #     swap_states_schema_version = self.swap(
+    #         feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+    #     swap_exp_schema_version = self.swap(
+    #         exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+    #     with swap_states_schema_version, swap_exp_schema_version:
+    #         exploration = exp_domain.Exploration.create_default_exploration(
+    #             self.VALID_EXP_ID, title='title', category='category')
+    #         exp_services.save_new_exploration(self.albert_id, exploration)
+    #     self.assertLess(
+    #         exploration.states_schema_version,
+    #         feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    #     # Bring the main exploration to the latest schema.
+    #     caching_services.delete_multi(
+    #         caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+    #         [self.VALID_EXP_ID])
+    #     latest_schema_version = python_utils.UNICODE(
+    #         feconf.CURRENT_STATE_SCHEMA_VERSION)
+    #     migration_change_list = [
+    #         exp_domain.ExplorationChange({
+    #             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+    #             'from_version': '37',
+    #             'to_version': latest_schema_version
+    #         })
+    #     ]
+    #     exp_services.update_exploration(
+    #         self.albert_id, self.VALID_EXP_ID, migration_change_list,
+    #         'Ran Exploration Migration job.')
+    #     exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+    #     self.assertEqual(
+    #         exploration_model.states_schema_version,
+    #         feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    #     job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+    #     exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+    #     self.process_and_flush_pending_mapreduce_tasks()
+
+    #     actual_output = (
+    #         exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
+    #             job_id))
+    #     expected_output = [
+    #         '[u\'SUCCESS\', 1]',
+    #         '[u\'SUCCESS - Snapshot is already at latest schema version\', 1]'
+    #     ]
+    #     self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    # def test_migration_job_audit_failure(self):
+    #     """Test that the audit job catches any errors that would otherwise
+    #     occur during the migration.
+    #     """
+    #     swap_states_schema_36 = self.swap(
+    #         feconf, 'CURRENT_STATE_SCHEMA_VERSION', 36)
+    #     swap_exp_schema_41 = self.swap(
+    #         exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 41)
+    #     with swap_states_schema_36, swap_exp_schema_41:
+    #         exploration = exp_domain.Exploration.create_default_exploration(
+    #             self.VALID_EXP_ID, title='title', category='category')
+    #         exp_services.save_new_exploration(self.albert_id, exploration)
+
+    #     # Bring the main exploration to the latest schema.
+    #     caching_services.delete_multi(
+    #         caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+    #         [self.VALID_EXP_ID])
+    #     latest_schema_version = python_utils.UNICODE(
+    #         feconf.CURRENT_STATE_SCHEMA_VERSION)
+    #     migration_change_list = [
+    #         exp_domain.ExplorationChange({
+    #             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+    #             'from_version': '37',
+    #             'to_version': latest_schema_version
+    #         })
+    #     ]
+    #     exp_services.update_exploration(
+    #         self.albert_id, self.VALID_EXP_ID, migration_change_list,
+    #         'Ran Exploration Migration job.')
+    #     exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+    #     self.assertEqual(
+    #         exploration_model.states_schema_version,
+    #         feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    #     # Make a mock conversion function that raises an error when trying to
+    #     # convert the old snapshot.
+    #     mock_conversion = classmethod(
+    #         lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+
+    #     with self.swap(
+    #         exp_domain.Exploration, '_convert_states_v36_dict_to_v37_dict',
+    #         mock_conversion
+    #     ):
+    #         job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+    #         exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+    #         self.process_and_flush_pending_mapreduce_tasks()
+
+    #         actual_output = (
+    #             exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
+    #                 job_id)
+    #         )
+
+    #     expected_output_message = (
+    #         u'[u\'MIGRATION_ERROR\', [u"Exploration snapshot %s-1 failed '
+    #         'migration to states v37: u\'property_that_dne\'"]]'
+    #         % self.VALID_EXP_ID
+    #     )
+    #     self.assertIn(expected_output_message, actual_output)
+
+    # def test_audit_job_detects_invalid_exploration(self):
+    #     exploration = exp_domain.Exploration.create_default_exploration(
+    #         self.VALID_EXP_ID, title='title', category='category')
+    #     exp_services.save_new_exploration(self.albert_id, exploration)
+
+    #     exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+    #     exploration_model.language_code = 'invalid_language_code'
+    #     exploration_model.commit(
+    #         self.albert_id, 'Changed language_code.', [])
+    #     caching_services.delete_multi(
+    #         caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+    #         [self.VALID_EXP_ID])
+
+    #     job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+    #     exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+    #     self.process_and_flush_pending_mapreduce_tasks()
+
+    #     actual_output = (
+    #         exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(job_id))
+    #     expected_output_message = (
+    #         '[u\'INFO - Exploration %s-1 failed non-strict validation\', '
+    #         '[u\'Invalid language_code: invalid_language_code\']]'
+    #         % self.VALID_EXP_ID)
+    #     self.assertIn(expected_output_message, actual_output)
+
+    # def test_audit_job_detects_exploration_that_is_not_up_to_date(self):
+    #     swap_states_schema_37 = self.swap(
+    #         feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+    #     swap_exp_schema_42 = self.swap(
+    #         exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+    #     with swap_states_schema_37, swap_exp_schema_42:
+    #         exploration = exp_domain.Exploration.create_default_exploration(
+    #             self.VALID_EXP_ID, title='title', category='category')
+    #         exp_services.save_new_exploration(self.albert_id, exploration)
+    #     self.assertLess(
+    #         exploration.states_schema_version,
+    #         feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    #     swap_states_schema_38 = self.swap(
+    #         feconf, 'CURRENT_STATE_SCHEMA_VERSION', 38)
+    #     swap_exp_schema_43 = self.swap(
+    #         exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 43)
+    #     with swap_states_schema_38, swap_exp_schema_43:
+    #         job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+    #         exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+    #         self.process_and_flush_pending_mapreduce_tasks()
+
+    #     actual_output = (
+    #         exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
+    #             job_id))
+    #     expected_output = [
+    #         '[u\'FAILURE - Exploration is not at latest schema version\', '
+    #         '[u\'%s\']]' % self.VALID_EXP_ID,
+    #     ]
+    #     self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    # def test_audit_job_handles_missing_states_schema_version(self):
+    #     swap_exp_schema_5 = self.swap(
+    #         exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 5)
+    #     with swap_exp_schema_5:
+    #         with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 0):
+    #             exploration = exp_domain.Exploration.create_default_exploration(
+    #                 self.VALID_EXP_ID, title='title', category='category')
+    #             exp_services.save_new_exploration(self.albert_id, exploration)
+
+    #         # Bring the main exploration to the latest schema.
+    #         caching_services.delete_multi(
+    #             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+    #             [self.VALID_EXP_ID])
+    #         migration_change_list = [
+    #             exp_domain.ExplorationChange({
+    #                 'cmd': (
+    #                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
+    #                 'from_version': '0',
+    #                 'to_version': '1'
+    #             })
+    #         ]
+    #         with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
+    #             exp_services.update_exploration(
+    #                 self.albert_id, self.VALID_EXP_ID, migration_change_list,
+    #                 'Ran Exploration Migration job.')
+    #         exploration_model = exp_models.ExplorationModel.get(
+    #             self.VALID_EXP_ID)
+    #         self.assertEqual(exploration_model.states_schema_version, 1)
+
+    #         # Modify the snapshot to have no states schema version. (This
+    #         # implies a schema version of 0.)
+    #         snapshot_content_model = (
+    #             exp_models.ExplorationSnapshotContentModel.get(
+    #                 '%s-1' % self.VALID_EXP_ID))
+    #         del snapshot_content_model.content['states_schema_version']
+    #         snapshot_content_model.update_timestamps(
+    #             update_last_updated_time=False)
+    #         snapshot_content_model.put()
+
+    #         # There is no failure due to a missing states schema version.
+    #         with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
+    #             job_id = (
+    #                 exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new())
+    #             exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+    #             self.process_and_flush_pending_mapreduce_tasks()
+
+
+# class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
+
+#     ALBERT_EMAIL = 'albert@example.com'
+#     ALBERT_NAME = 'albert'
+
+#     VALID_EXP_ID = 'exp_id0'
+#     NEW_EXP_ID = 'exp_id1'
+#     EXP_TITLE = 'title'
+
+#     def setUp(self):
+#         super(ExpSnapshotsMigrationJobTests, self).setUp()
+
+#         # Setup user who will own the test explorations.
+#         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+#         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+#         self.process_and_flush_pending_mapreduce_tasks()
+
+#     def test_migration_job_does_not_convert_up_to_date_exp(self):
+#         """Tests that the exploration migration job does not convert a
+#         snapshot that is already the latest states schema version.
+#         """
+#         # Create a new, default exploration that should not be affected by the
+#         # job.
+#         exploration = exp_domain.Exploration.create_default_exploration(
+#             self.VALID_EXP_ID, title='title', category='category')
+#         init_state = exploration.states[exploration.init_state_name]
+#         self.set_interaction_for_state(init_state, 'EndExploration')
+#         init_state.update_interaction_default_outcome(None)
+#         exp_services.save_new_exploration(self.albert_id, exploration)
+#         self.assertEqual(
+#             exploration.states_schema_version,
+#             feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+#         # Start migration job on sample exploration.
+#         job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+#         exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+#         self.process_and_flush_pending_mapreduce_tasks()
+
+#         actual_output = (
+#             exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(job_id))
+#         expected_output = [
+#             '[u\'SUCCESS - Snapshot is already at latest schema version\', 1]']
+#         self.assertEqual(actual_output, expected_output)
+
+#     def test_migration_job_succeeds_on_default_exploration(self):
+#         swap_states_schema_37 = self.swap(
+#             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+#         swap_exp_schema_42 = self.swap(
+#             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+#         with swap_states_schema_37, swap_exp_schema_42:
+#             exploration = exp_domain.Exploration.create_default_exploration(
+#                 self.VALID_EXP_ID, title='title', category='category')
+#             exp_services.save_new_exploration(self.albert_id, exploration)
+
+#         # Bring the main exploration to schema version 38.
+#         caching_services.delete_multi(
+#             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+#             [self.VALID_EXP_ID])
+#         migration_change_list = [
+#             exp_domain.ExplorationChange({
+#                 'cmd': (
+#                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
+#                 'from_version': '37',
+#                 'to_version': '38'
+#             })
+#         ]
+#         swap_states_schema_38 = self.swap(
+#             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 38)
+#         swap_exp_schema_43 = self.swap(
+#             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 43)
+#         with swap_states_schema_38, swap_exp_schema_43:
+#             exp_services.update_exploration(
+#                 self.albert_id, self.VALID_EXP_ID, migration_change_list,
+#                 'Ran Exploration Migration job.')
+
+#             job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+#             exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+#             self.process_and_flush_pending_mapreduce_tasks()
+
+#         actual_output = (
+#             exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(job_id))
+#         expected_output = [
+#             '[u\'SUCCESS - Model saved\', 1]',
+#             '[u\'SUCCESS - Model upgraded\', 1]',
+#             '[u\'SUCCESS - Snapshot is already at latest schema version\', 1]']
+#         self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+#     def test_migration_job_skips_deleted_explorations(self):
+#         """Tests that the exploration migration job skips deleted explorations
+#         and does not attempt to migrate.
+#         """
+#         self.save_new_exp_with_states_schema_v0(
+#             self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+
+#         # Note: This creates a summary based on the upgraded model (which is
+#         # fine). A summary is needed to delete the exploration.
+#         exp_services.regenerate_exploration_and_contributors_summaries(
+#             self.NEW_EXP_ID)
+
+#         # Delete the exploration before migration occurs.
+#         exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
+
+#         # Ensure the exploration is deleted.
+#         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+#             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+#         # Start migration job on sample exploration.
+#         job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+#         exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+
+#         # This running without errors indicates the deleted exploration is
+#         # being ignored, since otherwise exp_fetchers.get_exploration_by_id
+#         # (used within the job) will raise an error.
+#         self.process_and_flush_pending_mapreduce_tasks()
+
+#         actual_output = (
+#             exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(job_id))
+#         expected_output_choices = [
+#             '[u\'INFO - Exploration does not exist\', [u\'%s-1\', u\'%s-2\']]' %
+#             (self.NEW_EXP_ID, self.NEW_EXP_ID),
+#             '[u\'INFO - Exploration does not exist\', [u\'%s-2\', u\'%s-1\']]' %
+#             (self.NEW_EXP_ID, self.NEW_EXP_ID)
+#         ]
+#         self.assertEqual(len(actual_output), 1)
+#         self.assertIn(actual_output[0], expected_output_choices)
+
+#         # Ensure the exploration is still deleted.
+#         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+#             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+#     def test_migration_job_detects_invalid_exploration(self):
+#         exploration = exp_domain.Exploration.create_default_exploration(
+#             self.VALID_EXP_ID, title='title', category='category')
+#         exp_services.save_new_exploration(self.albert_id, exploration)
+
+#         exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+#         exploration_model.language_code = 'invalid_language_code'
+#         exploration_model.commit(
+#             self.albert_id, 'Changed language_code.', [])
+#         caching_services.delete_multi(
+#             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+#             [self.VALID_EXP_ID])
+
+#         job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+#         exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+#         self.process_and_flush_pending_mapreduce_tasks()
+
+#         actual_output = (
+#             exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(job_id))
+#         expected_output_message = (
+#             '[u\'INFO - Exploration %s-1 failed non-strict validation\', '
+#             '[u\'Invalid language_code: invalid_language_code\']]'
+#             % self.VALID_EXP_ID)
+#         self.assertIn(expected_output_message, actual_output)
+
+#     def test_migration_job_detects_exploration_that_is_not_up_to_date(self):
+#         swap_states_schema_37 = self.swap(
+#             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+#         swap_exp_schema_42 = self.swap(
+#             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+#         with swap_states_schema_37, swap_exp_schema_42:
+#             exploration = exp_domain.Exploration.create_default_exploration(
+#                 self.VALID_EXP_ID, title='title', category='category')
+#             exp_services.save_new_exploration(self.albert_id, exploration)
+#         self.assertLess(
+#             exploration.states_schema_version,
+#             feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+#         swap_states_schema_38 = self.swap(
+#             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 38)
+#         swap_exp_schema_43 = self.swap(
+#             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 43)
+#         with swap_states_schema_38, swap_exp_schema_43:
+#             job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+#             exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+#             self.process_and_flush_pending_mapreduce_tasks()
+
+#         actual_output = (
+#             exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(
+#                 job_id))
+#         expected_output = [
+#             '[u\'FAILURE - Exploration is not at latest schema version\', '
+#             '[u\'%s\']]' % self.VALID_EXP_ID,
+#         ]
+#         self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+#     def test_migration_job_handles_missing_states_schema_version(self):
+#         swap_exp_schema_5 = self.swap(
+#             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 5)
+#         with swap_exp_schema_5:
+#             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 0):
+#                 exploration = exp_domain.Exploration.create_default_exploration(
+#                     self.VALID_EXP_ID, title='title', category='category')
+#                 exp_services.save_new_exploration(self.albert_id, exploration)
+
+#             # Bring the main exploration to the latest schema.
+#             caching_services.delete_multi(
+#                 caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+#                 [self.VALID_EXP_ID])
+#             migration_change_list = [
+#                 exp_domain.ExplorationChange({
+#                     'cmd': (
+#                         exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
+#                     'from_version': '0',
+#                     'to_version': '1'
+#                 })
+#             ]
+#             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
+#                 exp_services.update_exploration(
+#                     self.albert_id, self.VALID_EXP_ID, migration_change_list,
+#                     'Ran Exploration Migration job.')
+#             exploration_model = exp_models.ExplorationModel.get(
+#                 self.VALID_EXP_ID)
+#             self.assertEqual(exploration_model.states_schema_version, 1)
+
+#             # Modify the snapshot to have no states schema version. (This
+#             # implies a schema version of 0.)
+#             snapshot_content_model = (
+#                 exp_models.ExplorationSnapshotContentModel.get(
+#                     '%s-1' % self.VALID_EXP_ID))
+#             del snapshot_content_model.content['states_schema_version']
+#             snapshot_content_model.update_timestamps(
+#                 update_last_updated_time=False)
+#             snapshot_content_model.put()
+
+#             # There is no failure due to a missing states schema version.
+#             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
+#                 job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+#                 exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+#                 self.process_and_flush_pending_mapreduce_tasks()
+
+#         # The updated snapshot content model should have a populated states
+#         # schema version.
+#         snapshot_content_model = exp_models.ExplorationSnapshotContentModel.get(
+#             '%s-1' % self.VALID_EXP_ID)
+#         self.assertEqual(
+#             snapshot_content_model.content['states_schema_version'], 1)

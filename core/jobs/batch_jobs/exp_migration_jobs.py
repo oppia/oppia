@@ -777,78 +777,81 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
             Result((str, Exception)). Result containing
             tuple that consists of exploration ID and Exception if any.
         """
-        with datastore_services.get_ndb_context():
-            latest_exploration = exp_fetchers.get_exploration_by_id(
-                exp_id, strict=False)
-            if latest_exploration is None:
-                return result.Err(
-                    (exp_id, Exception('Exploration does not exist.'))
-                )
-
-            exploration_model = exp_models.ExplorationModel.get(exp_id)
-        if (exploration_model.states_schema_version !=
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
-            return result.Err(
-                (
-                    exp_id,
-                    Exception('Exploration is not at latest schema version')
-                )
-            )
-
         try:
-            latest_exploration.validate()
-        except Exception:
-            return result.Err(
-                (
-                    exp_id,
-                    Exception(
-                        'Exploration %s failed non-strict validation' % exp_id
+            with datastore_services.get_ndb_context():
+                latest_exploration = exp_fetchers.get_exploration_by_id(
+                    exp_id, strict=False)
+                if latest_exploration is None:
+                    return result.Err(
+                        (exp_id, Exception('Exploration does not exist.'))
+                    )
+
+                exploration_model = exp_models.ExplorationModel.get(exp_id)
+            if (exploration_model.states_schema_version !=
+                    feconf.CURRENT_STATE_SCHEMA_VERSION):
+                return result.Err(
+                    (
+                        exp_id,
+                        Exception('Exploration is not at latest schema version')
                     )
                 )
-            )
 
-        # Some (very) old explorations do not have a states schema version.
-        # These explorations have snapshots that were created before the
-        # states_schema_version system was introduced. We therefore set their
-        # states schema version to 0, since we now expect all snapshots to
-        # explicitly include this field.
-        if 'states_schema_version' not in exp_snapshot_model.content:
-            exp_snapshot_model.content['states_schema_version'] = 0
-
-        target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        current_state_schema_version = (
-            exp_snapshot_model.content['states_schema_version']
-        )
-        if current_state_schema_version == target_state_schema_version:
-            return result.Ok(
-                (
-                    exp_id,
-                    Exception('Snapshot is already at latest schema version')
-                )
-            )
-
-        versioned_exploration_states = {
-            'states_schema_version': current_state_schema_version,
-            'states': exp_snapshot_model.content['states']
-        }
-        while current_state_schema_version < target_state_schema_version:
             try:
-                with datastore_services.get_ndb_context():
-                    exp_domain.Exploration.update_states_from_model(
-                        versioned_exploration_states,
-                        current_state_schema_version,
-                        exp_id)
-                current_state_schema_version += 1
-            except Exception as e:
-                error_message = (
-                    'Exploration snapshot %s failed migration to states '
-                    'v%s: %s' % (
-                        exp_id, current_state_schema_version + 1, e))
-                logging.exception(error_message)
-                return result.Err((exp_id, error_message))
+                latest_exploration.validate()
+            except Exception:
+                return result.Err(
+                    (
+                        exp_id,
+                        Exception(
+                            'Exploration %s failed non-strict validation' % exp_id
+                        )
+                    )
+                )
 
-            if target_state_schema_version == current_state_schema_version:
-                result.Ok((exp_id, 'SUCCESS'))
+            # Some (very) old explorations do not have a states schema version.
+            # These explorations have snapshots that were created before the
+            # states_schema_version system was introduced. We therefore set their
+            # states schema version to 0, since we now expect all snapshots to
+            # explicitly include this field.
+            if 'states_schema_version' not in exp_snapshot_model.content:
+                exp_snapshot_model.content['states_schema_version'] = 0
+
+            target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+            current_state_schema_version = (
+                exp_snapshot_model.content['states_schema_version']
+            )
+            if current_state_schema_version == target_state_schema_version:
+                return result.Ok(
+                    (
+                        exp_id,
+                        Exception('Snapshot is already at latest schema version')
+                    )
+                )
+
+            versioned_exploration_states = {
+                'states_schema_version': current_state_schema_version,
+                'states': exp_snapshot_model.content['states']
+            }
+            while current_state_schema_version < target_state_schema_version:
+                try:
+                    with datastore_services.get_ndb_context():
+                        exp_domain.Exploration.update_states_from_model(
+                            versioned_exploration_states,
+                            current_state_schema_version,
+                            exp_id)
+                    current_state_schema_version += 1
+                except Exception as e:
+                    error_message = (
+                        'Exploration snapshot %s failed migration to states '
+                        'v%s: %s' % (
+                            exp_id, current_state_schema_version + 1, e))
+                    logging.exception(error_message)
+                    return result.Err((exp_id, error_message))
+
+                if target_state_schema_version == current_state_schema_version:
+                    result.Ok((exp_id, 'SUCCESS'))
+        except Exception as e:
+            return result.Err((exp_id, e))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the audit of exploration
