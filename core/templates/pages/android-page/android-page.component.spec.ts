@@ -26,6 +26,8 @@ import { AndroidPageComponent } from './android-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
 import { AlertsService } from 'services/alerts.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+
 
 class MockIntersectionObserver {
   observe: () => void;
@@ -65,7 +67,7 @@ describe('Android page', () => {
   beforeEach(async() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [AndroidPageComponent],
+      declarations: [AndroidPageComponent, MockTranslatePipe],
       providers: [
         AlertsService,
         AndroidUpdatesBackendApiService,

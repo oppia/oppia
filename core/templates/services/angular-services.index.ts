@@ -433,6 +433,7 @@ import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-edito
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
+import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -898,5 +899,6 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationAutomaticTextToSpeechService],
   ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
   ['CompareVersionsService', CompareVersionsService],
-  ['EntityCreationService', EntityCreationService]
+  ['EntityCreationService', EntityCreationService],
+  ['ClassroomAdminDataService', ClassroomAdminDataService]
 ];

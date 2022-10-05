@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,93 +16,103 @@
  * @fileoverview Component for the questions tab.
  */
 
-require(
-  'components/question-directives/questions-list/' +
-  'questions-list.component.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-backend-api.service.ts');
-require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('services/questions-list.service.ts');
-require('services/stateful/focus-manager.service.ts');
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { Topic } from 'domain/topic/TopicObjectFactory';
+import { TopicRights } from 'domain/topic/topic-rights.model';
+import { CategorizedSkills, TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { Subscription } from 'rxjs';
+import { QuestionsListService } from 'services/questions-list.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
-angular.module('oppia').component('questionsTab', {
-  template: require('./topic-questions-tab.component.html'),
-  controller: [
-    '$scope', '$window', 'FocusManagerService', 'QuestionsListService',
-    'TopicEditorStateService', 'TopicsAndSkillsDashboardBackendApiService',
-    function(
-        $scope, $window, FocusManagerService, QuestionsListService,
-        TopicEditorStateService, TopicsAndSkillsDashboardBackendApiService) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      $scope.getSkillsCategorizedByTopics = null;
+@Component({
+  selector: 'oppia-topic-questions-tab',
+  templateUrl: './topic-questions-tab.component.html'
+})
+export class TopicQuestionsTabComponent implements OnInit,
+ AfterViewInit, OnDestroy {
+  topic!: Topic;
+  topicRights!: TopicRights;
+  groupedSkillSummaries!: object;
+  skillIdToRubricsObject!: object;
+  allSkillSummaries!: ShortSkillSummary[];
+  canEditQuestion!: boolean;
+  selectedSkillId!: string;
+  getSkillsCategorizedByTopics!: CategorizedSkills;
+  getUntriagedSkillSummaries!: SkillSummary[];
 
-      var _initTab = function() {
-        $scope.question = null;
-        $scope.skillId = null;
-        $scope.topic = TopicEditorStateService.getTopic();
-        $scope.topicRights = TopicEditorStateService.getTopicRights();
-        $scope.groupedSkillSummaries = (
-          TopicEditorStateService.getGroupedSkillSummaries());
-        $scope.skillIdToRubricsObject =
-          TopicEditorStateService.getSkillIdToRubricsObject();
-        $scope.allSkillSummaries = [];
-        $scope.allSkillSummaries = $scope.allSkillSummaries.concat(
-          $scope.topic.getUncategorizedSkillSummaries());
-        for (var i = 0; i < $scope.topic.getSubtopics().length; i++) {
-          var subtopic = $scope.topic.getSubtopics()[i];
-          $scope.allSkillSummaries = $scope.allSkillSummaries.concat(
-            subtopic.getSkillSummaries());
-        }
-        TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-          .then(function(response) {
-            $scope.getSkillsCategorizedByTopics = (
-              response.categorizedSkillsDict);
-            $scope.getUntriagedSkillSummaries = (
-              response.untriagedSkillSummaries);
-          });
-        $scope.canEditQuestion = $scope.topicRights.canEditTopic();
-        $scope.misconceptions = [];
-        $scope.questionIsBeingUpdated = false;
-        $scope.questionIsBeingSaved = false;
-        $scope.emptyMisconceptionsList = [];
-      };
+  constructor(
+    private focusManagerService: FocusManagerService,
+    private questionsListService: QuestionsListService,
+    private topicsAndSkillsDashboardBackendApiService:
+      TopicsAndSkillsDashboardBackendApiService,
+    private topicEditorStateService: TopicEditorStateService,
+  ) {}
 
-      $scope.reinitializeQuestionsList = function(skillId) {
-        $scope.selectedSkillId = skillId;
-        QuestionsListService.resetPageNumber();
-        QuestionsListService.getQuestionSummariesAsync(
-          skillId, true, true
-        );
-      };
+  directiveSubscriptions = new Subscription();
 
-      ctrl.$onInit = function() {
-      // To set autofocus when screen loads.
-        $window.onload = function() {
-          FocusManagerService.setFocus('selectSkillField');
-        };
-        // To-set autofocus when user navigates to editor using
-        // question-editor-tab.
-        FocusManagerService.setFocus('selectSkillField');
-        $scope.selectedSkillId = null;
-        ctrl.directiveSubscriptions.add(
-          TopicEditorStateService.onTopicInitialized.subscribe(
-            () => _initTab()
-          ));
-        ctrl.directiveSubscriptions.add(
-          TopicEditorStateService.onTopicReinitialized.subscribe(
-            () => _initTab()
-          ));
-        _initTab();
-      };
-
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+  _initTab(): void {
+    this.topic = this.topicEditorStateService.getTopic();
+    this.topicRights = this.topicEditorStateService.getTopicRights();
+    this.groupedSkillSummaries = (
+      this.topicEditorStateService.getGroupedSkillSummaries());
+    this.skillIdToRubricsObject = (
+      this.topicEditorStateService.getSkillIdToRubricsObject());
+    this.allSkillSummaries = [];
+    this.allSkillSummaries = this.allSkillSummaries.concat(
+      this.topic.getUncategorizedSkillSummaries());
+    for (let i = 0; i < this.topic.getSubtopics().length; i++) {
+      let subtopic = this.topic.getSubtopics()[i];
+      this.allSkillSummaries = this.allSkillSummaries.concat(
+        subtopic.getSkillSummaries());
     }
-  ]
-});
+    this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+      .then((response) => {
+        this.getSkillsCategorizedByTopics = (
+          response.categorizedSkillsDict);
+        this.getUntriagedSkillSummaries = (
+          response.untriagedSkillSummaries);
+      });
+    this.canEditQuestion = this.topicRights.canEditTopic();
+  }
+
+  reinitializeQuestionsList(skillId: string): void {
+    this.selectedSkillId = skillId;
+    this.questionsListService.resetPageNumber();
+    this.questionsListService.getQuestionSummariesAsync(
+      skillId, true, true
+    );
+  }
+
+  ngAfterViewInit(): void {
+    // To set autofocus when screen loads.
+    this.focusManagerService.setFocus('selectSkillField');
+  }
+
+  ngOnInit(): void {
+    // To-set autofocus when user navigates to editor using
+    // question-editor-tab.
+    this.focusManagerService.setFocus('selectSkillField');
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onTopicInitialized.subscribe(
+        () => this._initTab()
+      ));
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onTopicReinitialized.subscribe(
+        () => this._initTab()
+      ));
+    this._initTab();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaTopicQuestionsTab',
+  downgradeComponent({
+    component: TopicQuestionsTabComponent
+  }) as angular.IDirectiveFactory);
