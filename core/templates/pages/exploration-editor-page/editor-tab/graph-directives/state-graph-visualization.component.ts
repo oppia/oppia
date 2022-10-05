@@ -480,8 +480,10 @@ export class StateGraphVisualization
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.routerService.onCenterGraph.subscribe(() => {
-        this.centerGraph();
-        this.redrawGraph();
+        setTimeout(() => {
+          this.centerGraph();
+          this.redrawGraph();
+        });
       })
     );
 
