@@ -116,6 +116,7 @@ export class ContributionsAndReview
   activeDropdownTabChoice: string;
   reviewTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
+  languageCode: string;
   tabNameToOpportunityFetchFunction: {
     [key: string]: {
       [key: string]: Function;
@@ -604,6 +605,11 @@ export class ContributionsAndReview
     };
 
     $(document).on('click', this.closeDropdownWhenClickedOutside);
+  }
+
+  onChangeLanguage(languageCode: string): void {
+    this.languageCode = languageCode;
+    console.log('change language to ' + languageCode);
   }
 
   ngOnDestroy(): void {
