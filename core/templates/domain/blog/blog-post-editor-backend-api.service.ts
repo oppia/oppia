@@ -23,11 +23,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { HttpClient } from '@angular/common/http';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostChangeDict } from 'domain/blog/blog-post-update.service';
+import { ImagesData } from 'services/image-local-storage.service';
 
-interface ImageData {
-  filename: string;
-  imageBlob: Blob;
-}
 
 interface BlogPostUpdateBackendDict {
   'blog_post': BlogPostBackendDict;
@@ -135,7 +132,7 @@ export class BlogPostEditorBackendApiService {
   }
 
   async postThumbnailDataAsync(
-      blogPostId: string, imagesData: ImageData[]): Promise<void> {
+      blogPostId: string, imagesData: ImagesData[]): Promise<void> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
         BlogDashboardPageConstants.BLOG_EDITOR_DATA_URL_TEMPLATE, {
@@ -145,7 +142,11 @@ export class BlogPostEditorBackendApiService {
       let payload = {
         thumbnail_filename: imagesData[0].filename,
       };
-      body.append('image', imagesData[0].imageBlob);
+      let imageBlob = imagesData[0].imageBlob;
+      if (imageBlob === null) {
+        throw new Error('Image blob is null.');
+      }
+      body.append('image', imageBlob);
       body.append('payload', JSON.stringify(payload));
       this.http.post(blogPostDataUrl, body).toPromise().then(
         () => {

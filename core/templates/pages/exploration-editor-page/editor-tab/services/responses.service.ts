@@ -39,11 +39,13 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
-  refresherExplorationId: string;
-  missingPrerequisiteSkillId: string;
+  refresherExplorationId: string | null;
+  missingPrerequisiteSkillId: string | null;
 }
 
 interface UpdateAnswerGroupCorrectnessLabel {
@@ -54,31 +56,35 @@ interface UpdateAnswerGroupFeedback {
   feedback: SubtitledHtml;
 }
 
+interface UpdateRule {
+  rules: Rule[];
+}
+
 type UpdateActiveAnswerGroup = (
   AnswerGroup |
   UpdateAnswerGroupFeedback |
   UpdateAnswerGroupCorrectnessLabel |
-  UpdateActiveAnswerGroupDest
+  UpdateActiveAnswerGroupDest |
+  UpdateRule
 );
 
 @Injectable({
   providedIn: 'root',
 })
 export class ResponsesService {
-  private _answerGroupsMemento: AnswerGroup[] = null;
-  private _defaultOutcomeMemento: Outcome = null;
-  private _confirmedUnclassifiedAnswersMemento: readonly InteractionAnswer[] = (
-    null);
+  private _answerGroupsMemento!: AnswerGroup[];
+  private _defaultOutcomeMemento!: Outcome | null;
+  private _confirmedUnclassifiedAnswersMemento!: readonly InteractionAnswer[];
 
   // Represents the current selected answer group, starting at index 0. If the
   // index equal to the number of answer groups (answerGroups.length), then it
   // is referring to the default outcome.
-  private _activeAnswerGroupIndex: number = null;
+  private _activeAnswerGroupIndex!: number;
   private _activeRuleIndex: number = -1;
-  private _answerGroups = null;
-  private _defaultOutcome: Outcome = null;
-  private _confirmedUnclassifiedAnswers: readonly InteractionAnswer[] = null;
-  private _answerChoices: AnswerChoice[] = null;
+  private _answerGroups!: AnswerGroup[];
+  private _defaultOutcome!: Outcome | null;
+  private _confirmedUnclassifiedAnswers!: readonly InteractionAnswer[];
+  private _answerChoices!: AnswerChoice[];
   private _answerGroupsChangedEventEmitter = new EventEmitter();
   private _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
@@ -99,30 +105,32 @@ export class ResponsesService {
     const currentInteractionId = this.stateInteractionIdService.savedMemento;
     const interactionCanHaveSolution = (
       currentInteractionId &&
-      INTERACTION_SPECS[currentInteractionId].can_have_solution);
+      INTERACTION_SPECS[
+        currentInteractionId as InteractionSpecsKey
+      ].can_have_solution);
+    const stateSolutionSavedMemento = (
+      this.stateSolutionService.savedMemento);
     const solutionExists = (
-      this.stateSolutionService.savedMemento &&
-      this.stateSolutionService.savedMemento.correctAnswer !== null);
+      stateSolutionSavedMemento &&
+      stateSolutionSavedMemento.correctAnswer !== null);
 
     if (interactionCanHaveSolution && solutionExists) {
       const interaction = this.stateEditorService.getInteraction();
+      const activeStateName = this.stateEditorService.getActiveStateName();
+      if (activeStateName === null) {
+        throw new Error('Active state name is null');
+      }
 
       interaction.answerGroups = cloneDeep(this._answerGroups);
       interaction.defaultOutcome = cloneDeep(this._defaultOutcome);
       const solutionIsValid = this.solutionVerificationService.verifySolution(
-        this.stateEditorService.getActiveStateName(),
-        interaction,
-        this.stateSolutionService.savedMemento.correctAnswer
+        activeStateName, interaction, stateSolutionSavedMemento.correctAnswer
       );
 
       const solutionWasPreviouslyValid = (
-        this.solutionValidityService.isSolutionValid(
-          this.stateEditorService.getActiveStateName()
-        ));
+        this.solutionValidityService.isSolutionValid(activeStateName));
       this.solutionValidityService.updateValidity(
-        this.stateEditorService.getActiveStateName(),
-        solutionIsValid
-      );
+        activeStateName, solutionIsValid);
 
       if (solutionIsValid && !solutionWasPreviouslyValid) {
         this.alertsService.addInfoMessage(
@@ -140,7 +148,7 @@ export class ResponsesService {
     }
   };
 
-  private _saveAnswerGroups = (newAnswerGroups) => {
+  private _saveAnswerGroups = (newAnswerGroups: AnswerGroup[]) => {
     const oldAnswerGroups = this._answerGroupsMemento;
     if (
       newAnswerGroups &&
@@ -154,39 +162,62 @@ export class ResponsesService {
     }
   };
 
-  private _updateAnswerGroup = (index, updates, callback) => {
+  private _updateAnswerGroup = (
+      index: number,
+      updates: UpdateActiveAnswerGroup,
+      callback: (value: AnswerGroup[]) => void
+  ) => {
     const answerGroup = this._answerGroups[index];
 
     if (answerGroup) {
       if (updates.hasOwnProperty('rules')) {
-        answerGroup.rules = updates.rules;
+        let ruleUpdates = updates as { rules: Rule[] };
+        answerGroup.rules = ruleUpdates.rules;
       }
       if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
+        let taggedSkillMisconceptionIdUpdates = updates as {
+          taggedSkillMisconceptionId: string;
+        };
         answerGroup.taggedSkillMisconceptionId = (
-          updates.taggedSkillMisconceptionId);
+          taggedSkillMisconceptionIdUpdates.taggedSkillMisconceptionId);
       }
       if (updates.hasOwnProperty('feedback')) {
-        answerGroup.outcome.feedback = updates.feedback;
+        let feedbackUpdates = updates as { feedback: SubtitledHtml };
+        answerGroup.outcome.feedback = feedbackUpdates.feedback;
       }
       if (updates.hasOwnProperty('dest')) {
-        answerGroup.outcome.dest = updates.dest;
+        let destUpdates = updates as UpdateActiveAnswerGroupDest;
+        answerGroup.outcome.dest = destUpdates.dest;
       }
       if (updates.hasOwnProperty('destIfReallyStuck')) {
-        answerGroup.outcome.destIfReallyStuck = updates.destIfReallyStuck;
+        let destIfReallyStuckUpdates = updates as Outcome;
+        answerGroup.outcome.destIfReallyStuck = (
+          destIfReallyStuckUpdates.destIfReallyStuck);
       }
       if (updates.hasOwnProperty('refresherExplorationId')) {
+        let refresherExplorationIdUpdates = updates as {
+          refresherExplorationId: string;
+        };
         answerGroup.outcome.refresherExplorationId = (
-          updates.refresherExplorationId);
+          refresherExplorationIdUpdates.refresherExplorationId);
       }
       if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
+        let missingPrerequisiteSkillIdUpdates = updates as {
+          missingPrerequisiteSkillId: string;
+        };
         answerGroup.outcome.missingPrerequisiteSkillId = (
-          updates.missingPrerequisiteSkillId);
+          missingPrerequisiteSkillIdUpdates.missingPrerequisiteSkillId);
       }
       if (updates.hasOwnProperty('labelledAsCorrect')) {
-        answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
+        let labelledAsCorrectUpdates = updates as {
+          labelledAsCorrect: boolean;
+        };
+        answerGroup.outcome.labelledAsCorrect = (
+          labelledAsCorrectUpdates.labelledAsCorrect);
       }
       if (updates.hasOwnProperty('trainingData')) {
-        answerGroup.trainingData = updates.trainingData;
+        let trainingDataUpdates = updates as AnswerGroup;
+        answerGroup.trainingData = trainingDataUpdates.trainingData;
       }
       this._saveAnswerGroups(this._answerGroups);
       callback(this._answerGroupsMemento);
@@ -199,7 +230,7 @@ export class ResponsesService {
     }
   };
 
-  private _saveDefaultOutcome = (newDefaultOutcome) => {
+  private _saveDefaultOutcome = (newDefaultOutcome: Outcome | null) => {
     const oldDefaultOutcome = this._defaultOutcomeMemento;
     if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
       this._defaultOutcome = newDefaultOutcome;
@@ -209,7 +240,7 @@ export class ResponsesService {
   };
 
   private _saveConfirmedUnclassifiedAnswers = (
-      newConfirmedUnclassifiedAnswers
+      newConfirmedUnclassifiedAnswers: readonly InteractionAnswer[]
   ) => {
     const oldConfirmedUnclassifiedAnswers = this
       ._confirmedUnclassifiedAnswersMemento;
@@ -227,7 +258,7 @@ export class ResponsesService {
     }
   };
 
-  private _updateAnswerChoices = (newAnswerChoices) => {
+  private _updateAnswerChoices = (newAnswerChoices: AnswerChoice[]) => {
     const oldAnswerChoices = cloneDeep(this._answerChoices);
     this._answerChoices = newAnswerChoices;
     return oldAnswerChoices;
@@ -263,7 +294,7 @@ export class ResponsesService {
     return this._answerGroups.length;
   }
 
-  getDefaultOutcome(): Outcome {
+  getDefaultOutcome(): Outcome | null {
     return cloneDeep(this._defaultOutcome);
   }
 
@@ -285,7 +316,7 @@ export class ResponsesService {
 
   onInteractionIdChanged(
       newInteractionId: string,
-      callback: (value: AnswerGroup[], value2: Outcome) => void
+      callback: (value: AnswerGroup[], value2: Outcome | null) => void
   ): void {
     this._answerGroups = [];
 
@@ -293,11 +324,17 @@ export class ResponsesService {
     // Recreate the default outcome if switching away from a terminal
     // interaction.
     if (newInteractionId) {
-      if (INTERACTION_SPECS[newInteractionId].is_terminal) {
+      if (INTERACTION_SPECS[
+        newInteractionId as InteractionSpecsKey
+      ].is_terminal) {
         this._defaultOutcome = null;
       } else if (!this._defaultOutcome) {
+        const stateName = this.stateEditorService.getActiveStateName();
+        if (!stateName) {
+          throw new Error('Cannot find active state name.');
+        }
         this._defaultOutcome = this.outcomeObjectFactory.createNew(
-          this.stateEditorService.getActiveStateName(),
+          stateName,
           ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME,
           '',
           []
@@ -342,7 +379,7 @@ export class ResponsesService {
   updateAnswerGroup(
       index: number,
       updates: AnswerGroup,
-      callback: (value: AnswerGroup) => void
+      callback: (value: AnswerGroup[]) => void
   ): void {
     this._updateAnswerGroup(index, updates, callback);
   }
@@ -360,16 +397,19 @@ export class ResponsesService {
 
   updateActiveAnswerGroup(
       updates: UpdateActiveAnswerGroup,
-      callback: (value: AnswerGroup) => void
+      callback: (value: AnswerGroup[]) => void
   ): void {
     this._updateAnswerGroup(this._activeAnswerGroupIndex, updates, callback);
   }
 
   updateDefaultOutcome(
       updates: Outcome,
-      callback: (value: Outcome) => void
+      callback: (value: Outcome | null) => void
   ): void {
     const outcome = this._defaultOutcome;
+    if (!outcome) {
+      return;
+    }
     if (updates.hasOwnProperty('feedback')) {
       outcome.feedback = updates.feedback;
     }
@@ -409,7 +449,7 @@ export class ResponsesService {
   // accordingly.
   handleCustomArgsUpdate(
       newAnswerChoices: AnswerChoice[],
-      callback: (value: AnswerGroup) => void
+      callback: (value: AnswerGroup[]) => void
   ): void {
     const oldAnswerChoices = this._updateAnswerChoices(newAnswerChoices);
     // If the interaction is ItemSelectionInput, update the answer groups
@@ -455,13 +495,14 @@ export class ResponsesService {
         return choice.val;
       });
 
-      let key, newInputValue;
+      let key: string, newInputValue: (string | number | SubtitledHtml)[];
       this._answerGroups.forEach((answerGroup, answerGroupIndex) => {
         const newRules = cloneDeep(answerGroup.rules);
         newRules.forEach((rule) => {
           for (key in rule.inputs) {
             newInputValue = [];
-            rule.inputs[key].forEach((item) => {
+            let inputValue = rule.inputs[key] as string[];
+            inputValue.forEach((item: string) => {
               const newIndex = newChoiceStrings.indexOf(item);
               if (newIndex !== -1) {
                 newInputValue.push(item);
@@ -550,8 +591,8 @@ export class ResponsesService {
   // This registers the change to the handlers in the list of changes.
   save(
       newAnswerGroups: AnswerGroup[],
-      defaultOutcome: Outcome,
-      callback: (value: AnswerGroup[], value2: Outcome) => void
+      defaultOutcome: Outcome | null,
+      callback: (value: AnswerGroup[], value2: Outcome | null) => void
   ): void {
     this._saveAnswerGroups(newAnswerGroups);
     this._saveDefaultOutcome(defaultOutcome);

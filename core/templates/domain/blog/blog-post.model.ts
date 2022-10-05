@@ -30,11 +30,7 @@ export interface BlogPostBackendDict {
   'published_on'?: string;
 }
 export class BlogPostData {
-  // TODO(#13637): Remove the use of interstitial blog post
-  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
-  // blog post that is displayed in the editor until the actual
-  // is fetched from the backend.
-  _id: string | null;
+  _id: string;
   _authorUsername: string;
   _title: string;
   _content: string;
@@ -44,7 +40,7 @@ export class BlogPostData {
   _lastUpdated?: string;
   _publishedOn?: string;
   constructor(
-      id: string | null,
+      id: string,
       authorUsername: string,
       title: string,
       content: string,
@@ -64,7 +60,7 @@ export class BlogPostData {
     this._publishedOn = publishedOn;
   }
 
-  get id(): string | null {
+  get id(): string {
     return this._id;
   }
 
@@ -196,7 +192,7 @@ export class BlogPostData {
   // until the actual blog post is fetched from the backend.
   static createInterstitialBlogPost(): BlogPostData {
     return new BlogPostData (
-      null, 'loading', 'Blog Post Title loading', '', [],
+      'id', 'loading', 'Blog Post Title loading', '', [],
       null, 'Url Fragment loading'
     );
   }

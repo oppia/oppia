@@ -31,7 +31,7 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 export class RefresherExplorationConfirmationModal
   extends ConfirmOrCancelModal {
   confirmRedirectEventEmitter: EventEmitter<void> = new EventEmitter();
-  refresherExplorationId: string;
+  refresherExplorationId!: string;
   constructor(
       private ngbActiveModal: NgbActiveModal,
       private windowRef: WindowRef,

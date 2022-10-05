@@ -20,8 +20,8 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamSpec } from 'domain/exploration/ParamSpecObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
@@ -47,27 +47,27 @@ import { StatsReportingService } from './stats-reporting.service';
    providedIn: 'root'
  })
 export class ExplorationEngineService {
-  private _explorationId: string;
-  private _editorPreviewMode: boolean;
-  private _questionPlayerMode: boolean;
+  private _explorationId!: string;
+  private _editorPreviewMode!: boolean;
+  private _questionPlayerMode!: boolean;
   private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> = (
     new EventEmitter()
   );
 
   answerIsBeingProcessed: boolean = false;
   alwaysAskLearnersForAnswerDetails: boolean = false;
-  exploration: Exploration;
+  exploration!: Exploration;
 
   // This list may contain duplicates. A state name is added to it each time
   // the learner moves to a new card.
   visitedStateNames: string[] = [];
-  currentStateName: string;
-  nextStateName: string;
+  currentStateName!: string;
+  nextStateName!: string;
 
   // Param changes to be used ONLY in editor preview mode.
-  manualParamChanges: ParamChange[];
-  initStateName: string;
-  version: number;
+  manualParamChanges!: ParamChange[];
+  initStateName!: string;
+  version!: number | null;
 
   constructor(
     private alertsService: AlertsService,
@@ -112,7 +112,12 @@ export class ExplorationEngineService {
 
     if (explorationContext) {
       this._explorationId = this.contextService.getExplorationId();
-      this.version = this.urlService.getExplorationVersionFromUrl();
+      const version = this.urlService.getExplorationVersionFromUrl();
+      if (version === null) {
+        throw new Error('Invalid version.');
+      } else {
+        this.version = version;
+      }
       this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
       this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
       if (
@@ -167,25 +172,35 @@ export class ExplorationEngineService {
       oldParams: ExplorationParams,
       paramChanges: ParamChange[],
       envs: Record<string, string>[]
-  ): ExplorationParams {
+  ): ExplorationParams | null {
     let newParams: ExplorationParams = { ...oldParams };
     if (paramChanges.every((pc) => {
       if (pc.generatorId === 'Copier') {
+        const customizationArgsValue = pc.customizationArgs.value;
+        if (customizationArgsValue === undefined) {
+          return false;
+        }
         if (!pc.customizationArgs.parse_with_jinja) {
-          newParams[pc.name] = pc.customizationArgs.value;
+          newParams[pc.name] = customizationArgsValue;
         } else {
-          let paramValue: string = (
+          // Value is null if there is some error in the expression or syntax.
+          let paramValue: string | null = (
             this.expressionInterpolationService.processUnicode(
-              pc.customizationArgs.value, [newParams].concat(envs)));
+              customizationArgsValue, [newParams].concat(envs)));
           if (paramValue === null) {
             return false;
           }
           newParams[pc.name] = paramValue;
         }
       } else {
+        const customizationArgsListOfValues = (
+          pc.customizationArgs.list_of_values);
+        if (customizationArgsListOfValues === undefined) {
+          return false;
+        }
         // RandomSelector.
         newParams[pc.name] = this.randomFromArray(
-          pc.customizationArgs.list_of_values);
+          customizationArgsListOfValues);
       }
       return true;
     })) {
@@ -208,7 +223,8 @@ export class ExplorationEngineService {
   ): void {
     let initialState: State = this.exploration.getInitialState();
     let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
-    let newParams: ExplorationParams = this.makeParams(
+    // Returns null if any evaluation fails.
+    let newParams: ExplorationParams | null = this.makeParams(
       oldParams, initialState.paramChanges, [oldParams]);
     if (newParams === null) {
       this.alertsService.addWarning('Expression parsing error.');
@@ -220,17 +236,25 @@ export class ExplorationEngineService {
     this.currentStateName = this.exploration.initStateName;
     this.nextStateName = this.exploration.initStateName;
 
-    let interaction: Interaction = this.exploration.getInteraction(
+    let interaction = this.exploration.getInteraction(
       this.exploration.initStateName);
+    if (interaction === null) {
+      throw new Error('Interaction not found.');
+    }
     let nextFocusLabel: string = this.focusManagerService.generateFocusLabel();
 
     let interactionId = interaction.id;
     let interactionHtml = null;
-
+    let interactionCustomizationArgs = (
+      this.exploration.getInteractionCustomizationArgs(
+        this.exploration.initStateName));
+    if (interactionCustomizationArgs === null) {
+      throw new Error('Interaction customization args not found.');
+    }
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
         interactionId,
-        this.exploration.getInteractionCustomizationArgs(this.currentStateName),
+        interactionCustomizationArgs,
         true,
         nextFocusLabel,
         null
@@ -248,11 +272,20 @@ export class ExplorationEngineService {
         this.exploration.initStateName, newParams);
     }
 
+    if (interactionHtml === null) {
+      throw new Error('Interaction HTML not found.');
+    }
+
+    let contentId = initialState.content.contentId;
+    if (contentId === null) {
+      throw new Error('Content id not found.');
+    }
+
     let initialCard = StateCard.createNewCard(
       this.currentStateName, questionHtml, interactionHtml,
       interaction, initialState.recordedVoiceovers,
-      initialState.writtenTranslations,
-      initialState.content.contentId, this.audioTranslationLanguageService);
+      initialState.writtenTranslations, contentId,
+      this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
   }
 
@@ -260,9 +293,12 @@ export class ExplorationEngineService {
   // exploration-level initial parameter changes list, followed by any
   // manual parameter changes (in editor preview mode).
   initParams(manualParamChanges: ParamChange[]): void {
-    let baseParams = {};
-    this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
-      baseParams[paramName] = paramSpec.getType().createDefaultValue();
+    let baseParams: ExplorationParams = {};
+    this.exploration.paramSpecs.forEach((
+        paramName: string, paramSpec: ParamSpec
+    ) => {
+      baseParams[paramName] = (
+        paramSpec.getType().createDefaultValue() as string);
     });
 
     let startingParams = this.makeParams(
@@ -270,18 +306,32 @@ export class ExplorationEngineService {
       this.exploration.paramChanges.concat(manualParamChanges),
       [baseParams]);
 
+    if (startingParams === null) {
+      throw new Error('Expression parsing error.');
+    }
+
     this.learnerParamsService.init(startingParams);
   }
 
   private _getInteractionHtmlByStateName(
       labelForFocusTarget: string, stateName: string
   ): string {
-    let interactionId: string = this.exploration.getInteractionId(
+    let interactionId: string | null = this.exploration.getInteractionId(
       stateName);
+
+    if (interactionId === null) {
+      throw new Error('Interaction ID not found.');
+    }
+
+    let interactionCustomizationArgs = (
+      this.exploration.getInteractionCustomizationArgs(stateName));
+    if (interactionCustomizationArgs === null) {
+      throw new Error('Interaction customization args not found.');
+    }
 
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
-      this.exploration.getInteractionCustomizationArgs(stateName),
+      interactionCustomizationArgs,
       true,
       labelForFocusTarget, null);
   }
@@ -326,8 +376,8 @@ export class ExplorationEngineService {
   */
   init(
       explorationDict: ExplorationBackendDict,
-      explorationVersion: number,
-      preferredAudioLanguage: string,
+      explorationVersion: number | null,
+      preferredAudioLanguage: string | null,
       autoTtsEnabled: boolean,
       preferredContentLanguageCodes: string[],
       successCallback: (stateCard: StateCard, label: string) => void
@@ -335,9 +385,13 @@ export class ExplorationEngineService {
     this.exploration = this.explorationObjectFactory.createFromBackendDict(
       explorationDict);
     this.answerIsBeingProcessed = false;
+    let stateName = this.exploration.getInitialState().name;
+    if (stateName === null) {
+      throw new Error('State name not found.');
+    }
     if (this._editorPreviewMode) {
       this.exploration.setInitialStateName(this.initStateName);
-      this.visitedStateNames = [this.exploration.getInitialState().name];
+      this.visitedStateNames = [stateName];
       this.initParams(this.manualParamChanges);
       this.audioTranslationLanguageService.init(
         this.exploration.getAllVoiceoverLanguageCodes(),
@@ -348,7 +402,7 @@ export class ExplorationEngineService {
       this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
       this._loadInitialState(successCallback);
     } else {
-      this.visitedStateNames.push(this.exploration.getInitialState().name);
+      this.visitedStateNames.push(stateName);
       this.version = explorationVersion;
       this.initParams([]);
       this.audioTranslationLanguageService.init(
@@ -357,11 +411,9 @@ export class ExplorationEngineService {
         this.exploration.getLanguageCode(),
         autoTtsEnabled);
       this.audioPreloaderService.init(this.exploration);
-      this.audioPreloaderService.kickOffAudioPreloader(
-        this.exploration.getInitialState().name);
+      this.audioPreloaderService.kickOffAudioPreloader(stateName);
       this.imagePreloaderService.init(this.exploration);
-      this.imagePreloaderService.kickOffImagePreloader(
-        this.exploration.getInitialState().name);
+      this.imagePreloaderService.kickOffImagePreloader(stateName);
       this.checkAlwaysAskLearnersForAnswerDetails();
       this._loadInitialState(successCallback);
     }
@@ -372,7 +424,8 @@ export class ExplorationEngineService {
     );
   }
 
-  moveToExploration(successCallback: (StateCard, string) => void): void {
+  moveToExploration(successCallback: (
+    stateCard: StateCard, str: string) => void): void {
     this._loadInitialState(successCallback);
   }
 
@@ -401,11 +454,13 @@ export class ExplorationEngineService {
     return this.exploration.title;
   }
 
-  getExplorationVersion(): number {
+  getExplorationVersion(): number | null {
     return this.version;
   }
 
-  getAuthorRecommendedExpIdsByStateName(stateName: string): string[] {
+  // If no customization arguments are defined for a terminal state,
+  // a null value is returned.
+  getAuthorRecommendedExpIdsByStateName(stateName: string): string[] | null {
     return this.exploration.getAuthorRecommendedExpIds(stateName);
   }
 
@@ -424,10 +479,16 @@ export class ExplorationEngineService {
         refreshInteraction: boolean,
         feedbackHtml: string,
         feedbackAudioTranslations: BindableVoiceovers,
-        refresherExplorationId: string,
-        missingPrerequisiteSkillId: string,
+        // Below property is null if no refresher exploration is available for
+        // the current state.
+        refresherExplorationId: string | null,
+        // Below property is null if no missing prerequisite skill is available
+        // for the current state.
+        missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
-        taggedSkillMisconceptionId: string,
+        // Below property is null if no skill misconception is tagged to the
+        // current state.
+        taggedSkillMisconceptionId: string | null,
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,
@@ -435,7 +496,7 @@ export class ExplorationEngineService {
       ) => void
   ): boolean {
     if (this.answerIsBeingProcessed) {
-      return;
+      return false;
     }
     this.answerIsBeingProcessed = true;
     let oldStateName: string = this.playerTranscriptService.getLastStateName();
@@ -459,17 +520,26 @@ export class ExplorationEngineService {
       let feedbackIsUseful: boolean = (
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
           oldStateName, oldState, answer, interactionRulesService));
+
+      let ruleIndex = classificationResult.ruleIndex;
+      if (ruleIndex === null) {
+        throw new Error('Rule index should not be null.');
+      }
       this.statsReportingService.recordAnswerSubmitted(
         oldStateName,
         this.learnerParamsService.getAllParams(),
         answer,
         classificationResult.answerGroupIndex,
-        classificationResult.ruleIndex,
+        ruleIndex,
         classificationResult.classificationCategorization,
         feedbackIsUseful);
 
+      let interactionId = oldState.interaction.id;
+      if (interactionId === null) {
+        throw new Error('Interaction ID should not be null.');
+      }
       this.statsReportingService.recordAnswerSubmitAction(
-        oldStateName, newStateName, oldState.interaction.id, answer,
+        oldStateName, newStateName, interactionId, answer,
         outcome.feedback.html);
     }
 
@@ -486,13 +556,16 @@ export class ExplorationEngineService {
     oldParams.answer = answer;
     let feedbackHtml: string = this.makeFeedback(
       outcome.feedback.html, [oldParams]);
-    let feedbackContentId: string = outcome.feedback.contentId;
+    let feedbackContentId: string | null = outcome.feedback.contentId;
+    if (feedbackContentId === null) {
+      throw new Error('Feedback content id should not be null.');
+    }
     let feedbackAudioTranslations: BindableVoiceovers = (
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
     if (feedbackHtml === null) {
       this.answerIsBeingProcessed = false;
       this.alertsService.addWarning('Feedback content should not be empty.');
-      return;
+      return false;
     }
     let newParams = (
       newState ? this.makeParams(
@@ -500,7 +573,7 @@ export class ExplorationEngineService {
     if (newParams === null) {
       this.answerIsBeingProcessed = false;
       this.alertsService.addWarning('Parameters should not be empty.');
-      return;
+      return false;
     }
 
     let questionHtml = this.makeQuestion(newState, [newParams, {
@@ -510,7 +583,7 @@ export class ExplorationEngineService {
       this.answerIsBeingProcessed = false;
       // TODO(#13133): Remove all question related naming conventions.
       this.alertsService.addWarning('Question content should not be empty.');
-      return;
+      return false;
     }
 
     // TODO(sll): Remove the 'answer' key from newParams.
@@ -529,7 +602,8 @@ export class ExplorationEngineService {
 
     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextInteractionHtml = null;
-    if (this.exploration.getInteraction(this.nextStateName).id) {
+    let interaction = this.exploration.getInteraction(newStateName);
+    if (interaction && interaction.id) {
       nextInteractionHtml = (
         this._getInteractionHtmlByStateName(_nextFocusLabel, this.nextStateName)
       );
@@ -541,13 +615,22 @@ export class ExplorationEngineService {
     questionHtml = questionHtml + this._getRandomSuffix();
     nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
 
+    let nextStateName = this.exploration.getInteraction(newStateName);
+    if (nextStateName === null) {
+      throw new Error('Next state name is null.');
+    }
+
+    let contentId = (
+      this.exploration.getState(this.nextStateName).content.contentId);
+    if (contentId === null) {
+      throw new Error('Content id should not be null.');
+    }
+
     let nextCard = StateCard.createNewCard(
-      this.nextStateName, questionHtml, nextInteractionHtml,
-      this.exploration.getInteraction(this.nextStateName),
+      this.nextStateName, questionHtml, nextInteractionHtml, nextStateName,
       this.exploration.getState(this.nextStateName).recordedVoiceovers,
       this.exploration.getState(this.nextStateName).writtenTranslations,
-      this.exploration.getState(this.nextStateName).content.contentId,
-      this.audioTranslationLanguageService);
+      contentId, this.audioTranslationLanguageService);
     successCallback(
       nextCard, refreshInteraction, feedbackHtml,
       feedbackAudioTranslations, refresherExplorationId,
@@ -572,7 +655,11 @@ export class ExplorationEngineService {
   getStateCardByName(stateName: string): StateCard {
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let interactionHtml = null;
-    if (this.exploration.getInteraction(stateName).id) {
+    let interactionStateName = this.exploration.getInteraction(stateName);
+    if (interactionStateName === null) {
+      throw new Error('Interaction state name is null.');
+    }
+    if (interactionStateName && interactionStateName.id) {
       interactionHtml = (
         this._getInteractionHtmlByStateName(
           _nextFocusLabel, stateName
@@ -585,17 +672,21 @@ export class ExplorationEngineService {
     );
     interactionHtml = interactionHtml + this._getRandomSuffix();
 
+    let contentId = (
+      this.exploration.getState(this.nextStateName).content.contentId);
+    if (contentId === null) {
+      throw new Error('Content id should not be null.');
+    }
+
     return StateCard.createNewCard(
-      stateName, contentHtml, interactionHtml,
-      this.exploration.getInteraction(stateName),
+      stateName, contentHtml, interactionHtml, interactionStateName,
       this.exploration.getState(stateName).recordedVoiceovers,
       this.exploration.getState(stateName).writtenTranslations,
-      this.exploration.getState(stateName).content.contentId,
-      this.audioTranslationLanguageService);
+      contentId, this.audioTranslationLanguageService);
   }
 
   getShortestPathToState(
-      allStates: StateObjectsBackendDict, destStateName: string
+      allStates: StateObjectsBackendDict, destStateName: string | null
   ): string[] {
     let stateGraphLinks: { source: string; target: string }[] = [];
 
@@ -623,7 +714,7 @@ export class ExplorationEngineService {
     let shortestPathToStateInReverse: string[] = [];
     let pathsQueue: string[] = [];
     let visitedNodes: Record<string, boolean> = {};
-    let nodeToParentMap: Record<string, string> = {};
+    let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
     // 1st state does not have a parent

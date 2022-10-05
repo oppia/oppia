@@ -19,9 +19,9 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -38,6 +38,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { CdkDragSortEvent } from '@angular/cdk/drag-drop';
 
 @Pipe({ name: 'parameterizeRuleDescriptionPipe' })
 class MockParameterizeRuleDescriptionPipe {
@@ -92,9 +93,9 @@ describe('State Responses Component', () => {
   let externalSaveService: ExternalSaveService;
   let stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService;
   let alertsService: AlertsService;
-  let ngbModal: NgbModal = null;
-  let answerGroups;
-  let defaultOutcome;
+  let ngbModal: NgbModal;
+  let answerGroups: AnswerGroup[];
+  let defaultOutcome: Outcome;
 
   let defaultsOutcomesToSuppressWarnings = [
     {
@@ -284,10 +285,7 @@ describe('State Responses Component', () => {
 
   it('should sort state responses properly', () => {
     component.answerGroups = answerGroups;
-    spyOn(responsesService, 'save').and.callFake(
-      (value, values, callback) => {
-        callback(null, null);
-      });
+    spyOn(responsesService, 'save');
     spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
     spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
       .and.stub();
@@ -295,10 +293,8 @@ describe('State Responses Component', () => {
     const event = {
       previousIndex: 1,
       currentIndex: 1,
-      container: undefined,
-      item: undefined,
     };
-    component.drop(event);
+    component.drop(event as CdkDragSortEvent<AnswerGroup[]>);
     component.sendOnSaveNextContentIdIndex(0);
     component.sendshowMarkAllAudioAsNeedingUpdateModalIfRequired([]);
 
@@ -315,12 +311,12 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService, 'getInapplicableSkillMisconceptionIds')
       .and.returnValue(['id1']);
 
-    expect(component.responseCardIsShown).toBe(undefined);
-    expect(component.enableSolicitAnswerDetailsFeature).toBe(undefined);
-    expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(undefined);
-    expect(component.stateName).toBe(undefined);
-    expect(component.misconceptionsBySkill).toEqual(undefined);
-    expect(component.inapplicableSkillMisconceptionIds).toEqual(undefined);
+    expect(component.responseCardIsShown).toBeUndefined();
+    expect(component.enableSolicitAnswerDetailsFeature).toBeUndefined();
+    expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBeUndefined();
+    expect(component.stateName).toBeUndefined();
+    expect(component.misconceptionsBySkill).toBeUndefined();
+    expect(component.inapplicableSkillMisconceptionIds).toBeUndefined();
 
     component.ngOnInit();
 
@@ -386,10 +382,7 @@ describe('State Responses Component', () => {
     spyOn(responsesService, 'getActiveAnswerGroupIndex').and.returnValue(0);
     spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
-    spyOn(responsesService, 'onInteractionIdChanged').and.callFake(
-      (options, callback) => {
-        callback(null, null);
-      });
+    spyOn(responsesService, 'onInteractionIdChanged');
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
     spyOn(responsesService, 'getDefaultOutcome').and.returnValue(
       defaultOutcome);
@@ -438,9 +431,9 @@ describe('State Responses Component', () => {
       .and.returnValue(['misconception1']);
 
     expect(component.answerGroups).toEqual([]);
-    expect(component.defaultOutcome).toEqual(undefined);
-    expect(component.activeAnswerGroupIndex).toBe(undefined);
-    expect(component.inapplicableSkillMisconceptionIds).toEqual(undefined);
+    expect(component.defaultOutcome).toBeUndefined();
+    expect(component.activeAnswerGroupIndex).toBeUndefined();
+    expect(component.inapplicableSkillMisconceptionIds).toBeUndefined();
 
     component.ngOnInit();
 
@@ -475,11 +468,7 @@ describe('State Responses Component', () => {
     let onHandleCustomArgsUpdateEmitter = new EventEmitter();
     spyOnProperty(stateEditorService, 'onHandleCustomArgsUpdate')
       .and.returnValue(onHandleCustomArgsUpdateEmitter);
-    spyOn(responsesService, 'handleCustomArgsUpdate').and.callFake(
-      (newAnswerChoices, callback) => {
-        callback(null);
-      }
-    );
+    spyOn(responsesService, 'handleCustomArgsUpdate');
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.ngOnInit();
@@ -645,7 +634,6 @@ describe('State Responses Component', () => {
 
     expect(component.isSelfLoopWithNoFeedback(outcome1)).toBe(true);
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
-    expect(component.isSelfLoopWithNoFeedback(null)).toBe(false);
   });
 
   it('should check if outcome marked as correct has self loop', () => {
@@ -731,8 +719,6 @@ describe('State Responses Component', () => {
     let outcome4 = outcomeObjectFactory.createNew('Hola', '', 'Wrong!', []);
 
     expect(component.isLinearWithNoFeedback(outcome4)).toBe(false);
-
-    expect(component.isLinearWithNoFeedback(null)).toBe(false);
   });
 
   it('should get outcome tooltip text', () => {
@@ -812,7 +798,7 @@ describe('State Responses Component', () => {
     spyOn(ngbModal, 'open').and.returnValues({
       componentInstance: {
         addState: {
-          subscribe(value) {
+          subscribe(value: () => void) {
             value();
           }
         },
@@ -821,7 +807,14 @@ describe('State Responses Component', () => {
       },
       result: Promise.resolve({
         reopen: true,
-        tmpRule: new Rule('', null, null),
+        tmpRule: new Rule('', {
+          x: {
+            contentId: null,
+            normalizedStrSet: []
+          }
+        }, {
+          x: 'TranslatableSetOfNormalizedString'
+        }),
         tmpOutcome: outcomeObjectFactory
           .createNew('Hola', '1', 'Feedback text', []),
         tmpTaggedSkillMisconceptionId: ''
@@ -830,7 +823,7 @@ describe('State Responses Component', () => {
     {
       componentInstance: {
         addState: {
-          subscribe(value) {
+          subscribe(value: () => void) {
             value();
           }
         },
@@ -839,7 +832,14 @@ describe('State Responses Component', () => {
       },
       result: Promise.resolve({
         reopen: false,
-        tmpRule: new Rule('', null, null),
+        tmpRule: new Rule('', {
+          x: {
+            contentId: null,
+            normalizedStrSet: []
+          }
+        }, {
+          x: 'TranslatableSetOfNormalizedString'
+        }),
         tmpOutcome: outcomeObjectFactory
           .createNew('Hola', '1', 'Feedback text', []),
         tmpTaggedSkillMisconceptionId: ''
@@ -858,7 +858,7 @@ describe('State Responses Component', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
         addState: {
-          subscribe(value) {
+          subscribe(value: () => void) {
             return;
           }
         },
@@ -885,10 +885,7 @@ describe('State Responses Component', () => {
   });
 
   it('should delete answer group after modal is opened', fakeAsync(() => {
-    spyOn(responsesService, 'deleteAnswerGroup').and.callFake(
-      (value, callback) => {
-        callback(null);
-      });
+    spyOn(responsesService, 'deleteAnswerGroup');
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: Promise.resolve()
@@ -921,11 +918,7 @@ describe('State Responses Component', () => {
   });
 
   it('should update active answer group for newly tagged misconception', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
-      (taggedSkillMisconceptionId, callback) => {
-        callback(null);
-      }
-    );
+    spyOn(responsesService, 'updateActiveAnswerGroup');
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveTaggedMisconception(
@@ -939,11 +932,7 @@ describe('State Responses Component', () => {
   });
 
   it('should update active answer group when feedback is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
-      (feedback, callback) => {
-        callback(null);
-      }
-    );
+    spyOn(responsesService, 'updateActiveAnswerGroup');
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupFeedback(defaultOutcome);
@@ -952,10 +941,7 @@ describe('State Responses Component', () => {
   });
 
   it('should update active answer group when destination is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup')
-      .and.callFake((dest, callback) => {
-        callback(null);
-      });
+    spyOn(responsesService, 'updateActiveAnswerGroup');
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupDest(defaultOutcome);
@@ -964,10 +950,7 @@ describe('State Responses Component', () => {
   });
 
   it('should update active answer group when destination is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup')
-      .and.callFake((destIfReallyStuck, callback) => {
-        callback(null);
-      });
+    spyOn(responsesService, 'updateActiveAnswerGroup');
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupDestIfStuck(defaultOutcome);
@@ -977,11 +960,7 @@ describe('State Responses Component', () => {
 
   it('should update active answer group when correctness' +
     ' label is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
-      (labelledAsCorrect, callback) => {
-        callback(null);
-      }
-    );
+    spyOn(responsesService, 'updateActiveAnswerGroup');
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupCorrectnessLabel(defaultOutcome);
@@ -991,14 +970,17 @@ describe('State Responses Component', () => {
 
 
   it('should update active answer group when answer rules are changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
-      (rules, callback) => {
-        callback(null);
-      }
-    );
+    spyOn(responsesService, 'updateActiveAnswerGroup');
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.saveActiveAnswerGroupRules([new Rule('', null, null)]);
+    component.saveActiveAnswerGroupRules([new Rule('', {
+      x: {
+        contentId: null,
+        normalizedStrSet: []
+      }
+    }, {
+      x: 'TranslatableSetOfNormalizedString'
+    })]);
 
     expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
   });
@@ -1006,11 +988,7 @@ describe('State Responses Component', () => {
 
   it('should update default outcome when default' +
     ' outcome feedback is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome').and.callFake(
-      ({feedback, dest}, callback) => {
-        callback(null);
-      }
-    );
+    spyOn(responsesService, 'updateDefaultOutcome');
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeFeedback(defaultOutcome);
@@ -1020,10 +998,7 @@ describe('State Responses Component', () => {
 
   it('should update default outcome when default' +
     ' outcome destination is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome')
-      .and.callFake((dest, callback) => {
-        callback(null);
-      });
+    spyOn(responsesService, 'updateDefaultOutcome');
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeDest(defaultOutcome);
@@ -1033,10 +1008,7 @@ describe('State Responses Component', () => {
 
   it('should update default outcome when default' +
     ' outcome destination for stuck learner is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome')
-      .and.callFake((destIfReallyStuck, callback) => {
-        callback(null);
-      });
+    spyOn(responsesService, 'updateDefaultOutcome');
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeDestIfStuck(defaultOutcome);
@@ -1046,11 +1018,7 @@ describe('State Responses Component', () => {
 
   it('should update default outcome when default' +
     ' outcome correctness label is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome').and.callFake(
-      ({labelledAsCorrect}, callback) => {
-        callback(null);
-      }
-    );
+    spyOn(responsesService, 'updateDefaultOutcome');
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeCorrectnessLabel(defaultOutcome);
@@ -1099,6 +1067,10 @@ describe('State Responses Component', () => {
 
   it('should get an empty summary when default outcome' +
     ' is a falsy value', () => {
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'Outcome'." We need to suppress this error because of the need to
+    // test validations.
+    // @ts-ignore
     expect(component.summarizeDefaultOutcome(null, 'Continue', 0, true))
       .toBe('');
   });

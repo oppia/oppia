@@ -56,7 +56,7 @@ describe('Learner View Rating Service', () => {
     ' when calling \'submitUserRating\'', fakeAsync(() => {
     let userRatingSpy = spyOn(
       learnerViewRatingBackendApiService, 'submitUserRatingAsync')
-      .and.resolveTo(null);
+      .and.callThrough();
 
     learnerViewRatingService.submitUserRating(2);
     tick();

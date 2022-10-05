@@ -129,8 +129,11 @@ export class BlogPostEditorComponent implements OnInit {
           this.defaultTagsList = editorData.listOfDefaulTags;
           this.maxAllowedTags = editorData.maxNumOfTags;
           this.title = this.blogPostData.title;
-          this.dateTimeLastSaved = this.getDateStringInWords(
-            this.blogPostData.lastUpdated);
+          let lastUpdated = this.blogPostData.lastUpdated;
+          if (lastUpdated === undefined) {
+            throw new Error('Last updated property is undefined');
+          }
+          this.dateTimeLastSaved = this.getDateStringInWords(lastUpdated);
           this.contentEditorIsActive = Boolean(
             this.blogPostData.content.length === 0);
           if (this.blogPostData.thumbnailFilename) {
@@ -142,7 +145,7 @@ export class BlogPostEditorComponent implements OnInit {
               this.blogDashboardPageService.imageUploaderIsNarrow = true;
             }
           }
-          if (this.blogPostData.publishedOn) {
+          if (this.blogPostData.publishedOn && this.blogPostData.lastUpdated) {
             if (this.blogPostData.lastUpdated.slice(0, -8) === (
               this.blogPostData.publishedOn.slice(0, -8))) {
               this.lastChangesWerePublished = true;

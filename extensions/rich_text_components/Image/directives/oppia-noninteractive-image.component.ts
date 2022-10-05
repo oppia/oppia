@@ -56,19 +56,19 @@ interface Dimension {
   styleUrls: []
 })
 export class NoninteractiveImage implements OnInit, OnChanges {
-  @Input() filepathWithValue: string;
+  @Input() filepathWithValue!: string;
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
-  filepath: string;
+  filepath!: string;
   imageUrl: SafeResourceUrl | string = '';
   imageAltText: string = '';
   imageCaption: string = '';
-  loadingIndicatorUrl;
+  loadingIndicatorUrl: string = '';
   isLoadingIndicatorShown: boolean = false;
   isTryAgainShown: boolean = false;
-  dimensions: ImageDimensions;
-  imageContainerStyle: Dimension;
-  loadingIndicatorStyle: Dimension;
+  dimensions!: ImageDimensions;
+  imageContainerStyle!: Dimension;
+  loadingIndicatorStyle!: Dimension;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -133,25 +133,40 @@ export class NoninteractiveImage implements OnInit, OnChanges {
             this.imageLocalStorageService.isInStorage(this.filepath))) {
           const base64Url = this.imageLocalStorageService.getRawImageData(
             this.filepath);
+          if (base64Url === null) {
+            throw new Error('Base64 url is null');
+          }
           const mimeType = base64Url.split(';')[0];
           if (mimeType === AppConstants.SVG_MIME_TYPE) {
-            this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-              base64Url);
+            const svgResourceUrl = (
+              this.svgSanitizerService.getTrustedSvgResourceUrl(base64Url));
+            if (svgResourceUrl === null) {
+              throw new Error('SVG is invalid');
+            }
+            this.imageUrl = svgResourceUrl;
           } else {
             this.imageUrl = base64Url;
           }
         } else {
+          const entityType = this.contextService.getEntityType();
+          if (entityType === undefined) {
+            throw new Error('Entity type is undefined');
+          }
           this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-            this.contextService.getEntityType(),
-            this.contextService.getEntityId(),
-            this.filepath);
+            entityType, this.contextService.getEntityId(), this.filepath);
         }
-      } catch (e) {
+      } catch (e: unknown) {
+        const entityType = this.contextService.getEntityType();
+        if (entityType === undefined) {
+          throw new Error('Entity type is undefined');
+        }
         const additionalInfo = (
-          '\nEntity type: ' + this.contextService.getEntityType() +
+          '\nEntity type: ' + entityType +
           '\nEntity ID: ' + this.contextService.getEntityId() +
           '\nFilepath: ' + this.filepath);
-        e.message += additionalInfo;
+        if (e instanceof Error) {
+          e.message += additionalInfo;
+        }
         throw e;
       }
 
@@ -179,6 +194,9 @@ export class NoninteractiveImage implements OnInit, OnChanges {
       this.filepath).then(objectUrl => {
       this.isTryAgainShown = false;
       this.isLoadingIndicatorShown = false;
+      if (objectUrl === null) {
+        throw new Error('Object url is null');
+      }
       this.imageUrl = objectUrl;
     }, () => {
       this.isTryAgainShown = true;

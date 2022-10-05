@@ -53,9 +53,9 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private i18nLanguageCodeService: I18nLanguageCodeService,
   ) {}
 
-  selectedLanguageCode: string;
-  languageOptions: ExplorationLanguageInfo[];
-  currentGlobalLanguageCode: string;
+  selectedLanguageCode!: string;
+  languageOptions!: ExplorationLanguageInfo[];
+  currentGlobalLanguageCode!: string;
 
   ngOnInit(): void {
     this.currentGlobalLanguageCode = (

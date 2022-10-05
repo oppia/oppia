@@ -27,7 +27,7 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -41,8 +41,8 @@ import { AudioTranslationLanguageService } from
 export class QuestionPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
-  private currentIndex: number = null;
-  private nextIndex: number = null;
+  private currentIndex!: number;
+  private nextIndex!: number;
 
   constructor(
       private alertsService: AlertsService,
@@ -220,20 +220,20 @@ export class QuestionPlayerEngineService {
       answer: InteractionAnswer,
       interactionRulesService: InteractionRulesService,
       successCallback: (
-          nextCard: StateCard,
+          nextCard: StateCard | null,
           refreshInteraction: boolean,
           feedbackHtml: string,
           feedbackAudioTranslations: BindableVoiceovers,
-          refresherExplorationId,
-          missingPrerequisiteSkillId,
+          refresherExplorationId: string | null,
+          missingPrerequisiteSkillId: string | null,
           remainOnCurrentCard: boolean,
           taggedSkillMisconceptionId: string,
-          wasOldStateInitial,
-          isFirstHit,
+          wasOldStateInitial: boolean,
+          isFirstHit: boolean,
           isFinalQuestion: boolean,
           focusLabel: string) => void): boolean {
     if (this.answerIsBeingProcessed) {
-      return;
+      return false;
     }
 
     const answerString = answer as string;
@@ -269,7 +269,7 @@ export class QuestionPlayerEngineService {
     if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
-      return;
+      return false;
     }
 
     let newState = null;
@@ -285,7 +285,7 @@ export class QuestionPlayerEngineService {
     if (questionHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Question name should not be empty.');
-      return;
+      return false;
     }
     this.setAnswerIsBeingProcessed(false);
 
@@ -293,7 +293,7 @@ export class QuestionPlayerEngineService {
     const interactionIsInline = (
       !interactionId ||
       InteractionSpecsConstants.
-        INTERACTION_SPECS[interactionId].display_mode ===
+        INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
     const refreshInteraction = (
       answerIsCorrect || interactionIsInline);

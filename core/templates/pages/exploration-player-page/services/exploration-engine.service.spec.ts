@@ -41,6 +41,9 @@ import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
@@ -303,10 +306,10 @@ describe('Exploration engine service ', () => {
       title: 'My Exploration Title',
       correctness_feedback_enabled: false,
       draft_change_list_id: 9,
-      is_version_of_draft_valid: null,
+      is_version_of_draft_valid: false,
       language_code: 'en',
       init_state_name: 'Start',
-      draft_changes: null,
+      draft_changes: [],
     };
 
     paramChangeDict = {
@@ -404,16 +407,16 @@ describe('Exploration engine service ', () => {
   beforeEach(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(2);
-    spyOn(contentTranslationLanguageService, 'init').and.returnValue(null);
-    spyOn(imagePreloaderService, 'init').and.returnValue(null);
-    spyOn(imagePreloaderService, 'kickOffImagePreloader').and.returnValue(null);
-    spyOn(audioPreloaderService, 'init').and.returnValue(null);
-    spyOn(audioPreloaderService, 'kickOffAudioPreloader').and.returnValue(null);
+    spyOn(contentTranslationLanguageService, 'init').and.callThrough();
+    spyOn(imagePreloaderService, 'init').and.callThrough();
+    spyOn(imagePreloaderService, 'kickOffImagePreloader').and.callThrough();
+    spyOn(audioPreloaderService, 'init').and.callThrough();
+    spyOn(audioPreloaderService, 'kickOffAudioPreloader').and.callThrough();
     spyOn(statsReportingService, 'recordExplorationStarted')
-      .and.returnValue(null);
-    spyOn(statsReportingService, 'recordAnswerSubmitted').and.returnValue(null);
+      .and.callThrough();
+    spyOn(statsReportingService, 'recordAnswerSubmitted').and.callThrough();
     spyOn(statsReportingService, 'recordAnswerSubmitAction')
-      .and.returnValue(null);
+      .and.callThrough();
     spyOn(expressionInterpolationService, 'processHtml')
       .and.callFake((html, envs) => html);
     spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
@@ -490,8 +493,9 @@ describe('Exploration engine service ', () => {
         }), 1, 0, 'default_outcome');
 
       let lastCard = StateCard.createNewCard(
-        'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id', audioTranslationLanguageService);
+        'Card 1', 'Content html', 'Interaction text', {} as Interaction,
+        {} as RecordedVoiceovers, {} as WrittenTranslations, 'content_id',
+        audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -531,8 +535,9 @@ describe('Exploration engine service ', () => {
         }), 1, 0, 'default_outcome');
 
       let lastCard = StateCard.createNewCard(
-        'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id', audioTranslationLanguageService);
+        'Card 1', 'Content html', 'Interaction text', {} as Interaction,
+        {} as RecordedVoiceovers, {} as WrittenTranslations, 'content_id',
+        audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -563,7 +568,7 @@ describe('Exploration engine service ', () => {
           dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
-            html: null
+            html: 'html'
           },
           labelled_as_correct: true,
           param_changes: [],
@@ -572,8 +577,9 @@ describe('Exploration engine service ', () => {
         }), 1, 0, 'default_outcome');
 
       let lastCard = StateCard.createNewCard(
-        'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id', audioTranslationLanguageService);
+        'Card 1', 'Content html', 'Interaction text', {} as Interaction,
+        {} as RecordedVoiceovers, {} as WrittenTranslations, 'content_id',
+        audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -614,8 +620,9 @@ describe('Exploration engine service ', () => {
         }), 1, 0, 'default_outcome');
 
       let lastCard = StateCard.createNewCard(
-        'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id', audioTranslationLanguageService);
+        'Card 1', 'Content html', 'Interaction text', {} as Interaction,
+        {} as RecordedVoiceovers, {} as WrittenTranslations, 'content_id',
+        audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -659,8 +666,9 @@ describe('Exploration engine service ', () => {
         }), 1, 0, 'default_outcome');
 
       let lastCard = StateCard.createNewCard(
-        'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id', audioTranslationLanguageService);
+        'Card 1', 'Content html', 'Interaction text', {} as Interaction,
+        {} as RecordedVoiceovers, {} as WrittenTranslations, 'content_id',
+        audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -669,7 +677,7 @@ describe('Exploration engine service ', () => {
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       spyOn(explorationEngineService, 'makeQuestion')
-        .and.returnValue(null);
+        .and.callThrough();
       let alertsServiceSpy = spyOn(
         alertsService, 'addWarning').and.callThrough();
 
@@ -793,8 +801,9 @@ describe('Exploration engine service ', () => {
       }), 1, 0, 'default_outcome');
 
     let lastCard = StateCard.createNewCard(
-      'Card 1', 'Content html', 'Interaction text', null,
-      null, null, 'content_id', audioTranslationLanguageService);
+      'Card 1', 'Content html', 'Interaction text', {} as Interaction,
+      {} as RecordedVoiceovers, {} as WrittenTranslations, 'content_id',
+      audioTranslationLanguageService);
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(playerTranscriptService, 'getLastStateName')
@@ -803,7 +812,7 @@ describe('Exploration engine service ', () => {
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(answerClassificationResult);
 
-    expect(explorationEngineService.currentStateName).toBe(undefined);
+    expect(explorationEngineService.currentStateName).toBeUndefined();
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -823,7 +832,7 @@ describe('Exploration engine service ', () => {
       .createFromBackendDict(explorationDict);
 
     let currentStateName = explorationEngineService.currentStateName;
-    expect(currentStateName).toBe(undefined);
+    expect(currentStateName).toBeUndefined();
 
     // Please note that we are not calling init funtion here.
     explorationEngineService.moveToExploration(moveToExplorationCb);

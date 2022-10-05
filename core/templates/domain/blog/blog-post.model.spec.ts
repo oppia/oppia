@@ -107,7 +107,7 @@ describe('Blog Post Object Factory', () => {
 
   it('should be able to create an interstitial blog post object', () => {
     let blogPost = BlogPostData.createInterstitialBlogPost();
-    expect(blogPost.id).toEqual(null);
+    expect(blogPost.id).toEqual('id');
     expect(blogPost.authorUsername).toEqual('loading');
     expect(blogPost.title).toEqual('Blog Post Title loading');
     expect(blogPost.content).toEqual('');

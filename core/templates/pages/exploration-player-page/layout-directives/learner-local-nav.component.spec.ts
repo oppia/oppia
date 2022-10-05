@@ -150,22 +150,19 @@ describe('Learner Local Nav Component ', () => {
     constants.ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS = false;
 
     // Pre-checks.
-    expect(component.explorationId).toBe(null);
-    expect(component.version).toBe(null);
+    expect(component.explorationId).toBeUndefined();
     expect(component.canEdit).toBe(null);
 
     component.ngOnInit();
     tick();
 
     expect(component.explorationId).toBe('test_id');
-    expect(component.version).toBe(1);
     expect(component.canEdit).toBe(true);
   }));
 
   it('should open a modal to report exploration when ' +
     'clicking on flag button', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return (
         { componentInstance: {},
           result: Promise.resolve()
@@ -197,7 +194,7 @@ describe('Learner Local Nav Component ', () => {
   it('should hide attribution modal', () => {
     spyOn(attributionService, 'isAttributionModalShown').and.returnValue(true);
     const hideModalSpy = spyOn(
-      attributionService, 'hideAttributionModal').and.returnValue(null);
+      attributionService, 'hideAttributionModal').and.callThrough();
 
     component.toggleAttributionModal();
 
@@ -207,7 +204,7 @@ describe('Learner Local Nav Component ', () => {
   it('should show attribution modal', () => {
     spyOn(attributionService, 'isAttributionModalShown').and.returnValue(false);
     const showModalSpy = spyOn(
-      attributionService, 'showAttributionModal').and.returnValue(null);
+      attributionService, 'showAttributionModal').and.callThrough();
 
     component.toggleAttributionModal();
 

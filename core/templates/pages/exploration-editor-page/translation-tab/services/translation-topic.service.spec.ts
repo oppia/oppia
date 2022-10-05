@@ -29,10 +29,10 @@ import { fakeAsync, TestBed } from '@angular/core/testing';
 
 
 describe('Translation topic service', () => {
-  var $flushPendingTasks = null;
+  var $flushPendingTasks: () => void;
   let $q = null;
 
-  let loggerService: LoggerService = null;
+  let loggerService: LoggerService;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
 
@@ -71,6 +71,10 @@ describe('Translation topic service', () => {
         'Invalid active topic name: Topic 3'
       );
 
+      // This throws "Argument of type 'null' is not assignable to parameter
+      // of type 'string'" We need to suppress this error because of the need
+      // to test validations.
+      // @ts-ignore
       translationTopicService.setActiveTopicName(null);
       $flushPendingTasks();
       expect(

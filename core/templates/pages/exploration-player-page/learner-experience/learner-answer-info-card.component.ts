@@ -38,8 +38,8 @@ export class LearnerAnswerInfoCard {
   @Output() submitAnswer: EventEmitter<SubmitAnswerEventDataInterface> = (
     new EventEmitter());
 
-  interaction: Interaction;
-  answerDetails: string;
+  interaction!: Interaction;
+  answerDetails!: string;
 
   constructor(
     private explorationEngineService: ExplorationEngineService,

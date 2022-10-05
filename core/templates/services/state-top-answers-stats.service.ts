@@ -44,8 +44,8 @@ export class StateTopAnswersStatsService {
   private initializationHasStarted: boolean;
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
 
-  private resolveInitPromise: () => void;
-  private rejectInitPromise: (_) => void;
+  private resolveInitPromise!: () => void;
+  private rejectInitPromise!: (_: Error) => void;
   private initPromise: Promise<void>;
 
   constructor(
@@ -80,7 +80,7 @@ export class StateTopAnswersStatsService {
         }
         this.resolveInitPromise();
       } catch (error) {
-        this.rejectInitPromise(error);
+        this.rejectInitPromise(error as Error);
       }
     }
     return this.initPromise;
@@ -138,15 +138,22 @@ export class StateTopAnswersStatsService {
   private refreshAddressedInfo(updatedState: State): void {
     const stateName = updatedState.name;
 
-    if (!this.topAnswersStatsByStateName.has(stateName)) {
+    if (stateName === null || !this.topAnswersStatsByStateName.has(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
 
     const stateStats = this.topAnswersStatsByStateName.get(stateName);
+    if (stateStats === undefined) {
+      throw new Error(stateName + ' does not exist.');
+    }
 
-    if (stateStats.interactionId !== updatedState.interaction.id) {
+    let interactionId = updatedState.interaction.id;
+    if (interactionId === null) {
+      throw new Error('Interaction ID cannot be null.');
+    }
+    if (stateStats.interactionId !== interactionId) {
       this.topAnswersStatsByStateName.set(
-        stateName, new AnswerStatsEntry([], updatedState.interaction.id));
+        stateName, new AnswerStatsEntry([], interactionId));
     } else {
       stateStats.answers.forEach(a => a.isAddressed = (
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(

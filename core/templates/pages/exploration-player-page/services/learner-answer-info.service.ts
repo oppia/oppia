@@ -41,8 +41,10 @@ export class LearnerAnswerInfoService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private submittedAnswerInfoCount: number = 0;
   private currentEntityId!: string;
-  private stateName!: string;
-  private interactionId!: string;
+  // Name is null before saving a state.
+  private stateName!: string | null;
+  // Id is null until populated from the backend.
+  private interactionId!: string | null;
   private currentAnswer!: string;
   private currentInteractionRulesService!: InteractionRulesService;
   private canAskLearnerForAnswerInfo: boolean = false;
@@ -90,9 +92,17 @@ export class LearnerAnswerInfoService {
       return;
     }
 
+    if (this.interactionId === null) {
+      throw new Error('Interaction id cannot be null.');
+    }
+
     if (this.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
       this.interactionId) !== -1) {
       return;
+    }
+
+    if (this.stateName === null) {
+      throw new Error('State name cannot be null.');
     }
 
     if (this.visitedStates.indexOf(this.stateName) !== -1) {
@@ -129,6 +139,13 @@ export class LearnerAnswerInfoService {
   }
 
   recordLearnerAnswerInfo(answerDetails: string): void {
+    if (this.interactionId === null) {
+      throw new Error('Interaction id cannot be null.');
+    }
+
+    if (this.stateName === null) {
+      throw new Error('State name cannot be null.');
+    }
     this.learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
       this.currentEntityId, this.stateName, this.interactionId,
       this.currentAnswer, answerDetails);

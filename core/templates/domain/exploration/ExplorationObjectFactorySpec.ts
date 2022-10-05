@@ -167,6 +167,7 @@ describe('Exploration object factory', () => {
       title: 'My Title',
       init_state_name: 'Introduction',
       language_code: 'en',
+      auto_tts_enabled: false,
       states: {
         'first state': firstState,
         'second state': secondState},

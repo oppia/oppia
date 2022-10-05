@@ -30,12 +30,12 @@ import constants from 'assets/constants';
   templateUrl: './feedback-popup.component.html'
 })
 export class FeedbackPopupComponent {
-  feedbackUrl: string;
+  feedbackUrl!: string;
+  feedbackPopoverId!: string;
+  feedbackTitle!: string;
   feedbackText: string = '';
   isSubmitterAnonymized: boolean = false;
-  isLoggedIn: boolean;
-  feedbackPopoverId: string;
-  feedbackTitle: string;
+  isLoggedIn: boolean = false;
   feedbackSubmitted: boolean = false;
   MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
   @Output() closePopover: EventEmitter<void> = new EventEmitter();

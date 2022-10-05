@@ -50,7 +50,7 @@ describe('NoninteractiveImage', () => {
     'WVsbG93IiAvPjwvc3ZnPg==';
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(data): string {
+    escapedJsonToObj(data: string): string {
       return data;
     }
   }
@@ -62,16 +62,16 @@ describe('NoninteractiveImage', () => {
   }
 
   let mockImageLocalStorageService = {
-    getRawImageData: (filename) => {
+    getRawImageData: (filename: string) => {
       return dataUrlSvg;
     },
-    saveImage: (filename, imageData) => {
+    saveImage: (filename: string, imageData: string) => {
       return 'Image file save.';
     },
-    deleteImage: (filename) => {
+    deleteImage: (filename: string) => {
       return 'Image file is deleted.';
     },
-    isInStorage: (filename) => {
+    isInStorage: (filename: string) => {
       return true;
     }
   };

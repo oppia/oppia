@@ -27,7 +27,7 @@ import { LearnerViewRatingBackendApiService } from './learner-view-rating-backen
   providedIn: 'root'
 })
 export class LearnerViewRatingService {
-  userRating: number;
+  userRating!: number;
   private _ratingUpdatedEventEmitter: EventEmitter<void> = new EventEmitter();
 
   constructor(
@@ -36,7 +36,7 @@ export class LearnerViewRatingService {
     LearnerViewRatingBackendApiService
   ) {}
 
-  init(successCallback: (usrRating) => void): void {
+  init(successCallback: (usrRating: number) => void): void {
     this.learnerViewRatingBackendApiService.getUserRatingAsync()
       .then((response) => {
         successCallback(response.user_rating);

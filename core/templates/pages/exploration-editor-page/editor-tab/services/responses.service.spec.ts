@@ -23,7 +23,7 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -36,21 +36,22 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import {
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 describe('Responses Service', () => {
-  let alertsService: AlertsService = null;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
-  let explorationHtmlFormatterService: ExplorationHtmlFormatterService = null;
-  let interactionData = null;
-  let interactionDataWithRules = null;
-  let interactionObjectFactory: InteractionObjectFactory = null;
-  let loggerService: LoggerService = null;
-  let outcomeObjectFactory: OutcomeObjectFactory = null;
-  let responsesService: ResponsesService = null;
-  let savedMemento = null;
-  let stateEditorService: StateEditorService = null;
-  let stateInteractionIdService: StateInteractionIdService = null;
-  let stateSolutionService: StateSolutionService = null;
+  let alertsService: AlertsService;
+  let answerGroupObjectFactory: AnswerGroupObjectFactory;
+  let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  let interactionData: Interaction;
+  let interactionDataWithRules: Interaction;
+  let interactionObjectFactory: InteractionObjectFactory;
+  let loggerService: LoggerService;
+  let outcomeObjectFactory: OutcomeObjectFactory;
+  let responsesService: ResponsesService;
+  let savedMemento: Solution;
+  let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
+  let stateSolutionService: StateSolutionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -71,7 +72,6 @@ describe('Responses Service', () => {
 
     savedMemento = {
       ehfs: explorationHtmlFormatterService,
-      shof: SubtitledHtml,
       answerIsExclusive: true,
       correctAnswer: 'This is the correct answer',
       explanation: new SubtitledHtml('', 'tesster'),
