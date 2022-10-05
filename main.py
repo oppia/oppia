@@ -832,6 +832,9 @@ URLS = [
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_SEND_MAIL_URL_PREFIX,
         topic_editor.TopicPublishSendMailHandler),
+    get_redirect_route(
+        r'%s/' % feconf.TOPIC_ID_TO_TOPIC_NAME,
+        topic_editor.TopicIdToTopicNameHandler),
 
     get_redirect_route(
         r'%s/<selected_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
