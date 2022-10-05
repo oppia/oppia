@@ -6212,7 +6212,11 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_buttonText_0: {}
+        ca_buttonText_0:
+          hi:
+            data_format: html
+            translation: <p>choicewa</p>
+            needs_update: false
         content: {}
         default_outcome: {}
   end:
@@ -6302,7 +6306,11 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_buttonText_0: {}
+        ca_buttonText_0:
+          hi:
+            data_format: html
+            needs_update: true
+            translation: <p>choicewa</p>
         content: {}
         default_outcome: {}
   end:
