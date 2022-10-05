@@ -56,7 +56,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         )
         class_object = value_generators_domain.Registry()
         self.assertEqual(
-            contents_registry, 
+            contents_registry,
             class_object.get_generator_class_by_id(
                 'RandomSelector'
             ).get_html_template()
@@ -71,7 +71,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         )
         class_object = value_generators_domain.Registry()
         self.assertEqual(
-            contents_registry, 
+            contents_registry,
             class_object.get_generator_class_by_id(
                 'Copier'
             ).get_html_template()
