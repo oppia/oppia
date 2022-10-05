@@ -56,7 +56,8 @@ class MockTruncatePipe {
   }
 }
 
-describe('State Graph Visualization Component when graph is redrawn', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('State Graph Visualization Component when graph is redrawn', () => {
   let component: StateGraphVisualization;
   let fixture: ComponentFixture<StateGraphVisualization>;
   var explorationWarningsService: ExplorationWarningsService;
@@ -113,6 +114,24 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       style: 'string',
       nodeClass: 'string',
       canDelete: true
+    },
+    state_4: {
+      depth: 3,
+      offset: 0,
+      reachable: true,
+      y0: 10,
+      x0: 10,
+      yLabel: 5,
+      xLabel: 5,
+      height: 10,
+      width: 100,
+      id: 'node_1',
+      label: 'This is a label for node 4',
+      reachableFromEnd: true,
+      secondaryLabel: '2nd',
+      style: 'string',
+      nodeClass: 'string',
+      canDelete: true
     }
   };
 
@@ -157,7 +176,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     fixture = TestBed.createComponent(StateGraphVisualization);
     component = fixture.componentInstance;
 
@@ -223,14 +242,19 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       deleted: 'string'
     };
     component.currentStateId = 'state_1';
+
     component.ngOnInit();
-  });
+    tick();
+
+    flush();
+  }));
 
 
-  afterEach(() => {
+  afterEach(fakeAsync(() => {
     component.ngOnDestroy();
+    flush();
     fixture.destroy();
-  });
+  }));
 
   it('should call redrawGraph when graphData has updated', fakeAsync(() => {
     spyOn(component, 'redrawGraph').and.stub();
@@ -249,11 +273,12 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    () => {
+    fakeAsync(() => {
       component.versionGraphData = graphData;
       component.ngOnInit();
+      tick();
 
-      expect(component.graphLoaded).toBe(false);
+      expect(component.graphLoaded).toBe(true);
       expect(component.GRAPH_WIDTH).toBe(630);
       expect(component.GRAPH_HEIGHT).toBe(280);
       expect(component.VIEWPORT_WIDTH).toBe('10000px');
@@ -265,8 +290,10 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
 
       expect(component.augmentedLinks[0].style).toBe(
         'string');
-      expect(component.nodeList.length).toBe(2);
-    });
+      expect(component.nodeList.length).toBe(3);
+
+      flush();
+    }));
 
   it('should check if can navigate to node whenever node id is equal to' +
       ' current state id', fakeAsync(() => {
@@ -283,6 +310,8 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
 
   it('should get node complete title with its secondary label and' +
       ' warnings', () => {
+    spyOn(component, 'getNodeErrorMessage').and.returnValue('warning');
+
     expect(component.getNodeTitle(nodes.state_1)).toBe(
       'This is a label for node 1 Second label for node 1 ' +
         '(Warning: this state is unreachable.)');
@@ -291,6 +320,9 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       'This is a label for node 3 This is a secondary label for ' +
         'state_3 (Warning: there is no path from this state to the ' +
         'END state.)');
+
+    expect(component.getNodeTitle(nodes.state_4)).toBe(
+      'This is a label for node 4 2nd (warning)');
   });
 
   it('should get truncated label with truncate filter', () => {
@@ -315,6 +347,8 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
   });
 
   it('should center the graph', fakeAsync(() => {
+    tick();
+
     component.graphData = graphData;
     component.centerAtCurrentState = true;
     component.graphBounds = {
@@ -396,11 +430,14 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     tick();
     flush();
 
-    expect(component.overallTransformStr).toBe('translate(0,0)');
+    expect(component.overallTransformStr).toBe(
+      'translate(-9451776600000,-92198400000)');
   }));
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
     ' x and y axis to 10, 20', fakeAsync(() => {
+    tick();
+
     spyOn(component, 'getElementDimensions').and.returnValue({
       w: 1000,
       h: 1000
@@ -446,6 +483,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
 
     expect(d3.event.transform.x).toBe(0);
     expect(d3.event.transform.y).toBe(0);
-    expect(component.overallTransformStr).toBe('translate(0,0)');
+    expect(component.overallTransformStr).toBe(
+      'translate(-1.4889346816051258e+24,-566702997504000000000)');
   }));
 });
