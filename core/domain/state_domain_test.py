@@ -843,8 +843,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
-            }
+            },
+            'recorded_voiceovers': { 'voiceovers_mapping': {}}
         }
+
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,

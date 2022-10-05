@@ -471,7 +471,7 @@ describe('States Object Factory', () => {
   it('should create a new state given a state name and set ' +
     'that state to a terminal state', () => {
     let newStates = ssof.createFromBackendDict(statesDict);
-    newStates.addState('new state');
+    newStates.addState('new state', 'content_5', 'default_outcome_6');
 
     expect(newStates.getState('new state')).toEqual(
       sof.createFromBackendDict('new state', newState2));

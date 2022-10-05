@@ -3440,7 +3440,7 @@ class State(translation_domain.BaseTranslatableObject):
 
             # INVALID_CONTENT_ID doesn't corresponds to any existing content in
             # the state. Such Ids cannot be replaced with any new id.
-            if old_id != feconf.INVALID_CONTENT_ID:
+            if old_id == feconf.INVALID_CONTENT_ID:
                 return old_id
 
             return id_mapping[old_id]
