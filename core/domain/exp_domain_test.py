@@ -5985,8 +5985,8 @@ class ExplorationChangesMergeabilityUnitTests(
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
     def append_next_content_id_index_change(
-      self, change_list: List[exp_domain.ExplorationChange]
-      ) -> List[exp_domain.ExplorationChange]:
+        self, change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
         """Appends the next_content_id_index change in the change list."""
         change_list.append(exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -6183,7 +6183,7 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT),
+                    translation_domain.ContentType.CONTENT),
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
@@ -6197,7 +6197,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'hint_content': {
                     'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.HINT),
+                        translation_domain.ContentType.HINT),
                     'html': '<p>This is a first hint.</p>'
                 }
             }],
@@ -6693,7 +6693,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'feedback':
                         {
                             'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                                translation_domain.ContentType.FEEDBACK),
                             'html': '<p>Next</p>'
                         },
                         'param_changes': [],

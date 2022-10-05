@@ -692,9 +692,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(
-                opportunity_services,
-                'update_translation_opportunity_with_accepted_suggestion',
-                lambda x, _: x):
+            opportunity_services,
+            'update_translation_opportunity_with_accepted_suggestion',
+            lambda x, _: x
+        ):
             self.put_json('%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
@@ -811,7 +812,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         with self.swap(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
-            lambda x, _: x):
+            lambda x, _: x
+        ):
             self.put_json('%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
@@ -899,9 +901,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, self.translator_id, change_dict, 'description')
         with self.swap(
-                opportunity_services,
-                'update_translation_opportunity_with_accepted_suggestion',
-                lambda x, _: x):
+            opportunity_services,
+            'update_translation_opportunity_with_accepted_suggestion',
+            lambda x, _: x
+        ):
             suggestion_services.accept_suggestion(
                 suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
             )

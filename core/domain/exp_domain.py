@@ -120,9 +120,9 @@ DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
 # This takes additional 'content_id' and 'state_name' parameters.
 DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
     'mark_written_translations_as_needing_update')
-CMD_MARK_TRANSLATIONS_NEEDS_UPDATE = 'mark_translations_needs_update'
+CMD_MARK_TRANSLATIONS_NEEDS_UPDATE: Final = 'mark_translations_needs_update'
 # This takes additional 'content_id' parameters.
-CMD_REMOVE_TRANSLATIONS = 'remove_translations'
+CMD_REMOVE_TRANSLATIONS: Final = 'remove_translations'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY: Final = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -2085,7 +2085,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'following states: %s' % ', '.join(dead_end_states))
 
     def get_content_html(
-            self, state_name: str, content_id: str) -> Union[str, List[str]]:
+        self, state_name: str, content_id: str
+    ) -> Union[str, List[str]]:
         """Return the content for a given content id of a state.
 
         Args:
