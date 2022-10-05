@@ -11,8 +11,8 @@
 }
 
 .oppia-android-speech-bubble-text {
-  margin-left: 40px;
   margin-top: -25px;
+  text-align: center;
 }
 
 .oppia-android-speech-bubble {
@@ -147,7 +147,7 @@
 }
 
 .oppia-android-key-feature-text {
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
   font-weight: 700;
 }
@@ -156,6 +156,7 @@
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 18px;
   font-weight: 400;
+  margin-top: 2px;
 }
 
 .oppia-android-empty-div {
