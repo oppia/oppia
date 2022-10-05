@@ -193,7 +193,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 self.assertItemsEqual(
                     observed_log_messages,
                     [
-                        'Cloud Secret Manager is not working.',
+                        'Cloud Secret Manager is not able to get '
+                        'MAILCHIMP_API_KEY.',
                         'Mailchimp API key is not available.'
                     ]
                 )

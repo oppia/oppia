@@ -219,7 +219,9 @@ class EmailTests(test_utils.GenericTestBase):
                 # The '\nNoneType: None' represents the stacktrace which is not
                 # available in the backend tests.
                 self.assertIn(
-                    'Cloud Secret Manager is not working.\nNoneType: None', logs
+                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.'
+                    '\nNoneType: None',
+                    logs
                 )
 
     def test_mailgun_domain_name_not_set_raises_exception(self) -> None:
@@ -238,7 +240,9 @@ class EmailTests(test_utils.GenericTestBase):
                 # The '\nNoneType: None' represents the stacktrace which is not
                 # available in the backend tests.
                 self.assertIn(
-                    'Cloud Secret Manager is not working.\nNoneType: None', logs
+                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.'
+                    '\nNoneType: None',
+                    logs
                 )
 
     def test_invalid_status_code_returns_false(self) -> None:
