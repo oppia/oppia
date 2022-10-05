@@ -157,11 +157,8 @@ var ExplorationEditorFeedbackTab = function() {
 
     await waitFor.visibilityOf(
       feedbackStatusDropdown, 'Feedback Status Dropdown is not visible');
-    await action.click('Feedback Status Dropdow', feedbackStatusDropdown);
-    var optionLabelFeedbackStatus = (
-      $('.e2e-test-oppia-feedback-status-' + feedbackStatus.toLowerCase()));
-    await action.click(
-      'Option feedback status', optionLabelFeedbackStatus, true);
+    await action.select(
+      'Option feedback status', feedbackStatusDropdown, feedbackStatus);
 
     await action.click(
       'Feedback Send Response Button', feedbackSendResponseButton);
