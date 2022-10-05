@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
+      - name: echo env.GITHUB_SHA
+        run: |
+          echo "${env.GITHUB_SHA}"
       - uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v2
@@ -61,6 +64,9 @@ jobs:
         os: [ubuntu-22.04]
     needs: build_webpack
     steps:
+      - name: echo env.GITHUB_SHA
+        run: |
+          echo "${env.GITHUB_SHA}"
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
