@@ -21,7 +21,6 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.domain import caching_services
 from core.domain import topic_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import topic_migration_jobs

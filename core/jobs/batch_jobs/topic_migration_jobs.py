@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import caching_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
