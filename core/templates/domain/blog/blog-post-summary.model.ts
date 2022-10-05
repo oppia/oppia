@@ -21,6 +21,7 @@ export interface BlogPostSummaryBackendDict {
   'id': string;
   'title': string;
   'summary': string;
+  'author_username': string;
   'author_name': string;
   'tags': string[];
   'url_fragment': string;
@@ -33,6 +34,7 @@ export interface BlogPostSummaryBackendDict {
 export class BlogPostSummary {
   _id: string;
   _authorUsername: string;
+  _authorName: string;
   _title: string;
   _summary: string;
   _tags: string[];
@@ -44,6 +46,7 @@ export class BlogPostSummary {
   constructor(
       id: string,
       authorUsername: string,
+      authorName: string,
       title: string,
       summary: string,
       tags: string[],
@@ -54,6 +57,7 @@ export class BlogPostSummary {
       authorProfilePicUrl?: string) {
     this._id = id;
     this._authorUsername = authorUsername;
+    this._authorName = authorName;
     this._title = title;
     this._summary = summary;
     this._tags = tags;
@@ -70,6 +74,10 @@ export class BlogPostSummary {
 
   get authorUsername(): string {
     return this._authorUsername;
+  }
+
+  get authorName(): string {
+    return this._authorName;
   }
 
   get lastUpdated(): string | undefined {
@@ -109,6 +117,7 @@ export class BlogPostSummary {
   ): BlogPostSummary {
     return new BlogPostSummary (
       blogPostSummaryBackendDict.id,
+      blogPostSummaryBackendDict.author_username,
       blogPostSummaryBackendDict.author_name,
       blogPostSummaryBackendDict.title,
       blogPostSummaryBackendDict.summary,

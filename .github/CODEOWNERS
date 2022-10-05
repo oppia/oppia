@@ -112,6 +112,7 @@
 /core/templates/pages/blog-dashboard-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-home-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-post-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-author-profile-page/ @oppia/lace-frontend-reviewers
 
 # Collection project.
 /core/controllers/collection*.py @oppia/lace-backend-reviewers

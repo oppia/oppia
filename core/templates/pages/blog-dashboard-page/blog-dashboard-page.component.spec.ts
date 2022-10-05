@@ -174,6 +174,7 @@ describe('Blog Dashboard Page Component', () => {
     let defaultImageUrl = 'banner_image_url';
     let blogDashboardData = {
       authorName: 'test_user',
+      authorBio: 'Bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,
@@ -271,7 +272,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
+      authorName: 'test_user',
+      authorBio: 'bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 1,
       numOfDraftBlogPosts: 0,
@@ -306,7 +308,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
+      authorName: 'test_user',
+      authorBio: 'Bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,
@@ -336,7 +339,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
+      authorName: 'test_user',
+      authorBio: 'Bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,

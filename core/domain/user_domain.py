@@ -67,6 +67,7 @@ class BlogAuthorDetailsDict(TypedDict):
 
     author_name: str
     author_bio: str
+    last_updated: Optional[str]
 
 
 class UserSettings:
@@ -1650,7 +1651,7 @@ class BlogAuthorDetails:
         self.author_bio = author_bio
         self.last_updated = last_updated
 
-    def require_valid_author_name(cls, author_name: str) -> None:
+    def require_valid_author_name(self, author_name: str) -> None:
         """Checks if the given author name is valid or not.
 
         Args:

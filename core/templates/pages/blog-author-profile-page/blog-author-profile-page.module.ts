@@ -19,7 +19,6 @@
 import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -47,7 +46,6 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     TranslateModule,
     ReactiveFormsModule,
     Error404PageModule,
-    MatTooltipModule
   ],
   declarations: [
     BlogAuthorProfilePageComponent,

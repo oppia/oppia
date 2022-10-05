@@ -43,6 +43,8 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   blogDashboardData!: BlogDashboardData;
   windowIsNarrow: boolean = false;
   activeView: string = 'gridView';
+  authorNameEditorOpened: boolean = false;
+  authorBioEditorOpened: boolean = false;
   directiveSubscriptions = new Subscription();
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   constructor(
@@ -93,6 +95,9 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
         this.authorProfilePictureUrl = decodeURIComponent((
           // eslint-disable-next-line max-len
           dashboardData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
+        if (!this.authorBio.length) {
+          this.authorBioEditorOpened = true;
+        }
         this.loaderService.hideLoadingScreen();
       }, (errorResponse) => {
         if (
@@ -145,6 +150,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   updateAuthorName(): void {
+    this.authorNameEditorOpened = false;
     this.blogDashboardBackendService.updateAuthorDetailsAsync(
       this.authorName, this.authorBio).then(() => {
       this.alertsService.addSuccessMessage('Author name saved successfully.');
@@ -152,6 +158,27 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
       this.alertsService.addWarning(
         `Unable to update author name. Error: ${error}`);
     });
+  }
+
+  updateAuthorBio(): void {
+    this.blogDashboardBackendService.updateAuthorDetailsAsync(
+      this.authorName, this.authorBio).then(() => {
+      this.alertsService.addSuccessMessage('Author bio saved successfully.');
+    }, (error) => {
+      this.alertsService.addWarning(
+        `Unable to update author bio. Error: ${error}`);
+    });
+    if (this.authorBio) {
+      this.authorBioEditorOpened = false;
+    }
+  }
+
+  openAuthorNameEditor(): void {
+    this.authorNameEditorOpened = true;
+  }
+
+  openAuthorBioEditor(): void {
+    this.authorBioEditorOpened = true;
   }
 }
 

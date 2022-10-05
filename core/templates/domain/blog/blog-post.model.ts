@@ -68,7 +68,7 @@ export class BlogPostData {
     return this._id;
   }
 
-  get authorUsername(): string {
+  get authorName(): string {
     return this._authorName;
   }
 

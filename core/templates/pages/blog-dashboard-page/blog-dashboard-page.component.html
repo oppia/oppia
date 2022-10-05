@@ -1,34 +1,60 @@
 <div *ngIf="activeTab === 'main'">
   <mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
-    <mat-card-header class="blog-dashboard-header">
+    <mat-card-header class="blog-dashboard-header mr-0">
       <img mat-card-avatar
            [src]="authorProfilePictureUrl"
            alt="Profile image of the author of the blog post"
            class="e2e-test-profile-current-user-photo">
-      <mat-card-title class="blog-dashboard-card-title e2e-test-username-visible">
-        <input class="form-control required general-text-format"
-               [(ngModel)]="authorName"
-               [ngClass]="{'blog-title-input-field': blogPostData.title.length > 0}"
-               maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
-               minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
-               aria-label="Title"
-               (focusout)="updateAuthorName()"
-               (focus)="authorNameEditorOpened"
-               autofocus>
-        <button *ngIf="!authorNameEditorOpened"
-                class="fas fa-pen oppia-editor-edit-icon oppia-autofocus"
-                title="Edit Author Name"
-                (click)="authorNameEditorOpened=true">
-          &#xE254;
-        </button>
+      <mat-card-title class="w-100">
+        <span *ngIf="!authorNameEditorOpened" class="blog-dashboard-card-title e2e-test-username-visible">
+          {{ authorName }}
+          <button class="fas fa-pen oppia-editor-edit-icon"
+                  title="Edit Author Name"
+                  (click)="openAuthorNameEditor()">
+            &#xE254;
+          </button>
+        </span>
+        <span *ngIf="authorNameEditorOpened" class="d-flex mb-2">
+          <input class="w-auto form-control required general-text-format oppia-autofocus"
+                 [(ngModel)]="authorName"
+                 maxlength="MAX_AUTHOR_NAME_LENGTH"
+                 aria-label="Author Name of the user">
+          <button class="btn btn-success btn-sm ml-2" (click)="updateAuthorName()" [disabled]="!(authorName.length)">
+            {{ 'I18N_BLOG_DASHBOARD_PAGE_SAVE_BUTTON' | translate }}
+          </button>
+        </span>
+        <div class="blog-author-bio-container">
+          <span *ngIf="!authorBioEditorOpened" class="d-flex">
+            <span class="blog-author-bio">
+              {{ authorBio }}
+            </span>
+            <button class="fas fa-pen oppia-editor-edit-icon mb-auto"
+                    title="Edit Author Name"
+                    (click)="openAuthorBioEditor()">
+                    &#xE254;
+            </button>
+          </span>
+          <span *ngIf="authorBioEditorOpened" class="blog-author-bio-editor">
+            <textarea *ngIf="authorBioEditorOpened"
+                      class="oppia-bio-border oppia-autofocus w-100"
+                      [(ngModel)]="authorBio"
+                      [attr.value]="authorBio"
+                      rows="5"
+                      [maxlength]="600"
+                      placeholder="{{ 'I18N_PREFERENCES_BIO_EXPLAIN_TEXT' | translate }}">
+            </textarea>
+            <button class="mt-2 btn btn-success btn-sm ml-2" (click)="updateAuthorBio()">
+              Save
+            </button>
+          </span>
+        </div>
       </mat-card-title>
-      <mat-card-subtitle>
+      <mat-card-subtitle class="mt-2" *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
         <button mat-button
                 class="new-post-button e2e-test-create-blog-post-button"
-                (click)="createNewBlogPost()"
-                *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
+                (click)="createNewBlogPost()">
           <mat-icon class="new-post-icon position-absolute">+</mat-icon>
-          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase}}</span>
+          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase }}</span>
         </button>
       </mat-card-subtitle>
     </mat-card-header>
@@ -37,7 +63,7 @@
            *ngIf="!(blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts)">
         <blockquote class="blog-dashboard-intro-card">
           <p class="blog-dashboard-intro-card-message">
-            {{ 'I18N_BLOG_DASHBOARD_INTRO_MESSAGE' | translate}}
+            {{ 'I18N_BLOG_DASHBOARD_INTRO_MESSAGE' | translate }}
           </p>
           <button mat-button
                   class="mx-2 my-2 create-new-blog-post-button e2e-test-create-blog-post-button"
@@ -50,7 +76,7 @@
       <mat-tab-group class="e2e-test-mat-tabs" *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
         <mat-tab>
           <ng-template mat-tab-label>
-            {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{ blogDashboardData.numOfDraftBlogPosts }})
+            {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase }} ({{ blogDashboardData.numOfDraftBlogPosts }})
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
             <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
@@ -82,7 +108,7 @@
         </mat-tab>
         <mat-tab>
           <ng-template mat-tab-label class="e2e-test-publish-tab-button">
-            {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{ blogDashboardData.numOfPublishedBlogPosts }})
+            {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase }} ({{ blogDashboardData.numOfPublishedBlogPosts }})
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
             <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
@@ -125,6 +151,35 @@
     padding-bottom: 100px;
   }
 
+  .oppia-editor-edit-icon {
+    border: unset;
+    font-size: 16px;
+    position: relative;
+    right: unset;
+    top: unset;
+  }
+
+  .blog-author-bio-editor {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    line-height: 20px;
+    text-align: left;
+  }
+
+  .blog-author-bio-container {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 100;
+    line-height: 18px;
+    text-align: left;
+  }
+
+  .oppia-editor-edit-icon:hover {
+    opacity: 1;
+  }
+
   .blog-dashboard-tiles-container {
     display: flex;
     flex-flow: wrap;
@@ -133,12 +188,12 @@
   }
 
   .blog-dashboard-card .mat-card-avatar {
-    height: 7.5vw;
-    max-height: 100px;
-    max-width: 100px;
-    min-height: 36px;
-    min-width: 36px;
-    width: 7.5vw;
+    height: 12vw;
+    max-height: 140px;
+    max-width: 140px;
+    min-height: 44px;
+    min-width: 44px;
+    width: 12vw;
   }
 
   .blog-dashboard-card-title {
@@ -270,7 +325,6 @@
 
     .new-post-button {
       margin-bottom: unset;
-      margin-top: 15px;
     }
 
     :host /deep/ .mat-tab-label {
@@ -282,7 +336,6 @@
   @media(max-width: 620px) {
     .new-post-button {
       margin-bottom: unset;
-      margin-top: 10px;
     }
 
     :host /deep/ .mat-card-header-text {

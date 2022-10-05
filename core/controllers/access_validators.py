@@ -229,7 +229,6 @@ class BlogAuthorProfilePageAccessValidationHandler(base.BaseHandler):
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, author_username) -> None:
-        print(author_username)
         user_settings = (
             user_services.get_user_settings_from_username(author_username))
         if user_settings is None:

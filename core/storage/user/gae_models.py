@@ -3187,6 +3187,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         cls.update_timestamps_multi(learner_groups_user_models_to_put)
         cls.put_multi(learner_groups_user_models_to_put)
 
+
 class BlogAuthorDetailsModel(base_models.BaseModel):
     """Model for storing user's blog author details.
 
@@ -3225,7 +3226,7 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @classmethod
-    def export_data(user_id: str) -> Dict[str, str]:
+    def export_data(cls, user_id: str) -> Dict[str, str]:
         """Exports the data from BlogAuthorDetailModel into dict format for
         Takeout.
 
@@ -3235,10 +3236,10 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from BlogAuthorDetailModel.
         """
-        authorModel = BlogAuthorDetailsModel.get(user_id)
+        author_model = BlogAuthorDetailsModel.get(user_id)
         return {
-            'author_name': authorModel.author_name,
-            'author_bio': authorModel.author_bio
+            'author_name': author_model.author_name,
+            'author_bio': author_model.author_bio
         }
 
     @classmethod
@@ -3254,7 +3255,7 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
 
         Raises:
             Exception. A blog author details model with the given ID exists
-            already.
+                already.
         """
         if cls.get_by_id(user_id):
             raise Exception(

@@ -24,7 +24,8 @@ describe('Blog post summary object factory', () => {
   let sampleSummary: BlogPostSummary;
   let sampleSummaryBackendObject = {
     id: 'sampleId',
-    author_name: 'test_user',
+    author_username: 'test_user',
+    author_name: 'test_user_name',
     title: 'Title',
     summary: 'Hello World',
     tags: ['news'],
@@ -48,6 +49,7 @@ describe('Blog post summary object factory', () => {
 
     expect(sampleSummary.id).toEqual('sampleId');
     expect(sampleSummary.authorUsername).toEqual('test_user');
+    expect(sampleSummary.authorName).toEqual('test_user_name');
     expect(sampleSummary.title).toEqual('Title');
     expect(sampleSummary.tags).toEqual(['news']);
     expect(sampleSummary.summary).toEqual('Hello World');

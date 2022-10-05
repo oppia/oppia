@@ -2939,7 +2939,8 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
 
     return exp_fetchers.get_exploration_user_data(user_id, exploration_id)
 
-def create_blog_author_details_model(user_id: str):
+
+def create_blog_author_details_model(user_id: str) -> None:
     """Creates a new blog author details model.
 
     Args:
@@ -2950,14 +2951,16 @@ def create_blog_author_details_model(user_id: str):
     if blog_author_details_model:
         return
     user_settings = get_user_settings(user_id, strict=True)
-    user_models.BlogAuthorDetailsModel.create(
-        user_id,
-        user_settings.username,
-        user_settings.user_bio
-    )
+    # Adding an if statement for mypy type checks to pass.
+    if user_settings.username:
+        user_models.BlogAuthorDetailsModel.create(
+            user_id,
+            user_settings.username,
+            user_settings.user_bio
+        )
 
 
-def get_blog_author_details(user_id: str):
+def get_blog_author_details(user_id: str) -> user_domain.BlogAuthorDetails:
     """Returns the blog author details for the given user id.
 
     Args:
@@ -2983,6 +2986,7 @@ def update_blog_author_details(
 
     Args:
         user_id: str. The user id of the blog author.
+        author_name: str. The publicly viewable name of the author.
         author_bio: str. The bio of the blog author.
     """
     blog_author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)

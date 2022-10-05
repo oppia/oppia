@@ -1,1 +1,170 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+@media (max-width: 550px) {
+  @media (max-width: 440px) {
+    oppia-blog-author-page mat-card.oppia-blog-author-page-card {
+      width: 350px;
+    }
 
+    .mat-card.oppia-page-card {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+}
+
+oppia-blog-author-page .authorProfilePic.mat-card-avatar {
+  height: 13vw;
+  max-height: 160px;
+  max-width: 160px;
+  min-height: 120px;
+  min-width: 120px;
+  width: 13vw;
+}
+
+oppia-blog-author-page .blog-author-name {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 27px;
+  font-weight: bold;
+  line-height: 32px;
+  text-align: left;
+}
+
+oppia-blog-author-page .blog-author-bio {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 20px;
+  line-height: 24px;
+  text-align: left;
+}
+
+oppia-blog-author-page .total-blog-post-number-display {
+  color: #555;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 21px;
+  font-weight: 300;
+  line-height: 18px;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+oppia-blog-author-page .posts-display-heading {
+  color: #555;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 28px;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+oppia-blog-author-page .blog-author-page-posts-number-display {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 19px;
+  text-align: left;
+}
+
+oppia-blog-author-page .oppia-blog-author-page-card {
+  background: #fff;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 20px;
+  margin-left: 10vw;
+  margin-right: 10vw;
+  margin-top: 52px;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+ngb-pagination .page-link {
+  border: unset;
+  border-radius: 100%;
+  color: #333;
+  font-size: 22px;
+  font-weight: bold;
+  height: 3rem;
+  padding: 0;
+  width: 3rem;
+}
+
+ngb-pagination .page-link:hover {
+  background-color: none;
+  border-color: none;
+}
+
+ngb-pagination .page-item.active .page-link {
+  background: rgba(65, 152, 137, 0.2);
+  color: #333;
+}
+
+ngb-pagination .page-item .pagination-button {
+  background: none;
+  border: none;
+  border-radius: 100%;
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 22px;
+  font-weight: bold;
+  height: 100%;
+  justify-content: center;
+  letter-spacing: 0;
+  line-height: 25px;
+  padding: 0;
+  width: 100%;
+}
+
+oppia-blog-author-page .blog-post-card {
+  margin-top: 30px;
+}
+
+.blog-homepage .oppia-navbar-breadcrumb-separator:after {
+  border-left-style: ridge;
+  border-width: 2px;
+  content: "";
+  font-size: 30px;
+}
+
+.blog-homepage .oppia-navbar-breadcrumb {
+  display: -webkit-inline-box;
+  flex-flow: column;
+  margin-left: -10px;
+  overflow-wrap: break-word;
+  padding-top: 3px;
+}
+
+@media(max-width:500px) {
+  .mobile-navbar-blog-homepage {
+    font-size: 14px;
+    line-height: 0px;
+    vertical-align: text-top;
+  }
+
+  .oppia-navbar-breadcrumb.main-blog-homepage-mobile-breadcrumb {
+    line-height: 12px;
+    padding-top: 15px;
+  }
+
+}
+
+@media(max-width: 1000px) {
+  oppia-blog-author-page .blog-author-name {
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  oppia-blog-author-page .blog-author-bio {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  oppia-blog-author-page .total-blog-post-number-display {
+    font-size: 18px;
+    line-height: 20px;
+  }
+}

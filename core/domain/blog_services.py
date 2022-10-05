@@ -822,7 +822,7 @@ def get_total_number_of_published_blog_post_summaries() -> int:
 
 
 def get_total_number_of_published_blog_post_summaries_by_author(
-    author_id
+    author_id: str
 ) -> int:
     """Returns total number of published BlogPostSummaries by author.
 

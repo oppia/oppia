@@ -44,12 +44,12 @@ export class BlogAuthorProfilePageComponent implements OnInit {
   authorProfilePicUrl!: string;
   DEFAULT_PROFILE_PICTURE_URL!: string;
   lastPostOnPageNum!: number;
+  noResultsFound!: boolean;
   blogPostSummaries: BlogPostSummary[] = [];
   blogPostSummariesToShow: BlogPostSummary[] = [];
   totalBlogPosts: number = 0;
   page: number = 1;
   firstPostOnPageNum: number = 1;
-  noResultsFound: boolean = false;
   showBlogPostCardsLoadingScreen: boolean = false;
   constructor(
     private windowDimensionsService: WindowDimensionsService,
@@ -75,6 +75,8 @@ export class BlogAuthorProfilePageComponent implements OnInit {
       this.authorUsername, '0').then((data: BlogAuthorProfilePageData) => {
       if (data.numOfBlogPostSummaries) {
         this.totalBlogPosts = data.numOfBlogPostSummaries;
+        this.authorName = data.authorName;
+        this.authorBio = data.authorBio;
         this.noResultsFound = false;
         this.blogPostSummaries = data.blogPostSummaries;
         this.blogPostSummariesToShow = this.blogPostSummaries;
@@ -146,6 +148,6 @@ export class BlogAuthorProfilePageComponent implements OnInit {
   }
 
   isSmallScreenViewActive(): boolean {
-    return this.windowDimensionsService.getWidth() <= 900;
+    return this.windowDimensionsService.getWidth() <= 768;
   }
 }

@@ -45,11 +45,14 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.setPageTitleAndMetaTags();
+
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitleAndMetaTags();
       })
     );
+
     this.authorUsername = this.urlService.getBlogAuthorUsernameFromUrl();
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService
@@ -58,6 +61,7 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
         this.pageIsShown = true;
       }, () => {
         this.errorPageIsShown = true;
+      }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

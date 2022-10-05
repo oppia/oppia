@@ -50,8 +50,11 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
         summary_dict = summary.to_dict()
         user_settings = user_services.get_user_settings(
             summary_dict['author_id'])
-        summary_dict['author_name'] = user_settings.username
+        author_details = user_services.get_blog_author_details(
+            summary_dict['author_id'])
+        summary_dict['author_username'] = user_settings.username
         summary_dict['profile_pic_url'] = user_settings.profile_picture_data_url
+        summary_dict['author_name'] = author_details.author_name
         del summary_dict['author_id']
         summary_dicts.append(summary_dict)
     return summary_dicts
@@ -177,9 +180,11 @@ class BlogPostDataHandler(base.BaseHandler):
                 Exception(
                     'The blog post page with the given url doesn\'t exist.'))
         user_settings = user_services.get_user_settings(blog_post.author_id)
+        author_details = user_services.get_blog_author_details(
+            blog_post.author_id)
         blog_post_dict = (
             blog_services.get_blog_post_from_model(blog_post).to_dict())
-        blog_post_dict['author_name'] = user_settings.username
+        blog_post_dict['author_name'] = author_details.author_name
         del blog_post_dict['author_id']
         # We fetch 1 more than the required blog post summaries as the result
         # might contain the blog post which is currently being viewed.
@@ -266,7 +271,7 @@ class AuthorsPageHandler(base.BaseHandler):
 
         author_details = user_services.get_blog_author_details(
             user_settings.user_id).to_dict()
-        number_of_published_blog_post_summaries = (
+        num_of_published_blog_post_summaries = (
                 blog_services
                 .get_total_number_of_published_blog_post_summaries_by_author(
                     user_settings.user_id
@@ -289,7 +294,7 @@ class AuthorsPageHandler(base.BaseHandler):
             'author_details': author_details,
             'profile_picture_data_url': (
                 user_settings.profile_picture_data_url),
-            'no_of_blog_post_summaries': number_of_published_blog_post_summaries,
+            'no_of_blog_post_summaries': num_of_published_blog_post_summaries,
             'summary_dicts': blog_post_summary_dicts
         })
         self.render_json(self.values)

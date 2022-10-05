@@ -115,7 +115,7 @@ module.exports = function(config) {
       terminal: argv.terminalEnabled
     },
     // Continue running in the background after running tests.
-    singleRun: true,
+    singleRun: false,
     customLaunchers: {
       CI_Chrome: {
         base: 'ChromeHeadless',

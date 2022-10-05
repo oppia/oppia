@@ -96,7 +96,6 @@ class BlogDashboardDataHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
         author_details = (
             user_services.get_blog_author_details(self.user_id).to_dict())
-        print(author_details)
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
