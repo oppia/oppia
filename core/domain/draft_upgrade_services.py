@@ -394,7 +394,8 @@ class DraftUpgradeUtil:
                     )
 
             elif exp_change.property_name == (
-                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
+            ):
                 # Ruling out the possibility of different types
                 # for mypy type checking.
                 assert isinstance(exp_change.new_value, dict)
