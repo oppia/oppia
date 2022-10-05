@@ -32,7 +32,6 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -73,7 +72,6 @@ describe('Content language selector component', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let playerTranscriptService: PlayerTranscriptService;
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
 
@@ -104,8 +102,6 @@ describe('Content language selector component', () => {
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    writtenTranslationsObjectFactory = TestBed.get(
-      WrittenTranslationsObjectFactory);
     imagePreloaderService = TestBed.get(ImagePreloaderService);
     audioTranslationLanguageService = TestBed.get(
       AudioTranslationLanguageService);

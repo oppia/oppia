@@ -79,7 +79,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             exp_id_to_content_id_mapping[suggestion.target_id]
         )
 
-        suggestion_content_id = suggestion.change.new_value['content_id']  # type: ignore[index]
+        suggestion_content_id = suggestion.change.content_id
         old_to_new_content_ids_in_state = old_to_new_content_id_mapping[
             suggestion.change.state_name
         ]
@@ -91,11 +91,9 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
                     % suggestion_content_id
                 )
             )
-        suggestion.change.new_value['content_id'] = (  # type: ignore[index]
-            old_to_new_content_ids_in_state[
-                suggestion_content_id
-            ]
-        )
+        suggestion.change.content_id = old_to_new_content_ids_in_state[
+            suggestion_content_id
+        ]
         return result.Ok((suggestion.suggestion_id, suggestion))
 
     @staticmethod
@@ -112,13 +110,12 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             the exploration id and the second element being the mapping
             of old content ids to new content ids.
         """
-        states_dict = {}
-        for state_name in exploration.states:
-            states_dict[state_name] = exploration.states[state_name]
-        (old_content_id_to_new_content_id, _) = (
+        old_content_id_to_new_content_id, _ = (
             state_domain.State
             .generate_old_content_id_to_new_content_id_in_v52_states(
-                states_dict))
+                exploration.states
+            )
+        )
         return (exploration.id, old_content_id_to_new_content_id)
 
     @staticmethod

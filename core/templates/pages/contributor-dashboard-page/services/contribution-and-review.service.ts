@@ -263,11 +263,11 @@ export class ContributionAndReviewService {
   }
 
   async updateQuestionSuggestionAsync(
-    suggestionId: string, skillDifficulty: number,
-    questionStateData: StateBackendDict, nextContentIdIndex: number,
-    imagesData: ImagesData[],
-    onSuccess: (suggestionId: string) => void,
-    onFailure: (suggestionId: string) => void
+      suggestionId: string, skillDifficulty: number,
+      questionStateData: StateBackendDict, nextContentIdIndex: number,
+      imagesData: ImagesData[],
+      onSuccess: (suggestionId: string) => void,
+      onFailure: (suggestionId: string) => void
   ): Promise<void> {
     const payload = {
       skill_difficulty: skillDifficulty,

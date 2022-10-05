@@ -359,7 +359,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return state
 
         def _verify_interaction_supports_android(
-            self: StateDomainUnitTests, interaction_id: str
+            self: StateDomainUnitTests, interaction_id: Optional[str]
         ) -> None:
             """Checks that the provided interaction is supported on Android."""
             init_state = _create_init_state_for_interaction_verification()
@@ -404,10 +404,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_supports_android(self, 'TextInput')
         _verify_interaction_supports_android(self, 'NumericExpressionInput')
         _verify_interaction_supports_android(self, 'RatioExpressionInput')
-        # Here, method can only accept string values but for testing purposes
-        # we are providing None, which causes MyPy to throw an error. Thus
-        # to avoid the error, we used ignore here.
-        _verify_interaction_supports_android(self, None)  # type: ignore[arg-type]
+        _verify_interaction_supports_android(self, None)
 
         _verify_interaction_does_not_support_android(self, 'CodeRepl')
         _verify_interaction_does_not_support_android(self, 'GraphInput')
@@ -2281,6 +2278,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         solution_dict = {
             'answer_is_exclusive': 1,  # type: ignore[typeddict-item]
             'correct_answer': 'hello_world!',
@@ -2296,9 +2296,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected answer_is_exclusive to be bool, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_list_param_changes(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         exploration.init_state.param_changes = 0  # type: ignore[assignment]

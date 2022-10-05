@@ -3471,7 +3471,7 @@ class State(translation_domain.BaseTranslatableObject):
         content_id_generator = translation_domain.ContentIdGenerator()
         for state_name in sorted(states_dict.keys()):
             state: StateDict = states_dict[state_name]
-            new_voiceovers_mapping: Dict[str, VoiceoverDict] = {}
+            new_voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]] = {}
             old_to_new_content_id: Dict[str, str] = {}
             old_voiceovers_mapping = state['recorded_voiceovers'][
                 'voiceovers_mapping']
@@ -3485,7 +3485,13 @@ class State(translation_domain.BaseTranslatableObject):
                 if content_type == translation_domain.ContentType.RULE:
                     content_id_key = 'contentId'
 
+                # Here we use MyPy ignore because the content Id key for the
+                # contents in the rule inputs is contentId instead of
+                # content_id.
                 old_content_id = content[content_id_key]  # type: ignore[misc]
+                # Here we use MyPy ignore because the content Id key for the
+                # contents in the rule inputs is contentId instead of
+                # content_id.
                 content[content_id_key] = new_content_id  # type: ignore[index]
 
                 assert isinstance(old_content_id, str)
@@ -3515,13 +3521,19 @@ class State(translation_domain.BaseTranslatableObject):
                 'rule_descriptions']
             answer_type = interaction_specs[interaction_id]['answer_type']
 
-            if not interaction['solution'] is None:
+            if interaction['solution']:
                 solution_dict = interaction['solution']
+                assert solution_dict is not None
                 if answer_type in object_content_ids_replacers:
+                    # Here we use cast because correct_answer can be of
+                    # different types but the 'if' case above covers only for
+                    # the PossibleContentIdsType.
+                    correct_answer = cast(
+                        PossibleContentIdsType, solution_dict['correct_answer'])
                     solution_dict['correct_answer'] = (
                         object_content_ids_replacers[answer_type](
-                            solution_dict['correct_answer'], # type: ignore[arg-type]
-                            old_to_new_content_id)
+                            correct_answer, old_to_new_content_id
+                        )
                     )
 
             if not rule_descriptions:
@@ -3534,14 +3546,18 @@ class State(translation_domain.BaseTranslatableObject):
 
             for answer_group in answer_groups:
                 for rule_spec in answer_group['rule_specs']:
-                    rule_input = rule_spec['inputs']
+                    rule_inputs = rule_spec['inputs']
                     rule_type = rule_spec['rule_type']
                     for key, value_class in rules_variables[rule_type]:
                         if value_class not in object_content_ids_replacers:
                             continue
-
-                        rule_input[key] = object_content_ids_replacers[
-                            value_class](rule_input[key], old_to_new_content_id) # type: ignore[arg-type]
+                        # Here we use cast because rule input can be a dict but
+                        # the 'if' case above covers only for the
+                        # PossibleContentIdsType.
+                        rule_input = cast(
+                            PossibleContentIdsType, rule_inputs[key])
+                        rule_inputs[key] = object_content_ids_replacers[
+                            value_class](rule_input, old_to_new_content_id)
 
         return states_dict, content_id_generator.next_content_id_index
 
@@ -3574,6 +3590,9 @@ class State(translation_domain.BaseTranslatableObject):
                     states_dict[state_name])
             ):
                 if content_type == translation_domain.ContentType.RULE:
+                    # Here we use MyPy ignore because the content Id key for the
+                    # contents in the rule inputs is contentId instead of
+                    # content_id.
                     content_id = content['contentId']  # type: ignore[misc]
                 else:
                     content_id = content['content_id']

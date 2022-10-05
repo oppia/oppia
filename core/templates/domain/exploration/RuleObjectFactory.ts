@@ -56,11 +56,7 @@ export class Rule extends BaseTranslatableObject {
     let translatableFields: TranslatableField[] = [];
     Object.keys(this.inputs).forEach(inputName => {
       const ruleInput = this.inputs[inputName];
-      // All rules input types which are translatable are subclasses of
-      // BaseTranslatableObject having dict structure with contentId
-      // as a key.
       if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-        // @ts-ignore
         translatableFields.push(ruleInput);
       }
     });

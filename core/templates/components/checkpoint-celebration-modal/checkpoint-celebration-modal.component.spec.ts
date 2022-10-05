@@ -30,7 +30,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { PlatformFeatureService } from 'services/platform-feature.service';
@@ -215,7 +214,6 @@ describe('Checkpoint celebration modal component', function() {
   let windowDimensionsService: WindowDimensionsService;
   let urlInterpolationService: UrlInterpolationService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let platformFeatureService: PlatformFeatureService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
@@ -235,7 +233,6 @@ describe('Checkpoint celebration modal component', function() {
         PlayerPositionService,
         UrlInterpolationService,
         InteractionObjectFactory,
-        WrittenTranslationsObjectFactory,
         AudioTranslationLanguageService,
         ExplorationPlayerStateService,
         {
@@ -268,8 +265,6 @@ describe('Checkpoint celebration modal component', function() {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    writtenTranslationsObjectFactory = TestBed.inject(
-      WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);

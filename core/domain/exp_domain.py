@@ -2849,6 +2849,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         )
                     )
                 translations_mapping = (
+                    # Here we use MyPy ignore because the latest schema of state
+                    # dict doesn't contains written_translations property.
                     state_dict['written_translations']['translations_mapping']) # type: ignore[misc]
                 for content_id in translations_mapping:
                     if content_id in list_of_subtitled_unicode_content_ids:
@@ -3100,13 +3102,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     content_id_list.extend(
                         customisation_args[ca_name].get_content_ids()
                     )
-
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
             translations_mapping = (
                 state_dict['written_translations']['translations_mapping']) # type: ignore[misc]
             new_translations_mapping = {}
             for content_id, translation_item in translations_mapping.items():
                 if content_id in content_id_list:
                     new_translations_mapping[content_id] = translation_item
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
             state_dict['written_translations']['translations_mapping'] = ( # type: ignore[misc]
                 new_translations_mapping)
 
@@ -3131,7 +3136,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         content-id.
         """
         for _, state_dict in states_dict.items():
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains next_content_id_index property.
             del state_dict['next_content_id_index'] # type: ignore[misc]
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
             del state_dict['written_translations'] # type: ignore[misc]
         states_dict, next_content_id_index = (
             state_domain.State
