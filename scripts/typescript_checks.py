@@ -310,8 +310,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts',
     'core/templates/pages/exploration-editor-page/statistics-tab/templates/state-stats-modal.component.spec.ts',
     'core/templates/pages/exploration-editor-page/statistics-tab/templates/state-stats-modal.component.ts',
-    'core/templates/pages/exploration-editor-page/suggestion-modal-for-editor-view/exploration-editor-suggestion-modal.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/suggestion-modal-for-editor-view/exploration-editor-suggestion-modal.component.ts',
     'core/templates/pages/exploration-editor-page/suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service.spec.ts',
     'core/templates/pages/exploration-editor-page/suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/audio-translation-bar/audio-translation-bar.directive.spec.ts',

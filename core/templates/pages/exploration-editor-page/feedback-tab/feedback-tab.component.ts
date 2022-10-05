@@ -31,7 +31,6 @@ import { ChangeListService } from '../services/change-list.service';
 import { ExplorationStatesService } from '../services/exploration-states.service';
 import { ThreadDataBackendApiService } from './services/thread-data-backend-api.service';
 import { ThreadStatusDisplayService } from './services/thread-status-display.service';
-import { SuggestionModalForExplorationEditorService } from '../suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service';
 import { FeedbackThread } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 
@@ -61,8 +60,6 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
-    private suggestionModalForExplorationEditorService:
-      SuggestionModalForExplorationEditorService,
     private threadDataBackendApiService: ThreadDataBackendApiService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private userService: UserService,
@@ -143,26 +140,6 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     return (
        !this._isSuggestionHandled() && this._isSuggestionValid() &&
        !this._hasUnsavedChanges()) ? 'primary' : 'default';
-  }
-
-  // TODO(Allan): Implement ability to edit suggestions before applying.
-  showSuggestionModal(): void {
-    if (this.activeThread === null) {
-      throw new Error(
-        'Trying to show suggestion of a non-existent thread');
-    }
-    this.suggestionModalForExplorationEditorService.showSuggestionModal(
-      this.activeThread.suggestion.suggestionType,
-      {
-        activeThread: this.activeThread,
-        setActiveThread: (
-          threadId => this.fetchUpdatedThreads()
-            .then(() => this.setActiveThread(threadId))),
-        isSuggestionHandled: this._isSuggestionHandled(),
-        hasUnsavedChanges: this._hasUnsavedChanges(),
-        isSuggestionValid: this._isSuggestionValid()
-      }
-    );
   }
 
   addNewMessage(threadId: string, tmpText: string, tmpStatus: string): void {

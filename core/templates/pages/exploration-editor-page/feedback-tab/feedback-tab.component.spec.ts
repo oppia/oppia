@@ -29,7 +29,6 @@ import { UserService } from 'services/user.service';
 import { ChangeListService } from '../services/change-list.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationStatesService } from '../services/exploration-states.service';
-import { SuggestionModalForExplorationEditorService } from '../suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service';
 import { ThreadDataBackendApiService } from './services/thread-data-backend-api.service';
 import { FeedbackTabComponent } from './feedback-tab.component';
 import { UserInfo } from 'domain/user/user-info.model';
@@ -43,8 +42,6 @@ describe('Feedback Tab Component', () => {
   let dateTimeFormatService: DateTimeFormatService;
   let editabilityService: EditabilityService;
   let explorationStatesService: ExplorationStatesService;
-  let suggestionModalForExplorationEditorService:
-     SuggestionModalForExplorationEditorService;
   let threadDataBackendApiService: ThreadDataBackendApiService;
   let userService: UserService;
   let ngbModal: NgbModal;
@@ -88,8 +85,6 @@ describe('Feedback Tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     editabilityService = TestBed.inject(EditabilityService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    suggestionModalForExplorationEditorService = TestBed.inject(
-      SuggestionModalForExplorationEditorService);
     threadDataBackendApiService = (
       TestBed.inject(ThreadDataBackendApiService));
     userService = TestBed.inject(UserService);
@@ -370,13 +365,6 @@ describe('Feedback Tab Component', () => {
     expect(component.getSuggestionButtonType()).toBe('primary');
   }));
 
-  it('should not open show suggestion modal when active thread is null',
-    () => {
-      expect(() => {
-        component.showSuggestionModal();
-      }).toThrowError('Trying to show suggestion of a non-existent thread');
-    });
-
   it('should call fetchUpdatedThreads', fakeAsync(() => {
     component.activeThread = SuggestionThread.createFromBackendDicts({
       status: 'review',
@@ -413,114 +401,6 @@ describe('Feedback Tab Component', () => {
     expect(threadDataBackendApiService.getThread)
       .toHaveBeenCalled();
   }));
-
-  it('should open show suggestion modal when active thread exists',
-    fakeAsync(() => {
-      component.activeThread = SuggestionThread.createFromBackendDicts({
-        status: 'review',
-        subject: '',
-        summary: '',
-        original_author_username: 'Username1',
-        last_updated_msecs: 0,
-        message_count: 1,
-        thread_id: '1',
-        state_name: '',
-        last_nonempty_message_author: '',
-        last_nonempty_message_text: ''
-      }, {
-        suggestion_type: 'edit_exploration_state_content',
-        suggestion_id: '1',
-        target_type: '',
-        target_id: '',
-        status: '',
-        author_name: '',
-        change: {
-          state_name: '',
-          new_value: {html: ''},
-          old_value: {html: ''},
-          skill_id: '',
-        },
-        last_updated_msecs: 0
-      });
-      let getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
-      getThreadSpy.and.returnValue(
-        SuggestionThread.createFromBackendDicts({
-          status: 'Open',
-          subject: '',
-          summary: '',
-          original_author_username: 'Username1',
-          last_updated_msecs: 0,
-          message_count: 1,
-          thread_id: '1',
-          last_nonempty_message_author: 'Message 1',
-          last_nonempty_message_text: 'Message 2',
-          state_name: ''
-        }, {
-          suggestion_type: 'edit_exploration_state_content',
-          suggestion_id: '1',
-          target_type: '',
-          target_id: '',
-          status: '',
-          author_name: '',
-          change: {
-            state_name: '',
-            new_value: {html: ''},
-            old_value: {html: ''},
-            skill_id: '',
-          },
-          last_updated_msecs: 0
-        }));
-      spyOn(component, '_isSuggestionHandled').and.returnValue(null);
-      spyOn(component, '_hasUnsavedChanges').and.returnValue(null);
-      spyOn(component, '_isSuggestionValid').and.returnValue(null);
-      spyOn(component, 'fetchUpdatedThreads').and.returnValue(
-        Promise.resolve(null));
-      spyOn(component, 'setActiveThread').and.returnValue(null);
-      spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-        Promise.resolve(null));
-      component.setActiveThread('1');
-
-      spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
-        .and.callFake((suggestionType, obj) => {
-          obj.setActiveThread('0');
-        });
-
-      getThreadSpy.and.returnValue(
-        SuggestionThread.createFromBackendDicts({
-          status: 'Review',
-          subject: '',
-          summary: '',
-          original_author_username: 'Username1',
-          last_updated_msecs: 0,
-          message_count: 1,
-          thread_id: '2',
-          last_nonempty_message_author: 'Message 1',
-          last_nonempty_message_text: 'Message 2',
-          state_name: ''
-        }, {
-          suggestion_type: 'edit_exploration_state_content',
-          suggestion_id: '2',
-          target_type: '',
-          target_id: '',
-          status: '',
-          author_name: '',
-          change: {
-            state_name: '',
-            new_value: {html: ''},
-            old_value: {html: ''},
-            skill_id: '',
-          },
-          last_updated_msecs: 0
-        }));
-      component.showSuggestionModal();
-      tick();
-
-      expect(
-        suggestionModalForExplorationEditorService.showSuggestionModal)
-        .toHaveBeenCalled();
-      expect(component.feedbackMessage.status).toBe(null);
-      expect(component.feedbackMessage.text).toBe('');
-    }));
 
   it('should create a new thread when closing create new thread modal',
     fakeAsync(() => {

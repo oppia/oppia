@@ -95,12 +95,6 @@
                   <div class="oppia-view-suggestion-button-container e2e-test-exploration-feedback">
                     {{ m.text }}
                   </div>
-                  <div *ngIf="activeThread.isSuggestionThread() && index == 0">
-                    <button class="btn btn-{{ getSuggestionButtonType() }} e2e-test-view-suggestion-btn oppia-view-suggestion-btn"
-                            (click)="showSuggestionModal()">
-                      View Suggestion
-                    </button>
-                  </div>
                 </div>
               </div>
             </td>

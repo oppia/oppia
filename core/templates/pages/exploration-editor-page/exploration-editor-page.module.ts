@@ -81,7 +81,6 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
-import { ExplorationEditorSuggestionModalComponent } from './suggestion-modal-for-editor-view/exploration-editor-suggestion-modal.component';
 import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
 import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
 import { NeedsGuidingResponsesTaskComponent } from './improvements-tab/needs-guiding-responses-task.component';
@@ -152,7 +151,6 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
-    ExplorationEditorSuggestionModalComponent,
     FeedbackTabComponent,
     ImprovementsTabComponent,
     NeedsGuidingResponsesTaskComponent,
@@ -205,7 +203,6 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
-    ExplorationEditorSuggestionModalComponent,
     FeedbackTabComponent,
     ImprovementsTabComponent,
     NeedsGuidingResponsesTaskComponent,
