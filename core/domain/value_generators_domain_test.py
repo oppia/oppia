@@ -69,9 +69,10 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
     def test_registry_template_copier_contents(self) -> None:
         contents_registry = (
             '<span class="d-inline-block align-middle">\n  '
-            '<object-editor obj-type="<[objType]>" init-args="initArgs" valu'
-            'e="customizationArgs.value" always-editable="true">\n  </obje'
-            'ct-editor>\n</span>\n')
+            '<object-editor obj-type="<[objType]>" init-args="initArgs" '
+            'value="customizationArgs.value" always-editable="true">\n  '
+            '</object-editor>\n</span>\n'
+        )
         class_object = value_generators_domain.Registry()
         self.assertEqual(
             contents_registry, class_object.get_generator_class_by_id(
