@@ -10,18 +10,18 @@
           <label for="audioTranslationFileField" class="col-lg-2 col-md-2 col-sm-2 float-left">Audio File</label>
           <div class="col-lg-10 col-md-10 col-sm-10">
             <oppia-audio-file-uploader id="audioTranslationFileField"
-                                       [dropped-file]="droppedFile"
-                                       (file-change)="updateUploadedFile($event)"
-                                       (file-clear)="clearUploadedFile()">
+                                       [droppedFile]="droppedFile"
+                                       (fileChange)="updateUploadedFile($event)"
+                                       (fileClear)="clearUploadedFile()">
             </oppia-audio-file-uploader>
-            <div ng-if="isAudioAvailable"
+            <div *ngIf="isAudioAvailable"
                  class="oppia-updated-audio-file-upload-message">
               <strong>Note:</strong> Uploading a new audio file will replace the existing audio file.
             </div>
-            <div ng-if="errorMessage"
+            <div *ngIf="errorMessage"
                  class="oppia-audio-file-upload-field-error-message e2e-test-audio-file-upload-field-error-message">
               <i class="material-icons">&#xE002;</i>
-              <[errorMessage]>
+              {{ errorMessage }}
             </div>
           </div>
         </div>
@@ -31,9 +31,9 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary e2e-test-close-audio-upload-modal" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success e2e-test-save-uploaded-audio-button" ng-click="confirm()" ng-disabled="!isAudioTranslationValid() || saveInProgress">
-    <[saveButtonText]>
+  <button class="btn btn-secondary e2e-test-close-audio-upload-modal" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-save-uploaded-audio-button" (click)="confirm()" [disabled]="!isAudioTranslationValid() || saveInProgress">
+    {{ saveButtonText }}
   </button>
 </div>
 
@@ -45,6 +45,7 @@
     font-size: 14px;
     padding: 4px;
   }
+
   .oppia-audio-file-upload-field-error-message i {
     margin-right: 4px;
   }

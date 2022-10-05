@@ -2,25 +2,26 @@
   <strong>Exploration Overview</strong>
 </span>
 
-<md-card class="oppia-translation-graph-container">
+<mat-card class="oppia-translation-graph-container">
   <div id="tutorialTranslationOverview" class="oppia-translation-state-graph-container e2e-test-translation-graph">
-    <state-graph-visualization [graph-data]="getGraphData()"
-                               [current-state-id]="getActiveStateName()"
-                               (on-click-function)="onClickStateInMap($event)"
-                               [allow-panning]="true"
-                               [version-graph-data]="null"
-                               [center-at-current-state]="true"
-                               [node-colors]="nodeColors()"
-                               [show-translation-warnings]="true"
+    <state-graph-visualization [currentStateId]="getActiveStateName()"
+                               (onClickFunction)="onClickStateInMap($event)"
+                               [allowPanning]="true"
+                               [versionGraphData]="null"
+                               [centerAtCurrentState]="true"
+                               [nodeColors]="nodeColors()"
+                               [showTranslationWarnings]="true"
                                class="h-100">
     </state-graph-visualization>
   </div>
-</md-card>
+</mat-card>
+
 <style>
-  state-translation-status-graph .oppia-exploration-overview-text {
+  .oppia-exploration-overview-text {
     font-size: 16px;
   }
-  state-translation-status-graph .oppia-translation-graph-container {
+
+  .oppia-translation-graph-container {
     background-color: white;
     margin: 20px 0;
     padding: 8px;

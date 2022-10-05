@@ -26,6 +26,7 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { JoyrideModule } from 'ngx-joyride';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -87,6 +88,17 @@ import { NeedsGuidingResponsesTaskComponent } from './improvements-tab/needs-gui
 import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
 import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
 import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
+import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
+import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component'; // easy testing left
+import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
+import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component'; // testcase left
+import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
+import { StateTranslationComponent } from './translation-tab/state-translation/state-translation.component'; // test case left
+import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component'; // test case left
+import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component'; // test case left
+import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component'; // some test case left
+import { TranslationTabComponent } from './translation-tab/translation-tab.component';
+import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
 
 @NgModule({
   imports: [
@@ -101,6 +113,7 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     ReactiveFormsModule,
     FormsModule,
     MatPaginatorModule,
+    JoyrideModule.forRoot(),
     RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
@@ -157,6 +170,17 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     PieChartComponent,
     StateStatsModalComponent,
     StatisticsTabComponent,
+    ExplorationEditorTabComponent,
+    ExplorationSavePromptModalComponent,
+    ExplorationSaveAndPublishButtonsComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationComponent,
+    StateTranslationEditorComponent,
+    StateTranslationStatusGraphComponent,
+    TranslatorOverviewComponent,
+    TranslationTabComponent,
+    ExplorationEditorPageComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -209,6 +233,17 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     PieChartComponent,
     StateStatsModalComponent,
     StatisticsTabComponent,
+    ExplorationEditorTabComponent,
+    ExplorationSavePromptModalComponent,
+    ExplorationSaveAndPublishButtonsComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationComponent,
+    StateTranslationEditorComponent,
+    StateTranslationStatusGraphComponent,
+    TranslatorOverviewComponent,
+    TranslationTabComponent,
+    ExplorationEditorPageComponent,
   ],
   providers: [
     {
