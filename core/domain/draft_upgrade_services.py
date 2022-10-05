@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import logging
-from urllib.parse import urlparse  # pylint: disable=import-only-modules
 
 from core import constants, utils
 from core.domain import exp_domain
@@ -156,7 +155,7 @@ class DraftUpgradeUtil:
                 return False
 
             # If link is invalid.
-            if urlparse(lnk).scheme not in constants.acceptable_schemes:
+            if utils.get_url_scheme(lnk) not in constants.acceptable_schemes:
                 return False
 
         return True

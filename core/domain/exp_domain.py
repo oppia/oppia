@@ -29,7 +29,6 @@ import datetime
 import json
 import re
 import string
-from urllib.parse import urlparse   # pylint: disable=import-only-modules
 
 from core import feconf
 from core import schema_utils
@@ -1382,12 +1381,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 continue
 
             # If link is http.
-            if urlparse(lnk).scheme == 'http':
+            if utils.get_url_scheme(lnk) == 'http':
                 # Replace http with https.
                 lnk = lnk.replace('http', 'https')
 
             # If link is invalid.
-            if urlparse(lnk).scheme not in constants.acceptable_schemes:
+            if utils.get_url_scheme(lnk) not in constants.acceptable_schemes:
                 # Delete the link.
                 link.decompose()
                 continue

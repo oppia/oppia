@@ -38,6 +38,19 @@ from typing import Dict, List, Union
 class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""
 
+    def test_get_url_scheme(self) -> None:
+        test_cases = [
+            ('https://www.google.com', 'https'),
+            ('mailto:example@example.com', 'mailto'),
+            ('oppia.org', ''),
+            ('http://www.test.com', 'http'),
+            ('file:///usr/bin/', 'file')
+        ]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                utils.get_url_scheme(test_case[0]), test_case[1])
+
     def test_open_file(self) -> None:
         with utils.open_file(
             os.path.join('core', 'utils.py'), 'r'
