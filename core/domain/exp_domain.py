@@ -1369,11 +1369,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             lnk_attr = link.get('url-with-value')
             txt_attr = link.get('text-with-value')
 
-            if lnk_attr is None:
-                # Delete the link.
-                link.decompose()
-                continue
-            if txt_attr is None:
+            if lnk_attr is None or txt_attr is None:
                 # Delete the link.
                 link.decompose()
                 continue

@@ -168,8 +168,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
-    def test_convert_states_v52_dict_to_v53_dict(self) -> None:
-        draft_change_list_v52_1 = [
+    def test_convert_states_v52_dict_to_v53_dict_empty_attribute(self) -> None:
+        draft_change_list_v52 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -179,29 +179,23 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         '<p><oppia-noninteractive-link'
                         ' text-with-value="&amp;quot;&amp;quot;"'
                         ' url-with-value='
-                        '"&amp;quot;mailto:example@example.com&amp'
-                        ';quot;"></oppia-noninteractive-link></p>'
-                        '<p><oppia-noninteractive-link'
-                        ' text-with-value="&amp;quot;&amp;quot;"'
-                        ' url-with-value='
-                        '"&amp;quot;http://www.google.com&amp'
-                        ';quot;"></oppia-noninteractive-link></p>'
-                        '<p><oppia-noninteractive-link>'
-                        '</oppia-noninteractive-link></p>'
-                        '<p><oppia-noninteractive-link'
-                        ' text-with-value="&amp;quot;&amp;quot;"'
-                        ' url-with-value='
-                        '"&amp;quot;https://www.oppia.org&amp'
-                        ';quot;"></oppia-noninteractive-link></p>'
-                        '<p><oppia-noninteractive-link'
-                        ' url-with-value='
-                        '"&amp;quot;https://www.test.com&amp'
+                        '"&amp;quot;https://example@example.com&amp'
                         ';quot;"></oppia-noninteractive-link></p>'
                     )
                 ).to_dict()
             })]
 
-        draft_change_list_v52_2 = [
+        # Migrate exploration to state schema version 53.
+        self.create_and_migrate_new_exploration('52', '53')
+        migrated_draft_change_list_v53 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52, 1, 2, self.EXP_ID)
+        )
+        # As invalid drafts are rejected, this draft will be None.
+        assert migrated_draft_change_list_v53 is None
+
+    def test_convert_states_v52_dict_to_v53_dict_invalid_translation(self) -> None: # pylint: disable=line-too-long
+        draft_change_list_v52 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
@@ -218,10 +212,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'en': state_domain.WrittenTranslation(
                             'html',
                             (
-                                '<p><oppia-noninteractive-link' +
-                                ' text-with-value="&amp;quot;&amp;quot;"' +
-                                ' url-with-value=' +
-                                '"&amp;quot;mailto:example@example.com&amp' +
+                                '<p><oppia-noninteractive-link'
+                                ' url-with-value='
+                                '"&amp;quot;mailto:example@example.com&amp'
                                 ';quot;"></oppia-noninteractive-link></p>'
                             ),
                             True
@@ -235,17 +228,87 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         self.create_and_migrate_new_exploration('52', '53')
         migrated_draft_change_list_v53 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v52_1, 1, 2, self.EXP_ID)
+                draft_change_list_v52, 1, 2, self.EXP_ID)
         )
         # As invalid drafts are rejected, this draft will be None.
         assert migrated_draft_change_list_v53 is None
 
+    def test_convert_states_v52_dict_to_v53_dict_none_attribute(self) -> None:
+        draft_change_list_v52 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': state_domain.SubtitledHtml(
+                    'content', (
+                        '<p><oppia-noninteractive-link'
+                        ' url-with-value='
+                        '"&amp;quot;https://example@example.com&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                    )
+                ).to_dict()
+            })]
+
+        # Migrate exploration to state schema version 53.
+        self.create_and_migrate_new_exploration('52', '53')
         migrated_draft_change_list_v53 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v52_2, 1, 2, self.EXP_ID)
+                draft_change_list_v52, 1, 2, self.EXP_ID)
         )
         # As invalid drafts are rejected, this draft will be None.
         assert migrated_draft_change_list_v53 is None
+
+    def test_convert_states_v52_dict_to_v53_dict_invalid_link(self) -> None:
+        draft_change_list_v52 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': state_domain.SubtitledHtml(
+                    'content', (
+                        '<p><oppia-noninteractive-link'
+                        ' text-with-value="&amp;quot;Link&amp;quot;"'
+                        ' url-with-value='
+                        '"&amp;quot;mailto:example@example.com&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                    )
+                ).to_dict()
+            })]
+
+        # Migrate exploration to state schema version 53.
+        self.create_and_migrate_new_exploration('52', '53')
+        migrated_draft_change_list_v53 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52, 1, 2, self.EXP_ID)
+        )
+        # As invalid drafts are rejected, this draft will be None.
+        assert migrated_draft_change_list_v53 is None
+
+    def test_convert_states_v52_dict_to_v53_dict_valid(self) -> None:
+        draft_change_list_v52 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': state_domain.SubtitledHtml(
+                    'content', (
+                        '<p><oppia-noninteractive-link'
+                        ' text-with-value="&amp;quot;Link&amp;quot;"'
+                        ' url-with-value='
+                        '"&amp;quot;https://www.link.com&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                    )
+                ).to_dict()
+            })]
+
+        # Migrate exploration to state schema version 53.
+        self.create_and_migrate_new_exploration('52', '53')
+        migrated_draft_change_list_v53 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52, 1, 2, self.EXP_ID)
+        )
+        # This is a valid draft.
+        assert migrated_draft_change_list_v53 is not None
 
     def test_convert_states_v51_dict_to_v52_dict(self) -> None:
         draft_change_list_v51_1 = [

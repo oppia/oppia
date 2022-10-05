@@ -128,18 +128,14 @@ class DraftUpgradeUtil:
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-    def _invalidate_drafts_with_invalid_links(cls, html_content: str) -> None:
+    def are_links_are_valid(cls, html_content: str) -> bool:
         """Invalidates all drafts with invalid links.
 
         Args:
             html_content: str. HTML content of the draft.
 
         Returns:
-            None. This function doesn't return anything.
-
-        Raises:
-            InvalidDraftConversionException. The conversion cannot be
-                completed.
+            bool. Validity of links in the draft.
         """
 
         soup = bs4.BeautifulSoup(html_content, 'html.parser')
@@ -151,30 +147,21 @@ class DraftUpgradeUtil:
             lnk_attr = link.get('url-with-value')
             txt_attr = link.get('text-with-value')
 
-            if lnk_attr is None:
-                # Invalidate draft.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.')
-            if txt_attr is None:
-                # Invalidate Draft.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.')
+            if lnk_attr is None or txt_attr is None:
+                return False
 
             lnk = lnk_attr.replace('&quot;', '')
             txt = txt_attr.replace('&quot;', '')
 
-            # If text is empty and the link is not.
-            if len(lnk) != 0 and len(txt) == 0:
-                # Invalidate draft.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.')
+            # If the text or the link is empty.
+            if len(lnk) == 0 or len(txt) == 0:
+                return False
 
             # If link is invalid.
             if urlparse(lnk).scheme not in acceptable_schemes:
-                # Invalidate draft.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                return False
+
+        return True
 
     @classmethod
     def _convert_html_in_draft_change_list(
@@ -400,7 +387,11 @@ class DraftUpgradeUtil:
                 new_value = edit_content_property_cmd.new_value
                 html_content = new_value['html']
 
-                cls._invalidate_drafts_with_invalid_links(html_content)
+                if not cls.are_links_are_valid(
+                    html_content):
+                    raise InvalidDraftConversionException(
+                        'Conversion cannot be completed.'
+                    )
 
             elif exp_change.property_name == (
                 exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
@@ -416,9 +407,11 @@ class DraftUpgradeUtil:
                         if written_translation['data_format'] != 'html':
                             raise InvalidDraftConversionException
 
-                        cls._invalidate_drafts_with_invalid_links(
-                            written_translation['translation']
-                        )
+                        if not cls.are_links_are_valid(
+                            written_translation['translation']):
+                            raise InvalidDraftConversionException(
+                                'Conversion cannot be completed.'
+                            )
 
         return draft_change_list
 
