@@ -48,16 +48,14 @@
                     (mouseenter)="activateProfileDropdown()"
                     (mouseleave)="deactivateProfileDropdown()">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="profileUrl"
+                    <a [href]="profileUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       <strong>{{ username }}</strong>
                     </a>
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/preferences"
+                    <a href="/preferences"
                        [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
@@ -65,8 +63,7 @@
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
+                    <a [href]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
                        [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
