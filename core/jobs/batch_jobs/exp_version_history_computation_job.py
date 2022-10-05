@@ -70,9 +70,9 @@ class FormattedModelGroupDict(TypedDict):
 class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
     """Computes and populates the version history data for an exploration."""
 
-    def is_valid_model_group(
+    def convert_to_formatted_model_group(
         self, model_group: UnformattedModelGroupDict
-    ) -> bool:
+    ) -> Optional[FormattedModelGroupDict]:
         """Returns True if the given model group is valid.
 
         Args:
@@ -85,89 +85,63 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         all_exp_models = model_group['all_exp_models']
         exp_models_vlatest = model_group['exp_models_vlatest']
         commit_log_models = model_group['commit_log_models']
+        version_history_models = model_group['version_history_models']
+
+        response_dict: Optional[FormattedModelGroupDict] = None
 
         model_group_is_valid = len(exp_models_vlatest) == 1
         if model_group_is_valid: # pragma: no cover
             exp_model_vlatest = exp_models_vlatest[0]
 
-            commit_log_flags: List[bool] = [False] * exp_model_vlatest.version
-            exp_flags: List[bool] = [False] * exp_model_vlatest.version
+            all_explorations: List[Optional[exp_domain.Exploration]] = (
+                [None] * exp_model_vlatest.version
+            )
+            for exp_model in all_exp_models:
+                if (
+                    exp_model is not None and
+                    exp_model.version >= 1 and
+                    exp_model.version <= exp_model_vlatest.version
+                ):
+                    all_explorations[exp_model.version - 1] = exp_model
+            model_group_is_valid = (all_explorations.count(None) == 0)
 
             if model_group_is_valid:
+                all_commit_log_models: List[Optional[
+                    exp_models.ExplorationCommitLogEntryModel
+                ]] = (
+                    [None] * exp_model_vlatest.version
+                )
                 for commit_log in commit_log_models:
-                    # Version can be None if there is a commit which does not
-                    # change the version of the exploration such as changing
-                    # roles.
                     if (
                         commit_log is not None and
                         commit_log.version is not None and
                         commit_log.version >= 1 and
                         commit_log.version <= exp_model_vlatest.version
                     ):
-                        commit_log_flags[commit_log.version - 1] = True
-                model_group_is_valid = (
-                    exp_model_vlatest.version == commit_log_flags.count(True)
-                )
+                        all_commit_log_models[commit_log.version - 1] = commit_log
+                model_group_is_valid = (all_commit_log_models.count(None) == 0)
 
-            if model_group_is_valid:
-                for exp_model in all_exp_models:
-                    if (
-                        exp_model is not None and
-                        exp_model.version >= 1 and
-                        exp_model.version <= exp_model_vlatest.version
-                    ):
-                        exp_flags[exp_model.version - 1] = True
-                model_group_is_valid = (
-                    exp_model_vlatest.version == exp_flags.count(True)
-                )
-
-        return model_group_is_valid
-
-    def convert_to_formatted_model_group_dict(
-        self, model_group: UnformattedModelGroupDict
-    ) -> FormattedModelGroupDict:
-        """Returns a formatted version of the given valid model group.
-
-        Args:
-            model_group: UnformattedModelGroupDict. The model group to be
-                formatted.
-
-        Returns:
-            FormattedModelGroupDict. The formatted version of the given valid
-            model group dict.
-        """
-        exp_vlatest = model_group['exp_models_vlatest'][0]
-
-        all_explorations: List[Optional[exp_domain.Exploration]] = (
-            [None] * exp_vlatest.version
-        )
-        for exploration in model_group['all_exp_models']:
-            all_explorations[exploration.version - 1] = exploration
-
-        commit_log_models: List[Optional[
-            exp_models.ExplorationCommitLogEntryModel
-        ]] = (
-            [None] * exp_vlatest.version
-        )
-        for commit_log in model_group['commit_log_models']:
-            if commit_log.version is not None:
-                commit_log_models[commit_log.version - 1] = commit_log
-
-        version_history_models: List[Optional[
-            exp_models.ExplorationVersionHistoryModel
-        ]] = [None] * exp_vlatest.version
-        for version_history in model_group['version_history_models']:
-            if version_history is not None: # pragma: no cover
-                version_history_models[
-                    version_history.exploration_version - 1
-                ] = version_history
-
-        return {
-            'exp_vlatest': exp_vlatest,
-            'all_explorations': all_explorations, # type: ignore[typeddict-item]
-            'commit_log_models': commit_log_models, # type: ignore[typeddict-item]
-            'version_history_models': version_history_models
-        }
+                if model_group_is_valid:
+                    all_version_history_models: List[Optional[
+                        exp_models.ExplorationVersionHistoryModel
+                    ]] = [None] * exp_model_vlatest.version
+                    for version_history in version_history_models:
+                        if (
+                            version_history is not None and
+                            version_history.exploration_version is not None and
+                            version_history.exploration_version >= 1 and
+                            version_history.exploration_version <= exp_model_vlatest.version
+                        ): # pragma: no cover
+                            all_version_history_models[
+                                version_history.exploration_version - 1
+                            ] = version_history
+                    response_dict = {
+                        'exp_vlatest': exp_model_vlatest,
+                        'all_explorations': all_explorations,
+                        'commit_log_models': all_commit_log_models,
+                        'version_history_models': all_version_history_models
+                    }
+        return response_dict
 
     def get_updated_version_history_model(
         self,
@@ -600,11 +574,11 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             model_groups
             | 'Get rid of exploration id' >>
                 beam.Values() # pylint: disable=no-value-for-parameter
-            | 'Filter valid model groups' >> beam.Filter(
-                self.is_valid_model_group
+            | 'Get formatted model groups' >> beam.Map(
+                self.convert_to_formatted_model_group
             )
-            | 'Format valid model groups' >> beam.Map(
-                self.convert_to_formatted_model_group_dict
+            | 'Filter valid model groups' >> beam.Filter(
+                lambda x: x is not None
             )
         )
 
@@ -737,9 +711,9 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             except Exception:
                 return None # type: ignore[return-value]
 
-    def is_valid_model_group(
+    def convert_to_formatted_model_group(
         self, model_group: UnformattedModelGroupDict
-    ) -> bool:
+    ) -> Optional[FormattedModelGroupDict]:
         """Returns True if the given model group is valid.
 
         Args:
@@ -754,107 +728,64 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         commit_log_models = model_group['commit_log_models']
         version_history_models = model_group['version_history_models']
 
+        response_dict: Optional[FormattedModelGroupDict] = None
+
         model_group_is_valid = len(exp_models_vlatest) == 1
-        if model_group_is_valid: # pragma: no cover
+        if model_group_is_valid:
             exp_model_vlatest = exp_models_vlatest[0]
 
-            commit_log_flags: List[bool] = [False] * exp_model_vlatest.version
-            version_history_flags: List[bool] = (
-                [False] * exp_model_vlatest.version
+            all_explorations: List[Optional[exp_domain.Exploration]] = (
+                [None] * exp_model_vlatest.version
             )
-            exp_flags: List[bool] = [False] * exp_model_vlatest.version
+            for exp_model in all_exp_models:
+                if (
+                    exp_model is not None and
+                    exp_model.version >= 1 and
+                    exp_model.version <= exp_model_vlatest.version
+                ):
+                    all_explorations[exp_model.version - 1] = exp_model
+            model_group_is_valid = (all_explorations.count(None) == 0)
 
             if model_group_is_valid:
+                all_commit_log_models: List[Optional[
+                    exp_models.ExplorationCommitLogEntryModel
+                ]] = (
+                    [None] * exp_model_vlatest.version
+                )
                 for commit_log in commit_log_models:
-                    # Version can be None if there is a commit which does not
-                    # change the version of the exploration such as changing
-                    # roles.
                     if (
                         commit_log is not None and
                         commit_log.version is not None and
                         commit_log.version >= 1 and
                         commit_log.version <= exp_model_vlatest.version
                     ):
-                        commit_log_flags[commit_log.version - 1] = True
-                model_group_is_valid = (
-                    exp_model_vlatest.version == commit_log_flags.count(True)
-                )
+                        all_commit_log_models[commit_log.version - 1] = commit_log
+                model_group_is_valid = (all_commit_log_models.count(None) == 0)
 
-            if model_group_is_valid:
-                for exp_model in all_exp_models:
-                    if (
-                        exp_model is not None and
-                        exp_model.version >= 1 and
-                        exp_model.version <= exp_model_vlatest.version
-                    ):
-                        exp_flags[exp_model.version - 1] = True
-                model_group_is_valid = (
-                    exp_model_vlatest.version == exp_flags.count(True)
-                )
+                if model_group_is_valid:
+                    all_version_history_models: List[Optional[
+                        exp_models.ExplorationVersionHistoryModel
+                    ]] = [None] * exp_model_vlatest.version
+                    for version_history in version_history_models:
+                        if (
+                            version_history is not None and
+                            version_history.exploration_version is not None and
+                            version_history.exploration_version >= 1 and
+                            version_history.exploration_version <= exp_model_vlatest.version
+                        ): # pragma: no cover
+                            all_version_history_models[
+                                version_history.exploration_version - 1
+                            ] = version_history
+                    model_group_is_valid = (all_version_history_models.count(None) == 0)
 
-            if model_group_is_valid:
-                for vh_model in version_history_models:
-                    if (
-                        vh_model is not None and
-                        vh_model.exploration_version >= 1 and
-                        vh_model.exploration_version <= (
-                            exp_model_vlatest.version
-                        )
-                    ):
-                        version_history_flags[
-                            vh_model.exploration_version - 1] = True
-                model_group_is_valid = (
-                    exp_model_vlatest.version == version_history_flags.count(
-                        True
-                    )
-                )
-
-        return model_group_is_valid
-
-    def convert_to_formatted_model_group_dict(
-        self, model_group: UnformattedModelGroupDict
-    ) -> FormattedModelGroupDict:
-        """Returns a formatted version of the given valid model group.
-
-        Args:
-            model_group: UnformattedModelGroupDict. The model group to be
-                formatted.
-
-        Returns:
-            FormattedModelGroupDict. The formatted version of the given valid
-            model group dict.
-        """
-        exp_vlatest = model_group['exp_models_vlatest'][0]
-
-        all_explorations: List[Optional[exp_domain.Exploration]] = (
-            [None] * exp_vlatest.version
-        )
-        for exploration in model_group['all_exp_models']:
-            all_explorations[exploration.version - 1] = exploration
-
-        commit_log_models: List[Optional[
-            exp_models.ExplorationCommitLogEntryModel
-        ]] = (
-            [None] * exp_vlatest.version
-        )
-        for commit_log in model_group['commit_log_models']:
-            if commit_log.version is not None: # pragma: no cover
-                commit_log_models[commit_log.version - 1] = commit_log
-
-        version_history_models: List[Optional[
-            exp_models.ExplorationVersionHistoryModel
-        ]] = [None] * exp_vlatest.version
-        for version_history in model_group['version_history_models']:
-            version_history_models[version_history.exploration_version - 1] = ( # type: ignore[union-attr]
-                version_history
-            )
-
-        return {
-            'exp_vlatest': exp_vlatest,
-            'all_explorations': all_explorations, # type: ignore[typeddict-item]
-            'commit_log_models': commit_log_models, # type: ignore[typeddict-item]
-            'version_history_models': version_history_models
-        }
+                    if model_group_is_valid:
+                        response_dict = {
+                            'exp_vlatest': exp_model_vlatest,
+                            'all_explorations': all_explorations,
+                            'commit_log_models': all_commit_log_models,
+                            'version_history_models': all_version_history_models
+                        }
+        return response_dict
 
     def compare_version_histories(
         self,
@@ -1138,11 +1069,11 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             | 'Group by key' >> beam.CoGroupByKey()
             | 'Get rid of exploration id' >>
                 beam.Values() # pylint: disable=no-value-for-parameter
-            | 'Filter valid model groups' >> beam.Filter(
-                self.is_valid_model_group
+            | 'Get formatted model groups' >> beam.Map(
+                self.convert_to_formatted_model_group
             )
-            | 'Format valid model groups' >> beam.Map(
-                self.convert_to_formatted_model_group_dict
+            | 'Filter valid model groups' >> beam.Filter(
+                lambda x: x is not None
             )
             | 'Get the verification result for each model group' >>
                 beam.Map(self.verify_version_history_models)
