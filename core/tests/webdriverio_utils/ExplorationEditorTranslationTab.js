@@ -28,14 +28,14 @@ var ExplorationEditorTranslationTab = function() {
     '.e2e-test-translation-tab-dismiss-welcome-modal');
   var translationWelcomeModal = $('.e2e-test-translation-tab-welcome-modal');
   var buttonsSelector = function() {
-    return $$('.ng-joyride .skipBtn');
+    return $$('.joyride-step__close');
   };
   var nextTutorialStageButtonSelector = function() {
-    return $$('.ng-joyride .nextBtn');
+    return $$('.joyride-step__next-container');
   };
   var translationTabStartTutorialElement = $(
     '.e2e-test-translation-tab-start-tutorial');
-  var titleElement = $('.ng-joyride-title');
+  var titleElement = $('.e2e-test-joyride-title');
 
   this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.
@@ -57,7 +57,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButton = await $$('button=Finish');
+    var finishTutorialButton = await $$('.joyride-button=done');
     var buttons = finishTutorialButton;
     if (buttons.length === 1) {
       await action.click('Finish tutorial stage button', buttons[0]);
@@ -76,7 +76,7 @@ var ExplorationEditorTranslationTab = function() {
       'Re-record/Re-upload audio'
     ];
     for (const HEADING of tutorialTabHeadings) {
-      var tutorialTabHeadingElement = $(`.popover-title=${HEADING}`);
+      var tutorialTabHeadingElement = $(`.e2e-test-joyride-title=${HEADING}`);
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
