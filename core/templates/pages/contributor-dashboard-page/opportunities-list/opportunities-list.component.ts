@@ -63,7 +63,7 @@ export class OpportunitiesListComponent {
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
   more: boolean = false;
   userIsOnLastPage: boolean = true;
-  languageCode: string;
+  languageCode: string = '';
 
   constructor(
     private zone: NgZone,
