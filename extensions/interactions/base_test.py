@@ -266,7 +266,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'default_value': 1,
             }, {
                 'name': 'catchMisspellings',
-                'description': 'Catch Misspellings',
+                'description': 'Catch Misspellings (Detect if answer is misspelled by atmost 2 letters)',
                 'schema': {
                     'type': 'bool'
                 },

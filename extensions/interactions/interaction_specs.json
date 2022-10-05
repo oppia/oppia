@@ -748,7 +748,7 @@
         },
         "default_value": 1
     }, {
-      "description": "Catch Misspellings",
+      "description": "Catch Misspellings (Detect if answer is misspelled by atmost 2 letters)",
       "name": "catchMisspellings",
       "schema": {
         "type": "bool"
