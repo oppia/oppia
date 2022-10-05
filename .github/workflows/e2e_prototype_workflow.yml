@@ -23,7 +23,7 @@ jobs:
           architecture: 'x64'
       - name: echo env.GITHUB_SHA
         run: |
-          echo "${env.GITHUB_SHA}"
+          ${{ github.sha }}
       - uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v2
@@ -55,7 +55,7 @@ jobs:
           cache-name: cache-build-files
         with:
           path: /home/runner/work/oppia/
-          key: ${{ env.GITHUB_SHA }}
+          key: ${{ github.sha }} 
 
   e2e_user_features_and_library:
     runs-on:  ${{ matrix.os }}
@@ -64,9 +64,9 @@ jobs:
         os: [ubuntu-22.04]
     needs: build_webpack
     steps:
-      - name: echo env.GITHUB_SHA
+      - name: echo sha
         run: |
-          echo "${env.GITHUB_SHA}"
+          echo ${{ github.sha }} 
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
@@ -79,7 +79,7 @@ jobs:
           cache-name: cache-build-files
         with:
           path: /home/runner/work/oppia/
-          key: ${{ env.GITHUB_SHA }}
+          key: ${{ github.sha }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -97,9 +97,9 @@ jobs:
           cache-name: cache-build-files
         with:
           path: /home/runner/work/oppia/
-          key: ${{ env.GITHUB_SHA }}
+          key: ${{ github.sha }}
           restore-keys: |
-                        ${{ env.GITHUB_SHA}}
+                        ${{ github.sha }}
       - id: check-risk
         name: Check if PR is low-risk
         uses: ./.github/actions/check-if-pr-is-low-risk
