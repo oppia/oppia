@@ -198,8 +198,8 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         interaction: base.BaseInteraction,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         *,
-        tagged_skill_misconecrption_id_part_of_exp: bool = False,
-        rule_specs_part_of_exp: bool = False
+        tagged_skill_misconception_id_required: bool = False,
+        empty_rule_specs_allowed: bool = False
     ) -> None:
         """Verifies that all rule classes are valid, and that the AnswerGroup
         only has one classifier rule.
@@ -209,10 +209,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
-            tagged_skill_misconecrption_id_part_of_exp: bool. The 'tagged_skill_
-                misconecrption_id' belongs to an exploration state.
-            rule_specs_part_of_exp: bool. Rule specs belongs to an exploration
-                state.
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
+            empty_rule_specs_allowed: bool. Empty rule specs are allowed.
 
         Raises:
             ValidationError. One or more attributes of the AnswerGroup are
@@ -229,12 +228,18 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
 
-        if self.tagged_skill_misconception_id is not None:
-            if tagged_skill_misconecrption_id_part_of_exp:
-                raise utils.ValidationError(
-                    'Expected tagged skill misconception id to be None, '
-                    'received %s' % self.tagged_skill_misconception_id)
+        if (
+            self.tagged_skill_misconception_id is not None and
+            not tagged_skill_misconception_id_required
+        ):
+            raise utils.ValidationError(
+                'Expected tagged skill misconception id to be None, '
+                'received %s' % self.tagged_skill_misconception_id)
 
+        if (
+            self.tagged_skill_misconception_id is not None and
+            tagged_skill_misconception_id_required
+        ):
             if not isinstance(self.tagged_skill_misconception_id, str):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
@@ -248,11 +253,15 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                     'to be <skill_id>-<misconception_id>, received %s'
                     % self.tagged_skill_misconception_id)
 
-        if len(self.rule_specs) == 0 and rule_specs_part_of_exp:
+        if len(self.rule_specs) == 0 and not empty_rule_specs_allowed:
             raise utils.ValidationError(
                 'There must be at least one rule for each answer group.')
 
-        if len(self.rule_specs) == 0 and len(self.training_data) == 0:
+        if (
+            len(self.rule_specs) == 0 and
+            len(self.training_data) == 0 and
+            empty_rule_specs_allowed
+        ):
             raise utils.ValidationError(
                 'There must be at least one rule or training data for each'
                 ' answer group.')
@@ -943,8 +952,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         *,
-        tagged_skill_misconecrption_id_part_of_exp: bool = False,
-        rule_specs_part_of_exp: bool = False
+        tagged_skill_misconception_id_required: bool = False,
+        empty_rule_specs_allowed: bool = False
 
     ) -> None:
         """Validates various properties of the InteractionInstance.
@@ -954,10 +963,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 the exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property(obj_type).
                 Is used to validate AnswerGroup objects.
-            tagged_skill_misconecrption_id_part_of_exp: bool. The 'tagged_skill_
-                misconecrption_id' belongs to an exploration state.
-            rule_specs_part_of_exp: bool. Rule specs belongs to an exploration
-                state.
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
+            empty_rule_specs_allowed: bool. Empty rule specs are allowed.
 
         Raises:
             ValidationError. One or more attributes of the InteractionInstance
@@ -993,9 +1001,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         for answer_group in self.answer_groups:
             answer_group.validate(
                 interaction, exp_param_specs_dict,
-                tagged_skill_misconecrption_id_part_of_exp=(
-                    tagged_skill_misconecrption_id_part_of_exp),
-                rule_specs_part_of_exp=rule_specs_part_of_exp)
+                tagged_skill_misconception_id_required=(
+                    tagged_skill_misconception_id_required),
+                empty_rule_specs_allowed=empty_rule_specs_allowed)
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -3258,8 +3266,8 @@ class State(translation_domain.BaseTranslatableObject):
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         allow_null_interaction: bool,
         *,
-        tagged_skill_misconecrption_id_part_of_exp: bool = False,
-        rule_specs_part_of_exp: bool = False
+        tagged_skill_misconception_id_required: bool = False,
+        empty_rule_specs_allowed: bool = False
     ) -> None:
         """Validates various properties of the State.
 
@@ -3271,10 +3279,9 @@ class State(translation_domain.BaseTranslatableObject):
                 question.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
-            tagged_skill_misconecrption_id_part_of_exp: bool. The 'tagged_skill_
-                misconecrption_id' belongs to an exploration state.
-            rule_specs_part_of_exp: bool. Rule specs belongs to an exploration
-                state.
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
+            empty_rule_specs_allowed: bool. Empty rule specs are allowed.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.
@@ -3294,9 +3301,9 @@ class State(translation_domain.BaseTranslatableObject):
         if self.interaction.id is not None:
             self.interaction.validate(
                 exp_param_specs_dict,
-                tagged_skill_misconecrption_id_part_of_exp=(
-                    tagged_skill_misconecrption_id_part_of_exp),
-                rule_specs_part_of_exp=rule_specs_part_of_exp)
+                tagged_skill_misconception_id_required=(
+                    tagged_skill_misconception_id_required),
+                empty_rule_specs_allowed=empty_rule_specs_allowed)
 
         content_id_list = []
         content_id_list.append(self.content.content_id)

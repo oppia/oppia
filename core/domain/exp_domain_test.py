@@ -1648,13 +1648,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected tagged skill misconception id to be None, received 1')
         with self.assertRaisesRegex(
             Exception,
-            'Expected tagged skill misconception id to be a str, received 1'
+            'Expected tagged skill misconception id to be None, received 1'
         ):
             exploration.init_state.validate(
                 exploration.param_specs,
                 allow_null_interaction=False,
-                tagged_skill_misconecrption_id_part_of_exp=False,
-                rule_specs_part_of_exp=False)
+                tagged_skill_misconception_id_required=False,
+                empty_rule_specs_allowed=False)
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -1683,15 +1683,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Expected the format of tagged skill misconception id '
-            'to be <skill_id>-<misconception_id>, received '
+            'Expected tagged skill misconception id to be None, received '
             'invalid_tagged_skill_misconception_id'
         ):
             exploration.init_state.validate(
                 exploration.param_specs,
                 allow_null_interaction=False,
-                tagged_skill_misconecrption_id_part_of_exp=False,
-                rule_specs_part_of_exp=False)
+                tagged_skill_misconception_id_required=False,
+                empty_rule_specs_allowed=False)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
@@ -1708,14 +1707,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'There must be at least one rule for each answer group.')
         with self.assertRaisesRegex(
             Exception,
-            'There must be at least one rule or training data for each '
-            'answer group.'
+            'There must be at least one rule for each answer group.'
         ):
             exploration.init_state.validate(
                 exploration.param_specs,
                 allow_null_interaction=False,
-                tagged_skill_misconecrption_id_part_of_exp=False,
-                rule_specs_part_of_exp=False)
+                tagged_skill_misconception_id_required=False,
+                empty_rule_specs_allowed=False)
 
         exploration.states = {
             exploration.init_state_name: (
