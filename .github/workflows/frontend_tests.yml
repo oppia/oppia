@@ -33,6 +33,7 @@ jobs:
     needs: generate-job-strategy-matrix
     runs-on:  ${{ matrix.os }}
     strategy:
+      max-parallel: 25
       matrix:
         os: [ubuntu-22.04]
         num_runs: ${{ fromJson(needs.generate-job-strategy-matrix.outputs.job-strategy-matrix) }}
