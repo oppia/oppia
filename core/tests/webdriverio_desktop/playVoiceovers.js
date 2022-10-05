@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
  * @fileoverview End-to-end tests for the functionality of the voiceover player.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js');
+  '../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage = require(
-  '../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+  '../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Voiceover player', function() {
   var explorationEditorPage = null;
@@ -54,9 +54,9 @@ describe('Voiceover player', function() {
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
-      'Hindi', '../data/cafe.mp3');
+      'हिन्दी (Hindi)', '../data/cafe.mp3');
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
-      'Arabic', '../data/ambient-noise.mp3');
+      'العربية (Arabic)', '../data/ambient-noise.mp3');
     await explorationEditorPage.saveChanges('Added voiceovers');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voiceoverPlayerTest');
@@ -72,11 +72,11 @@ describe('Voiceover player', function() {
     await libraryPage.get();
     await libraryPage.playExploration('voiceoverPlayerTest');
     await explorationPlayerPage.expandAudioBar();
-    await explorationPlayerPage.changeVoiceoverLanguage('Hindi');
+    await explorationPlayerPage.changeVoiceoverLanguage('हिन्दी (Hindi)');
     await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
     await explorationPlayerPage.pressPauseButton();
-    await explorationPlayerPage.changeVoiceoverLanguage('Arabic');
+    await explorationPlayerPage.changeVoiceoverLanguage('العربية (Arabic)');
     await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
   });

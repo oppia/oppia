@@ -4947,6 +4947,8 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": ["tabs", "skillreview"],
+
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -6129,6 +6131,9 @@ export default {
     "log", "ln", "sqrt", "abs", "sin", "cos", "tan", "sec", "csc", "cot",
     "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
   ],
+
+  // Supported functions for math interactions.
+  "SUPPORTED_FUNCTION_NAMES": ["sqrt", "abs"],
 
   "OSK_MAIN_TAB": "mainTab",
   "OSK_FUNCTIONS_TAB": "functionsTab",
