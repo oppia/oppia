@@ -125,7 +125,8 @@
     <oppia-statistics-tab ng-show="$ctrl.getActiveTabName() === 'stats'">
     </oppia-statistics-tab>
 
-    <oppia-improvements-tab ng-if="$ctrl.isImprovementsTabEnabled()" ng-show="$ctrl.getActiveTabName() === 'improvements'">
+    <oppia-improvements-tab ng-if="$ctrl.isImprovementsTabEnabled()"
+                            ng-show="$ctrl.getActiveTabName() === 'improvements'">
     </oppia-improvements-tab>
 
     <oppia-settings-tab ng-show="$ctrl.getActiveTabName() === 'settings'" [current-user-is-curriculum-admin]="$ctrl.currentUserIsCurriculumAdmin" [current-user-is-moderator]="$ctrl.currentUserIsModerator">

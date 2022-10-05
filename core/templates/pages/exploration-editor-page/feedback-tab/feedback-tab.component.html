@@ -1,8 +1,10 @@
 <mat-card class="oppia-editor-card oppia-feedback-card">
   <div *ngIf="!activeThread">
     <div class="float-right">
-      <button *ngIf="userIsLoggedIn" class="btn btn-success float-right oppia-thread-button oppia-autofocus"
-              (click)="showCreateThreadModal()" (focus)="newThreadButton">
+      <button *ngIf="userIsLoggedIn"
+              class="btn btn-success float-right oppia-thread-button oppia-autofocus"
+              (click)="showCreateThreadModal()"
+              (focus)="newThreadButton">
         Start new thread
       </button>
     </div>
@@ -11,7 +13,7 @@
 
     <div class="oppia-clear"></div>
 
-    <div *ngIf="threadData && threadData.feedbackThreads?.length === 0">
+    <div *ngIf="threadData && threadData.feedbackThreads && threadData.feedbackThreads.length === 0">
       <em>No feedback has been given for this exploration yet.</em>
     </div>
     <br>
@@ -29,12 +31,21 @@
     <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-8">
         <span class="oppia-back-arrow">
-          <button type="button" class="btn btn-secondary btn-sm e2e-test-oppia-feedback-back-button" (click)="onBackButtonClicked()">
-            <i class="fas fa-angle-left oppia-back-arrow-icon oppia-vcenter" title="Return to list of feedback threads"></i>
+          <button type="button" 
+                  class="btn btn-secondary btn-sm e2e-test-oppia-feedback-back-button"
+                  (click)="onBackButtonClicked()">
+            <i class="fas fa-angle-left oppia-back-arrow-icon oppia-vcenter"
+               title="Return to list of feedback threads"></i>
           </button>
         </span>
-        <span class="oppia-thread-text" [hidden]="activeThread.isSuggestionThread()">Feedback Thread: {{ activeThread.subject }}</span>
-        <span class="oppia-thread-text" [hidden]="!activeThread.isSuggestionThread()">Suggestion Thread: {{ activeThread.subject }}</span>
+        <span class="oppia-thread-text" 
+              [hidden]="activeThread.isSuggestionThread()">
+              Feedback Thread: {{ activeThread.subject }}
+        </span>
+        <span class="oppia-thread-text"
+              [hidden]="!activeThread.isSuggestionThread()">
+              Suggestion Thread: {{ activeThread.subject }}
+        </span>
       </div>
 
       <div class="col-lg-4 col-md-4 col-sm-4 float-right">
@@ -42,7 +53,8 @@
           <span *ngIf="activeThread.stateName" class="badge badge-info">
             state: {{ activeThread.stateName }}
           </span>
-          <span [ngClass]="getLabelClass(activeThread.status)" class="e2e-test-oppia-feedback-status-name">
+          <span [ngClass]="getLabelClass(activeThread.status)"
+                class="e2e-test-oppia-feedback-status-name">
             {{ getHumanReadableStatus(activeThread.status) }}
           </span>
         </div>
@@ -79,9 +91,12 @@
 
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
-                  <div class="oppia-view-suggestion-button-container e2e-test-exploration-feedback">{{ m.text }}</div>
+                  <div class="oppia-view-suggestion-button-container e2e-test-exploration-feedback">
+                    {{ m.text }}
+                  </div>
                   <div *ngIf="activeThread.isSuggestionThread() && index == 0">
-                    <button class="btn btn-{{ getSuggestionButtonType() }} e2e-test-view-suggestion-btn oppia-view-suggestion-btn" (click)="showSuggestionModal()">
+                    <button class="btn btn-{{ getSuggestionButtonType() }} e2e-test-view-suggestion-btn oppia-view-suggestion-btn"
+                            (click)="showSuggestionModal()">
                       View Suggestion
                     </button>
                   </div>
@@ -100,11 +115,15 @@
         <div>
           <label for="feedbackMessage">
             Add new message
-            <span *ngIf="isExplorationEditable() && !activeThread.isSuggestionThread()">(and/or change status)</span>
+            <span *ngIf="isExplorationEditable() && !activeThread.isSuggestionThread()">
+              (and/or change status)
+            </span>
           </label>
-          <textarea class="form-control e2e-test-feedback-response-textarea oppia-autofocus" [(ngModel)]="feedbackMessage.text"
+          <textarea class="form-control e2e-test-feedback-response-textarea oppia-autofocus"
+                    [(ngModel)]="feedbackMessage.text"
                     id="feedbackMessage" rows="6"
-                    [disabled]="messageSendingInProgress" (focus)="feedbackMessage">
+                    [disabled]="messageSendingInProgress"
+                    (focus)="feedbackMessage">
           </textarea>
         </div>
 
@@ -112,9 +131,14 @@
           <span [hidden]="!(isExplorationEditable() && !activeThread.isSuggestionThread())">
             Change status (optional):
             <select class="e2e-test-oppia-feedback-status-menu" [(ngModel)]="feedbackMessage.status" [disabled]="messageSendingInProgress">
-              <option *ngFor="let choice of STATUS_CHOICES" class="e2e-test-oppia-feedback-status-{{choice.id}}" [value]="choice.id">{{ choice.text }}</option>
+              <option *ngFor="let choice of STATUS_CHOICES"
+                      class="e2e-test-oppia-feedback-status-{{choice.id}}"
+                      [value]="choice.id">
+                      {{ choice.text }}
+              </option>
             </select>
-            <div class="oppia-icon-container" *ngIf="!feedbackMessage.text && (feedbackMessage.status === 'ignored' || feedbackMessage.status === 'not_actionable')">
+            <div class="oppia-icon-container"
+                 *ngIf="!feedbackMessage.text && (feedbackMessage.status === 'ignored' || feedbackMessage.status === 'not_actionable')">
               <i class="fas fa-info-circle"></i>
               <span>Please specify a reason for setting the status to {{ getHumanReadableStatus(feedbackMessage.status) }}.</span>
             </div>

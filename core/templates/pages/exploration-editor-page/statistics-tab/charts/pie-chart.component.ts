@@ -50,7 +50,6 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
    };
 
    directiveSubscriptions = new Subscription();
-   // TODO(#13015): Remove use of unknown as a type.
    chart: google.visualization.PieChart;
 
    constructor(
