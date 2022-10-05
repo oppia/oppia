@@ -244,14 +244,10 @@ class MigrateTopicJob(base_jobs.JobBase):
                     'TOPIC PROCESSED'))
         )
 
-        migrated_topic_error_results = (
+        migration_error_check = (
             all_migrated_topic_results
             | 'Filter errors' >> beam.Filter(
                 lambda result_item: result_item.is_err())
-        )
-
-        migration_error_check = (
-            migrated_topic_error_results
             | 'Count number of errors' >> beam.combiners.Count.Globally()
             | 'Check if error count is zero' >> beam.Map(lambda x: x == 0)
         )
@@ -260,7 +256,8 @@ class MigrateTopicJob(base_jobs.JobBase):
             all_migrated_topic_results
             | 'Remove all results in case of migration errors' >> beam.Filter(
                 self._check_migration_errors,
-                beam.pvalue.AsSingleton(migration_error_check))
+                is_no_migration_error=beam.pvalue.AsSingleton(
+                    migration_error_check))
         )
 
         migrated_topics = (
