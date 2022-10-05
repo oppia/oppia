@@ -56,8 +56,7 @@ class MockTruncatePipe {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('State Graph Visualization Component when graph is redrawn', () => {
+describe('State Graph Visualization Component when graph is redrawn', () => {
   let component: StateGraphVisualization;
   let fixture: ComponentFixture<StateGraphVisualization>;
   var explorationWarningsService: ExplorationWarningsService;
@@ -242,10 +241,8 @@ fdescribe('State Graph Visualization Component when graph is redrawn', () => {
       deleted: 'string'
     };
     component.currentStateId = 'state_1';
-
     component.ngOnInit();
     tick();
-
     flush();
   }));
 
@@ -347,6 +344,7 @@ fdescribe('State Graph Visualization Component when graph is redrawn', () => {
   });
 
   it('should center the graph', fakeAsync(() => {
+    component.ngOnInit();
     tick();
 
     component.graphData = graphData;
@@ -400,6 +398,14 @@ fdescribe('State Graph Visualization Component when graph is redrawn', () => {
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
     ' x and y axis to 0', fakeAsync(() => {
+    spyOn(component, 'getElementDimensions').and.returnValue({
+      w: 1000,
+      h: 1000
+    });
+
+    component.ngOnInit();
+    tick();
+
     spyOn(stateGraphLayoutService, 'getGraphBoundaries').and.returnValue({
       bottom: 20,
       left: 10,
@@ -430,12 +436,13 @@ fdescribe('State Graph Visualization Component when graph is redrawn', () => {
     tick();
     flush();
 
-    expect(component.overallTransformStr).toBe(
-      'translate(-9451776600000,-92198400000)');
+    expect(component.innerTransformStr).toBe(
+      'translate(10,20)');
   }));
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
     ' x and y axis to 10, 20', fakeAsync(() => {
+    component.ngOnInit();
     tick();
 
     spyOn(component, 'getElementDimensions').and.returnValue({
@@ -484,6 +491,6 @@ fdescribe('State Graph Visualization Component when graph is redrawn', () => {
     expect(d3.event.transform.x).toBe(0);
     expect(d3.event.transform.y).toBe(0);
     expect(component.overallTransformStr).toBe(
-      'translate(-1.4889346816051258e+24,-566702997504000000000)');
+      'translate(465,487.5)');
   }));
 });
