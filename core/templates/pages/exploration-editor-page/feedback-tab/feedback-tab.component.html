@@ -130,7 +130,9 @@
         <div>
           <span [hidden]="!(isExplorationEditable() && !activeThread.isSuggestionThread())">
             Change status (optional):
-            <select class="e2e-test-oppia-feedback-status-menu" [(ngModel)]="feedbackMessage.status" [disabled]="messageSendingInProgress">
+            <select class="e2e-test-oppia-feedback-status-menu"
+                    [(ngModel)]="feedbackMessage.status"
+                    [disabled]="messageSendingInProgress">
               <option *ngFor="let choice of STATUS_CHOICES"
                       class="e2e-test-oppia-feedback-status-{{choice.id}}"
                       [value]="choice.id">

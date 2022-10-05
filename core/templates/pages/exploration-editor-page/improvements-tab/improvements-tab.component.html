@@ -7,16 +7,25 @@
           <a class="improvements-tab-view-resolved-tasks" href="#">
             <img class="improvements-tab-time-machine" [src]="timeMachineImageUrl">
             <span class="improvements-tab-text">View Resolved Tasks</span>
-            <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+            <i class="material-icons improvements-tab-chevron-right-icon">
+              chevron_right
+            </i>
           </a>
         </div>
         <div class="improvements-tab-overview-body">
           <div class="improvements-tab-summary">
             <div class="improvements-pending-summary">
-              <strong class="improvements-tab-count">{{ getNumTasks() }}</strong>
-              <p class="improvements-tab-units" [ngPlural]="getNumTasks()">
-                <ng-template ngPluralCase="one">Improvement pending</ng-template>
-                <ng-template ngPluralCase="other">Total Improvements pending</ng-template>
+              <strong class="improvements-tab-count">
+                {{ getNumTasks() }}
+              </strong>
+              <p class="improvements-tab-units"
+                 [ngPlural]="getNumTasks()">
+                <ng-template ngPluralCase="one">
+                  Improvement pending
+                </ng-template>
+                <ng-template ngPluralCase="other">
+                  Total Improvements pending
+                </ng-template>
               </p>
             </div>
             <div class="improvements-tab-exploration-health-summary"
@@ -30,14 +39,19 @@
             </div>
           </div>
           <ul class="improvements-tab-navigation" *ngIf="getNumTasks() > 0">
-            <li class="improvements-tab-navigation-item" *ngIf="getNumExpLevelTasks() > 0">
+            <li class="improvements-tab-navigation-item"
+                *ngIf="getNumExpLevelTasks() > 0">
               <a class="improvements-tab-task-scope" href="#">
                 <span class="improvements-tab-dot-warning">&nbsp;</span>
                 <strong class="improvements-tab-scope-number">
                   {{ getNumExpLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">exploration-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  exploration-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
             <li class="improvements-tab-navigation-item"
@@ -47,20 +61,30 @@
                 <strong class="improvements-tab-scope-number">
                   {{ getNumConceptLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">concept-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  concept-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
             <li class="improvements-tab-navigation-item" *ngIf="getNumCardLevelTasks() > 0">
-              <a class="improvements-tab-task-scope" href="#card-level-improvements" target="_self">
+              <a class="improvements-tab-task-scope"
+                 href="#card-level-improvements"
+                 target="_self">
                 <span [ngClass]="'improvements-tab-dot-' + getExplorationHealth()">
                   &nbsp;
                 </span>
                 <strong class="improvements-tab-scope-number">
                   {{ getNumCardLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">card-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  card-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
           </ul>
@@ -68,14 +92,20 @@
       </div>
       <div class="improvements-tab-completion-rate">
         <oppia-completion-graph [completionRate]="completionRate"></oppia-completion-graph>
-        <p class="improvements-tab-value">{{ completionRateAsPercent }}</p>
-        <p class="improvements-tab-label">Exploration Completion Rate</p>
+        <p class="improvements-tab-value">
+          {{ completionRateAsPercent }}
+        </p>
+        <p class="improvements-tab-label">
+          Exploration Completion Rate
+        </p>
       </div>
     </div>
   </div>
   <div class="improvements-tab-body">
-    <div class="improvements-tab-level" *ngIf="getNumCardLevelTasks() > 0">
-      <div class="improvements-tab-level-header" name="card-level-improvements">
+    <div class="improvements-tab-level"
+         *ngIf="getNumCardLevelTasks() > 0">
+      <div class="improvements-tab-level-header"
+           name="card-level-improvements">
         card-level improvements
       </div>
       <hr>
@@ -103,7 +133,9 @@
                   {{ getStateRetentionPercent(stateTasks.stateName) }} Current Retention
                 </div>
                 <div class="improvements-tab-state-num-issues">
-                  <strong>{{ getNumCardLevelTasksForState(stateTasks.stateName) }}</strong>
+                  <strong>
+                    {{ getNumCardLevelTasksForState(stateTasks.stateName) }}
+                  </strong>
                   <span [ngPlural]="getNumCardLevelTasksForState(stateTasks.stateName)">
                     <ng-template ngPluralCase="one">issue found</ng-template>
                     <ng-template ngPluralCase="other">issues found</ng-template>

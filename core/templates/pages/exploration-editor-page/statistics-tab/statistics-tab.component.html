@@ -3,7 +3,9 @@
     <div *ngIf="explorationHasBeenVisited">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
-        <oppia-pie-chart *ngIf="pieChartData && pieChartOptions" [data]="pieChartData" [options]="pieChartOptions">
+        <oppia-pie-chart *ngIf="pieChartData && pieChartOptions"
+                         [data]="pieChartData"
+                         [options]="pieChartOptions">
         </oppia-pie-chart>
         <p class="text-center">
           <span *ngIf="numPassersby"
