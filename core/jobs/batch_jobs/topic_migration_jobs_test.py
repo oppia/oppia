@@ -140,7 +140,6 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(stdout='TOPIC MIGRATED SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='CACHE DELETION SUCCESS: 1')
         ])
 
         migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
@@ -173,50 +172,11 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(stdout='TOPIC MIGRATED SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='CACHE DELETION SUCCESS: 1')
         ])
         migrated_topic_summary_model = topic_models.TopicSummaryModel.get(
             self.TOPIC_1_ID
         )
         self.assertEqual(migrated_topic_summary_model.version, 2)
-
-    def test_broken_cache_is_reported(self) -> None:
-        cache_swap = self.swap_to_always_raise(
-            caching_services, 'delete_multi', Exception('cache deletion error'))
-        unmigrated_topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_1_ID,
-            name='topic title',
-            description='description',
-            canonical_name='topic title',
-            subtopic_schema_version=3,
-            story_reference_schema_version=1,
-            next_subtopic_id=1,
-            language_code='cs',
-            url_fragment='topic',
-            page_title_fragment_for_web='fragm',
-        )
-        unmigrated_topic_model.update_timestamps()
-        unmigrated_topic_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
-        with cache_swap:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stdout='TOPIC MIGRATED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PROCESSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stderr='CACHE DELETION ERROR: "cache deletion error": 1'
-                )
-            ])
-        migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
-        self.assertEqual(migrated_topic_model.version, 2)
 
     def test_broken_topic_leads_to_no_migration(self) -> None:
         first_unmigrated_topic_model = self.create_model(

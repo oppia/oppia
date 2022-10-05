@@ -104,26 +104,6 @@ class MigrateTopicJob(base_jobs.JobBase):
             yield (topic_id, topic_change)
 
     @staticmethod
-    def _delete_topic_from_cache(
-        topic: topic_domain.Topic
-    ) -> result.Result[str, Exception]:
-        """Deletes topic from cache.
-
-        Args:
-            topic: Topic. The topic which should be deleted from cache.
-
-        Returns:
-            Result(str, Exception). The id of the story when the deletion was
-            successful or Exception when the deletion failed.
-        """
-        try:
-            caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_TOPIC, None, [topic.id])
-            return result.Ok(topic.id)
-        except Exception as e:
-            return result.Err(e)
-
-    @staticmethod
     def _update_topic(
         topic_model: topic_models.TopicModel,
         migrated_topic: topic_domain.Topic,
@@ -314,15 +294,6 @@ class MigrateTopicJob(base_jobs.JobBase):
                     'TOPIC MIGRATED'))
         )
 
-        cache_deletion_job_run_results = (
-            transformed_topic_objects_list
-            | 'Delete topic from cache' >> beam.Map(
-                lambda topic_object: self._delete_topic_from_cache(
-                    topic_object['topic']))
-            | 'Generate result for cache deletion' >> (
-                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
-        )
-
         topic_models_to_put = (
             transformed_topic_objects_list
             | 'Generate topic models to put' >> beam.FlatMap(
@@ -350,7 +321,6 @@ class MigrateTopicJob(base_jobs.JobBase):
 
         return (
             (
-                cache_deletion_job_run_results,
                 migrated_topic_job_run_results,
                 already_migrated_job_run_results,
                 topic_objects_list_job_run_results
