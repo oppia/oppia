@@ -2060,7 +2060,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             populated_model.canonical_story_references,
             topic.canonical_story_references):
             self.assertEqual(model_reference, topic_reference.to_dict())
-    
+
         for model_reference, topic_reference in zip(
             populated_model.additional_story_references,
             topic.additional_story_references):
@@ -2142,18 +2142,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             populated_model.canonical_story_count,
             topic_summary.canonical_story_count
-        )  
+        )
         self.assertEqual(
             populated_model.uncategorized_skill_count,
             topic_summary.uncategorized_skill_count
-        )  
+        )
         self.assertEqual(
             populated_model.subtopic_count,
-            topic_summary.subtopic_count)  
+            topic_summary.subtopic_count)
         self.assertEqual(
             populated_model.total_skill_count,
             topic_summary.total_skill_count
-        )  
+        )
         self.assertEqual(
             populated_model.total_published_node_count,
             topic_summary.total_published_node_count
@@ -2176,9 +2176,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             populated_model.url_fragment,
             topic_summary.url_fragment
-        )   
+        )
 
-       
+
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
 class MockTopicObject(topic_domain.Topic):
