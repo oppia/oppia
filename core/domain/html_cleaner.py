@@ -28,7 +28,7 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 from typing_extensions import Final, TypedDict
 
 
@@ -195,6 +195,22 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
     return components
 
 
+def _initialize_bs4_and_empty_values_variable(
+    html_data
+) -> Tuple[bs4.BeautifulSoup, str]:
+    """Initializes bs4 and empty values variable.
+
+    Args:
+        html_data: str. The html data.
+
+    Returns:
+        tuple. Tuple of initialized bs4 and empty values variable.
+    """
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
+    empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
+    return (soup, empty_values)
+
+
 def validate_rte_tags(
     html_data: str, is_tag_nested_inside_tabs_or_collapsible: bool = False
 ) -> None:
@@ -248,8 +264,7 @@ def validate_rte_tags(
         ValidationError. Collapsible tag present inside tabs or another
             collapsible.
     """
-    soup = bs4.BeautifulSoup(html_data, 'html.parser')
-    empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
+    soup, empty_values = _initialize_bs4_and_empty_values_variable(html_data)
     for tag in soup.find_all('oppia-noninteractive-image'):
         if not tag.has_attr('alt-with-value'):
             raise utils.ValidationError(
@@ -482,8 +497,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
             present.
         ValidationError. Collapsible heading-with-value attribute is empty.
     """
-    soup = bs4.BeautifulSoup(html_data, 'html.parser')
-    empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
+    soup, empty_values = _initialize_bs4_and_empty_values_variable(html_data)
     tabs_tags = soup.find_all('oppia-noninteractive-tabs')
     for tag in tabs_tags:
         if tag.has_attr('tab_contents-with-value'):

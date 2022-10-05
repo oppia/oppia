@@ -808,9 +808,8 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                 )
                 raise e
             if math_tag.has_attr('svg_filename-with-value'):
-                svg_filename = (
-                    json.loads(utils.unescape_html(
-                        math_tag['svg_filename-with-value'])))
+                svg_filename = json.loads(utils.unescape_html(
+                        math_tag['svg_filename-with-value']))
                 normalized_svg_filename = (
                     objects.UnicodeString.normalize(svg_filename))
                 math_content_dict = {
