@@ -181,7 +181,6 @@ export class OpportunitiesListComponent {
 
   onChangeLanguage(languageCode: string): void {
     this.languageCode = languageCode;
-    console.log('opportunities list -- change language to ' + languageCode);
   }
 }
 

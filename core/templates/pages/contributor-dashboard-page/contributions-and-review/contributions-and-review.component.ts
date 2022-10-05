@@ -16,7 +16,7 @@
  * @fileoverview Component for showing and reviewing contributions.
  */
 
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -613,7 +613,6 @@ export class ContributionsAndReview
 
   onChangeLanguage(languageCode: string): void {
     this.languageCode = languageCode;
-    console.log('change language to ' + languageCode);
     this.opportunitiesListRef.onChangeLanguage(languageCode);
   }
 
