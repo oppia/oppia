@@ -37,8 +37,6 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyExpsToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
-  expIdForVersionHistoryLogs: string = '';
-  versionHistoryLogsDownloadUrl = '/version-history-logs/';
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -207,16 +205,6 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
           'Server error: ' + errorResponse);
       });
     this.adminTaskManagerService.finishTask();
-  }
-
-  onChangeExplorationId(expIdForVersionHistoryLogs: string): void {
-    this.expIdForVersionHistoryLogs = expIdForVersionHistoryLogs;
-  }
-
-  generateVersionHistoryLogs(): void {
-    this.windowRef.nativeWindow.open(
-      this.versionHistoryLogsDownloadUrl + this.expIdForVersionHistoryLogs
-    );
   }
 
   async getDataAsync(): Promise<void> {

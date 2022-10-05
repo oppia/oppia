@@ -58,6 +58,8 @@ export class AdminMiscTabComponent {
   publishedOn!: string;
   showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
+  expIdForVersionHistoryLogs: string = '';
+  versionHistoryLogsDownloadUrl = '/version-history-logs/';
 
   constructor(
     private windowRef: WindowRef,
@@ -290,6 +292,16 @@ export class AdminMiscTabComponent {
     this.stateName = '';
     this.numAnswers = 0;
     this.showDataExtractionQueryStatus = false;
+  }
+
+  onChangeExplorationId(expIdForVersionHistoryLogs: string): void {
+    this.expIdForVersionHistoryLogs = expIdForVersionHistoryLogs;
+  }
+
+  generateVersionHistoryLogs(): void {
+    this.windowRef.nativeWindow.open(
+      this.versionHistoryLogsDownloadUrl + this.expIdForVersionHistoryLogs
+    );
   }
 }
 

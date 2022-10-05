@@ -132,28 +132,6 @@
       </div>
     </div>
   </mat-card>
-  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-    <div class="container ml-0">
-      <h3>Get logs while generating version history</h3>
-      <div class="row">
-        <span class="col-lg-4 col-md-4 col-sm-4">
-          <input
-              type="text"
-              placeholder="Exploration ID"
-              (change)="onChangeExplorationId($event.target.value)"
-              [value]="expIdForVersionHistoryLogs"
-          >
-        </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
-          <button type="button"
-                  class="btn btn-secondary float-right"
-                  (click)="generateVersionHistoryLogs()">
-            Generate Logs
-          </button>
-        </span>
-      </div>
-    </div>
-  </mat-card>
 </div>
 
 <style>
