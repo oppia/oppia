@@ -56,7 +56,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'PreferencesHandler',
     'ProfilePage',
     'QuestionCountDataHandler',
-    'QuestionCreationHandler',
     'QuestionPlayerHandler',
     'QuestionSkillLinkHandler',
     'RecentCommitsHandler',

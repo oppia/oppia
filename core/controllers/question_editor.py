@@ -36,7 +36,26 @@ from core.domain import skill_fetchers
 
 class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
-
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'skill_ids':{
+                'schema':{
+                    'type': 'list'
+                }
+            },
+            'skill_difficulties' : {
+                'schema' : {
+                    'type' : 'list'
+                }
+            },
+            'question_dict':{
+                'schema':{
+                    'type':'dict'
+                }
+            }
+        }
+    }
     @acl_decorators.can_manage_question_skill_status
     def post(self):
         """Handles POST requests."""
