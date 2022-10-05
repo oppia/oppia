@@ -160,7 +160,7 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
   };
 }
 
-// Add Object.entries() polyfill for Chrome 53 and below.
+// Object.entries() polyfill for Chrome 53 and below.
 if (!Object.entries) {
   Object.entries = (obj: Object) => {
     let ownProps = Object.keys(obj),
