@@ -666,3 +666,46 @@ class TopicNameHandler(base.BaseHandler):
                 topic_services.does_topic_with_name_exist(topic_name))
         })
         self.render_json(self.values)
+
+
+def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
+    """Normalizes a string of comma-separated topic IDs into a list of
+    topic IDs.
+
+    Args:
+        comma_separated_topic_ids: str. Comma separated topic IDs.
+
+    Returns:
+        list(str). A list of topic IDs.
+    """
+    if not comma_separated_topic_ids:
+        return list([])
+    return list(comma_separated_topic_ids.split(','))
+
+
+class TopicIdToTopicNameHandler(base.BaseHandler):
+    """Handler class to get topic ID to topic name dict."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'comma_separated_topic_ids': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': normalize_comma_separated_topic_ids
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        topic_ids = self.normalized_request.get(
+            'comma_separated_topic_ids')
+        self.values.update({
+            'topic_id_to_topic_name': (
+                topic_services.get_topic_id_to_topic_name_dict(topic_ids))
+        })
+        self.render_json(self.values)
