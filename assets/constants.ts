@@ -22,6 +22,9 @@ export default {
   // in the URL for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
 
+  // Acceptable URL schemes for links.
+  "acceptable_schemes": ["https", ""],
+
   // The default classroom URL fragment to use when the provided classroom URL
   // fragment in the controller is invalid.
   "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",

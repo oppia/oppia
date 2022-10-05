@@ -1363,8 +1363,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         soup = bs4.BeautifulSoup(html_content, 'html.parser')
         links = soup.find_all('oppia-noninteractive-link')
 
-        acceptable_schemes = ['https', '']
-
         for link in links:
             lnk_attr = link.get('url-with-value')
             txt_attr = link.get('text-with-value')
@@ -1389,7 +1387,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 lnk = lnk.replace('http', 'https')
 
             # If link is invalid.
-            if urlparse(lnk).scheme not in acceptable_schemes:
+            if urlparse(lnk).scheme not in constants.acceptable_schemes:
                 # Delete the link.
                 link.decompose()
                 continue

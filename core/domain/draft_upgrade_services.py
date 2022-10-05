@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 from urllib.parse import urlparse  # pylint: disable=import-only-modules
 
-from core import utils
+from core import constants, utils
 from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
@@ -141,8 +141,6 @@ class DraftUpgradeUtil:
         soup = bs4.BeautifulSoup(html_content, 'html.parser')
         links = soup.find_all('oppia-noninteractive-link')
 
-        acceptable_schemes = ['https', '']
-
         for link in links:
             lnk_attr = link.get('url-with-value')
             txt_attr = link.get('text-with-value')
@@ -158,7 +156,7 @@ class DraftUpgradeUtil:
                 return False
 
             # If link is invalid.
-            if urlparse(lnk).scheme not in acceptable_schemes:
+            if urlparse(lnk).scheme not in constants.acceptable_schemes:
                 return False
 
         return True
