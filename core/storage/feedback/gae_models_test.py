@@ -170,7 +170,6 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         expected_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             'entity_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -194,7 +193,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
-    
+
     def test_get_field_names_for_takeout(self) -> None:
         expected_dict = {'last_updated': 'last_updated_msec'}
         model = feedback_models.GeneralFeedbackThreadModel
