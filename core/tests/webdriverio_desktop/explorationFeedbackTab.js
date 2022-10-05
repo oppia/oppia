@@ -72,7 +72,7 @@ describe('ExplorationFeedback', function() {
       'superUserExplorationFeedback');
   });
 
-  fit('should add feedback to an exploration', async function() {
+  it('should add feedback to an exploration', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
