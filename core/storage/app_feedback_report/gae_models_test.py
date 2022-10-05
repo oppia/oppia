@@ -365,7 +365,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 # to ensure that InvalidInputException is thrown.
                 model_class.get_filter_options_for_field(
                     InvalidFilter.INVALID_FIELD) # type: ignore[arg-type]
-    
+
     def test_get_filter_options_returns_correctly(self) -> None:
         model = app_feedback_report_models.AppFeedbackReportModel
         self.assertEqual(
@@ -386,7 +386,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             [self.REPORT_SUBMITTED_TIMESTAMP_1.date()])
         self.assertEqual(
             model.get_filter_options_for_field(
-                app_feedback_report_models.FilterFieldNames.ANDROID_DEVICE_MODEL),
+                app_feedback_report_models.FilterFieldNames
+                .ANDROID_DEVICE_MODEL),
             [self.ANDROID_DEVICE_MODEL])
         self.assertEqual(
             model.get_filter_options_for_field(
@@ -394,11 +395,13 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             [self.TEXT_LANGUAGE_CODE_ENGLISH])
         self.assertEqual(
             model.get_filter_options_for_field(
-                app_feedback_report_models.FilterFieldNames.ANDROID_SDK_VERSION),
+                app_feedback_report_models.FilterFieldNames
+                .ANDROID_SDK_VERSION),
             [self.ANDROID_SDK_VERSION])
         self.assertEqual(
             model.get_filter_options_for_field(
-                app_feedback_report_models.FilterFieldNames.AUDIO_LANGUAGE_CODE),
+                app_feedback_report_models.FilterFieldNames
+                .AUDIO_LANGUAGE_CODE),
             [self.AUDIO_LANGUAGE_CODE_ENGLISH])
         self.assertEqual(
             model.get_filter_options_for_field(
@@ -406,9 +409,10 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             [self.PLATFORM_VERSION])
         self.assertEqual(
             model.get_filter_options_for_field(
-                app_feedback_report_models.FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE),
+                app_feedback_report_models.FilterFieldNames
+                .ANDROID_DEVICE_COUNTRY_LOCALE_CODE),
             [self.DEVICE_COUNTRY_LOCALE_CODE_INDIA])
-    
+
     def test_get_export_policy(self) -> None:
         expected_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -539,7 +543,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
         model = app_feedback_report_models.AppFeedbackReportTicketModel
         self.assertEqual(
             model.get_lowest_supported_role(), feconf.ROLE_ID_MODERATOR)
-    
+
     def test_get_export_policy(self) -> None:
         expected_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -618,7 +622,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             'android', self.TICKET_ID, self.STATS_DATE)
 
         self.assertEqual(entity_id, entity_id_copy)
-    
+
     def test_null_ticket_id_is_handled(self) -> None:
         model_class = (
             app_feedback_report_models.AppFeedbackReportStatsModel)
