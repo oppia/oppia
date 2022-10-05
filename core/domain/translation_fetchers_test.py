@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
@@ -78,12 +79,45 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
     def test_get_all_entity_translation_objects_for_entity_returns_correclty(
         self
     ) -> None:
-        pass
+        exp_id = 'exp1'
 
-    def test_get_unique_entity_translation_object_returns_none(self) -> None:
-        pass
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp_id, 5
+            )
+        )
+        self.assertEqual(len(entity_translations), 0)
 
-    def test_get_unique_entity_translation_object_returns_correctly(
+        language_codes = ['hi', 'bn']
+        for language_code in language_codes:
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', exp_id, 5, language_code, {}
+            ).put()
+
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp_id, 5
+            )
+        )
+        self.assertEqual(len(entity_translations), 2)
+        self.assertItemsEqual(
+            [
+                entity_translation.language_code
+                for entity_translation in entity_translations
+            ], language_codes
+        )
+
+    def test_get_entity_translation_returns_correctly(
         self
     ) -> None:
-        pass
+        exp_id = 'exp1'
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', exp_id, 5, 'hi', {}
+        ).put()
+
+        entity_translation = (
+            translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.EXPLORATION, exp_id, 5, 'hi'
+            )
+        )
+        self.assertEqual(entity_translation.language_code, 'hi')

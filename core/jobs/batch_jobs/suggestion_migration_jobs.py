@@ -122,7 +122,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
     def _update_suggestion(
         suggestion_model: suggestion_models.GeneralSuggestionModel,
         migrated_suggestion: suggestion_registry.BaseSuggestion,
-    ) -> List[suggestion_models.GeneralSuggestionModel]:
+    ) -> suggestion_models.GeneralSuggestionModel:
         """Updates the suggestion model with the new content id.
 
         Args:
@@ -130,11 +130,11 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             migrated_suggestion: Suggestion. The suggestion domain object.
 
         Returns:
-            list(suggestion_model). List of suggestion models to update.
+            suggestion_model. The suggestion models to update.
         """
         suggestion_model.change_cmd = migrated_suggestion.change.to_dict()
         datastore_services.update_timestamps_multi([suggestion_model])
-        return [suggestion_model]
+        return suggestion_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         unmigrated_translation_suggestion_models = (
@@ -216,7 +216,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 
         suggestion_models_to_put = (
             suggestion_objects_list
-            | 'Generate suggestion models to put' >> beam.FlatMap(
+            | 'Generate suggestion models to put' >> beam.Map(
                 lambda suggestion_objects: self._update_suggestion(
                     suggestion_objects['suggestion_model'],
                     suggestion_objects['suggestion']

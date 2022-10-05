@@ -114,9 +114,7 @@ def add_new_translation(
 
     entity_translation = translation_fetchers.get_entity_translation(
         entity_type, entity_id, entity_version, language_code)
-
     entity_translation.translations[content_id] = translated_content
-
     entity_translation.validate()
 
     model = translation_models.EntityTranslationsModel.create_new(
@@ -126,7 +124,6 @@ def add_new_translation(
         language_code,
         entity_translation.to_dict()['translations']
     )
-
     model.update_timestamps()
     model.put()
 
@@ -265,8 +262,7 @@ def get_translation_counts(
 
 
 def get_translatable_text(
-    exploration: exp_domain.Exploration,
-    language_code: str
+    exploration: exp_domain.Exploration, language_code: str
 ) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
     """Returns all the contents which needs translation in the given
     language.

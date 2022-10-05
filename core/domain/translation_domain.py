@@ -75,8 +75,8 @@ class TranslatableContentDict(TypedDict):
     content_value: feconf.ContentValueType
     content_type: str
     content_format: str
-    interaction_id: Union[str, None]
-    rule_type: Union[str, None]
+    interaction_id: Optional[str]
+    rule_type: Optional[str]
 
 
 class TranslatableContent:
@@ -90,8 +90,8 @@ class TranslatableContent:
         content_type: ContentType,
         content_format: TranslatableContentFormat,
         content_value: feconf.ContentValueType,
-        interaction_id: Union[str, None] = None,
-        rule_type: Union[str, None] = None
+        interaction_id: Optional[str] = None,
+        rule_type: Optional[str] = None
     ) -> None:
         """Constructs an TranslatableContent domain object.
 
@@ -220,8 +220,8 @@ class TranslatableContentsCollection:
         content_type: ContentType,
         content_format: TranslatableContentFormat,
         content_value: feconf.ContentValueType,
-        interaction_id: Union[str, None] = None,
-        rule_type: Union[str, None] = None
+        interaction_id: Optional[str] = None,
+        rule_type: Optional[str] = None
     ) -> None:
         """Adds translatable field parameter to
         'content_id_to_translatable_content' dict.
@@ -367,8 +367,7 @@ class BaseTranslatableObject:
         return content_id_to_translatable_content
 
     def are_translations_displayable(
-        self,
-        entity_translation: EntityTranslation
+        self, entity_translation: EntityTranslation
     ) -> bool:
         """Whether the given EntityTranslation in the given lanaguage is
         displayable.
@@ -389,10 +388,12 @@ class BaseTranslatableObject:
 
         content_ids = self.get_translatable_content_ids()
         for content_id in content_ids:
-            if content_id.startswith(ContentType.RULE.value):
-                if not content_id in entity_translation.translations:
-                    # Rule-related translations cannot be missing.
-                    return False
+            if (
+                content_id.startswith(ContentType.RULE.value) and
+                not content_id in entity_translation.translations
+            ):
+                # Rule-related translations cannot be missing.
+                return False
 
         translatable_content_count = len(content_ids)
         translated_content_count = entity_translation.get_translation_count()
@@ -1242,7 +1243,7 @@ class ContentIdGenerator:
     def generate(
         self,
         content_type: ContentType,
-        extra_prefix: Union[str, None] = None
+        extra_prefix: Optional[str] = None
     ) -> str:
         """Generates the new content-id from the next content id."""
         content_id = content_type.value + '_'

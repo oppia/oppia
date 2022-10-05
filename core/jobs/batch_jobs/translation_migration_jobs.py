@@ -152,10 +152,8 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
             entity_translations_result
             | 'Filter the results with OK status' >> beam.Filter(
                 lambda result: result.is_ok())
-            | 'Fetch the translation objects' >> beam.Map(
+            | 'Fetch the translation objects' >> beam.FlatMap(
                 lambda result: result.unwrap())
-            | 'Flatten the list of lists of objects' >> beam.FlatMap(
-                lambda x: x)
             | 'Create models from objects' >> beam.Map(
                 self._create_entity_translation_model)
         )
