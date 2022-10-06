@@ -174,7 +174,7 @@
               <span>Name</span>
               <span class="number-skills-header"># of Questions</span>
             </div>
-            <div class="example-list" cdkDropList (cdkDropListDropped)="drop($event)">
+            <div class="skills-list" cdkDropList (cdkDropListDropped)="drop($event)">
               <div *ngFor="let skillSummary of subtopic?.getSkillSummaries();index as idx"
                    class="skill-list-item"
                    cdkDrag>
@@ -401,37 +401,37 @@
     padding-bottom: 4px;
   }
   .skill-list-item {
-  padding: 20px 10px;
-  border-bottom: solid 1px #ccc;
-  color: rgba(0, 0, 0, 0.87);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  cursor: move;
-  background: white;
-  font-size: 14px;
-}
-.cdk-drag-preview {
-  box-sizing: border-box;
-  border-radius: 4px;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-              0 8px 10px 1px rgba(0, 0, 0, 0.14),
-              0 3px 14px 2px rgba(0, 0, 0, 0.12);
-}
-.cdk-drag-placeholder {
-  opacity: 0;
-}
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-.skill-list-item:last-child {
-  border: none;
-}
-.example-list.cdk-drop-list-dragging .skill-list-item:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
+    align-items: center;
+    background: white;
+    border-bottom: solid 1px #ccc;
+    box-sizing: border-box;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: move;
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    justify-content: space-between;
+    padding: 20px 10px;
+  }
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+  }
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .skill-list-item:last-child {
+    border: none;
+  }
+  .skills-list.cdk-drop-list-dragging .skill-list-item:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
 
   @media screen and (max-width: 1100px) {
     .subtopic-content .subtopic-left-box {
