@@ -869,10 +869,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(test_story_dict, story_ref_dict)
 
     def test_story_ref_from_dict(self) -> None:
-        test_story_dict = {
-            'story_id': 'story_id_1',
-            'story_is_published': False
-            }
+        test_story_dict = topic_domain.StoryReference(
+            'story_id_1', False).to_dict()
         test_story_obj = topic_domain.StoryReference.from_dict(test_story_dict)
         self.assertEqual(test_story_obj.story_id, 'story_id_1')
         self.assertEqual(test_story_obj.story_is_published, False)
