@@ -29,13 +29,13 @@ import { ContextService } from 'services/context.service';
 })
 export class AddAudioTranslationModalComponent
    extends ConfirmOrCancelModal implements OnInit {
-   @Input() audioFile: FileList;
+   @Input() audioFile: File;
    @Input() generatedFilename: string;
    @Input() isAudioAvailable: boolean;
    @Input() languageCode: string;
 
    uploadedFile: Blob;
-   droppedFile: FileList;
+   droppedFile: File;
    saveButtonText: string;
    saveInProgress: boolean;
    errorMessage: string;
@@ -45,9 +45,9 @@ export class AddAudioTranslationModalComponent
      'There was an error uploading the audio file.');
 
    constructor(
-     private ngbActiveModal: NgbActiveModal,
-     private assetsBackendApiService: AssetsBackendApiService,
-     private contextService: ContextService,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private contextService: ContextService,
+    private ngbActiveModal: NgbActiveModal,
    ) {
      super(ngbActiveModal);
    }

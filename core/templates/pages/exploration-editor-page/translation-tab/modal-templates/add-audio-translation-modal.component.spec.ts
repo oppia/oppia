@@ -16,108 +16,133 @@
  * @fileoverview Unit tests for AddAudioTranslationModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { ContextService } from 'services/context.service';
+import { AddAudioTranslationModalComponent } from './add-audio-translation-modal.component';
 
-describe('Add Audio Translation Modal Controller', function() {
-  var $q = null;
-  var $scope = null;
-  var $uibModalInstance = null;
-  var AssetsBackendApiService = null;
-  var ContextService = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-  var audioFile = new File([], '');
-  var generatedFilename = 'new_audio_file.mp3';
-  var isAudioAvailable = true;
-  var languageCode = 'en';
+  dismiss(): void {
+    return;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+describe('Add Audio Translation Modal Controller', () => {
+  let component: AddAudioTranslationModalComponent;
+  let fixture: ComponentFixture<AddAudioTranslationModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let contextService: ContextService;
+
+  let audioFile = new File([], '');
+  let generatedFilename = 'new_audio_file.mp3';
+  let isAudioAvailable = true;
+  let languageCode = 'en';
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        AddAudioTranslationModalComponent
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
-    AssetsBackendApiService = $injector.get('AssetsBackendApiService');
-    ContextService = $injector.get('ContextService');
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AddAudioTranslationModalComponent);
+    component = fixture.componentInstance;
 
-    $scope = $rootScope.$new();
-    $controller('AddAudioTranslationModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      audioFile: audioFile,
-      generatedFilename: generatedFilename,
-      isAudioAvailable: isAudioAvailable,
-      languageCode: languageCode
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    contextService = TestBed.inject(ContextService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+
+    spyOn(ngbActiveModal, 'close');
+    spyOn(ngbActiveModal, 'dismiss');
+
+    component.audioFile = audioFile;
+    component.generatedFilename = generatedFilename;
+    component.isAudioAvailable = isAudioAvailable;
+    component.languageCode = languageCode;
+
+    fixture.detectChanges();
+  });
+
+  it('should initialize component properties after controller is initialized',
+    () => {
+      expect(component.saveButtonText).toBe('Save');
+      expect(component.saveInProgress).toBe(false);
+      expect(component.isAudioAvailable).toBe(isAudioAvailable);
+      expect(component.droppedFile).toBe(audioFile);
     });
-  }));
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.errorMessage).toBe(null);
-      expect($scope.saveButtonText).toBe('Save');
-      expect($scope.saveInProgress).toBe(false);
-      expect($scope.isAudioAvailable).toBe(isAudioAvailable);
-      expect($scope.droppedFile).toBe(audioFile);
-    });
-
-  it('should save audio successfully then close the modal', function() {
-    var file = {
-      size: 1000,
-      name: 'file.mp3'
+  it('should save audio successfully then close the modal', fakeAsync(() => {
+    let file = {
+      size: 1000
     };
-    $scope.updateUploadedFile(file);
+    component.updateUploadedFile(file as Blob);
 
-    spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
 
-    var response = {
+    let response = {
+      filename: 'filename',
       duration_secs: 10
     };
-    spyOn(AssetsBackendApiService, 'saveAudio').and.returnValue(
-      $q.resolve(response));
-    $scope.confirm();
-    $scope.$apply();
 
-    expect($scope.saveButtonText).toBe('Saving...');
-    expect($scope.saveInProgress).toBe(true);
-    expect($uibModalInstance.close).toHaveBeenCalledWith({
+    spyOn(assetsBackendApiService, 'saveAudio').and.returnValue(
+      Promise.resolve(response));
+
+    component.confirm();
+    tick();
+
+    expect(component.saveButtonText).toBe('Saving...');
+    expect(component.saveInProgress).toBe(true);
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
       languageCode: languageCode,
       filename: generatedFilename,
       fileSizeBytes: file.size,
       durationSecs: response.duration_secs
     });
-  });
+  }));
 
-  it('should use reject handler when trying to save audio fails', function() {
-    var file = {
-      size: 1000,
-      name: 'file.mp3'
-    };
-    $scope.updateUploadedFile(file);
+  it('should use reject handler when trying to save audio fails',
+    fakeAsync(() => {
+      let file = {
+        size: 1000
+      };
+      component.updateUploadedFile(file as Blob);
 
-    spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(AssetsBackendApiService, 'saveAudio').and.returnValue($q.reject({}));
-    $scope.confirm();
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+      spyOn(assetsBackendApiService, 'saveAudio')
+        .and.returnValue(Promise.reject({}));
 
-    expect($scope.saveButtonText).toBe('Saving...');
-    expect($scope.saveInProgress).toBe(true);
+      component.confirm();
 
-    $scope.$apply();
+      expect(component.saveButtonText).toBe('Saving...');
+      expect(component.saveInProgress).toBe(true);
 
-    expect($scope.errorMessage).toBe(
-      'There was an error uploading the audio file.');
-    expect($scope.saveButtonText).toBe('Save');
-    expect($scope.saveInProgress).toBe(false);
-    expect($uibModalInstance.close).not.toHaveBeenCalled();
+      tick();
 
-    $scope.clearUploadedFile();
-    expect($scope.errorMessage).toBe(null);
-  });
+      expect(component.errorMessage).toBe(
+        'There was an error uploading the audio file.');
+      expect(component.saveButtonText).toBe('Save');
+      expect(component.saveInProgress).toBe(false);
+      expect(ngbActiveModal.close).not.toHaveBeenCalled();
+
+      component.clearUploadedFile();
+      expect(component.errorMessage).toBe(null);
+    }));
 });

@@ -141,6 +141,7 @@ export class StateTranslationEditorComponent
     this.contentId = (
       this.translationTabActiveContentIdService.getActiveContentId());
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
+
     if (this.stateWrittenTranslationsService
       .savedMemento.hasWrittenTranslation(this.contentId, this.languageCode)) {
       let writtenTranslation = (
@@ -152,6 +153,7 @@ export class StateTranslationEditorComponent
     let writtenTranslation: WrittenTranslation = (
       this.stateWrittenTranslationsService
         .displayed.getWrittenTranslation(this.contentId, this.languageCode));
+
     newWrittenTranslation = writtenTranslation;
     if (oldWrittenTranslation === null || (
       (oldWrittenTranslation.translation !==

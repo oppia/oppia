@@ -30,18 +30,18 @@ declare global {
   providedIn: 'root'
 })
 export class VoiceoverRecordingService {
-  audioContextAvailable;
-  defer = new EventEmitter();
-  definedAudioContext; // Will be defined audio context.
+  audioContextAvailable: typeof AudioContext;
+  definedAudioContext: AudioContext; // Will be defined audio context.
   isAvailable: boolean;
   isRecording: boolean = false;
-  microphone;
-  microphoneStream;
+  microphone: MediaStreamAudioSourceNode;
+  microphoneStream: MediaStream;
   mp3Worker: Worker = null;
-  processor;
+  processor: ScriptProcessorNode;
+  defer: EventEmitter<string> = new EventEmitter();
 
   constructor(
-     private loggerService: LoggerService
+    private loggerService: LoggerService
   ) { }
 
   _stopRecord(): void {
@@ -108,7 +108,7 @@ export class VoiceoverRecordingService {
     }
   }
 
-  getMp3Data(): EventEmitter<void> {
+  getMp3Data(): EventEmitter<string> {
     return this.defer;
   }
 
@@ -170,7 +170,7 @@ export class VoiceoverRecordingService {
   _initRecorder(): void {
     // Browser agnostic AudioContext API check.
     this.audioContextAvailable = window.AudioContext ||
-       window.webkitAudioContext;
+      window.webkitAudioContext;
 
     if (this.audioContextAvailable) {
       // Promise required because angular is async with worker.

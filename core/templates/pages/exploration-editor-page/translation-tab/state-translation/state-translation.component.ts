@@ -28,8 +28,7 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -50,6 +49,8 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { BaseTranslatableObject } from 'interactions/rule-input-defs';
+import { Hint } from 'domain/exploration/HintObjectFactory';
 
 @Component({
   selector: 'oppia-state-translation',
@@ -64,29 +65,31 @@ export class StateTranslationComponent
    INTERACTION_SPECS = INTERACTION_SPECS;
    activatedTabId: string;
    activeAnswerGroupIndex: number;
-   stateAnswerGroups;
+   stateAnswerGroups: AnswerGroup[];
    RULE_INPUT_TYPES_TO_DATA_FORMATS: object;
-   TAB_ID_RULE_INPUTS;
-   stateContent;
+   TAB_ID_RULE_INPUTS: string;
+   stateContent: SubtitledHtml;
    stateSolution;
    interactionPreviewHtml: string;
    stateInteractionCustomizationArgs: InteractionCustomizationArgs;
-   interactionRuleTranslatableContents;
    interactionCustomizationArgTranslatableContent;
    activeCustomizationArgContentIndex: number;
    activeRuleContentIndex: number;
    activeHintIndex: number;
-   stateHints;
+   stateHints: Hint[];
    stateName: string;
    needsUpdateTooltipMessage: string;
    stateInteractionId: string;
-   TAB_ID_CUSTOMIZATION_ARGS;
-   TAB_ID_SOLUTION;
-   TAB_ID_FEEDBACK;
-   TAB_ID_HINTS;
+   TAB_ID_CUSTOMIZATION_ARGS: string;
+   TAB_ID_SOLUTION: string;
+   TAB_ID_FEEDBACK: string;
+   TAB_ID_HINTS: string;
    TAB_ID_CONTENT: string;
    stateDefaultOutcome: Outcome;
    answerChoices: AnswerChoice[];
+   interactionRuleTranslatableContents: {
+    rule: Rule; inputName: string; contentId: string;
+  }[];
 
    constructor(
      private ckEditorCopyContentService: CkEditorCopyContentService,
@@ -494,7 +497,7 @@ export class StateTranslationComponent
          // BaseTranslatableObject having dict structure with contentId
          // as a key.
          if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-           const contentId = ruleInput.contentId;
+           const contentId = (ruleInput as BaseTranslatableObject).contentId;
            interactionRuleTranslatableContent.push({
              rule, inputName, contentId
            });
