@@ -144,11 +144,14 @@ describe('Translation tab component', () => {
 
     explorationStatesService.init({
       Introduction: {
+        classifier_model_id: null,
+        card_is_checkpoint: null,
         content: {
           content_id: 'content',
           html: 'Introduction Content'
         },
         interaction: {
+          confirmed_unclassified_answers: null,
           id: 'TextInput',
           customization_args: {
             placeholder: {value: {
@@ -159,7 +162,10 @@ describe('Translation tab component', () => {
           },
           answer_groups: [{
             rule_specs: [],
+            training_data: null,
+            tagged_skill_misconception_id: null,
             outcome: {
+              missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
               feedback: {
@@ -172,6 +178,7 @@ describe('Translation tab component', () => {
             }
           }],
           default_outcome: {
+            missing_prerequisite_skill_id: null,
             dest: 'default',
             dest_if_really_stuck: null,
             feedback: {
@@ -215,10 +222,6 @@ describe('Translation tab component', () => {
             content: {},
             default_outcome: {},
             feedback_1: {
-              en: {
-                html: 'This is a html',
-                needs_update: false
-              }
             }
           }
         }
