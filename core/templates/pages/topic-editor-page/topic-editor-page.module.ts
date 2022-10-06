@@ -47,6 +47,7 @@ import { TopicEditorSendMailComponent } from './modal-templates/topic-editor-sen
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { TopicEditorNavbarComponent } from './navbar/topic-editor-navbar.component';
 import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.component';
 import { RearrangeSkillsInSubtopicsModalComponent } from './modal-templates/rearrange-skills-in-subtopics-modal.component';
 
@@ -75,6 +76,7 @@ import { RearrangeSkillsInSubtopicsModalComponent } from './modal-templates/rear
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent,
+    TopicEditorNavbarComponent,
     TopicQuestionsTabComponent
   ],
   entryComponents: [
@@ -89,6 +91,7 @@ import { RearrangeSkillsInSubtopicsModalComponent } from './modal-templates/rear
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent,
+    TopicEditorNavbarComponent,
     TopicQuestionsTabComponent
   ],
   providers: [

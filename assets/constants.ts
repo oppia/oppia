@@ -4947,6 +4947,8 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": ["tabs", "skillreview"],
+
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -6130,6 +6132,9 @@ export default {
     "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
   ],
 
+  // Supported functions for math interactions.
+  "SUPPORTED_FUNCTION_NAMES": ["sqrt", "abs"],
+
   "OSK_MAIN_TAB": "mainTab",
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",
@@ -6330,6 +6335,24 @@ export default {
     "ABOUT_FOUNDATION": {
       "ROUTE": "about-foundation",
       "TITLE": "About the Oppia Foundation | Oppia",
+      "META": []
+    },
+    "EXPLORATION_PLAYER": {
+      "ROUTE": "explore/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "EXPLORATION_PLAYER_EMBED": {
+      "ROUTE": "embed/exploration/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": []
     },
     "ANDROID": {
