@@ -25,7 +25,7 @@ import { SkillEditorMainTabComponent } from './skill-editor-main-tab.component';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { SkillEditorRoutingService } from '../services/skill-editor-routing.service';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -42,7 +42,6 @@ describe('Skill editor main tab component', () => {
   let skillEditorStateService: SkillEditorStateService;
   let focusManagerService: FocusManagerService;
   let assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
-  let changeDetectorRef: ChangeDetectorRef;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -67,9 +66,9 @@ describe('Skill editor main tab component', () => {
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillEditorRoutingService = TestBed.inject(SkillEditorRoutingService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    changeDetectorRef = TestBed.inject(ChangeDetectorRef);
 
     component.ngOnInit();
+    component.ngAfterContentChecked();
   });
 
   it('should initialize the variables', () => {
@@ -158,12 +157,4 @@ describe('Skill editor main tab component', () => {
     flush();
     expect(focusSpy).toHaveBeenCalled();
   }));
-
-  it('should update view after chagnes', () => {
-    spyOn(changeDetectorRef, 'detectChanges');
-
-    component.ngAfterContentChecked();
-
-    expect(changeDetectorRef.detectChanges).not.toHaveBeenCalled();
-  });
 });
