@@ -1868,9 +1868,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     def validate(
         self,
-        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        *,
-        validation_from_exploration: bool = False
+        exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -1879,8 +1877,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 the exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property(obj_type).
                 Is used to validate AnswerGroup objects.
-            validation_from_exploration: bool. True if the validation is called
-                from the exploration.
 
         Raises:
             ValidationError. One or more attributes of the InteractionInstance
@@ -1932,23 +1928,19 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
-        # These validations should only be run when we are validating for
-        # an exploration because as of now(16 Sept 2022) the data related
-        # to Question model is not yet fixed.
-        if validation_from_exploration:
-            interaction_id_to_validation_dict = {
-                'Continue': self._validate_continue_input,
-                'EndExploration': self._validate_end_exploration_input,
-                'NumericInput': self._validate_numeric_input,
-                'FractionInput': self._validate_fraction_input,
-                'NumberWithUnits': self._validate_number_with_units_input,
-                'MultipleChoiceInput': self._validate_multi_choice_input,
-                'ItemSelectionInput': self._validate_item_selec_input,
-                'DragAndDropSortInput': self._validate_drag_and_drop_input,
-                'TextInput': self._validate_text_input
-            }
-            if self.id in interaction_id_to_validation_dict:
-                interaction_id_to_validation_dict[self.id]()
+        interaction_id_to_validation_dict = {
+            'Continue': self._validate_continue_input,
+            'EndExploration': self._validate_end_exploration_input,
+            'NumericInput': self._validate_numeric_input,
+            'FractionInput': self._validate_fraction_input,
+            'NumberWithUnits': self._validate_number_with_units_input,
+            'MultipleChoiceInput': self._validate_multi_choice_input,
+            'ItemSelectionInput': self._validate_item_selec_input,
+            'DragAndDropSortInput': self._validate_drag_and_drop_input,
+            'TextInput': self._validate_text_input
+        }
+        if self.id in interaction_id_to_validation_dict:
+            interaction_id_to_validation_dict[self.id]()
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
@@ -4200,8 +4192,7 @@ class State(translation_domain.BaseTranslatableObject):
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         *,
-        allow_null_interaction: bool,
-        validation_from_exploration: bool = False
+        allow_null_interaction: bool
     ) -> None:
         """Validates various properties of the State.
 
@@ -4213,8 +4204,6 @@ class State(translation_domain.BaseTranslatableObject):
                 question.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
-            validation_from_exploration: bool. True if the validation is called
-                from the exploration.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.
@@ -4232,9 +4221,7 @@ class State(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
-            self.interaction.validate(
-                exp_param_specs_dict,
-                validation_from_exploration=validation_from_exploration)
+            self.interaction.validate(exp_param_specs_dict)
 
         content_id_list = []
         content_id_list.append(self.content.content_id)
