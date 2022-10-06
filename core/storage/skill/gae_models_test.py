@@ -100,7 +100,7 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
-        
+
         self.assertIsNone(
             skill_models.SkillModel.get_by_description('Invalid description'))
         self.assertEqual(

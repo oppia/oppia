@@ -208,7 +208,8 @@ class LearnerGroupModel(base_models.BaseModel):
             # We add a no branch flag here because if found_models is not None,
             # user_id has to be either in learner_user_ids,
             # invited_learner_user_ids or facilitator_user_ids.
-            elif user_id in learner_group_model.facilitator_user_ids: # pragma: no branch
+            elif user_id in ( # pragma: no branch
+                    learner_group_model.facilitator_user_ids):
                 learner_group_data = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
@@ -285,7 +286,8 @@ class LearnerGroupModel(base_models.BaseModel):
             # We add a no branch flag here because if found_models is not None,
             # user_id has to be either in learner_user_ids,
             # invited_learner_user_ids or facilitator_user_ids.
-            elif user_id in learner_group_model.invited_learner_user_ids: # pragma: no branch
+            elif user_id in ( # pragma: no branch
+                    learner_group_model.invited_learner_user_ids):
                 learner_group_model.invited_learner_user_ids.remove(user_id)
 
             learner_group_models_to_put.append(learner_group_model)
