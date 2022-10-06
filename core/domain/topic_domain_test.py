@@ -857,7 +857,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         ):
             topic.validate()
 
-    def test_story_ref_to_dict(self):
+    def test_story_ref_to_dict(self) -> None:
         test_story_dict = {
             'story_id': 'story_id_1',
             'story_is_published': False
