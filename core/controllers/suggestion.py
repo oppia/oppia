@@ -537,7 +537,7 @@ class SuggestionListHandler(base.BaseHandler):
                     }]
                 },
                 'default_value': None
-            }
+            },
         }
     }
 
@@ -551,11 +551,6 @@ class SuggestionListHandler(base.BaseHandler):
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
         query_fields_and_values = list(self.request.GET.items())
-
-        for query in query_fields_and_values:
-            if query[0] not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
-                raise self.InvalidInputException(
-                    'Not allowed to query on field %s' % query[0])
 
         suggestions = suggestion_services.query_suggestions(
             query_fields_and_values)
