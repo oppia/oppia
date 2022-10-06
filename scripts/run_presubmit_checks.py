@@ -29,7 +29,10 @@ from . import run_backend_tests
 from . import run_frontend_tests
 from .linters import pre_commit_linter
 
-_PARSER = argparse.ArgumentParser(
+from typing import List, Optional
+from typing_extensions import Final
+
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder prior to opening a PR:
     python -m scripts.run_presubmit_checks
@@ -52,24 +55,28 @@ _PARSER.add_argument(
     help='optional; if specified, the origin branch to compare against.')
 
 
-def main(args=None) -> None:
+def main(args: Optional[List[str]] = None) -> None:
     """Run the presubmit checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
     # Run Javascript and Python linters.
     print('Linting files since the last commit')
-    pre_commit_linter.main(args=[])
+    pre_commit_linter.main(args=[])  # type: ignore[no-untyped-call]
     print('Linting passed.')
     print('')
 
-    current_branch = subprocess.check_output([
-        'git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+    current_branch = subprocess.check_output(
+        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], text=True
+    )
 
     # If the current branch exists on remote origin, matched_branch_num=1
     # else matched_branch_num=0.
-    matched_branch_num = subprocess.check_output([
-        'git', 'ls-remote', '--heads', 'origin', current_branch, '|', 'wc',
-        '-l'])
+    matched_branch_num = subprocess.check_output(
+        [
+        'git', 'ls-remote', '--heads', 'origin', current_branch, '|', 'wc', '-l'
+        ],
+        text=True
+    )
 
     # Set the origin branch to develop if it's not specified.
     if parsed_args.branch:
@@ -81,8 +88,12 @@ def main(args=None) -> None:
 
     print('Comparing the current branch with %s' % branch)
 
-    all_changed_files = subprocess.check_output([
-        'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch])
+    all_changed_files = subprocess.check_output(
+        [
+        'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch
+        ],
+        text=True
+    )
 
     if common.FRONTEND_DIR in all_changed_files:
         # Run frontend unit tests.
@@ -97,7 +108,7 @@ def main(args=None) -> None:
 
     # Run backend tests.
     print('Running backend tests')
-    run_backend_tests.main(args=[])
+    run_backend_tests.main(args=[])  # type: ignore[no-untyped-call]
     print('Backend tests passed.')
 
 
