@@ -296,8 +296,9 @@ describe('Question Suggestion Editor Modal Component', () => {
   it('should update the question', () => {
     spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
       .and.callFake((
-          suggestionId, skillDifficulty, questionStateData, imagesData,
-          successCallback, errorCallback) => {
+          suggestionId, skillDifficulty, questionStateData, nextContentIdIndex,
+          imagesData, successCallback, errorCallback
+      ) => {
         successCallback(null);
         return null;
       });
@@ -316,8 +317,9 @@ describe('Question Suggestion Editor Modal Component', () => {
     () => {
       spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
         .and.callFake((
-            suggestionId, skillDifficulty, questionStateData, imagesData,
-            successCallback, errorCallback) => {
+            suggestionId, skillDifficulty, questionStateData,
+            nextContentIdIndex, imagesData, successCallback, errorCallback
+        ) => {
           successCallback(null);
           return null;
         });

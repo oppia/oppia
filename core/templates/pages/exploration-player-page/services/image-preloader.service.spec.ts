@@ -381,9 +381,9 @@ describe('Image preloader service', () => {
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
-    spyOn(ctms, 'getTranslatedHtml').and.callFake(
-      (unusedLanguageCode, content) => {
-        return content.html;
+    spyOn(ctms, 'getHtmlTranslations').and.callFake(
+      (unusedLanguageCode, unusedContentIds) => {
+        return [];
       });
 
     exploration = (
