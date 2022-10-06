@@ -40,9 +40,9 @@ oppia-story-summary-tile .oppia-story-title {
 oppia-story-summary-tile .completed-icon {
   color: #00645c;
   float: left;
+  font-size: 20px;
   margin-right: 6px;
   width: 24px;
-  font-size: 20px;
 }
 
 oppia-story-summary-tile .view-button {
@@ -313,8 +313,8 @@ oppia-story-summary-tile .oppia-topic-viewer-container .background-banner-positi
 }
 
 oppia-story-summary-tile .down-caret-position {
-  width: 24px;
   vertical-align: middle;
+  width: 24px;
 }
 
 oppia-story-summary-tile .up-caret-position {
