@@ -86,7 +86,6 @@ export class SkillEditorMainTabComponent implements OnInit,
     if (!this.topicName && this.assignedSkillTopicData) {
       this.topicName = Object.keys(this.assignedSkillTopicData)[0];
       this.changeSelectedTopic(this.topicName);
-      this.changeDetectorRef.detectChanges();
       return this.assignedSkillTopicData;
     }
     this.assignedSkillTopicData = (

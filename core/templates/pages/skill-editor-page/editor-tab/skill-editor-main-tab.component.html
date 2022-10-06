@@ -21,7 +21,8 @@
           <strong class="status-key">
             Topic:
           </strong>
-          <select class="form-control"
+          <select *ngIf="getAssignedSkillTopicData()"
+                  class="form-control"
                   [(ngModel)]="topicName"
                   (change)="changeSelectedTopic(topicName)"
                   [disabled]="!isTopicDropdownEnabled()">
