@@ -14,6 +14,7 @@
 	"I18N_ABOUT_PAGE_TABS_CREDITS": "Merci",
 	"I18N_ABOUT_PAGE_TABS_FOUNDATION": "Fondatioun",
 	"I18N_ABOUT_PAGE_TITLE": "Iwwer | Oppia",
+	"I18N_ANDROID_PAGE_EMAIL_FIELD_LABEL": "E-Mail-Adress",
 	"I18N_ANDROID_PAGE_FEATURE_TEXT_3": "Léiert an Ärer Sprooch",
 	"I18N_ANDROID_PAGE_NAME_FIELD_LABEL": "Numm",
 	"I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "Mech notifiéieren",
@@ -349,6 +350,7 @@
 	"I18N_TOPNAV_PREFERENCES": "Astellungen",
 	"I18N_TOPNAV_SIGN_IN": "Aloggen",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Alogge mat Google",
+	"I18N_TOPNAV_TRY_ANDROID_APP_TEXT": "Probéiert et haut!",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Dir hutt am Ganzen <[totalSubscribers]> Abonnenten.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Ofbestellen",
 	"I18N_YES": "Jo"
