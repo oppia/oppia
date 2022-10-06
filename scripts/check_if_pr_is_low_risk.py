@@ -162,6 +162,7 @@ def lookup_pr(owner: str, repo: str, pull_number: str) -> Optional[PRDict]:
         {'Accept': 'application/vnd.github.v3+json'})
     response = utils.url_open(request)
     if response.getcode() != 200:
+        response.close()
         return None
     pr: PRDict = json.load(response)
     response.close()

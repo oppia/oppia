@@ -379,7 +379,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def test_check_changes_in_gcloud_path_without_mismatch(self) -> None:
         temp_file = tempfile.NamedTemporaryFile()
         temp_file_name = 'mock_release_constants.json'
-        # Here we use MyPy ignore because here we are assigning value to
+        # Here we use MyPy ignore because we are assigning value to
         # the read-only 'name' attribute which causes MyPy to throw an error.
         # Thus, to avoid the error, we used ignore here.
         temp_file.name = temp_file_name  # type: ignore[misc]
@@ -396,7 +396,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def test_check_changes_in_gcloud_path_with_mismatch(self) -> None:
         temp_file = tempfile.NamedTemporaryFile()
         temp_file_name = 'mock_release_constants.json'
-        # Here we use MyPy ignore because here we are assigning value to
+        # Here we use MyPy ignore because we are assigning value to
         # the read-only 'name' attribute which causes MyPy to throw an error.
         # Thus, to avoid the error, we used ignore here.
         temp_file.name = temp_file_name  # type: ignore[misc]
