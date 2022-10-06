@@ -880,6 +880,17 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ).is_terminal
         )
 
+    @property
+    def is_linear(self) -> bool:
+        """Determines if this interaction type is linear.
+
+        Returns:
+            bool. Whether the interaction is linear.
+        """
+        return bool(interaction_registry.Registry.get_interaction_by_id(
+            self.id).is_linear
+        )
+
     def is_supported_on_android_app(self) -> bool:
         """Determines whether the interaction is a valid interaction that is
         supported by the Android app.
@@ -1903,7 +1914,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if self.is_terminal and self.answer_groups:
             raise utils.ValidationError(
                 'Terminal interactions must not have any answer groups.')
-        if self.is_terminal and self.answer_groups:
+        if self.is_linear and self.answer_groups:
             raise utils.ValidationError(
                 'Linear interactions must not have any answer groups.')
 
