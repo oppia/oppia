@@ -4191,7 +4191,6 @@ class State(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        *,
         allow_null_interaction: bool
     ) -> None:
         """Validates various properties of the State.
