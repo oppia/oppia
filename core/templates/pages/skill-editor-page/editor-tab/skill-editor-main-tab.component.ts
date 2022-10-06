@@ -16,7 +16,7 @@
  * @fileoverview Component for the main tab of the skill editor.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
@@ -32,14 +32,17 @@ import { AssignedSkillTopicData, SkillEditorStateService } from '../services/ski
   selector: 'oppia-skill-editor-main-tab',
   templateUrl: './skill-editor-main-tab.component.html'
 })
-export class SkillEditorMainTabComponent implements OnInit {
+export class SkillEditorMainTabComponent implements OnInit,
+ AfterContentChecked {
   subtopicName: string;
   topicName: string;
   assignedSkillTopicData: AssignedSkillTopicData;
   skill: Skill;
   selectedTopic: Topic;
+  topicDropdownEnabled = false;
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private focusManagerService: FocusManagerService,
     private ngbModal: NgbModal,
     private pageTitleService: PageTitleService,
@@ -91,9 +94,10 @@ export class SkillEditorMainTabComponent implements OnInit {
   }
 
   isTopicDropdownEnabled(): boolean {
-    return Boolean(
+    this.topicDropdownEnabled = Boolean(
       this.assignedSkillTopicData &&
         Object.keys(this.assignedSkillTopicData).length);
+    return this.topicDropdownEnabled;
   }
 
   changeSelectedTopic(topicName: string): void {
@@ -104,6 +108,10 @@ export class SkillEditorMainTabComponent implements OnInit {
   hasLoadedSkill(): boolean {
     this.skill = this.skillEditorStateService.getSkill();
     return this.skillEditorStateService.hasLoadedSkill();
+  }
+
+  ngAfterContentChecked(): void {
+    this.changeDetectorRef.detectChanges();
   }
 
   ngOnInit(): void {
