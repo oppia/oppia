@@ -106,9 +106,9 @@
             <div *ngIf="!schemaEditorIsShown"
                  (click)="showSchemaEditor()"
                  class="subtopic-html-content e2e-test-edit-html-content">
-              <oppia-interaction-display [htmlData]="htmlData"
-                                         class="e2e-test-subtopic-html-content">
-              </oppia-interaction-display>
+              <oppia-rte-output-display class="e2e-test-subtopic-html-content"
+                                        [rteString]="htmlData">
+              </oppia-rte-output-display>
             </div>
           </div>
           <div class="subtopic-thumbnail e2e-test-subtopic-thumbnail">
