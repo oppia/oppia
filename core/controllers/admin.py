@@ -887,7 +887,8 @@ class AdminRoleHandler(base.BaseHandler):
         # schema, a Bad Request error will be thrown and the else branch of the
         # below condition will never execute. Hence, we use the no branch
         # flag.
-        elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME: # pragma: no branch
+        elif filter_criterion == ( # pragma: no branch
+                feconf.USER_FILTER_CRITERION_USERNAME):
             username = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_USERNAME)
             user_id = user_services.get_user_id_from_username(username)

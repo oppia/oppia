@@ -115,7 +115,8 @@ class ContributionRightsHandler(base.BaseHandler):
         # If 'category' has a value other than those defined in the schema,
         # a Bad Request error will be thrown and the else branch of the below
         # condition will never execute. Hence, we use the no branch flag.
-        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: # pragma: no branch
+        elif category == ( # pragma: no branch
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
             if user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to submit question.' % (
