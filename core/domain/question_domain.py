@@ -1774,7 +1774,7 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        self.question_state_data.validate({}, False)
+        self.question_state_data.validate({}, allow_null_interaction=False)
 
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""
