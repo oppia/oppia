@@ -820,7 +820,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
-            
+
     def test_skill_id_not_present_old_subtopic(self) -> None:
         self.topic.subtopics = [
             topic_domain.Subtopic(
@@ -832,10 +832,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
         with self.assertRaisesRegex(
-            Exception, 
+            Exception,
             'Skill id skill_not_exist is not present in the given old subtopic'
         ):
-            self.topic.move_skill_id_to_subtopic(1,2,'skill_not_exist')
+            self.topic.move_skill_id_to_subtopic(1, 2, 'skill_not_exist')
 
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
