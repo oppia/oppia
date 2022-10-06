@@ -20,7 +20,8 @@ from __future__ import annotations
 
 import logging
 
-from core import constants, utils
+from core.constants import constants
+from core import utils
 from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
@@ -375,13 +376,11 @@ class DraftUpgradeUtil:
             # 'CMD_EDIT_EXPLORATION_PROPERTY'.
             new_value: AllowedDraftChangeListTypes = exp_change.new_value
             if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                # Here we use cast because this 'if' condition forces
-                # change to have type EditExpStatePropertyContentCmd.
-                edit_content_property_cmd = cast(
-                    exp_domain.EditExpStatePropertyContentCmd,
-                    exp_change
-                )
-                new_value = edit_content_property_cmd.new_value
+                # Ruling out the possibility of different types
+                # for mypy type checking.
+                assert isinstance(exp_change.new_value, dict)
+
+                new_value = exp_change.new_value
                 html_content = new_value['html']
 
                 if not cls.are_links_are_valid(
