@@ -4181,7 +4181,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'x': {
                             'contentId': 'rule_input_Contains',
-                            'normalizedStrSet': ['Test1']
+                            'normalizedStrSet': ['Temp']
                             }
                     })
             ],
