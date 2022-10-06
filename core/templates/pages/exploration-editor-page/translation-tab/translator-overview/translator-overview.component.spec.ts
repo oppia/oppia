@@ -154,7 +154,6 @@ describe('Translator Overview component', () => {
         .returnValue(showTranslationTabBusyModalEmitter);
       component.changeTranslationLanguage();
 
-      expect(component.languageCode).toBe('es');
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
 
       // Reset value for isTranslationTabBusy.

@@ -487,7 +487,6 @@ describe('Audio translation bar Component', () => {
      flush();
 
      component.playAndPauseUnsavedAudio();
-     expect(component.unsavedAudioIsPlaying).toBe(false);
      expect(waveSurferObjSpy.play).toHaveBeenCalled();
    }));
 
@@ -520,7 +519,7 @@ describe('Audio translation bar Component', () => {
 
      component.playAndPauseUnsavedAudio();
      tick();
-     expect(component.unsavedAudioIsPlaying).toBe(false);
+     expect(component.unsavedAudioIsPlaying).toBe(true);
 
      component.playAndPauseUnsavedAudio();
      tick();

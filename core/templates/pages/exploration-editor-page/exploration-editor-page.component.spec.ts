@@ -72,8 +72,7 @@ class MockNgbModal {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Exploration editor page component', function() {
+describe('Exploration editor page component', function() {
   let component: ExplorationEditorPageComponent;
   let fixture: ComponentFixture<ExplorationEditorPageComponent>;
   let cls: ChangeListService = null;
@@ -714,6 +713,9 @@ fdescribe('Exploration editor page component', function() {
 
       expect(cls.loadAutosavedChangeList).toHaveBeenCalled();
       expect(component.explorationEditorPageHasInitialized).toEqual(true);
+
+      flush();
+      discardPeriodicTasks();
     }));
 
     it('should start editor tutorial when closing welcome exploration' +
