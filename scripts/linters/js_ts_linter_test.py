@@ -64,6 +64,7 @@ VALID_UNLISTED_SERVICE_PATH: Final = os.path.join(
 # compile method reduces the compile time as fewer files are compiled
 # thereby making the tests run faster.
 
+
 class Ret:
     """Return object with required attributes."""
 
@@ -192,7 +193,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         def mock_popen(
             unused_cmd: str, stdout: str, stderr: str  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
         def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
             return (b'Output', b'Invalid')
