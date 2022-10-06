@@ -97,10 +97,7 @@ core.schema_utils_test
 core.storage.base_model.gae_models_test
 core.storage.collection.gae_models_test
 core.storage.exploration.gae_models_test
-core.storage.job.gae_models_test
-core.storage.learner_group.gae_models_test
 core.storage.question.gae_models_test
-core.storage.skill.gae_models_test
 core.storage.statistics.gae_models_test
 core.storage.suggestion.gae_models_test
 core.storage.topic.gae_models_test

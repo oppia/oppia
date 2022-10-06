@@ -205,7 +205,10 @@ class LearnerGroupModel(base_models.BaseModel):
                     'subtopic_page_ids': [],
                     'story_ids': []
                 }
-            elif user_id in learner_group_model.facilitator_user_ids:
+            # We add a no branch flag here because if found_models is not None,
+            # user_id has to be either in learner_user_ids,
+            # invited_learner_user_ids or facilitator_user_ids.
+            elif user_id in learner_group_model.facilitator_user_ids: # pragma: no branch
                 learner_group_data = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
@@ -279,7 +282,10 @@ class LearnerGroupModel(base_models.BaseModel):
 
             # If the user has been invited to join the group, delete the
             # user from the invited_learner_user_ids list.
-            elif user_id in learner_group_model.invited_learner_user_ids:
+            # We add a no branch flag here because if found_models is not None,
+            # user_id has to be either in learner_user_ids,
+            # invited_learner_user_ids or facilitator_user_ids.
+            elif user_id in learner_group_model.invited_learner_user_ids: # pragma: no branch
                 learner_group_model.invited_learner_user_ids.remove(user_id)
 
             learner_group_models_to_put.append(learner_group_model)
