@@ -222,7 +222,7 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
         swap_api_key_feconf = self.swap(
             feconf, 'MAILCHIMP_API_KEY', 'abcdefabcdefabcdefabcdefabcdef12')
         swap_mailchimp_class = self.swap_to_always_return(
-            mailchimp3, 'MailChimp', self.MockMailchimpClass)
+            mailchimp3, 'MailChimp', mailchimp)
 
         with swap_api_key_secrets_return_none, self.swap_audience_id:
             with swap_api_key_feconf, swap_mailchimp_class:
