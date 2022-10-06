@@ -187,7 +187,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/servers_test.py',
     'scripts/setup.py',
     'scripts/setup_test.py',
-    'scripts/linters/js_ts_linter.py',
     'scripts/linters/js_ts_linter_test.py',
     'scripts/linters/pre_commit_linter.py',
     'scripts/linters/pre_commit_linter_test.py',
