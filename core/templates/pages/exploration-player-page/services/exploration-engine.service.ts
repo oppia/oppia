@@ -19,7 +19,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
@@ -549,17 +548,15 @@ export class ExplorationEngineService {
     // interaction is TextInput.
     let oldInteractionId = oldState.interaction.id;
 
-    // Work => let catchMisspellingsFeatOn = oldStateCard.getInteraction().customizationArgs.
-    
-    if(oldInteractionId === "TextInput" && onSameCard) {
+    // Work => let catchMisspellingsFeatOn =
+    // oldStateCard.getInteraction().customizationArgs.
+
+    if (oldInteractionId === 'TextInput' && onSameCard) {
       var answerIsOnlyMisspelled = this.answerClassificationService.
-    isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
+        isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
       if (answerIsOnlyMisspelled) {
         // Change the feedbackHtml.
-        let i18NKeyPrefix = 'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT'
-        feedbackHtml = this.translateService.instant(
-          this.getRandomI18nKey(i18NKeyPrefix, 3)
-        )
+        feedbackHtml = this.getFeedbackHtmlWhenAnswerMisspelled();
       }
     }
 
@@ -585,6 +582,12 @@ export class ExplorationEngineService {
   ): string {
     const randomValue = Math.floor(Math.random() * availableKeyCount) + 1;
     return i18nKeyPrefix + '_' + randomValue.toString();
+  }
+
+  getFeedbackHtmlWhenAnswerMisspelled(): string {
+    const i18NKeyPrefix = 'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT';
+    return this.translateService.instant(
+      this.getRandomI18nKey(i18NKeyPrefix, 3));
   }
 
   isAnswerBeingProcessed(): boolean {

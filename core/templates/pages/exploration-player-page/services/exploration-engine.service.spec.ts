@@ -50,7 +50,7 @@ class MockTranslateService {
   }
 }
 
-fdescribe('Exploration engine service ', () => {
+describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
@@ -527,46 +527,50 @@ fdescribe('Exploration engine service ', () => {
 
     it('should check for misspellings if the answer ' +
       'is incorrect', () => {
-        let initSuccessCb = jasmine.createSpy('success');
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let answer = 'answoo';
-        let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createFromBackendDict({
-            dest: 'Start',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: 'feedback_1',
-              html: 'Answer is not correct!'
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
-          }), 1, 0, 'default_outcome');
+      let initSuccessCb = jasmine.createSpy('success');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let answer = 'answoo';
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'Start',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'feedback_1',
+            html: 'Answer is not correct!'
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }), 1, 0, 'default_outcome');
 
-        let lastCard = StateCard.createNewCard(
-          'Card 1', 'Content html', 'Interaction text', null,
-          null, null, 'content_id', audioTranslationLanguageService);
+      let lastCard = StateCard.createNewCard(
+        'Card 1', 'Content html', 'Interaction text', null,
+        null, null, 'content_id', audioTranslationLanguageService);
 
-        spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
-        spyOn(playerTranscriptService, 'getLastStateName')
-          .and.returnValue('Start');
-        spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
-        spyOn(answerClassificationService, 'getMatchingClassificationResult')
-          .and.returnValue(answerClassificationResult);
+      spyOn(contextService, 'isInExplorationEditorPage')
+        .and.returnValue(false);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('Start');
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+      spyOn(answerClassificationService, 'isAnswerOnlyMisspelled')
+        .and.returnValue(true);
+      spyOn(Math, 'random').and.returnValue(0.45);
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
 
-        explorationEngineService.init(
-          explorationDict, 1, null, true, ['en'], initSuccessCb);
+      explorationEngineService.init(
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
 
-        const isAnswerCorrect = explorationEngineService.submitAnswer(
-          answer, textInputService, submitAnswerSuccessCb);
+      const isAnswerCorrect = explorationEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
 
-
-        expect(submitAnswerSuccessCb).toHaveBeenCalled();
-        expect(answerClassificationService.isAnswerOnlyMisspelled(explorationEngineService.getStateCardByName('Start').getInteraction(), answer)).toBe(true);
-        expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
-        expect(isAnswerCorrect).toBe(false);
-    })
+      expect(submitAnswerSuccessCb).toHaveBeenCalled();
+      expect(explorationEngineService.getFeedbackHtmlWhenAnswerMisspelled()).
+        toBe('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2');
+      expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
+      expect(isAnswerCorrect).toBe(false);
+    });
 
     it('should not submit answer again if the answer ' +
       'is already being processed', () => {
