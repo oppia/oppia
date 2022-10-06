@@ -3275,7 +3275,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if len(empty_choices) == 1:
             invalid_choices_index.append(choices.index(empty_choices[0]))
             invalid_choices_content_ids.append(empty_choices[0]['content_id'])
-            choices.remove(empty_choices[0])
+            choices_to_remove.append(empty_choices[0])
         else:
             for idx, empty_choice in enumerate(empty_choices):
                 empty_choice['html'] = (
@@ -3742,8 +3742,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_value_b = rule_spec['inputs']['b']
                         # For x in [a, b], a must not be greater than b.
                         if rule_value_a > rule_value_b:
-                            rule_value_a, rule_value_b = (
-                                rule_value_b, rule_value_a)
+                            rule_spec['inputs']['a'] = rule_value_b
+                            rule_spec['inputs']['b'] = rule_value_a
                         rule_value_a = float(rule_value_a)
                         rule_value_b = float(rule_value_b)
                         cls._set_lower_and_upper_bounds(

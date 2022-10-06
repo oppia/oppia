@@ -6602,6 +6602,14 @@ states:
         - inputs:
             x: 25.0
           rule_type: Equals
+        - inputs:
+            tol: -5.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: 39.0
+            b: 30.0
+          rule_type: IsInclusivelyBetween
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
@@ -6641,8 +6649,8 @@ states:
             x: 5.0
           rule_type: IsLessThan
         - inputs:
-            a: 5.0
-            b: 9.0
+            a: 9.0
+            b: 5.0
           rule_type: IsInclusivelyBetween
         - inputs:
             tol: 2.0
@@ -6839,6 +6847,14 @@ states:
         - inputs:
             x: 25.0
           rule_type: Equals
+        - inputs:
+            tol: 5.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: 30.0
+            b: 39.0
+          rule_type: IsInclusivelyBetween
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
@@ -7102,6 +7118,26 @@ states:
           rule_type: HasDenominatorEqualTo
         tagged_skill_misconception_id: null
         training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_13
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         allowImproperFraction:
@@ -7128,7 +7164,7 @@ states:
       id: FractionInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 13
+    next_content_id_index: 14
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7138,6 +7174,7 @@ states:
         feedback_10: {}
         feedback_11: {}
         feedback_12: {}
+        feedback_13: {}
         feedback_8: {}
         feedback_9: {}
     solicit_answer_details: false
@@ -7149,6 +7186,7 @@ states:
         feedback_10: {}
         feedback_11: {}
         feedback_12: {}
+        feedback_13: {}
         feedback_8: {}
         feedback_9: {}
   end:
@@ -7306,7 +7344,7 @@ states:
       id: FractionInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 13
+    next_content_id_index: 14
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8055,6 +8093,10 @@ states:
             x:
             - ca_choices_20
           rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_21
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
@@ -8219,6 +8261,10 @@ states:
         - inputs:
             x:
             - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_21
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
