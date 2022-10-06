@@ -777,7 +777,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
             self.assertEqual(
-                interaction.dependency_ids, interaction._dependency_ids)
+                interaction.dependency_ids, interaction._dependency_ids) # pylint: disable=protected-access
 
     def test_linear_interactions(self) -> None:
         """Sanity-check for the number of linear interactions."""
