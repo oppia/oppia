@@ -25,12 +25,11 @@ import shutil
 import subprocess
 
 import esprima
+from typing import Any, Dict, List, Tuple, Union
+from typing_extensions import Final
 
 from .. import common
 from .. import concurrent_task_utils
-
-from typing import Any, Dict, List, Tuple, Union
-from typing_extensions import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover

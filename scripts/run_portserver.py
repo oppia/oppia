@@ -57,15 +57,15 @@ import socket
 import sys
 import threading
 
+from typing import Any, Callable, Deque, List, Optional, Sequence, Set
+from typing_extensions import Final
+
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
 from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 
 from core import utils   # isort:skip
-
-from typing import Any, Callable, Deque, List, Optional, Sequence, Set
-from typing_extensions import Final
 
 _PROTOCOLS: Final = [
     (socket.SOCK_STREAM, socket.IPPROTO_TCP),

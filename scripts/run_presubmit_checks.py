@@ -24,13 +24,13 @@ from __future__ import annotations
 import argparse
 import subprocess
 
+from typing import List, Optional
+from typing_extensions import Final
+
 from . import common
 from . import run_backend_tests
 from . import run_frontend_tests
 from .linters import pre_commit_linter
-
-from typing import List, Optional
-from typing_extensions import Final
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
