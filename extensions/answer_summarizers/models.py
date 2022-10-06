@@ -475,7 +475,14 @@ class TopAnswersByCategorization(BaseCalculation):
             str, List[state_domain.AcceptableCorrectAnswerTypes]
         ] = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
-            if category in CLASSIFICATION_CATEGORIES:
+            # The 'classification_categorization' of SubmittedAnswer cannot
+            # have a value other than those defined in
+            # CLASSIFICATION_CATEGORIES. This is made sure by validate()
+            # method in stats_domain.SubmittedAnswer class which defines
+            # valid classification categories. Therefore a branch where
+            # category in CLASSIFICATION_CATEGORIES is false would not arise.
+            # Hence we use no branch flag.
+            if category in CLASSIFICATION_CATEGORIES: # pragma: no branch
                 submitted_answers_by_categorization[category].extend(
                     d['answer'] for d in answer_dicts)
 

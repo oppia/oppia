@@ -99,8 +99,6 @@ core.storage.exploration.gae_models_test
 core.storage.question.gae_models_test
 core.storage.topic.gae_models_test
 core.utils_test
-extensions.answer_summarizers.models_test
-extensions.interactions.base_test
 extensions.objects.models.objects_test
 main_test
 scripts.build_test

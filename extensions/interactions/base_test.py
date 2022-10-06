@@ -769,6 +769,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         'Expected trainable interaction to have more '
                         'classifier: %s' % interaction_id))
 
+    def test_get_dependency_ids(self) -> None:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        for interaction_id in all_interaction_ids:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
+            self.assertEqual(
+                interaction.dependency_ids, interaction._dependency_ids)
+
     def test_linear_interactions(self) -> None:
         """Sanity-check for the number of linear interactions."""
 
