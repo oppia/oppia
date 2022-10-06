@@ -166,6 +166,7 @@
     "dequeue": "^1.0.5",
     "fabric": "^4.1.0",
     "firebase": "^8.10.0",
+    "gauge-ts": "^0.1.1",
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
     "globalthis": "^1.0.2",
