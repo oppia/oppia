@@ -7,8 +7,7 @@
   </tr>
   <tr *ngFor="let row of data; index as index">
     <td>
-      <a class="answer-rank"
-         (click)="toggleAnswerVisibility(index)">Answer Set #{{ index + 1 }}</a>
+      <a class="answer-rank" (click)="toggleAnswerVisibility(index)">Answer Set #{{ index + 1 }}</a>
       <table class="item table item-table"
              [hidden]="!answerVisible[index]">
         <tr *ngFor="let item of row.answer">
