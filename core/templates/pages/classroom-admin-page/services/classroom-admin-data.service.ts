@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { ClassroomData } from '../existing-classroom.model';
+import { ClassroomData, ExistingClassroomData } from '../existing-classroom.model';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 
 
@@ -35,6 +35,7 @@ export class ClassroomAdminDataService {
 
   nameValidationError: string = '';
   urlValidationError: string = '';
+  topicsGraphValidationError: string = '';
 
   onClassroomNameChange(classroom: ClassroomData): void {
     this.nameValidationError = classroom.getClassroomNameValidationErrors();
@@ -76,23 +77,33 @@ export class ClassroomAdminDataService {
     });
   }
 
-  isClassroomValid(
+  onTopicDependencyChange(classroom: ExistingClassroomData): void {
+    this.topicsGraphValidationError = (
+      classroom.validateDependencyGraph());
+  }
+
+  validateClassroom(
       tempClassroom: ClassroomData,
       existingClassroom: ClassroomData
   ): void {
     this.onClassroomNameChange(tempClassroom);
     this.onClassroomUrlChange(
       tempClassroom, existingClassroom.getClassroomUrlFragment());
+    if (tempClassroom instanceof ExistingClassroomData) {
+      this.onTopicDependencyChange(tempClassroom);
+    }
 
     tempClassroom.setClassroomValidityFlag(
       this.nameValidationError === '' &&
-      this.urlValidationError === ''
+      this.urlValidationError === '' &&
+      this.topicsGraphValidationError === ''
     );
   }
 
   reinitializeErrorMsgs(): void {
     this.nameValidationError = '';
     this.urlValidationError = '';
+    this.topicsGraphValidationError = '';
   }
 }
 
