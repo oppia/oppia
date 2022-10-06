@@ -868,6 +868,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         story_ref_dict = story_ref_obj.to_dict()
         self.assertDictEqual(test_story_dict, story_ref_dict)
 
+    def test_story_ref_from_dict(self) -> None:
+        test_story_dict = {
+            'story_id': 'story_id_1',
+            'story_is_published': False
+            }
+        test_story_obj = topic_domain.StoryReference.from_dict(test_story_dict)
+        self.assertEqual(test_story_obj.story_id, 'story_id_1')
+        self.assertEqual(test_story_obj.story_is_published, False)
+        
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
         Topic during export and import.
