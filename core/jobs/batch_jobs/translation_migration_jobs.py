@@ -65,7 +65,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
             list of EntityTranslation objects.
         """
         try:
-            language_code_to_translation = {}
+            lang_code_to_translation = {}
             (old_content_id_to_new_content_id, _) = (
                 state_domain.State
                 .generate_old_content_id_to_new_content_id_in_v52_states(
@@ -75,34 +75,32 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
                     'written_translations']['translations_mapping']
                 for content_id in translations_mapping:
                     new_content_id = (
-                        old_content_id_to_new_content_id[state_name][
-                            content_id])
-                    for language_code in translations_mapping[content_id]:
-                        if language_code not in language_code_to_translation:
-                            language_code_to_translation[language_code] = (
+                        old_content_id_to_new_content_id[state_name][content_id]
+                    )
+                    for lang_code in translations_mapping[content_id]:
+                        if lang_code not in lang_code_to_translation:
+                            lang_code_to_translation[lang_code] = (
                                 translation_domain.EntityTranslation(
                                     exploration.id,
                                     feconf.TranslatableEntityType.EXPLORATION,
-                                    exploration.version, language_code, {}))
+                                    exploration.version, lang_code, {}))
 
                         translation_dict = translations_mapping[content_id][
-                            language_code]
-                        (
-                            language_code_to_translation[language_code]
-                            .add_translation(
-                                new_content_id,
-                                translation_dict['translation'],
-                                translation_domain.TranslatableContentFormat(
-                                    translation_dict['data_format']),
-                                translation_dict['needs_update'])
+                            lang_code]
+                        lang_code_to_translation[lang_code].add_translation(
+                            new_content_id,
+                            translation_dict['translation'],
+                            translation_domain.TranslatableContentFormat(
+                                translation_dict['data_format']),
+                            translation_dict['needs_update']
                         )
-            for entity_translation in language_code_to_translation.values():
+            for entity_translation in lang_code_to_translation.values():
                 entity_translation.validate()
         except Exception as e:
             logging.exception(e)
             return result.Err((exploration.id, e))
 
-        return result.Ok(list(language_code_to_translation.values()))
+        return result.Ok(list(lang_code_to_translation.values()))
 
     @staticmethod
     def _create_entity_translation_model(

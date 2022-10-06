@@ -28,8 +28,42 @@ export type TranslatableField = (
   TranslatableSetOfNormalizedString |
   TranslatableSetOfUnicodeString
 );
+interface ContentReplacers {
+  [format: string]: (arg0: TranslatableField, arg1: TranslatedContent) => void;
+}
 
 export class BaseTranslatableObject {
+  private contentReplacers: ContentReplacers = {
+    html: (
+        translatableField,
+        writtenTranslation
+    ): void => {
+      (translatableField as SubtitledHtml).html = (
+        writtenTranslation.translation as string);
+    },
+    unicode: (
+        translatableField: TranslatableField,
+        writtenTranslation: TranslatedContent
+    ): void => {
+      (translatableField as SubtitledUnicode).unicode = (
+        writtenTranslation.translation as string);
+    },
+    set_of_normalized_string: (
+        translatableField: TranslatableField,
+        writtenTranslation: TranslatedContent
+    ): void => {
+      (translatableField as TranslatableSetOfNormalizedString)
+        .normalizedStrSet = writtenTranslation.translation as string[];
+    },
+    set_of_unicode_string: (
+        translatableField: TranslatableField,
+        writtenTranslation: TranslatedContent
+    ): void => {
+      (translatableField as TranslatableSetOfUnicodeString).unicodeStrSet = (
+        writtenTranslation.translation as string[]);
+    }
+  };
+
   static getContentValue(content: TranslatableField): string | string[] | null {
     if (content instanceof SubtitledHtml) {
       return content.html;
@@ -60,31 +94,16 @@ export class BaseTranslatableObject {
     return [];
   }
 
-  _isString(translation: string|string[]): translation is string {
-    return (typeof translation === 'string');
-  }
-
-  _isValidStringTranslation(writtenTranslation: TranslatedContent): boolean {
-    return (
-      writtenTranslation !== undefined &&
-      this._isString(writtenTranslation.translation) &&
-      writtenTranslation.translation !== '' &&
-      writtenTranslation.needsUpdate === false);
-  }
-
   swapContentsWithTranslation(entityTranslations: EntityTranslation): void {
     this.getTranslatableFields().forEach((translatableField) => {
-      const contentId = translatableField.contentId;
-      if (entityTranslations.hasWrittenTranslation(contentId)) {
-        let writtenTranslation = entityTranslations.getWrittenTranslation(
-          contentId);
-        if (this._isValidStringTranslation(writtenTranslation)) {
-          if (translatableField instanceof SubtitledHtml) {
-            translatableField.html = writtenTranslation.translation as string;
-          } else if (translatableField instanceof SubtitledUnicode) {
-            translatableField.unicode = (
-              writtenTranslation.translation as string);
-          }
+      const contentId = translatableField.contentId as string;
+      let writtenTranslation = entityTranslations.getWrittenTranslation(
+        contentId);
+      if (writtenTranslation !== null) {
+        let dataFormat: string = writtenTranslation.dataFormat;
+        if (this.contentReplacers.hasOwnProperty(dataFormat)) {
+          this.contentReplacers[dataFormat](
+            translatableField, writtenTranslation);
         }
       }
     });
@@ -116,7 +135,7 @@ export class BaseTranslatableObject {
 
   getAllContentIds(): string[] {
     return this.getAllContents().map((content) => {
-      return content.contentId;
+      return content.contentId as string;
     });
   }
 }

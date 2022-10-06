@@ -27,8 +27,7 @@ import { ExplorationBackendDict, ExplorationObjectFactory } from
 import { ExtractImageFilenamesFromModelService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
-import { ContentTranslationManagerService } from
-  'pages/exploration-player-page/services/content-translation-manager.service';
+
 import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -38,7 +37,6 @@ describe('Extracting Image file names in the state service', () => {
   let eof: ExplorationObjectFactory;
   let sof: SkillObjectFactory;
   let ecs: ContextService;
-  let ctms: ContentTranslationManagerService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: { [x: string]: string[] };
   let skillDict: SkillBackendDict;
@@ -51,13 +49,8 @@ describe('Extracting Image file names in the state service', () => {
     eof = TestBed.inject(ExplorationObjectFactory);
     ecs = TestBed.inject(ContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
-    ctms = TestBed.inject(ContentTranslationManagerService);
     sof = TestBed.inject(SkillObjectFactory);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
-    spyOn(ctms, 'getTranslatedHtml').and.callFake(
-      (unusedLanguageCode, content) => {
-        return content.html;
-      });
 
     explorationDict = {
       correctness_feedback_enabled: false,

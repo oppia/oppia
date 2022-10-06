@@ -27,13 +27,8 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-  getNextIndex: () => number;
-  revertUnusedIndexes: () => void;
-
-  constructor() {
-    this.getNextIndex = null;
-    this.revertUnusedIndexes = null;
-  }
+  getNextIndex!: () => number;
+  revertUnusedIndexes!: () => void;
 
   init(getNextIndex: () => number, revertUnusedIndexes: () => void): void {
     this.getNextIndex = getNextIndex;

@@ -153,12 +153,11 @@ export class StateObjectFactory {
     });
     newState.content.contentId = contentIdForContent;
     let defaultOutcome = newState.interaction.defaultOutcome;
-    defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
 
-    if (
-      newState.interaction.defaultOutcome !== null &&
-      newStateName !== null
-    ) {
+    if (defaultOutcome) {
+      defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
+    }
+    if (defaultOutcome !== null && newStateName !== null) {
       defaultOutcome.dest = newStateName as string;
     }
     newState.recordedVoiceovers.addContentId(contentIdForContent);

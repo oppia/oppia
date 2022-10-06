@@ -51,7 +51,7 @@ export class EntityTranslation {
     return Object.keys(this.translationMapping);
   }
 
-  getWrittenTranslation(contentId: string): TranslatedContent {
+  getWrittenTranslation(contentId: string): TranslatedContent | null {
     if (!this.hasWrittenTranslation(contentId)) {
       return null;
     }

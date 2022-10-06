@@ -32,6 +32,7 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 export interface InputResponsePair {
   learnerInput: string;
@@ -269,9 +270,9 @@ export class StateCard {
 
   swapContentsWithTranslation(entityTranslation: EntityTranslation): void {
     if (entityTranslation.hasWrittenTranslation(this._contentId)) {
-      this.contentHtml = (
-        entityTranslation.getWrittenTranslation(
-          this._contentId).translation as string);
+      let writtenTranslation = entityTranslation.getWrittenTranslation(
+        this._contentId) as TranslatedContent;
+      this.contentHtml = writtenTranslation.translation as string;
     }
     this._interaction.swapContentsWithTranslation(entityTranslation);
   }

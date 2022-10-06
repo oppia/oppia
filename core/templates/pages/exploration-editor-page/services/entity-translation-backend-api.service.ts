@@ -33,7 +33,8 @@ export class EntityTranslationBackendApiService {
   ) {}
 
   private _getUrl(
-      entityId, entityType, entityVersion, languageCode
+      entityId: string, entityType: string, entityVersion: number,
+      languageCode: string
   ) {
     return this.urlInterpolationService.interpolateUrl(
       AppConstants.ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE, {

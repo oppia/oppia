@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
-import isObject from 'lodash/isObject';
 
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -28,9 +27,8 @@ import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFac
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { BaseTranslatableObject, InteractionRuleInputs } from 'interactions/rule-input-defs';
-import { WrittenTranslation } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 export interface LanguageCodeToEntityTranslations {
   [languageCode: string]: EntityTranslation;
 }
@@ -52,9 +50,9 @@ export class ContentTranslationManagerService {
   private languageCodeToEntityTranslations: LanguageCodeToEntityTranslations = (
     {});
 
-  private entityType: string = null;
-  private entityId: string = null;
-  private version: number = null;
+  private entityType!: string;
+  private entityId!: string;
+  private version!: number;
 
   constructor(
     private ngbModal: NgbModal,
@@ -84,34 +82,29 @@ export class ContentTranslationManagerService {
     });
   }
 
-  getTranslatedHtml(
+  getHtmlTranslations(
       languageCode: string,
-      content: SubtitledHtml
-  ): string {
-    if (!content.contentId) {
-      throw new Error('Content ID does not exist');
-    }
+      contentIds: string[]
+  ): string[] {
     if (!this.languageCodeToEntityTranslations.hasOwnProperty(languageCode)) {
-      return content.html;
+      return [];
     }
 
-    let entityTranslation = this.languageCodeToEntityTranslations[languageCode];
-    if (!entityTranslation.hasWrittenTranslation(languageCode)) {
-      return content.html;
-    }
-    const writtenTranslation = entityTranslation[content.contentId];
-    const translationText = writtenTranslation.getTranslation();
+    let entityTranslation = this.languageCodeToEntityTranslations[
+      languageCode] as EntityTranslation;
+    let htmlStrings: string[] = [];
+    contentIds.forEach((contentId) => {
+      if (!entityTranslation.hasWrittenTranslation(contentId)) {
+        return;
+      }
 
-    // The isString() check is needed for the TypeScript compiler to narrow the
-    // type down from string|string[] to string. See "Using type predicates" at
-    // https://www.typescriptlang.org/docs/handbook/2/narrowing.html
-    // for more information.
-    if (this._isString(translationText) &&
-      this._isValidStringTranslation(writtenTranslation)) {
-      return translationText;
-    }
-
-    return content.html;
+      let writtenTranslation = entityTranslation.getWrittenTranslation(
+        contentId) as TranslatedContent;
+      if (writtenTranslation.dataFormat === 'html') {
+        htmlStrings.push(writtenTranslation.translation as string);
+      }
+    });
+    return htmlStrings;
   }
 
   setOriginalTranscript(explorationLanguageCode: string): void {
@@ -164,27 +157,11 @@ export class ContentTranslationManagerService {
         card.getInteractionHtml(), 'text/html'
       ).body.childNodes[0] as HTMLElement;
       this.extensionTagAssemblerService.formatCustomizationArgAttrs(
-        element, card.getInteractionCustomizationArgs());
+        element,
+        card.getInteractionCustomizationArgs() as InteractionCustomizationArgs
+      );
       card.setInteractionHtml(element.outerHTML);
     }
-  }
-
-  _isTranslatableObject(
-      ruleInputValue: InteractionRuleInputs):
-    ruleInputValue is BaseTranslatableObject {
-    return isObject(ruleInputValue) && 'contentId' in ruleInputValue;
-  }
-
-  _isString(translation: string | string[]): translation is string {
-    return (typeof translation === 'string');
-  }
-
-  _isValidStringTranslation(writtenTranslation: WrittenTranslation): boolean {
-    return (
-      writtenTranslation !== undefined &&
-      this._isString(writtenTranslation.translation) &&
-      writtenTranslation.translation !== '' &&
-      writtenTranslation.needsUpdate === false);
   }
 
   init(entityType: string, entityId: string, version: number): void {

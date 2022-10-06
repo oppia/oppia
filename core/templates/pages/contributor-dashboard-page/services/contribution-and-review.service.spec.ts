@@ -531,8 +531,7 @@ describe('Contribution and review service', () => {
         .returnValue(Promise.resolve());
 
       cars.updateQuestionSuggestionAsync(
-        'pqr', 2, questionStateData,
-        imagesData, onSuccess, onFailure);
+        'pqr', 2, questionStateData, 10, imagesData, onSuccess, onFailure);
       tick();
 
       expect(carbas.updateQuestionSuggestionAsync)
@@ -547,8 +546,7 @@ describe('Contribution and review service', () => {
         .returnValue(Promise.reject());
 
       cars.updateQuestionSuggestionAsync(
-        'pqr', 2, questionStateData,
-        imagesData, onSuccess, onFailure);
+        'pqr', 2, questionStateData, 10, imagesData, onSuccess, onFailure);
       tick();
 
       expect(carbas.updateQuestionSuggestionAsync)

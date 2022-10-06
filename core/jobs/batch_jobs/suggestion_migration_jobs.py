@@ -34,7 +34,7 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover

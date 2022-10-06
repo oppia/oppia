@@ -57,6 +57,10 @@ export class Rule extends BaseTranslatableObject {
     Object.keys(this.inputs).forEach(inputName => {
       const ruleInput = this.inputs[inputName];
       if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+        // This throws Type error for ruleInput". We need to suppress this error
+        // because the type for RuleInputs is incorrect and bypass flag can be
+        // removed once we have correct type for RuleInputs.
+        // @ts-ignore
         translatableFields.push(ruleInput);
       }
     });

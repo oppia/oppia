@@ -31,8 +31,8 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class ExplorationNextContentIdIndexService
     extends ExplorationPropertyService {
   propertyName: string = 'next_content_id_index';
-  displayed: number;
-  savedMemento: number;
+  displayed!: number;
+  savedMemento!: number;
 
   constructor(
     protected alertsService: AlertsService,

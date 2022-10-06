@@ -95,13 +95,13 @@ describe('State Object Factory', () => {
     stateObject = {
       classifier_model_id: null,
       content: {
-        content_id: 'content',
+        content_id: 'content_0',
         html: ''
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
+          content_0: {},
+          default_outcome_1: {}
         }
       },
       interaction: {

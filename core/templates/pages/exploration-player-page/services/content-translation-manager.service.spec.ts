@@ -16,17 +16,15 @@
  * @fileoverview Unit tests for the content translation manager service.
  */
 
-import { TestBed } from '@angular/core/testing';
-
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { WrittenTranslations, WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
@@ -40,7 +38,9 @@ import { AudioTranslationLanguageService} from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
@@ -48,10 +48,9 @@ describe('Content translation manager service', () => {
   let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
   let suof: SubtitledUnicodeObjectFactory;
-  let wtof: WrittenTranslationsObjectFactory;
   let atls: AudioTranslationLanguageService;
-
-  let writtenTranslations: WrittenTranslations;
+  let etbs: EntityTranslationBackendApiService;
+  let entityTranslation: EntityTranslation;
 
   class MockActiveModal {
     close(): void {
@@ -61,10 +60,10 @@ describe('Content translation manager service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, NgbModule],
       declarations: [
-        TranslationsFetchingMessageModalComponent,
-        LoadingDotsComponent
+        LoadingDotsComponent,
+        TranslationsFetchingMessageModalComponent
       ],
       providers: [
         {
@@ -72,14 +71,66 @@ describe('Content translation manager service', () => {
           useClass: MockActiveModal
         }
       ]
-    });
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [TranslationsFetchingMessageModalComponent],
+      }
+    }).compileComponents();
+
     ctms = TestBed.inject(ContentTranslationManagerService);
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     iof = TestBed.inject(InteractionObjectFactory);
     pts = TestBed.inject(PlayerTranscriptService);
     suof = TestBed.inject(SubtitledUnicodeObjectFactory);
-    wtof = TestBed.inject(WrittenTranslationsObjectFactory);
     atls = TestBed.inject(AudioTranslationLanguageService);
+    etbs = TestBed.inject(EntityTranslationBackendApiService);
+
+    entityTranslation = EntityTranslation.createFromBackendDict({
+      entity_id: 'exp',
+      entity_type: 'exploration',
+      entity_version: 5,
+      language_code: 'fr',
+      translations: {
+        content: {
+          content_format: 'html',
+          content_value: '<p>fr content</p>',
+          needs_update: false
+        },
+        hint_0: {
+          content_format: 'html',
+          content_value: '<p>fr hint</p>',
+          needs_update: false
+        },
+        solution: {
+          content_format: 'html',
+          content_value: '<p>fr solution</p>',
+          needs_update: false
+        },
+        ca_placeholder_0: {
+          content_format: 'unicode',
+          content_value: 'fr placeholder',
+          needs_update: false
+        },
+        outcome_1: {
+          content_format: 'html',
+          content_value: '<p>fr feedback</p>',
+          needs_update: false
+        },
+        default_outcome: {
+          content_format: 'html',
+          content_value: '<p>fr default outcome</p>',
+          needs_update: false
+        },
+        rule_input_3: {
+          content_format: 'set_of_normalized_string',
+          content_value: ['fr rule input 1', 'fr rule input 2'],
+          needs_update: false
+        }
+      }
+    });
+    spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
+      Promise.resolve(entityTranslation)
+    );
 
     let defaultOutcomeDict = {
       dest: 'dest_default',
@@ -154,60 +205,6 @@ describe('Content translation manager service', () => {
       solution: solutionDict
     };
 
-    writtenTranslations = wtof.createFromBackendDict({
-      translations_mapping: {
-        content: {
-          fr: {
-            data_format: 'html',
-            translation: '<p>fr content</p>',
-            needs_update: false
-          }
-        },
-        hint_0: {
-          fr: {
-            data_format: 'html',
-            translation: '<p>fr hint</p>',
-            needs_update: false
-          }
-        },
-        solution: {
-          fr: {
-            data_format: 'html',
-            translation: '<p>fr solution</p>',
-            needs_update: false
-          }
-        },
-        ca_placeholder_0: {
-          fr: {
-            data_format: 'html',
-            translation: 'fr placeholder',
-            needs_update: false
-          }
-        },
-        outcome_1: {
-          fr: {
-            data_format: 'html',
-            translation: '<p>fr feedback</p>',
-            needs_update: false
-          }
-        },
-        default_outcome: {
-          fr: {
-            data_format: 'html',
-            translation: '<p>fr default outcome</p>',
-            needs_update: false
-          }
-        },
-        rule_input_3: {
-          fr: {
-            data_format: 'set_of_normalized_string',
-            translation: ['fr rule input 1', 'fr rule input 2'],
-            needs_update: false
-          }
-        }
-      }
-    });
-
     const interaction = iof.createFromBackendDict(interactionDict);
 
     pts.addNewCard(
@@ -229,9 +226,10 @@ describe('Content translation manager service', () => {
     );
   });
 
-  it('should switch to a new language', () => {
+  it('should switch to a new language', fakeAsync(() => {
     ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
+    flushMicrotasks();
 
     const card = pts.transcript[0];
     const interaction = card.getInteraction();
@@ -257,43 +255,50 @@ describe('Content translation manager service', () => {
     });
     expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>fr default outcome</p>');
-  });
+  }));
 
-  it('should switch to a new language expect invalid translations', () => {
+  it('should switch to a new language expect invalid translations', fakeAsync(
+    () => {
+      ctms.setOriginalTranscript('en');
+
+      const card = pts.transcript[0];
+      const interaction = card.getInteraction();
+      const translatedCustomizationArgs = {
+        placeholder: {
+          value: suof.createFromBackendDict({
+            unicode_str: 'fr placeholder',
+            content_id: 'ca_placeholder_0'
+          })
+        },
+        rows: {value: 1}
+      };
+
+      entityTranslation.markTranslationAsNeedingUpdate('hint_0');
+      spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
+        Promise.resolve(entityTranslation)
+      );
+      ctms.displayTranslations('fr');
+      tick();
+
+      expect(card.contentHtml).toBe('<p>fr content</p>');
+      expect(interaction.hints[0].hintContent.html).toBe('<p>en hint</p>');
+      expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
+      expect(interaction.customizationArgs).toEqual(
+        translatedCustomizationArgs);
+      expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
+        '<p>fr feedback</p>');
+      expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
+        contentId: 'rule_input_3',
+        normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
+      });
+      expect(interaction.defaultOutcome?.feedback.html).toBe(
+        '<p>fr default outcome</p>');
+    }));
+
+  it('should switch back to the original language', fakeAsync(() => {
     ctms.setOriginalTranscript('en');
-
-    const card = pts.transcript[0];
-    const interaction = card.getInteraction();
-    const translatedCustomizationArgs = {
-      placeholder: {
-        value: suof.createFromBackendDict({
-          unicode_str: 'fr placeholder',
-          content_id: 'ca_placeholder_0'
-        })
-      },
-      rows: {value: 1}
-    };
-
-    writtenTranslations.toggleNeedsUpdateAttribute('hint_0', 'fr');
     ctms.displayTranslations('fr');
-
-    expect(card.contentHtml).toBe('<p>fr content</p>');
-    expect(interaction.hints[0].hintContent.html).toBe('<p>en hint</p>');
-    expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
-    expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
-    expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
-      '<p>fr feedback</p>');
-    expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
-      contentId: 'rule_input_3',
-      normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
-    });
-    expect(interaction.defaultOutcome?.feedback.html).toBe(
-      '<p>fr default outcome</p>');
-  });
-
-  it('should switch back to the original language', () => {
-    ctms.setOriginalTranscript('en');
-    ctms.displayTranslations('fr');
+    tick();
     ctms.displayTranslations('en');
 
     const card = pts.transcript[0];
@@ -320,7 +325,7 @@ describe('Content translation manager service', () => {
     });
     expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>en default outcome</p>');
-  });
+  }));
 
   it('should emit to onStateCardContentUpdateEmitter when the ' +
      'language is changed', () => {
@@ -331,30 +336,43 @@ describe('Content translation manager service', () => {
     expect(onStateCardContentUpdate).toHaveBeenCalled();
   });
 
-  it('should return default content HTML if translation is invalid', () => {
-    let content = new SubtitledHtml('<p>en content</p>', 'content');
-    let translatedHtml = ctms.getTranslatedHtml('fr', content);
-    expect(translatedHtml).toEqual('<p>en content</p>');
-  });
+  it('should return translation HTML if it exist', fakeAsync(
+    () => {
+      ctms.displayTranslations('fr');
+      tick();
 
-  it('should throw error if content id is not defined', () => {
-    let content = new SubtitledHtml('<p>en content</p>', null);
-    expect(() => {
-      ctms.getTranslatedHtml('fr', content);
-    }).toThrowError('Content ID does not exist');
-  });
+      let translatedHtml = ctms.getHtmlTranslations(
+        'fr', ['hint_0', 'solution']);
+      expect(translatedHtml).toEqual(['<p>fr hint</p>', '<p>fr solution</p>']);
+    }));
 
-  it('should return default content HTML if translation is nonexistent', () => {
-    let content = new SubtitledHtml('<p>en content</p>', 'content');
-    let translatedHtml = ctms.getTranslatedHtml('pt', content);
-    expect(translatedHtml).toEqual('<p>en content</p>');
-  });
+  it('should return empty list if content_id in translation does not exist',
+    fakeAsync(() => {
+      ctms.displayTranslations('fr');
+      tick();
 
-  it('should return valid translated content HTML', () => {
-    let content = new SubtitledHtml('<p>en content</p>', 'content');
-    let translatedHtml = ctms.getTranslatedHtml('fr', content);
-    expect(translatedHtml).toEqual('<p>fr content</p>');
-  });
+      let translatedHtml = ctms.getHtmlTranslations('fr', ['hint_1']);
+      expect(translatedHtml).toEqual([]);
+    }));
+
+  it('should return empty list if translation does not exist', fakeAsync(
+    () => {
+      ctms.displayTranslations('fr');
+      tick();
+
+      let translatedHtml = ctms.getHtmlTranslations(
+        'hi', ['hint_0', 'solution']);
+      expect(translatedHtml).toEqual([]);
+    }));
+
+  it('should not return non html translations', fakeAsync(() => {
+    ctms.displayTranslations('fr');
+    tick();
+
+    let translatedHtml = ctms.getHtmlTranslations(
+      'fr', ['hint_0', 'ca_placeholder_0']);
+    expect(translatedHtml).toEqual(['<p>fr hint</p>']);
+  }));
 
   it('should not switch rules if the replacement is empty', () => {
     let newInteractionDict = {
@@ -467,12 +485,14 @@ describe('Content translation manager service', () => {
       const card = pts.transcript[0];
       const interaction = card.getInteraction();
 
-      writtenTranslations.addContentId('ca_0');
-      writtenTranslations.addWrittenTranslation(
-        'ca_0', 'fr', 'unicode', 'fr 1');
-      writtenTranslations.addContentId('ca_1');
-      writtenTranslations.addWrittenTranslation(
-        'ca_1', 'fr', 'unicode', 'fr 2');
+      entityTranslation.translationMapping.ca_0 = new TranslatedContent(
+        'fr 1', 'unicode', false);
+      entityTranslation.translationMapping.ca_1 = new TranslatedContent(
+        'fr 2', 'unicode', false);
+
+      spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
+        Promise.resolve(entityTranslation)
+      );
 
       interaction.id = 'DummyInteraction';
       interaction.customizationArgs = {
