@@ -196,8 +196,8 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
 
 
 def _initialize_bs4_and_empty_values_variable(
-    html_data
-) -> Tuple[bs4.BeautifulSoup, str]:
+    html_data: str
+) -> Tuple[bs4.BeautifulSoup, List[str]]:
     """Initializes bs4 and empty values variable.
 
     Args:
@@ -211,8 +211,21 @@ def _initialize_bs4_and_empty_values_variable(
     return (soup, empty_values)
 
 
-def _raise_validation_errors_for_escaped_html(tag, attr, tag_name, empty_values):
-    """"""
+def _raise_validation_errors_for_escaped_html_tag(
+    tag: bs4.BeautifulSoup, attr: str, tag_name: str, empty_values: List[str]
+) -> None:
+    """Raises validation for the errored escaped html tag.
+
+    Args:
+        tag: bs4.BeautifulSoup. The tag which needs to be validated.
+        attr: str. The attribute name that needs to be validated inside the tag.
+        tag_name: str. The tag name.
+        empty_values: List[str]. The list of empty values.
+
+    Raises:
+        ValidationError. Tag does not have the attribute.
+        ValidationError. Tag attribute is empty.
+    """
     if not tag.has_attr(attr):
         raise utils.ValidationError(
             '%s tag does not have \'%s\' attribute.' % (tag_name, attr)
@@ -224,8 +237,21 @@ def _raise_validation_errors_for_escaped_html(tag, attr, tag_name, empty_values)
         )
 
 
-def _raise_validation_errors_for_unescaped_html(tag, attr, tag_name, empty_values):
-    """"""
+def _raise_validation_errors_for_unescaped_html_tag(
+    tag: bs4.BeautifulSoup, attr: str, tag_name: str, empty_values: List[str]
+) -> None:
+    """Raises validation for the errored unescaped html tag.
+
+    Args:
+        tag: bs4.BeautifulSoup. The tag which needs to be validated.
+        attr: str. The attribute name that needs to be validated inside the tag.
+        tag_name: str. The tag name.
+        empty_values: List[str]. The list of empty values.
+
+    Raises:
+        ValidationError. Tag does not have the attribute.
+        ValidationError. Tag attribute is empty.
+    """
     if not tag.has_attr(attr):
         raise utils.ValidationError(
             '%s tag does not have \'%s\' attribute.' % (tag_name, attr)
@@ -333,14 +359,14 @@ def validate_rte_tags(
             )
 
     for tag in soup.find_all('oppia-noninteractive-skillreview'):
-        _raise_validation_errors_for_unescaped_html(
+        _raise_validation_errors_for_unescaped_html_tag(
             tag,
             'text-with-value',
             'SkillReview',
             empty_values
         )
 
-        _raise_validation_errors_for_unescaped_html(
+        _raise_validation_errors_for_unescaped_html_tag(
             tag,
             'skill_id-with-value',
             'SkillReview',
@@ -349,14 +375,14 @@ def validate_rte_tags(
 
     for tag in soup.find_all('oppia-noninteractive-video'):
 
-        _raise_validation_errors_for_escaped_html(
+        _raise_validation_errors_for_escaped_html_tag(
             tag,
             'start-with-value',
             'Video',
             empty_values
         )
 
-        _raise_validation_errors_for_escaped_html(
+        _raise_validation_errors_for_escaped_html_tag(
             tag,
             'end-with-value',
             'Video',
@@ -385,7 +411,7 @@ def validate_rte_tags(
                 'a boolean value.'
             )
 
-        _raise_validation_errors_for_unescaped_html(
+        _raise_validation_errors_for_unescaped_html_tag(
             tag,
             'video_id-with-value',
             'Video',
@@ -399,7 +425,7 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        _raise_validation_errors_for_unescaped_html(
+        _raise_validation_errors_for_unescaped_html_tag(
             tag,
             'url-with-value',
             'Link',

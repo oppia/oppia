@@ -21,8 +21,6 @@ import os
 from core import feconf
 from core import utils
 from core.controllers import domain_objects_validator
-from core.domain import exp_domain
-from core.domain import state_domain
 from core.tests import test_utils
 
 
