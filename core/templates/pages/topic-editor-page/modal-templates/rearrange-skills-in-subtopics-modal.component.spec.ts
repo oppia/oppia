@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,132 +13,157 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for RearrangeSkillsInSubtopicsModalController.
+ * @fileoverview Unit tests for Rearrange Skills In Subtopics Modal.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { TopicUpdateService } from 'domain/topic/topic-update.service';
+import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { RearrangeSkillsInSubtopicsModalComponent } from './rearrange-skills-in-subtopics-modal.component';
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-describe('Rearrange Skills In Subtopic Modal Controller', function() {
-  var $scope = null;
-  var ctrl = null;
-  var topic = null;
-  var $uibModalInstance = null;
-  var TopicEditorStateService = null;
-  var TopicUpdateService;
-  var TopicObjectFactory;
-  var topicInitializedEventEmitter = null;
-  var topicReinitializedEventEmitter = null;
+  dismiss(): void {
+    return;
+  }
+}
 
-  importAllAngularServices();
+describe('Rearrange Skills In Subtopic Modal Component', () => {
+  let component: RearrangeSkillsInSubtopicsModalComponent;
+  let fixture: ComponentFixture<RearrangeSkillsInSubtopicsModalComponent>;
+  let topicEditorStateService: TopicEditorStateService;
+  let topicUpdateService: TopicUpdateService;
+  let topicObjectFactory: TopicObjectFactory;
+  let topicInitializedEventEmitter = new EventEmitter();
+  let topicReinitializedEventEmitter = new EventEmitter();
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
-    TopicUpdateService = $injector.get('TopicUpdateService');
-    $uibModalInstance = $injector.get('$uibModal');
-    $scope = $rootScope.$new();
-    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    topic = TopicObjectFactory.createInterstitialTopic();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        RearrangeSkillsInSubtopicsModalComponent
+      ],
+      providers: [
+        TopicEditorStateService,
+        TopicUpdateService,
+        TopicObjectFactory,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ]
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      RearrangeSkillsInSubtopicsModalComponent
+    );
+    component = fixture.componentInstance;
+    topicEditorStateService = TestBed.inject(TopicEditorStateService);
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
+    topicUpdateService = TestBed.inject(TopicUpdateService);
+    let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
+    let topic = topicObjectFactory.createInterstitialTopic();
     topic._subtopics = [subtopic];
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    ctrl = $controller('RearrangeSkillsInSubtopicsModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-
-    });
-  }));
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+  });
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
-  it('should initialize the variables', function() {
-    ctrl.init();
-    expect(ctrl.topic).toEqual(topic);
+  it('should initialize the letiables', () => {
+    component.ngOnInit();
+    expect(component.topic).toEqual(topic);
   });
 
-  it('should get skill editor url', function() {
-    expect(ctrl.getSkillEditorUrl('1')).toBe('/skill_editor/1');
+  it('should get skill editor url', () => {
+    expect(component.getSkillEditorUrl('1')).toBe('/skill_editor/1');
   });
 
-  it('should record skill summary to move and subtopic Id', function() {
-    var skillSummary = ShortSkillSummary.create(
+  it('should record skill summary to move and subtopic Id', () => {
+    let skillSummary = ShortSkillSummary.create(
       '1', 'Skill description');
-    ctrl.onMoveSkillStart(1, skillSummary);
-    expect(ctrl.skillSummaryToMove).toEqual(skillSummary);
-    expect(ctrl.oldSubtopicId).toEqual(1);
+    component.onMoveSkillStart(1, skillSummary);
+    expect(component.skillSummaryToMove).toEqual(skillSummary);
+    expect(component.oldSubtopicId).toEqual(1);
   });
 
-  it('should call TopicUpdateService when skill is moved', function() {
-    var moveSkillSpy = spyOn(TopicUpdateService, 'moveSkillToSubtopic');
-    ctrl.onMoveSkillEnd(1);
+  it('should call TopicUpdateService when skill is moved', () => {
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    component.onMoveSkillEnd(1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic',
-    function() {
-      var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      ctrl.onMoveSkillEnd(null);
+    () => {
+      let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+      component.onMoveSkillEnd(null);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
   it('should not call TopicUpdateService when skill is moved to same subtopic',
-    function() {
-      var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      ctrl.oldSubtopicId = null;
-      ctrl.onMoveSkillEnd(null);
+    () => {
+      let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+      component.oldSubtopicId;
+      component.onMoveSkillEnd(null);
       expect(removeSkillSpy).not.toHaveBeenCalled();
     });
 
   it('should not call TopicUpdateService if subtopic name validation fails',
-    function() {
-      ctrl.editableName = 'subtopic1';
-      var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
-      ctrl.updateSubtopicTitle(1);
+    () => {
+      component.editableName = 'subtopic1';
+      let subtopicTitleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
+      component.updateSubtopicTitle(1);
       expect(subtopicTitleSpy).not.toHaveBeenCalled();
     });
 
-  it('should call TopicUpdateService to update subtopic title', function() {
-    var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
-    ctrl.updateSubtopicTitle(1);
+  it('should call TopicUpdateService to update subtopic title', () => {
+    let subtopicTitleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
+    component.updateSubtopicTitle(1);
     expect(subtopicTitleSpy).toHaveBeenCalled();
   });
 
-  it('should call set and reset the selected subtopic index', function() {
-    ctrl.editNameOfSubtopicWithId(1);
-    expect(ctrl.selectedSubtopicId).toEqual(1);
-    ctrl.editNameOfSubtopicWithId(10);
-    expect(ctrl.selectedSubtopicId).toEqual(10);
-    ctrl.editNameOfSubtopicWithId(0);
-    expect(ctrl.editableName).toEqual('');
-    expect(ctrl.selectedSubtopicId).toEqual(0);
+  it('should call set and reset the selected subtopic index', () => {
+    component.editNameOfSubtopicWithId(1);
+    expect(component.selectedSubtopicId).toEqual(1);
+    component.editNameOfSubtopicWithId(10);
+    expect(component.selectedSubtopicId).toEqual(10);
+    component.editNameOfSubtopicWithId(0);
+    expect(component.editableName).toEqual('');
+    expect(component.selectedSubtopicId).toEqual(0);
   });
 
   it('should call initEditor on calls from topic being initialized',
-    function() {
+    () => {
       topicInitializedEventEmitter = new EventEmitter();
       topicReinitializedEventEmitter = new EventEmitter();
 
-      spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
-        function() {
+      spyOnProperty(topicEditorStateService, 'onTopicInitialized').and.callFake(
+        () => {
           return topicInitializedEventEmitter;
         });
       spyOnProperty(
-        TopicEditorStateService, 'onTopicReinitialized').and.callFake(
-        function() {
+        topicEditorStateService, 'onTopicReinitialized').and.callFake(
+        () => {
           return topicReinitializedEventEmitter;
         });
-      spyOn(ctrl, 'initEditor').and.callThrough();
-      ctrl.init();
-      expect(ctrl.initEditor).toHaveBeenCalledTimes(1);
+      spyOn(component, 'initEditor').and.callThrough();
+      component.ngOnInit();
+      expect(component.initEditor).toHaveBeenCalledTimes(1);
       topicInitializedEventEmitter.emit();
-      expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
+      expect(component.initEditor).toHaveBeenCalledTimes(2);
       topicReinitializedEventEmitter.emit();
-      expect(ctrl.initEditor).toHaveBeenCalledTimes(3);
+      expect(component.initEditor).toHaveBeenCalledTimes(3);
     });
 });

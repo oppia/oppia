@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,122 +13,156 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for RearrangeSkillsInSubtopicsModal.
+ * @fileoverview Component for RearrangeSkillsInSubtopicsModal.
  */
 
-require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
-
-require(
-  'components/common-layout-directives/common-elements/' +
-    'confirm-or-cancel-modal.controller.ts');
-
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/topic/topic-update.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { TopicUpdateService } from 'domain/topic/topic-update.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
+import { SubtopicValidationService } from '../services/subtopic-validation.service';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Subtopic } from 'domain/topic/subtopic.model';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
-angular.module('oppia').controller(
-  'RearrangeSkillsInSubtopicsModalController', [
-    '$controller', '$scope', '$uibModalInstance', 'SubtopicValidationService',
-    'TopicEditorStateService',
-    'TopicUpdateService', 'UrlInterpolationService',
-    function(
-        $controller, $scope, $uibModalInstance, SubtopicValidationService,
-        TopicEditorStateService, TopicUpdateService, UrlInterpolationService) {
-      $controller('ConfirmOrCancelModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance
-      });
-      var ctrl = this;
-      var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.initEditor = function() {
-        ctrl.topic = TopicEditorStateService.getTopic();
-        ctrl.subtopics = ctrl.topic.getSubtopics();
-        ctrl.uncategorizedSkillSummaries = (
-          ctrl.topic.getUncategorizedSkillSummaries());
-      };
+@Component({
+  selector: 'oppia-rearrange-skills-in-subtopics-modal',
+  templateUrl: './rearrange-skills-in-subtopics-modal.component.html'
+})
+export class RearrangeSkillsInSubtopicsModalComponent
+ extends ConfirmOrCancelModal implements OnInit, OnDestroy {
+  topic: Topic;
+  subtopics: Subtopic[];
+  uncategorizedSkillSummaries: ShortSkillSummary[];
+  skillSummaryToMove: ShortSkillSummary;
+  oldSubtopicId: number;
+  errorMsg: string;
+  editableName: string;
+  selectedSubtopicId: number;
 
-      ctrl.getSkillEditorUrl = function(skillId) {
-        return UrlInterpolationService.interpolateUrl(
-          SKILL_EDITOR_URL_TEMPLATE, {
-            skillId: skillId
-          }
-        );
-      };
+  SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
+  directiveSubscriptions = new Subscription();
 
-      /**
-       * @param {string|null} oldSubtopicId - The id of the subtopic from
-       *    which the skill is to be moved, or null if the origin is the
-       *    uncategorized section.
-       * @param {SkillSummary} skillSummary - The summary of the skill that
-       *    is to be moved.
-       */
-      ctrl.onMoveSkillStart = function(oldSubtopicId, skillSummary) {
-        ctrl.skillSummaryToMove = skillSummary;
-        ctrl.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
-      };
+  constructor(
+    private subtopicValidationService: SubtopicValidationService,
+    private topicEditorStateService: TopicEditorStateService,
+    private topicUpdateService: TopicUpdateService,
+    private urlInterpolationService: UrlInterpolationService,
+    private ngbActiveModal: NgbActiveModal,
+  ) {
+    super(ngbActiveModal);
+  }
 
-      /**
-       * @param {string|null} newSubtopicId - The subtopic to which the
-       *    skill is to be moved, or null if the destination is the
-       *    uncategorized section.
-       */
-      ctrl.onMoveSkillEnd = function(newSubtopicId) {
-        if (newSubtopicId === ctrl.oldSubtopicId) {
-          return;
-        }
+  todo = ['Get to work', 'Pick up groceries', 'Go home', 'Fall asleep'];
 
-        if (newSubtopicId === null) {
-          TopicUpdateService.removeSkillFromSubtopic(
-            ctrl.topic, ctrl.oldSubtopicId, ctrl.skillSummaryToMove);
-        } else {
-          TopicUpdateService.moveSkillToSubtopic(
-            ctrl.topic, ctrl.oldSubtopicId, newSubtopicId,
-            ctrl.skillSummaryToMove);
-        }
-        ctrl.initEditor();
-      };
+  done = ['Get up', 'Brush teeth', 'Take a shower', 'Check e-mail', 'Walk dog'];
 
-
-      ctrl.updateSubtopicTitle = function(subtopicId) {
-        if (!SubtopicValidationService.checkValidSubtopicName(
-          ctrl.editableName)) {
-          ctrl.errorMsg = 'A subtopic with this title already exists';
-          return;
-        }
-
-        TopicUpdateService.setSubtopicTitle(
-          ctrl.topic, subtopicId, ctrl.editableName);
-        ctrl.editNameOfSubtopicWithId(null);
-      };
-
-      ctrl.editNameOfSubtopicWithId = function(subtopicId) {
-        if (!subtopicId) {
-          ctrl.editableName = '';
-        }
-        ctrl.selectedSubtopicId = subtopicId;
-      };
-
-      ctrl.init = function() {
-        ctrl.editableName = '';
-        ctrl.directiveSubscriptions.add(
-          TopicEditorStateService.onTopicInitialized.subscribe(
-            () => ctrl.initEditor()
-          ));
-        ctrl.directiveSubscriptions.add(
-          TopicEditorStateService.onTopicReinitialized.subscribe(
-            () => ctrl.initEditor()
-          ));
-        ctrl.initEditor();
-      };
-      ctrl.init();
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+  drop(event): void {
+    console.log(event);
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
     }
-  ]
-);
+  }
+
+  initEditor(): void {
+    this.topic = this.topicEditorStateService.getTopic();
+    this.subtopics = this.topic.getSubtopics();
+    this.uncategorizedSkillSummaries = (
+      this.topic.getUncategorizedSkillSummaries());
+  }
+
+  getSkillEditorUrl(skillId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      this.SKILL_EDITOR_URL_TEMPLATE, {
+        skillId: skillId
+      }
+    );
+  }
+
+  /**
+   * @param {string|null} oldSubtopicId - The id of the subtopic from
+   *    which the skill is to be moved, or null if the origin is the
+   *    uncategorized section.
+   * @param {SkillSummary} skillSummary - The summary of the skill that
+   *    is to be moved.
+   */
+  onMoveSkillStart(
+      oldSubtopicId: number, skillSummary: ShortSkillSummary): void {
+    this.skillSummaryToMove = skillSummary;
+    this.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
+  }
+
+  /**
+   * @param {string|null} newSubtopicId - The subtopic to which the
+   *    skill is to be moved, or null if the destination is the
+   *    uncategorized section.
+   */
+  onMoveSkillEnd(newSubtopicId: number | null): void {
+    if (newSubtopicId === this.oldSubtopicId) {
+      return;
+    }
+
+    if (newSubtopicId === null) {
+      this.topicUpdateService.removeSkillFromSubtopic(
+        this.topic, this.oldSubtopicId, this.skillSummaryToMove);
+    } else {
+      this.topicUpdateService.moveSkillToSubtopic(
+        this.topic, this.oldSubtopicId, newSubtopicId,
+        this.skillSummaryToMove);
+    }
+    this.initEditor();
+  }
+
+
+  updateSubtopicTitle(subtopicId: number): void {
+    if (!this.subtopicValidationService.checkValidSubtopicName(
+      this.editableName)) {
+      this.errorMsg = 'A subtopic with this title already exists';
+      return;
+    }
+
+    this.topicUpdateService.setSubtopicTitle(
+      this.topic, subtopicId, this.editableName);
+    this.editNameOfSubtopicWithId(null);
+  }
+
+  editNameOfSubtopicWithId(subtopicId: number): void {
+    if (!subtopicId) {
+      this.editableName = '';
+    }
+    this.selectedSubtopicId = subtopicId;
+  }
+
+  isSkillDeleted(skillSummary: ShortSkillSummary): boolean {
+    return skillSummary.getDescription() === null;
+  }
+
+  ngOnInit(): void {
+    this.editableName = '';
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onTopicInitialized.subscribe(
+        () => this.initEditor()
+      ));
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onTopicReinitialized.subscribe(
+        () => this.initEditor()
+      ));
+    this.initEditor();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}

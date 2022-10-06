@@ -20,6 +20,7 @@ import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/chang
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { Subscription } from 'rxjs';
+import { RearrangeSkillsInSubtopicsModalComponent } from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -38,9 +39,6 @@ require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-  'rearrange-skills-in-subtopics-modal.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -69,7 +67,7 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'ContextService',
+        '$rootScope', '$scope', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
         'ImageUploadHelperService', 'NgbModal',
         'PageTitleService', 'StoryCreationService', 'TopicEditorRoutingService',
@@ -82,7 +80,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
         function(
-            $rootScope, $scope, $uibModal, ContextService,
+            $rootScope, $scope, ContextService,
             EntityCreationService, FocusManagerService,
             ImageUploadHelperService, NgbModal,
             PageTitleService, StoryCreationService, TopicEditorRoutingService,
@@ -254,16 +252,12 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.reassignSkillsInSubtopics = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                  'rearrange-skills-in-subtopics-modal.template.html'),
-              backdrop: 'static',
-              windowClass: 'rearrange-skills-modal',
-              controller: 'RearrangeSkillsInSubtopicsModalController',
-              controllerAs: '$ctrl',
-              size: 'xl'
-            }).result.then(function() {
+            NgbModal.open(
+              RearrangeSkillsInSubtopicsModalComponent, {
+                backdrop: 'static',
+                windowClass: 'rearrange-skills-modal',
+                size: 'xl'
+              }).result.then(function() {
               ctrl.initEditor();
             }, function() {
               // Note to developers:

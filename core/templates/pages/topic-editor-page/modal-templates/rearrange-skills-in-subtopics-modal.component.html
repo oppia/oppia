@@ -4,119 +4,153 @@
       Subtopics & Skills
     </h3>
   </div>
-  <div class="modal-body subtopics">
+  <div class="modal-body subtopics" cdkDropListGroup>
     <div class="subtopics-container">
       <div class="empty-placeholder"></div>
       <div class="item-flex-container">
-        <md-card class="item-container uncategorized-skill-ids e2e-test-uncategorized-skills-container"
-                 ng-class="{'skills-valid': !$ctrl.uncategorizedSkillSummaries.length, 'skills-invalid': $ctrl.uncategorizedSkillSummaries.length}"
-                 dnd-list="$ctrl.uncategorizedSkillSummaries"
-                 dnd-drop="$ctrl.onMoveSkillEnd(null)">
+        <div class="item-container uncategorized-skill-ids e2e-test-uncategorized-skills-container"
+             [ngClass]="{'skills-valid': !uncategorizedSkillSummaries?.length, 'skills-invalid': uncategorizedSkillSummaries?.length}">
           <strong>Uncategorized Skills</strong>
           <div class="number-skills-container">
-            <span ng-if="$ctrl.uncategorizedSkillSummaries.length === 1" class="number-skills-text"><[$ctrl.uncategorizedSkillSummaries.length]> Skill</span>
-            <span ng-if="!($ctrl.uncategorizedSkillSummaries.length === 1)" class="number-skills-text"><[$ctrl.uncategorizedSkillSummaries.length]> Skills</span>
+            <span *ngIf="uncategorizedSkillSummaries?.length === 1"
+                  class="number-skills-text">{{ uncategorizedSkillSummaries?.length }} Skill</span>
+            <span *ngIf="!(uncategorizedSkillSummaries?.length === 1)"
+                  class="number-skills-text">{{ uncategorizedSkillSummaries?.length }} Skills</span>
           </div>
-          <div class="uncategorized-skills-container">
-            <md-card class="skill-id"
-                     ng-repeat="skillSummary in $ctrl.uncategorizedSkillSummaries track by $index"
-                     dnd-draggable="skillSummary"
-                     dnd-effect-allowed="move"
-                     dnd-dragstart="$ctrl.onMoveSkillStart(null, skillSummary)">
-              <div class="skill-card">
-                <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
-                   class="skill-name e2e-test-uncategorized-skill-card"
-                   ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                   <[skillSummary.getDescription()]>
-                </a>
-              </div>
-            </md-card>
-            <p class="intro-card-message e2e-test-no-uncategorized-skills" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0">
+          <div class="uncategorized-skills-container"
+               cdkDropList
+               [cdkDropListData]="uncategorizedSkillSummaries"
+               (cdkDropListDropped)="drop($event)">
+              <mat-card class="skill-id"
+                        *ngFor="let skillSummary of uncategorizedSkillSummaries"
+                        cdkDrag>
+                <div class="skill-card">
+                  <a *ngIf="!isSkillDeleted(skillSummary)"
+                    class="skill-name e2e-test-uncategorized-skill-card"
+                    [href]="getSkillEditorUrl(skillSummary.getId())"
+                    target="_blank"
+                    rel="noopener">
+                    {{ skillSummary.getDescription() }}
+                  </a>
+                </div>
+              </mat-card>
+            <p class="intro-card-message e2e-test-no-uncategorized-skills"
+               *ngIf="uncategorizedSkillSummaries?.length === 0">
               There are no unassigned skills left in the topic.
             </p>
           </div>
-        </md-card>
+        </div>
       </div>
-      <div ng-repeat="(subtopicIndex, subtopic) in $ctrl.subtopics"
-           dnd-list="subtopic.getSkillSummaries()"
-           dnd-drop="$ctrl.onMoveSkillEnd(subtopic.getId())"
+      <div *ngFor="let subtopic of subtopics"
            class="item-flex-container">
-        <md-card class="subtopic item-container e2e-test-subtopic-column">
-          <div class="subtopic-header" ng-click="$ctrl.editNameOfSubtopicWithId(subtopic.getId())">
-            <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
-            <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
+        <div class="subtopic item-container e2e-test-subtopic-column">
+          <div class="subtopic-header"
+               (click)="editNameOfSubtopicWithId(subtopic.getId())">
+            <strong [ngbTooltip]="subtopic.getTitle()"
+                    placement="bottom"
+                    *ngIf="subtopic?.getTitle()?.length < 25">
+              {{ subtopic.getTitle() }}
+            </strong>
+            <strong [ngbTooltip]="subtopic?.getTitle()"
+                    placement="bottom"
+                    *ngIf="subtopic?.getTitle().length >= 25">
+              {{ subtopic?.getTitle().substring(0,15) }}...
+            </strong>
             <div class="number-skills-container">
-              <span ng-if="subtopic.getSkillSummaries().length === 1" class="number-skills-text"><[subtopic.getSkillSummaries().length]> Skill</span>
-              <span ng-if="!(subtopic.getSkillSummaries().length === 1)" class="number-skills-text"><[subtopic.getSkillSummaries().length]> Skills</span>
+              <span *ngIf="subtopic.getSkillSummaries().length === 1"
+                    class="number-skills-text">
+                {{ subtopic?.getSkillSummaries().length }} Skill
+              </span>
+              <span *ngIf="!(subtopic?.getSkillSummaries().length === 1)"
+                    class="number-skills-text">
+                {{ subtopic?.getSkillSummaries().length }} Skills
+              </span>
             </div>
           </div>
-          <div ng-if="subtopic.getId() === $ctrl.selectedSubtopicId">
-            <input type="text" ng-model="$ctrl.editableName">
-            <button class="btn btn-secondary" ng-click="$ctrl.editNameOfSubtopicWithId(null)">Cancel</button>
-            <button class="btn btn-primary" ng-click="$ctrl.updateSubtopicTitle(subtopic.getId())">Save</button>
+          <div *ngIf="subtopic.getId() === selectedSubtopicId">
+            <input type="text" [(ngModel)]="editableName">
+            <button class="btn btn-secondary"
+                    (click)="editNameOfSubtopicWithId(null)">
+              Cancel
+            </button>
+            <button class="btn btn-primary"
+                    (click)="updateSubtopicTitle(subtopic.getId())">
+              Save
+            </button>
           </div>
-          <div class="subtopic-container">
-            <md-card class="skill-id"
-                     ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
-                     dnd-draggable="skillSummary"
-                     dnd-dragstart="$ctrl.onMoveSkillStart(subtopic.getId(), skillSummary)"
-                     dnd-effect-allowed="move">
-              <div class="skill-card">
-                <a ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" class="skill-name e2e-test-subtopic-skill-description" target="_blank" rel="noopener">
-                   <[skillSummary.getDescription()]>
-                </a>
-              </div>
-            </md-card>
+          <div class="subtopic-container"
+               cdkDropList
+               [cdkDropListData]="subtopic?.getSkillSummaries()"
+               (cdkDropListDropped)="drop($event)">
+              <mat-card class="skill-id"
+                       *ngFor="let skillSummary of subtopic?.getSkillSummaries()"
+                        cdkDrag>
+                <div class="skill-card">
+                  <a [href]="getSkillEditorUrl(skillSummary?.getId())"
+                    class="skill-name e2e-test-subtopic-skill-description"
+                    target="_blank"
+                    rel="noopener">
+                    {{ skillSummary?.getDescription() }}
+                  </a>
+                </div>
+              </mat-card>
           </div>
-        </md-card>
+        </div>
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success e2e-test-save-rearrange-skills" ng-click="confirm()">Save</button>
+    <button class="btn btn-secondary"
+            (click)="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-success e2e-test-save-rearrange-skills"
+            (click)="confirm()">
+      Save
+    </button>
   </div>
 </div>
 <style>
-  .rearrange-skills-modal .modal-dialog {
+  .modal-dialog {
     max-width: inherit;
     width: 80vw;
   }
-  .rearrange-skills-modal .modal-body {
+  .modal-body {
     height: 55vh;
     padding: 40px 0 0 0;
   }
-  .rearrange-skills-modal a {
+  a {
     color: #666;
   }
-  .rearrange-skills-modal .subtopic-container {
+  .subtopic-container {
+    height: 60vh;
+    /* max-height: 60vh;
+    overflow-y: auto; */
+  }
+  .uncategorized-skills-container {
     max-height: 60vh;
     overflow-y: auto;
   }
-  .rearrange-skills-modal .uncategorized-skills-container {
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-  .rearrange-skills-modal .item-container {
+  .item-container {
     background-color: #eee;
     border-radius: 4px;
     max-height: 95%;
     padding: 5px 10px;
     width: 15vw;
   }
-  .rearrange-skills-modal .rearrange-skills-modal {
+  .rearrange-skills-modal {
     display: flex;
     height: auto;
     margin: 6vh 10vh 0 10vh;
   }
-  .rearrange-skills-modal .intro-card-message {
+  .intro-card-message {
     color: #808080;
     font-size: 0.8em;
     line-height: 1.846;
     padding: 10px;
     text-align: center;
   }
-  .rearrange-skills-modal .subtopics-container {
+  .subtopics-container {
     align-content: flex-start;
     display: flex;
     flex-direction: column;
@@ -125,13 +159,13 @@
     max-height: 350px;
     overflow-x: auto;
   }
-  .rearrange-skills-modal .subtopic-header {
+  .subtopic-header {
     text-align: left;
   }
-  .rearrange-skills-modal .item-flex-container {
+  .item-flex-container {
     min-height: 200px;
   }
-  .rearrange-skills-modal .skill-id {
+  .skill-id {
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -140,36 +174,36 @@
     margin: 8px 0;
     text-align: left;
   }
-  .rearrange-skills-modal .skill-id:hover {
+  .skill-id:hover {
     background-color: #e0e0e0;
   }
-  .rearrange-skills-modal .skill-card {
+  .skill-card {
     margin-left: 12px;
   }
-  .rearrange-skills-modal .dndPlaceholder {
+  .dndPlaceholder {
     display: none;
   }
-  .rearrange-skills-modal .skills-valid {
+  .skills-valid {
     background-color: #009c8a33;
     border: 2px solid #009c8a;
   }
-  .rearrange-skills-modal .skills-invalid {
+  .skills-invalid {
     background-color: #c55f4533;
     border: 2px solid #c55f45;
   }
-  .rearrange-skills-modal .dndDragover .subtopic {
+  .dndDragover .subtopic {
     box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
     padding-bottom: 40px;
   }
-  .rearrange-skills-modal .number-skills-container {
+  .number-skills-container {
     bottom: 3px;
     position: relative;
   }
-  .rearrange-skills-modal .number-skills-text {
+  .number-skills-text {
     color: #666;
     font-size: 14px;
   }
-  .rearrange-skills-modal .empty-placeholder {
+  .empty-placeholder {
     height: 100%;
     width: 60px;
   }

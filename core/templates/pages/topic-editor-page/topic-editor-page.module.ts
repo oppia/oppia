@@ -48,6 +48,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.component';
+import { RearrangeSkillsInSubtopicsModalComponent } from './modal-templates/rearrange-skills-in-subtopics-modal.component';
 
 @NgModule({
   imports: [
@@ -64,6 +65,7 @@ import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.
   ],
   declarations: [
     ChangeSubtopicAssignmentModalComponent,
+    RearrangeSkillsInSubtopicsModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -77,6 +79,7 @@ import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.
   ],
   entryComponents: [
     ChangeSubtopicAssignmentModalComponent,
+    RearrangeSkillsInSubtopicsModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
