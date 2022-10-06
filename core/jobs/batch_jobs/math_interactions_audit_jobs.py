@@ -104,7 +104,10 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
         Returns:
             bool. Whether the exploration contains math interactions.
         """
-        return any(
+        # We are adding no branch here because the any() method returns either
+        # True or False but the case where it exits out of execution will never
+        # occur. Hence we add the flag to ignore the branch (110 -> exit).
+        return any( # pragma: no branch
             state_dict['interaction']['id'] in feconf.MATH_INTERACTION_IDS
             for state_dict in model.states.values())
 

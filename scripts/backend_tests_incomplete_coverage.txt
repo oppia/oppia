@@ -85,7 +85,6 @@ core.domain.visualization_registry_test
 core.domain.voiceover_services_test
 core.domain.wipeout_domain_test
 core.domain.wipeout_service_test
-core.jobs.batch_jobs.math_interactions_audit_jobs_test
 core.jobs.transforms.validation.base_validation_test
 core.jobs.types.base_validation_errors_test
 core.platform.auth.firebase_auth_services_test
@@ -99,7 +98,6 @@ core.storage.collection.gae_models_test
 core.storage.exploration.gae_models_test
 core.storage.question.gae_models_test
 core.storage.topic.gae_models_test
-core.storage.user.gae_models_test
 core.utils_test
 extensions.answer_summarizers.models_test
 extensions.interactions.base_test

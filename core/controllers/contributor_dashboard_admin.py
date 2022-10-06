@@ -111,7 +111,11 @@ class ContributionRightsHandler(base.BaseHandler):
                     'User %s already has rights to review question.' % (
                         username))
             user_services.allow_user_to_review_question(user_id)
-        else:
+        # The handler schema defines the possible values of 'category'.
+        # If 'category' has a value other than those defined in the schema,
+        # a Bad Request error will be thrown and the else branch of the below
+        # condition will never execute. Hence, we use the no branch flag.
+        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: # pragma: no branch
             if user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to submit question.' % (
@@ -153,7 +157,12 @@ class ContributionRightsHandler(base.BaseHandler):
                     '%s does not have rights to review question.' % (
                         username))
             user_services.remove_question_review_rights(user_id)
-        else:
+        # The handler schema defines the possible values of 'category'.
+        # If 'category' has a value other than those defined in the schema,
+        # a Bad Request error will be thrown and the else branch of the below
+        # condition will never execute. Hence, we use the no branch flag.
+        elif category == ( # pragma: no branch
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
             if not user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     '%s does not have rights to submit question.' % (

@@ -288,7 +288,12 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'version': version
                 }
-            else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown and the else branch of the
+            # below condition will never execute. Hence, we use the no branch
+            # flag.
+            elif action == 'update_feature_flag_rules': # pragma: no branch
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rules = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')
@@ -877,7 +882,12 @@ class AdminRoleHandler(base.BaseHandler):
             self.render_json({
                 'usernames': user_services.get_usernames_by_role(role)
             })
-        else:
+        # The handler schema defines the possible values of 'filter_criterion'.
+        # If 'filter_criterion' has a value other than those defined in the
+        # schema, a Bad Request error will be thrown and the else branch of the
+        # below condition will never execute. Hence, we use the no branch
+        # flag.
+        elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME: # pragma: no branch
             username = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_USERNAME)
             user_id = user_services.get_user_id_from_username(username)
@@ -988,7 +998,11 @@ class TopicManagerRoleHandler(base.BaseHandler):
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
-        else:
+        # The handler schema defines the possible values of 'action'.
+        # If 'action' has a value other than those defined in the schema,
+        # a Bad Request error will be thrown and the else branch of the below
+        # condition will never execute. Hence, we use the no branch flag.
+        elif action == 'deassign': # pragma: no branch
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 
