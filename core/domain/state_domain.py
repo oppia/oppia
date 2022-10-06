@@ -958,11 +958,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 'The Continue button text should be at most 20 characters.'
             )
 
-        if len(self.answer_groups) > 0:
-            raise utils.ValidationError(
-                'The Continue button does not require answer groups.'
-            )
-
     def _validate_end_exploration_input(self) -> None:
         """Validates the End interaction.
 
@@ -1908,6 +1903,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if self.is_terminal and self.answer_groups:
             raise utils.ValidationError(
                 'Terminal interactions must not have any answer groups.')
+        if self.is_terminal and self.answer_groups:
+            raise utils.ValidationError(
+                'Linear interactions must not have any answer groups.')
 
         for answer_group in self.answer_groups:
             answer_group.validate(interaction, exp_param_specs_dict)
@@ -1928,7 +1926,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
-        interaction_id_to_validation_dict = {
+        interaction_id_to_validation_func = {
             'Continue': self._validate_continue_input,
             'EndExploration': self._validate_end_exploration_input,
             'NumericInput': self._validate_numeric_input,
@@ -1939,8 +1937,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'DragAndDropSortInput': self._validate_drag_and_drop_input,
             'TextInput': self._validate_text_input
         }
-        if self.id in interaction_id_to_validation_dict:
-            interaction_id_to_validation_dict[self.id]()
+        if self.id in interaction_id_to_validation_func:
+            interaction_id_to_validation_func[self.id]()
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using

@@ -1154,43 +1154,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.customization_args[
             'buttonText'].value.unicode_str = 'Continue'
 
-        def mock_ans_group_validate(self, _, __):
-            """Empty function to swap the answer group validation function so
-            it does not raise an error when we create an answer group for
-            `Continue` interaction.
-            """
-
-        test_ans_group = [
-            state_domain.AnswerGroup(
-                state_domain.Outcome(
-                    'D', None, state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
-                    False, [], None, None),
-                [
-                    state_domain.RuleSpec(
-                        'Contains',
-                        {
-                            'x':
-                            {
-                                'contentId': 'rule_input_0',
-                                'normalizedStrSet': ['Test0']
-                            }
-                        })
-                ],
-                [],
-                None
-            )
-        ]
-
-        with self.swap(
-          state_domain.AnswerGroup, 'validate', mock_ans_group_validate
-        ):
-            self.state.interaction.answer_groups = test_ans_group
-            self._assert_validation_error(
-                self.new_exploration,
-                'The Continue button does not require answer groups.')
-        self.state.interaction.answer_groups = []
-
     def test_numeric_interaction(self) -> None:
         """Tests Numeric interaction."""
         self.set_interaction_for_state(self.state, 'NumericInput')
@@ -2587,6 +2550,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
+
+        self.set_interaction_for_state(init_state, 'Continue')
+        self._assert_validation_error(
+            exploration,
+            'Linear interactions must not have any answer groups.')
 
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
