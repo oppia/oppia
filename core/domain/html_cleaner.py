@@ -207,8 +207,35 @@ def _initialize_bs4_and_empty_values_variable(
         tuple. Tuple of initialized bs4 and empty values variable.
     """
     soup = bs4.BeautifulSoup(html_data, 'html.parser')
-    empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
+    empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
     return (soup, empty_values)
+
+
+def _raise_validation_errors_for_escaped_html(tag, attr, tag_name, empty_values):
+    """"""
+    if not tag.has_attr(attr):
+        raise utils.ValidationError(
+            '%s tag does not have \'%s\' attribute.' % (tag_name, attr)
+        )
+
+    if tag[attr].strip() in empty_values:
+        raise utils.ValidationError(
+            '%s tag \'%s\' attribute should not be empty.' % (tag_name, attr)
+        )
+
+
+def _raise_validation_errors_for_unescaped_html(tag, attr, tag_name, empty_values):
+    """"""
+    if not tag.has_attr(attr):
+        raise utils.ValidationError(
+            '%s tag does not have \'%s\' attribute.' % (tag_name, attr)
+        )
+
+    attr_value = utils.unescape_html(tag[attr])[1:-1].replace('\\"', '')
+    if attr_value.strip() in empty_values:
+        raise utils.ValidationError(
+            '%s tag \'%s\' attribute should not be empty.' % (tag_name, attr)
+        )
 
 
 def validate_rte_tags(
@@ -306,58 +333,35 @@ def validate_rte_tags(
             )
 
     for tag in soup.find_all('oppia-noninteractive-skillreview'):
-        if not tag.has_attr('text-with-value'):
-            raise utils.ValidationError(
-                'SkillReview tag does not have \'text-with-value\' '
-                'attribute.'
-            )
+        _raise_validation_errors_for_unescaped_html(
+            tag,
+            'text-with-value',
+            'SkillReview',
+            empty_values
+        )
 
-        text_value = utils.unescape_html(
-                tag['text-with-value'])[1:-1].replace('\\"', '')
-        if text_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'SkillReview tag should not have \'text-with-value\' '
-                'attribute value as empty string.'
-            )
-
-        if not tag.has_attr('skill_id-with-value'):
-            raise utils.ValidationError(
-                'SkillReview tag does not have \'skill_id-with-value\' '
-                'attribute.'
-            )
-
-        skill_value = utils.unescape_html(
-                tag['skill_id-with-value'])[1:-1].replace('\\"', '')
-        if skill_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'SkillReview tag should not have '
-                '\'skill_id-with-value\' attribute value as empty string.'
-            )
+        _raise_validation_errors_for_unescaped_html(
+            tag,
+            'skill_id-with-value',
+            'SkillReview',
+            empty_values
+        )
 
     for tag in soup.find_all('oppia-noninteractive-video'):
-        if not tag.has_attr('start-with-value'):
-            raise utils.ValidationError(
-                'Video tag does not have \'start-with-value\' '
-                'attribute.'
-            )
 
-        if tag['start-with-value'].strip() in empty_values:
-            raise utils.ValidationError(
-                'Video tag \'start-with-value\' attribute should not '
-                'be empty.'
-            )
+        _raise_validation_errors_for_escaped_html(
+            tag,
+            'start-with-value',
+            'Video',
+            empty_values
+        )
 
-        if not tag.has_attr('end-with-value'):
-            raise utils.ValidationError(
-                'Video tag does not have \'end-with-value\' '
-                'attribute.'
-            )
-
-        if tag['end-with-value'].strip() in empty_values:
-            raise utils.ValidationError(
-                'Video tag \'end-with-value\' attribute should not '
-                'be empty.'
-            )
+        _raise_validation_errors_for_escaped_html(
+            tag,
+            'end-with-value',
+            'Video',
+            empty_values
+        )
 
         start_value = float(tag['start-with-value'].strip())
         end_value = float(tag['end-with-value'].strip())
@@ -381,19 +385,12 @@ def validate_rte_tags(
                 'a boolean value.'
             )
 
-        if not tag.has_attr('video_id-with-value'):
-            raise utils.ValidationError(
-                'Video tag does not have \'video_id-with-value\' '
-                'attribute.'
-            )
-
-        video_id_value = utils.unescape_html(
-                tag['video_id-with-value'])[1:-1].replace('\\"', '')
-        if video_id_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'Video tag \'video_id-with-value\' attribute should not '
-                'be empty.'
-            )
+        _raise_validation_errors_for_unescaped_html(
+            tag,
+            'video_id-with-value',
+            'Video',
+            empty_values
+        )
 
     for tag in soup.find_all('oppia-noninteractive-link'):
         if not tag.has_attr('text-with-value'):
@@ -402,19 +399,12 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        if not tag.has_attr('url-with-value'):
-            raise utils.ValidationError(
-                'Link tag does not have \'url-with-value\' '
-                'attribute.'
-            )
-
-        url_value = utils.unescape_html(
-                tag['url-with-value'])[1:-1].replace('\\"', '')
-        if url_value.strip() in empty_values:
-            raise utils.ValidationError(
-                'Link tag \'url-with-value\' attribute should not '
-                'be empty.'
-            )
+        _raise_validation_errors_for_unescaped_html(
+            tag,
+            'url-with-value',
+            'Link',
+            empty_values
+        )
 
     for tag in soup.find_all('oppia-noninteractive-math'):
         if not tag.has_attr('math_content-with-value'):

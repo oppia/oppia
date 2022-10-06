@@ -1224,8 +1224,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '&amp;quot;\"></oppia-noninteractive-skillreview>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'SkillReview tag should not have '
-            '\'text-with-value\' attribute value as empty string.')
+            self.new_exploration, 'SkillReview tag \'text-with-value\' '
+            'attribute should not be empty.')
 
         self.state.content.html = (
             '<oppia-noninteractive-skillreview text-with-value=\"&amp;quot;'
@@ -1241,8 +1241,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'text&amp;quot;\"></oppia-noninteractive-skillreview>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'SkillReview tag should not have '
-            '\'skill_id-with-value\' attribute value as empty string.')
+            self.new_exploration, 'SkillReview tag \'skill_id-with-value\' '
+            'attribute should not be empty.')
 
     def test_video_rte_tag(self) -> None:
         """Validate Video tag."""
