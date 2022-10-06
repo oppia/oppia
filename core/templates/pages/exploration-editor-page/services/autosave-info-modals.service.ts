@@ -26,6 +26,7 @@ import { SaveValidationFailModalComponent } from '../modal-templates/save-valida
 import { LostChangesModalComponent } from '../modal-templates/lost-changes-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
+import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 @Injectable({
   providedIn: 'root'
@@ -54,7 +55,8 @@ export class AutosaveInfoModalsService {
     return this._isModalOpen;
   }
 
-  showVersionMismatchModal(lostChanges: LostChange[]): void {
+  showVersionMismatchModal(
+      lostChanges: LostChange[] | ExplorationChange[]): void {
     const modelRef = this.ngbModal.open(
       SaveVersionMismatchModalComponent, {
         backdrop: 'static',

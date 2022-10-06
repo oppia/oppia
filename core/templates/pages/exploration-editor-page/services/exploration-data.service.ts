@@ -22,6 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
+import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 import { ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { tap } from 'rxjs/operators';
 import { AlertsService } from 'services/alerts.service';
@@ -133,7 +134,7 @@ export class ExplorationDataService {
 
   async getDataAsync(errorCallback: (
     explorationId: string,
-    lostChanges: ExplorationChange[]) => void | undefined
+    lostChanges: ExplorationChange[]| LostChange[]) => void | undefined
   ): Promise<ExplorationBackendDict> {
     if (this.data) {
       this.loggerService.info('Found exploration data in cache.');

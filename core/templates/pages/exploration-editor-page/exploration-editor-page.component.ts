@@ -179,7 +179,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.explorationDataService.getDataAsync((explorationId, lostChanges) => {
         if (!this.autosaveInfoModalsService.isModalOpen()) {
           this.autosaveInfoModalsService.showLostChangesModal(
-            lostChanges, explorationId);
+            lostChanges as LostChange[], explorationId);
         }
       }),
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
@@ -286,8 +286,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         // Show modal displaying lost changes if the version of draft
         // changes is invalid, and draft_changes is not `null`.
         this.autosaveInfoModalsService.showVersionMismatchModal(
-           this.changeListService.getChangeList() as unknown as LostChange[]);
-        return;
+          this.changeListService.getChangeList());
+        // Shivam PTAL return;
       }
       this.routerService.onRefreshStatisticsTab.emit();
 
