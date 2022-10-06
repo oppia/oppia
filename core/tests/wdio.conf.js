@@ -109,6 +109,18 @@ var suites = {
     './core/tests/webdriverio_desktop/extensions.js'
   ],
 
+  featureGating: [
+    './core/tests/webdriverio/featureGatingFlow.js'
+  ],
+
+  fileUploadExtensions: [
+    './core/tests/webdriverio_desktop/fileUploadExtensions.js'
+  ],
+
+  fileUploadFeatures: [
+    './core/tests/webdriverio_desktop/voiceoverUploadFeatures.js'
+  ],
+
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
   ],
@@ -117,8 +129,16 @@ var suites = {
     './core/tests/webdriverio_desktop/learnerDashboard.js'
   ],
 
+  library: [
+    './core/tests/webdriverio/libraryFlow.js'
+  ],
+
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
+  ],
+
+  playVoiceovers: [
+    './core/tests/webdriverio_desktop/playVoiceovers.js'
   ],
 
   preferences: [
@@ -131,6 +151,10 @@ var suites = {
 
   profileMenu: [
     './core/tests/webdriverio/profileMenuFlow.js'
+  ],
+
+  publication: [
+    './core/tests/webdriverio_desktop/publicationAndLibrary.js'
   ],
 
   skillEditor: [

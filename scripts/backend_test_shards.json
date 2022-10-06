@@ -56,6 +56,7 @@
         "core.jobs.batch_jobs.email_deletion_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
         "core.jobs.io.cache_io_test",
+        "scripts.contributor_dashboard_debug_test",
         "core.platform.secrets.cloud_secrets_services_test"
     ],
     "2": [
