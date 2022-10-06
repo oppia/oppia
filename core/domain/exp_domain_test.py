@@ -7766,6 +7766,10 @@ states:
             x:
             - ca_choices_22
           rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: ContainsAtLeastOneOf
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
@@ -7914,6 +7918,10 @@ states:
             - ca_choices_20
             - ca_choices_21
           rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: ContainsAtLeastOneOf
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
