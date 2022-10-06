@@ -830,7 +830,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Demo']
                         }
                     },
                     'rule_type': 'Contains'
@@ -855,7 +855,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': 'rule_input_5',
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Question']
                         }
                     },
                     'rule_type': 'Contains'
@@ -990,7 +990,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Demo']
                         }
                     },
                     'rule_type': 'Contains'
@@ -1015,7 +1015,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': 'rule_input_5',
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Question']
                         }
                     },
                     'rule_type': 'Contains'
