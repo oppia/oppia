@@ -93,12 +93,12 @@
       <div (click)="showAllChapters()"
            *ngIf="showButton && (chaptersDisplayed < nodeCount)"
            class="view-button">
-      <span class="fas fa-caret-down down-caret-position"></span>
+        <span class="fas fa-caret-down down-caret-position"></span>
       </div>
       <div (click)="hideExtraChapters()"
            *ngIf="showButton && (chaptersDisplayed === nodeCount)"
            class="view-button">
-      <span class="fas fa-caret-up up-caret-position"></span>
+        <span class="fas fa-caret-up up-caret-position"></span>
       </div>
     </div>
     <div class="chapters-container-box chapter-container" *ngIf="checkTabletView()">
