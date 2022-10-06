@@ -836,7 +836,28 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Skill id skill_not_exist is not present in the given old subtopic'
         ):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_not_exist')
-
+            
+    def test_validate_topic_bad_story_reference(self) -> None:
+        topic = self.topic
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2#'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_3')
+        ]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Invalid story ID: story_id_2#'
+            
+        ):
+            topic.validate()
+            
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
         Topic during export and import.
