@@ -373,7 +373,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         ):
             self.question.validate()
 
-        state.interaction.answer_groups[0].tagged_skill_misconception_id = 1
+        # Here we use MyPy ignore because we want to add a test which would
+        # check the tagged_skill_misconception_id's format as well as the
+        # regex.
+        state.interaction.answer_groups[
+            0].tagged_skill_misconception_id = 1 # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected tagged skill misconception id to be a str, received 1'
