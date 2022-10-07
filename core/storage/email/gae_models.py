@@ -326,9 +326,19 @@ class SentEmailModel(base_models.BaseModel):
             email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound)
 
         for message in messages:
-            if (message.recipient_id == recipient_id and
-                    message.subject == email_subject and
-                    message.html_body == email_body):
+            # We generate hash using recipient_id, email_subject and email_body
+            # in this method. Then we get all the messages who have the same
+            # hash and are sent within the last DUPLICATE_EMAIL_INTERVAL_MINS.
+            # If 'messages' is not None then all its element share the same
+            # hash and therefore the same recipient_id, email_subject and
+            # email_body which are same as those passed to this method as
+            # parameters. Therefore a branch where the below if condition is
+            # false will never arise and hence, we use no branch flag.
+            if ( # pragma: no branch
+                message.recipient_id == recipient_id and
+                message.subject == email_subject and
+                message.html_body == email_body
+            ):
                 return True
 
         return False
