@@ -821,7 +821,7 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                 exp_snapshot_model.content['states_schema_version']
             )
             if current_state_schema_version == target_state_schema_version:
-                return result.Ok(
+                return result.Err(
                     (
                         exp_id,
                         Exception('Snapshot is already at latest schema version')
@@ -849,7 +849,7 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                     return result.Err((exp_id, error_message))
 
                 if target_state_schema_version == current_state_schema_version:
-                    result.Ok((exp_id, 'SUCCESS'))
+                    return result.Ok((exp_id, 'SUCCESS'))
         except Exception as e:
             return result.Err((exp_id, e))
 
@@ -961,7 +961,7 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
             exp_snapshot_model.content['states_schema_version']
         )
         if current_state_schema_version == target_state_schema_version:
-            return result.Ok(
+            return result.Err(
                 (
                     exp_id,
                     Exception('Snapshot is already at latest schema version')
@@ -989,7 +989,7 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
                 return result.Err((exp_id, error_message))
 
             if target_state_schema_version == current_state_schema_version:
-                result.Ok((exp_id, 'SUCCESS'))
+                return result.Ok((exp_id, 'SUCCESS'))
 
         exp_snapshot_model.content['states'] = (
             versioned_exploration_states['states']
