@@ -211,12 +211,9 @@
   width: 100%;
 }
 
-.oppia-lesson-info-card .single-checkpoint-bar {
-  justify-content: center;
-}
-
 .oppia-lesson-info-card .multiple-checkpoints-bar {
   justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 .oppia-lesson-info-card .reverse-checkpoint-order {
@@ -290,7 +287,9 @@
 }
 
 .oppia-lesson-info-card .save-progress-btn-container {
+  align-items: center;
   display: flex;
+  flex-direction: column;
   justify-content: center;
 }
 
@@ -301,7 +300,7 @@
   cursor: pointer;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   height: 40px;
-  margin-top: 20px;
+  margin: 5px 0;
   width: 170px;
 }
 
