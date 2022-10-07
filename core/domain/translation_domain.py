@@ -104,7 +104,7 @@ class TranslatableContent:
                 content.
             content_value: ContentValueType. The content value which can be
                 translated.
-            interaction_id: str|None. The Id of the interaction in which the
+            interaction_id: str|None. The ID of the interaction in which the
                 content is used.
             rule_type: str|None. The rule type of the answer group in which the
                 content is used.
@@ -235,7 +235,7 @@ class TranslatableContentsCollection:
                 content.
             content_value: ContentValueType. The content value which can be
                 translated.
-            interaction_id: str|None. The Id of the interaction in which the
+            interaction_id: str|None. The ID of the interaction in which the
                 content is used.
             rule_type: str|None. The rule type of the answer group in which the
                 content is used.
@@ -504,7 +504,7 @@ class EntityTranslation:
         """Constructs an TranslatableContent domain object.
 
         Args:
-            entity_id: str. The Id of the entity.
+            entity_id: str. The ID of the entity.
             entity_type: TranslatableEntityType. The type of the entity.
             entity_version: int. The version of the entity.
             language_code: str. The langauge code for the translated contents
@@ -614,7 +614,7 @@ class EntityTranslation:
         """Adds new TranslatedContent in the object.
 
         Args:
-            content_id: str. The Id of the content.
+            content_id: str. The ID of the content.
             content_value: ContentValueType. The translation content.
             content_format: TranslatableContentFormat. The format of the
                 content.
@@ -669,7 +669,7 @@ class EntityTranslation:
         language_code: str,
         entity_version: int = 0
     ) -> EntityTranslation:
-        """Creates new and empty EntityTranslation object."""
+        """Creates a new and empty EntityTranslation object."""
         return cls(
             entity_id=entity_id,
             entity_type=entity_type,
@@ -938,7 +938,7 @@ class WrittenTranslations:
     def from_dict(
         cls, written_translations_dict: WrittenTranslationsDict
     ) -> WrittenTranslations:
-        """Return a WrittenTranslations domain object from a dict.
+        """Returns a WrittenTranslations domain object from a dict.
 
         Args:
             written_translations_dict: dict. The dict representation of

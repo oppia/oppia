@@ -138,7 +138,7 @@ def update_translation_related_change(
     """Updates the translation related changes in the EntityTranslation models.
 
     Args:
-        exploration_id: str. The iId of the exploration.
+        exploration_id: str. The ID of the exploration.
         exploration_version: int. The current version of exploration.
         content_ids_corresponding_translations_to_remove: List[str]. The list of
             content Ids for translation removal.
@@ -186,11 +186,11 @@ def update_translation_related_change(
 def get_languages_with_complete_translation(
     exploration: exp_domain.Exploration
 ) -> List[str]:
-    """Returns a list of language code in which the exploration translation
+    """Returns a list of language codes in which the exploration translation
     is 100%.
 
     Returns:
-        list(str). A list of language code in which the translation for the
+        list(str). A list of language codes in which the translation for the
         exploration is complete i.e, 100%.
     """
     content_count = exploration.get_content_count()
@@ -210,11 +210,11 @@ def get_displayable_translation_languages(
     entity_type: feconf.TranslatableEntityType,
     entity: exp_domain.Exploration
 ) -> List[str]:
-    """Returns a list of language code in which the exploration translation
+    """Returns a list of language codes in which the exploration translation
     is 100%.
 
     Returns:
-        list(str). A list of language code in which the translation for the
+        list(str). A list of language codes in which the translation for the
         exploration is complete i.e, 100%.
     """
     language_code_list = []
