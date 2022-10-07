@@ -141,6 +141,11 @@ describe('Translation tab component', () => {
       .and.returnValue(enterTranslationForTheFirstTimeEmitter);
     spyOnProperty(routerService, 'onRefreshTranslationTab')
       .and.returnValue(refreshTranslationTabEmitter);
+    spyOn(document, 'querySelectorAll').and.returnValue([{
+      style: {
+        zIndex: '5'
+      }
+    }] as unknown as NodeListOf<Element>);
 
     explorationStatesService.init({
       Introduction: {

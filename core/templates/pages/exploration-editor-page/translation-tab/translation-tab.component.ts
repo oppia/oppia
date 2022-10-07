@@ -16,7 +16,7 @@
  * @fileoverview Component for the translation tab.
  */
 
-import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { WelcomeTranslationModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
