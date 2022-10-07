@@ -16,9 +16,33 @@
  * @fileoverview Directive for the "frequency table" visualization.
  */
 
-angular.module('oppia').directive('oppiaVisualizationFrequencyTable', () => ({
-  restrict: 'E',
-  scope: { data: '<', options: '<', addressedInfoIsSupported: '<' },
-  template: require('./oppia-visualization-frequency-table.directive.html'),
-  style: require('./oppia-visualization-frequency-table.directive.css'),
-}));
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import './oppia-visualization-frequency-table.directive.css';
+
+@Component({
+  selector: 'oppia-visualization-frequency-table',
+  templateUrl: './oppia-visualization-frequency-table.directive.html'
+})
+export class OppiaVisualizationFrequencyTableComponent {
+  @Input() data: {
+    answer: string;
+    frequency: string;
+    isAddressed: boolean;
+  } [] = [];
+
+  @Input() options: {
+    title: string;
+    column_headers: string[];
+  } | null = null;
+
+  @Input() addressedInfoIsSupported: boolean = false;
+
+  constructor() {}
+}
+
+angular.module('oppia').directive('oppiaVisualizationFrequencyTable',
+   downgradeComponent({
+     component: OppiaVisualizationFrequencyTableComponent
+   }) as angular.IDirectiveFactory);

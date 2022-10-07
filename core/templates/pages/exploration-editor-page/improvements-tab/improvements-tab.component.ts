@@ -13,109 +13,154 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the improvements tab of the exploration editor.
+ * @fileoverview Component for the improvements tab of the exploration editor.
  * @requires ExplorationImprovementsService.isImprovementsTabEnabledAsync() to
  *  have returned true. The component should be disabled by an ngIf until then.
  */
 
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
+import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
+import { IneffectiveFeedbackLoopTask } from 'domain/improvements/ineffective-feedback-loop-task.model';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
+import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/successive-incorrect-answers-task.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationImprovementsTaskRegistryService, StateTasks } from 'services/exploration-improvements-task-registry.service';
+import { RouterService } from '../services/router.service';
 
-require('components/statistics-directives/completion-graph.component.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/exploration-editor-page/improvements-tab/' +
-  'needs-guiding-responses-task.component.ts');
-require('services/exploration-improvements.service.ts');
-require('services/exploration-improvements-task-registry.service.ts');
+@Component({
+  selector: 'oppia-improvements-tab',
+  templateUrl: './improvements-tab.component.html'
+})
+export class ImprovementsTabComponent implements OnInit {
+  stateRetentions: Map<string, number>;
+  stateVisibility: Map<string, boolean>;
+  timeMachineImageUrl: string;
+  completionRate: number;
+  completionRateAsPercent: string;
+  hbrTasks: HighBounceRateTask[];
+  iflTasks: IneffectiveFeedbackLoopTask[];
+  ngrTasks: NeedsGuidingResponsesTask[];
+  siaTasks: SuccessiveIncorrectAnswersTask[];
+  allStateTasks: StateTasks[];
 
-angular.module('oppia').component('improvementsTab', {
-  template: require('./improvements-tab.component.html'),
-  controller: [
-    'ExplorationImprovementsTaskRegistryService', 'RouterService',
-    'UrlInterpolationService',
-    function(
-        ExplorationImprovementsTaskRegistryService, RouterService,
-        UrlInterpolationService) {
-      this.$onInit = () => {
-        this.timeMachineImageUrl = (
-          UrlInterpolationService.getStaticImageUrl('/icons/time_machine.svg'));
-        this.navigateToStateEditor = (stateName: string) => {
-          RouterService.navigateToMainTab(stateName);
-        };
+  constructor(
+     private explorationImprovementsTaskRegistryService:
+       ExplorationImprovementsTaskRegistryService,
+     private routerService: RouterService,
+     private urlInterpolationService: UrlInterpolationService,
+  ) { }
 
-        const expStats = (
-          ExplorationImprovementsTaskRegistryService.getExplorationStats());
-        this.completionRate = (
-          (expStats && expStats.numStarts > 0) ?
-            (expStats.numCompletions / expStats.numStarts) : 0);
-        this.completionRateAsPercent = (
-          Math.round(100.0 * this.completionRate) + '%');
+  navigateToStateEditor(stateName: string): void {
+    this.routerService.navigateToMainTab(stateName);
+  }
 
-        const hbrTasks = (
-          ExplorationImprovementsTaskRegistryService
-            .getOpenHighBounceRateTasks());
-        const iflTasks = (
-          ExplorationImprovementsTaskRegistryService
-            .getOpenIneffectiveFeedbackLoopTasks());
-        const ngrTasks = (
-          ExplorationImprovementsTaskRegistryService
-            .getOpenNeedsGuidingResponsesTasks());
-        const siaTasks = (
-          ExplorationImprovementsTaskRegistryService
-            .getOpenSuccessiveIncorrectAnswersTasks());
+  getNumTasks(): number {
+    return (
+      this.hbrTasks.length + this.iflTasks.length + this.ngrTasks.length +
+       this.siaTasks.length);
+  }
 
-        this.getNumTasks = () => (
-          hbrTasks.length + iflTasks.length + ngrTasks.length +
-          siaTasks.length);
-        this.getNumExpLevelTasks = () => hbrTasks.length;
-        this.getNumConceptLevelTasks = () => iflTasks.length;
-        this.getNumCardLevelTasks = () => ngrTasks.length + siaTasks.length;
-        this.hasCriticalTasks = () => ngrTasks.length > 0;
-        this.getExplorationHealth = () => {
-          if (this.hasCriticalTasks()) {
-            return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_CRITICAL;
-          } else if (this.getNumTasks() > 0) {
-            return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_WARNING;
-          } else {
-            return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_HEALTHY;
-          }
-        };
-        this.getNumCardLevelTasksForState = (stateName: string) => {
-          const stateTasks = (
-            ExplorationImprovementsTaskRegistryService.getStateTasks(
-              stateName));
-          const ngrTask = stateTasks.ngrTask;
-          const siaTask = stateTasks.siaTask;
-          return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
-        };
+  getNumExpLevelTasks(): number {
+    return this.hbrTasks.length;
+  }
 
-        this.allStateTasks = (
-          ExplorationImprovementsTaskRegistryService.getAllStateTasks());
-        const namesOfStatesWithTasks = (
-          this.allStateTasks.map(stateTasks => stateTasks.stateName));
+  getNumConceptLevelTasks(): number {
+    return this.iflTasks.length;
+  }
 
-        const stateRetentions: Map<string, number> = (
-          new Map(namesOfStatesWithTasks.map(stateName => {
-            const stateStats = expStats.getStateStats(stateName);
-            const numCompletions = stateStats.numCompletions;
-            const totalHitCount = stateStats.totalHitCount;
-            const retentionRate = Math.round(
-              totalHitCount ? (100.0 * numCompletions / totalHitCount) : 0);
-            return [stateName, retentionRate];
-          })));
+  getNumCardLevelTasks(): number {
+    return (this.ngrTasks.length + this.siaTasks.length);
+  }
 
-        this.getStateRetentionPercent = (stateName: string) => (
-          stateRetentions.get(stateName) + '%');
+  hasCriticalTasks(): boolean {
+    return (this.ngrTasks.length > 0);
+  }
 
-        const stateVisibility: Map<string, boolean> = (
-          new Map(namesOfStatesWithTasks.map(stateName => [stateName, true])));
+  getExplorationHealth(): string {
+    if (this.hasCriticalTasks()) {
+      return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_CRITICAL;
+    } else if (this.getNumTasks() > 0) {
+      return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_WARNING;
+    } else {
+      return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_HEALTHY;
+    }
+  }
 
-        this.isStateTasksVisible = (stateName: string) => (
-          stateVisibility.get(stateName));
-        this.toggleStateTasks = (stateName: string) => (
-          stateVisibility.set(stateName, !stateVisibility.get(stateName)));
-      };
-    },
-  ],
-});
+  getNumCardLevelTasksForState(stateName: string): number {
+    const stateTasks = (
+      this.explorationImprovementsTaskRegistryService.getStateTasks(
+        stateName));
+    const ngrTask = stateTasks.ngrTask;
+    const siaTask = stateTasks.siaTask;
+    return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
+  }
+
+  isStateTasksVisible(stateName: string): boolean {
+    return this.stateVisibility.get(stateName);
+  }
+
+  toggleStateTasks(stateName: string): Map<string, boolean> {
+    return (
+      this.stateVisibility.set(
+        stateName, !this.stateVisibility.get(stateName)));
+  }
+
+  getStateRetentionPercent(stateName: string): string {
+    return this.stateRetentions.get(stateName) + '%';
+  }
+
+  ngOnInit(): void {
+    this.timeMachineImageUrl = (
+      this.urlInterpolationService
+        .getStaticImageUrl('/icons/time_machine.svg'));
+
+    const expStats = (
+      this.explorationImprovementsTaskRegistryService.getExplorationStats());
+
+    this.completionRate = (
+       (expStats && expStats.numStarts > 0) ?
+         (expStats.numCompletions / expStats.numStarts) : 0);
+
+    this.completionRateAsPercent = (
+      Math.round(100.0 * this.completionRate) + '%');
+
+    this.hbrTasks = (
+      this.explorationImprovementsTaskRegistryService
+        .getOpenHighBounceRateTasks());
+    this.iflTasks = (
+      this.explorationImprovementsTaskRegistryService
+        .getOpenIneffectiveFeedbackLoopTasks());
+    this.ngrTasks = (
+      this.explorationImprovementsTaskRegistryService
+        .getOpenNeedsGuidingResponsesTasks());
+    this.siaTasks = (
+      this.explorationImprovementsTaskRegistryService
+        .getOpenSuccessiveIncorrectAnswersTasks());
+
+    this.allStateTasks = (
+      this.explorationImprovementsTaskRegistryService.getAllStateTasks());
+
+    const namesOfStatesWithTasks = (
+      this.allStateTasks.map(stateTasks => stateTasks.stateName));
+
+    this.stateRetentions = (
+      new Map(namesOfStatesWithTasks.map(stateName => {
+        const stateStats = expStats.getStateStats(stateName);
+        const numCompletions = stateStats.numCompletions;
+        const totalHitCount = stateStats.totalHitCount;
+        const retentionRate = Math.round(
+           totalHitCount ? (100.0 * numCompletions / totalHitCount) : 0);
+        return [stateName, retentionRate];
+      })));
+
+    this.stateVisibility = (
+      new Map(namesOfStatesWithTasks.map(stateName => [stateName, true])));
+  }
+}
+
+angular.module('oppia').directive('oppiaImprovementsTab',
+    downgradeComponent({
+      component: ImprovementsTabComponent
+    }) as angular.IDirectiveFactory);

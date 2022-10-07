@@ -17,132 +17,163 @@
  * exploration editor.
  */
 
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { States, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
+import { ComputeGraphService, GraphData } from 'services/compute-graph.service';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { StateInteractionStatsService } from 'services/state-interaction-stats.service';
+import { ExplorationDataService } from '../services/exploration-data.service';
+import { RouterService } from '../services/router.service';
+import { StateStatsModalComponent } from './templates/state-stats-modal.component';
 
-require(
-  'pages/exploration-editor-page/statistics-tab/templates/' +
-  'state-stats-modal.controller.ts');
+interface PieChartOptions {
+  chartAreaWidth: number;
+  colors: string[];
+  height: number;
+  left: number;
+  legendPosition: string;
+  pieHole: number;
+  pieSliceBorderColor: string;
+  pieSliceTextStyleColor: string;
+  title: string;
+  width: number;
+}
 
-require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/exploration/StatesObjectFactory.ts');
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('services/alerts.service.ts');
-require('services/compute-graph.service.ts');
-require('services/exploration-stats.service.ts');
-require('services/state-interaction-stats.service.ts');
-require('pages/admin-page/services/admin-router.service.ts');
+@Component({
+  selector: 'oppia-statistics-tab',
+  templateUrl: './statistics-tab.component.html'
+})
+export class StatisticsTabComponent implements
+    OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
+  stateStatsModalIsOpen: boolean;
+  explorationHasBeenVisited: boolean;
+  pieChartOptions: PieChartOptions;
+  pieChartData: ((string | number)[] | string[]) [];
+  statsGraphData: GraphData;
+  numPassersby: number;
+  states: States;
+  expStats: ExplorationStats;
+  expId: string;
 
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+  constructor(
+    private alertsService: AlertsService,
+    private computeGraphService: ComputeGraphService,
+    private explorationDataService: ExplorationDataService,
+    private explorationStatsService: ExplorationStatsService,
+    private ngbModal: NgbModal,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private routerService: RouterService,
+    private stateInteractionStatsService: StateInteractionStatsService,
+    private statesObjectFactory: StatesObjectFactory,
+    private urlInterpolationService: UrlInterpolationService,
+  ) {}
 
-angular.module('oppia').component('statisticsTab', {
-  template: require('./statistics-tab.component.html'),
-  controller: [
-    '$q', '$rootScope', '$scope', '$uibModal',
-    'AlertsService', 'ComputeGraphService',
-    'ExplorationDataService', 'ExplorationStatsService',
-    'ReadOnlyExplorationBackendApiService', 'RouterService',
-    'StateInteractionStatsService', 'StatesObjectFactory',
-    'UrlInterpolationService',
-    function(
-        $q, $rootScope, $scope, $uibModal,
-        AlertsService, ComputeGraphService,
-        ExplorationDataService, ExplorationStatsService,
-        ReadOnlyExplorationBackendApiService, RouterService,
-        StateInteractionStatsService, StatesObjectFactory,
-        UrlInterpolationService) {
-      this.directiveSubscriptions = new Subscription();
-      const expId = ExplorationDataService.explorationId;
-      const refreshExplorationStatistics = () => {
-        $q.all([
-          ReadOnlyExplorationBackendApiService
-            .loadLatestExplorationAsync(expId),
-          ExplorationStatsService.getExplorationStatsAsync(expId)
-        ]).then(responses => {
-          const [expResponse, expStats] = responses;
-          const initStateName = expResponse.exploration.init_state_name;
-          const numNonCompletions = (
-            expStats.numActualStarts - expStats.numCompletions);
+  refreshExplorationStatistics(): void {
+    Promise.all([
+      this.readOnlyExplorationBackendApiService
+        .loadLatestExplorationAsync(this.expId),
+      this.explorationStatsService.getExplorationStatsAsync(this.expId)
+    ]).then((responses) => {
+      const [expResponse, expStats] = responses;
+      const initStateName = expResponse.exploration.init_state_name;
+      const numNonCompletions = (
+        expStats.numActualStarts - expStats.numCompletions);
 
-          this.states = StatesObjectFactory.createFromBackendDict(
-            expResponse.exploration.states);
-          this.expStats = expStats;
+      this.states = this.statesObjectFactory.createFromBackendDict(
+        expResponse.exploration.states);
+      this.expStats = expStats;
 
-          $scope.statsGraphData = (
-            ComputeGraphService.compute(initStateName, this.states));
-          $scope.numPassersby = (
-            expStats.numStarts - expStats.numActualStarts);
-          $scope.pieChartData = [
-            ['Type', 'Number'],
-            ['Completions', expStats.numCompletions],
-            ['Non-Completions', numNonCompletions]
-          ];
-          $scope.pieChartOptions = {
-            chartAreaWidth: 500,
-            colors: ['#008808', '#d8d8d8'],
-            height: 300,
-            left: 230,
-            legendPosition: 'right',
-            pieHole: 0.6,
-            pieSliceBorderColor: 'black',
-            pieSliceTextStyleColor: 'black',
-            title: '',
-            width: 600,
-          };
+      this.statsGraphData = (
+        this.computeGraphService.compute(initStateName, this.states));
+      this.numPassersby = (
+        expStats.numStarts - expStats.numActualStarts);
 
-          if (expStats.numActualStarts > 0) {
-            $scope.explorationHasBeenVisited = true;
-          }
-          $rootScope.$applyAsync();
+      this.pieChartData = [
+        ['Type', 'Number'],
+        ['Completions', expStats.numCompletions],
+        ['Non-Completions', numNonCompletions]
+      ];
+
+      this.pieChartOptions = {
+        chartAreaWidth: 500,
+        colors: ['#008808', '#d8d8d8'],
+        height: 300,
+        left: 230,
+        legendPosition: 'right',
+        pieHole: 0.6,
+        pieSliceBorderColor: 'black',
+        pieSliceTextStyleColor: 'black',
+        title: '',
+        width: 600,
+      };
+
+      if (expStats.numActualStarts > 0) {
+        this.explorationHasBeenVisited = true;
+      }
+    });
+  }
+
+  onClickStateInStatsGraph(stateName: string): void {
+    if (!this.stateStatsModalIsOpen) {
+      this.stateStatsModalIsOpen = true;
+
+      const state = this.states.getState(stateName);
+      this.alertsService.clearWarnings();
+
+      this.stateInteractionStatsService.computeStatsAsync(
+        this.expId, state)
+        .then((stats) => {
+          const modalRef = this.ngbModal.open(StateStatsModalComponent, {
+            backdrop: false,
+          });
+
+          modalRef.componentInstance.interactionArgs = (
+            state.interaction.customizationArgs);
+          modalRef.componentInstance.stateName = stateName;
+          modalRef.componentInstance.visualizationsInfo = (
+            stats.visualizationsInfo);
+          modalRef.componentInstance.stateStats = (
+            this.expStats.getStateStats(stateName));
+
+          modalRef.result.then(
+            () => this.stateStatsModalIsOpen = false,
+            () => {
+              this.alertsService.clearWarnings();
+              this.stateStatsModalIsOpen = false;
+            });
         });
-      };
+    }
+  }
 
-      const openStateStatsModal = (stateName: string) => {
-        const state = this.states.getState(stateName);
-        AlertsService.clearWarnings();
-        return StateInteractionStatsService.computeStatsAsync(expId, state)
-          .then(stats => $uibModal.open({
-            controller: 'StateStatsModalController',
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/statistics-tab/templates/' +
-              'state-stats-modal.template.html'),
-            styleUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/statistics-tab/templates/' +
-              'state-stats-modal.template.css'),
-            backdrop: true,
-            resolve: {
-              interactionArgs: () => state.interaction.customizationArgs,
-              stateName: () => stateName,
-              visualizationsInfo: () => stats.visualizationsInfo,
-              stateStats: () => this.expStats.getStateStats(stateName),
-            },
-          }).result);
-      };
+  ngOnInit(): void {
+    this.expId = this.explorationDataService.explorationId;
 
-      this.$onInit = () => {
-        this.stateStatsModalIsOpen = false;
-        $scope.onClickStateInStatsGraph = (stateName: string) => {
-          if (!this.stateStatsModalIsOpen) {
-            this.stateStatsModalIsOpen = true;
-            openStateStatsModal(stateName).then(
-              () => this.stateStatsModalIsOpen = false,
-              () => {
-                AlertsService.clearWarnings();
-                this.stateStatsModalIsOpen = false;
-              });
-          }
-        };
-        $scope.explorationHasBeenVisited = false;
-        this.directiveSubscriptions.add(
-          RouterService.onRefreshStatisticsTab.subscribe(
-            () => refreshExplorationStatistics())
-        );
-      };
+    this.stateStatsModalIsOpen = false;
+    this.explorationHasBeenVisited = false;
 
-      this.$onDestroy = function() {
-        this.directiveSubscriptions.unsubscribe();
-      };
-    },
-  ],
-});
+    this.directiveSubscriptions.add(
+      this.routerService.onRefreshStatisticsTab.subscribe(
+        () => this.refreshExplorationStatistics())
+    );
+
+    this.refreshExplorationStatistics();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaStatisticsTab',
+   downgradeComponent({
+     component: StatisticsTabComponent
+   }) as angular.IDirectiveFactory);

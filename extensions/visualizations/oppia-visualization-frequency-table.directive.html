@@ -1,15 +1,15 @@
-<strong><[options.title]></strong>
+<strong>{{ options.title }}</strong>
 <table class="table">
   <tr>
-    <th><[options.column_headers[0]]></th>
-    <th><[options.column_headers[1]]></th>
-    <th ng-if="addressedInfoIsSupported">Addressed specifically?</th>
+    <th>{{ options.column_headers[0] }}</th>
+    <th>{{ options.column_headers[1] }}</th>
+    <th *ngIf="addressedInfoIsSupported">Addressed specifically?</th>
   </tr>
-  <tr ng-repeat="row in data track by $index">
-    <td><[row.answer]></td>
-    <td><[row.frequency]></td>
-    <td ng-if="addressedInfoIsSupported">
-      <[row.isAddressed ? 'Yes' : 'No']>
+  <tr *ngFor="let row of data; index as index">
+    <td>{{ row.answer }}</td>
+    <td>{{ row.frequency }}</td>
+    <td *ngIf="addressedInfoIsSupported">
+      {{ row.isAddressed ? 'Yes' : 'No' }}
     </td>
   </tr>
 </table>

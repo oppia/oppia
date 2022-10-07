@@ -5,119 +5,153 @@
         <div class="improvements-tab-overview-header">
           <h1 class="improvements-tab-header-title">Overview</h1>
           <a class="improvements-tab-view-resolved-tasks" href="#">
-            <img class="improvements-tab-time-machine" ng-src="<[$ctrl.timeMachineImageUrl]>">
+            <img class="improvements-tab-time-machine" [src]="timeMachineImageUrl">
             <span class="improvements-tab-text">View Resolved Tasks</span>
-            <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+            <i class="material-icons improvements-tab-chevron-right-icon">
+              chevron_right
+            </i>
           </a>
         </div>
         <div class="improvements-tab-overview-body">
           <div class="improvements-tab-summary">
             <div class="improvements-pending-summary">
-              <strong class="improvements-tab-count"><[$ctrl.getNumTasks()]></strong>
+              <strong class="improvements-tab-count">
+                {{ getNumTasks() }}
+              </strong>
               <p class="improvements-tab-units"
-                 ng-pluralize count="$ctrl.getNumTasks()"
-                 when="{'one': 'Improvement pending', 'other': 'Total Improvements pending'}">
+                 [ngPlural]="getNumTasks()">
+                <ng-template ngPluralCase="one">
+                  Improvement pending
+                </ng-template>
+                <ng-template ngPluralCase="other">
+                  Total Improvements pending
+                </ng-template>
               </p>
             </div>
             <div class="improvements-tab-exploration-health-summary"
-                 ng-class="['improvements-tab-' + $ctrl.getExplorationHealth()]">
+                 [ngClass]="['improvements-tab-' + getExplorationHealth()]">
               <span class="improvements-tab-outer-dot">
                 <span class="improvements-tab-inner-dot">&nbsp;</span>
               </span>
               <p class="improvements-tab-exploration-health e2e-test-improvements-tab-health"
-                 ng-bind="$ctrl.getExplorationHealth()">
+                 [innerText]="getExplorationHealth()">
               </p>
             </div>
           </div>
-          <ul class="improvements-tab-navigation" ng-if="$ctrl.getNumTasks() > 0">
-            <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumExpLevelTasks() > 0">
+          <ul class="improvements-tab-navigation" *ngIf="getNumTasks() > 0">
+            <li class="improvements-tab-navigation-item"
+                *ngIf="getNumExpLevelTasks() > 0">
               <a class="improvements-tab-task-scope" href="#">
                 <span class="improvements-tab-dot-warning">&nbsp;</span>
                 <strong class="improvements-tab-scope-number">
-                  <[$ctrl.getNumExpLevelTasks()]>
+                  {{ getNumExpLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">exploration-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  exploration-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
             <li class="improvements-tab-navigation-item"
-                ng-if="$ctrl.getNumConceptLevelTasks() > 0">
+                *ngIf="getNumConceptLevelTasks() > 0">
               <a class="improvements-tab-task-scope" href="#">
                 <span class="improvements-tab-dot-warning">&nbsp;</span>
                 <strong class="improvements-tab-scope-number">
-                  <[$ctrl.getNumConceptLevelTasks()]>
+                  {{ getNumConceptLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">concept-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  concept-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
-            <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumCardLevelTasks() > 0">
-              <a class="improvements-tab-task-scope" href="#card-level-improvements" target="_self">
-                <span ng-class="'improvements-tab-dot-' + $ctrl.getExplorationHealth()">
+            <li class="improvements-tab-navigation-item" *ngIf="getNumCardLevelTasks() > 0">
+              <a class="improvements-tab-task-scope"
+                 href="#card-level-improvements"
+                 target="_self">
+                <span [ngClass]="'improvements-tab-dot-' + getExplorationHealth()">
                   &nbsp;
                 </span>
                 <strong class="improvements-tab-scope-number">
-                  <[$ctrl.getNumCardLevelTasks()]>
+                  {{ getNumCardLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">card-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  card-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
           </ul>
         </div>
       </div>
       <div class="improvements-tab-completion-rate">
-        <oppia-completion-graph [completion-rate]="$ctrl.completionRate"></oppia-completion-graph>
-        <p class="improvements-tab-value"><[$ctrl.completionRateAsPercent]></p>
-        <p class="improvements-tab-label">Exploration Completion Rate</p>
+        <oppia-completion-graph [completionRate]="completionRate"></oppia-completion-graph>
+        <p class="improvements-tab-value">
+          {{ completionRateAsPercent }}
+        </p>
+        <p class="improvements-tab-label">
+          Exploration Completion Rate
+        </p>
       </div>
     </div>
   </div>
   <div class="improvements-tab-body">
-    <div class="improvements-tab-level" ng-if="$ctrl.getNumCardLevelTasks() > 0">
-      <div class="improvements-tab-level-header" name="card-level-improvements">
+    <div class="improvements-tab-level"
+         *ngIf="getNumCardLevelTasks() > 0">
+      <div class="improvements-tab-level-header"
+           name="card-level-improvements">
         card-level improvements
       </div>
       <hr>
-      <div class="improvements-tab-state-groups e2e-test-improvements-tab-state-group"
-           ng-repeat="stateTasks in $ctrl.allStateTasks track by stateTasks.stateName"
-           ng-if="$ctrl.getNumCardLevelTasksForState(stateTasks.stateName) > 0">
-        <div class="improvements-tab-state-header">
-          <div class="improvements-tab-collapse-arrow">
-            <a class="improvements-tab-collapse-arrow-button"
-               ng-click="$ctrl.toggleStateTasks(stateTasks.stateName)">
-              <i class="material-icons">
-                keyboard_arrow_<[$ctrl.isStateTasksVisible(stateTasks.stateName) ? 'down' : 'up']>
-              </i>
-            </a>
-          </div>
-          <div class="improvements-tab-state-details">
-            <div class="improvements-tab-state-link">
-              <a class="improvements-tab-state-link-a"
-                 ng-click="$ctrl.navigateToStateEditor(stateTasks.stateName)">
-                <[stateTasks.stateName]>
+      <div *ngFor="let stateTasks of allStateTasks;index as index">
+        <div class="improvements-tab-state-groups e2e-test-improvements-tab-state-group"
+             *ngIf="getNumCardLevelTasksForState(stateTasks.stateName) > 0">
+          <div class="improvements-tab-state-header">
+            <div class="improvements-tab-collapse-arrow">
+              <a class="improvements-tab-collapse-arrow-button"
+                 (click)="toggleStateTasks(stateTasks.stateName)">
+                <i class="material-icons">
+                  keyboard_arrow_{{isStateTasksVisible(stateTasks.stateName) ? 'down' : 'up'}}
+                </i>
               </a>
             </div>
-            <div class="improvements-tab-state-stats">
-              <div class="improvements-tab-state-retention">
-                <[$ctrl.getStateRetentionPercent(stateTasks.stateName)]> Current Retention
+            <div class="improvements-tab-state-details">
+              <div class="improvements-tab-state-link">
+                <a class="improvements-tab-state-link-a"
+                   (click)="navigateToStateEditor(stateTasks.stateName)">
+                  {{ stateTasks.stateName }}
+                </a>
               </div>
-              <div class="improvements-tab-state-num-issues">
-                <strong><[$ctrl.getNumCardLevelTasksForState(stateTasks.stateName)]></strong>
-                <span ng-pluralize count="$ctrl.getNumCardLevelTasksForState(stateTasks.stateName)"
-                      when="{'one': 'issue found', 'other': 'issues found'}">
-                </span>
+              <div class="improvements-tab-state-stats">
+                <div class="improvements-tab-state-retention">
+                  {{ getStateRetentionPercent(stateTasks.stateName) }} Current Retention
+                </div>
+                <div class="improvements-tab-state-num-issues">
+                  <strong>
+                    {{ getNumCardLevelTasksForState(stateTasks.stateName) }}
+                  </strong>
+                  <span [ngPlural]="getNumCardLevelTasksForState(stateTasks.stateName)">
+                    <ng-template ngPluralCase="one">issue found</ng-template>
+                    <ng-template ngPluralCase="other">issues found</ng-template>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <hr>
-        <div class="improvements-tab-state-body"
-             ng-show="$ctrl.isStateTasksVisible(stateTasks.stateName)">
-          <needs-guiding-responses-task ng-if="stateTasks.ngrTask.isOpen()"
-                                        task="stateTasks.ngrTask"
-                                        stats="stateTasks.supportingStats">
-          </needs-guiding-responses-task>
+          <hr>
+          <div class="improvements-tab-state-body"
+               [hidden]="!(isStateTasksVisible(stateTasks.stateName))">
+            <oppia-needs-guiding-responses-task *ngIf="stateTasks.ngrTask.isOpen()"
+                                                [task]="stateTasks.ngrTask"
+                                                [stats]="stateTasks.supportingStats">
+            </oppia-needs-guiding-responses-task>
+          </div>
         </div>
       </div>
     </div>
