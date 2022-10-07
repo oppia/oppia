@@ -50,9 +50,8 @@
             <span class="d-none d-md-block oppia-num-changes-text" *ngIf="getChangeListLength()">({{ getChangeListLength() }})</span>
           </span>
           <span class="oppia-publish-label-container" *ngIf="!isPrivate()" title="Publish Changes">
-            <i class="material-icons md-18 oppia-save-publish-button-icon"
+            <i class="fas fa-cloud-upload-alt md-18 oppia-save-publish-button-icon"
                alt="Publish Changes">
-              &#xE2C3;
             </i>
             <span class="oppia-save-publish-button-label e2e-test-publish-changes-message">Publish Changes</span>
             <span class="d-none d-md-block oppia-num-changes-count-text" *ngIf="getChangeListLength()">({{ getChangeListLength() }})</span>
