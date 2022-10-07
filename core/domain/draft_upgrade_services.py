@@ -20,8 +20,8 @@ from __future__ import annotations
 
 import logging
 
-from core.constants import constants
 from core import utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.domain import rules_registry
@@ -149,7 +149,9 @@ class DraftUpgradeUtil:
                 return False
 
             lnk = lnk_attr.replace('&quot;', '')
+            lnk = lnk.replace(' ', '')
             txt = txt_attr.replace('&quot;', '')
+            txt = txt.replace(' ', '')
 
             # If the text or the link is empty.
             if len(lnk) == 0 or len(txt) == 0:

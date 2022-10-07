@@ -5833,6 +5833,8 @@ tags: []
 title: ''
 """)
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
         latest_sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -5889,7 +5891,10 @@ states_schema_version: 53
 tags: []
 title: ''
 """)
-# pylint: enable=line-too-long  # pylint: disable=single-line-pragma
+
+# pylint: disable=single-line-pragma
+# pylint: enable=line-too-long
+
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)

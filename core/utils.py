@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-from urllib.parse import urlparse  # pylint: disable=import-only-modules
 import base64
 import binascii
 import collections
@@ -33,6 +32,7 @@ import string
 import time
 import unicodedata
 import urllib.parse
+from urllib.parse import urlparse  # pylint: disable=import-only-modules
 import urllib.request
 import zlib
 
@@ -387,6 +387,7 @@ def get_random_choice(alist: List[T]) -> T:
     index = get_random_int(len(alist))
     return alist[index]
 
+
 def get_url_scheme(url: str) -> str:
     """Gets the url scheme used by a link.
 
@@ -397,6 +398,7 @@ def get_url_scheme(url: str) -> str:
         str. Returns the URL scheme.
     """
     return urlparse(url).scheme
+
 
 def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """Converts a PNG base64 data URL to a PNG binary data.

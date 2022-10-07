@@ -1367,16 +1367,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
             txt_attr = link.get('text-with-value')
 
             if lnk_attr is None or txt_attr is None:
-                # Delete the link.
                 link.decompose()
                 continue
 
             lnk = lnk_attr.replace('&quot;', '')
+            lnk = lnk.replace(' ', '')
             txt = txt_attr.replace('&quot;', '')
+            txt = txt.replace(' ', '')
 
             # If the text or the link is empty.
             if len(lnk) == 0 or len(txt) == 0:
-                # Delete the link.
                 link.decompose()
                 continue
 
@@ -1387,7 +1387,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             # If link is invalid.
             if utils.get_url_scheme(lnk) not in constants.acceptable_schemes:
-                # Delete the link.
                 link.decompose()
                 continue
 
@@ -3211,19 +3210,34 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         for state_dict in states_dict.values():
             translations_mapping = (
-                    state_dict['written_translations']['translations_mapping'])
-            for language_code in translations_mapping['content']:
-                written_translation = (
-                    translations_mapping['content'][language_code])
-                # Here, we are narrowing down the type from
-                # Union[List[str], str] to str.
-                assert isinstance(
-                    written_translation['translation'],
-                    str
-                )
-                written_translation['translation'] = (
-                    cls.fix_non_interactive_links(
-                        written_translation['translation']))
+                state_dict['written_translations']['translations_mapping'])
+            new_translations_mapping = {}
+            for content_id, translation_item in translations_mapping.items():
+                if content_id != 'content':
+                    new_translations_mapping[content_id] = translation_item
+                else:
+                    for language_code in translations_mapping[content_id]:
+                        written_translation = (
+                            translation_item[language_code]
+                        )
+                        # Here, we are narrowing down the type from
+                        # Union[List[str], str] to str.
+                        assert isinstance(
+                            written_translation['translation'],
+                            str
+                        )
+                        correct_html = (
+                            cls.fix_non_interactive_links(
+                                written_translation['translation']))
+
+                        written_translation['translation'] = correct_html
+                        translation_item[language_code] = (
+                            written_translation)
+
+                new_translations_mapping[content_id] = translation_item
+
+            state_dict['written_translations']['translations_mapping'] = (
+                new_translations_mapping)
 
         return states_dict
 
