@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import copy
 import os
-import re
 
 from core import feconf
 from core import utils
@@ -1591,24 +1590,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(answer_groups)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
-        solution_dict: state_domain.SolutionDict = {
-            'answer_is_exclusive': True,
-            'correct_answer': 'hello_world!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': 'hello_world is a string'
-                }
-        }
-        # Ruling out the possibility of None for mypy type checking.
-        assert init_state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict)
-        init_state.update_interaction_solution(solution)
-        self._assert_validation_error(
-            exploration,
-            re.escape('Hint(s) must be specified if solution is specified'))
-
-        init_state.update_interaction_solution(None)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test

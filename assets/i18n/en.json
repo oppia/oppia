@@ -309,7 +309,7 @@
     "I18N_DONATE_PAGE_VISION_TEXT_TWO": "Please donate to The Oppia Foundation, a registered 501(c)(3) nonprofit, and join us in bringing the joys of teaching and learning to people everywhere.",
     "I18N_EDIT_LEARNER_GROUP_PAGE_TITLE": "Edit Learner Group | Oppia",
     "I18N_EMPTY_LEARNER_GROUPS_MESSAGE": "You don’t have any group yet",
-    "I18N_EMPTY_SOLTUION_MESSAGE": "Please provide the solution for the state.",
+    "I18N_EMPTY_SOLUTION_MESSAGE": "Please provide the solution for the state.",
     "I18N_END_CHAPTER_MILESTONE_MESSAGE_1": "You just completed your 1st chapter!",
     "I18N_END_CHAPTER_MILESTONE_MESSAGE_2": "You just completed your 5th chapter!",
     "I18N_END_CHAPTER_MILESTONE_MESSAGE_3": "You just completed your 10th chapter!",
