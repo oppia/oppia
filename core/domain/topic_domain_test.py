@@ -888,7 +888,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_title, subtopic_obj.title)
         self.assertEqual(url_frag, subtopic_obj.url_fragment)
 
-    def test_remove_skill_id_exception(self) -> None:
+    def test_remove_skill_id_not_present_exception(self) -> None:
         skill_id = 'skill_id_123'
         topic = self.topic
         with self.assertRaisesRegex(
