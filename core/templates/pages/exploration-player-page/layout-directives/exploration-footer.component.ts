@@ -76,6 +76,9 @@ export class ExplorationFooterComponent {
   footerIsInQuestionPlayerMode: boolean = false;
   CHECKPOINTS_FEATURE_IS_ENABLED = false;
 
+  conceptCardForStateExists: boolean = true;
+  linkedSkillId: string | null = null;
+
   constructor(
     private contextService: ContextService,
     private explorationSummaryBackendApiService:
@@ -320,6 +323,30 @@ export class ExplorationFooterComponent {
       }, () => {
         this.loggerService.error(
           'Information card failed to load for exploration ' +
+          this.explorationId);
+      });
+    }
+  }
+
+  showConceptCard(): void {
+    if (this.linkedSkillId) {
+      this.openInformationCardModal();
+
+      // Update user has viewed lesson info modal once if
+      // lesson info modal button is clicked.
+      if (!this.learnerHasViewedLessonInfoTooltip) {
+        this.learnerHasViewedLessonInfo();
+      }
+    } else {
+      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
+        stringifiedExpIds,
+        includePrivateExplorations
+      ).then((response) => {
+        this.expInfo = response.summaries[0];
+        this.openInformationCardModal();
+      }, () => {
+        this.loggerService.error(
+          'Concept card failed to load for exploration ' +
           this.explorationId);
       });
     }

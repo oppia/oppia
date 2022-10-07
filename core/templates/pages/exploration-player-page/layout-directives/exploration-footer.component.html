@@ -33,5 +33,17 @@
         </oppia-hint-and-solution-buttons>
       </div>
     </div>
+    <div [ngClass]="{'col-sm-7': isLanguageRTL(), 'col-sm-9': !isLanguageRTL()}">
+      <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
+        <div *ngIf="!windowIsNarrow && conceptCardForStateExists">
+          <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
+              *ngIf="isConceptCardButtonVisible()"
+              [ngClass]="{'viewed': isConceptCardConsumed()}"
+              (click)="showConceptCard()">
+            <i class="fas fa-lightbulb"></i>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
