@@ -1,7 +1,7 @@
 <div class="oppia-feedback-popup-container">
   <div *ngIf="!feedbackSubmitted">
     <button type="button" class="oppia-close-popover-button e2e-test-exploration-feedback-close-button" (click)="close()">
-      <i class="fas fa-times" style="font-size: 18px; color:black"></i>
+      <i class="fas fa-times"></i>
     </button>
     <br>
 
@@ -54,6 +54,10 @@
   }
   label {
     font-weight: normal;
+  }
+  .fa-times{
+    font-size: 18px; 
+    color:black";
   }
   .oppia-feedback-popup-container {
     min-width: 200px;
