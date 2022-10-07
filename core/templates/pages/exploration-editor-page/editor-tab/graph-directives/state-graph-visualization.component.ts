@@ -453,9 +453,6 @@ export class StateGraphVisualization
       this.nodeList.push(this.nodeData[nodeId]);
     }
 
-    this.overallTransformStr = 'translate(0,0)';
-    this.innerTransformStr = 'translate(0,0)';
-
     if (this.allowPanning) {
       this.makeGraphPannable();
     }
@@ -480,6 +477,9 @@ export class StateGraphVisualization
   }
 
   ngOnInit(): void {
+    this.overallTransformStr = 'translate(0,0)';
+    this.innerTransformStr = 'translate(0,0)';
+
     this.directiveSubscriptions.add(
       this.routerService.onCenterGraph.subscribe(() => {
         setTimeout(() => {
