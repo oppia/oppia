@@ -10,13 +10,13 @@
     <div class="improvements-tab-task-details">
       <div class="improvements-tab-task-details-header">Top answers with no feedback</div>
 
-      <oppia-visualization-sorted-tiles data="$ctrl.sortedTilesData"
-                                        options="$ctrl.sortedTilesOptions"
-                                        total-frequency="$ctrl.sortedTilesTotalFrequency">
+      <oppia-visualization-sorted-tiles [data]="sortedTilesData"
+                                        [options]="sortedTilesOptions"
+                                        [totalFrequency]="sortedTilesTotalFrequency">
       </oppia-visualization-sorted-tiles>
 
       <div class="improvements-tab-task-actions">
-        <a ng-click="$ctrl.navigateToStateEditor()">
+        <a (click)="navigateToStateEditor()">
           Address Answers <i class="material-icons improvements-tab-east-icon">east</i>
         </a>
       </div>
