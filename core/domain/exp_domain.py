@@ -4220,7 +4220,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if rows_value < 1:
             state_dict['interaction']['customization_args'][
                 'rows']['value'] = 1
-        elif rows_value > 10:
+        if rows_value > 10:
             state_dict['interaction']['customization_args'][
                 'rows']['value'] = 10
         for answer_group in answer_groups:
@@ -4416,9 +4416,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 tag.decompose()
                 continue
 
-            if tag['text-with-value'] is None:
-                tag.decompose()
-                continue
             if tag['text-with-value'].strip() in empty_values:
                 tag.decompose()
                 continue
@@ -4427,9 +4424,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 tag.decompose()
                 continue
 
-            if tag['skill_id-with-value'] is None:
-                tag.decompose()
-                continue
             if tag['skill_id-with-value'].strip() in empty_values:
                 tag.decompose()
                 continue
@@ -4459,9 +4453,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('video_id-with-value'):
                 tag.decompose()
                 continue
-            if tag['video_id-with-value'] is None:
-                tag.decompose()
-                continue
+
             if tag['video_id-with-value'].strip() in empty_values:
                 tag.decompose()
                 continue
@@ -4501,9 +4493,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             math_content_list = json.loads(math_content_json)
 
             if 'raw_latex' not in math_content_list:
-                tag.decompose()
-                continue
-            if math_content_list['raw_latex'] is None:
                 tag.decompose()
                 continue
             if math_content_list['raw_latex'].strip() in empty_values:
