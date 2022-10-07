@@ -11,9 +11,9 @@
               class="oppia-translation-language-selector e2e-test-translation-language-selector oppia-autofocus"
               (change)="changeTranslationLanguage()"
               [(ngModel)]="languageCode">
-              <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id" (focus)="audioTranslationLanguageCodeField">
-                {{ language.description }}
-              </option>
+        <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id" (focus)="audioTranslationLanguageCodeField">
+          {{ language.description }}
+        </option>
       </select>
     </div>
     <div *ngIf="canShowTabModeSwitcher()" class="oppia-mode-change-section">
