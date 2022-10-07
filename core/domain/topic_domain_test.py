@@ -888,6 +888,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_title, subtopic_obj.title)
         self.assertEqual(url_frag, subtopic_obj.url_fragment)
 
+    def test_remove_skill_id_exception(self) -> None:
+        skill_id = 'skill_id_123'
+        topic = self.topic
+        with self.assertRaisesRegex(
+            Exception,
+            'Skill id %s is not present in the old subtopic' % skill_id
+        ):
+            topic.remove_skill_id_from_subtopic(1, skill_id)
+
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
         Topic during export and import.
