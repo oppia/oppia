@@ -953,37 +953,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             outcomes.append(self.default_outcome)
         return outcomes
 
-    def _validate_continue_input(self) -> None:
-        """Validates the Continue interaction.
-
-        Raises:
-            ValidationError. Text value is empty or is more than 20 characters.
-            ValidationError. Answer group is present.
-        """
-        button_text = self.customization_args['buttonText'].value
-        # Ruling out the possibility of different types for mypy type checking.
-        assert isinstance(button_text, SubtitledUnicode)
-        text_value = button_text.unicode_str
-        if len(text_value) > 20:
-            raise utils.ValidationError(
-                'The Continue button text should be at most 20 characters.'
-            )
-
-    def _validate_end_exploration_input(self) -> None:
-        """Validates the End interaction.
-
-        Raises:
-            ValidationError. Recommended explorations are more than 3.
-        """
-        recc_exp_ids = (
-            self.customization_args['recommendedExplorationIds'].value
-        )
-        if len(recc_exp_ids) > 3:
-            raise utils.ValidationError(
-                'The End interaction should not have more than 3 '
-                'recommended explorations.'
-            )
-
     def _set_lower_and_upper_bounds(
         self,
         range_var: RangeVariableDict,
@@ -1462,26 +1431,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         f'in FractionInput interaction.'
                     )
 
-    def _validate_choices_should_be_unique_and_empty(self) -> None:
-        """Validates that the answer choice should be unique and non empty
-
-        Raises:
-            ValidationError. Answer choice is empty.
-            ValidationError. Answer choice is duplicate.
-        """
-        choices = self.customization_args['choices'].value
-        seen_choices = []
-        for choice in choices:
-            if choice.html in ('<p></p>', ''):
-                raise utils.ValidationError(
-                    'There should not be any empty choices.'
-                )
-            if choice.html in seen_choices:
-                raise utils.ValidationError(
-                    'There should not be any duplicate choices.'
-                )
-            seen_choices.append(choice.html)
-
     def _validate_multi_choice_input(self) -> None:
         """Validates the MultipleChoiceInput interaction.
 
@@ -1503,8 +1452,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         f'interaction is already present.'
                     )
                 rule_spec_till_now.append(rule_spec.to_dict())
-
-        self._validate_choices_should_be_unique_and_empty()
 
     def _validate_item_selec_input(self) -> None:
         """Validates the ItemSelectionInput interaction.
@@ -1572,8 +1519,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'or greater than max_selection_value '
                             f'in ItemSelectionInput interaction.'
                         )
-
-        self._validate_choices_should_be_unique_and_empty()
 
     def _validate_drag_and_drop_input(self) -> None:
         """Validates the DragAndDropInput interaction.
@@ -1707,12 +1652,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             item_to_layer_idx[item] = layer_idx
 
                     for ele in equal_ordering_one_at_incorec_posn:
-                        is_off_by_one_value = False
+                        wrong_positions = 0
                         for layer_idx, layer in enumerate(ele):
                             for item in layer:
                                 if layer_idx != item_to_layer_idx[item]:
-                                    is_off_by_one_value = True
-                        if is_off_by_one_value:
+                                    wrong_positions += 1
+                        if wrong_positions <= 1:
                             raise utils.ValidationError(
                                 f'Rule - {rule_spec_index} of answer '
                                 f'group {ans_group_index} will never '
@@ -1728,8 +1673,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 'Atleast 2 choices should be there '
                 'in DragAndDropSortInput interaction.'
             )
-
-        self._validate_choices_should_be_unique_and_empty()
 
     def _validate_text_input(self) -> None:
         """Validates the TextInput interaction.
@@ -1756,14 +1699,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         rule_spec_till_now: List[RuleSpecDict] = []
         seen_strings_contains: List[List[str]] = []
         seen_strings_startswith: List[List[str]] = []
-
-        # Text input height should be >= 1 and <= 10.
-        rows_value = self.customization_args['rows'].value
-        if rows_value < 1 or rows_value > 10:
-            raise utils.ValidationError(
-                f'Rows having value {rows_value} is either '
-                f'less than 1 or greater than 10.'
-            )
 
         for ans_group_idx, answer_group in enumerate(self.answer_groups):
             for rule_spec_idx, rule_spec in enumerate(answer_group.rule_specs):
@@ -1937,9 +1872,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
+        # TODO: Find a way to encode these checks more declaratively.
+        # Conceptually the validation code should go in each interaction
+        # and as inside the interaction the code is very declarative we need
+        # to figure out a way to put these validations following the
+        # same format.
         interaction_id_to_validation_func = {
-            'Continue': self._validate_continue_input,
-            'EndExploration': self._validate_end_exploration_input,
             'NumericInput': self._validate_numeric_input,
             'FractionInput': self._validate_fraction_input,
             'NumberWithUnits': self._validate_number_with_units_input,

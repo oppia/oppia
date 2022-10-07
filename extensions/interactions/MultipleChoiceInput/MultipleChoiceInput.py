@@ -49,13 +49,21 @@ class MultipleChoiceInput(base.BaseInteraction):
         'description': 'Multiple Choice options',
         'schema': {
             'type': 'list',
-            'validators': [{
-                'id': 'has_length_at_least',
-                'min_value': 1,
-            }],
+            'validators': [
+                {
+                    'id': 'has_length_at_least',
+                    'min_value': 1,
+                },
+                {
+                    'id': 'has_subtitled_html_content_uniquified'
+                }
+            ],
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
+                "validators": [{
+                    "id": "has_subtitled_html_non_empty"
+                }],
                 'replacement_ui_config': {
                     'html': {
                         'hide_complex_extensions': True,

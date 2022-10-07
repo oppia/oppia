@@ -44,21 +44,30 @@ class DragAndDropSortInput(base.BaseInteraction):
         'description': 'Items for drag and drop',
         'schema': {
             'type': 'list',
-            'validators': [{
-                'id': 'has_length_at_least',
-                # NOTE: There is slightly stricter validation of the number of
-                # minimum choices in frontend. It should be at least 2 from the
-                # frontend perspective but we can't impose it here as min_value
-                # in the customization schema determines the number of RTEs that
-                # appear in the customization modal initially that needs to be
-                # 1. Here min_value: 2 and default_value: [''] aren't allowed as
-                # default_value needs to be at least of same length as min_value
-                # else schema tests for customization args will fail.
-                'min_value': 1
-            }],
+            'validators': [
+                {
+                    'id': 'has_length_at_least',
+                    # NOTE: There is slightly stricter validation of the number
+                    # of minimum choices in frontend. It should be at least 2
+                    # from the frontend perspective but we can't impose it here
+                    # as min_value in the customization schema determines the
+                    # number of RTEs that appear in the customization modal
+                    # initially that needs to be 1. Here min_value: 2 and
+                    # default_value: [''] aren't allowed as default_value needs
+                    # to be at least of same length as min_value else schema
+                    # tests for customization args will fail.
+                    'min_value': 1
+                },
+                {
+                    'id': 'has_subtitled_html_content_uniquified'
+                }
+            ],
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
+                "validators": [{
+                    "id": "has_subtitled_html_non_empty"
+                }],
                 'replacement_ui_config': {
                     'html': {
                         'hide_complex_extensions': True,

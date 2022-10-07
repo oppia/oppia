@@ -1143,17 +1143,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.create_default_exploration('test_id'))
         self.state = self.new_exploration.states['Introduction']
 
-    def test_continue_interaction(self) -> None:
-        """Tests Continue interaction."""
-        self.set_interaction_for_state(self.state, 'Continue')
-        self.state.interaction.customization_args[
-            'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeeeeeeee'
-        self._assert_validation_error(
-            self.new_exploration, 'The Continue button text should be at '
-            'most 20 characters.')
-        self.state.interaction.customization_args[
-            'buttonText'].value.unicode_str = 'Continue'
-
     def test_numeric_interaction(self) -> None:
         """Tests Numeric interaction."""
         self.set_interaction_for_state(self.state, 'NumericInput')
@@ -1198,6 +1187,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'inputs': {
                         'x': 10
                     }
+                },
+                {
+                    'rule_type': 'IsGreaterThanOrEqualTo',
+                    'inputs': {
+                        'x': 15
+                    }
                 }
             ],
             'outcome': {
@@ -1237,6 +1232,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'NumericInput interaction is already present.')
         rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            self.new_exploration, 'Rule \'2\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules')
+
         self.state.recorded_voiceovers.add_content_id_for_voiceover(
             'feedback_0')
         self.state.written_translations.add_content_id_for_translation(
@@ -1360,6 +1359,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'f': {
                             'isNegative': False,
                             'wholeNumber': 0,
+                            'numerator': 7,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
                             'numerator': 5,
                             'denominator': 2
                         }
@@ -1427,6 +1437,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'ExactlyEqualTo will never be matched because it is '
             'made redundant by the above rules')
         rule_specs.remove(rule_specs[1])
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            self.new_exploration, 'Rule \'3\' from answer group \'0\' of '
+            'FractionInput interaction will never be matched because it is '
+            'made redundant by the above rules')
 
         state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
         state.written_translations.add_content_id_for_translation('feedback_0')
@@ -1586,22 +1601,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
         self.state.interaction.customization_args['choices'].value = [
             state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
         ]
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'MultipleChoiceInput interaction is already present.'
         )
         rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            self.new_exploration, 'There should not be any duplicate choices.'
-        )
-        self.state.interaction.customization_args[
-            'choices'].value[1].html = '<p>3</p>'
-        self._assert_validation_error(
-            self.new_exploration, 'There should not be any empty choices.'
-        )
         self.state.interaction.customization_args[
             'choices'].value[2].html = '<p>2</p>'
 
@@ -1649,8 +1656,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
         self.state.interaction.customization_args['choices'].value = [
             state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
         ]
         self.state.interaction.customization_args[
             'minAllowableSelectionCount'].value = 3
@@ -1690,16 +1697,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'minAllowableSelectionCount'].value = 1
         self.state.interaction.customization_args[
             'maxAllowableSelectionCount'].value = 3
-        self._assert_validation_error(
-            self.new_exploration, 'There should not be any duplicate choices.'
-        )
-        self.state.interaction.customization_args[
-            'choices'].value[1].html = '<p>3</p>'
-        self._assert_validation_error(
-            self.new_exploration, 'There should not be any empty choices.'
-        )
-        self.state.interaction.customization_args[
-            'choices'].value[2].html = '<p>2</p>'
 
     def test_drag_and_drop_interaction(self) -> None:
         """Tests DragAndDrop interaction."""
@@ -1813,6 +1810,25 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                             ]
                         ]
                     }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_1'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ]
+                        ]
+                    }
                 }
             ],
             'outcome': {
@@ -1876,21 +1892,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.new_exploration, 'Atleast 2 choices should be there '
             'in DragAndDropSortInput interaction.')
-        self.state.interaction.customization_args['choices'].value = [
-            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_1', '<p>1</p>'),
-            state_domain.SubtitledHtml('ca_choices_2', '<p></p>')
-        ]
-        self._assert_validation_error(
-            self.new_exploration, 'There should not be any duplicate choices.'
-        )
-        self.state.interaction.customization_args[
-            'choices'].value[1].html = '<p>3</p>'
-        self._assert_validation_error(
-            self.new_exploration, 'There should not be any empty choices.'
-        )
-        self.state.interaction.customization_args[
-            'choices'].value[2].html = '<p>2</p>'
 
     def test_text_interaction(self) -> None:
         """Tests Text interaction."""
@@ -2061,11 +2062,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.answer_groups = (
             test_ans_group_for_text_interaction)
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
-        self.state.interaction.customization_args['rows'].value = 20
-        self._assert_validation_error(
-            self.new_exploration, 'Rows having value 20 is either '
-            'less than 1 or greater than 10.'
-        )
+
         self.state.interaction.customization_args['rows'].value = 5
         self._assert_validation_error(
             self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
@@ -2099,16 +2096,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'TextInput interaction is already present.')
-
-    def test_end_interaction(self) -> None:
-        """Tests End interaction."""
-        self.set_interaction_for_state(self.state, 'EndExploration')
-        self.state.update_interaction_default_outcome(None)
-        self.state.interaction.customization_args[
-            'recommendedExplorationIds'].value = ['a', 'b', 'c', 'd']
-        self._assert_validation_error(
-            self.new_exploration, 'The End interaction should not have more '
-            'than 3 recommended explorations.')
 
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
