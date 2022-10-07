@@ -103,7 +103,7 @@ class MockStateEditorService {
   }
 }
 
-fdescribe('Customize Interaction Modal Component', () => {
+describe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
   let contextService: ContextService;
   let changeDetectorRef: ChangeDetectorRef;
@@ -236,6 +236,26 @@ fdescribe('Customize Interaction Modal Component', () => {
 
     spyOn(component, 'getCustomizationArgsWarningsList').and
       .returnValue([]);
+
+    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+  });
+
+  it('should enablr save interaction button when it is End Exploration interaction', () => {
+    spyOn(component, 'getTitle').and
+      .returnValue('End Exploration');
+      
+    let className = 'exploration-id-input';
+
+    spyOn(
+      document, 'getElementsByClassName'
+    ).withArgs(className).and.returnValue(undefined);
+
+    // let dummyDivElement: HTMLInputElement = document.createElement('input');
+    // let inpVal = angular.element(dummyDivElement).attr('ng-reflect-model');
+
+    // spyOn(
+    //   document, 'getElementsByClassName'
+    // ).withArgs(className).and.returnValue([]);
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
