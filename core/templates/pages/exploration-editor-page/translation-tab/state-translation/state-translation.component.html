@@ -30,22 +30,22 @@
       <li>
         To revert and cancel any unsaved translation(s),
         click the
-        <i class="material-icons" style="color: #009688">
+        <i class="material-icons oppia-state-translation-icons">
         &#xE5C9;</i> button.
-      </li>
+    </li>
       <li>
         To play the audio, click the
-        <i class="material-icons" style="color: #009688" >
+        <i class="material-icons oppia-state-translation-icons" >
         &#xE039;</i> button.
       </li>
       <li>
         To do retakes, click the
-        <i class="material-icons" style="color: #009688">
+        <i class="material-icons oppia-state-translation-icons">
         &#xE028;</i> button.
       </li>
       <li>
         To delete a recording, click the
-        <i class="material-icons" style="color: #009688">
+        <i class="material-icons oppia-state-translation-icons">
         &#xE872;</i> button.
       </li>
     </ul>
@@ -55,26 +55,26 @@
 <ng-template #TranslationTabRecordingOverview>
   <h3 class="e2e-test-joyride-title">Recording Audio</h3>
   <div>
-    <p>To create audio translations in Oppia, we recommend using the <i class="material-icons" style="color: #009688" >&#xE2C6;</i>
+    <p>To create audio translations in Oppia, we recommend using the <i class="material-icons oppia-state-translation-icons">&#xE2C6;</i>
     button to <b>upload</b> audio files from your computer.</p>
     <p>You can also record via your browser, but that may lead to degraded audio quality. If you would like to do so anyway,
        simply follow these 3 steps: </p>
        <ol>
         <li>
           To start <b>recording</b>, click the
-          <i class="material-icons" style="color: #009688">
+          <i class="material-icons oppia-state-translation-icons">
           mic</i> button.
           If the browser pops up a message asking if you’d
           like to record audio, accept it.
         </li>
         <li>
           When you are ready to end the recording, click
-          <i class="material-icons" style="color: #009688">
+          <i class="material-icons oppia-state-translation-icons">
           &#xE047;</i> to <b>stop</b>.
         </li>
         <li>
-          Hit the <b>save</b> <i class="material-icons"
-          style="color: #009688" > &#xE161;</i> button
+          Hit the <b>save</b>
+           <i class="material-icons oppia-state-translation-icons"> &#xE161;</i> button
           to confirm the recording.
         </li>
       </ol>
@@ -463,6 +463,9 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
+  }
+  .oppia-state-translation-icons {
+    color: #009688
   }
   state-translation .oppia-translation-state-content-html-data {
     pointer-events: none;

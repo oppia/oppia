@@ -763,4 +763,3 @@ describe('Audio translation bar Component', () => {
      tick();
    }));
 });
-
