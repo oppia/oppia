@@ -878,7 +878,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_create_default_subtopic(self) -> None:
         subtopic_id = 1
         subtopic_title = 'subtopic_title'
-        url_frag = 'url_frag'        
+        url_frag = 'url_frag'
         subtopic_obj = topic_domain.Subtopic.create_default_subtopic(
             subtopic_id,
             subtopic_title,
