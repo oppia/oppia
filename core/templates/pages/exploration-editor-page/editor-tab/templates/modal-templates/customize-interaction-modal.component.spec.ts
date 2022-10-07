@@ -240,10 +240,10 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable save interaction button when it is End Exploration interaction', () => {
+  it('should enable Save Interaction button for End Exploration', () => {
     spyOn(component, 'getTitle').and
       .returnValue('End Exploration');
-      
+
     let className = 'exploration-id-input';
 
     spyOn(
@@ -253,29 +253,17 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable save interaction button when input in add Exploration ID is non-empty in End Exploration interaction', () => {
+  it('should Save Interaction button when input in add Exploration ID', () => {
     spyOn(component, 'getTitle').and
       .returnValue('End Exploration');
 
     let inputField = document.createElement('input');
     let inputValue = angular.element(inputField);
-    
-    (inputValue as any).attr != "";
+
+    (inputValue as any).attr !== '';
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
-
-  // it('should disable save interaction button when input in add Exploration ID is empty in End Exploration interaction', () => {
-  //   spyOn(component, 'getTitle').and
-  //     .returnValue('End Exploration');
-
-  //   let inputField = document.createElement('input');
-  //   let inputValue = angular.element(inputField);
-
-  //   (inputValue as any).attr = "";
-
-  //   expect(component.isSaveInteractionButtonEnabled()).toBe(false);
-  // });
 
   it('should open intreaction when user click on it', () => {
     spyOn(interactionDetailsCacheService, 'contains').and

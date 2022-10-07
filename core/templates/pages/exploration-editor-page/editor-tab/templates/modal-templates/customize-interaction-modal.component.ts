@@ -260,26 +260,28 @@ export class CustomizeInteractionModalComponent
       this.stateInteractionIdService.displayed);
     let EndExploration = 'End Exploration';
     /*
-      There is a special condition specifically for the END EXPLORATION interaction
-      We have to check that the input field for adding the exploration Ids must be non-empty
-      If the input field is empty, then the Save Interaction button must be disabled!
+      There is a condition for the END EXPLORATION interaction
+      We have to check that the input field for adding
+      the exploration Ids must be non-empty
+      Save Interaction button should be disable for empty input
     */
     if (explorationTitle === EndExploration) {
       let inputField = document.getElementsByClassName('exploration-id-input');
       if (inputField === undefined) {
         return true;
       }
-      let inputValue = angular.element(inputField[inputField.length-1]).attr('ng-reflect-model');
-      if (inputValue === "") {
-        return false;
+      let inputValue = angular.element(
+        inputField[inputField.length - 1]).attr('ng-reflect-model');
+      if (inputValue !== '') {
+        return true;
       }
-      return true;
+    } else {
+      return !!(
+        this.hasCustomizationArgs &&
+        this.stateInteractionIdService.displayed &&
+        this.getCustomizationArgsWarningsList().length === 0
+      );
     }
-    return !!(
-      this.hasCustomizationArgs &&
-      this.stateInteractionIdService.displayed &&
-      this.getCustomizationArgsWarningsList().length === 0
-    );
   }
 
   getSaveInteractionButtonTooltip(): string {
