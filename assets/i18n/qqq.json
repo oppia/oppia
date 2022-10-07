@@ -309,6 +309,7 @@
 	"I18N_DONATE_PAGE_VISION_TEXT_TWO": "The second paragraph of the vision of Oppia in the Donate page.",
 	"I18N_EDIT_LEARNER_GROUP_PAGE_TITLE": "Title of the Edit Learner Group page.",
 	"I18N_EMPTY_LEARNER_GROUPS_MESSAGE": "Text shown when the learner groups list on the facilitator dashboard is empty.",
+	"I18N_EMPTY_SOLTUION_MESSAGE": "Text shown when the solution for a state is not specified.",
 	"I18N_END_CHAPTER_MILESTONE_MESSAGE_1": "Message displayed at the end of a chapter after a signed in learner completes their 1st chapter ever.",
 	"I18N_END_CHAPTER_MILESTONE_MESSAGE_2": "Message displayed at the end of a chapter after a signed in learner completes their 5th chapter ever.",
 	"I18N_END_CHAPTER_MILESTONE_MESSAGE_3": "Message displayed at the end of a chapter after a signed in learner completes their 10th chapter ever.",
