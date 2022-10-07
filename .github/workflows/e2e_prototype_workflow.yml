@@ -21,6 +21,13 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
+      - uses: 'actions/cache@v2'
+        id: python-cache
+        with:
+          path: ${{ env,pythonLocation}}/lib/python3.7/site-packages/*
+          key: ${{ runner.os }}-3.7-${{ github.sha}}
+          restore-keys: |
+            ${{ runner.os }}-3.7-${{ github.sha}}
       - name: echo github sha
         run: |
           echo ${{ github.sha }}
@@ -72,6 +79,13 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
+      - uses: 'actions/cache@v2'
+        id: python-cache
+        with:
+          path: ${{ env,pythonLocation}}/lib/python3.7/site-packages/*
+          key: ${{ runner.os }}-3.7-${{ github.sha}}
+          restore-keys: |
+            ${{ runner.os }}-3.7-${{ github.sha}}
       - uses: ./.github/actions/merge
       - name: Cache build files
         uses: actions/cache@v2
