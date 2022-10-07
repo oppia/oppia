@@ -61,7 +61,7 @@ describe('Blog Post Editor Component', () => {
 
   let sampleBlogPostBackendDict = {
     id: 'sampleBlogId',
-    author_username: 'test_user',
+    author_name: 'test_user',
     title: 'sample_title',
     content: '<p>hello</p>',
     thumbnail_filename: 'image.png',
@@ -167,7 +167,6 @@ describe('Blog Post Editor Component', () => {
   });
 
   it('should initialize', () => {
-    let expectedBlogPost = BlogPostData.createInterstitialBlogPost();
     let defaultImageUrl = 'banner_image_url';
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue(defaultImageUrl);
@@ -179,15 +178,14 @@ describe('Blog Post Editor Component', () => {
     component.ngOnInit();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.blogPostData).toEqual(expectedBlogPost);
     expect(component.blogPostId).toEqual('');
     expect(component.MAX_CHARS_IN_BLOG_POST_TITLE).toBe(
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
     expect(component.initEditor).toHaveBeenCalled;
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual(defaultImageUrl);
     expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
     expect(component.windowIsNarrow).toBe(true);
+    expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
   });
 
   it('should set image uploader window size', () => {
@@ -323,6 +321,7 @@ describe('Blog Post Editor Component', () => {
 
     component.saveDraft();
 
+    expect(component.saveInProgress).toBe(true);
     expect(component.updateBlogPostData).toHaveBeenCalledWith(false);
   });
 
@@ -332,17 +331,21 @@ describe('Blog Post Editor Component', () => {
     spyOn(alertsService, 'addWarning');
     component.blogPostData = sampleBlogPostData;
     component.blogPostData.title = '';
+    component.saveInProgress = true;
 
     component.saveDraft();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Please fix the errors.');
+    expect(component.saveInProgress).toBe(false);
   });
 
   it('should update blog post data successfully in the backend',
     fakeAsync(() => {
       component.blogPostData = sampleBlogPostData;
       component.blogPostId = sampleBlogPostData.id;
+      component.saveInProgress = true;
+      component.publishingInProgress = true;
       spyOn(blogPostUpdateService, 'getBlogPostChangeDict')
         .and.returnValue({});
       spyOn(blogPostUpdateService, 'setBlogPostTags');
@@ -353,6 +356,7 @@ describe('Blog Post Editor Component', () => {
       component.updateBlogPostData(false);
       tick();
 
+      expect(component.saveInProgress).toBe(false);
       expect(blogPostUpdateService.setBlogPostTags).toHaveBeenCalled();
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Blog Post Saved Successfully.');
@@ -361,6 +365,7 @@ describe('Blog Post Editor Component', () => {
       component.updateBlogPostData(true);
       tick();
 
+      expect(component.publishingInProgress).toBe(false);
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Blog Post Saved and Published Successfully.');
     }));
@@ -369,6 +374,8 @@ describe('Blog Post Editor Component', () => {
     fakeAsync(() => {
       component.blogPostData = sampleBlogPostData;
       component.blogPostId = sampleBlogPostData.id;
+      component.saveInProgress = true;
+      component.publishingInProgress = true;
       spyOn(blogPostUpdateService, 'getBlogPostChangeDict')
         .and.returnValue({});
       spyOn(blogPostEditorBackendApiService, 'updateBlogPostDataAsync')
@@ -382,6 +389,8 @@ describe('Blog Post Editor Component', () => {
         .toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to save Blog Post. Internal Error: status: 500');
+      expect(component.publishingInProgress).toBe(false);
+      expect(component.saveInProgress).toBe(false);
     }));
 
   it('should get formatted date string from the timestamp in milliseconds',
@@ -451,9 +460,13 @@ describe('Blog Post Editor Component', () => {
       spyOn(component, 'updateBlogPostData');
 
       component.publishBlogPost();
+
+      expect(component.publishingInProgress).toBe(true);
+
       tick();
 
       expect(component.updateBlogPostData).not.toHaveBeenCalled();
+      expect(component.publishingInProgress).toBe(false);
     }));
 
   it('should successfully place call to publish blog post model', fakeAsync(
@@ -516,6 +529,7 @@ describe('Blog Post Editor Component', () => {
 
   it('should display alert when unable to post thumbnail data',
     fakeAsync(() => {
+      component.blogPostData = sampleBlogPostData;
       let imagesData = [{
         filename: 'imageFilename1',
         imageBlob: new Blob([''], { type: 'image/jpeg' })
@@ -547,6 +561,7 @@ describe('Blog Post Editor Component', () => {
       spyOn(alertsService, 'addSuccessMessage');
       spyOn(imageLocalStorageService, 'getStoredImagesData')
         .and.returnValue(imagesData);
+      component.blogPostData = sampleBlogPostData;
 
       component.postImageDataToServer();
       tick();
@@ -559,6 +574,7 @@ describe('Blog Post Editor Component', () => {
     }));
 
   it('should correctly return if the publish button is disabled or not', () => {
+    component.blogPostData = sampleBlogPostData;
     spyOn(component.blogPostData, 'prepublishValidate').and.returnValues(
       [], [], [], ['some issues']);
     component.newChangesAreMade = true;

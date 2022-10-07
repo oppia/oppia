@@ -23,7 +23,7 @@ describe('Blog Post Object Factory', () => {
   beforeEach(() => {
     let sampleBlogPostBackendDict = {
       id: 'sampleId',
-      author_username: 'testUsername',
+      author_name: 'testUsername',
       title: 'sampleTitle',
       content: '<p>Hello</p>',
       thumbnail_filename: 'image',
@@ -103,17 +103,6 @@ describe('Blog Post Object Factory', () => {
       'Blog Post title should not exceed 40 characters.',
       'Blog Post should atmost have 1 tag(s) linked to it.'
     ]);
-  });
-
-  it('should be able to create an interstitial blog post object', () => {
-    let blogPost = BlogPostData.createInterstitialBlogPost();
-    expect(blogPost.id).toEqual(null);
-    expect(blogPost.authorUsername).toEqual('loading');
-    expect(blogPost.title).toEqual('Blog Post Title loading');
-    expect(blogPost.content).toEqual('');
-    expect(blogPost.tags).toEqual([]);
-    expect(blogPost.thumbnailFilename).toEqual(null);
-    expect(blogPost.urlFragment).toEqual('Url Fragment loading');
   });
 
   it('should return correct property values', () => {
