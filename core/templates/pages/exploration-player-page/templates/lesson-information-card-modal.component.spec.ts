@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for lesson information card modal component.
  */
 
-import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
@@ -115,7 +114,6 @@ describe('Lesson Information card modal component', () => {
   let userService: UserService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let localStorageService: LocalStorageService;
-  let clipboard: Clipboard;
   let checkpointCelebrationUtilityService:
     CheckpointCelebrationUtilityService;
 
