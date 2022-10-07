@@ -172,8 +172,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/install_third_party_test.py',
     'scripts/pre_commit_hook.py',
     'scripts/pre_commit_hook_test.py',
-    'scripts/pre_push_hook.py',
-    'scripts/pre_push_hook_test.py',
     'scripts/run_backend_tests.py',
     'scripts/run_e2e_tests.py',
     'scripts/run_e2e_tests_test.py',
