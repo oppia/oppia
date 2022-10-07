@@ -28,11 +28,11 @@ import tempfile
 from core import utils
 from core.tests import test_utils
 
+from typing import Dict, List, Optional, Tuple
+
 from . import common
 from . import install_python_prod_dependencies
 from . import pre_push_hook
-
-from typing import Dict, List, Optional, Tuple
 
 
 class PrePushHookTests(test_utils.GenericTestBase):
@@ -501,10 +501,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_install_hook_with_error_in_making_pre_push_executable(
         self
     ) -> None:
+
         def mock_islink(unused_file: str) -> bool:
             return True
+
         def mock_exists(unused_file: str) -> bool:
             return True
+
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
         ) -> Tuple[str, str]:
