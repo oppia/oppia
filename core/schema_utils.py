@@ -753,6 +753,8 @@ class _Validators:
         Returns:
             bool. Whether the given object has length atmost the max_value.
         """
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(obj, dict)
         if len(obj['unicode_str']) > max_value:
             return False
         return True
@@ -770,6 +772,8 @@ class _Validators:
         Returns:
             bool. Whether the given object is empty.
         """
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(obj, dict)
         if is_default:
             return True
         if obj['html'] in ('', '<p></p>'):
@@ -791,6 +795,9 @@ class _Validators:
         """
         seen_choices = []
         for choice in obj:
+            # Ruling out the possibility of different types for mypy type
+            # checking.
+            assert isinstance(choice, dict)
             if choice['html'] in seen_choices:
                 return False
             seen_choices.append(choice['html'])
