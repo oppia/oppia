@@ -3943,30 +3943,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
-        # No answer choice should appear in more than one rule.
-        for answer_group in answer_groups:
-            unwanted_rule = []
-            for rule_spec in answer_group['rule_specs']:
-                if rule_spec['rule_type'] == 'Equals':
-                    if (
-                        rule_spec['inputs']['x'] in
-                        selected_equals_choices
-                    ):
-                        unwanted_rule.append(rule_spec)
-                    else:
-                        selected_equals_choices.append(
-                            rule_spec['inputs']['x'])
-
-            for ele in unwanted_rule:
-                answer_group['rule_specs'].remove(ele)
-            if (
-                len(answer_group['rule_specs']) == 0 and
-                answer_group not in empty_ans_groups
-            ):
-                empty_ans_groups.append(answer_group)
-
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['customization_args']['choices'][
             'value'] = choices
@@ -4174,12 +4150,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                                 item_to_layer_idx[item] = layer_idx
 
                         for ele in off_by_one_rules:
-                            off_by_one_value = False
+                            wrong_positions = 0
                             for layer_idx, layer in enumerate(ele):
                                 for item in layer:
                                     if layer_idx != item_to_layer_idx[item]:
-                                        off_by_one_value = True
-                            if off_by_one_value:
+                                        wrong_positions += 1
+                            if wrong_positions <= 1:
                                 invalid_rules.append(rule_spec)
 
         empty_ans_groups = []
