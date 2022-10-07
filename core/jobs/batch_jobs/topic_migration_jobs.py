@@ -174,7 +174,7 @@ class MigrateTopicJob(base_jobs.JobBase):
         """Checks if any migration errors have occured.
 
         Args:
-            migrated_topic: Topic. The migrated topic domain object.
+            unused_migrated_topic: Topic. Unused migrated topic domain object.
             is_no_migration_error: beam.pvalue.AsSingleton. Side input data
                 specifying non-zero erros during migration.
 
