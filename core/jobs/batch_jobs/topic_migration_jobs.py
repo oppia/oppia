@@ -32,7 +32,6 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-
 from typing import Iterable, Sequence, Tuple
 
 MYPY = False
@@ -169,7 +168,7 @@ class MigrateTopicJob(base_jobs.JobBase):
 
     @staticmethod
     def _check_migration_errors(
-        migrated_topic: topic_domain.Topic, # pylint: disable=unused-argument
+        unused_migrated_topic: topic_domain.Topic,
         is_no_migration_error: beam.pvalue.AsSingleton
     ) -> bool:
         """Checks if any migration errors have occured.
@@ -279,7 +278,7 @@ class MigrateTopicJob(base_jobs.JobBase):
             topic_objects_list
             | 'Remove migrated jobs' >> beam.Filter(
                 lambda x: (
-                        len(x['topic_changes']) == 0 and len(x['topic']) > 0
+                    len(x['topic_changes']) == 0 and len(x['topic']) > 0
                 ))
             | 'Transform previously migrated topics into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(

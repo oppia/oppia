@@ -2058,12 +2058,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         for model_reference, topic_reference in zip(
             populated_model.canonical_story_references,
-            topic.canonical_story_references):
+            topic.canonical_story_references
+        ):
             self.assertEqual(model_reference, topic_reference.to_dict())
 
         for model_reference, topic_reference in zip(
             populated_model.additional_story_references,
-            topic.additional_story_references):
+            topic.additional_story_references
+        ):
             self.assertEqual(model_reference, topic_reference.to_dict())
         self.assertEqual(
             populated_model.uncategorized_skill_ids,
