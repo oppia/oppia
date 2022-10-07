@@ -227,6 +227,9 @@ describe('Audio translation bar Component', () => {
        translationTabDivMock.triggerHandler('dragover');
        tick();
 
+       component.waveSurferOnFinishCb();
+       tick();
+
        expect(component.dropAreaIsAccessible).toBe(true);
        expect(component.userIsGuest).toBe(false);
      }));

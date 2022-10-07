@@ -9,16 +9,16 @@
   <h3 class="e2e-test-joyride-title">Tutorial Complete</h3>
   <p>
     <p>
-    Now, you are ready to begin adding translations 
-    to your explorations! 
-    This marks the end of this tour. 
-    Remember to save your progress periodically using 
-    the save button in the navigation bar at the top: 
+    Now, you are ready to begin adding translations
+    to your explorations!
+    This marks the end of this tour.
+    Remember to save your progress periodically using
+    the save button in the navigation bar at the top:
     <button class="btn btn-success" disabled>
     <i class="material-icons" >&#xE161;
-    </i></button>.<br> 
-    Thank you for making this lesson more accessible 
-    for non-native speakers!' 
+    </i></button>.<br>
+    Thank you for making this lesson more accessible
+    for non-native speakers!'
   </p>
 </ng-template>
 
@@ -29,24 +29,24 @@
     <ul>
       <li>
         To revert and cancel any unsaved translation(s),
-        click the 
-        <i class="material-icons" style="color:#009688">
+        click the
+        <i class="material-icons" style="color: #009688">
         &#xE5C9;</i> button.
       </li>
       <li>
-        To play the audio, click the 
-        <i class="material-icons" style="color:#009688" >
-        &#xE039;</i> button. 
+        To play the audio, click the
+        <i class="material-icons" style="color: #009688" >
+        &#xE039;</i> button.
       </li>
       <li>
-        To do retakes, click the 
-        <i class="material-icons" style="color:#009688">
-        &#xE028;</i> button. 
+        To do retakes, click the
+        <i class="material-icons" style="color: #009688">
+        &#xE028;</i> button.
       </li>
       <li>
-        To delete a recording, click the 
-        <i class="material-icons" style="color:#009688">
-        &#xE872;</i> button. 
+        To delete a recording, click the
+        <i class="material-icons" style="color: #009688">
+        &#xE872;</i> button.
       </li>
     </ul>
   </div>
@@ -55,29 +55,29 @@
 <ng-template #TranslationTabRecordingOverview>
   <h3 class="e2e-test-joyride-title">Recording Audio</h3>
   <div>
-    <p>To create audio translations in Oppia, we recommend using the <i class="material-icons" style="color:#009688" >&#xE2C6;</i>
+    <p>To create audio translations in Oppia, we recommend using the <i class="material-icons" style="color: #009688" >&#xE2C6;</i>
     button to <b>upload</b> audio files from your computer.</p>
     <p>You can also record via your browser, but that may lead to degraded audio quality. If you would like to do so anyway,
-       simply follow these 3 steps:</p>
+       simply follow these 3 steps: </p>
        <ol>
         <li>
-          To start <b>recording</b>, click the 
-          <i class="material-icons" style="color:#009688">
-          mic</i> button. 
-          If the browser pops up a message asking if you’d 
-          like to record audio, accept it. 
+          To start <b>recording</b>, click the
+          <i class="material-icons" style="color: #009688">
+          mic</i> button.
+          If the browser pops up a message asking if you’d
+          like to record audio, accept it.
         </li>
         <li>
-          When you are ready to end the recording, click 
-          <i class="material-icons" style="color:#009688">
-          &#xE047;</i> to <b>stop</b>. 
+          When you are ready to end the recording, click
+          <i class="material-icons" style="color: #009688">
+          &#xE047;</i> to <b>stop</b>.
         </li>
         <li>
           Hit the <b>save</b> <i class="material-icons"
-          style="color:#009688" > &#xE161;</i> button 
+          style="color: #009688" > &#xE161;</i> button
           to confirm the recording.
         </li>
-      </ol> 
+      </ol>
   </div>
 </ng-template>
 
@@ -177,7 +177,7 @@
               <span>
                 <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
                                           (click)="onContentClick($event)"
-                                          class="oppia-rte-editor" 
+                                          class="oppia-rte-editor"
                                           [rteString]="getRequiredHtml(caContent.content)">
                 </oppia-rte-output-display>
               </span>
@@ -204,7 +204,7 @@
                (click)="changeActiveRuleContentIndex(index)"
                [ngClass]="{'oppia-rule-tab-active': activeRuleContentIndex === index}"
                [ngStyle]="contentIdStatusColorStyle(ruleContent.contentId)">
-               {{ ruleContent.rule | parameterizeRuleDescriptionPipe:stateInteractionId:answerChoices }}
+               {{ ruleContent.rule | parameterizeRuleDescriptionPipe: stateInteractionId: answerChoices }}
             </a>
             <div *ngIf="activeRuleContentIndex === index">
               <div class="oppia-editor-card-section">

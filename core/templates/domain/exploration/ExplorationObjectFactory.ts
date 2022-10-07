@@ -66,7 +66,7 @@ export interface ExplorationBackendDict {
   'category'?: string;
   'objective'?: string;
   'tags'?: string;
-  'rights': {
+  'rights'?: {
     'owner_names': string[];
     'editor_names': string[];
     'voice_artist_names': string[];
@@ -80,7 +80,7 @@ export interface ExplorationBackendDict {
     'mute_feedback_notifications': boolean;
     'mute_suggestion_notifications': boolean;
   };
-  'show_state_translation_tutorial_on_load': boolean;
+  'show_state_translation_tutorial_on_load'?: boolean;
   'user'?: string;
   'show_state_editor_tutorial_on_load'?: boolean;
 }

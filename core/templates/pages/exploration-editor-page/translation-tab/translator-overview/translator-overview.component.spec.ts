@@ -100,6 +100,8 @@ describe('Translator Overview component', () => {
 
   it('should initialize component properties after controller is initialized',
     () => {
+      component.canShowTabModeSwitcher();
+
       expect(component.inTranslationMode).toBe(true);
       expect(component.inVoiceoverMode).toBe(true);
       expect(component.languageCodesAndDescriptions.length).toBe(
@@ -112,11 +114,6 @@ describe('Translator Overview component', () => {
           explorationLanguageCode)
       });
     });
-
-  it('should show tab mode switcher when language code is different' +
-    ' from exploration\'s language code', () => {
-    expect(component.canShowTabModeSwitcher()).toBe(true);
-  });
 
   it('should change to voiceover active mode when changing translation tab',
     () => {

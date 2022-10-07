@@ -89,14 +89,14 @@ import { StatisticsTabComponent } from './statistics-tab/statistics-tab.componen
 import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
 import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
 import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
-import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component'; // easy testing left
+import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
 import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
-import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component'; // testcase left
+import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
 import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
-import { StateTranslationComponent } from './translation-tab/state-translation/state-translation.component'; // test case left
-import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component'; // test case left
-import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component'; // test case left
-import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component'; // some test case left
+import { StateTranslationComponent } from './translation-tab/state-translation/state-translation.component';
+import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component';
+import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component';
+import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component';
 import { TranslationTabComponent } from './translation-tab/translation-tab.component';
 import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
 
