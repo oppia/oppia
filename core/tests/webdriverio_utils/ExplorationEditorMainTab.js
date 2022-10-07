@@ -178,7 +178,7 @@ var ExplorationEditorMainTab = function() {
     // Use: await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = $(`.e2e-test-joyride-title=${HEADING}`);
       await waitFor.visibilityOf(
-        tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
+        tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
       var nextTutorialStageButtons = await $$('.joyride-step__next-container');
       await waitFor.elementToBeClickable(

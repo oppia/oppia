@@ -19,11 +19,11 @@
   </p>
 </ng-template>
 
-<div class="oppia-translation-tab" *ngIf="showTranslationTabSubDirectives" joyrideStep="translationTabTourContainer" [stepContent]="TranslationTabTourContainer">
+<div class="oppia-translation-tab" *ngIf="showTranslationTabSubDirectives">
   <div class="oppia-translator-overview">
     <oppia-translator-overview [isTranslationTabBusy]="isTranslationTabBusy" joyrideStep="translationTabOverview" [stepContent]="TranslationTabOverview"></oppia-translator-overview>
   </div>
-  <div class="row">
+  <div class="row" joyrideStep="translationTabTourContainer" [stepContent]="TranslationTabTourContainer">
     <div class="col-lg-8 col-md-8 col-sm-8">
       <oppia-state-translation [isTranslationTabBusy]="isTranslationTabBusy"></oppia-state-translation>
     </div>

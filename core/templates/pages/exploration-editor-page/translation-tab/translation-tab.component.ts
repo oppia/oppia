@@ -16,7 +16,7 @@
  * @fileoverview Component for the translation tab.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { WelcomeTranslationModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
@@ -121,7 +121,12 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
         themeColor: '#212f23',
         }
       ).subscribe(
-        (value) => {},
+        (value) => {
+          // This code make the joyride visible over navbar
+          // by overriding the properties of joyride-step__holder class.
+          document.querySelectorAll<HTMLElement>(
+            '.joyride-step__holder')[0].style.zIndex = '1007';
+        },
         (value) => {},
         () => {
           this.leaveTutorial();
