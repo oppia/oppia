@@ -384,21 +384,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         ):
             self.question.validate()
 
-    def test_validate_empty_rule_specs(self) -> None:
-        """Checks if the empty empty rule specs raise an error when training
-        data is not provided.
-        """
-        state = self.question.question_state_data
-        state.update_interaction_answer_groups(
-            [self.state_answer_group])
-        state.interaction.answer_groups[0].rule_specs = []
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'There must be at least one rule or training data for each '
-            'answer group.'
-        ):
-            self.question.validate()
-
     def test_strict_validation(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as True.

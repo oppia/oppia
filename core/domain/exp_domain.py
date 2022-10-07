@@ -1635,8 +1635,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict,
-                tagged_skill_misconception_id_required=False,
-                empty_rule_specs_allowed=False)
+                tagged_skill_misconception_id_required=False)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in

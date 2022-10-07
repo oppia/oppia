@@ -1774,15 +1774,13 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        # Here the variable `tagged_skill_misconception_id_required` and
-        # `empty_rule_specs_allowed` represents that if the state is allowed
-        # to have empty rule specs and the tagged skill misconception id is
+        # Here the variable `tagged_skill_misconception_id_required`
+        # represents that the tagged skill misconception id field is
         # required for it.
         self.question_state_data.validate(
             {},
             False,
-            tagged_skill_misconception_id_required=True,
-            empty_rule_specs_allowed=True)
+            tagged_skill_misconception_id_required=True)
 
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""

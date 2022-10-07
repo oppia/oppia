@@ -1653,8 +1653,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.validate(
                 exploration.param_specs,
                 allow_null_interaction=False,
-                tagged_skill_misconception_id_required=False,
-                empty_rule_specs_allowed=False)
+                tagged_skill_misconception_id_required=False)
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -1689,8 +1688,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.validate(
                 exploration.param_specs,
                 allow_null_interaction=False,
-                tagged_skill_misconception_id_required=False,
-                empty_rule_specs_allowed=False)
+                tagged_skill_misconception_id_required=False)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
@@ -1712,8 +1710,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.validate(
                 exploration.param_specs,
                 allow_null_interaction=False,
-                tagged_skill_misconception_id_required=False,
-                empty_rule_specs_allowed=False)
+                tagged_skill_misconception_id_required=False)
 
         exploration.states = {
             exploration.init_state_name: (
