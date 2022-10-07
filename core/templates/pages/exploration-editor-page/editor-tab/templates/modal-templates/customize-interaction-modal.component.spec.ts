@@ -103,7 +103,7 @@ class MockStateEditorService {
   }
 }
 
-describe('Customize Interaction Modal Component', () => {
+fdescribe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
   let contextService: ContextService;
   let changeDetectorRef: ChangeDetectorRef;
@@ -240,13 +240,13 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable saving the interaction when it is End Exploration', () => {
-    spyOn(component, 'getTitle').and
-      .returnValue('End Exploration');
+  // it('should enable saving the interaction when it is End Exploration', () => {
+  //   spyOn(component, 'getTitle').and
+  //     .returnValue('End Exploration');
 
-    spyOn(
-      document, 'getElementsByClassName'
-    ).withArgs('class-name').and.returnValue(undefined);
+  //   spyOn(
+  //     document, 'getElementsByClassName'
+  //   ).withArgs('class-name').and.returnValue(undefined);
 
     
     // expect(document.getElementsByClassName('exploration-id-input')).toBe(undefined);
@@ -254,8 +254,7 @@ describe('Customize Interaction Modal Component', () => {
     // let dummyElements = [document.createElement('div')];
     // expect(document.getElementsByClassName('exploration-id-input')).toEqual(dummyElements);
 
-    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
-  });
+  //   expe
 
   // it('should disable saving the interaction when it is End Exploration', () => {
   //   let s = component.isSaveInteractionButtonEnabled();
