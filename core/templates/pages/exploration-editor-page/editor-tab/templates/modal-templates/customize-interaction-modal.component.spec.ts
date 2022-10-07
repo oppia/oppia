@@ -238,14 +238,31 @@ describe('Customize Interaction Modal Component', () => {
       .returnValue([]);
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+  });
 
+  it('should enable saving the interaction when it is End Exploration', () => {
     spyOn(component, 'getTitle').and
       .returnValue('End Exploration');
 
-    expect(document.getElementsByClassName('form-control display-inline')).toBe(undefined);
+    spyOn(
+      document, 'getElementsByClassName'
+    ).withArgs('class-name').and.returnValue(undefined);
 
-    expect(document.getElementsByClassName('form-control display-inline')).toEqual([new (): HTMLAllCollection, prototype: HTMLAllCollection]);
+    
+    // expect(document.getElementsByClassName('exploration-id-input')).toBe(undefined);
+
+    // let dummyElements = [document.createElement('div')];
+    // expect(document.getElementsByClassName('exploration-id-input')).toEqual(dummyElements);
+
+    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
+
+  // it('should disable saving the interaction when it is End Exploration', () => {
+  //   let s = component.isSaveInteractionButtonEnabled();
+  //   spyOn(s, 'inputValue').and.Equal
+
+  //   expect(component.isSaveInteractionButtonEnabled()).toBe(false);
+  // });
 
   it('should open intreaction when user click on it', () => {
     spyOn(interactionDetailsCacheService, 'contains').and
