@@ -34,7 +34,6 @@ import { RatingComputationService } from 'components/ratings/rating-computation/
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -83,7 +82,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // The below property is defined only when the learner is on a
   // checkpointed state, and is undefined otherwise.
   translatedCongratulatoryCheckpointMessage: string | undefined;
-  showTooltip: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -99,7 +97,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private checkpointCelebrationUtilityService:
       CheckpointCelebrationUtilityService,
-    private ngbModal: NgbModal
   ) {
     super(ngbActiveModal);
   }
@@ -241,16 +238,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     }
     this.saveProgressMenuIsShown = true;
   }
-
-  copyProgressUrl(): void {
-    this.clipboard.copy(this.loggedOutProgressUniqueUrl);
-    this.showTooltip = true;
-    setTimeout(() => {
-      this.showTooltip = false;
-    }, 1000);
-  }
-
-
 
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(

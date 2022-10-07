@@ -17,6 +17,8 @@
  */
 
 import { Component, Input } from '@angular/core';
+import { Clipboard } from '@angular/cdk/clipboard';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'copy-exploration-url',
@@ -24,5 +26,18 @@ import { Component, Input } from '@angular/core';
 })
 
 export class ComponentOverviewComponent {
-  @Input() show !: boolean;
+  @Input() copy_url !: string;
+  showTooltip : boolean = false;
+
+  constructor(
+    private clipboard: Clipboard,
+    private i18nLanguageCodeService: I18nLanguageCodeService) {}
+
+  copyURL_button(): void {
+    this.clipboard.copy(this.copy_url);
+    this.showTooltip = true;
+    setTimeout(() => {
+      this.showTooltip = false;
+    }, 1000);
+  }
 }

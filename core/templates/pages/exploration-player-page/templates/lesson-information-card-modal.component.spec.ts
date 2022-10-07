@@ -401,17 +401,6 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.loggedOutProgressUniqueUrlId).toEqual('abcdef');
   }));
 
-  it('should correctly copy progress URL', () => {
-    spyOn(clipboard, 'copy');
-    let loggedOutProgressUrl = 'https://oppia.org/progress/abcdef';
-    componentInstance.loggedOutProgressUniqueUrl = loggedOutProgressUrl;
-
-    componentInstance.copyProgressUrl();
-
-    expect(clipboard.copy).toHaveBeenCalledWith(
-      loggedOutProgressUrl);
-  });
-
   it('should store unique progress URL ID when login button is clicked',
     fakeAsync(() => {
       spyOn(userService, 'getLoginUrlAsync').and.returnValue(

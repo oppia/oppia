@@ -411,49 +411,6 @@
   width: 100%;
 }
 
-.save-progress-menu .uid-box .uid-copy {
-  align-items: flex-end;
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 30px;
-  width: 100%;
-}
-
-.save-progress-menu .uid-box .copy-tooltip-margin {
-  margin-top: -33px;
-}
-
-.save-progress-menu .uid-box .uid-copy .unique-progress-id {
-  align-items: center;
-  border: 1px solid black;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  margin-left: 20px;
-  padding: 5px;
-  width: 70%;
-  word-break: break-word;
-}
-
-.save-progress-menu .uid-box .uid-copy .uid-btn-container {
-  display: flex;
-  flex-direction: column;
-  margin-left: 2%;
-  position: relative;
-  width: 20%;
-}
-
-.save-progress-menu .uid-box .uid-copy .uid-copy-btn {
-  box-shadow: 1px 1px 2px 0 rgba(0, 100, 92, 0.8);
-  color: #00645c;
-  font-family: Roboto, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  margin: 0 auto;
-  width: 100%;
-}
-
 .save-progress-menu .save-progress-close-button {
   background: transparent;
   border: none;
