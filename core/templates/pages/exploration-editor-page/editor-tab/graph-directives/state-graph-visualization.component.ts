@@ -458,7 +458,9 @@ export class StateGraphVisualization
     }
 
     if (this.centerAtCurrentState) {
-      this.centerGraph();
+      setTimeout(() => {
+        this.centerGraph();
+      });
     }
   }
 
