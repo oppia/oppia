@@ -158,7 +158,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 ca_spec.default_value,
                 schema_utils.normalize_against_schema(
-                    ca_spec.default_value, ca_spec.schema))
+                    ca_spec.default_value, ca_spec.schema, is_default=True))
 
             if ca_spec.schema['type'] == 'custom':
                 obj_class = object_registry.Registry.get_object_class_by_type(

@@ -96,7 +96,8 @@ def normalize_against_schema(
         obj: Any,
         schema: Dict[str, Any],
         apply_custom_validators: bool = True,
-        global_validators: Optional[List[Dict[str, Any]]] = None
+        global_validators: Optional[List[Dict[str, Any]]] = None,
+        is_default: bool = False
 ) -> Any:
     """Validate the given object using the schema, normalizing if necessary.
 
@@ -108,6 +109,7 @@ def normalize_against_schema(
             object using the validators defined in the schema.
         global_validators: list(dict). List of additional validators that will
             verify all the values in the schema.
+        is_default: bool. True when the incoming object is a default_value.
 
     Returns:
         *. The normalized object.
@@ -139,7 +141,8 @@ def normalize_against_schema(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
-                obj, obj_class.get_schema(), apply_custom_validators=False)
+                obj, obj_class.get_schema(), apply_custom_validators=False,
+                is_default=is_default)
         else:
             normalized_obj = obj_class.normalize(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
@@ -159,7 +162,8 @@ def normalize_against_schema(
             normalized_obj[key] = normalize_against_schema(
                 obj[key],
                 prop[SCHEMA_KEY_SCHEMA],
-                global_validators=global_validators
+                global_validators=global_validators,
+                is_default=is_default
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
@@ -167,11 +171,13 @@ def normalize_against_schema(
         for key, value in obj.items():
             normalized_key = normalize_against_schema(
                 key, schema[SCHEMA_KEY_KEYS][SCHEMA_KEY_SCHEMA],
-                global_validators=global_validators
+                global_validators=global_validators,
+                is_default=is_default
             )
             normalized_obj[normalized_key] = normalize_against_schema(
                 value, schema[SCHEMA_KEY_VALUES][SCHEMA_KEY_SCHEMA],
-                global_validators=global_validators
+                global_validators=global_validators,
+                is_default=is_default
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
         if isinstance(obj, bool):
@@ -214,7 +220,10 @@ def normalize_against_schema(
                     schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
             normalize_against_schema(
-                item, item_schema, global_validators=global_validators
+                item,
+                item_schema,
+                global_validators=global_validators,
+                is_default=is_default
             ) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
@@ -289,10 +298,16 @@ def normalize_against_schema(
             for validator in schema[SCHEMA_KEY_VALIDATORS]:
                 kwargs = dict(validator)
                 del kwargs['id']
-                assert get_validator(
-                    validator['id'])(normalized_obj, **kwargs), (
-                        'Validation failed: %s (%s) for object %s' % (
-                            validator['id'], kwargs, normalized_obj))
+                validator_func = get_validator(validator['id'])
+                if validator_func.__name__ == 'has_subtitled_html_non_empty':
+                    assert validator_func(
+                        normalized_obj, is_default=is_default), (
+                            'Validation failed: %s (%s) for object %s' % (
+                                validator['id'], kwargs, normalized_obj))
+                else:
+                    assert validator_func(normalized_obj, **kwargs), (
+                            'Validation failed: %s (%s) for object %s' % (
+                                validator['id'], kwargs, normalized_obj))
 
     if global_validators is not None:
         for validator in global_validators:
@@ -743,15 +758,20 @@ class _Validators:
         return True
 
     @staticmethod
-    def has_subtitled_html_non_empty(obj: state_domain.SubtitledHtml) -> bool:
+    def has_subtitled_html_non_empty(
+        obj: state_domain.SubtitledHtml, is_default: bool = False
+    ) -> bool:
         """Checks if the given subtitled html content is empty
 
         Args:
             obj: state_domain.SubtitledHtml. The object to verify.
+            is_default: bool. True when the incoming value is a `default_value`.
 
         Returns:
             bool. Whether the given object is empty.
         """
+        if is_default:
+            return True
         if obj['html'] in ('', '<p></p>'):
             return False
         return True

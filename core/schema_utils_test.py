@@ -221,7 +221,11 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
         }
     },
     SCHEMA_TYPE_CUSTOM: {
-        'has_subtitled_html_non_empty': {},
+        'has_subtitled_html_non_empty': {
+            'is_default': {
+                'type': SCHEMA_TYPE_BOOL
+            }
+        },
         'has_expected_subtitled_content_length': {
             'max_value': {
                 'type': SCHEMA_TYPE_INT
@@ -265,15 +269,10 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
     Raises:
         AssertionError. The object fails to validate against the schema.
     """
-    print("********************************")
-    print("before - ", obj_type)
     reference_dict = VALIDATOR_SPECS[obj_type]
-    print("after - ", obj_type)
-    print("validator - ", validator)
     assert 'id' in validator, 'id is not present in validator'
     assert validator['id'] in reference_dict, (
         '%s is not present in reference_dict' % validator['id'])
-    print("after after - ", obj_type)
 
     customization_keys = list(validator.keys())
     customization_keys.remove('id')

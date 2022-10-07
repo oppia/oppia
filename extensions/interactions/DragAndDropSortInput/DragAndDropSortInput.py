@@ -66,7 +66,8 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
                 'validators': [{
-                    'id': 'has_subtitled_html_non_empty'
+                    'id': 'has_subtitled_html_non_empty',
+                    'is_default': False
                 }],
                 'replacement_ui_config': {
                     'html': {
