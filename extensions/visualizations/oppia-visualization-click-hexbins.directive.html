@@ -34,7 +34,7 @@
       <path *ngFor="let hexbin of hexbins; index as index"
             [ngClass]="['click-hexbin-hexagon', 'e2e-test-hexagon-' + index]"
             [attr.fill]="getFillColor(hexbin)"
-            [attr.d]="'M {{hexbin.x}}, {{hexbin.y}}{{hexagon}}'"
+            [attr.d]="'M ' + hexbin.x +', '+ hexbin.y + hexagon"
             (mouseover)="showTooltip(hexbin)"
             (mouseout)="hideTooltip(hexbin)">
       </path>
