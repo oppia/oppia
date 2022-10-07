@@ -48,6 +48,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.check_function_calls = {
             'check_call_is_called': False,
         }
+        self.call_counter = 0
         self.print_arr = []
         def mock_check_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             self.check_function_calls['check_call_is_called'] = True
@@ -95,6 +96,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_tweak_yarn_executable(self):
         def mock_is_file(unused_filename):
+            if self.call_counter == 0:
+                self.call_counter = 1
+                return False
             return True
 
         def mock_rename(origin_name, new_name):
@@ -105,7 +109,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         rename_swap = self.swap(os, 'rename', mock_rename)
         with isfile_swap, rename_swap:
             install_third_party_libs.tweak_yarn_executable()
-        self.assertTrue(mock_rename.called)
+            self.assertFalse(mock_rename.called)
+            install_third_party_libs.tweak_yarn_executable()
+            self.assertTrue(mock_rename.called)
 
     def test_get_yarn_command_on_windows(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')

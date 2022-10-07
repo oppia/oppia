@@ -126,10 +126,7 @@ scripts.build_test
 scripts.common_test
 scripts.concurrent_task_utils_test
 scripts.docstrings_checker_test
-scripts.flake_checker_test
-scripts.install_backend_python_libs_test
 scripts.install_python_prod_dependencies_test
-scripts.install_third_party_libs_test
 scripts.install_third_party_test
 scripts.linters.general_purpose_linter_test
 scripts.linters.html_linter_test

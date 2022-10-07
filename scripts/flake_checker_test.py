@@ -384,8 +384,6 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
         def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             response = {
-                'log': ['log1', 'log2'],
-                'result': True,
                 'flake': {
                     'suite': 'suiteName',
                     'test': 'testName',
