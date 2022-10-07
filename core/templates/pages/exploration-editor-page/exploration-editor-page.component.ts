@@ -70,7 +70,7 @@ import { UserExplorationPermissionsService } from './services/user-exploration-p
 import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 
 @Component({
-  selector: 'oppia-exploration-editor-page',
+  selector: 'exploration-editor-page',
   templateUrl: './exploration-editor-page.component.html'
 })
 export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
@@ -577,7 +577,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaExplorationEditorPage',
+angular.module('oppia').directive('explorationEditorPage',
    downgradeComponent({
      component: ExplorationEditorPageComponent
    }) as angular.IDirectiveFactory);
