@@ -85,8 +85,8 @@
       <div class="oppia-mp3-converting" *ngIf="voiceoverRecorder.status().isRecording">
         Recording audio<loading-dots></loading-dots>
       </div>
-        <div id="visualized" class="oppia-audio-wave-view" *ngIf="!voiceoverRecorder.status().isRecording && !audioIsCurrentlyBeingSaved">
-        </div>
+      <div id="visualized" class="oppia-audio-wave-view" *ngIf="!voiceoverRecorder.status().isRecording && !audioIsCurrentlyBeingSaved">
+      </div>
     </div>
   </div>
   <div class="oppia-content-wrapper" *ngIf="voiceoverRecorder.status().isRecording">
