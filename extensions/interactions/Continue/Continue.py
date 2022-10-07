@@ -52,9 +52,9 @@ class Continue(base.BaseInteraction):
         'schema': {
             'type': 'custom',
             'obj_type': 'SubtitledUnicode',
-            "validators": [{
-                "id": "has_expected_subtitled_content_length",
-                "max_value": 20
+            'validators': [{
+                'id': 'has_expected_subtitled_content_length',
+                'max_value': 20
             }],
         },
         'default_value': {

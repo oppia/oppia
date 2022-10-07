@@ -76,8 +76,8 @@ class ItemSelectionInput(base.BaseInteraction):
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
-                "validators": [{
-                    "id": "has_subtitled_html_non_empty"
+                'validators': [{
+                    'id': 'has_subtitled_html_non_empty'
                 }],
                 'replacement_ui_config': {
                     'html': {
