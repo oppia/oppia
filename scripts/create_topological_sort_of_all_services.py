@@ -111,9 +111,10 @@ def make_graph() -> Tuple[Dict[str, List[str]], Set[str]]:
                         # section above. Hence, a branch where the below if
                         # condition is false will never arise and hence, we add
                         # the no branch flag.
-                        if parsed_node.type == 'ExpressionStatement' and ( # pragma: no branch
-                                parsed_node.expression.callee.name == (
-                                    'require')):
+                        if ( # pragma: no branch
+                            parsed_node.type == 'ExpressionStatement' and
+                            parsed_node.expression.callee.name == 'require'
+                        ):
                             arguments = parsed_node.expression.arguments
                             for argument in arguments:
                                 dep_path = argument.value
