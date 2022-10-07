@@ -71,51 +71,6 @@ jobs:
         run: for run in {1..5}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --mobile --prod_env; done
         env:
           VIDEO_RECORDING_IS_ENABLED: 1
-      - name: Run e2e Contributor Dashboard Tests in mobile view
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..5}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --mobile --prod_env; done
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 1
-      - name: Run e2e Contributor Dashboard Tests in mobile view
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..5}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --mobile --prod_env; done
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 1
-      - name: Run e2e Play Voiceovers Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers" --prod_env
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e File Upload Extensions Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions" --prod_env
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Contributor Dashboard Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Contributor Dashboard Tests in mobile view
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..5}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --mobile --prod_env; done
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 1
-      - name: Run e2e Blog Dashboard Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="blogDashboard" --prod_env
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Publication Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="publication"  --skip-install --skip-build --server_log_level="info" --prod_env
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Feature Gating Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --suite="featureGating"
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
