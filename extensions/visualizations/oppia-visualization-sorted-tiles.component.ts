@@ -38,6 +38,7 @@ export class VisualizationSortedTilesComponent implements OnInit {
   @Input() totalFrequency: number;
   @Input() options: {
     use_percentages: boolean;
+    header?: string;
   };
 
   isSelected: boolean[];
