@@ -11,11 +11,7 @@
     <div class="oppia-share-publish-link">
       <p>Here's your exploration link:</p>
       <div class="oppia-share-link-container">
-        <div class="oppia-share-link-box" id="exploration-link">{{ explorationLink }}</div>
-        <div class="oppia-share-link-tooltip">
-          <copy-exploration-url [copy_url]="explorationLink"></copy-exploration-url>
-        </div>
-      </div>
+      <copy-exploration-url [copy_url]="explorationLink"></copy-exploration-url>
     </div>
     <sharing-links layoutType="row post-publish-modal-sharing-links"
                    layoutAlignType="center center"
@@ -82,15 +78,6 @@
     border-radius: 4px;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .oppia-share-publish-body .oppia-share-publish-link .oppia-share-link-box {
-    border: 1px solid black;
-    font-size: 14px;
-    padding: 10px;
-    padding-left: 20px;
-    text-align: left;
-    width: 70%;
   }
 
   .oppia-share-publish-body .oppia-share-publish-link span {
