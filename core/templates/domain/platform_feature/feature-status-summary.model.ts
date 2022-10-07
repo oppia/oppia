@@ -27,6 +27,7 @@ export enum FeatureNames {
   EndChapterCelebration = 'end_chapter_celebration',
   CheckpointCelebration = 'checkpoint_celebration',
   AndroidBetaLandingPage = 'android_beta_landing_page',
+  BlogProject = 'blog_project',
 }
 
 export interface FeatureStatusSummaryBackendDict {

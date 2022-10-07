@@ -5,7 +5,7 @@
            [src]="authorProfilePictureUrl"
            alt="Profile image of the author of the blog post"
            class="e2e-test-profile-current-user-photo">
-      <mat-card-title class="w-100">
+      <mat-card-title class="w-100 d-flex justify-content-between">
         <span *ngIf="!authorNameEditorOpened" class="blog-dashboard-card-title e2e-test-username-visible">
           {{ authorName }}
           <button class="fas fa-pen oppia-editor-edit-icon"
@@ -23,6 +23,15 @@
             {{ 'I18N_BLOG_DASHBOARD_PAGE_SAVE_BUTTON' | translate }}
           </button>
         </span>
+        <button mat-button
+                *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts"
+                class="new-post-button e2e-test-create-blog-post-button"
+                (click)="createNewBlogPost()">
+          <mat-icon class="new-post-icon position-absolute">+</mat-icon>
+          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase }}</span>
+        </button>
+      </mat-card-title>
+      <mat-card-subtitle class="mt-2">
         <div class="blog-author-bio-container">
           <span *ngIf="!authorBioEditorOpened" class="d-flex">
             <span class="blog-author-bio">
@@ -40,7 +49,7 @@
                       [(ngModel)]="authorBio"
                       [attr.value]="authorBio"
                       rows="5"
-                      [maxlength]="600"
+                      [maxlength]="450"
                       placeholder="{{ 'I18N_PREFERENCES_BIO_EXPLAIN_TEXT' | translate }}">
             </textarea>
             <button class="mt-2 btn btn-success btn-sm ml-2" (click)="updateAuthorBio()">
@@ -48,14 +57,6 @@
             </button>
           </span>
         </div>
-      </mat-card-title>
-      <mat-card-subtitle class="mt-2" *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
-        <button mat-button
-                class="new-post-button e2e-test-create-blog-post-button"
-                (click)="createNewBlogPost()">
-          <mat-icon class="new-post-icon position-absolute">+</mat-icon>
-          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase }}</span>
-        </button>
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
@@ -307,6 +308,13 @@
     overflow: hidden;
   }
 
+  :host /deep/ mat-card-header .mat-card-header-text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+
   mat-card-header.blog-dashboard-header {
     margin: 3.75vw 3.438vw;
   }
@@ -315,12 +323,6 @@
     .blog-dashboard-card {
       margin: 20px;
       width: unset;
-    }
-
-    :host /deep/ mat-card-header .mat-card-header-text {
-      display: flex;
-      flex-grow: 1;
-      justify-content: space-between;
     }
 
     .new-post-button {

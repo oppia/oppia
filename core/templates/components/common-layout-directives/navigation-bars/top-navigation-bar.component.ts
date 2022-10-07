@@ -360,6 +360,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  getOppiaBlogUrl(): string {
+    if (this.platformFeatureService.status.BlogProject.isEnabled) {
+      return '/blog';
+    } else {
+      return 'https://medium.com/oppia-org';
+    }
+  }
+
   changeLanguage(languageCode: string): void {
     this.i18nService.updateUserPreferredLanguage(languageCode);
   }

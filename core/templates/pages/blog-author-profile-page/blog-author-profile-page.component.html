@@ -22,10 +22,10 @@
     <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen"
          class="oppia-blog-post-card-container">
       <div class="d-flex align-items-baseline">
-        <ngb-pagination [collectionSize]="3"
+        <ngb-pagination [collectionSize]="totalBlogPosts"
                         [(page)]="page"
                         [maxSize]="2"
-                        [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_PAGE"
+                        [pageSize]="MAX_NUM_CARD_TO_DISPLAY_ON_PAGE"
                         [rotate]="true"
                         (pageChange)="onPageChange()"
                         class="ml-auto">
@@ -63,7 +63,7 @@
       <ngb-pagination [collectionSize]="totalBlogPosts"
                       [(page)]="page"
                       [maxSize]="2"
-                      [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_PAGE"
+                      [pageSize]="MAX_NUM_CARD_TO_DISPLAY_ON_PAGE"
                       [rotate]="true"
                       (pageChange)="onPageChange()"
                       class="ml-auto">

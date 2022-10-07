@@ -8,11 +8,12 @@
         <img mat-card-avatar
              class="mr-2"
              [src]="authorProfilePicUrl"
-             alt="Profile image of the author of the blog post">
-        <mat-card-subtitle class="e2e-test-username-visible">
-          {{ blogPost.authorUsername }}
+             alt="Profile image of the author of the blog post"
+             (click)="navigateToAuthorProfilePage()">
+        <mat-card-subtitle class="blog-author-name" (click)="navigateToAuthorProfilePage()">
+          {{ blogPost.authorName }}
         </mat-card-subtitle>
-        <mat-card-subtitle class="pt-2 font-weight-light mobile-published-date">
+        <mat-card-subtitle class="pt-2 font-weight-light mobile-published-date" (click)="navigateToAuthorProfilePage()">
           {{ publishedDateString }}
         </mat-card-subtitle>
         <button class="mr-0 mt-auto ml-auto mb-2"

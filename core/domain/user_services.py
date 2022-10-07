@@ -1518,8 +1518,6 @@ def add_user_role(user_id: str, role: str) -> None:
         raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
         raise Exception('Adding a %s role is not allowed.' % role)
-    if role in [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]:
-        create_blog_author_details_model(user_id)
     user_settings.roles.append(role)
     role_services.log_role_query(
         user_id, feconf.ROLE_ACTION_ADD, role=role,
@@ -2946,10 +2944,6 @@ def create_blog_author_details_model(user_id: str) -> None:
     Args:
         user_id: str. The user ID of the blog author.
     """
-    blog_author_details_model = (
-        user_models.BlogAuthorDetailsModel.get_by_id(user_id))
-    if blog_author_details_model:
-        return
     user_settings = get_user_settings(user_id, strict=True)
     # Adding an if statement for mypy type checks to pass.
     if user_settings.username:
@@ -2961,7 +2955,9 @@ def create_blog_author_details_model(user_id: str) -> None:
 
 
 def get_blog_author_details(user_id: str) -> user_domain.BlogAuthorDetails:
-    """Returns the blog author details for the given user id.
+    """Returns the blog author details for the given user id. If
+    blogAuthorDetailsModel is not present, a new model with default values is
+    created.
 
     Args:
         user_id: str. The user id of the blog author.
@@ -2969,13 +2965,15 @@ def get_blog_author_details(user_id: str) -> user_domain.BlogAuthorDetails:
     Returns:
         BlogAuthorDetails. The blog author details for the given user id.
     """
-    blog_author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)
-    if blog_author_model is None:
-        return None
+    author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)
+    if author_model is None:
+        create_blog_author_details_model(user_id)
+        author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)
+
     return user_domain.BlogAuthorDetails(
-        blog_author_model.author_name,
-        blog_author_model.author_bio,
-        blog_author_model.last_updated
+        author_model.author_name,
+        author_model.author_bio,
+        author_model.last_updated
     )
 
 
@@ -2994,3 +2992,17 @@ def update_blog_author_details(
     blog_author_model.author_bio = author_bio
     blog_author_model.update_timestamps()
     blog_author_model.put()
+
+
+def is_user_blog_post_author(user_id: str) -> bool:
+    """Checks whether user can write blog posts.
+
+    Args:
+        user_id: str. The user id of the user.
+
+    Returns:
+        bool. Whether the user can author blog posts.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    author_roles = [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]
+    return any(role in author_roles for role in user_settings.roles)

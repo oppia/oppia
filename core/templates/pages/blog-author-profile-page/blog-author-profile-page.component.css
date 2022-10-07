@@ -75,9 +75,8 @@ oppia-blog-author-page .oppia-blog-author-page-card {
   background: #fff;
   border-radius: 8px 8px 0 0;
   margin-bottom: 20px;
-  margin-left: 10vw;
-  margin-right: 10vw;
   margin-top: 52px;
+  max-width: 900px;
   padding-left: 3rem;
   padding-right: 3rem;
 }
@@ -123,14 +122,14 @@ oppia-blog-author-page .blog-post-card {
   margin-top: 30px;
 }
 
-.blog-homepage .oppia-navbar-breadcrumb-separator:after {
+.blog-author-page .oppia-navbar-breadcrumb-separator:after {
   border-left-style: ridge;
   border-width: 2px;
   content: "";
   font-size: 30px;
 }
 
-.blog-homepage .oppia-navbar-breadcrumb {
+.blog-author-page .oppia-navbar-breadcrumb {
   display: -webkit-inline-box;
   flex-flow: column;
   margin-left: -10px;
@@ -139,13 +138,13 @@ oppia-blog-author-page .blog-post-card {
 }
 
 @media(max-width:500px) {
-  .mobile-navbar-blog-homepage {
+  .mobile-navbar-blog-author-page {
     font-size: 14px;
     line-height: 0px;
     vertical-align: text-top;
   }
 
-  .oppia-navbar-breadcrumb.main-blog-homepage-mobile-breadcrumb {
+  .oppia-navbar-breadcrumb.main-blog-author-page-mobile-breadcrumb {
     line-height: 12px;
     padding-top: 15px;
   }
@@ -166,5 +165,10 @@ oppia-blog-author-page .blog-post-card {
   oppia-blog-author-page .total-blog-post-number-display {
     font-size: 18px;
     line-height: 20px;
+  }
+
+  oppia-blog-author-page .oppia-blog-author-page-card {
+    margin-left: 10vw;
+    margin-right: 10vw;
   }
 }

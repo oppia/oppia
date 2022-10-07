@@ -62,7 +62,7 @@ export class BlogPostEditorComponent implements OnInit {
   MIN_CHARS_IN_BLOG_POST_TITLE!: number;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   dateTimeLastSaved: string = '';
-  authorUsername: string = '';
+  authorName: string = '';
   windowIsNarrow: boolean = false;
   contentEditorIsActive: boolean = false;
   invalidImageWarningIsShown: boolean = false;
@@ -124,7 +124,7 @@ export class BlogPostEditorComponent implements OnInit {
           this.authorProfilePictureUrl = decodeURIComponent((
             // eslint-disable-next-line max-len
             editorData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
-          this.authorUsername = editorData.username;
+          this.authorName = editorData.authorName;
           this.defaultTagsList = editorData.listOfDefaulTags;
           this.maxAllowedTags = editorData.maxNumOfTags;
           this.title = this.blogPostData.title;

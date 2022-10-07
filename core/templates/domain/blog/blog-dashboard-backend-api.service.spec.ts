@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
+import { BlogAuthorDetailsBackendDict, BlogDashboardBackendApiService, BlogDashboardBackendResponse, BlogDashboardData } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
 
@@ -27,8 +27,12 @@ describe('Blog Dashboard backend api service', () => {
   let httpTestingController: HttpTestingController;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
-  let blogDashboardBackendResponse = {
-    username: 'testUsername',
+  let authorDetials: BlogAuthorDetailsBackendDict = {
+    author_name: 'test_name',
+    author_bio: 'author bio',
+  };
+  let blogDashboardBackendResponse: BlogDashboardBackendResponse = {
+    author_details: authorDetials,
     profile_picture_data_url: 'image',
     no_of_published_blog_posts: 0,
     no_of_draft_blog_posts: 0,
@@ -37,6 +41,7 @@ describe('Blog Dashboard backend api service', () => {
   };
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
+    author_username: 'test_sername',
     author_name: 'test_user',
     title: 'sample_title',
     summary: 'hello',
@@ -46,8 +51,9 @@ describe('Blog Dashboard backend api service', () => {
     last_updated: '3232323',
     published_on: '1212121',
   };
-  let blogDashboardDataObject = {
-    username: blogDashboardBackendResponse.username,
+  let blogDashboardDataObject: BlogDashboardData = {
+    authorName: 'test_name',
+    authorBio: 'author bio',
     profilePictureDataUrl: (
       blogDashboardBackendResponse.profile_picture_data_url),
     numOfDraftBlogPosts: blogDashboardBackendResponse.no_of_draft_blog_posts,

@@ -231,6 +231,7 @@ class BlogPostDataHandler(base.BaseHandler):
                 break
 
         self.values.update({
+            'author_username': user_settings.username,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'blog_post_dict': blog_post_dict,
             'summary_dicts': _get_blog_card_summary_dicts_for_homepage(

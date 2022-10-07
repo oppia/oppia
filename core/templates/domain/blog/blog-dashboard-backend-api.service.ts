@@ -27,7 +27,7 @@ export interface BlogAuthorDetailsBackendDict {
   'author_name': string;
   'author_bio': string;
 }
-interface BlogDashboardBackendResponse {
+export interface BlogDashboardBackendResponse {
   'author_details': BlogAuthorDetailsBackendDict;
   'profile_picture_data_url': string;
   'no_of_published_blog_posts': number;

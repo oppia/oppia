@@ -89,6 +89,7 @@ oppia-blog-post-page mat-card-content.blog-card-content {
 
 
 oppia-blog-post-page .blog-card-header-content .mat-card-avatar {
+  cursor: pointer;
   height: 64px;
   width: 64px;
 }
@@ -173,6 +174,10 @@ oppia-blog-post-page .post-to-recommend-section-heading {
     font-size: 16px;
     font-weight: 500;
     line-height: 18px;
+  }
+
+  oppia-blog-post-page mat-card-subtitle .blog-author-name {
+    cursor: pointer;
   }
 
   .blog-post-sub-heading-font {

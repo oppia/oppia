@@ -1,10 +1,10 @@
-<oppia-angular-root>
+<oppia-angular-root *ngIf="pageIsShown">
   <oppia-base-content>
-    <navbar-breadcrumb class="blog-author-page-breadcrumb">
+    <navbar-breadcrumb class="blog-author-page">
       <div class="nav navbar-nav oppia-navbar-breadcrumb main-blog-author-mobile-breadcrumb">
         <span class="mx-3 oppia-navbar-breadcrumb-separator"></span>
-        <span class="pt-3 mobile-navbar-blog-homepage">
-          {{ 'I18N_BLOG_HOME_PAGE_BREADCRUMB' | translate }}
+        <span class="pt-3 mobile-navbar-blog-author-page">
+          {{ 'I18N_BLOG_AUTHOR_PROFILE_PAGE_BREADCRUMB' | translate }}
         </span>
       </div>
     </navbar-breadcrumb>

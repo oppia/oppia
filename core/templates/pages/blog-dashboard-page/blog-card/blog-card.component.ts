@@ -23,6 +23,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogPostPageConstants } from 'pages/blog-post-page/blog-post-page.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
 
 @Component({
@@ -40,11 +41,13 @@ export class BlogCardComponent implements OnInit {
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   thumbnailUrl: string = '';
   publishedDateString: string = '';
+  blogCardPreviewModeIsActive: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
+    private contextService: ContextService,
   ) {}
 
   ngOnInit(): void {
@@ -63,6 +66,8 @@ export class BlogCardComponent implements OnInit {
       throw new Error('Blog Post Summary published date is not defined');
     }
     this.publishedDateString = this.getDateStringInWords(publishedOn);
+    this.blogCardPreviewModeIsActive = (
+      this.contextService.isInBlogPostEditorPage());
   }
 
   getDateStringInWords(naiveDate: string): string {
@@ -71,11 +76,12 @@ export class BlogCardComponent implements OnInit {
   }
 
   navigateToBlogPostPage(): void {
-    let blogPostUrl = this.urlInterpolationService.interpolateUrl(
-      BlogPostPageConstants.BLOG_POST_PAGE_URL_TEMPLATE,
-      { blog_post_url: this.blogPostSummary.urlFragment }
-    );
-
-    this.windowRef.nativeWindow.open(blogPostUrl);
+    if (!this.blogCardPreviewModeIsActive) {
+      let blogPostUrl = this.urlInterpolationService.interpolateUrl(
+        BlogPostPageConstants.BLOG_POST_PAGE_URL_TEMPLATE,
+        { blog_post_url: this.blogPostSummary.urlFragment }
+      );
+      this.windowRef.nativeWindow.location.href = blogPostUrl;
+    }
   }
 }

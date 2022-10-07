@@ -41,7 +41,7 @@ export class BlogPostData {
   _publishedOn?: string;
   constructor(
       id: string,
-      authorUsername: string,
+      authorName: string,
       title: string,
       content: string,
       tags: string[],
@@ -50,7 +50,7 @@ export class BlogPostData {
       lastUpdated?: string,
       publishedOn?: string) {
     this._id = id;
-    this._authorName = authorUsername;
+    this._authorName = authorName;
     this._title = title;
     this._content = content;
     this._tags = tags;

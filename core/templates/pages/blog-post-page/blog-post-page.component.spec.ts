@@ -52,10 +52,8 @@ class MockWindowRef {
       href: 'http://localhost/blog/blog-test',
       toString() {
         return 'http://localhost/test_path';
-      }
-    },
-    history: {
-      pushState(data: object, title: string, url?: string | null) {}
+      },
+      reload: () => { }
     }
   };
 }
@@ -72,6 +70,7 @@ describe('Blog home page component', () => {
   let loaderService: LoaderService;
   let urlInterpolationService: UrlInterpolationService;
   let component: BlogPostPageComponent;
+  let mockWindowRef: MockWindowRef;
   let fixture: ComponentFixture<BlogPostPageComponent>;
 
   beforeEach(waitForAsync(() => {
@@ -110,6 +109,7 @@ describe('Blog home page component', () => {
     component = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     spyOn(loaderService, 'showLoadingScreen');
@@ -177,6 +177,7 @@ describe('Blog home page component', () => {
     let blogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     component.blogPostPageData = {
+      authorUsername: 'test_username',
       blogPostDict: blogPostData,
       profilePictureDataUrl: 'sample-url',
       summaryDicts: [],
@@ -195,5 +196,16 @@ describe('Blog home page component', () => {
     expect(component.blogPost).toEqual(blogPostData);
     expect(component.postsToRecommend.length).toBe(0);
     expect(component.publishedDateString).toBe('November 21, 2014');
+  });
+
+  it('should navigate to author profile page', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/blog/author/test-username');
+    component.authorUsername = 'test-username';
+
+    component.navigateToAuthorProfilePage();
+
+    expect(mockWindowRef.nativeWindow.location.href).toEqual(
+      '/blog/author/test-username');
   });
 });

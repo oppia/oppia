@@ -204,7 +204,7 @@ describe('Blog Post Editor Component', () => {
 
   it('should successfully fetch blog post editor data', fakeAsync(() => {
     let blogPostEditorData = {
-      username: 'test_user',
+      authorName: 'test_user',
       profilePictureDataUrl: 'sample_url',
       listOfDefaulTags: ['news', 'Learners'],
       maxNumOfTags: 2,
@@ -219,7 +219,7 @@ describe('Blog Post Editor Component', () => {
 
     expect(blogPostEditorBackendApiService.fetchBlogPostEditorData)
       .toHaveBeenCalled();
-    expect(component.authorUsername).toEqual('test_user');
+    expect(component.authorName).toEqual('test_user');
     expect(component.blogPostData).toEqual(sampleBlogPostData);
     expect(component.authorProfilePictureUrl).toEqual('sample_url');
     expect(component.defaultTagsList).toEqual(['news', 'Learners']);

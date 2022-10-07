@@ -163,7 +163,7 @@ class BlogHomePageAccessValidationHandler(base.BaseHandler):
 
     # Using type ignore[misc] here because untyped decorator makes function
     # "get" also untyped.
-    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
+    @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Validates access to blog home page."""
         pass
@@ -191,7 +191,7 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
 
     # Using type ignore[misc] here because untyped decorator makes function
     # "get" also untyped.
-    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
+    @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         # Please use type casting here instead of type ignore[union-attr] once
         # this attribute `normalized_request` has been type annotated in the
@@ -229,18 +229,17 @@ class BlogAuthorProfilePageAccessValidationHandler(base.BaseHandler):
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, author_username) -> None:
-        user_settings = (
+        author_settings = (
             user_services.get_user_settings_from_username(author_username))
-        if user_settings is None:
+
+        if author_settings is None:
             raise self.PageNotFoundException(
                 Exception(
                     'User with given username does not exist'
                 )
             )
-        author_details = user_services.get_blog_author_details( # type: ignore[no-untyped-call]
-            user_settings.user_id)
 
-        if not author_details:
+        if not user_services.is_user_blog_post_author(author_settings.user_id):
             raise self.PageNotFoundException(
                 Exception(
                     'User with given username is not a blog post author.'

@@ -34,12 +34,22 @@ import { PageHeadService } from 'services/page-head.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BlogPostPageRootComponent } from './blog-post-page-root.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { UserService } from 'services/user.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
   instant(key: string): string {
     return key;
   }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    BlogProject: {
+      isEnabled: true
+    }
+  };
 }
 
 describe('Blog Post Page Root', () => {
@@ -53,6 +63,8 @@ describe('Blog Post Page Root', () => {
   let pageTitleService: PageTitleService;
   let blogHomePageBackendApiService: BlogHomePageBackendApiService;
   let sampleBlogPost: BlogPostData;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let userService: UserService;
   let alertsService: AlertsService;
   let sampleBlogPostBackendDict: BlogPostBackendDict = {
     id: 'sampleId',
@@ -79,11 +91,16 @@ describe('Blog Post Page Root', () => {
         PageHeadService,
         MetaTagCustomizationService,
         UrlService,
+        UserService,
         PageTitleService,
         BlogHomePageBackendApiService,
         {
           provide: TranslateService,
           useClass: MockTranslateService
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -105,6 +122,8 @@ describe('Blog Post Page Root', () => {
     translateService = TestBed.inject(TranslateService);
     sampleBlogPost = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
+    userService = TestBed.inject(UserService);
+    mockPlatformFeatureService.status.BlogProject.isEnabled = true;
     spyOn(urlService, 'getBlogPostUrlFromUrl')
       .and.returnValue('sample-post');
   });
@@ -114,7 +133,10 @@ describe('Blog Post Page Root', () => {
       expect(component).toBeDefined();
     });
 
-  it('should initialize and show page when access is valid', fakeAsync(() => {
+  it('should initialize and show page when access is valid and blog project' +
+  ' feature is enabled', fakeAsync(() => {
+    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
+      Promise.resolve(false));
     spyOn(
       accessValidationBackendApiService, 'validateAccessToBlogPostPage')
       .and.returnValue(Promise.resolve());
@@ -123,14 +145,12 @@ describe('Blog Post Page Root', () => {
     spyOn(component, 'fetchBlogPostData');
 
     component.ngOnInit();
+    tick();
+    tick();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(component.blogPostUrlFragment).toBe('sample-post');
-
-    tick();
-
-    expect(
-      accessValidationBackendApiService.validateAccessToBlogPostPage)
+    expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
       .toHaveBeenCalled();
     expect(component.fetchBlogPostData).toHaveBeenCalledWith('sample-post');
     expect(component.errorPageIsShown).toBeFalse();
@@ -139,6 +159,8 @@ describe('Blog Post Page Root', () => {
 
   it('should initialize and show error page when server respond with error',
     fakeAsync(() => {
+      spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
+        Promise.resolve(false));
       spyOn(
         accessValidationBackendApiService, 'validateAccessToBlogPostPage')
         .and.returnValue(Promise.reject());
@@ -148,15 +170,66 @@ describe('Blog Post Page Root', () => {
 
       component.ngOnInit();
       tick();
+      tick();
+      tick();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(
-        accessValidationBackendApiService.validateAccessToBlogPostPage)
+      expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
         .toHaveBeenCalledWith('sample-post');
       expect(component.fetchBlogPostData).not.toHaveBeenCalled();
       expect(component.errorPageIsShown).toBeTrue();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
+
+  it('should initialize and show error page when blog project feature is' +
+  ' disabled and user can not edit blog posts', fakeAsync(() => {
+    mockPlatformFeatureService.status.BlogProject.isEnabled = false;
+    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
+      Promise.resolve(false));
+    spyOn(
+      accessValidationBackendApiService, 'validateAccessToBlogPostPage');
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(component, 'fetchBlogPostData');
+
+    component.ngOnInit();
+    tick();
+    tick();
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(component.blogPostUrlFragment).toBe('sample-post');
+    expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
+      .not.toHaveBeenCalled();
+    expect(component.fetchBlogPostData).not.toHaveBeenCalled();
+    expect(component.errorPageIsShown).toBeTrue();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
+
+  it('should initialize and validate access when blog project feature is ' +
+  'disabled and user can edit blog posts', fakeAsync(() => {
+    mockPlatformFeatureService.status.BlogProject.isEnabled = false;
+    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
+      Promise.resolve(true));
+    spyOn(
+      accessValidationBackendApiService, 'validateAccessToBlogPostPage')
+      .and.returnValue(Promise.resolve());
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(component, 'fetchBlogPostData');
+
+    component.ngOnInit();
+    tick();
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(component.blogPostUrlFragment).toBe('sample-post');
+
+    tick();
+
+    expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
+      .toHaveBeenCalled();
+    expect(component.errorPageIsShown).toBeFalse();
+    expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
+  }));
 
   it('should initialize and subscribe to onLangChange', fakeAsync(() => {
     spyOn(
@@ -208,6 +281,7 @@ describe('Blog Post Page Root', () => {
   it('should successfully load fetch blog post data from backend', fakeAsync(
     () => {
       let sampleBlogPostPageData: BlogPostPageData = {
+        authorUsername: 'test_username',
         blogPostDict: sampleBlogPost,
         profilePictureDataUrl: 'sample-url',
         summaryDicts: [],

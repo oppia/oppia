@@ -103,7 +103,8 @@ describe('Blog Card Preview Modal Component', () => {
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
-      blogPostData.authorUsername,
+      '',
+      blogPostData.authorName,
       blogPostData.title,
       '<p>hello</p>',
       blogPostData.tags,
@@ -127,7 +128,8 @@ describe('Blog Card Preview Modal Component', () => {
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
-      blogPostData.authorUsername,
+      '',
+      blogPostData.authorName,
       blogPostData.title,
       '<p>hello</p>',
       blogPostData.tags,

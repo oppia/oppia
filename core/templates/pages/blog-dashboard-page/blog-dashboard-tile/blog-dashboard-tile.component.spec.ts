@@ -87,6 +87,7 @@ describe('Blog Dashboard Tile Component', () => {
     alertsService = TestBed.inject(AlertsService);
     sampleBlogPostSummary = {
       id: 'sampleId',
+      author_username: 'test_username',
       author_name: 'test_user',
       title: 'Title',
       summary: 'Hello World',

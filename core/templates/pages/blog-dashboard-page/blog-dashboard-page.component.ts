@@ -164,13 +164,13 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     this.blogDashboardBackendService.updateAuthorDetailsAsync(
       this.authorName, this.authorBio).then(() => {
       this.alertsService.addSuccessMessage('Author bio saved successfully.');
+      if (this.authorBio.length) {
+        this.authorBioEditorOpened = false;
+      }
     }, (error) => {
       this.alertsService.addWarning(
         `Unable to update author bio. Error: ${error}`);
     });
-    if (this.authorBio) {
-      this.authorBioEditorOpened = false;
-    }
   }
 
   openAuthorNameEditor(): void {

@@ -35,6 +35,7 @@ describe('Blog home page backend api service', () => {
   let blogHomePageBackendResponse: BlogHomePageBackendResponse;
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
+    author_username: 'test_username',
     author_name: 'test_user',
     title: 'sample_title',
     summary: 'hello',
@@ -100,11 +101,13 @@ describe('Blog home page backend api service', () => {
     };
     blogPostObject = BlogPostData.createFromBackendDict(blogPost);
     blogPostPageBackendResponse = {
+      author_username: 'test_username',
       blog_post_dict: blogPost,
       summary_dicts: [] as BlogPostSummaryBackendDict[],
       profile_picture_data_url: 'imageUrl'
     };
     blogPostPageDataObject = {
+      authorUsername: 'test_username',
       blogPostDict: blogPostObject,
       summaryDicts: [],
       profilePictureDataUrl: 'imageUrl',

@@ -47,6 +47,7 @@ export interface SearchResponseBackendDict {
 }
 
 export interface BlogPostPageBackendResponse {
+  'author_username': string;
   'profile_picture_data_url': string;
   'blog_post_dict': BlogPostBackendDict;
   'summary_dicts': BlogPostSummaryBackendDict[];
@@ -65,6 +66,7 @@ export interface BlogHomePageData {
 }
 
 export interface BlogPostPageData {
+  authorUsername: string;
   profilePictureDataUrl: string;
   blogPostDict: BlogPostData;
   summaryDicts: BlogPostSummary[];
@@ -171,6 +173,7 @@ export class BlogHomePageBackendApiService {
       this.http.get<BlogPostPageBackendResponse>(blogPostDataUrl).toPromise()
         .then(response => {
           resolve({
+            authorUsername: response.author_username,
             profilePictureDataUrl: response.profile_picture_data_url,
             summaryDicts: (
               response.summary_dicts.map(

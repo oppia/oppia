@@ -60,7 +60,8 @@ export class BlogCardPreviewModalComponent
 
     this.blogPostSummary = new BlogPostSummary (
       this.blogPostData.id,
-      this.blogPostData.authorUsername,
+      '',
+      this.blogPostData.authorName,
       this.blogPostData.title,
       this.summaryContent,
       this.blogPostData.tags,

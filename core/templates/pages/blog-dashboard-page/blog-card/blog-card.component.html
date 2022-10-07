@@ -1,6 +1,8 @@
-<mat-card class="blog-card"
+<mat-card role="button"
+          class="blog-card"
+          [ngClass]="{'recommendation-blog-card': shownOnblogPostPage, 'blog-card-is-clickable': !blogCardPreviewModeIsActive}"
           (click)="navigateToBlogPostPage()"
-          [ngClass]="{'recommendation-blog-card': shownOnblogPostPage}">
+          (keydown.enter)="navigateToBlogPostPage()">
   <div mat-card-image class="blog-card-thumbnail-container">
     <picture>
       <img mat-card-image
@@ -70,6 +72,10 @@
     margin: 10px;
     min-height: 420px;
     width: 576px;
+  }
+
+  .blog-card.blog-card-is-clickable {
+    cursor: pointer;
   }
 
   .mat-card-image.blog-card-thumbnail {

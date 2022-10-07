@@ -43,7 +43,7 @@ describe('Blog Post Editor backend api service', () => {
       tags: ['learners', 'news'],
       url_fragment: 'sample#url'
     },
-    username: 'test_user',
+    author_name: 'test_user',
     profile_picture_data_url: 'image',
     max_no_of_tags: 2,
     list_of_default_tags: ['learners', 'news'],
@@ -59,7 +59,7 @@ describe('Blog Post Editor backend api service', () => {
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
     blogPostEditorDataObject = {
-      username: blogPostEditorBackendResponse.username,
+      authorName: blogPostEditorBackendResponse.author_name,
       profilePictureDataUrl: (
         blogPostEditorBackendResponse.profile_picture_data_url),
       maxNumOfTags: blogPostEditorBackendResponse.max_no_of_tags,
