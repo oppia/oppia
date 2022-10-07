@@ -132,6 +132,7 @@
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
+/scripts/contributor_dashboard_debug.py @oppia/contributor-experience-team
 
 
 # Core documentation
