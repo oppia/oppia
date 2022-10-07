@@ -46,7 +46,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str],
             stdout: int = subprocess.PIPE,
             stderr: int = subprocess.PIPE
-        ) -> subprocess.Popen[bytes]:
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
         def mock_get_remote_name() -> bytes:
             return b'remote'
@@ -65,7 +65,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         def mock_check_output(
-            unused_cmd_tokens: List[str], text: bool = True
+            unused_cmd_tokens: List[str], text: bool = True  # pylint: disable=unused-argument
         ) -> str:
             return 'Output'
         self.linter_code = 0
@@ -143,7 +143,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             stderr=subprocess.PIPE)
         def mock_popen(
             cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if b'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
             elif b'remote.upstream.url' in cmd_tokens:
@@ -165,7 +165,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         process.communicate = mock_communicate  # type: ignore[assignment]
         def mock_popen(
             unused_cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -186,7 +186,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         process_for_remote_url.communicate = mock_communicate  # type: ignore[assignment]
         def mock_popen(
             cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if b'config' in cmd_tokens:
                 return process_for_remote_url
             else:
@@ -208,7 +208,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             stderr=subprocess.PIPE)
         def mock_popen(
             cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if b'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
             elif b'remote.upstream.url' in cmd_tokens:
@@ -241,7 +241,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             stderr=subprocess.PIPE)
         def mock_popen(
             cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if b'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
             elif b'remote.upstream.url' in cmd_tokens:
@@ -674,7 +674,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             ' working.\nStash your changes or commit them.\n' in self.print_arr)
 
     def test_error_while_branch_change(self) -> None:
-        def mock_check_output(cmd_tokens: List[str], text: bool = True) -> str:
+        def mock_check_output(cmd_tokens: List[str], text: bool = True) -> str:  # pylint: disable=unused-argument
             if 'symbolic-ref' in cmd_tokens:
                 return 'old-branch'
             raise subprocess.CalledProcessError(1, 'cmd', output='Output')
