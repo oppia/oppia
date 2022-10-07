@@ -106,7 +106,12 @@ def make_graph() -> Tuple[Dict[str, List[str]], Set[str]]:
                     parsed_nodes = parsed_script.body
                     for parsed_node in parsed_nodes:
                         # For require statements.
-                        if parsed_node.type == 'ExpressionStatement' and (
+                        # The dep_lines contains only the expressions beginning
+                        # with 'require' keyword. This is made sure by the code
+                        # section above. Hence, a branch where the below if
+                        # condition is false will never arise and hence, we add
+                        # the no branch flag.
+                        if parsed_node.type == 'ExpressionStatement' and ( # pragma: no branch
                                 parsed_node.expression.callee.name == (
                                     'require')):
                             arguments = parsed_node.expression.arguments

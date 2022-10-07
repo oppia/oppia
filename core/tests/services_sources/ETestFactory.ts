@@ -14,7 +14,9 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import {
+  Title
+} from '@angular/platform-browser';
 import { DTest } from 
   'core/tests/services-sources/DTest.service.ts'
 require('core/tests/services-sources/CTest.service.ts');

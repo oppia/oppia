@@ -123,12 +123,8 @@ extensions.interactions.base_test
 extensions.objects.models.objects_test
 main_test
 scripts.build_test
-scripts.check_frontend_test_coverage_test
-scripts.check_if_pr_is_low_risk_test
-scripts.clean_test
 scripts.common_test
 scripts.concurrent_task_utils_test
-scripts.create_topological_sort_of_all_services_test
 scripts.docstrings_checker_test
 scripts.flake_checker_test
 scripts.install_backend_python_libs_test

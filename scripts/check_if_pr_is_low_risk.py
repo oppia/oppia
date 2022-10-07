@@ -92,7 +92,7 @@ def load_diff(base_branch):
             return [], {}
         elif len(split) == 2:
             diff_files.append((split[1], split[1]))
-        elif len(split) == 3:
+        else: # Case when len(split) == 3.
             diff_files.append((split[1], split[2]))
     file_diffs = {}
     for file_tuple in diff_files:
