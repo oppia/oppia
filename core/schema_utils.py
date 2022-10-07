@@ -738,7 +738,7 @@ class _Validators:
         Returns:
             bool. Whether the given object has length atmost the max_value.
         """
-        if len(obj.unicode_str) > max_value:
+        if len(obj['unicode_str']) > max_value:
             return False
         return True
 
@@ -752,7 +752,7 @@ class _Validators:
         Returns:
             bool. Whether the given object is empty.
         """
-        if obj.html in ('', '<p></p>'):
+        if obj['html'] in ('', '<p></p>'):
             return False
         return True
 
@@ -771,7 +771,7 @@ class _Validators:
         """
         seen_choices = []
         for choice in obj:
-            if choice.html in seen_choices:
+            if choice['html'] in seen_choices:
                 return False
-            seen_choices.append(choice.html)
+            seen_choices.append(choice['html'])
         return True

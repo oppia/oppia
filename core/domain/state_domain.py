@@ -1872,7 +1872,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
-        # TODO: Find a way to encode these checks more declaratively.
+        # TODO(#16236): Find a way to encode these checks more declaratively.
         # Conceptually the validation code should go in each interaction
         # and as inside the interaction the code is very declarative we need
         # to figure out a way to put these validations following the
