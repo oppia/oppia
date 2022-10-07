@@ -39,7 +39,7 @@ class ItemSelectionInput(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'minAllowableSelectionCount',
-        'description': 'Minimum number of selections permitted',
+        'description': 'Minimum number of selections permitted.',
         'schema': {
             'type': 'int',
             'validators': [{
