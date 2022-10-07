@@ -324,6 +324,13 @@ export class ContextService {
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
   }
 
+  isInBlogPostEditorPage(): boolean {
+    return (
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD
+    );
+  }
+
   canAddOrEditComponents(): boolean {
     var currentPageContext = this.getPageContext();
     var allowedPageContext: string[] = [

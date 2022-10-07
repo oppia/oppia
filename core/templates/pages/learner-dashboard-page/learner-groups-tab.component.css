@@ -31,6 +31,12 @@
   padding: 0 28px 16px;
 }
 
+.learner-groups-tab .learner-groups-section-heading {
+  color: #00645c;
+  font-size: 24px;
+  margin: 0;
+}
+
 .learner-groups-tab .learner-groups-heading {
   color: #00645c;
   font-size: 20px;
@@ -67,6 +73,7 @@
 
 .learner-groups-tab .oppia-learner-group-summary-card-title {
   font-size: 20px;
+  line-height: 1.1;
 }
 
 .learner-groups-tab .oppia-learner-group-summary-card-learners {
@@ -75,8 +82,21 @@
 }
 
 .learner-groups-tab .oppia-learner-group-summary-card-cta-buttons {
+  align-items: center;
   display: flex;
-  gap: 15px;
+  gap: 40px;
+}
+
+.learner-groups-tab .learner-group-accept-invite-button {
+  color: #00645c;
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.learner-groups-tab .learner-group-decline-invite-button {
+  color: #a53417;
+  cursor: pointer;
+  font-size: 23px;
 }
 
 .learner-groups-tab .invited-groups-info-summary-container {
@@ -93,7 +113,7 @@
 
 .learner-groups-tab .invitations-count-pill {
   align-items: center;
-  background: #00645c;
+  background: #a53417;
   border-radius: 50%;
   color: #fff;
   display: flex;
@@ -125,21 +145,22 @@
   margin: 0;
 }
 
-.learner-groups-tab .learner-group-view-details-button {
-  background: #00609c;
-  color: #fff;
-  padding: 10px 24px;
-}
-
 .learner-groups-tab .learner-group-decline-invitation-button {
   background: #a53417;
   color: #fff;
   padding: 10px 24px;
 }
 
-.learner-groups-tab .oppia-learner-group-no-invitations {
-  color: #555;
+.learner-groups-tab .learner-group-view-details-button {
+  cursor: pointer;
+  margin-right: 30px;
+  text-decoration: underline;
+}
+
+.learner-groups-tab .learner-group-view-preferences-button {
+  cursor: pointer;
   font-size: 14px;
+  text-decoration: underline;
 }
 
 .learner-groups-tab .learner-group-exit-group-button {
