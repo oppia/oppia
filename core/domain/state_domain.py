@@ -199,7 +199,6 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         *,
         tagged_skill_misconception_id_required: bool = False,
-        empty_rule_specs_allowed: bool = False
     ) -> None:
         """Verifies that all rule classes are valid, and that the AnswerGroup
         only has one classifier rule.
@@ -211,7 +210,6 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 value objects with an object type property (obj_type).
             tagged_skill_misconception_id_required: bool. The 'tagged_skill_
                 misconception_id' is required or not.
-            empty_rule_specs_allowed: bool. Empty rule specs are allowed.
 
         Raises:
             ValidationError. One or more attributes of the AnswerGroup are
@@ -253,18 +251,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                     'to be <skill_id>-<misconception_id>, received %s'
                     % self.tagged_skill_misconception_id)
 
-        if len(self.rule_specs) == 0 and not empty_rule_specs_allowed:
+        if len(self.rule_specs) == 0:
             raise utils.ValidationError(
                 'There must be at least one rule for each answer group.')
-
-        if (
-            len(self.rule_specs) == 0 and
-            len(self.training_data) == 0 and
-            empty_rule_specs_allowed
-        ):
-            raise utils.ValidationError(
-                'There must be at least one rule or training data for each'
-                ' answer group.')
 
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type not in interaction.rules_dict:
@@ -953,8 +942,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         *,
         tagged_skill_misconception_id_required: bool = False,
-        empty_rule_specs_allowed: bool = False
-
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -965,7 +952,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 Is used to validate AnswerGroup objects.
             tagged_skill_misconception_id_required: bool. The 'tagged_skill_
                 misconception_id' is required or not.
-            empty_rule_specs_allowed: bool. Empty rule specs are allowed.
 
         Raises:
             ValidationError. One or more attributes of the InteractionInstance
@@ -1002,8 +988,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             answer_group.validate(
                 interaction, exp_param_specs_dict,
                 tagged_skill_misconception_id_required=(
-                    tagged_skill_misconception_id_required),
-                empty_rule_specs_allowed=empty_rule_specs_allowed)
+                    tagged_skill_misconception_id_required))
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -3267,7 +3252,6 @@ class State(translation_domain.BaseTranslatableObject):
         allow_null_interaction: bool,
         *,
         tagged_skill_misconception_id_required: bool = False,
-        empty_rule_specs_allowed: bool = False
     ) -> None:
         """Validates various properties of the State.
 
@@ -3281,7 +3265,6 @@ class State(translation_domain.BaseTranslatableObject):
                 allowed to be unspecified.
             tagged_skill_misconception_id_required: bool. The 'tagged_skill_
                 misconception_id' is required or not.
-            empty_rule_specs_allowed: bool. Empty rule specs are allowed.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.
@@ -3302,8 +3285,7 @@ class State(translation_domain.BaseTranslatableObject):
             self.interaction.validate(
                 exp_param_specs_dict,
                 tagged_skill_misconception_id_required=(
-                    tagged_skill_misconception_id_required),
-                empty_rule_specs_allowed=empty_rule_specs_allowed)
+                    tagged_skill_misconception_id_required))
 
         content_id_list = []
         content_id_list.append(self.content.content_id)
