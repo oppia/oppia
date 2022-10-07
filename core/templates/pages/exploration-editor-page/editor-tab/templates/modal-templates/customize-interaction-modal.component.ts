@@ -256,9 +256,16 @@ export class CustomizeInteractionModalComponent
   }
 
   isSaveInteractionButtonEnabled(): boolean {
-    let exploration = this.getTitle(this.stateInteractionIdService.displayed);
-    if (exploration === 'End Exploration') {
-      let inputField = document.getElementsByClassName('form-control display-inline');
+    let exploration = this.getTitle(
+      this.stateInteractionIdService.displayed);
+    let EndExploration = 'End Exploration';
+    /*
+      There is a special condition specifically for the END EXPLORATION interaction
+      We have to check that the input field for adding the exploration Ids must be non-empty
+      If the input field is empty, then the Save Interaction button must be disabled!
+    */
+    if (exploration === EndExploration) {
+      let inputField = document.getElementsByClassName('exploration-id-input');
       if (inputField === undefined) {
         return true;
       }
