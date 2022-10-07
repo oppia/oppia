@@ -1,0 +1,68 @@
+<div class="modal-header">
+  <h3>
+    Add new classroom
+  </h3>
+</div>
+<div class="modal-body">
+  <div class="row new-classroom-input-data">
+    <span class="col-lg-3 col-md-3 col-sm-3">Name</span>
+    <div class="new-classroom-name-input">
+      <textarea [(ngModel)]="tempClassroom._name"
+                rows="1"
+                (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
+      </textarea>
+      <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
+        {{ classroomAdminDataService.nameValidationError }}
+      </p>
+    </div>
+  </div>
+
+  <div class="row new-classroom-input-data">
+    <span class="col-lg-3 col-md-3 col-sm-3">URL Fragment</span>
+    <div class="new-classroom-name-input">
+      <textarea [(ngModel)]="tempClassroom._urlFragment"
+                rows="1"
+                (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
+      </textarea>
+      <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
+        {{ classroomAdminDataService.urlValidationError }}
+      </p>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary"
+          (click)="cancel()"
+          [disabled]="newClassroomCreationInProgress">
+    Cancel
+  </button>
+  <button class="btn btn-success"
+          (click)="createClassroom()"
+          [disabled]="!tempClassroom.isClassroomDataValid()">
+    <span *ngIf="!newClassroomCreationInProgress">Create</span>
+    <mat-spinner *ngIf="newClassroomCreationInProgress"
+                 class="oppia-create-classroom-spinning-button"
+                 [diameter]="22">
+    </mat-spinner>
+  </button>
+</div>
+
+<style>
+  .new-classroom-input-data {
+    margin: 10px;
+  }
+  /* TODO(#16156): Remove the instances of /deep/ from the codebase. */
+  :host /deep/ .oppia-create-classroom-spinning-button circle {
+    stroke: #fff;
+  }
+  .oppia-create-classroom-spinning-button {
+    margin: 0 5px;
+  }
+  .new-classroom-name-input {
+    width: 400px;
+  }
+  .oppia-warning-text {
+    color: #f00;
+    font-size: 0.8em;
+  }
+</style>

@@ -16,22 +16,40 @@
  * @fileoverview Directive for "enumerated frequency table" visualization.
  */
 
-angular.module('oppia').directive(
-  'oppiaVisualizationEnumeratedFrequencyTable', () => ({
-    restrict: 'E',
-    scope: { data: '<', options: '<', addressedInfoIsSupported: '<' },
-    template: require(
-      './oppia-visualization-enumerated-frequency-table.directive.html'),
-    style: require(
-      './oppia-visualization-enumerated-frequency-table.directive.css'),
-    controller: ['$scope', function($scope) {
-      this.$onInit = () => {
-        // By default only the first element is shown, the rest are hidden.
-        $scope.answerVisible = $scope.data.map((_, i) => i === 0);
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 
-        $scope.toggleAnswerVisibility = (i: number) => {
-          $scope.answerVisible[i] = !$scope.answerVisible[i];
-        };
-      };
-    }],
-  }));
+import './oppia-visualization-enumerated-frequency-table.directive.css';
+
+@Component({
+  selector: 'oppia-visualization-enumerated-frequency-table',
+  templateUrl: './oppia-visualization-enumerated-frequency-table.directive.html'
+})
+export class OppiaVisualizationEnumeratedFrequencyTableComponent
+   implements OnInit {
+  @Input() data: AnswerStats[];
+  @Input() addressedInfoIsSupported: string[];
+  @Input() options: {
+    title: string;
+    column_headers: string;
+  };
+
+  answerVisible: boolean[];
+
+  constructor() { }
+
+  toggleAnswerVisibility(i: number): void {
+    this.answerVisible[i] = !this.answerVisible[i];
+  }
+
+  ngOnInit(): void {
+    // By default only the first element is shown, the rest are hidden.
+    this.answerVisible = this.data.map((_, i) => i === 0);
+  }
+}
+
+angular.module('oppia').directive('oppiaVisualizationEnumeratedFrequencyTable',
+   downgradeComponent({
+     component: OppiaVisualizationEnumeratedFrequencyTableComponent
+   }) as angular.IDirectiveFactory);
