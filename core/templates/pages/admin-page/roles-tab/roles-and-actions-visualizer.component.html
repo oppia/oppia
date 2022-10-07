@@ -37,6 +37,16 @@
     height: 200px;
     padding: 25% 40%;
   }
+  .oppia-option-list {
+    display:flex;
+    flex-wrap:wrap;
+    list-style: none;
+    margin-bottom: 0;
+    position: relative;
+    padding-left: 0;
+    padding-right: 0;
+    vertical-align: top;
+  }
 </style>
 
 <div class="oppia-roles-container">
@@ -48,7 +58,7 @@
 
 <div class="oppia-actions-container">
   <div class="font-weight-bold mb-3">{{ humanReadableRoles[activeRole] | titlecase }}:</div>
-  <ul class="nav nav-tabs">
+  <ul class="oppia-option-list nav-tabs">
     <li class="nav-item">
       <button class="nav-link"
               [ngClass]="activeTab===TAB_ACTIONS ? 'active' : ''"
