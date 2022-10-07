@@ -975,10 +975,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if self.solution:
             self.solution.validate(self.id)
 
-        if self.solution and not self.hints:
-            raise utils.ValidationError(
-                'Hint(s) must be specified if solution is specified')
-
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
         customization_args_util.validate_customization_args_and_values().
