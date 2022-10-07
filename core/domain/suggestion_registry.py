@@ -773,9 +773,11 @@ class SuggestionTranslateContent(BaseSuggestion):
         # Before calling this accept method we are already checking if user
         # with 'final_reviewer_id' exists or not.
         assert self.final_reviewer_id is not None
-        if (hasattr(self.change, 'data_format') and (
-                translation_domain.TranslatableContentFormat
-                .is_data_format_list(self.change.data_format))):
+        if (
+            hasattr(self.change, 'data_format') and
+            translation_domain.TranslatableContentFormat.is_data_format_list(
+                self.change.data_format)
+        ):
             return
 
         self._copy_new_images_to_target_entity_storage()

@@ -607,11 +607,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `state_name` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute
-        # "state_name"` error. Thus to avoid the error, we used ignore here.
         suggestion.change.state_name = 'Introduction'
 
         suggestion.pre_accept_validate()
@@ -1512,11 +1507,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                 })
             ], 'Added state')
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `state_name` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute
-        # "state_name"` error. Thus to avoid the error, we used ignore here.
+
         suggestion.change.state_name = 'Introduction'
 
         suggestion.pre_accept_validate()

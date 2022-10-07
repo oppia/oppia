@@ -340,7 +340,8 @@ def update_opportunity_with_updated_exploration(
 
 
 def update_translation_opportunity_with_accepted_suggestion(
-        exploration_id: str, language_code: str) -> None:
+    exploration_id: str, language_code: str
+) -> None:
     """Updates the translation opportunity for the accepted suggestion in the
     ExplorationOpportunitySummaryModel.
 

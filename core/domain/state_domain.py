@@ -151,6 +151,8 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 translatable_contents_collection
                 .add_fields_from_translatable_object(self.outcome)
             )
+        # Instead of hardcoding interactions name here, Interaction can
+        # have a flag indicating whether the rule_specs can have translations.
         for rule_spec in self.rule_specs:
             if kwargs['interaction_id'] not in ['TextInput', 'SetInput']:
                 break
@@ -3317,7 +3319,7 @@ class State(translation_domain.BaseTranslatableObject):
     ) -> Iterator[Tuple[
         Union[SubtitledHtmlDict, Dict[str, Union[str, List[str]]]],
         translation_domain.ContentType,
-        Union[str, None]
+        Optional[str]
     ]]:
         """This method iterates throughout the state dict and yields the value
         for each field. The yielded value is used for generating and updating

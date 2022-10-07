@@ -54,7 +54,7 @@ QUESTION_PROPERTY_QUESTION_STATE_DATA: Final = 'question_state_data'
 QUESTION_PROPERTY_LINKED_SKILL_IDS: Final = 'linked_skill_ids'
 QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS: Final = (
     'inapplicable_skill_misconception_ids')
-QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
+QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -1681,7 +1681,7 @@ class Question(translation_domain.BaseTranslatableObject):
             state_domain.State
             .update_old_content_id_to_new_content_id_in_v52_states({
                 'question_state': question_state_dict
-                })
+            })
         )
 
         return states_dict['question_state'], next_content_id_index
@@ -1691,7 +1691,7 @@ class Question(translation_domain.BaseTranslatableObject):
         cls,
         versioned_question_state: VersionedQuestionStateDict,
         current_state_schema_version: int
-    ) -> Union[int, None]:
+    ) -> Optional[int]:
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.

@@ -211,7 +211,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_written_translations(self) -> None:
         written_translations_dict: (
-            translation_domain.WrittenTranslationsDict) = {
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content': {
                     'en': {

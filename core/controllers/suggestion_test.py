@@ -241,8 +241,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'], 'invalid_suggestion_id'), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -258,8 +258,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
                 'exploration.target_id.id'), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 }, csrf_token=csrf_token,
             expected_status_int=404)
 
@@ -304,8 +304,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, exp_id,
                 suggestion_id), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -332,8 +332,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, 'exp_id',
                 suggestion_to_accept['suggestion_id']), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -372,8 +372,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 exp_id, suggestion_id), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 }, csrf_token=csrf_token, expected_status_int=401)
 
         self.assertEqual(
@@ -428,8 +428,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_reject['target_id'],
             suggestion_to_reject['suggestion_id']), {
-                'action': u'reject',
-                'review_message': u'Rejected!'
+                'action': 'reject',
+                'review_message': 'Rejected!'
             }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -454,10 +454,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
+                'action': 'accept',
                 'commit_message':
-                    u'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
-                'review_message': u'Accepted'
+                    'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                'review_message': 'Accepted'
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
@@ -495,9 +495,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted'
+                    'action': 'accept',
+                    'commit_message': 'commit message',
+                    'review_message': 'Accepted'
                 }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -525,9 +525,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
+                'action': 'accept',
+                'commit_message': 'commit message',
+                'review_message': 'Accepted'
             }, csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
@@ -543,9 +543,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
+                'action': 'accept',
+                'commit_message': 'commit message',
+                'review_message': 'Accepted'
             }, csrf_token=csrf_token, expected_status_int=401)
 
         # Testing users with scores above threshold can accept.
@@ -558,9 +558,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
+                'action': 'accept',
+                'commit_message': 'commit message',
+                'review_message': 'Accepted'
             }, csrf_token=csrf_token)
 
         suggestion_post_accept = self.get_json(
@@ -583,9 +583,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
+                'action': 'accept',
+                'commit_message': 'commit message',
+                'review_message': 'Accepted'
             }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -620,8 +620,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         response = self.put_json(
             '%s/resubmit/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, 'invalid_suggestion_id'), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -645,7 +645,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.put_json('%s/resubmit/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX, suggestion.suggestion_id), {
                 'summary_message': 'summary message',
-                'action': u'resubmit',
+                'action': 'resubmit',
                 'change': {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -700,9 +700,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted'
+                    'action': 'accept',
+                    'commit_message': 'commit message',
+                    'review_message': 'Accepted'
                 }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -818,9 +818,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'Translated content of State 1',
-                    'review_message': u'This looks good!',
+                    'action': 'accept',
+                    'commit_message': 'Translated content of State 1',
+                    'review_message': 'This looks good!',
                 }, csrf_token=csrf_token)
 
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
@@ -1597,9 +1597,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'This looks good!',
+                    'action': 'accept',
+                    'commit_message': 'commit message',
+                    'review_message': 'This looks good!',
                     'skill_id': self.SKILL_ID
                 }, csrf_token=csrf_token)
 
@@ -1774,9 +1774,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion.target_id,
                 suggestion.suggestion_id), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'This looks good!',
+                    'action': 'accept',
+                    'commit_message': 'commit message',
+                    'review_message': 'This looks good!',
                     'skill_id': skill_id
                 }, csrf_token=csrf_token)
 
@@ -1957,8 +1957,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             '%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, self.skill_id,
                 thread_id), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
@@ -1993,8 +1993,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 '%s/skill/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
                     self.skill_id, suggestion_id), {
-                        'action': u'reject',
-                        'review_message': u'Rejected!'
+                        'action': 'reject',
+                        'review_message': 'Rejected!'
                     }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -2021,8 +2021,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
                     'skill_id', suggestion_to_accept['suggestion_id']),
                 {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 },
                 csrf_token=csrf_token, expected_status_int=400)
 
@@ -2074,8 +2074,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_reject['target_id'],
                 suggestion_to_reject['suggestion_id']), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'action': 'reject',
+                    'review_message': 'Rejected!'
                 }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -2103,9 +2103,9 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted!',
+                    'action': 'accept',
+                    'commit_message': 'commit message',
+                    'review_message': 'Accepted!',
                     'skill_id': self.skill_id
                 }, csrf_token=csrf_token)
 
@@ -2135,9 +2135,9 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted!',
+                    'action': 'accept',
+                    'commit_message': 'commit message',
+                    'review_message': 'Accepted!',
                     'skill_id': self.skill_id
                 }, csrf_token=csrf_token)
 

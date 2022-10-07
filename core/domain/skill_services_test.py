@@ -1606,7 +1606,8 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             '-noninteractive-math>')
 
         written_translations_dict: (
-            translation_domain.WrittenTranslationsDict) = {
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content1': {
                     'en': {
