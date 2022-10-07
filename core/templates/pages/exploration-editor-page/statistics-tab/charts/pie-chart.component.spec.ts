@@ -16,187 +16,175 @@
  * @fileoverview Unit tests for pieChart.
  */
 
-import { of } from 'rxjs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { PieChartComponent } from './pie-chart.component';
 
-describe('Pie Chart component', function() {
-  var ctrl = null;
-  var $flushPendingTasks = null;
-  var $scope = null;
+describe('Pie Chart component', () => {
+  let component: PieChartComponent;
+  let fixture: ComponentFixture<PieChartComponent>;
+  let resizeEvent = new EventEmitter();
+  let mockedChart = null;
 
-  var mockedChart = null;
-  var resizeEvent = new Event('resize');
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowDimensionsService', {
-      getResizeEvent: () => of(resizeEvent)
-    });
-  }));
-  afterEach(() => {
-    if (ctrl) {
-      ctrl.$onDestroy();
+  class MockWindowDimensionsService {
+    getResizeEvent() {
+      return resizeEvent;
     }
-  });
+  }
 
-  describe('when $scope data is not an array', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      var $rootScope = $injector.get('$rootScope');
-
-      mockedChart = {
-        draw: () => {}
-      };
-
-      // This approach was choosen because spyOnProperty() doesn't work on
-      // properties that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property google does not have access type get' error.
-      // eslint-disable-next-line max-len
-      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-      // ref: https://github.com/jasmine/jasmine/issues/1415
-      Object.defineProperty(window, 'google', {
-        get: () => ({})
-      });
-      spyOnProperty(window, 'google').and.returnValue({
-        visualization: {
-          arrayToDataTable: () => {},
-          PieChart: () => mockedChart
-        },
-        charts: {
-          setOnLoadCallback: callback => {}
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+      ],
+      declarations: [
+        PieChartComponent
+      ],
+      providers: [
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
         }
-      });
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
-      $scope = $rootScope.$new();
-      ctrl = $componentController('pieChart', {
-        $scope: $scope,
-        $element: []
-      }, {
-        data: () => ({})
-      });
-      ctrl.$onInit();
-    }));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      PieChartComponent);
+    component = fixture.componentInstance;
 
-    it('should not redraw chart', function() {
-      const drawSpy = spyOn(mockedChart, 'draw');
-      angular.element(window).triggerHandler('resize');
+    mockedChart = {
+      draw: () => {},
+      data: 1
+    };
 
-      // Waiting for $applyAsync be called, which can take ~10 miliseconds
-      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
-      $flushPendingTasks();
-      expect(drawSpy).not.toHaveBeenCalled();
+    // This approach was choosen because spyOnProperty() doesn't work on
+    // properties that doesn't have a get access type.
+    // Without this approach the test will fail because it'll throw
+    // 'Property google does not have access type get' error.
+    // eslint-disable-next-line max-len
+    // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+    // ref: https://github.com/jasmine/jasmine/issues/1415
+    Object.defineProperty(window, 'google', {
+      get: () => ({})
     });
+    component.data = [];
+    component.chart = mockedChart;
+    component.options = {
+      title: 'Pie title',
+      legendPosition: null,
+      pieHole: null,
+      pieSliceTextStyleColor: '#fff',
+      pieSliceBorderColor: '#fff',
+      left: 0,
+      chartAreaWidth: 0,
+      colors: [],
+      height: 0,
+      width: 0
+    };
   });
 
-  describe('when chart is not defined', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      var $rootScope = $injector.get('$rootScope');
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
 
-      mockedChart = {
-        draw: () => {}
-      };
-
-      // This approach was choosen because spyOnProperty() doesn't work on
-      // properties that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property google does not have access type get' error.
-      // eslint-disable-next-line max-len
-      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-      // ref: https://github.com/jasmine/jasmine/issues/1415
-      Object.defineProperty(window, 'google', {
-        get: () => ({})
-      });
-      spyOnProperty(window, 'google').and.returnValue({
-        visualization: {
-          arrayToDataTable: () => {},
-          PieChart: () => jasmine.createSpy('chart')
-        },
-        charts: {
-          setOnLoadCallback: callback => {}
+  it('should initialize component', fakeAsync(() => {
+    spyOnProperty(window, 'google').and.returnValue({
+      visualization: {
+        arrayToDataTable: () => {},
+        PieChart: () => {
+          return mockedChart;
         }
-      });
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('pieChart', {
-        $scope: $scope,
-        $element: []
-      }, {
-        data: () => [],
-        options: () => ({})
-      });
-      ctrl.$onInit();
-    }));
-
-    it('should not redraw chart', function() {
-      const pieChartSpy = spyOn(window.google.visualization, 'PieChart');
-      angular.element(window).triggerHandler('resize');
-
-      // Waiting for $applyAsync be called, which can take ~10 miliseconds
-      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
-      $flushPendingTasks();
-      expect(pieChartSpy).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('when chart is defined and $scope data is an array', function() {
-    let drawSpy: jasmine.Spy<() => void>;
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      var $rootScope = $injector.get('$rootScope');
-      drawSpy = jasmine.createSpy('draw', () => {});
-
-      // This approach was choosen because spyOnProperty() doesn't work on
-      // properties that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property google does not have access type get' error.
-      // eslint-disable-next-line max-len
-      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-      // ref: https://github.com/jasmine/jasmine/issues/1415
-      Object.defineProperty(window, 'google', {
-        get: () => ({})
-      });
-
-      spyOnProperty(window, 'google').and.returnValue({
-        visualization: {
-          arrayToDataTable: () => {},
-          PieChart: function() {
-            this.draw = drawSpy;
-          }
-        },
-        charts: {
-          setOnLoadCallback: callback => callback()
+      },
+      charts: {
+        setOnLoadCallback: (callback) => {
+          callback();
         }
-      });
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('pieChart', {
-        $scope: $scope,
-        $element: []
-      }, {
-        data: () => [],
-        options: () => ({
-          title: 'Pie title',
-          pieHole: null,
-          pieSliceTextStyleColor: '#fff',
-          pieSliceBorderColor: '#fff',
-          left: 0,
-          chartAreaWidth: 0,
-          colors: [],
-          height: 0,
-          width: 0
-        })
-      });
-      ctrl.$onInit();
-    }));
-
-    it('should redraw chart', function() {
-      angular.element(window).triggerHandler('resize');
-
-      // Waiting for $applyAsync be called, which can take ~10 miliseconds
-      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
-      $flushPendingTasks();
-      expect(drawSpy).toHaveBeenCalled();
+      }
     });
-  });
+    component.redrawChart();
+    tick();
+    component.ngAfterViewInit();
+    tick();
+    component.ngOnInit();
+    tick();
+  }));
+
+  it('should initialize afterview init', fakeAsync(() => {
+    spyOn(component, 'redrawChart').and.stub();
+    spyOnProperty(window, 'google').and.returnValue({
+      visualization: {
+        PieChart: class Mockdraw {
+          constructor(value) {}
+          draw() {}
+        }
+      },
+      charts: {
+        setOnLoadCallback: (callback) => {
+          callback();
+        }
+      }
+    });
+    component.pieChart = {
+      nativeElement: null
+    };
+    component.chart = null;
+    component.ngAfterViewInit();
+    tick();
+
+    expect(component.redrawChart).toHaveBeenCalled();
+  }));
+
+  it('should not redraw chart', fakeAsync(() => {
+    spyOnProperty(window, 'google').and.returnValue({
+      visualization: {
+        PieChart: class Mockdraw {
+          constructor(value) {}
+          draw() {}
+        }
+      },
+      charts: {
+        setOnLoadCallback: (callback) => {
+          callback();
+        }
+      }
+    });
+    spyOn(component, 'redrawChart').and.stub();
+    component.chart = mockedChart;
+
+    component.ngAfterViewInit();
+    tick();
+
+    expect(component.redrawChart).not.toHaveBeenCalled();
+  }));
+
+  it('should redraw chart', fakeAsync(() => {
+    spyOnProperty(window, 'google').and.returnValue({
+      visualization: {
+        PieChart: class Mockdraw {
+          constructor(value) {}
+          draw() {}
+        }
+      },
+      charts: {
+        setOnLoadCallback: (callback) => {
+          callback();
+        }
+      }
+    });
+    spyOn(component, 'redrawChart').and.stub();
+
+    component.ngOnInit();
+    tick();
+    resizeEvent.emit();
+    tick();
+
+    expect(component.redrawChart).toHaveBeenCalled();
+  }));
 });
