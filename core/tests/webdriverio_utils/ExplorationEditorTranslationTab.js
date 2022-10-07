@@ -234,7 +234,7 @@ var ExplorationEditorTranslationTab = function() {
   this.setTranslation = async function(richTextInstructions) {
     await action.click('Edit translation button', editTranslationButtton);
     // eslint-disable-next-line oppia/e2e-practices
-    var stateTranslationEditorTag = $('<state-translation-editor>');
+    var stateTranslationEditorTag = $('<oppia-state-translation-editor>');
     var stateTranslationEditor = stateTranslationEditorTag.$(
       '.e2e-test-state-translation-editor');
     await waitFor.visibilityOf(
