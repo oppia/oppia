@@ -93,12 +93,12 @@
       <div (click)="showAllChapters()"
            *ngIf="showButton && (chaptersDisplayed < nodeCount)"
            class="view-button">
-        <span class="material-icons"> arrow_drop_down </span>
+        <span class="fas fa-caret-down down-caret-position"></span>
       </div>
       <div (click)="hideExtraChapters()"
            *ngIf="showButton && (chaptersDisplayed === nodeCount)"
            class="view-button">
-        <span class="material-icons"> arrow_drop_up </span>
+        <span class="fas fa-caret-up up-caret-position"></span>
       </div>
     </div>
     <div class="chapters-container-box chapter-container" *ngIf="checkTabletView()">
@@ -123,8 +123,7 @@
     <div class="chapter-details" *ngIf="!checkTabletView()">
       <div class="chapter-title"
            *ngFor="let title of nodeTitles;let idx = index">
-        <div *ngIf="storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
-          done
+        <div *ngIf="storySummary.isNodeCompleted(title)" class="fas fa-check completed-icon">
         </div>
         <div [ngClass]="{'border-bottom': idx < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(title) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(title), 'complete-chapter': storySummary.isNodeCompleted(title)}"
              *ngIf="idx < chaptersDisplayed">
@@ -141,13 +140,13 @@
            *ngIf="showButton && (chaptersDisplayed < nodeCount)"
            class="view-button">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_VIEW_ALL' | translate"></span>
-        <span class="material-icons"> arrow_drop_down </span>
+        <span class="fas fa-caret-down down-caret-position"></span>
       </div>
       <div (click)="hideExtraChapters()"
            *ngIf="showButton && (chaptersDisplayed === nodeCount)"
            class="view-button">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_VIEW_LESS' | translate"></span>
-        <span class="material-icons"> arrow_drop_up </span>
+        <span class="fas fa-caret-up up-caret-position"></span>
       </div>
     </div>
   </div>
