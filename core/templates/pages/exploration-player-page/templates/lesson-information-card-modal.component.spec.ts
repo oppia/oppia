@@ -196,7 +196,6 @@ describe('Lesson Information card modal component', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
-    clipboard = TestBed.inject(Clipboard);
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService);
 

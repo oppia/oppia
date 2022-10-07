@@ -62,11 +62,7 @@ describe('Post Publish Modal Controller', function() {
       }
     };
   }
-  const mockWindow = {
-    document: {
-      execCommand: (command: string) => {}
-    }
-  };
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [

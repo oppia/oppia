@@ -27,7 +27,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export class ComponentOverviewComponent {
   @Input() copy_url !: string;
-  showTooltip : boolean = false;
+  showTooltip: boolean = false;
 
   constructor(
     private clipboard: Clipboard,

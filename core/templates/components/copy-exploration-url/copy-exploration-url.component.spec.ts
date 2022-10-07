@@ -72,5 +72,4 @@ describe('Copy Exploration URL component', function() {
     expect(clipboard.copy).toHaveBeenCalledWith(
       explorationURL);
   });
-
- });
+});
