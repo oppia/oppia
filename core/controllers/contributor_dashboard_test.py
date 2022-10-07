@@ -1016,7 +1016,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'state_name': 'Introduction',
                 'new_value': {
                     'content_id': 'content',
-                    'image': ''
+                    'html': '<p>A content to translate.</p>'
                 }
             })], 'Changes content.')
 
@@ -1031,8 +1031,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'Introduction': {
                     'content': {
                         'content': (
-                            ''),
-                        'data_format': 'image',
+                            '<p>A content to translate.</p>'),
+                        'data_format': 'html',
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None
