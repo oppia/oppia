@@ -240,7 +240,7 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enablr save interaction button when it is End Exploration interaction', () => {
+  it('should enable save interaction button when it is End Exploration interaction', () => {
     spyOn(component, 'getTitle').and
       .returnValue('End Exploration');
       
@@ -250,35 +250,29 @@ describe('Customize Interaction Modal Component', () => {
       document, 'getElementsByClassName'
     ).withArgs(className).and.returnValue(undefined);
 
-    // let dummyDivElement: HTMLInputElement = document.createElement('input');
-    // let inpVal = angular.element(dummyDivElement).attr('ng-reflect-model');
+    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+  });
 
-    // spyOn(
-    //   document, 'getElementsByClassName'
-    // ).withArgs(className).and.returnValue([]);
+  it('should enable save interaction button when input in add Exploration ID is non-empty in End Exploration interaction', () => {
+    spyOn(component, 'getTitle').and
+      .returnValue('End Exploration');
+
+    let inputField = document.createElement('input');
+    let inputValue = angular.element(inputField);
+    
+    (inputValue as any).attr != "";
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  // it('should enable saving the interaction when it is End Exploration', () => {
+  // it('should disable save interaction button when input in add Exploration ID is empty in End Exploration interaction', () => {
   //   spyOn(component, 'getTitle').and
   //     .returnValue('End Exploration');
 
-  //   spyOn(
-  //     document, 'getElementsByClassName'
-  //   ).withArgs('class-name').and.returnValue(undefined);
+  //   let inputField = document.createElement('input');
+  //   let inputValue = angular.element(inputField);
 
-    
-    // expect(document.getElementsByClassName('exploration-id-input')).toBe(undefined);
-
-    // let dummyElements = [document.createElement('div')];
-    // expect(document.getElementsByClassName('exploration-id-input')).toEqual(dummyElements);
-
-  //   expe
-
-  // it('should disable saving the interaction when it is End Exploration', () => {
-  //   let s = component.isSaveInteractionButtonEnabled();
-  //   spyOn(s, 'inputValue').and.Equal
+  //   (inputValue as any).attr = "";
 
   //   expect(component.isSaveInteractionButtonEnabled()).toBe(false);
   // });
