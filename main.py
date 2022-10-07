@@ -1003,8 +1003,8 @@ URLS = [
         r'%s' % feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER,
         learner_group.LearnerDashboardLearnerGroupsHandler),
     get_redirect_route(
-        r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
-        learner_group.FacilitatorLearnerGroupViewHandler),
+        r'/view_learner_group_info_handler/<learner_group_id>',
+        learner_group.ViewLearnerGroupInfoHandler),
     get_redirect_route(
         r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
@@ -1014,6 +1014,10 @@ URLS = [
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerProgressHandler),
+    get_redirect_route(
+        r'/learner_group_learner_specific_progress_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnerSpecificProgressHandler
+    ),
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
@@ -1034,6 +1038,8 @@ URLS = [
         learner_group.ExitLearnerGroupHandler),
     get_redirect_route(
         r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
+    get_redirect_route(
+        r'/learner-group/<group_id>', learner_group.ViewLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),

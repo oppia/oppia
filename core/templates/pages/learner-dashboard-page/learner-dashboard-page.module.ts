@@ -39,6 +39,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 import { DeclineInvitationModalComponent } from './modal-templates/decline-invitaiton-modal.component';
+import { ViewLearnerGroupInvitationModalComponent } from './modal-templates/view-learner-group-invitation-modal.component';
 import { ExitLearnerGroupModalComponent } from './modal-templates/exit-learner-group-modal.component';
 import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -69,6 +70,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
+    ViewLearnerGroupInvitationModalComponent,
     ExitLearnerGroupModalComponent
   ],
   entryComponents: [
@@ -84,6 +86,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
+    ViewLearnerGroupInvitationModalComponent,
     ExitLearnerGroupModalComponent
   ],
   providers: [

@@ -341,7 +341,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
+class ViewLearnerGroupInfoHandlerTests(test_utils.GenericTestBase):
 
     USER1_EMAIL = 'user1@example.com'
     USER1_USERNAME = 'user1'
@@ -371,7 +371,7 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
         response = self.get_json(
-            '/facilitator_view_of_learner_group_handler/%s' % (
+            '/view_learner_group_info_handler/%s' % (
                 self.LEARNER_GROUP_ID))
 
         self.assertEqual(response['id'], self.LEARNER_GROUP_ID)
@@ -392,7 +392,7 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
         self.login(self.USER2_EMAIL)
 
         self.get_json(
-            '/facilitator_view_of_learner_group_handler/%s' % (
+            '/view_learner_group_info_handler/%s' % (
                 self.LEARNER_GROUP_ID), expected_status_int=401)
 
         self.logout()

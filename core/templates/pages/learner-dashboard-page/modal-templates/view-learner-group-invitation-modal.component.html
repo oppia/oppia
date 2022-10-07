@@ -1,0 +1,69 @@
+<div class="modal-header">
+  <p class="primary-color" [innerHTML]="'I18N_LEARNER_GROUP_INVITATION_MODAL_HEADER' | translate"></p>
+</div>
+<div class="modal-body">
+  <h3 class="primary-color">{{learnerGroup.title}}</h3>
+  <p>
+    Facilitator: <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames">{{facilitator}} &nbsp;</span>| <span>{{learnerGroup.learnersCount}} &nbsp;</span>
+    <span [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS'  | translate:{learnersCount: learnerGroup.learnersCount, messageFormat: true}"></span>
+  </p>
+  <mat-accordion class="learner-groups-progress-sharing-info">
+    <mat-expansion-panel hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="invited-groups-info-summary-container">
+            <div class="invited-groups-info-summary">
+              <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TITLE' | translate"></p>
+            </div>
+            <div class="drop-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                <path d="M15.1414 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                <path d="M0.999244 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="invited-groups-info-content">
+        <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT_1' | translate"></p>
+        <ul>
+          <li [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT_2' | translate"></li>
+          <li [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT_3' | translate"></li>
+        </ul>
+        <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT_4' | translate"></p>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <div>
+    <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" [value]="true" [checked]="progressSharingPermission" (change)="toggleProgressSharingPermission()" attr.aria-label="{{'I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_TRUE' | translate}}">
+      {{ 'I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_TRUE' | translate }}
+    </mat-radio-button>
+    <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" [value]="false" [checked]="!progressSharingPermission" (change)="toggleProgressSharingPermission()" attr.aria-label="{{'I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_FALSE' | translate}}">
+      {{ 'I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_FALSE' | translate }}
+    </mat-radio-button>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
+  <button class="btn btn-primary" (click)="confirm()" [innerHTML]="'I18N_JOIN_LEANER_GROUP_BUTTON' | translate"></button>
+</div>
+
+<style>
+  .primary-color {
+    color: #00645C;
+  }
+
+  .btn-primary {
+    background-color: #00645c;
+    border: solid 1px #00645c;
+    margin-right: 20px;
+    padding: 6px 16px;
+  }
+
+  .btn-secondary {
+    border: solid 1px #00645c;
+    color: #00645C;
+    margin-right: 20px;
+    padding: 6px 16px;
+  }
+</style>

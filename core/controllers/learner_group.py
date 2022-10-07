@@ -314,6 +314,74 @@ class LearnerGroupLearnerProgressHandler(base.BaseHandler):
         self.render_json(all_learners_progress)
 
 
+class LearnerGroupLearnerSpecificProgressHandler(base.BaseHandler):
+    """Handles operations related to fetching learner specific progress."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id):
+        """Handles GET requests for user progress through learner
+        group syllabus.
+        """
+
+        learner_user_id = self.user_id
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
+        if learner_group is None:
+            raise self.InvalidInputException('No such learner group exists.')
+
+        progress_sharing_permission = (
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [learner_user_id], learner_group_id
+            )
+        )[0]
+
+        story_ids = learner_group.story_ids
+        stories_progress = (
+            story_fetchers.get_multi_users_progress_in_stories(
+                [learner_user_id], story_ids
+            )
+        )[learner_user_id]
+        subtopic_page_ids = learner_group.subtopic_page_ids
+        subtopic_pages_progress = (
+            subtopic_page_services.get_multi_users_subtopic_pages_progress(
+                [learner_user_id], subtopic_page_ids
+            )
+        )[learner_user_id]
+
+        users_settings = user_services.get_user_settings(learner_user_id)
+        learner_progress = {
+            'username': self.username,
+            'progress_sharing_is_turned_on':
+                progress_sharing_permission,
+            'profile_picture_data_url':
+                users_settings.profile_picture_data_url,
+            'stories_progress': stories_progress,
+            'subtopic_pages_progress': subtopic_pages_progress
+        }
+
+        self.render_json(learner_progress)
+
+
 class LearnerGroupSyllabusHandler(base.BaseHandler):
     """Handles fetching of the learner group syllabus."""
 
@@ -462,8 +530,8 @@ class FacilitatorDashboardHandler(base.BaseHandler):
         })
 
 
-class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
-    """Handles operations related to the facilitators view of learner group."""
+class ViewLearnerGroupInfoHandler(base.BaseHandler):
+    """Handles operations related to viewing learner group info."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -485,13 +553,15 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id):
-        """Handles GET requests for facilitator's view of learner group."""
+        """Handles GET requests for viewing learner group info."""
 
-        is_valid_request = learner_group_services.is_user_facilitator(
+        is_valid_facilitator = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id)
-        if not is_valid_request:
+        is_valid_learner = learner_group_services.is_user_learner(
+            self.user_id, learner_group_id)
+        if not (is_valid_facilitator or is_valid_learner):
             raise self.UnauthorizedUserException(
-                'You are not a facilitator of this learner group.')
+                'You are not a member of this learner group.')
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             learner_group_id)
@@ -940,6 +1010,40 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
             'learner_of_learner_groups': learner_of_learner_groups_data,
             'invited_to_learner_groups': invited_to_learner_groups_data
         })
+
+
+class ViewLearnerGroupPage(base.BaseHandler):
+    """Page for learner view of a learner group."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, group_id):
+        """Handles GET requests."""
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+            raise self.PageNotFoundException
+
+        is_valid_request = learner_group_services.is_user_learner(
+            self.user_id, group_id)
+
+        if not is_valid_request:
+            raise self.PageNotFoundException
+
+        self.render_template('view-learner-group-page.mainpage.html')
 
 
 class LearnerGroupsFeatureStatusHandler(base.BaseHandler):

@@ -154,23 +154,27 @@
 }
 
 .decline-learner-group-invitation-modal .modal-dialog,
-.exit-learner-group-modal .modal-dialog {
+.exit-learner-group-modal .modal-dialog,
+.view-learner-group-invitation-modal .modal-dialog {
   margin: 200px auto;
 }
 
 .decline-learner-group-invitation-modal .modal-header,
-.exit-learner-group-modal .modal-header {
+.exit-learner-group-modal .modal-header,
+.view-learner-group-invitation-modal .modal-header {
   border-bottom: unset;
   padding-left: 40px
 }
 
 .decline-learner-group-invitation-modal .modal-body,
-.exit-learner-group-modal .modal-body {
+.exit-learner-group-modal .modal-body,
+.view-learner-group-invitation-modal .modal-body {
   padding: 0 40px 30px;
 }
 
 .decline-learner-group-invitation-modal .modal-footer,
-.exit-learner-group-modal .modal-footer {
+.exit-learner-group-modal .modal-footer,
+.view-learner-group-invitation-modal .modal-footer {
   border-top: unset;
   padding-bottom: 40px;
   padding-right: 40px;

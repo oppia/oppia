@@ -29,6 +29,7 @@ import {
   LearnerGroupAllLearnersInfo,
   LearnerGroupAllLearnersInfoBackendDict
 } from './learner-group-all-learners-info.model';
+import { ShortLearnerGroupSummary, ShortLearnerGroupSummaryBackendDict } from './short-learner-group-summary.model';
 
 
 interface DeleteLearnerGroupBackendResponse {
@@ -129,7 +130,7 @@ export class LearnerGroupBackendApiService {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
-          '/facilitator_view_of_learner_group_handler/<learner_group_id>', {
+          '/view_learner_group_info_handler/<learner_group_id>', {
             learner_group_id: learnerGroupId
           }
         )

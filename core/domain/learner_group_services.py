@@ -207,6 +207,23 @@ def is_user_facilitator(user_id: str, group_id: str) -> bool:
     return user_id in learner_group_model.facilitator_user_ids
 
 
+def is_user_learner(user_id: str, group_id: str) -> bool:
+    """Checks if the user is a learner of the leaner group.
+
+    Args:
+        user_id: str. The id of the user.
+        group_id: str. The id of the learner group.
+
+    Returns:
+        bool. Whether the user is a learner of the learner group.
+    """
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
+
+    return user_id in learner_group_model.learner_user_ids
+
+
 def remove_learner_group(group_id: str) -> None:
     """Removes the learner group with of given learner group ID.
 

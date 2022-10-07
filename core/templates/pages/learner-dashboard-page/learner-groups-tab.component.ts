@@ -27,6 +27,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DeclineInvitationModalComponent } from './modal-templates/decline-invitaiton-modal.component';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { ExitLearnerGroupModalComponent } from './modal-templates/exit-learner-group-modal.component';
+import { ViewLearnerGroupInvitationModalComponent } from './modal-templates/view-learner-group-invitation-modal.component';
 
 import './learner-groups-tab.component.css';
 
@@ -133,6 +134,35 @@ export class LearnerGroupsTabComponent {
       this.learnerGroupBackendApiService.exitLearnerGroupAsync(
         learnerGroupSummary.id, this.username
       ).then();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  viewLearnerGroupInvitation(
+      learnerGroupSummary: ShortLearnerGroupSummary
+  ): void {
+    let modalRef = this.ngbModal.open(
+      ViewLearnerGroupInvitationModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'view-learner-group-invitation-modal'
+      }
+    );
+    modalRef.componentInstance.learnerGroup = learnerGroupSummary;
+
+    modalRef.result.then((data) => {
+      this.learnerGroupBackendApiService.updateLearnerGroupInviteAsync(
+        learnerGroupSummary.id, this.username, data.progressSharingPermission
+      ).then(() => {
+          this.invitedToLearnerGroups = this.invitedToLearnerGroups.filter(
+            (invitedGroup) => invitedGroup.id !== learnerGroupSummary.id
+          );
+          this.learnerOfLearnerGroups.push(learnerGroupSummary);
+        }
+      );
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
