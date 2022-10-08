@@ -156,10 +156,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import { ComponentOverviewComponent } from './copy-exploration-url/copy-exploration-url.component';
 import { AnswerContentModalComponent } from './common-layout-directives/common-elements/answer-content-modal.component';
-import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualization-sorted-tiles.component';
-import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
-import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
-import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -175,6 +171,7 @@ import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-moda
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
+import { VisualizationSortedTilesComponent } from 'extensions/visualizations/oppia-visualization-sorted-tiles.component';
 
 @NgModule({
   imports: [
@@ -337,9 +334,6 @@ import { TranslateModule } from '@ngx-translate/core';
     ReviewTestPageComponent,
     ComponentOverviewComponent,
     AnswerContentModalComponent,
-    OppiaVisualizationClickHexbinsComponent,
-    OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
     VisualizationSortedTilesComponent,
   ],
@@ -463,11 +457,8 @@ import { TranslateModule } from '@ngx-translate/core';
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
     ReviewTestPageComponent,
-    ComponentOverviewComponent
+    ComponentOverviewComponent,
     AnswerContentModalComponent,
-    OppiaVisualizationClickHexbinsComponent,
-    OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
     VisualizationSortedTilesComponent,
   ],
@@ -603,11 +594,8 @@ import { TranslateModule } from '@ngx-translate/core';
     QuestionSuggestionReviewModalComponent,
     ReviewTestPageComponent,
     ComponentOverviewComponent,
-    TranslateModule
+    TranslateModule,
     AnswerContentModalComponent,
-    OppiaVisualizationClickHexbinsComponent,
-    OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
     VisualizationSortedTilesComponent,
   ],
