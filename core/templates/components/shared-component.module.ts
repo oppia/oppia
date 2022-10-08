@@ -171,7 +171,6 @@ import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-moda
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
-import { VisualizationSortedTilesComponent } from 'extensions/visualizations/oppia-visualization-sorted-tiles.component';
 
 @NgModule({
   imports: [
@@ -202,7 +201,7 @@ import { VisualizationSortedTilesComponent } from 'extensions/visualizations/opp
     AngularFireAuthModule,
     MatProgressSpinnerModule,
     NgbModalModule,
-    TranslateModule
+    TranslateModule,
   ],
 
   providers: [
@@ -333,9 +332,6 @@ import { VisualizationSortedTilesComponent } from 'extensions/visualizations/opp
     QuestionSuggestionReviewModalComponent,
     ReviewTestPageComponent,
     ComponentOverviewComponent,
-    AnswerContentModalComponent,
-    ReviewTestPageComponent,
-    VisualizationSortedTilesComponent,
   ],
 
   entryComponents: [
@@ -458,9 +454,6 @@ import { VisualizationSortedTilesComponent } from 'extensions/visualizations/opp
     QuestionSuggestionReviewModalComponent,
     ReviewTestPageComponent,
     ComponentOverviewComponent,
-    AnswerContentModalComponent,
-    ReviewTestPageComponent,
-    VisualizationSortedTilesComponent,
   ],
 
   exports: [
@@ -595,9 +588,6 @@ import { VisualizationSortedTilesComponent } from 'extensions/visualizations/opp
     ReviewTestPageComponent,
     ComponentOverviewComponent,
     TranslateModule,
-    AnswerContentModalComponent,
-    ReviewTestPageComponent,
-    VisualizationSortedTilesComponent,
   ],
 })
 
