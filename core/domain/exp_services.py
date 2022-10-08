@@ -1061,13 +1061,6 @@ def update_states_version_history(
     for state_name in exp_versions_diff.deleted_state_names:
         del states_version_history[state_name]
 
-    # Now, add the states which were newly added during this commit. The
-    # version history of these states are initialized as None because they
-    # were newly added and have no 'previously edited version'.
-    for state_name in exp_versions_diff.added_state_names:
-        states_version_history[state_name] = (
-            state_domain.StateVersionHistory(None, None, committer_id))
-
     # Now, handle the updation of version history of states which were renamed.
     # Firstly, we need to clean up the exp_versions_diff.old_to_new_state_names
     # dict from the state names which are not effectively changed. For example,
@@ -1138,6 +1131,13 @@ def update_states_version_history(
                     state_domain.StateVersionHistory(
                         prev_version, state_name, committer_id
                     ))
+
+    # Finally, add the states which were newly added during this commit. The
+    # version history of these states are initialized as None because they
+    # were newly added and have no 'previously edited version'.
+    for state_name in exp_versions_diff.added_state_names:
+        states_version_history[state_name] = (
+            state_domain.StateVersionHistory(None, None, committer_id))
 
     return states_version_history
 
