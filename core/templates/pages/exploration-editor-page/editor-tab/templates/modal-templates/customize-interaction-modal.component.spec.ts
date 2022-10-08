@@ -244,7 +244,7 @@ describe('Customize Interaction Modal Component', () => {
     spyOn(component, 'getTitle').and
       .returnValue('End Exploration');
 
-    let className = 'exploration-id-input';
+    let className = 'oppia-exploration-id-input';
 
     spyOn(
       document, 'getElementsByClassName'

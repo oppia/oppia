@@ -169,9 +169,7 @@ export class CustomizeInteractionModalComponent
   }
 
   getTitle(interactionId: string): string {
-    if (INTERACTION_SPECS[interactionId] !== undefined) {
-      return INTERACTION_SPECS[interactionId].name;
-    }
+    return INTERACTION_SPECS[interactionId].name;
   }
 
   getDescription(interactionId: string): string {
@@ -266,7 +264,7 @@ export class CustomizeInteractionModalComponent
       Save Interaction button should be disable for empty input
     */
     if (explorationTitle === EndExploration) {
-      let inputField = document.getElementsByClassName('exploration-id-input');
+      let inputField = document.getElementsByClassName('oppia-exploration-id-input');
       if (inputField === undefined) {
         return true;
       }
