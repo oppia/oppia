@@ -275,7 +275,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.graphLoaded).toBe(true);
+      expect(component.graphLoaded).toBeTrue();
       expect(component.GRAPH_WIDTH).toBe(630);
       expect(component.GRAPH_HEIGHT).toBe(280);
       expect(component.VIEWPORT_WIDTH).toBe('10000px');

@@ -458,6 +458,8 @@ export class StateGraphVisualization
     }
 
     if (this.centerAtCurrentState) {
+      // This Code will run once all the current
+      // call stack is finished executing.
       setTimeout(() => {
         this.centerGraph();
       });
@@ -484,6 +486,8 @@ export class StateGraphVisualization
 
     this.directiveSubscriptions.add(
       this.routerService.onCenterGraph.subscribe(() => {
+        // This Code will run once all the current
+        // call stack is finished executing.
         setTimeout(() => {
           this.centerGraph();
           this.redrawGraph();
