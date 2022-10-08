@@ -80,7 +80,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 checked.
 
         Returns:
-            bool. Whether the given model group is valid or not.
+            bool. Whether the given model group is valid or nots.
         """
         all_exp_models = model_group['all_exp_models']
         exp_models_vlatest = model_group['exp_models_vlatest']
@@ -118,7 +118,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         commit_log.version >= 1 and
                         commit_log.version <= exp_model_vlatest.version
                     ):
-                        all_commit_log_models[commit_log.version - 1] = commit_log
+                        all_commit_log_models[
+                            commit_log.version - 1
+                        ] = commit_log
                 model_group_is_valid = (all_commit_log_models.count(None) == 0)
 
                 if model_group_is_valid:
@@ -130,7 +132,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                             version_history is not None and
                             version_history.exploration_version is not None and
                             version_history.exploration_version >= 1 and
-                            version_history.exploration_version <= exp_model_vlatest.version
+                            version_history.exploration_version <=
+                                exp_model_vlatest.version
                         ): # pragma: no cover
                             all_version_history_models[
                                 version_history.exploration_version - 1
@@ -425,43 +428,54 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         new_vh_model.update_timestamps()
                         version_history_models[version - 1] = new_vh_model
                     except Exception as e:
-                        if exp_id == '_aneQq8yPVi3':
-                            for i in range(1, version + 1):
-                                logging.info(
-                                    'Commit commands at version %d: %s' % (
-                                        i, commit_log_models[i-1].commit_cmds
-                                    )
+                        for i in range(1, version + 1):
+                            logging.info(
+                                'Commit commands at version %d: %s' % (
+                                    i, commit_log_models[i - 1].commit_cmds
                                 )
-                                change_list: List[exp_domain.ExplorationChange] = []
-                                for change_dict in commit_log_models[i-1].commit_cmds:
-                                    try:
-                                        change_list.append(exp_domain.ExplorationChange(
+                            )
+                            change_list: List[
+                                exp_domain.ExplorationChange
+                            ] = []
+                            for change_dict in (
+                                commit_log_models[i - 1].commit_cmds
+                            ):
+                                try:
+                                    change_list.append(
+                                        exp_domain.ExplorationChange(
                                             change_dict
-                                        ))
-                                    except Exception:
-                                        continue
-                                exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-                                logging.info(
-                                    'Added states at version %d: %s' % (
-                                        i, exp_versions_diff.added_state_names
+                                        )
                                     )
+                                except Exception:
+                                    continue
+                            exp_versions_diff = (
+                                exp_domain.ExplorationVersionsDiff(
+                                    change_list
                                 )
-                                logging.info(
-                                    'Deleted states at version %d: %s' % (
-                                        i, exp_versions_diff.deleted_state_names
-                                    )
+                            )
+                            logging.info(
+                                'Added states at version %d: %s' % (
+                                    i, exp_versions_diff.added_state_names
                                 )
-                                logging.info(
-                                    'Renamed states at version %d: %s' % (
-                                        i, exp_versions_diff.old_to_new_state_names
-                                    )
+                            )
+                            logging.info(
+                                'Deleted states at version %d: %s' % (
+                                    i, exp_versions_diff.deleted_state_names
                                 )
-                            for i in range(1, version):
-                                logging.info(
-                                    'State version history at version %d: %s' % (
-                                        i, version_history_models[i-1].state_version_history
-                                    )
+                            )
+                            logging.info(
+                                'Renamed states at version %d: %s' % (
+                                    i, exp_versions_diff.old_to_new_state_names
                                 )
+                            )
+                        for i in range(1, version):
+                            logging.info(
+                                'State version history at version %d: %s' % (
+                                    i, version_history_models[
+                                        i - 1
+                                    ].state_version_history
+                                )
+                            )
                         return (exp_id, [], e, version)
             return (exp_id, version_history_models) # type: ignore[return-value]
 
@@ -759,7 +773,9 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                         commit_log.version >= 1 and
                         commit_log.version <= exp_model_vlatest.version
                     ):
-                        all_commit_log_models[commit_log.version - 1] = commit_log
+                        all_commit_log_models[
+                            commit_log.version - 1
+                        ] = commit_log
                 model_group_is_valid = (all_commit_log_models.count(None) == 0)
 
                 if model_group_is_valid:
@@ -771,12 +787,15 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                             version_history is not None and
                             version_history.exploration_version is not None and
                             version_history.exploration_version >= 1 and
-                            version_history.exploration_version <= exp_model_vlatest.version
+                            version_history.exploration_version <=
+                                exp_model_vlatest.version
                         ): # pragma: no cover
                             all_version_history_models[
                                 version_history.exploration_version - 1
                             ] = version_history
-                    model_group_is_valid = (all_version_history_models.count(None) == 0)
+                    model_group_is_valid = (
+                        all_version_history_models.count(None) == 0
+                    )
 
                     if model_group_is_valid:
                         response_dict = {
