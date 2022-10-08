@@ -537,7 +537,7 @@ class SuggestionListHandler(base.BaseHandler):
                     }]
                 },
                 'default_value': None
-            },
+            }
         }
     }
 
