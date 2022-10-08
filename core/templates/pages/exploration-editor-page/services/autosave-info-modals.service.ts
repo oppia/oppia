@@ -57,17 +57,19 @@ export class AutosaveInfoModalsService {
 
   showVersionMismatchModal(
       lostChanges: LostChange[] | ExplorationChange[]): void {
-    const modelRef = this.ngbModal.open(
-      SaveVersionMismatchModalComponent, {
-        backdrop: 'static',
-        keyboard: false
+    if (this._isModalOpen) {
+      const modelRef = this.ngbModal.open(
+        SaveVersionMismatchModalComponent, {
+          backdrop: 'static',
+          keyboard: false
+        });
+      modelRef.componentInstance.lostChanges = lostChanges;
+      modelRef.result.then(() => {
+        this._isModalOpen = false;
+      }, () => {
+        this._isModalOpen = false;
       });
-    modelRef.componentInstance.lostChanges = lostChanges;
-    modelRef.result.then(() => {
-      this._isModalOpen = false;
-    }, () => {
-      this._isModalOpen = false;
-    });
+    }
 
     this._isModalOpen = true;
   }
