@@ -3178,7 +3178,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_states_v52_dict_to_v53_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict],
+        cls,
+        states_dict: Dict[str, state_domain.StateDict],
         language_code: str
     ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 52 to 53. Version 53 fixes all the backend
@@ -3426,8 +3427,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _get_rule_value_of_fraction_interaction(
-        cls,
-        rule_spec: state_domain.RuleSpecDict
+        cls, rule_spec: state_domain.RuleSpecDict
     ) -> float:
         """Returns rule value of the rule_spec of FractionInput interaction so
         that we can keep track of rule's range
@@ -3894,9 +3894,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     earlier_rule = answer_groups[range_ele[
                         'ans_group_index']]['rule_specs'][
                             range_ele['rule_spec_index']]
-                    if (cls._should_check_range_criteria(
-                        earlier_rule, rule_spec) and
-                        cls._is_enclosed_by(range_var, range_ele)
+                    if (
+                        cls._should_check_range_criteria(
+                            earlier_rule, rule_spec
+                        ) and cls._is_enclosed_by(range_var, range_ele)
                     ):
                         invalid_rules.append(rule_spec)
 
@@ -4345,26 +4346,28 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state dictionary.
         """
         for state_name, state_dict in states_dict.items():
-            if state_dict['interaction']['id'] == 'Continue':
-                cls._fix_continue_interaction(state_dict, language_code)
-            elif state_dict['interaction']['id'] == 'EndExploration':
-                cls._fix_end_interaction(state_dict)
-            elif state_dict['interaction']['id'] == 'NumericInput':
-                cls._fix_numeric_input_interaction(state_dict, state_name)
-            elif state_dict['interaction']['id'] == 'FractionInput':
-                cls._fix_fraction_input_interaction(state_dict, state_name)
-            elif state_dict['interaction']['id'] == 'MultipleChoiceInput':
-                cls._fix_multiple_choice_input_interaction(
-                    state_dict, state_name)
-            elif state_dict['interaction']['id'] == 'ItemSelectionInput':
-                cls._fix_item_selection_input_interaction(
-                    state_dict, state_name)
-            elif state_dict['interaction']['id'] == 'DragAndDropSortInput':
-                cls._fix_drag_and_drop_input_interaction(
-                    state_dict, state_name)
-            elif state_dict['interaction']['id'] == 'TextInput':
-                cls._fix_text_input_interaction(
-                    state_dict, state_name)
+            interaction_id_to_fix_func = {
+                'Continue': cls._fix_continue_interaction,
+                'EndExploration': cls._fix_end_interaction,
+                'NumericInput': cls._fix_numeric_input_interaction,
+                'FractionInput': cls._fix_fraction_input_interaction,
+                'MultipleChoiceInput': (
+                    cls._fix_multiple_choice_input_interaction),
+                'ItemSelectionInput': cls._fix_item_selection_input_interaction,
+                'DragAndDropSortInput': (
+                    cls._fix_drag_and_drop_input_interaction),
+                'TextInput':  cls._fix_text_input_interaction
+            }
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id in interaction_id_to_fix_func:
+                if interaction_id == 'Continue':
+                    interaction_id_to_fix_func[interaction_id](
+                        state_dict, language_code)
+                elif interaction_id == 'EndExploration':
+                    interaction_id_to_fix_func[interaction_id](state_dict)
+                else:
+                    interaction_id_to_fix_func[interaction_id](
+                        state_dict, state_name)
 
             # Update translations and voiceovers.
             cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
@@ -4375,6 +4378,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # ################################################.
     # Fix validation errors for exploration state RTE.
     # ################################################.
+    empty_values = [
+            '&quot;&quot;', '\\"&quot;&quot;\\"', '', '\'\'', '\"\"', '<p></p>']
+    @classmethod
+    def _is_tag_removed_with_invalid_attributes(cls, tag, attr) -> bool:
+        """"""
+        if not tag.has_attr(attr):
+            tag.decompose()
+            return True
+
+        if tag[attr].strip() in cls.empty_values:
+            tag.decompose()
+            return True
+
+        return False
+
     @classmethod
     def fix_rte_tags(
         cls, html: str,
@@ -4431,32 +4449,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('alt-with-value'):
                 tag['alt-with-value'] = '&quot;&quot;'
 
-            if not tag.has_attr('filepath-with-value'):
-                tag.decompose()
-                continue
-
-            if tag['filepath-with-value'] in empty_values:
-                tag.decompose()
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'filepath-with-value'):
                 continue
 
             if not tag.has_attr('caption-with-value'):
                 tag['caption-with-value'] = '&quot;&quot;'
 
         for tag in soup.find_all('oppia-noninteractive-skillreview'):
-            if not tag.has_attr('text-with-value'):
-                tag.decompose()
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'text-with-value'):
                 continue
 
-            if tag['text-with-value'].strip() in empty_values:
-                tag.decompose()
-                continue
-
-            if not tag.has_attr('skill_id-with-value'):
-                tag.decompose()
-                continue
-
-            if tag['skill_id-with-value'].strip() in empty_values:
-                tag.decompose()
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'skill_id-with-value'):
                 continue
 
         for tag in soup.find_all('oppia-noninteractive-video'):
@@ -4481,48 +4487,37 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ):
                     tag['autoplay-with-value'] = 'false'
 
-            if not tag.has_attr('video_id-with-value'):
-                tag.decompose()
-                continue
-
-            if tag['video_id-with-value'].strip() in empty_values:
-                tag.decompose()
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'video_id-with-value'):
                 continue
 
             start_value = float(tag['start-with-value'])
             end_value = float(tag['end-with-value'])
             if (
                 start_value > end_value and
-                start_value != 0.0 and
-                end_value != 0.0
+                start_value != 0 and
+                end_value != 0
             ):
                 tag['end-with-value'] = '0'
                 tag['start-with-value'] = '0'
 
         for tag in soup.find_all('oppia-noninteractive-link'):
-            if (
-                not tag.has_attr('text-with-value') or
-                not tag.has_attr('url-with-value')
-            ):
+            if not tag.has_attr('text-with-value'):
                 tag.decompose()
                 continue
 
-            if tag['url-with-value'].strip() in empty_values:
-                tag.decompose()
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'url-with-value'):
                 continue
 
         for tag in soup.find_all('oppia-noninteractive-math'):
-            if not tag.has_attr('math_content-with-value'):
-                tag.decompose()
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'math_content-with-value'):
                 continue
 
-            if tag['math_content-with-value'] in empty_values:
-                tag.decompose()
-                continue
             math_content_json = utils.unescape_html(
                 tag['math_content-with-value'])
             math_content_list = json.loads(math_content_json)
-
             if 'raw_latex' not in math_content_list:
                 tag.decompose()
                 continue
@@ -4645,8 +4640,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _update_state_rte(
-        cls,
-        states_dict: Dict[str, state_domain.StateDict]
+        cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
         """Update the state RTE content and translations
 

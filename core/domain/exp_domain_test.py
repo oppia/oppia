@@ -5801,7 +5801,12 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content: {}
+        content:
+          hi:
+            data_format: html
+            translation:
+            - <p>choicewa</p>
+            needs_update: false
         default_outcome: {}
         feedback_2: {}
   end:
@@ -5914,7 +5919,12 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content: {}
+        content:
+          hi:
+            data_format: html
+            needs_update: false
+            translation:
+            - <p>choicewa</p>
         default_outcome: {}
         feedback_2: {}
   end:
@@ -6018,7 +6028,10 @@ states:
         <oppia-noninteractive-video video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
         <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\\"&amp;quot;&amp;quot;\\"></oppia-noninteractive-collapsible>
         <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
-        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>'
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>'
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6148,7 +6161,7 @@ states:
         video_id-with-value=\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;"
         heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>
         <oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;You
-        have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>'
+        have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>   '
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []

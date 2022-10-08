@@ -337,6 +337,7 @@ class DraftUpgradeUtil:
         for exp_change in draft_change_list:
             if exp_change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
+
             if (
                 exp_change.property_name ==
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
@@ -352,6 +353,7 @@ class DraftUpgradeUtil:
                         answer_group_dicts.remove(answer_group)
                     if answer_group['outcome']['dest'] == exp_change.state_name:
                         answer_group['outcome']['labelled_as_correct'] = False
+
             elif exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                 # Ruling out the possibility of any other type for mypy
                 # type checking.
@@ -361,6 +363,7 @@ class DraftUpgradeUtil:
                 html = exp_domain.Exploration.fix_tabs_and_collapsible_tags(
                     html)
                 exp_change.new_value['html'] = html
+
             elif exp_change.property_name == (
                 exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
             ):
@@ -368,21 +371,24 @@ class DraftUpgradeUtil:
                 # type checking.
                 assert isinstance(exp_change.new_value, dict)
                 written_translations = exp_change.new_value
+
                 for translations in (
                     written_translations['translations_mapping'].values()
                 ):
                     for written_translation in translations.values():
                         if written_translation['data_format'] == 'html':
                             if isinstance(
-                                written_translation['translation'], list):
+                                written_translation['translation'], list
+                            ):
                                 # Translation of type html should only be str,
                                 # cannot be of type list.
                                 raise InvalidDraftConversionException(
                                     'Conversion cannot be completed.')
+
                             else:
                                 fixed_translation = (
                                     exp_domain.Exploration.fix_rte_tags(
-                                    written_translation['translation']))
+                                        written_translation['translation']))
                                 fixed_translation = (
                                     exp_domain.Exploration.
                                     fix_tabs_and_collapsible_tags(
