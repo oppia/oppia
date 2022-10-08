@@ -1414,7 +1414,7 @@ class VersionHistoryLogsDownloader(EditorHandler):
                             )
                         )
                         version_histories.append(new_states_vh)
-                    except Exception as e:
+                    except Exception:
                         commit_cmds = []
                         added_states = []
                         deleted_states = []
@@ -1445,4 +1445,5 @@ class VersionHistoryLogsDownloader(EditorHandler):
                         response_dict['deleted_states'] = deleted_states
                         response_dict['renamed_states'] = renamed_states
                         response_dict['state_vhs'] = state_vhs
+                        break
         self.render_json(response_dict)
