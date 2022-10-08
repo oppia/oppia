@@ -900,7 +900,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_move_skill_id_from_subtopic_to_subtopic(self) -> None:
         """Checks that move_skill_id_to_subtopic works when moving a skill_id
         from an existing subtopic to a new subtopic returns the expected
-        updated values for skill_ids associated with each subtopic
+        updated values for skill_ids associated with each subtopic.
         """
         expected_subtopic1_skills = []
         expected_subtopic2_skills = ['skill_id_2', 'skill_id_1']
@@ -926,7 +926,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_move_skill_id_from_uncategorized_to_subtopic(self) -> None:
         """Checks that move_skill_id_to_subtopic works when moving a skill_id
         from an existing subtopic to a new subtopic returns the expected
-        updated values for skill_ids associated with each subtopic
+        updated values for skill_ids associated with each subtopic.
         """
         expected_subtopic_skills = ['skill_id_2', 'skill_id_3']
         expected_uncategorized_skills = []
