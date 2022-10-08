@@ -233,6 +233,45 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # As invalid drafts are rejected, this draft will be None.
         assert migrated_draft_change_list_v53 is None
 
+    def test_convert_states_v52_dict_to_v53_dict_invalid_translation_format(self) -> None: # pylint: disable=line-too-long
+        draft_change_list_v52 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
+                'state_name': 'New state',
+                'old_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html', '', False)
+                    }
+                }).to_dict(),
+                'new_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'unicode',
+                            (
+                                '<p><oppia-noninteractive-link'
+                                ' url-with-value='
+                                '"&amp;quot;mailto:example@example.com&amp'
+                                ';quot;"></oppia-noninteractive-link></p>'
+                            ),
+                            True
+                        )
+                    }
+                }).to_dict()
+            })
+        ]
+
+        # Migrate exploration to state schema version 53.
+        self.create_and_migrate_new_exploration('52', '53')
+        migrated_draft_change_list_v53 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52, 1, 2, self.EXP_ID)
+        )
+        # As invalid drafts are rejected, this draft will be None.
+        assert migrated_draft_change_list_v53 is None
+
     def test_convert_states_v52_dict_to_v53_dict_none_attribute(self) -> None:
         draft_change_list_v52 = [
             exp_domain.ExplorationChange({

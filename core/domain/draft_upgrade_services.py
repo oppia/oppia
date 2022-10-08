@@ -371,46 +371,45 @@ class DraftUpgradeUtil:
         """
 
         for exp_change in draft_change_list:
-            if not exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                continue
-            # The change object has the key 'new_value' only if the
-            # cmd is 'CMD_EDIT_STATE_PROPERTY' or
-            # 'CMD_EDIT_EXPLORATION_PROPERTY'.
-            new_value: AllowedDraftChangeListTypes = exp_change.new_value
-            if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                # Ruling out the possibility of different types
-                # for mypy type checking.
-                assert isinstance(exp_change.new_value, dict)
+            if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                # The change object has the key 'new_value' only if the
+                # cmd is 'CMD_EDIT_STATE_PROPERTY' or
+                # 'CMD_EDIT_EXPLORATION_PROPERTY'.
+                new_value: AllowedDraftChangeListTypes = exp_change.new_value
+                if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                    # Ruling out the possibility of different types
+                    # for mypy type checking.
+                    assert isinstance(exp_change.new_value, dict)
 
-                new_value = exp_change.new_value
-                html_content = new_value['html']
+                    new_value = exp_change.new_value
+                    html_content = new_value['html']
 
-                if not cls.are_links_are_valid(
-                    html_content):
-                    raise InvalidDraftConversionException(
-                        'Conversion cannot be completed.'
-                    )
+                    if not cls.are_links_are_valid(
+                        html_content):
+                        raise InvalidDraftConversionException(
+                            'Conversion cannot be completed.'
+                        )
 
-            elif exp_change.property_name == (
-                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
-            ):
-                # Ruling out the possibility of different types
-                # for mypy type checking.
-                assert isinstance(exp_change.new_value, dict)
-
-                written_translations = exp_change.new_value
-                for translations in (
-                    written_translations['translations_mapping'].values()
+                elif exp_change.property_name == (
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
                 ):
-                    for written_translation in translations.values():
-                        if written_translation['data_format'] != 'html':
-                            raise InvalidDraftConversionException
+                    # Ruling out the possibility of different types
+                    # for mypy type checking.
+                    assert isinstance(exp_change.new_value, dict)
 
-                        if not cls.are_links_are_valid(
-                            written_translation['translation']):
-                            raise InvalidDraftConversionException(
-                                'Conversion cannot be completed.'
-                            )
+                    written_translations = exp_change.new_value
+                    for translations in (
+                        written_translations['translations_mapping'].values()
+                    ):
+                        for written_translation in translations.values():
+                            if written_translation['data_format'] != 'html':
+                                raise InvalidDraftConversionException
+
+                            if not cls.are_links_are_valid(
+                                written_translation['translation']):
+                                raise InvalidDraftConversionException(
+                                    'Conversion cannot be completed.'
+                                )
 
         return draft_change_list
 
