@@ -4550,6 +4550,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         tab_content['content'],
                         is_tags_nested_inside_tabs_or_collapsible=True
                     )
+                if len(tab_content_list) == 0:
+                    tag.decompose()
+                    continue
                 tab_content_json = json.dumps(tab_content_list)
                 tag['tab_contents-with-value'] = utils.escape_html(
                     tab_content_json)
@@ -4574,6 +4577,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     collapsible_content_list,
                     is_tags_nested_inside_tabs_or_collapsible=True
                 )
+                if len(collapsible_content_list) == 0:
+                    tag.decompose()
+                    continue
                 collapsible_content_json = json.dumps(collapsible_content_list)
                 tag['content-with-value'] = utils.escape_html(
                     collapsible_content_json)
@@ -4978,12 +4984,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         exploration_dict['schema_version'] = 58
 
-        exp_tags = exploration_dict['tags']
-        exp_tags = [tag for tag in exp_tags if tag != '']
-        exp_tags = [tag for tag in exp_tags if len(tag) <= 30]
-        if len(exp_tags) > 10:
-            exp_tags = exp_tags[:10]
-        exploration_dict['tags'] = exp_tags
+        tags = exploration_dict['tags']
+        if len(tags) > 0:
+            exp_tags = []
+            [exp_tags.append(tag) for tag in tags if tag not in exp_tags]
+            exp_tags = [tag for tag in exp_tags if tag != '']
+            exp_tags = [tag for tag in exp_tags if len(tag) <= 30]
+            if len(exp_tags) > 10:
+                exp_tags = exp_tags[:10]
+            exploration_dict['tags'] = exp_tags
         exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
             exploration_dict['states'], exploration_dict['language_code'])
         exploration_dict['states_schema_version'] = 53
