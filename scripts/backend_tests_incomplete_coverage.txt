@@ -128,7 +128,6 @@ scripts.concurrent_task_utils_test
 scripts.docstrings_checker_test
 scripts.install_python_prod_dependencies_test
 scripts.install_third_party_test
-scripts.linters.general_purpose_linter_test
 scripts.linters.html_linter_test
 scripts.linters.js_ts_linter_test
 scripts.linters.other_files_linter_test
