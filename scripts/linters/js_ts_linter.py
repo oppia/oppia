@@ -36,6 +36,8 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from scripts.linters import pre_commit_linter
 
+ParsedExpressionsType = Dict[str, Dict[str, List[esprima.nodes.Node]]]
+
 COMPILED_TYPESCRIPT_TMP_PATH: Final = 'tmpcompiledjs/'
 
 # The INJECTABLES_TO_IGNORE contains a list of services that are not supposed
@@ -85,7 +87,7 @@ def _parse_js_or_ts_file(
 
 def _get_expression_from_node_if_one_exists(
     parsed_node: esprima.nodes.Node, components_to_check: List[str]
-) -> Any:
+) -> esprima.nodes.Node:
     """This function first checks whether the parsed node represents
     the required angular component that needs to be derived by checking if
     its in the 'components_to_check' list. If yes, then it  will return the
@@ -174,7 +176,7 @@ class JsTsLintChecksManager:
         self.ts_files = ts_files
         self.file_cache = file_cache
         self.parsed_js_and_ts_files: Dict[str, esprima.nodes.Module] = {}
-        self.parsed_expressions_in_files: Dict[str, Dict[str, List[Any]]] = {}
+        self.parsed_expressions_in_files: ParsedExpressionsType = {}
 
     @property
     def js_filepaths(self) -> List[str]:
@@ -228,9 +230,7 @@ class JsTsLintChecksManager:
 
         return parsed_js_and_ts_files
 
-    def _get_expressions_from_parsed_script(
-        self
-    ) -> Dict[str, Dict[str, List[Any]]]:
+    def _get_expressions_from_parsed_script(self) -> ParsedExpressionsType:
         """This function returns the expressions in the script parsed using
         js and ts files.
 
@@ -239,9 +239,9 @@ class JsTsLintChecksManager:
             in the script parsed using js and ts files.
         """
 
-        parsed_expressions_in_files: Dict[
-            str, Dict[str, List[Any]]
-        ] = collections.defaultdict(dict)
+        parsed_expressions_in_files: (
+            ParsedExpressionsType
+        ) = collections.defaultdict(dict)
         components_to_check = ['controller', 'directive', 'factory', 'filter']
 
         for filepath, parsed_script in self.parsed_js_and_ts_files.items():
