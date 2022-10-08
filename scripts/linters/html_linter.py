@@ -122,9 +122,12 @@ class CustomHTMLParser(html.parser.HTMLParser):
         indentation_of_first_attribute = (
             column_number + len(tag) + 2)
         starttag_text = self.get_starttag_text()
-
+        # Ruling out the possibility of None of 'starttag_text' for mypy
+        # type checking, because 'starttag_text' can only be None when no
+        # tag is encountered, but since we are calling 'handle_starttag'
+        # method only when a tag is encountered, so 'starttag_text' can
+        # never be a none value here.
         assert starttag_text is not None
-
         # Check whether the values of all attributes are placed
         # in double quotes.
         for attr, value in attrs:
@@ -303,7 +306,7 @@ class HTMLLintChecksManager:
         return self.files_to_lint
 
     @property
-    def all_filepaths(self) -> Optional[List[str]]:
+    def all_filepaths(self) -> List[str]:
         """Return all filepaths."""
         return self.html_filepaths
 
@@ -376,7 +379,7 @@ class ThirdPartyHTMLLintChecksManager:
         return self.files_to_lint
 
     @property
-    def all_filepaths(self) -> Optional[List[str]]:
+    def all_filepaths(self) -> List[str]:
         """Return all filepaths."""
         return self.html_filepaths
 

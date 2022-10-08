@@ -299,6 +299,9 @@ class CustomLintChecksManager:
         return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
             name, bool(errors), errors, errors)
 
+    # Here we use type Any because the argument 'workflow_dict' accept
+    # dictionaries that represents the content of workflow YAML file and
+    # that dictionaries can contain various types of values.
     @staticmethod
     def _check_that_workflow_steps_use_merge_action(
         workflow_dict: Dict[str, Any], workflow_path: str

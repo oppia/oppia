@@ -26,6 +26,7 @@ from typing_extensions import Final, TypedDict
 
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
+
 from .. import build
 from .. import common
 from .. import concurrent_task_utils
@@ -35,8 +36,8 @@ if MYPY:  # pragma: no cover
     from scripts.linters import pre_commit_linter
 
 
-class BadPatternRegexDict(TypedDict):
-    """Type for the dictionary representation of BAD_PATTERNS_REGEXP dicts."""
+class BadPatternRegexpDict(TypedDict):
+    """Dictionary representation of bad pattern regular expressions."""
 
     regexp: Pattern[str]
     message: str
@@ -45,7 +46,7 @@ class BadPatternRegexDict(TypedDict):
 
 
 class BadPatternsDict(TypedDict):
-    """Type for the dictionary representation of BAD_PATTERNS Dict."""
+    """Dictionary representation of bad patterns."""
 
     message: str
     excluded_files: Tuple[str, ...]
@@ -53,7 +54,7 @@ class BadPatternsDict(TypedDict):
 
 
 class MandatoryPatternsRegexpDict(TypedDict):
-    """Type for the dictionary representation of BAD_PATTERNS_REGEXP dicts."""
+    """Dictionary representation of mandatory pattern regular expressions."""
 
     regexp: Pattern[str]
     message: str
@@ -63,7 +64,7 @@ class MandatoryPatternsRegexpDict(TypedDict):
 
 
 class BadStringsConstantsDict(TypedDict):
-    """Type for the dictionary representation of BAD_STRINGS_CONSTANTS Dict."""
+    """Type for the dictionary representation of BAD_STRINGS_CONSTANTS dict."""
 
     message: str
     excluded_files: Tuple[str, ...]
@@ -137,7 +138,7 @@ BAD_PATTERNS: Dict[str, BadPatternsDict] = {
         'excluded_dirs': ()}
 }
 
-BAD_PATTERNS_REGEXP: List[BadPatternRegexDict] = [
+BAD_PATTERNS_REGEXP: List[BadPatternRegexpDict] = [
     {
         'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
         'message': 'Please link TODO comments to an issue '
@@ -180,7 +181,7 @@ MANDATORY_PATTERNS_JS_REGEXP: List[MandatoryPatternsRegexpDict] = [
     }
 ]
 
-BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexDict] = [
+BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexpDict] = [
     {
         'regexp': re.compile(r'text\/ng-template'),
         'message': 'The directives must be directly referenced.',
@@ -213,7 +214,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexDict] = [
     }
 ]
 
-BAD_PATTERNS_PYTHON_REGEXP: List[BadPatternRegexDict] = [
+BAD_PATTERNS_PYTHON_REGEXP: List[BadPatternRegexpDict] = [
     {
         'regexp': re.compile(r'__author__'),
         'message': 'Please remove author tags from this file.',
@@ -265,7 +266,7 @@ BAD_PATTERNS_PYTHON_REGEXP: List[BadPatternRegexDict] = [
     },
 ]
 
-BAD_PATTERNS_MAP: Dict[str, List[BadPatternRegexDict]] = {
+BAD_PATTERNS_MAP: Dict[str, List[BadPatternRegexpDict]] = {
     '.html': BAD_LINE_PATTERNS_HTML_REGEXP,
     '.py': BAD_PATTERNS_PYTHON_REGEXP
 }
@@ -291,7 +292,7 @@ def is_filepath_excluded_for_bad_patterns_check(
 
 
 def check_bad_pattern_in_file(
-    filepath: str, file_content: str, pattern: BadPatternRegexDict
+    filepath: str, file_content: str, pattern: BadPatternRegexpDict
 ) -> Tuple[bool, List[str]]:
     """Detects whether the given pattern is present in the file.
 

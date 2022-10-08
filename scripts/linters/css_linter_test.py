@@ -72,7 +72,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_perform_all_lint_checks_with_stderr(self) -> None:
         def mock_popen(
-            unused_commands: List[str], stdout: str, stderr: str  # pylint: disable=unused-argument
+            unused_commands: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
         ) -> scripts_test_utils.PopenStub:
             return scripts_test_utils.PopenStub(stdout=b'True', stderr=b'True')
 

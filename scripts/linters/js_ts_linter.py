@@ -25,6 +25,7 @@ import shutil
 import subprocess
 
 import esprima
+
 from typing import Any, Dict, List, Tuple, Union
 from typing_extensions import Final
 
@@ -53,6 +54,8 @@ INJECTABLES_TO_IGNORE: Final = [
 ]
 
 
+# Here we use type Any because the argument 'kwargs' can accept an
+# arbitrary number of keyword arguments with different types of values.
 def _parse_js_or_ts_file(
     filepath: str, file_content: str, **kwargs: Any
 ) -> Union[esprima.nodes.Module, esprima.nodes.Script]:
@@ -514,6 +517,10 @@ class ThirdPartyJsTsLintChecksManager:
             # string('') which is at the index 1 and message-id from the end.
             if re.search(r'^\d+:\d+', line.lstrip()):
                 searched_error_string = re.search(r'error', line)
+                # If the regex '^\d+:\d+' is matched then the output line of
+                # es-lint is an error message, and in the error message, 'error'
+                # keyword is always present. So, 'searched_error_string' is
+                # never going to be None here.
                 assert searched_error_string is not None
                 error_string = searched_error_string.group(0)
                 error_message = line.replace(error_string, '', 1)

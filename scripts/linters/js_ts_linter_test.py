@@ -28,6 +28,7 @@ from core.tests import test_utils
 from scripts import concurrent_task_utils
 
 import esprima
+
 from typing import List, Tuple
 from typing_extensions import Final
 
@@ -192,7 +193,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
     def test_third_party_linter_with_stderr(self) -> None:
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         def mock_popen(
-            unused_cmd: str, stdout: str, stderr: str  # pylint: disable=unused-argument
+            unused_cmd: str, stdout: int, stderr: int  # pylint: disable=unused-argument
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
         def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
