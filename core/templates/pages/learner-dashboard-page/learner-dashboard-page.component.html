@@ -245,21 +245,21 @@
                   <div class="row">
                     <div class="col-sm-9">
                       <span class="feedback-message-header">
-                        <span *ngIf="message.authorPictureDataUrl"
+                        <span *ngIf="!message.authorPictureDataUrl"
                               class="d-inline-block">
                           <img [src]="decodePngURIData(message.authorPictureDataUrl)"
                                class="oppia-navbar-profile-picture rounded-circle oppia-profile-picture"
                                alt="User Avatar">
                         </span>
 
-                        <span *ngIf="!message.authorPictureDataUrl"
+                        <span *ngIf="message.authorPictureDataUrl"
                               class="d-inline-block">
-                          <i class="fas fa-user-circle"></i>
+                          <i class="fas fa-user-circle fa-2x"></i>
                         </span>
                       </span>
 
                       <span *ngIf="message.authorUsername"
-                            class="feedback-message-author-name">
+                            class="feedback-message-author-name ">
                         <strong>{{ message.authorUsername }}</strong>
                       </span>
                       <span *ngIf="!message.authorUsername"
