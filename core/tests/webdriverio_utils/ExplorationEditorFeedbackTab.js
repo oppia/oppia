@@ -154,9 +154,12 @@ var ExplorationEditorFeedbackTab = function() {
     await action.setValue(
       'Feedback Response Text Area',
       feedbackResponseTextArea, feedbackResponse);
+
     await waitFor.visibilityOf(
       feedbackStatusDropdown, 'Feedback Status Dropdown is not visible');
-    await feedbackStatusDropdown.selectByVisibleText(feedbackStatus);
+    await action.select(
+      'Option feedback status', feedbackStatusDropdown, feedbackStatus);
+
     await action.click(
       'Feedback Send Response Button', feedbackSendResponseButton);
   };
