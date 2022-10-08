@@ -16,14 +16,16 @@
  * @fileoverview Unit tests for Rearrange Skills In Subtopics Modal.
  */
 
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { RearrangeSkillsInSubtopicsModalComponent } from './rearrange-skills-in-subtopics-modal.component';
 
@@ -37,6 +39,53 @@ class MockActiveModal {
   }
 }
 
+interface ContainerModel<T> {
+  id: string;
+  data: T[];
+  index: number;
+}
+
+class DragAndDropEventClass<T> {
+  createInContainerEvent(
+      containerId: string, data: T[], fromIndex: number, toIndex: number
+  ): CdkDragDrop<T[], T[]> {
+    const event = this.createEvent(fromIndex, toIndex);
+    const container = { id: containerId, data: data };
+    event.container = container as CdkDropList<T[]>;
+    event.previousContainer = event.container;
+    event.item = { data: data[fromIndex] } as CdkDrag<T>;
+    return event;
+  }
+
+  createCrossContainerEvent(
+      from: ContainerModel<T>, to: ContainerModel<T>
+  ): CdkDragDrop<T[], T[]> {
+    const event = this.createEvent(from.index, to.index);
+    event.container = this.createContainer(to);
+    event.previousContainer = this.createContainer(from);
+    event.item = { data: from.data[from.index] } as CdkDrag<T>;
+    return event;
+  }
+
+  private createEvent(
+      previousIndex: number, currentIndex: number
+  ): CdkDragDrop<T[], T[]> {
+    return {
+      previousIndex: previousIndex,
+      currentIndex: currentIndex,
+      isPointerOverContainer: true,
+      distance: { x: 0, y: 0 }
+    } as CdkDragDrop<T[], T[]>;
+  }
+
+  private createContainer(
+      model: ContainerModel<T>
+  ): CdkDropList<T[]> {
+    const container = { id: model.id, data: model.data };
+    return container as CdkDropList<T[]>;
+  }
+}
+
 describe('Rearrange Skills In Subtopic Modal Component', () => {
   let component: RearrangeSkillsInSubtopicsModalComponent;
   let fixture: ComponentFixture<RearrangeSkillsInSubtopicsModalComponent>;
@@ -45,6 +94,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   let topicObjectFactory: TopicObjectFactory;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
+  let topic: Topic;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -60,7 +110,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
           provide: NgbActiveModal,
           useClass: MockActiveModal
         }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 
@@ -73,7 +124,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     topicObjectFactory = TestBed.inject(TopicObjectFactory);
     topicUpdateService = TestBed.inject(TopicUpdateService);
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    let topic = topicObjectFactory.createInterstitialTopic();
+    topic = topicObjectFactory.createInterstitialTopic();
     topic._subtopics = [subtopic];
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
   });
@@ -99,24 +150,73 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     expect(component.oldSubtopicId).toEqual(1);
   });
 
+  it('should not call TopicUpdateService when skill is moved to same subtopic',
+    () => {
+      const dragAndDropEventClass = (
+        new DragAndDropEventClass<ShortSkillSummary>());
+      const containerData = [
+      {} as ShortSkillSummary
+      ];
+      const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
+        'selectedItems', containerData, 1, 0);
+      let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+      component.onMoveSkillEnd(dragDropEvent, null);
+      expect(removeSkillSpy).not.toHaveBeenCalled();
+    });
+
   it('should call TopicUpdateService when skill is moved', () => {
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+      previousContainer: {
+        data: ['1', '2']
+      },
+      container: {
+        data: ['3']
+      },
+      item: {}
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
     let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
-    component.onMoveSkillEnd(1);
+    component.onMoveSkillEnd(event, 1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic',
     () => {
+      const event = {
+        previousIndex: 1,
+        currentIndex: 1,
+        previousContainer: {
+          data: ['1', '2']
+        },
+        container: {
+          data: ['1']
+        },
+        item: {}
+      } as unknown as CdkDragDrop<ShortSkillSummary[]>;
       let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
-      component.onMoveSkillEnd(null);
+      component.oldSubtopicId = 1;
+      component.onMoveSkillEnd(event, null);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
-  it('should not call TopicUpdateService when skill is moved to same subtopic',
+  it('should call TopicUpdateService when new Subtopic Id is null',
     () => {
+      const event = {
+        previousIndex: 1,
+        currentIndex: 1,
+        previousContainer: {
+          data: ['1']
+        },
+        container: {
+          data: ['1']
+        },
+        item: {}
+      } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+
       let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
-      component.oldSubtopicId;
-      component.onMoveSkillEnd(null);
+      component.oldSubtopicId = null;
+      component.onMoveSkillEnd(event, null);
       expect(removeSkillSpy).not.toHaveBeenCalled();
     });
 
@@ -165,5 +265,11 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       expect(component.initEditor).toHaveBeenCalledTimes(2);
       topicReinitializedEventEmitter.emit();
       expect(component.initEditor).toHaveBeenCalledTimes(3);
+      let skillSummary = {
+        getDescription: () => {
+          return null;
+        }
+      };
+      component.isSkillDeleted(skillSummary as ShortSkillSummary);
     });
 });
