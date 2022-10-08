@@ -4105,7 +4105,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group['rule_specs']:
                 rule_inputs = rule_spec['inputs']
                 assert isinstance(rule_inputs, dict)
-                assert isinstance(rule_inputs['x'], list)
                 rule_spec_x: Union[List[str], List[List[str]]] = (
                     rule_inputs['x'])
 
