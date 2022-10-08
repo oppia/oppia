@@ -534,8 +534,12 @@ class SuggestionListHandler(base.BaseHandler):
 =======
                 },
                 'default_value': None
+<<<<<<< HEAD
             },
 >>>>>>> 4759d892a (remove redundant validation)
+=======
+            }
+>>>>>>> b81f25b11 (removed redundant comma)
         }
     }
 
