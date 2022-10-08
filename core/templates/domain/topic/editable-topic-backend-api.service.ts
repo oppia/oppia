@@ -99,6 +99,16 @@ interface DoesTopicWithNameExistBackendResponse {
   'topic_name_exists': boolean;
 }
 
+interface TopicIdToTopicNameBackendResponse {
+  'topic_id_to_topic_name': {
+    [topicId: string]: string;
+  };
+}
+
+export interface TopicIdToTopicNameResponse {
+    [topicId: string]: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -336,6 +346,36 @@ export class EditableTopicBackendApiService {
        Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesTopicWithUrlFragmentExist(topicUrlFragment, resolve, reject);
+    });
+  }
+
+  private _getTopicIdToTopicName(
+      topicIds: string[],
+      successCallback: (value: TopicIdToTopicNameResponse) => void,
+      errorCallback: (reason: string) => void
+  ): void {
+    const topicIdToTopicNameUrl = this.urlInterpolationService.interpolateUrl(
+      '/topic_id_to_topic_name_handler/?' +
+      'comma_separated_topic_ids=<comma_separated_topic_ids>', {
+        comma_separated_topic_ids: topicIds.join(',')
+      });
+
+    this.http.get<TopicIdToTopicNameBackendResponse>(topicIdToTopicNameUrl)
+      .toPromise().then((response) => {
+        if (successCallback) {
+          successCallback(
+            response.topic_id_to_topic_name
+          );
+        }
+      }, (errorResponse) => {
+        errorCallback(errorResponse.error.error);
+      });
+  }
+
+  async getTopicIdToTopicNameAsync(topicIds: string[]):
+      Promise<TopicIdToTopicNameResponse> {
+    return new Promise((resolve, reject) => {
+      this._getTopicIdToTopicName(topicIds, resolve, reject);
     });
   }
 }

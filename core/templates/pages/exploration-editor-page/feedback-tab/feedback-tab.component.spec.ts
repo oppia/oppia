@@ -16,149 +16,120 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
-import { fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { SuggestionModalService } from 'services/suggestion-modal.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { SuggestionThread } from
-  'domain/suggestion/suggestion-thread-object.model';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { EventEmitter } from '@angular/core';
-// ^^^ This block is to be removed.
+import { EditabilityService } from 'services/editability.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { ThreadDataBackendApiService } from './services/thread-data-backend-api.service';
+import { FeedbackTabComponent } from './feedback-tab.component';
+import { UserInfo } from 'domain/user/user-info.model';
+import { FeedbackThread } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 
-describe('Feedback Tab Component', function() {
-  var ctrl = null;
-  var $q = null;
-  var $scope = null;
-  var $rootScope = null;
-  var alertsService = null;
-  let changeListService: ChangeListService = null;
-  var dateTimeFormatService = null;
-  var editabilityService = null;
-  var explorationStatesService = null;
-  var suggestionModalForExplorationEditorService = null;
-  var threadDataBackendApiService = null;
-  var userService = null;
-  let ngbModal: NgbModal = null;
+describe('Feedback Tab Component', () => {
+  let component: FeedbackTabComponent;
+  let fixture: ComponentFixture<FeedbackTabComponent>;
+  let alertsService: AlertsService;
+  let changeListService: ChangeListService;
+  let dateTimeFormatService: DateTimeFormatService;
+  let editabilityService: EditabilityService;
+  let explorationStatesService: ExplorationStatesService;
+  let threadDataBackendApiService: ThreadDataBackendApiService;
+  let userService: UserService;
+  let ngbModal: NgbModal;
 
-  importAllAngularServices();
+  class MockNgbModal {
+    open() {
+      return {
+        result: Promise.resolve()
+      };
+    }
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+      ],
+      declarations: [
+        FeedbackTabComponent
+      ],
       providers: [
-        ChangeListService
-      ]
-    });
-  });
-  beforeEach(function() {
-    alertsService = TestBed.get(AlertsService);
-    changeListService = TestBed.inject(ChangeListService);
-    dateTimeFormatService = TestBed.get(DateTimeFormatService);
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
-    $provide.value(
-      'SuggestionModalService', TestBed.get(SuggestionModalService));
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-    $provide.value(
-      'UserService', TestBed.get(UserService));
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve(
-            {
-              newThreadSubject: 'New subject',
-              newThreadText: 'New text'
-            }
-          )
-        };
-      }
-    });
+        ChangeListService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    ngbModal = $injector.get('NgbModal');
-    editabilityService = $injector.get('EditabilityService');
-    explorationStatesService = $injector.get('ExplorationStatesService');
-    suggestionModalForExplorationEditorService = $injector.get(
-      'SuggestionModalForExplorationEditorService');
-    threadDataBackendApiService = (
-      $injector.get('ThreadDataBackendApiService'));
-    userService = $injector.get('UserService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      FeedbackTabComponent);
+    component = fixture.componentInstance;
 
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+    alertsService = TestBed.inject(AlertsService);
+    changeListService = TestBed.inject(ChangeListService);
+    dateTimeFormatService = TestBed.inject(DateTimeFormatService);
+    ngbModal = TestBed.inject(NgbModal);
+    editabilityService = TestBed.inject(EditabilityService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    threadDataBackendApiService = (
+      TestBed.inject(ThreadDataBackendApiService));
+    userService = TestBed.inject(UserService);
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve({
       isLoggedIn: () => true
-    }));
+    } as UserInfo));
     spyOn(
       threadDataBackendApiService,
-      'getFeedbackThreadsAsync').and.returnValue($q.resolve({}));
+      'getFeedbackThreadsAsync').and.returnValue(Promise.resolve(
+         {} as FeedbackThread[]));
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('feedbackTab', {
-      $scope: $scope,
-      AlertsService: alertsService
-    });
-    ctrl.$onInit();
-    $scope.$apply();
-  }));
+    component.ngOnInit();
+  });
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
-  it('should unsubscribe subscriptions on destroy', () => {
-    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
-    ctrl.$onDestroy();
-    expect(ctrl.directiveSubscriptions.unsubscribe)
-      .toHaveBeenCalled();
-  });
+  it('should get threads after feedback threads are available',
+    fakeAsync(() => {
+      let onFeedbackThreadsInitializedEmitter = new EventEmitter();
+      spyOnProperty(
+        threadDataBackendApiService, 'onFeedbackThreadsInitialized')
+        .and.returnValue(onFeedbackThreadsInitializedEmitter);
+      spyOn(threadDataBackendApiService, 'getThread').and.stub();
+      spyOn(component, 'fetchUpdatedThreads');
 
-  it('should get threads after feedback threads are available', () => {
-    let onFeedbackThreadsInitializedEmitter = new EventEmitter();
-    spyOnProperty(
-      threadDataBackendApiService, 'onFeedbackThreadsInitialized')
-      .and.returnValue(onFeedbackThreadsInitializedEmitter);
-    spyOn(ctrl, 'fetchUpdatedThreads');
+      component.ngOnInit();
+      tick();
 
-    ctrl.$onInit();
+      onFeedbackThreadsInitializedEmitter.emit();
 
-    onFeedbackThreadsInitializedEmitter.emit();
-    $scope.$apply();
-
-    expect(ctrl.fetchUpdatedThreads).toHaveBeenCalled();
-  });
+      expect(component.fetchUpdatedThreads).toHaveBeenCalled();
+    }));
 
   it('should throw an error when trying to active a non-existent thread',
-    function() {
-      expect(function() {
-        ctrl.setActiveThread('0');
+    () => {
+      expect(() => {
+        component.setActiveThread('0');
       }).toThrowError('Trying to display a non-existent thread');
     });
 
-  it('should set active thread when it exists', function() {
-    var thread = SuggestionThread.createFromBackendDicts({
+  it('should set active thread when it exists', fakeAsync(() => {
+    let thread = SuggestionThread.createFromBackendDicts({
       status: 'review',
       subject: '',
       summary: '',
@@ -186,42 +157,42 @@ describe('Feedback Tab Component', function() {
     });
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve(null));
 
-    ctrl.setActiveThread('1');
-    $scope.$apply();
+    component.setActiveThread('1');
+    tick();
 
-    expect(ctrl.activeThread).toEqual(thread);
-    expect(ctrl.tmpMessage.status).toBe('review');
-  });
+    expect(component.activeThread).toEqual(thread);
+    expect(component.feedbackMessage.status).toBe('review');
+  }));
 
   it('should add warning when trying to add a message in a thread with id' +
-    ' null', function() {
-    var addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-    ctrl.addNewMessage(null, 'Text', 'Open');
+     ' null', () => {
+    let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+    component.addNewMessage(null, 'Text', 'Open');
     expect(addWarningSpy).toHaveBeenCalledWith(
       'Cannot add message to thread with ID: null.');
   });
 
   it('should add warning when trying to add a invalid message in a thread',
-    function() {
-      var addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-      ctrl.addNewMessage('0', 'Text', null);
+    () => {
+      let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+      component.addNewMessage('0', 'Text', null);
       expect(addWarningSpy).toHaveBeenCalledWith(
         'Invalid message status: null');
     });
 
   it('should throw error when trying to add a message in an invalid thread',
-    function() {
-      expect(function() {
-        ctrl.addNewMessage('0', 'Text', 'Open');
+    () => {
+      expect(() => {
+        component.addNewMessage('0', 'Text', 'Open');
       }).toThrowError('Trying to add message to a non-existent thread.');
-      expect(ctrl.threadIsStale).toBe(true);
-      expect(ctrl.messageSendingInProgress).toBe(true);
+      expect(component.threadIsStale).toBe(true);
+      expect(component.messageSendingInProgress).toBe(true);
     });
 
   it('should add new message to a thread and then go back to feedback' +
-    ' threads list', function() {
+     ' threads list', fakeAsync(() => {
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
       SuggestionThread.createFromBackendDicts({
         status: 'Open',
@@ -250,30 +221,30 @@ describe('Feedback Tab Component', function() {
         last_updated_msecs: 0
       }));
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve(null));
 
-    ctrl.setActiveThread('1');
-    $scope.$apply();
+    component.setActiveThread('1');
+    tick();
 
     spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
-      $q.resolve());
-    ctrl.addNewMessage('1', 'Text', 'Open');
+      Promise.resolve(null));
 
-    expect(ctrl.messageSendingInProgress).toBe(true);
-    $scope.$apply();
+    component.addNewMessage('1', 'Text', 'Open');
+    tick();
 
-    expect(ctrl.messageSendingInProgress).toBe(false);
-    expect(ctrl.tmpMessage.status).toBe('Open');
-    expect(ctrl.tmpMessage.text).toBe('');
+    expect(component.messageSendingInProgress).toBe(false);
+    expect(component.messageSendingInProgress).toBe(false);
+    expect(component.feedbackMessage.status).toBe('Open');
+    expect(component.feedbackMessage.text).toBe('');
 
-    ctrl.onBackButtonClicked();
-    $scope.$apply();
+    component.onBackButtonClicked();
+    tick();
 
     expect(threadDataBackendApiService.getThread).toHaveBeenCalledWith('1');
-  });
+  }));
 
   it('should use reject handler when trying to add a message in a thread fails',
-    function() {
+    fakeAsync(() => {
       spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
         SuggestionThread.createFromBackendDicts({
           status: 'Open',
@@ -302,23 +273,23 @@ describe('Feedback Tab Component', function() {
           last_updated_msecs: 0
         }));
       spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-        $q.resolve());
-      ctrl.setActiveThread('1');
-      $scope.$apply();
+        Promise.resolve(null));
+
+      component.setActiveThread('1');
+      tick();
 
       spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
-        $q.reject());
-      ctrl.addNewMessage('1', 'Text', 'Open');
+        Promise.reject());
 
-      expect(ctrl.messageSendingInProgress).toBe(true);
-      $scope.$apply();
+      component.addNewMessage('1', 'Text', 'Open');
+      tick();
 
-      expect(ctrl.messageSendingInProgress).toBe(false);
-    });
+      expect(component.messageSendingInProgress).toBe(false);
+    }));
 
   it('should evaluate suggestion button type to be default when a feedback' +
-    ' thread is selected', function() {
-    var thread = SuggestionThread.createFromBackendDicts({
+     ' thread is selected', () => {
+    let thread = SuggestionThread.createFromBackendDicts({
       status: 'open',
       subject: '',
       summary: '',
@@ -346,17 +317,16 @@ describe('Feedback Tab Component', function() {
     });
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve(null));
 
-    ctrl.setActiveThread('1');
-    $scope.$apply();
+    component.setActiveThread('1');
 
-    expect(ctrl.getSuggestionButtonType()).toBe('default');
+    expect(component.getSuggestionButtonType()).toBe('default');
   });
 
   it('should evaluate suggestion button type to be primary when a feedback' +
-    ' thread is selected', function() {
-    var thread = SuggestionThread.createFromBackendDicts({
+     ' thread is selected', fakeAsync(() => {
+    let thread = SuggestionThread.createFromBackendDicts({
       status: 'review',
       subject: '',
       summary: '',
@@ -384,106 +354,69 @@ describe('Feedback Tab Component', function() {
     });
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve(null));
 
-    ctrl.setActiveThread('1');
-    $scope.$apply();
+    component.setActiveThread('1');
+    tick();
 
     spyOn(explorationStatesService, 'hasState').and.returnValue(true);
     spyOn(changeListService, 'getChangeList').and.returnValue([]);
 
-    expect(ctrl.getSuggestionButtonType()).toBe('primary');
-  });
+    expect(component.getSuggestionButtonType()).toBe('primary');
+  }));
 
-  it('should not open show suggestion modal when active thread is null',
-    function() {
-      expect(function() {
-        ctrl.showSuggestionModal();
-      }).toThrowError('Trying to show suggestion of a non-existent thread');
+  it('should call fetchUpdatedThreads', fakeAsync(() => {
+    component.activeThread = SuggestionThread.createFromBackendDicts({
+      status: 'review',
+      subject: '',
+      summary: '',
+      original_author_username: 'Username1',
+      last_updated_msecs: 0,
+      message_count: 1,
+      thread_id: '1',
+      state_name: '',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: ''
+    }, {
+      suggestion_type: 'edit_exploration_state_content',
+      suggestion_id: '1',
+      target_type: '',
+      target_id: '2',
+      status: '',
+      author_name: '',
+      change: {
+        state_name: '',
+        new_value: {html: ''},
+        old_value: {html: ''},
+        skill_id: '',
+      },
+      last_updated_msecs: 0
     });
 
-  it('should open show suggestion modal when active thread exists', function() {
-    var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
-    getThreadSpy.and.returnValue(
-      SuggestionThread.createFromBackendDicts({
-        status: 'Open',
-        subject: '',
-        summary: '',
-        original_author_username: 'Username1',
-        last_updated_msecs: 0,
-        message_count: 1,
-        thread_id: '1',
-        last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2',
-        state_name: ''
-      }, {
-        suggestion_type: 'edit_exploration_state_content',
-        suggestion_id: '1',
-        target_type: '',
-        target_id: '',
-        status: '',
-        author_name: '',
-        change: {
-          state_name: '',
-          new_value: {html: ''},
-          old_value: {html: ''},
-          skill_id: '',
-        },
-        last_updated_msecs: 0
-      }));
-    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
-    ctrl.setActiveThread('1');
-    $scope.$apply();
+    spyOn(threadDataBackendApiService, 'getThread')
+      .and.returnValue(null);
+    component.fetchUpdatedThreads().then(()=> {});
+    tick();
 
-    spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
-      .and.callFake(function(suggestionType, obj) {
-        obj.setActiveThread('0');
-      });
-
-    getThreadSpy.and.returnValue(
-      SuggestionThread.createFromBackendDicts({
-        status: 'Review',
-        subject: '',
-        summary: '',
-        original_author_username: 'Username1',
-        last_updated_msecs: 0,
-        message_count: 1,
-        thread_id: '2',
-        last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2',
-        state_name: ''
-      }, {
-        suggestion_type: 'edit_exploration_state_content',
-        suggestion_id: '2',
-        target_type: '',
-        target_id: '',
-        status: '',
-        author_name: '',
-        change: {
-          state_name: '',
-          new_value: {html: ''},
-          old_value: {html: ''},
-          skill_id: '',
-        },
-        last_updated_msecs: 0
-      }));
-    ctrl.showSuggestionModal();
-    $scope.$apply();
-
-    expect(
-      suggestionModalForExplorationEditorService.showSuggestionModal)
+    expect(threadDataBackendApiService.getThread)
       .toHaveBeenCalled();
-    expect(ctrl.tmpMessage.status).toBe('Review');
-    expect(ctrl.tmpMessage.text).toBe('');
-  });
+  }));
 
   it('should create a new thread when closing create new thread modal',
     fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          result: Promise.resolve({
+            newThreadSubject: 'New subject',
+            newThreadText: 'New text'
+          })
+        } as NgbModalRef);
+      });
       spyOn(alertsService, 'addSuccessMessage').and.callThrough();
       spyOn(threadDataBackendApiService, 'createNewThreadAsync').and.
         returnValue(Promise.resolve());
-      ctrl.showCreateThreadModal();
+
+      component.showCreateThreadModal();
       tick();
       tick();
 
@@ -491,56 +424,55 @@ describe('Feedback Tab Component', function() {
         .toHaveBeenCalledWith('New subject', 'New text');
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Feedback thread created.');
-      expect(ctrl.tmpMessage.status).toBe(null);
-      expect(ctrl.tmpMessage.text).toBe('');
+      expect(component.feedbackMessage.status).toBe(null);
+      expect(component.feedbackMessage.text).toBe('');
     }));
 
   it('should not create a new thread when dismissing create new thread modal',
-    function() {
+    () => {
       spyOn(threadDataBackendApiService, 'createNewThreadAsync');
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return ({
           result: Promise.reject()
         } as NgbModalRef);
       });
-      ctrl.showCreateThreadModal();
-      $scope.$apply();
+      component.showCreateThreadModal();
 
       expect(threadDataBackendApiService.createNewThreadAsync).not
         .toHaveBeenCalled();
     });
 
-  it('should get css classes based on status', function() {
-    expect(ctrl.getLabelClass('open')).toBe('badge badge-info');
-    expect(ctrl.getLabelClass('compliment')).toBe('badge badge-success');
-    expect(ctrl.getLabelClass('another')).toBe('badge badge-secondary');
+  it('should get css classes based on status', () => {
+    expect(component.getLabelClass('open')).toBe('badge badge-info');
+    expect(component.getLabelClass('compliment')).toBe('badge badge-success');
+    expect(component.getLabelClass('another')).toBe('badge badge-secondary');
   });
 
-  it('should get human readable status from provided status', function() {
-    expect(ctrl.getHumanReadableStatus('open')).toBe('Open');
-    expect(ctrl.getHumanReadableStatus('compliment')).toBe('Compliment');
-    expect(ctrl.getHumanReadableStatus('not_actionable')).toBe(
+  it('should get human readable status from provided status', () => {
+    expect(component.getHumanReadableStatus('open')).toBe('Open');
+    expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
+    expect(component.getHumanReadableStatus('not_actionable')).toBe(
       'Not Actionable');
   });
 
   it('should get formatted date string from the timestamp in milliseconds',
-    function() {
+    () => {
       // This method is being spied to avoid any timezone issues.
       spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString').and
         .returnValue('11/21/14');
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      var NOW_MILLIS = 1416563100000;
-      expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
+      let NOW_MILLIS = 1416563100000;
+      expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
         '11/21/14');
     });
 
-  it('should evaluate if exploration is editable', function() {
-    var isEditableSpy = spyOn(editabilityService, 'isEditable');
+  it('should evaluate if exploration is editable', () => {
+    let isEditableSpy = spyOn(editabilityService, 'isEditable');
 
     isEditableSpy.and.returnValue(true);
-    expect(ctrl.isExplorationEditable()).toBe(true);
+    expect(component.isExplorationEditable()).toBe(true);
 
     isEditableSpy.and.returnValue(false);
-    expect(ctrl.isExplorationEditable()).toBe(false);
+    expect(component.isExplorationEditable()).toBe(false);
   });
 });
