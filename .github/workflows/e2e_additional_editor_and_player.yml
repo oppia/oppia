@@ -48,19 +48,19 @@ jobs:
         run: python -m scripts.build --prod_env
       - name: Run Additional Editor E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..5}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeatures" --prod_env; done
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeatures" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Additional Editor Modals E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..5}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeaturesModals" --prod_env; done
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalEditorFeaturesModals" --prod_env
         env:
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Additional Player E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..5}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env; done
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
