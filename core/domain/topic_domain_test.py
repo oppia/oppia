@@ -902,7 +902,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         from an existing subtopic to a new subtopic returns the expected
         updated values for skill_ids associated with each subtopic.
         """
-        expected_subtopic1_skills = []
+        expected_subtopic1_skills: list[str] = []
         expected_subtopic2_skills = ['skill_id_2', 'skill_id_1']
         self.topic.subtopics = [
             topic_domain.Subtopic(
@@ -929,7 +929,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         updated values for skill_ids associated with each subtopic.
         """
         expected_subtopic_skills = ['skill_id_2', 'skill_id_3']
-        expected_uncategorized_skills = []
+        expected_uncategorized_skills: list[str] = []
         self.topic.uncategorized_skill_ids = ['skill_id_3']
         self.topic.subtopics = [
             topic_domain.Subtopic(
