@@ -39,7 +39,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
   subtopics: Subtopic[];
   uncategorizedSkillSummaries: ShortSkillSummary[];
   skillSummaryToMove: ShortSkillSummary;
-  oldSubtopicId: number;
+  oldSubtopicId: number | null = null;
   errorMsg: string;
   editableName: string;
   selectedSubtopicId: number;
@@ -55,25 +55,6 @@ export class RearrangeSkillsInSubtopicsModalComponent
     private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
-  }
-
-  todo = ['Get to work', 'Pick up groceries', 'Go home', 'Fall asleep'];
-
-  done = ['Get up', 'Brush teeth', 'Take a shower', 'Check e-mail', 'Walk dog'];
-
-  drop(event): void {
-    console.log(event);
-    if (event.previousContainer === event.container) {
-      moveItemInArray(
-        event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
-    }
   }
 
   initEditor(): void {
@@ -99,7 +80,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
    *    is to be moved.
    */
   onMoveSkillStart(
-      oldSubtopicId: number, skillSummary: ShortSkillSummary): void {
+      oldSubtopicId: number | null, skillSummary: ShortSkillSummary): void {
     this.skillSummaryToMove = skillSummary;
     this.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
   }
@@ -109,22 +90,34 @@ export class RearrangeSkillsInSubtopicsModalComponent
    *    skill is to be moved, or null if the destination is the
    *    uncategorized section.
    */
-  onMoveSkillEnd(newSubtopicId: number | null): void {
-    if (newSubtopicId === this.oldSubtopicId) {
-      return;
-    }
-
-    if (newSubtopicId === null) {
-      this.topicUpdateService.removeSkillFromSubtopic(
-        this.topic, this.oldSubtopicId, this.skillSummaryToMove);
+  onMoveSkillEnd(
+      event: CdkDragDrop<ShortSkillSummary[]>,
+      newSubtopicId: number | null): void {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      this.topicUpdateService.moveSkillToSubtopic(
-        this.topic, this.oldSubtopicId, newSubtopicId,
-        this.skillSummaryToMove);
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+      if (newSubtopicId === this.oldSubtopicId) {
+        return;
+      }
+
+      if (newSubtopicId === null) {
+        this.topicUpdateService.removeSkillFromSubtopic(
+          this.topic, this.oldSubtopicId, this.skillSummaryToMove);
+      } else {
+        this.topicUpdateService.moveSkillToSubtopic(
+          this.topic, this.oldSubtopicId, newSubtopicId,
+          this.skillSummaryToMove);
+      }
     }
     this.initEditor();
   }
-
 
   updateSubtopicTitle(subtopicId: number): void {
     if (!this.subtopicValidationService.checkValidSubtopicName(
