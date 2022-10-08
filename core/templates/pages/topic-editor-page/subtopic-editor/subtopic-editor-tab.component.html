@@ -223,65 +223,69 @@
   </div>
 </div>
 <style>
-  .subtopic-content .oppia-subtopics-list-card,
-  .subtopic-content .skills-card,
-  .subtopic-content .uncategorized-skill-ids {
+  .oppia-subtopics-list-card,
+  .skills-card,
+  .uncategorized-skill-ids {
     font-family: Roboto, Arial, sans-serif;
     padding: 30px 55px 30px 45px;
   }
-  .subtopic-content .subtopic-content-box {
+  .subtopic-content-box {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 0 auto;
     width: 85%;
   }
-  .subtopic-content .show-subtopic-preview-button {
+  .show-subtopic-preview-button {
     border-top: 1px solid #c1c1c1;
     color: #419889;
     font-size: 15px;
     padding: 10px 0;
     width: 100%;
   }
-  .subtopic-content .error-message {
+  .error-message {
     color: #f00;
     font-size: smaller;
   }
-  .subtopic-content .list-header {
+  .list-header {
     border-bottom: 2px solid #000;
     display: flex;
     justify-content: space-between;
     margin: 20px 0 0;
   }
-  .subtopic-content .list-header span {
+  .list-header span {
     font-weight: bold;
   }
-  .subtopic-content .number-skills-header {
+  .number-skills-header {
     margin-right: 30px;
   }
-  .subtopic-content .skill-list-item {
+  .skill-list-item {
+    background: white;
     border-bottom: 1px solid #dbdbdb;
+    box-sizing: border-box;
+    cursor: move;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 10px 0;
     position: relative;
   }
-  .subtopic-content .skill-list-item a {
+  .skill-list-item a {
     color: inherit;
     flex: 1;
     overflow: hidden;
+    padding-left: 5px;
     padding-right: 10px;
     text-decoration: none;
     word-wrap: break-word;
   }
-  .subtopic-content .skill-options-box {
+  .skill-options-box {
     margin-right: 14px;
   }
-  .subtopic-content .skill-options-box span {
+  .skill-options-box span {
     margin-right: 42px;
   }
-  .subtopic-content .skill-option-box {
+  .skill-option-box {
     background-color: #e1dcdc;
     border: 1px solid #000;
     padding: 0;
@@ -290,53 +294,53 @@
     width: 210px;
     z-index: 1;
   }
-  .subtopic-content .skill-edit-option {
+  .skill-edit-option {
     border-bottom: 1px solid #000;
     cursor: pointer;
     font-size: 15px;
     padding: 5px;
   }
-  .subtopic-content .remove-from-topic-option {
+  .remove-from-topic-option {
     border-bottom: none;
   }
-  .subtopic-content .subtopic-left-box {
+  .subtopic-left-box {
     margin-right: 3%;
     width: 50%;
   }
-  .subtopic-content .subtopic-thumbnail,
+  .subtopic-thumbnail,
   .subtopic-content, .subtopic-url-fragment {
     margin: 20px 0;
   }
-  .subtopic-content .subtopic-html {
+  .subtopic-html {
     margin: 30px 0;
   }
-  .subtopic-content .add-skill-btn {
+  .add-skill-btn {
     background-color: #008098;
     color: #fff;
     font-weight: bold;
     margin: 15px 0;
   }
-  .subtopic-content .subtopic-right-box {
+  .subtopic-right-box {
     width: 35%;
   }
-  .subtopic-content .subtopics-list-item {
+  .subtopics-list-item {
     display: flex;
     justify-content: space-between;
     margin: 7px 0;
   }
-  .subtopic-content .skill-card-header i {
+  .skill-card-header i {
     display: none;
   }
-  .subtopic-content .subtopic-header-text {
+  .subtopic-header-text {
     font-size: 15px;
     margin-bottom: 35px;
     margin-left: 4%;
   }
-  .subtopic-content .topic-name {
+  .topic-name {
     color: #707070;
     cursor: pointer;
   }
-  .subtopic-content .entity-count {
+  .entity-count {
     align-items: center;
     background-color: #fff;
     border: 1px solid #aaaac1;
@@ -348,70 +352,57 @@
     position: fixed;
     width: 24%;
   }
-  .subtopic-content .skill-count,
-  .subtopic-content .question-count {
+  .skill-count,
+  .question-count {
     border-right: 2px solid #aaaac1;
     display: inline-block;
     text-align: center;
     width: 50%;
   }
-  .subtopic-content .edit-icon {
+  .edit-icon {
     color: #595959;
   }
-  .subtopic-content .question-count {
+  .question-count {
     border-right: none;
   }
-  .subtopic-content .skill-count-value,
-  .subtopic-content .question-count-value,
-  .subtopic-content .story-count-value {
+  .skill-count-value,
+  .question-count-value,
+  .story-count-value {
     display: block;
     font-size: 26px;
     font-weight: bold;
     height: 40px;
   }
-  .subtopic-content .create-skill-container i {
+  .create-skill-container i {
     color: #419889;
     font-size: 30px;
     width: 100%;
   }
-  .subtopic-content .create-skill-text {
+  .create-skill-text {
     color: #419889;
   }
-  .subtopic-content .subtopic-title p {
+  .subtopic-title p {
     margin-bottom: 10px;
   }
-  .subtopic-content .subtopic-item-container {
+  .subtopic-item-container {
       border-radius: 4px;
       margin: 0;
       padding-top: 45px;
   }
-  .subtopic-content .subtopic-html-content {
+  .subtopic-html-content {
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
     padding: 6px 12px;
   }
-  .subtopic-content .subtopic-skill-card {
+  .subtopic-skill-card {
     margin-bottom: 30px;
     margin-top: 64px;
   }
-  .subtopic-content .subtopic-card-heading {
+  .subtopic-card-heading {
     margin-bottom: 0;
     margin-left: 20px;
     margin-top: 0;
     padding-bottom: 4px;
-  }
-  .skill-list-item {
-    align-items: center;
-    background: white;
-    border-bottom: solid 1px #ccc;
-    box-sizing: border-box;
-    color: rgba(0, 0, 0, 0.87);
-    cursor: move;
-    display: flex;
-    flex-direction: row;
-    font-size: 14px;
-    justify-content: space-between;
-    padding: 20px 10px;
   }
   .cdk-drag-preview {
     border-radius: 4px;
@@ -434,63 +425,63 @@
   }
 
   @media screen and (max-width: 1100px) {
-    .subtopic-content .subtopic-left-box {
+    .subtopic-left-box {
       width: 55%;
     }
-    .subtopic-content .subtopic-right-box {
+    .subtopic-right-box {
       width: 40%;
     }
   }
   @media screen and (max-width: 768px) {
-    .subtopic-content .subtopic-content-box {
+    .subtopic-content-box {
       width: 100%;
     }
-    .subtopic-content .subtopic-left-box {
+    .subtopic-left-box {
       margin-right: 0;
     }
-    .subtopic-content .entity-count,
-    .subtopic-content .subtopic-header-text {
+    .entity-count,
+    .subtopic-header-text {
       display: none;
     }
-    .subtopic-content .subtopic-content {
+    .subtopic-content {
       margin-top: 25px;
     }
-    .subtopic-content .draggable-icon-indicator {
+    .draggable-icon-indicator {
       display: none;
     }
-    .subtopic-content .subtopic-left-box,
-    .subtopic-content .subtopic-right-box {
+    .subtopic-left-box,
+    .subtopic-right-box {
       width: 100%;
     }
-    .subtopic-content .subtopic-item-container {
+    .subtopic-item-container {
       padding: 0;
     }
-    .subtopic-content .oppia-subtopics-list-card {
+    .oppia-subtopics-list-card {
       padding: 20px 10px 15px;
     }
-    .subtopic-content .subtopic-card-heading {
+    .subtopic-card-heading {
       margin: 0;
       padding: 0;
     }
-    .subtopic-content .subtopic-skill-card {
+    .subtopic-skill-card {
       display: block;
       margin-bottom: 0;
       margin-top: 40px;
       padding: 0;
     }
-    .subtopic-content .skill-card-header i {
+    .skill-card-header i {
       color: #000;
       display: block;
     }
-    .subtopic-content .skill-card-header {
+    .skill-card-header {
       align-items: center;
       display: flex;
       justify-content: space-between;
     }
-    .subtopic-content .skill-card-header h3 {
+    .skill-card-header h3 {
       margin: 0;
     }
-    .subtopic-content .skill-option-box {
+    .skill-option-box {
       right: 30px;
     }
   }
