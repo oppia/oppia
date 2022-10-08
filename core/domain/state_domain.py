@@ -59,9 +59,13 @@ if MYPY:  # pragma: no cover
 AllowedRuleSpecInputTypes = Union[
     str,
     int,
+    float,
     List[str],
     List[List[str]],
-    Dict[str, Union[str, List[str]]],
+    # Here we use type Any because some rule specs have deeply nested types,
+    # such as for the `NumberWithUnits` interaction.
+    Mapping[str, Union[str, List[str], int, bool, float, Dict[str, int], List[
+        Any]]],
 ]
 
 # TODO(#15982): Here we use type Any because `CustomizationArgsDictType` is a

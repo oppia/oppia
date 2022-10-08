@@ -3263,7 +3263,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 to ItemSelectionInput interaction or not.
         """
         empty_choices: List[state_domain.SubtitledHtmlDict] = []
-        seen_choices: List[state_domain.SubtitledHtmlDict] = []
+        seen_choices: List[str] = []
         choices_to_remove: List[state_domain.SubtitledHtmlDict] = []
         invalid_choices_index = []
         invalid_choices_content_ids = []
@@ -3302,7 +3302,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec['inputs']['x'] in invalid_choices_index:
                         invalid_rules.append(rule_spec)
                     if is_item_selection_interaction:
-                        rule_values = rule_spec['inputs']['x']
+                        rule_inputs = rule_spec['inputs']
+                        assert isinstance(rule_inputs, dict)
+                        rule_values = rule_inputs['x']
+                        assert isinstance(rule_values, list)
                         if any(
                             item in rule_values for item in
                             invalid_choices_content_ids
@@ -3435,7 +3438,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             value: float. The value of the rule spec.
         """
-        rule_value_f = rule_spec['inputs']['f']
+        rule_input = rule_spec['inputs']
+        assert isinstance(rule_input, dict)
+        rule_value_f = rule_input['f']
+        assert isinstance(rule_value_f, dict)
         value: float = (
             rule_value_f['wholeNumber'] +
             float(rule_value_f['numerator']) / rule_value_f['denominator']
@@ -3652,9 +3658,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'lb_inclusive': False,
                     'ub_inclusive': False
                 }
+                rule_inputs = rule_spec['inputs']
+                assert isinstance(rule_inputs, dict)
                 if rule_spec['rule_type'] == 'IsLessThanOrEqualTo':
                     try:
-                        rule_value = float(rule_spec['inputs']['x'])
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
                         cls._set_lower_and_upper_bounds(
                             range_var,
                             lower_infinity,
@@ -3667,7 +3676,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 elif rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
                     try:
-                        rule_value = float(rule_spec['inputs']['x'])
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
                         cls._set_lower_and_upper_bounds(
                             range_var,
                             rule_value,
@@ -3680,7 +3690,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 elif rule_spec['rule_type'] == 'Equals':
                     try:
-                        rule_value = float(rule_spec['inputs']['x'])
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
                         cls._set_lower_and_upper_bounds(
                             range_var,
                             rule_value,
@@ -3693,7 +3704,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 elif rule_spec['rule_type'] == 'IsLessThan':
                     try:
-                        rule_value = float(rule_spec['inputs']['x'])
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
                         cls._set_lower_and_upper_bounds(
                             range_var,
                             lower_infinity,
@@ -3706,8 +3718,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 elif rule_spec['rule_type'] == 'IsWithinTolerance':
                     try:
-                        rule_value_x = rule_spec['inputs']['x']
-                        rule_value_tol = rule_spec['inputs']['tol']
+                        rule_value_x = rule_inputs['x']
+                        assert isinstance(rule_value_x, float)
+                        rule_value_tol = rule_inputs['tol']
+                        assert isinstance(rule_value_tol, float)
                         # The `tolerance` value needs to be a positive value.
                         if rule_value_tol <= 0:
                             rule_spec['inputs']['tol'] = abs(rule_value_tol)
@@ -3725,7 +3739,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 elif rule_spec['rule_type'] == 'IsGreaterThan':
                     try:
-                        rule_value = float(rule_spec['inputs']['x'])
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
                         cls._set_lower_and_upper_bounds(
                             range_var,
                             rule_value,
@@ -3738,14 +3753,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 elif rule_spec['rule_type'] == 'IsInclusivelyBetween':
                     try:
-                        rule_value_a = rule_spec['inputs']['a']
-                        rule_value_b = rule_spec['inputs']['b']
+                        value_a = rule_inputs['a']
+                        assert isinstance(value_a, float)
+                        value_b = rule_inputs['b']
+                        assert isinstance(value_b, float)
                         # For x in [a, b], a must not be greater than b.
-                        if rule_value_a > rule_value_b:
-                            rule_spec['inputs']['a'] = rule_value_b
-                            rule_spec['inputs']['b'] = rule_value_a
-                        rule_value_a = float(rule_value_a)
-                        rule_value_b = float(rule_value_b)
+                        if value_a > value_b:
+                            rule_spec['inputs']['a'] = value_b
+                            rule_spec['inputs']['b'] = value_a
+                        rule_value_a = float(value_a)
+                        rule_value_b = float(value_b)
                         cls._set_lower_and_upper_bounds(
                             range_var,
                             rule_value_a,
@@ -3829,43 +3846,46 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'IsEquivalentTo', 'IsExactlyEqualTo',
                     'IsEquivalentToAndInSimplestForm'
                 ):
-                    rule_value_f: float = (
+                    rule_value_equal: float = (
                         cls._get_rule_value_of_fraction_interaction(rule_spec))
                     cls._set_lower_and_upper_bounds(
                         range_var,
-                        rule_value_f,
-                        rule_value_f,
+                        rule_value_equal,
+                        rule_value_equal,
                         lb_inclusive=True,
                         ub_inclusive=True
                     )
 
                 elif rule_spec['rule_type'] == 'IsGreaterThan':
-                    rule_value_f: float = (
+                    rule_value_greater: float = (
                         cls._get_rule_value_of_fraction_interaction(rule_spec))
 
                     cls._set_lower_and_upper_bounds(
                         range_var,
-                        rule_value_f,
+                        rule_value_greater,
                         upper_infinity,
                         lb_inclusive=False,
                         ub_inclusive=False
                     )
 
                 elif rule_spec['rule_type'] == 'IsLessThan':
-                    rule_value_f: float = (
+                    rule_value_less_than: float = (
                         cls._get_rule_value_of_fraction_interaction(rule_spec))
 
                     cls._set_lower_and_upper_bounds(
                         range_var,
                         lower_infinity,
-                        rule_value_f,
+                        rule_value_less_than,
                         lb_inclusive=False,
                         ub_inclusive=False
                     )
 
                 elif rule_spec['rule_type'] == 'HasDenominatorEqualTo':
                     try:
-                        rule_value_x = int(rule_spec['inputs']['x'])
+                        rule_inputs = rule_spec['inputs']
+                        assert isinstance(rule_inputs, dict)
+                        assert isinstance(rule_inputs['x'], int)
+                        rule_value_x = int(rule_inputs['x'])
                         matched_denominator['denominator'] = rule_value_x
                     except Exception:
                         invalid_rules.append(rule_spec)
@@ -3883,11 +3903,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for den in matched_denominator_list:
                     if (
                         rule_spec['rule_type'] ==
-                        'HasFractionalPartExactlyEqualTo' and
-                        den['denominator'] ==
-                        rule_spec['inputs']['f']['denominator']
+                        'HasFractionalPartExactlyEqualTo'
                     ):
-                        invalid_rules.append(rule_spec)
+                        rule_spec_f = rule_spec['inputs']['f']
+                        assert isinstance(rule_spec_f, dict)
+                        if den['denominator'] == rule_spec_f['denominator']:
+                            invalid_rules.append(rule_spec)
 
                 ranges.append(range_var)
                 matched_denominator_list.append(matched_denominator)
@@ -3927,8 +3948,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 to be fixed.
             state_name: str. The name of the state.
         """
-        selected_equals_choices = []
-        empty_ans_groups = []
         answer_groups = state_dict['interaction']['answer_groups']
 
         choices: List[state_domain.SubtitledHtmlDict] = (
@@ -4011,6 +4030,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 # `Equals` should have between min and max number of selections.
                 if rule_spec['rule_type'] == 'Equals':
                     rule_value = rule_spec['inputs']['x']
+                    assert isinstance(rule_value, list)
                     if (
                         len(rule_value) < min_value or
                         len(rule_value) > max_value
@@ -4077,17 +4097,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
         )
         invalid_rules = []
         ele_x_at_y_rules = []
-        off_by_one_rules = []
+        off_by_one_rules: List[List[str]] = []
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
         for answer_group in answer_groups:
             for rule_spec in answer_group['rule_specs']:
-                # Multiple items cannot be in the same place iff the
-                # setting is turned off.
-                for ele in rule_spec['inputs']['x']:
-                    if not multi_item_value and len(ele) > 1:
-                        invalid_rules.append(rule_spec)
+                rule_inputs = rule_spec['inputs']
+                assert isinstance(rule_inputs, dict)
+                assert isinstance(rule_inputs['x'], list)
+                rule_spec_x: Union[List[str], List[List[str]]] = (
+                    rule_inputs['x'])
 
                 if (
                     rule_spec['rule_type'] ==
@@ -4099,9 +4119,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if not multi_item_value:
                         invalid_rules.append(rule_spec)
                     else:
-                        off_by_one_rules.append(
-                            rule_spec['inputs']['x']
-                        )
+                        assert isinstance(rule_spec_x, list)
+                        off_by_one_rules.append(rule_spec_x)
 
                 # In `HasElementXBeforeElementY` rule, `X` value
                 # should not be equal to `Y` value.
@@ -4113,24 +4132,34 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 elif rule_spec['rule_type'] == 'HasElementXAtPositionY':
                     element = rule_spec['inputs']['x']
+                    assert isinstance(element, str)
                     position = rule_spec['inputs']['y']
+                    assert isinstance(position, int)
                     ele_x_at_y_rules.append(
                         {'element': element, 'position': position}
                     )
 
                 elif rule_spec['rule_type'] == 'IsEqualToOrdering':
+                    assert isinstance(rule_spec_x, list)
+                    # Multiple items cannot be in the same place iff the
+                    # setting is turned off.
+                    for ele in rule_spec_x:
+                        if not multi_item_value and len(ele) > 1:
+                            invalid_rules.append(rule_spec)
+
                     # `IsEqualToOrdering` rule should not have empty values.
-                    if len(rule_spec['inputs']['x']) <= 0:
+                    if len(rule_spec_x) <= 0:
                         invalid_rules.append(rule_spec)
                     else:
                         # `IsEqualToOrdering` rule should always come before
                         # `HasElementXAtPositionY` where element `X` is present
                         # at position `Y` in `IsEqualToOrdering` rule.
                         for ele in ele_x_at_y_rules:
+                            assert isinstance(ele, dict)
                             ele_position = ele['position']
                             ele_element = ele['element']
-                            rule_choice = rule_spec['inputs']['x'][
-                                ele_position - 1]
+                            assert isinstance(ele_position, int)
+                            rule_choice = rule_spec_x[ele_position - 1]
 
                             if len(rule_choice) == 0:
                                 invalid_rules.append(rule_spec)
@@ -4143,13 +4172,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         # `IsEqualToOrderingWithOneItemAtIncorrectPosition` when
                         # they are off by one value.
                         item_to_layer_idx = {}
-                        for layer_idx, layer in enumerate(
-                            rule_spec['inputs']['x']
-                        ):
+                        for layer_idx, layer in enumerate(rule_spec_x):
                             for item in layer:
                                 item_to_layer_idx[item] = layer_idx
 
                         for ele in off_by_one_rules:
+                            assert isinstance(ele, list)
                             wrong_positions = 0
                             for layer_idx, layer in enumerate(ele):
                                 for item in layer:
@@ -4206,8 +4234,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_name: str. The name of the state.
         """
         answer_groups = state_dict['interaction']['answer_groups']
-        seen_strings_contains: List[str] = []
-        seen_strings_startswith: List[str] = []
+        seen_strings_contains: List[List[str]] = []
+        seen_strings_startswith: List[List[str]] = []
         invalid_rules = []
 
         cls._remove_duplicate_rules_inside_answer_groups(
@@ -4224,8 +4252,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args'][
                 'rows']['value'] = 10
         for answer_group in answer_groups:
+            assert isinstance(answer_group['rule_specs'], list)
             for rule_spec in answer_group['rule_specs']:
-                rule_values = rule_spec['inputs']['x']['normalizedStrSet']
+                rule_spec_text = rule_spec['inputs']['x']
+                assert isinstance(rule_spec_text, dict)
+                rule_values = rule_spec_text['normalizedStrSet']
+                assert isinstance(rule_values, list)
                 if rule_spec['rule_type'] == 'Contains':
                     # `Contains` should always come after another
                     # `Contains` rule where the first contains rule
@@ -4987,7 +5019,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         tags = exploration_dict['tags']
         if len(tags) > 0:
             exp_tags = []
-            [exp_tags.append(tag) for tag in tags if tag not in exp_tags]
+            for tag in tags:
+                if tag not in exp_tags:
+                    exp_tags.append(tag)
             exp_tags = [tag for tag in exp_tags if tag != '']
             exp_tags = [tag for tag in exp_tags if len(tag) <= 30]
             if len(exp_tags) > 10:

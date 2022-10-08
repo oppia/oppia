@@ -6085,7 +6085,15 @@ states:
       translations_mapping:
         content: {}
 states_schema_version: 52
-tags: []
+tags:
+- a
+- b
+- b
+- c
+- d
+- e
+- f
+- gggggggggggggggggggggggggggggggg
 title: ''
 """)
 
@@ -6202,7 +6210,13 @@ states:
       translations_mapping:
         content: {}
 states_schema_version: 53
-tags: []
+tags:
+- a
+- b
+- c
+- d
+- e
+- f
 title: ''
 """)
 
@@ -6220,7 +6234,7 @@ title: ''
         from version less than 58.
         """
 
-        sample_yaml_content_for_cont_and_end_interac: str = (
+        sample_yaml_content_for_cont_and_end_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -6310,11 +6324,12 @@ states:
       translations_mapping:
         content: {}
 states_schema_version: 52
-tags: []
+tags:
+- gggggggggggggggggggggggggggggggg
 title: ''
 """)
 
-        latest_sample_yaml_content_for_cont_and_end_interac: str = (
+        latest_sample_yaml_content_for_cont_and_end_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -6409,12 +6424,12 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_cont_and_end_interac)
+            'eid', sample_yaml_content_for_cont_and_end_interac_1)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_cont_and_end_interac)
+            latest_sample_yaml_content_for_cont_and_end_interac_1)
 
-        sample_yaml_content_for_cont_and_end_interac: str = (
+        sample_yaml_content_for_cont_and_end_interac_2: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -6504,7 +6519,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_cont_and_end_interac: str = (
+        latest_sample_yaml_content_for_cont_and_end_interac_2: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -6595,10 +6610,10 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_cont_and_end_interac)
+            'eid', sample_yaml_content_for_cont_and_end_interac_2)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_cont_and_end_interac)
+            latest_sample_yaml_content_for_cont_and_end_interac_2)
 
     def test_fixing_invalid_numeric_exp_data_by_migrating_to_v58(
         self
@@ -7784,7 +7799,7 @@ title: ''
         data from version less than 58.
         """
 
-        sample_yaml_content_for_item_selection_interac: str = (
+        sample_yaml_content_for_item_selection_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -7940,7 +7955,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_item_selection_interac: str = (
+        latest_sample_yaml_content_for_item_selection_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -8094,12 +8109,12 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_item_selection_interac)
+            'eid', sample_yaml_content_for_item_selection_interac_1)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_item_selection_interac)
+            latest_sample_yaml_content_for_item_selection_interac_1)
 
-        sample_yaml_content_for_item_selection_interac: str = (
+        sample_yaml_content_for_item_selection_interac_2: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -8289,7 +8304,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_item_selection_interac: str = (
+        latest_sample_yaml_content_for_item_selection_interac_2: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -8416,12 +8431,12 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_item_selection_interac)
+            'eid', sample_yaml_content_for_item_selection_interac_2)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_item_selection_interac)
+            latest_sample_yaml_content_for_item_selection_interac_2)
 
-        sample_yaml_content_for_item_selection_interac: str = (
+        sample_yaml_content_for_item_selection_interac_3: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -8562,7 +8577,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_item_selection_interac: str = (
+        latest_sample_yaml_content_for_item_selection_interac_3: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -8686,12 +8701,12 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_item_selection_interac)
+            'eid', sample_yaml_content_for_item_selection_interac_3)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_item_selection_interac)
+            latest_sample_yaml_content_for_item_selection_interac_3)
 
-        sample_yaml_content_for_item_selection_interac: str = (
+        sample_yaml_content_for_item_selection_interac_4: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -8804,7 +8819,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_item_selection_interac: str = (
+        latest_sample_yaml_content_for_item_selection_interac_4: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -8919,10 +8934,10 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_item_selection_interac)
+            'eid', sample_yaml_content_for_item_selection_interac_4)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_item_selection_interac)
+            latest_sample_yaml_content_for_item_selection_interac_4)
 
     def test_fixing_invalid_drag_and_drop_exp_data_by_migrating_to_v58(
         self
@@ -8931,7 +8946,7 @@ title: ''
         data from version less than 58.
         """
 
-        sample_yaml_content_for_drag_and_drop_interac: str = (
+        sample_yaml_content_for_drag_and_drop_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -9137,7 +9152,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_drag_and_drop_interac: str = (
+        latest_sample_yaml_content_for_drag_and_drop_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -9265,12 +9280,12 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_drag_and_drop_interac)
+            'eid', sample_yaml_content_for_drag_and_drop_interac_1)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_drag_and_drop_interac)
+            latest_sample_yaml_content_for_drag_and_drop_interac_1)
 
-        sample_yaml_content_for_drag_and_drop_interac: str = (
+        sample_yaml_content_for_drag_and_drop_interac_2: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -9406,7 +9421,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_drag_and_drop_interac: str = (
+        latest_sample_yaml_content_for_drag_and_drop_interac_2: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -9537,10 +9552,10 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_drag_and_drop_interac)
+            'eid', sample_yaml_content_for_drag_and_drop_interac_2)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_drag_and_drop_interac)
+            latest_sample_yaml_content_for_drag_and_drop_interac_2)
 
     def test_fixing_invalid_text_exp_data_by_migrating_to_v58(
         self
@@ -9549,7 +9564,7 @@ title: ''
         data from version less than 58.
         """
 
-        sample_yaml_content_for_text_interac: str = (
+        sample_yaml_content_for_text_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -9824,7 +9839,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_text_interac: str = (
+        latest_sample_yaml_content_for_text_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -10038,12 +10053,12 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_text_interac)
+            'eid', sample_yaml_content_for_text_interac_1)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_text_interac)
+            latest_sample_yaml_content_for_text_interac_1)
 
-        sample_yaml_content_for_text_interac: str = (
+        sample_yaml_content_for_text_interac_2: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -10155,7 +10170,7 @@ tags: []
 title: ''
 """)
 
-        latest_sample_yaml_content_for_text_interac: str = (
+        latest_sample_yaml_content_for_text_interac_2: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -10269,10 +10284,10 @@ title: ''
 
         self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content_for_text_interac)
+            'eid', sample_yaml_content_for_text_interac_2)
         self.assertEqual(
             exploration.to_yaml(),
-            latest_sample_yaml_content_for_text_interac)
+            latest_sample_yaml_content_for_text_interac_2)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
