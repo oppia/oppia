@@ -256,14 +256,13 @@ export class CustomizeInteractionModalComponent
   isSaveInteractionButtonEnabled(): boolean {
     let explorationTitle = this.getTitle(
       this.stateInteractionIdService.displayed);
-    let EndExploration = 'End Exploration';
     /*
       There is a condition for the END EXPLORATION interaction
-      We have to check that the input field for adding
+      We have to check that the last input field for adding
       the exploration Ids must be non-empty
       Save Interaction button should be disable for empty input
     */
-    if (explorationTitle === EndExploration) {
+    if (explorationTitle === AppConstants.EndExploration) {
       let inputField = document.getElementsByClassName('oppia-exploration-id-input');
       if (inputField === undefined) {
         return true;

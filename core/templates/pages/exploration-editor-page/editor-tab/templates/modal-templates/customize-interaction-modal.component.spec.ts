@@ -242,7 +242,7 @@ describe('Customize Interaction Modal Component', () => {
 
   it('should enable Save Interaction button for End Exploration', () => {
     spyOn(component, 'getTitle').and
-      .returnValue('End Exploration');
+      .returnValue(AppConstants.EndExploration);
 
     let className = 'oppia-exploration-id-input';
 
@@ -255,7 +255,7 @@ describe('Customize Interaction Modal Component', () => {
 
   it('should Save Interaction button when input in add Exploration ID', () => {
     spyOn(component, 'getTitle').and
-      .returnValue('End Exploration');
+      .returnValue(AppConstants.EndExploration);
 
     let inputField = document.createElement('input');
     let inputValue = angular.element(inputField);
