@@ -40,8 +40,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 import { DeclineInvitationModalComponent } from './modal-templates/decline-invitaiton-modal.component';
 import { ViewLearnerGroupInvitationModalComponent } from './modal-templates/view-learner-group-invitation-modal.component';
-import { ExitLearnerGroupModalComponent } from './modal-templates/exit-learner-group-modal.component';
 import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
+import { ViewLearnerGroupDetailsModalComponent } from './modal-templates/view-learner-group-details-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
@@ -71,7 +71,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
     ViewLearnerGroupInvitationModalComponent,
-    ExitLearnerGroupModalComponent
+    ViewLearnerGroupDetailsModalComponent
   ],
   entryComponents: [
     LearnerDashboardPageComponent,
@@ -87,7 +87,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
     ViewLearnerGroupInvitationModalComponent,
-    ExitLearnerGroupModalComponent
+    ViewLearnerGroupDetailsModalComponent
   ],
   providers: [
     {

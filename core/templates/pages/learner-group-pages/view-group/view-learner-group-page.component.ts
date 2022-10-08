@@ -28,15 +28,17 @@ import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { ContextService } from 'services/context.service';
-import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-
-
-import './view-learner-group-page.component.css';
 import { UserService } from 'services/user.service';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
+import { ExitLearnerGroupModalComponent } from 'pages/learner-dashboard-page/modal-templates/exit-learner-group-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
+
+import './view-learner-group-page.component.css';
 
 @Component({
   selector: 'oppia-view-learner-group-page',
@@ -61,6 +63,8 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private contextService: ContextService,
     private userService: UserService,
+    private ngbModal: NgbModal,
+    private windowRef: WindowRef,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService
@@ -82,8 +86,8 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
             .fetchLearnerSpecificProgressInAssignedSyllabus(
               this.learnerGroupId
             ).then(learnerProgress => {
-              console.log(learnerProgress, 'shahjshjsa');
               this.learnerProgress = learnerProgress;
+              this.loaderService.hideLoadingScreen();
             });
           this.storyViewerBackendApiService.fetchProgressInStoriesChapters(
               this.username, this.learnerGroup.storyIds
@@ -91,7 +95,6 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
               this.storiesChaptersProgress = storiesChaptersProgress;
             });
         });
-        this.loaderService.hideLoadingScreen();
       });
     }
     this.subscribeToOnLangChange();
@@ -121,6 +124,55 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   getLearnersCount(): number {
     return this.learnerGroup.learnerUsernames.length;
+  }
+
+  getCompletedStoriesCountByLearner(): number {
+    let completedStoriesCount = 0;
+    this.learnerProgress.storiesProgress.forEach(storyProgress => {
+      if (
+        storyProgress.getCompletedNodeTitles().length ===
+        storyProgress.getNodeTitles().length
+      ) {
+        completedStoriesCount += 1;
+      }
+    });
+    return completedStoriesCount;
+  }
+
+  getMasteredSubtopicsCountOfLearner(): number {
+    let masteredSubtopicsCount = 0;
+    this.learnerProgress.subtopicsProgress.forEach(subtopicProgress => {
+      if (subtopicProgress.subtopicMastery &&
+        subtopicProgress.subtopicMastery >= 0.9
+      ) {
+        masteredSubtopicsCount += 1;
+      }
+    });
+    return masteredSubtopicsCount;
+  }
+
+  exitLearnerGroup(): void {
+    let modalRef = this.ngbModal.open(
+      ExitLearnerGroupModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'exit-learner-group-modal'
+      }
+    );
+    modalRef.componentInstance.learnerGroupTitle = this.learnerGroup.title;
+
+    modalRef.result.then(() => {
+      this.learnerGroupBackendApiService.exitLearnerGroupAsync(
+        this.learnerGroup.id, this.username
+      ).then(() => {
+        this.windowRef.nativeWindow.location.href = '/learner-dashboard';
+        this.loaderService.showLoadingScreen('Loading');
+      });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   ngOnDestroy(): void {

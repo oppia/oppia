@@ -1,39 +1,25 @@
 <div class="modal-header">
-  <p class="primary-color" [innerHTML]="'I18N_LEARNER_GROUP_INVITATION_MODAL_HEADER' | translate"></p>
+  <div class="modal-header-title">
+    <p class="primary-color">
+      <span translate="I18N_LEARNER_GROUP_DETAILS_TITLE"></span>
+    </p>
+    <div type="button" class="close" aria-label="Close" (click)="cancel()">
+      <span aria-hidden="true">&times;</span>
+    </div>
+  </div>
 </div>
 <div class="modal-body">
-  <h3 class="primary-color">{{learnerGroup.title}}</h3>
-  <p>
-    Facilitator: <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames">{{facilitator}} &nbsp;</span>| <span>{{learnerGroup.learnersCount}} &nbsp;</span>
-    <span [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS'  | translate:{learnersCount: learnerGroup.learnersCount, messageFormat: true}"></span>
-  </p>
-  <mat-accordion class="learner-groups-progress-sharing-info">
-    <mat-expansion-panel hideToggle>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <div class="invited-groups-info-summary-container">
-            <div class="invited-groups-info-summary">
-              <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TITLE' | translate"></p>
-            </div>
-            <div class="drop-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
-                <path d="M15.1414 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
-                <path d="M0.999244 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </div>
-          </div>
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <div class="invited-groups-info-content">
-        <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT_1' | translate"></p>
-        <ul>
-          <li [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT_2' | translate"></li>
-          <li [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT_3' | translate"></li>
-        </ul>
-        <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT_4' | translate"></p>
-      </div>
-    </mat-expansion-panel>
-  </mat-accordion>
+  <div class="group-title">
+    <b [innerHTML]="'I18N_LEARNER_GROUP_JOINING_MESSAGE' | translate:{groupName: learnerGroup.title, messageFormat: true}"></b>
+  </div>
+  <div class="group-description">
+    <b>Description</b>
+    <div>{{learnerGroup.description}}</div>
+  </div>
+  <div class="learner-groups-progress-sharing-info">
+    <b [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TITLE' | translate"></b>
+    <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT' | translate"></p>
+  </div>
   <div>
     <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" [value]="true" [checked]="progressSharingPermission" (change)="toggleProgressSharingPermission()" attr.aria-label="{{'I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_TRUE' | translate}}">
       {{ 'I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_TRUE' | translate }}
@@ -49,6 +35,14 @@
 </div>
 
 <style>
+  .modal-header-title {
+    border-bottom: solid 1px #e0e0e0;
+  }
+
+  .modal-header-title p {
+    margin: 0;
+  }
+
   .primary-color {
     color: #00645C;
   }
@@ -65,5 +59,25 @@
     color: #00645C;
     margin-right: 20px;
     padding: 6px 16px;
+  }
+
+  .btn-danger {
+    background: #fff;
+    border: solid 1px #a53417;
+    color: #a53417;
+    padding: 6px 16px;
+  }
+
+  .modal-header .close {
+    cursor: pointer;
+    font-size: 28px;
+    padding: 1rem 0;
+    margin: -1rem 0 -1rem auto;
+  }
+
+  .group-title,
+  .group-description,
+  .learner-groups-progress-sharing-info {
+    margin-bottom: 15px;
   }
 </style>

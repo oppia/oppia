@@ -1,0 +1,51 @@
+<div class="modal-header">
+  <div class="modal-header-title">
+    <p class="primary-color">
+      <span translate="I18N_LEARNER_GROUP_DETAILS_TITLE"></span>
+    </p>
+    <div type="button" class="close" aria-label="Close" (click)="cancel()">
+      <span aria-hidden="true">&times;</span>
+    </div>
+  </div>
+</div>
+<div class="modal-body">
+  <div class="group-title">
+    <b [innerHTML]="'I18N_LEARNER_GROUP_DETAILS_GROUP_TITLE' | translate"></b>
+    <div>{{learnerGroup.title}}</div>
+  </div>
+  <div class="group-description">
+    <b [innerHTML]="'I18N_LEARNER_GROUP_DETAILS_MODAL_DESCRIPTION' | translate"></b>
+    <div>{{learnerGroup.description}}</div>
+  </div>
+</div>
+<div class="modal-footer">
+</div>
+
+<style>
+  .modal-header-title {
+    border-bottom: solid 1px #e0e0e0;
+  }
+
+  .modal-header-title p {
+    margin: 0;
+  }
+
+  .primary-color {
+    color: #00645C;
+  }
+
+  .modal-header .close {
+    cursor: pointer;
+    font-size: 28px;
+    padding: 1rem 0;
+    margin: -1rem 0 -1rem auto;
+  }
+
+  .modal-body .group-title {
+    margin-bottom: 15px;
+  }
+
+  .modal-footer {
+    display: none;
+  }
+</style>

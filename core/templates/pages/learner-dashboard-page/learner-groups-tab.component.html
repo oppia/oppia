@@ -141,10 +141,10 @@
             </div>
           </div>
           <div class="oppia-learner-group-summary-card-cta-buttons">
-            <div class="learner-group-view-details-button" (click)="viewLearnerGroupInvitation(learnerGroupSummary)">
+            <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">
               <span [innerHTML]="'I18N_LEARNER_GROUP_VIEW_DETAILS' | translate"></span>
             </div>
-            <i class="fa fa-check learner-group-accept-invite-button" aria-hidden="true" (click)="viewLearnerGroupInvitation(learnerGroupSummary)"></i>
+            <i class="fa fa-check learner-group-accept-invite-button" aria-hidden="true" (click)="acceptLearnerGroupInvitation(learnerGroupSummary)"></i>
             <i class="fa fa-times learner-group-decline-invite-button" (click)="declineLearnerGroupInvitation(learnerGroupSummary)"></i>
           </div>
         </div>
@@ -172,8 +172,8 @@
             <span [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS'  | translate:{learnersCount: learnerGroupSummary.learnersCount, messageFormat: true}"></span>
           </div>
         </a>
-        <div class="learner-group-view-preferences-button">
-          <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUP_SECTION_VIEW_PREFERENCES' | translate"></span>
+        <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">
+          <span [innerHTML]="'I18N_LEARNER_GROUP_VIEW_DETAILS' | translate"></span>
         </div>
       </div>
     </div>

@@ -47,12 +47,16 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   declarations: [
     ViewLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
-    LearnerGroupLearnerSpecificProgressComponent
+    LearnerGroupViewAssignedSyllabusComponent,
+    LearnerGroupLearnerSpecificProgressComponent,
+    ExitLearnerGroupModalComponent
   ],
   entryComponents: [
     ViewLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
-    LearnerGroupLearnerSpecificProgressComponent
+    LearnerGroupViewAssignedSyllabusComponent,
+    LearnerGroupLearnerSpecificProgressComponent,
+    ExitLearnerGroupModalComponent
   ],
   providers: [
     {
@@ -91,6 +95,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { LearnerGroupLearnerSpecificProgressComponent } from '../edit-group/learner-group-learner-specific-progress.component';
 import { LearnerGroupOverviewComponent } from '../edit-group/learner-group-overview.component';
+import { LearnerGroupViewAssignedSyllabusComponent } from './learner-group-view-assigned-syllabus.component';
+import { ExitLearnerGroupModalComponent } from 'pages/learner-dashboard-page/modal-templates/exit-learner-group-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

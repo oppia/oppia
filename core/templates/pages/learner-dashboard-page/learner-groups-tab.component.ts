@@ -26,8 +26,8 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DeclineInvitationModalComponent } from './modal-templates/decline-invitaiton-modal.component';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
-import { ExitLearnerGroupModalComponent } from './modal-templates/exit-learner-group-modal.component';
 import { ViewLearnerGroupInvitationModalComponent } from './modal-templates/view-learner-group-invitation-modal.component';
+import { ViewLearnerGroupDetailsModalComponent } from './modal-templates/view-learner-group-details-modal.component';
 
 import './learner-groups-tab.component.css';
 
@@ -115,25 +115,22 @@ export class LearnerGroupsTabComponent {
     });
   }
 
-  exitLearnerGroup(
+  viewLearnerGroupDetails(
       learnerGroupSummary: ShortLearnerGroupSummary
   ): void {
     let modalRef = this.ngbModal.open(
-      ExitLearnerGroupModalComponent,
+      ViewLearnerGroupDetailsModalComponent,
       {
         backdrop: 'static',
-        windowClass: 'exit-learner-group-modal'
+        windowClass: 'view-learner-group-details-modal'
       }
     );
-    modalRef.componentInstance.learnerGroupTitle = learnerGroupSummary.title;
+    modalRef.componentInstance.learnerGroup = learnerGroupSummary;
 
     modalRef.result.then(() => {
-      this.learnerOfLearnerGroups = this.learnerOfLearnerGroups.filter(
-        (learnerGroup) => learnerGroup.id !== learnerGroupSummary.id
-      );
-      this.learnerGroupBackendApiService.exitLearnerGroupAsync(
-        learnerGroupSummary.id, this.username
-      ).then();
+      // Note to developers:
+      // This callback is triggered when the Confirm button is clicked.
+      // No further action is needed.
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -141,7 +138,7 @@ export class LearnerGroupsTabComponent {
     });
   }
 
-  viewLearnerGroupInvitation(
+  acceptLearnerGroupInvitation(
       learnerGroupSummary: ShortLearnerGroupSummary
   ): void {
     let modalRef = this.ngbModal.open(
@@ -155,12 +152,18 @@ export class LearnerGroupsTabComponent {
 
     modalRef.result.then((data) => {
       this.learnerGroupBackendApiService.updateLearnerGroupInviteAsync(
-        learnerGroupSummary.id, this.username, data.progressSharingPermission
-      ).then(() => {
+        learnerGroupSummary.id, this.username, true,
+        data.progressSharingPermission
+      ).then((learnerGroup) => {
+          let acceptedLearnerGroupSummary = new ShortLearnerGroupSummary(
+            learnerGroup.id, learnerGroup.title, learnerGroup.description,
+            learnerGroup.facilitatorUsernames,
+            learnerGroup.learnerUsernames.length
+          );
           this.invitedToLearnerGroups = this.invitedToLearnerGroups.filter(
             (invitedGroup) => invitedGroup.id !== learnerGroupSummary.id
           );
-          this.learnerOfLearnerGroups.push(learnerGroupSummary);
+          this.learnerOfLearnerGroups.push(acceptedLearnerGroupSummary);
         }
       );
     }, () => {

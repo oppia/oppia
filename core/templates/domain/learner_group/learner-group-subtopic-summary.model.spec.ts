@@ -31,7 +31,9 @@ describe('Subtopic Page Summary', () => {
       parent_topic_name: 'parentTopicName',
       thumbnail_filename: 'thumbnailFilename',
       thumbnail_bg_color: 'red',
-      subtopic_mastery: 0.5
+      subtopic_mastery: 0.5,
+      parent_topic_url_fragment: 'url_fragment',
+      classroom_url_fragment: 'math'
     };
 
     sampleLearnerGroupSubtopicSummary = (
@@ -51,6 +53,10 @@ describe('Subtopic Page Summary', () => {
       'thumbnailFilename');
     expect(sampleLearnerGroupSubtopicSummary.thumbnailBgColor).toEqual('red');
     expect(sampleLearnerGroupSubtopicSummary.subtopicMastery).toEqual(0.5);
+    expect(sampleLearnerGroupSubtopicSummary.parentTopicUrlFragment).toEqual(
+      'url_fragment');
+    expect(sampleLearnerGroupSubtopicSummary.classroomUrlFragment).toEqual(
+      'math');
   });
 
   it('should correctly convert backend dict to object without subtopic ' +
@@ -83,5 +89,9 @@ describe('Subtopic Page Summary', () => {
     expect(sampleLearnerGroupSubtopicSummary.subtopicMastery).toBeUndefined();
     expect(sampleLearnerGroupSubtopicSummary.subtopicPageId).toEqual(
       'parentTopicId:1');
+    expect(sampleLearnerGroupSubtopicSummary.parentTopicUrlFragment)
+      .toBeUndefined();
+    expect(sampleLearnerGroupSubtopicSummary.classroomUrlFragment)
+      .toBeUndefined();
   });
 });

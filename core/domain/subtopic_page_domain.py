@@ -545,6 +545,8 @@ class SubtopicPageSummaryDict(TypedDict):
     thumbnail_filename: Optional[str]
     thumbnail_bg_color: Optional[str]
     subtopic_mastery: Optional[float]
+    parent_topic_url_fragment: Optional[str]
+    classroom_url_fragment: Optional[str]
 
 
 class SubtopicPageSummary:

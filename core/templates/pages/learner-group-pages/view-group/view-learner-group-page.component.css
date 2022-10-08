@@ -1,85 +1,136 @@
-.oppia-edit-learner-group {
+.oppia-view-learner-group {
   text-align: left;
-  width: 90%;
-}
-
-.oppia-dashboard-view {
-  display: flex;
-  height: calc(100vh - 56px);
-  overflow: hidden;
-  text-align: left;
-  width: 100%;
 }
 
 .oppia-dashboard-view-tabs-container {
   background: #fff;
-  height: 100%;
+  margin: auto;
+  margin-top: 20px;
+  max-width: 940px;
   padding: 15px 0;
-  width: 20%;
+  width: 80%;
 }
 
 .oppia-dashboard-view-content-container {
-  height: 100%;
+  margin: auto;
+  max-width: 940px;
   overflow: auto;
   width: 80%;
 }
 
-.oppia-dashboard-view-tabs-container .group-info {
-  display: grid;
-  grid-gap: 10px;
-  padding: 0 40px;
+.oppia-view-learner-group .learner-group-card-container {
+  background: rgba(174, 210, 233, 0.4);
 }
 
-.oppia-dashboard-view-tabs-container .group-info-title {
-  color: #00645c;
-  font-size: 20px;
-}
-
-.oppia-dashboard-view-tabs-container .group-info-description {
-  color: #757575;
-  font-size: 12px;
-}
-
-.oppia-edit-learner-group .oppia-dashboard-view-tabs {
-  display: grid;
-  grid-gap: 5px;
-  margin-top: 40px;
-}
-
-.oppia-edit-learner-group .oppia-dashboard-view-tabs-item {
-  cursor: pointer;
-  margin-right: 10px;
-  padding: 15px 40px;
-}
-
-.oppia-edit-learner-group .oppia-dashboard-view-tabs hr {
-  border-top: 1px solid #e6e6e6;
+.oppia-view-learner-group .group-info-container {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+  max-width: 940px;
+  padding: 40px 0;
   width: 80%;
 }
 
-.oppia-edit-learner-group .oppia-dashboard-view-tabs-item.active {
-  background: rgba(39, 99, 92, 0.1);
-  border-bottom-right-radius: 25px;
-  border-top-right-radius: 25px;
+.oppia-view-learner-group .group-cta-buttons-container {
+  display: grid;
+  grid-gap: 5px;
+}
+
+.oppia-view-learner-group .group-cta-buttons-container .btn-primary {
+  background: #00609c;
+  border: 1px solid #00609c;
+  border-radius: 4px;
+  color: #fff;
+  padding: 8px 20px;
+}
+
+.oppia-view-learner-group .group-cta-buttons-container .btn-danger {
+  background: transparent;
+  border: 1px solid #be563c;
+  border-radius: 4px;
+  color: #be563c;
+  padding: 8px 20px;
+}
+
+.oppia-view-learner-group .group-info {
+  display: grid;
+  grid-gap: 6px;
+}
+
+.oppia-view-learner-group .group-info-title {
+  color: #00645c;
+  font-size: 24px;
+}
+
+.oppia-view-learner-group .group-info-description {
+  color: #757575;
+  font-size: 14px;
+}
+
+.oppia-view-learner-group .oppia-dashboard-view-tabs {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 40px;
+}
+
+.oppia-view-learner-group .oppia-dashboard-view-tabs-item {
+  cursor: pointer;
+  padding-bottom: 4px;
+}
+
+.oppia-view-learner-group .oppia-dashboard-view-tabs-item.active {
+  border-bottom: 3px solid #33978f;
+  color: #015952;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card {
+  background: #fff;
+  display: grid;
+  grid-gap: 25px;
+  margin: 40px auto 0;
+  padding: 25px;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card-title {
+  color: #00645c;
+  font-size: 18px;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card-content {
+  display: flex;
+  gap: 20px;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card-content .stories-count,
+.oppia-view-learner-group .learner-group-overview-summary-card-content .skills-count {
   color: #00645c;
 }
 
-.oppia-edit-learner-group .learners-count {
-  margin-right: 3px;
+.oppia-view-learner-group .learner-group-overview-summary-card .assigned-stories-info,
+.oppia-view-learner-group .learner-group-overview-summary-card .assigned-skills-info {
+  border: solid 1px #00645c;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 10px 30px;
+  text-align: center;
 }
 
-.oppia-edit-learner-group .tab-icon {
-  margin-right: 8px;
+.exit-learner-group-modal .modal-dialog {
+  margin: 200px auto;
 }
 
-.oppia-edit-learner-group .group-info-description svg {
-  vertical-align: baseline;
+.exit-learner-group-modal .modal-header {
+  border-bottom: unset;
+  padding-left: 40px
 }
 
-.oppia-edit-learner-group .oppia-dashboard-view-tabs-item svg {
-  vertical-align: text-top;
+.exit-learner-group-modal .modal-body {
+  padding: 0 40px 30px;
 }
 
-.oppia-edit-learner-group .oppia-dashboard-view-tabs-item.active svg path {
-  fill: #00645c;
+.exit-learner-group-modal .modal-footer {
+  border-top: unset;
+  padding-bottom: 40px;
+  padding-right: 40px;
 }
