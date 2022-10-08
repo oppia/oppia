@@ -97,6 +97,7 @@ var ExplorationEditorPage = function() {
   var navigateToStatsTabButton = $('.e2e-test-stats-tab');
   var navigateToTranslationTabButton = $('.e2e-test-translation-tab');
   var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
+  var previewTabLearnerViewCard = $('.e2e-test-learner-view-card-content');
   var publishChangesButtonTextContainer = $(
     '.e2e-test-publish-changes-message');
   var publishExplorationButton = $('.e2e-test-publish-exploration');
@@ -403,6 +404,8 @@ var ExplorationEditorPage = function() {
 
   this.navigateToPreviewTab = async function() {
     await action.click('Preview tab button', navigateToPreviewTabButton);
+    await waitFor.visibilityOf(
+      previewTabLearnerViewCard, 'Preview Tab learner card is not visible');
     await waitFor.pageToFullyLoad();
   };
 
