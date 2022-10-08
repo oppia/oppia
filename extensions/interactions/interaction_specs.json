@@ -155,6 +155,10 @@
           "items": {
             "type": "custom",
             "obj_type": "SubtitledHtml",
+            "validators": [{
+              "id": "has_subtitled_html_non_empty",
+              "is_default": false
+            }],
             "replacement_ui_config": {
               "html": {
                 "hide_complex_extensions": true,
@@ -167,6 +171,9 @@
             {
               "min_value": 1,
               "id": "has_length_at_least"
+            },
+            {
+              "id": "has_subtitled_html_content_uniquified"
             }
           ],
           "ui_config": {
@@ -247,6 +254,10 @@
           "items": {
             "type": "custom",
             "obj_type": "SubtitledHtml",
+            "validators": [{
+              "id": "has_subtitled_html_non_empty",
+              "is_default": false
+            }],
             "replacement_ui_config": {
               "html": {
                 "hide_complex_extensions": true,
@@ -255,6 +266,9 @@
             }
           },
           "type": "list",
+          "validators": [{
+            "id": "has_subtitled_html_content_uniquified"
+          }],
           "ui_config": {
             "add_element_text": "Add item for selection"
           }
@@ -290,7 +304,11 @@
         "name": "buttonText",
         "schema": {
           "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "obj_type": "SubtitledUnicode",
+          "validators": [{
+            "id": "has_expected_subtitled_content_length",
+            "max_value": 20
+          }]
         },
         "default_value": {
           "content_id": null,
@@ -629,6 +647,10 @@
           "items": {
             "type": "custom",
             "obj_type": "SubtitledHtml",
+            "validators": [{
+              "id": "has_subtitled_html_non_empty",
+              "is_default": false
+            }],
             "replacement_ui_config": {
               "html": {
                 "hide_complex_extensions": true,
@@ -641,6 +663,9 @@
             {
               "min_value": 1,
               "id": "has_length_at_least"
+            },
+            {
+              "id": "has_subtitled_html_content_uniquified"
             }
           ],
           "ui_config": {
