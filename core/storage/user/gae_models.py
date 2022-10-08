@@ -3226,7 +3226,7 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @classmethod
-    def export_data(cls, user_id: str) -> Dict[str, str]:
+    def export_data(cls, user_id: str) -> Dict[str, Union[str, float, None]]:
         """Exports the data from BlogAuthorDetailModel into dict format for
         Takeout.
 
@@ -3241,6 +3241,20 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
             'author_name': author_model.author_name,
             'author_bio': author_model.author_bio
         }
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user to export."""
+        return dict(super(BlogAuthorDetailsModel, cls).get_export_policy(), **{
+            # We do not export the id of the model because we should not
+            # export internal user ids.
+            'id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'author_name': base_models.EXPORT_POLICY.EXPORTED,
+            'author_bio': base_models.EXPORT_POLICY.EXPORTED,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
 
     @classmethod
     def create(

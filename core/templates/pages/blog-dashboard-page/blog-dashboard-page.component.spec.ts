@@ -174,7 +174,7 @@ describe('Blog Dashboard Page Component', () => {
     let defaultImageUrl = 'banner_image_url';
     let blogDashboardData = {
       authorName: 'test_user',
-      authorBio: 'Bio',
+      authorBio: '',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,
@@ -187,6 +187,7 @@ describe('Blog Dashboard Page Component', () => {
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
       .and.returnValue(Promise.resolve(blogDashboardData));
+    expect(component.authorBioEditorIsOpen).toBeFalse();
 
     component.initMainTab();
     // As loading screen should be shown irrespective of the response
@@ -200,6 +201,7 @@ describe('Blog Dashboard Page Component', () => {
     expect(blogDashboardBackendApiService.fetchBlogDashboardDataAsync)
       .toHaveBeenCalled();
     expect(component.authorProfilePictureUrl).toEqual('sample_url');
+    expect(component.authorBioEditorIsOpen).toBeTrue();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.windowIsNarrow).toBe(true);
@@ -356,5 +358,105 @@ describe('Blog Dashboard Page Component', () => {
 
     expect(component.blogDashboardData.draftBlogPostSummaryDicts).toEqual(
       []);
+  });
+
+  it('should display alert when unable to update author name', fakeAsync(() => {
+    component.authorName = 'new username';
+    component.authorBio = 'Oppia Blog Author';
+    component.authorNameEditorIsOpen = true;
+    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+      .and.returnValue(Promise.reject(
+        'Server responded with backend error.'));
+    spyOn(alertsService, 'addWarning');
+
+    component.updateAuthorName();
+    tick();
+
+    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+      .toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Unable to update author name. Error: Server responded with backend ' +
+      'error.');
+    expect(component.authorNameEditorIsOpen).toBeTrue();
+  }));
+
+  it('should successfully update author name', fakeAsync(() => {
+    component.authorName = 'new username';
+    component.authorBio = 'Oppia Blog Author';
+    component.authorNameEditorIsOpen = true;
+    let BlogAuthorDetails = {
+      authorName: 'new username',
+      authorBio: 'Oppia Blog Author'
+    };
+    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+      .and.returnValue(Promise.resolve(BlogAuthorDetails));
+    spyOn(alertsService, 'addSuccessMessage');
+
+    component.updateAuthorName();
+    tick();
+
+    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+      .toHaveBeenCalled();
+    expect(component.authorNameEditorIsOpen).toBeFalse();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Author name saved successfully.');
+  }));
+
+  it('should display alert when unable to update author bio', fakeAsync(() => {
+    component.authorName = 'sername';
+    component.authorBio = 'Fresh Oppia Blog Author';
+    component.authorBioEditorIsOpen = true;
+    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+      .and.returnValue(Promise.reject(
+        'Server responded with backend error.'));
+    spyOn(alertsService, 'addWarning');
+
+    component.updateAuthorBio();
+    tick();
+
+    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+      .toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Unable to update author bio. Error: Server responded with backend ' +
+      'error.');
+    expect(component.authorBioEditorIsOpen).toBeTrue();
+  }));
+
+  it('should successfully update author bio', fakeAsync(() => {
+    component.authorName = 'username';
+    component.authorBio = 'Fresh Oppia Blog Author';
+    component.authorBioEditorIsOpen = true;
+    let BlogAuthorDetails = {
+      authorName: 'username',
+      authorBio: 'Fresh Oppia Blog Author'
+    };
+    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+      .and.returnValue(Promise.resolve(BlogAuthorDetails));
+    spyOn(alertsService, 'addSuccessMessage');
+
+    component.updateAuthorBio();
+    tick();
+
+    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+      .toHaveBeenCalled();
+    expect(component.authorBioEditorIsOpen).toBeFalse();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Author bio saved successfully.');
+  }));
+
+  it('should open author name editor', () => {
+    component.authorNameEditorIsOpen = false;
+
+    component.openAuthorNameEditor();
+
+    expect(component.authorNameEditorIsOpen).toBeTrue();
+  });
+
+  it('should open author bio editor', () => {
+    component.authorBioEditorIsOpen = false;
+
+    component.openAuthorBioEditor();
+
+    expect(component.authorBioEditorIsOpen).toBeTrue();
   });
 });

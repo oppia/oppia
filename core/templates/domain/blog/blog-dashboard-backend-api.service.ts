@@ -48,7 +48,7 @@ export interface BlogDashboardData {
   publishedBlogPostSummaryDicts: BlogPostSummary[];
   draftBlogPostSummaryDicts: BlogPostSummary[];
 }
-interface BlogAuthorDetails {
+export interface BlogAuthorDetails {
   authorName: string;
   authorBio: string;
 }

@@ -166,16 +166,16 @@ class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the blog home page and its rendering."""
 
     def test_blog_home_page_access_without_logging_in(self):
-        self.get_json(
+        self.get_html_response(
             '%s/can_access_blog_home_page' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
 
-    def test_blog_home_page_access_without_having_rights(self):
+    def test_blog_home_page_access_after_logging_in(self):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        self.get_json(
+        self.get_html_response(
             '%s/can_access_blog_home_page' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
         self.logout()
 
     def test_blog_home_page_access_as_blog_admin(self):
@@ -183,16 +183,6 @@ class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.login(self.BLOG_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/can_access_blog_home_page' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
-        self.logout()
-
-    def test_blog_home_page_access_as_blog_post_editor(self):
-        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(
-            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login(self.BLOG_EDITOR_EMAIL)
         self.get_html_response(
             '%s/can_access_blog_home_page' %
             ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
@@ -218,16 +208,16 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         blog_post_model.put()
 
     def test_blog_post_page_access_without_logging_in(self):
-        self.get_json(
+        self.get_html_response(
             '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
 
-    def test_blog_post_page_access_without_having_rights(self):
+    def test_blog_post_page_access_after_logging_in(self):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        self.get_json(
+        self.get_html_response(
             '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
         self.logout()
 
     def test_blog_post_page_access_as_blog_admin(self):
@@ -235,16 +225,6 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.login(self.BLOG_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
-        self.logout()
-
-    def test_blog_post_page_access_as_blog_post_editor(self):
-        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(
-            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login(self.BLOG_EDITOR_EMAIL)
         self.get_html_response(
             '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' %
             ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
@@ -261,4 +241,65 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.get_json( # type: ignore[no-untyped-call]
             '%s/can_access_blog_post_page?blog_post_url_fragment=invalid-url' %
             ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=404)
+        self.logout()
+
+
+class BlogAuthorProfilePageAccessValidationHandlerTests(
+    test_utils.GenericTestBase):
+    """Checks the access to the blog author profile page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+
+    def test_blog_author_profile_page_access_without_logging_in(self):
+        self.get_html_response(
+            '%s/can_access_blog_author_profile_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME
+            ), expected_status_int=200
+        )
+
+    def test_blog_author_profile_page_access_after_logging_in(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_blog_author_profile_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME
+            ),expected_status_int=200
+        )
+        self.logout()
+
+    def test_blog_author_profile_page_access_as_blog_admin(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_blog_author_profile_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME
+            ),expected_status_int=200
+        )
+        self.logout()
+
+    def test_validation_returns_false_if_given_user_is_not_blog_post_author(
+        self
+    ) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            '%s/can_access_blog_author_profile_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.VIEWER_EMAIL
+            ),expected_status_int=404
+        )
+        self.logout()
+
+    def test_validation_returns_false_if_given_user_is_non_existent(
+        self
+    ) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            '%s/can_access_blog_author_profile_page/invalid_username' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX
+            ),expected_status_int=404
+        )
         self.logout()

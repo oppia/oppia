@@ -6,7 +6,7 @@
            alt="Profile image of the author of the blog post"
            class="e2e-test-profile-current-user-photo">
       <mat-card-title class="w-100 d-flex justify-content-between">
-        <span *ngIf="!authorNameEditorOpened" class="blog-dashboard-card-title e2e-test-username-visible">
+        <span *ngIf="!authorNameEditorIsOpen" class="blog-dashboard-card-title e2e-test-username-visible">
           {{ authorName }}
           <button class="fas fa-pen oppia-editor-edit-icon"
                   title="Edit Author Name"
@@ -14,7 +14,7 @@
             &#xE254;
           </button>
         </span>
-        <span *ngIf="authorNameEditorOpened" class="d-flex mb-2">
+        <span *ngIf="authorNameEditorIsOpen" class="d-flex mb-2">
           <input class="w-auto form-control required general-text-format oppia-autofocus"
                  [(ngModel)]="authorName"
                  maxlength="MAX_AUTHOR_NAME_LENGTH"
@@ -33,7 +33,7 @@
       </mat-card-title>
       <mat-card-subtitle class="mt-2">
         <div class="blog-author-bio-container">
-          <span *ngIf="!authorBioEditorOpened" class="d-flex">
+          <span *ngIf="!authorBioEditorIsOpen" class="d-flex">
             <span class="blog-author-bio">
               {{ authorBio }}
             </span>
@@ -43,8 +43,8 @@
                     &#xE254;
             </button>
           </span>
-          <span *ngIf="authorBioEditorOpened" class="blog-author-bio-editor">
-            <textarea *ngIf="authorBioEditorOpened"
+          <span *ngIf="authorBioEditorIsOpen" class="blog-author-bio-editor">
+            <textarea *ngIf="authorBioEditorIsOpen"
                       class="oppia-bio-border oppia-autofocus w-100"
                       [(ngModel)]="authorBio"
                       [attr.value]="authorBio"

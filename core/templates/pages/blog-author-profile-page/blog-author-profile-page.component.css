@@ -122,14 +122,24 @@ oppia-blog-author-page .blog-post-card {
   margin-top: 30px;
 }
 
-.blog-author-page .oppia-navbar-breadcrumb-separator:after {
+@media (max-width: 570px) {
+  .blog-author-page-breadcrumb .oppia-author-page-back-button {
+    margin-left: -10px;
+  }
+}
+
+.blog-author-page-breadcrumb .oppia-navbar-back-button {
+  cursor: pointer;
+}
+
+.blog-author-page-breadcrumb .oppia-navbar-breadcrumb-separator:after {
   border-left-style: ridge;
   border-width: 2px;
   content: "";
   font-size: 30px;
 }
 
-.blog-author-page .oppia-navbar-breadcrumb {
+.blog-author-page-breadcrumb .oppia-navbar-breadcrumb {
   display: -webkit-inline-box;
   flex-flow: column;
   margin-left: -10px;
@@ -137,18 +147,28 @@ oppia-blog-author-page .blog-post-card {
   padding-top: 3px;
 }
 
-@media(max-width:500px) {
-  .mobile-navbar-blog-author-page {
-    font-size: 14px;
-    line-height: 0px;
-    vertical-align: text-top;
+.blog-author-page-breadcrumb .oppia-blog-author-profile-page-title {
+  cursor: pointer;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+.blog-author-page-breadcrumb .oppia-blog-author-name {
+  color: #fff;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.2rem;
+}
+
+@media(max-width: 768px) {
+  .blog-author-page-breadcrumb .oppia-blog-author-profile-page-title {
+    font-size: 1rem;
   }
 
-  .oppia-navbar-breadcrumb.main-blog-author-page-mobile-breadcrumb {
-    line-height: 12px;
-    padding-top: 15px;
+  .blog-author-page-breadcrumb .oppia-blog-author-name {
+    font-size: 1.2rem;
   }
-
 }
 
 @media(max-width: 1000px) {

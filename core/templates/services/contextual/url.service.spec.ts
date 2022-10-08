@@ -154,6 +154,21 @@ describe('Url Service', () => {
     }).toThrowError('Invalid Blog Post Url.');
   });
 
+  it('should correctly retrieve author username from url', () => {
+    mockLocation.pathname = '/blog/author/username';
+    expect(urlService.getBlogAuthorUsernameFromUrl()).toBe('username');
+
+    mockLocation.pathname = '/blog/author/invalid/username';
+    expect(function() {
+      urlService.getBlogAuthorUsernameFromUrl();
+    }).toThrowError('Invalid Blog Author Profile Page Url.');
+
+    mockLocation.pathname = 'blog/invalid/username';
+    expect(function() {
+      urlService.getBlogAuthorUsernameFromUrl();
+    }).toThrowError('Invalid Blog Author Profile Page Url.');
+  });
+
   it('should correctly retrieve story url fragment from url', () => {
     mockLocation.pathname = '/learn/math/abcdefgijklm/story/bakery';
     expect(

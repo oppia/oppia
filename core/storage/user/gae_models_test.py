@@ -3541,3 +3541,99 @@ class LearnerGroupsUserModelTests(test_utils.GenericTestBase):
             ]
         }
         self.assertEqual(user_data, expected_data)
+
+
+class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
+    """Tests for BlogAuthorDetailsModel class."""
+
+    NONEXISTENT_USER_ID: Final = 'id_x'
+    USER_1_ID: Final = 'user_id'
+    USER_1_ROLE: Final = feconf.ROLE_ID_BLOG_ADMIN
+    USER_1_NAME: Final = 'user'
+    USER_2_ID: Final = 'user_two_id'
+    USER_2_ROLE: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
+    USER_2_NAME: Final = 'user two'
+    GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH: Final = utils.get_time_in_millisecs(
+        datetime.datetime(2019, 5, 20)
+    )
+    GENERIC_IMAGE_URL: Final = 'www.example.com/example.png'
+    GENERIC_USER_BIO: Final = 'I am a user of Oppia!'
+
+    def setUp(self) -> None:
+        """Set up author details models in datastore for use in testing."""
+        super().setUp()
+        author_model_one = user_models.BlogAuthorDetailsModel(
+            id=self.USER_1_ID,
+            author_name=self.USER_1_NAME,
+            author_bio=self.GENERIC_USER_BIO
+        )
+        author_model_one.update_timestamps()
+        author_model_one.put()
+
+    def test_get_deletion_policy_is_delete(self) -> None:
+        self.assertEqual(
+            user_models.BlogAuthorDetailsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.BlogAuthorDetailsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.BlogAuthorDetailsModel.get_export_policy(), {
+                'id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'author_name': base_models.EXPORT_POLICY.EXPORTED,
+                'author_bio': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )
+
+    def test_export_data_on_nonexistent_author(self) -> None:
+        """Test if export_data returns None when user's author detail model is
+        not in datastore.
+        """
+        with self.assertRaisesRegex(
+            user_models.BlogAuthorDetailsModel.EntityNotFoundError,
+            'Entity for class BlogAuthorDetailsModel with id %s not found' %
+            self.NONEXISTENT_USER_ID):
+            user_models.BlogAuthorDetailsModel.export_data(
+                self.NONEXISTENT_USER_ID)
+
+    def test_export_data_on_existent_author(self) -> None:
+        """Test if export_data works as intended on a user's author detail model
+         in datastore.
+         """
+        user_data = (
+            user_models.BlogAuthorDetailsModel.export_data(self.USER_1_ID))
+        expected_data = {
+            'author_name': self.USER_1_NAME,
+            'author_bio': self.GENERIC_USER_BIO
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_has_reference_to_user_id(self) -> None:
+        # Case for blog post author.
+        self.assertTrue(
+            user_models.BlogAuthorDetailsModel.has_reference_to_user_id(
+                self.USER_1_ID)
+        )
+
+        # Case for a non existing user.
+        self.assertFalse(
+            user_models.BlogAuthorDetailsModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID)
+        )
+
+    def test_creating_new_author_detail_model_instance(self) -> None:
+        user_models.BlogAuthorDetailsModel.create(
+            self.USER_2_ID, self.USER_2_NAME, self.GENERIC_USER_BIO)
+        model_instance = user_models.BlogAuthorDetailsModel.get_by_id(
+            self.USER_2_ID)
+        self.assertEqual(model_instance.id, self.USER_2_ID)
+        self.assertEqual(model_instance.author_name, self.USER_2_NAME)
+        self.assertEqual(model_instance.author_bio, self.GENERIC_USER_BIO)

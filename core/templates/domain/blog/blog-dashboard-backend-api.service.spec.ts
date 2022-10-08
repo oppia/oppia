@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { BlogAuthorDetailsBackendDict, BlogDashboardBackendApiService, BlogDashboardBackendResponse, BlogDashboardData } from 'domain/blog/blog-dashboard-backend-api.service';
+import { BlogAuthorDetails, BlogAuthorDetailsBackendDict, BlogDashboardBackendApiService, BlogDashboardBackendResponse, BlogDashboardData } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
 
@@ -61,6 +61,14 @@ describe('Blog Dashboard backend api service', () => {
       blogDashboardBackendResponse.no_of_published_blog_posts),
     publishedBlogPostSummaryDicts: [] as BlogPostSummary[],
     draftBlogPostSummaryDicts: [] as BlogPostSummary[],
+  };
+  let blogAuthorBackendDetails: BlogAuthorDetailsBackendDict = {
+    author_name: 'new_author_name',
+    author_bio: 'general bio'
+  };
+  let blogAuthorDetails: BlogAuthorDetails = {
+    authorName: 'new_author_name',
+    authorBio: 'general bio'
   };
   let blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
     blogPostSummary);
@@ -168,4 +176,44 @@ describe('Blog Dashboard backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
+
+  it('should successfully update author details in the backend.', fakeAsync(
+    () => {
+      bdbas.updateAuthorDetailsAsync(
+        blogAuthorBackendDetails.author_name,
+        blogAuthorBackendDetails.author_bio
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
+      expect(req.request.method).toEqual('PUT');
+      req.flush(blogAuthorBackendDetails);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(blogAuthorDetails);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should use the rejection handler if updating author details in the' +
+  ' backend fails.', fakeAsync(
+    () => {
+      bdbas.updateAuthorDetailsAsync(
+        blogAuthorBackendDetails.author_name,
+        blogAuthorBackendDetails.author_bio
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
+      expect(req.request.method).toEqual('PUT');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Some error in the backend.');
+    }));
 });

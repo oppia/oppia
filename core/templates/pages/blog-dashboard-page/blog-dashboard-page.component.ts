@@ -43,8 +43,8 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   blogDashboardData!: BlogDashboardData;
   windowIsNarrow: boolean = false;
   activeView: string = 'gridView';
-  authorNameEditorOpened: boolean = false;
-  authorBioEditorOpened: boolean = false;
+  authorNameEditorIsOpen: boolean = false;
+  authorBioEditorIsOpen: boolean = false;
   directiveSubscriptions = new Subscription();
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   constructor(
@@ -96,7 +96,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
           // eslint-disable-next-line max-len
           dashboardData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
         if (!this.authorBio.length) {
-          this.authorBioEditorOpened = true;
+          this.authorBioEditorIsOpen = true;
         }
         this.loaderService.hideLoadingScreen();
       }, (errorResponse) => {
@@ -150,11 +150,12 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   updateAuthorName(): void {
-    this.authorNameEditorOpened = false;
     this.blogDashboardBackendService.updateAuthorDetailsAsync(
       this.authorName, this.authorBio).then(() => {
+      this.authorNameEditorIsOpen = false;
       this.alertsService.addSuccessMessage('Author name saved successfully.');
     }, (error) => {
+      this.authorNameEditorIsOpen = true;
       this.alertsService.addWarning(
         `Unable to update author name. Error: ${error}`);
     });
@@ -165,7 +166,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
       this.authorName, this.authorBio).then(() => {
       this.alertsService.addSuccessMessage('Author bio saved successfully.');
       if (this.authorBio.length) {
-        this.authorBioEditorOpened = false;
+        this.authorBioEditorIsOpen = false;
       }
     }, (error) => {
       this.alertsService.addWarning(
@@ -174,11 +175,11 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   openAuthorNameEditor(): void {
-    this.authorNameEditorOpened = true;
+    this.authorNameEditorIsOpen = true;
   }
 
   openAuthorBioEditor(): void {
-    this.authorBioEditorOpened = true;
+    this.authorBioEditorIsOpen = true;
   }
 }
 
