@@ -376,7 +376,8 @@ class DraftUpgradeUtil:
                 # cmd is 'CMD_EDIT_STATE_PROPERTY' or
                 # 'CMD_EDIT_EXPLORATION_PROPERTY'.
                 new_value: AllowedDraftChangeListTypes = exp_change.new_value
-                if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                if exp_change.property_name == (
+                    exp_domain.STATE_PROPERTY_CONTENT):
                     # Ruling out the possibility of different types
                     # for mypy type checking.
                     assert isinstance(exp_change.new_value, dict)
