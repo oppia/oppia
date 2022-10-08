@@ -163,13 +163,13 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
 // Object.entries() polyfill for Chrome 53 and below.
 if (!Object.entries) {
   Object.entries = (obj: Object) => {
-    let ownProps = Object.keys(obj),
-      i = ownProps.length,
-      resArray = new Array(i); // Preallocate the array.
+    let objectProperties = Object.keys(obj);
+    let i = objectProperties.length;
+    let objectEntriesArray = new Array(i); // Preallocate the array.
 
     while (i--) {
-      resArray[i] = [ownProps[i], obj[ownProps[i]]];
-      return resArray;
+      objectEntriesArray[i] = [objectProperties[i], obj[objectProperties[i]]];
+      return objectEntriesArray;
     }
   };
 }
