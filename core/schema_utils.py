@@ -35,8 +35,8 @@ from core import utils
 from core.constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
-from core.domain import state_domain
 from core.domain import user_domain
+from extensions.objects.models import objects
 
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -742,12 +742,12 @@ class _Validators:
 
     @staticmethod
     def has_expected_subtitled_content_length(
-        obj: state_domain.SubtitledUnicode, max_value: int
+        obj: objects.SubtitledUnicode, max_value: int
     ) -> bool:
         """Checks if the given subtitled content length is within max value.
 
         Args:
-            obj: state_domain.SubtitledUnicode. The object to verify.
+            obj: objects.SubtitledUnicode. The object to verify.
             max_value: int. The maximum allowed value for the obj.
 
         Returns:
@@ -761,12 +761,12 @@ class _Validators:
 
     @staticmethod
     def has_subtitled_html_non_empty(
-        obj: state_domain.SubtitledHtml, is_default: bool = False
+        obj: objects.SubtitledHtml, is_default: bool = False
     ) -> bool:
         """Checks if the given subtitled html content is empty
 
         Args:
-            obj: state_domain.SubtitledHtml. The object to verify.
+            obj: objects.SubtitledHtml. The object to verify.
             is_default: bool. True when the incoming value is a `default_value`.
 
         Returns:
@@ -782,12 +782,12 @@ class _Validators:
 
     @staticmethod
     def has_subtitled_html_content_uniquified(
-        obj: List[state_domain.SubtitledHtml]
+        obj: List[objects.SubtitledHtml]
     ) -> bool:
         """Checks if the given subtitled html content is uniquified.
 
         Args:
-            obj: List[state_domain.SubtitledHtml]. The list of SubtitledHtml
+            obj: List[objects.SubtitledHtml]. The list of SubtitledHtml
                 content.
 
         Returns:
