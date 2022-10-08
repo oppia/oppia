@@ -33,6 +33,7 @@ import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 })
 export class AutosaveInfoModalsService {
   private _isModalOpen: boolean = false;
+  isLostChangesModal: boolean = false;
 
   constructor(
     private localStorageService: LocalStorageService,
@@ -57,7 +58,9 @@ export class AutosaveInfoModalsService {
 
   showVersionMismatchModal(
       lostChanges: LostChange[] | ExplorationChange[]): void {
-    if (this._isModalOpen) {
+    if (!this.isLostChangesModal) {
+      this.isLostChangesModal = true;
+
       const modelRef = this.ngbModal.open(
         SaveVersionMismatchModalComponent, {
           backdrop: 'static',
@@ -66,8 +69,10 @@ export class AutosaveInfoModalsService {
       modelRef.componentInstance.lostChanges = lostChanges;
       modelRef.result.then(() => {
         this._isModalOpen = false;
+        this.isLostChangesModal = false;
       }, () => {
         this._isModalOpen = false;
+        this.isLostChangesModal = false;
       });
     }
 
