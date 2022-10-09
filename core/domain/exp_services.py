@@ -25,7 +25,6 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import collections
-import copy
 import datetime
 import io
 import logging
