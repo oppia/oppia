@@ -789,9 +789,9 @@ class StateCompleteEventHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'NONE EXP VERSION: State Complete')
         event_services.StateCompleteEventHandler.record(
-            exploration_id, 
+            exploration_id,
             exp_version,
-            state_name, 
+            state_name,
             session_id,
             time_spent_in_state_secs
         )
@@ -863,9 +863,9 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
             'time_spent_in_state_secs')
 
         event_services.LeaveForRefresherExpEventHandler.record(
-            exploration_id, 
+            exploration_id,
             refresher_exp_id,
-            exp_version, 
+            exp_version,
             state_name,
             session_id,
             time_spent_in_state_secs
