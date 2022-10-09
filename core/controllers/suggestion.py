@@ -535,7 +535,8 @@ class SuggestionListHandler(base.BaseHandler):
                     'validators': [{
                         'id': 'is_supported_audio_language_code'
                     }]
-                }
+                },
+                'default_value': None
             }
         }
     }
