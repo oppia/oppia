@@ -899,7 +899,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_subtopic_thumbnail(self) -> None:
         """Tests that when we update the subtopic thumbail size
-        and filename that those attributes of the object come 
+        and filename that those attributes of the object come
         back with the updated values.
         """
         self.topic.subtopics = [
@@ -929,7 +929,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_subtopic(self) -> None:
         """Tests that when we delete a subtopic, its skill_id gets moved to
         uncategorized, that subtopic doesn't exist on the topic and that
-        there are the correct number of subtopics on the topic."""
+        there are the correct number of subtopics on the topic.
+        """
         subtopic_id_to_delete = 1
         skill_id_moved = 'skill_id_1'
         self.topic.subtopics = [
@@ -942,8 +943,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
         self.topic.delete_subtopic(subtopic_id_to_delete)
-        self.assertEqual(1,len(self.topic.subtopics))
-        self.assertEqual([skill_id_moved],self.topic.uncategorized_skill_ids)
+        self.assertEqual(1, len(self.topic.subtopics))
+        self.assertEqual([skill_id_moved], self.topic.uncategorized_skill_ids)
         with self.assertRaisesRegex(
             Exception,
             'The subtopic with id %s does not exist.' % subtopic_id_to_delete
