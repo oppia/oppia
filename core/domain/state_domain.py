@@ -216,10 +216,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 invalid.
             ValidationError. The AnswerGroup contains more than one classifier
                 rule.
-            ValidationError. Validation called from exploration and tagged skill
-                misconception is not None.
-            ValidationError. Validation called from exploration and rule spec is
-                empty.
+            ValidationError. The tagged_skill_misconception_id is not valid.
         """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
