@@ -1385,7 +1385,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     },
                     'rule_input_3': {},
                     'hint_4': {},
-                    'feedback_1': {},
+                    'default_outcome_1': {},
                     'feedback_2': {},
                     'solution_5': {}
                 }
@@ -2189,7 +2189,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         state_data = question.question_state_data
         self.assertEqual(sorted(
             state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
-                'content_0', 'feedback_1', 'feedback_2'])
+                'content_0', 'default_outcome_1', 'feedback_2'])
 
     def test_migrate_question_state_from_v35_to_latest(self) -> None:
         # Test restructuring of written_translations.

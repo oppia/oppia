@@ -554,7 +554,7 @@ states:
         dest: Introduction
         dest_if_really_stuck: null
         feedback:
-          content_id: feedback_2
+          content_id: default_outcome_2
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -569,7 +569,7 @@ states:
       voiceovers_mapping:
         ca_placeholder_5: {}
         content_1: {}
-        feedback_2: {}
+        default_outcome_2: {}
         feedback_3: {}
         rule_input_4: {}
     solicit_answer_details: false
