@@ -3,7 +3,7 @@
     even when the first button is not present. -->
   <div class="row-item row-item-previous-card">
     <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
-    <div *ngIf="hasPrevious && !helpCardHasContinueButton">
+    <div *ngIf="hasPrevious && !helpCardHasContinueButton && enableNavigationThroughCardHistory">
       <button mat-raised-button
               aria-label="Previous Card"
               (click)="validateIndexAndChangeCard(displayedCardIndex-1)"
@@ -12,7 +12,7 @@
       </button>
     </div>
   </div>
-  <div *ngIf="hasNext" class="row-item row-item-next-card">
+  <div *ngIf="hasNext && enableNavigationThroughCardHistory" class="row-item row-item-next-card">
     <button mat-raised-button
             (click)="validateIndexAndChangeCard(displayedCardIndex+1)"
             aria-label="Next Card"

@@ -45,6 +45,7 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() isLearnAgainButton!: boolean;
   @Input() displayedCard!: StateCard;
+  @Input() enableFeedback!: boolean;
   @ViewChild('helpCard') helpCard!: ElementRef;
   @ViewChild('interactionContainer') interactionContainer!: ElementRef;
   currentDisplayedCard!: StateCard;

@@ -107,6 +107,9 @@ export class TutorCardComponent {
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
   @Input() inStoryMode: boolean;
+  @Input() enableFeedback: boolean;
+  @Input() allowOnlySingleAttemptForAnswering: boolean;
+  @Input() showOnlyLastInputPairResponse: boolean;
   // The below property will be undefined when the current chapter
   // is the last chapter of a story.
   @Input() nextLessonLink: string | undefined;
