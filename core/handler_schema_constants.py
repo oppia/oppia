@@ -30,7 +30,6 @@ from __future__ import annotations
 
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AssetDevHandler',
-    'AudioUploadHandler',
     'BulkEmailWebhookEndpoint',
     'DeferredTasksHandler',
     'DeleteAccountPage',
