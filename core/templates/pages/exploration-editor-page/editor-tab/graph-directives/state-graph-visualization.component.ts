@@ -458,7 +458,7 @@ export class StateGraphVisualization
     }
 
     if (this.centerAtCurrentState) {
-      // This Code will run once all the current
+      // SetTimeout is required to ensure code runs once all the current call stack has finished execution
       // call stack is finished executing.
       setTimeout(() => {
         this.centerGraph();
