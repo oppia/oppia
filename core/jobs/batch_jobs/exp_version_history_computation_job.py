@@ -448,7 +448,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             vh_models_without_none: List[
                 exp_models.ExplorationVersionHistoryModel] = []
             for vh_model in version_history_models:
-                if vh_model is not None:
+                if vh_model is not None: # pragma: no cover
                     vh_models_without_none.append(vh_model)
             return (exp_id, vh_models_without_none)
 
@@ -718,7 +718,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         response_dict: Optional[FormattedModelGroupDict] = None
 
         model_group_is_valid = len(exp_models_vlatest) == 1
-        if model_group_is_valid:
+        if model_group_is_valid: # pragma: no cover
             exp_model_vlatest = exp_models_vlatest[0]
 
             all_explorations: List[Optional[exp_domain.Exploration]] = (
@@ -729,7 +729,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     exp_model is not None and
                     exp_model.version >= 1 and
                     exp_model.version <= exp_model_vlatest.version
-                ):
+                ): # pragma: no cover
                     all_explorations[exp_model.version - 1] = exp_model
             model_group_is_valid = (all_explorations.count(None) == 0)
 
@@ -745,13 +745,13 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                         commit_log.version is not None and
                         commit_log.version >= 1 and
                         commit_log.version <= exp_model_vlatest.version
-                    ):
+                    ): # pragma: no cover
                         all_commit_log_models[
                             commit_log.version - 1
                         ] = commit_log
                 model_group_is_valid = (all_commit_log_models.count(None) == 0)
 
-                if model_group_is_valid:
+                if model_group_is_valid: # pragma: no cover
                     all_version_history_models: List[Optional[
                         exp_models.ExplorationVersionHistoryModel
                     ]] = [None] * exp_model_vlatest.version
@@ -776,9 +776,9 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     explorations_without_none: List[
                         exp_domain.Exploration] = []
                     for exploration in all_explorations:
-                        if exploration is not None:
+                        if exploration is not None: # pragma: no cover
                             explorations_without_none.append(exploration)
-                    if model_group_is_valid:
+                    if model_group_is_valid: # pragma: no cover
                         response_dict = {
                             'exp_vlatest': exp_model_vlatest,
                             'all_explorations': explorations_without_none,
