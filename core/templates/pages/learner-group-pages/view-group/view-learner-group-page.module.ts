@@ -31,11 +31,16 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 import { ViewLearnerGroupPageComponent } from
   './view-learner-group-page.component';
-import { LearnerGroupLearnerSpecificProgressComponent } from '../edit-group/learner-group-learner-specific-progress.component';
-import { LearnerGroupOverviewComponent } from '../edit-group/learner-group-overview.component';
-import { LearnerGroupViewAssignedSyllabusComponent } from './learner-group-view-assigned-syllabus.component';
-import { ExitLearnerGroupModalComponent } from 'pages/learner-dashboard-page/modal-templates/exit-learner-group-modal.component';
-import { LearnerGroupPreferencesModalComponent } from '../templates/learner-group-preferences-modal.component';
+import { LearnerGroupLearnerSpecificProgressComponent } from
+  '../edit-group/learner-group-learner-specific-progress.component';
+import { LearnerGroupOverviewComponent } from
+  '../edit-group/learner-group-overview.component';
+import { LearnerGroupViewAssignedSyllabusComponent } from
+  './learner-group-view-assigned-syllabus.component';
+import { ExitLearnerGroupModalComponent } from
+  '../templates/exit-learner-group-modal.component';
+import { LearnerGroupPreferencesModalComponent } from
+  '../templates/learner-group-preferences-modal.component';
 
 @NgModule({
   imports: [

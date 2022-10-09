@@ -35,7 +35,7 @@ import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-use
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
 import { ExitLearnerGroupModalComponent } from
-  'pages/learner-dashboard-page/modal-templates/exit-learner-group-modal.component';
+  '../templates/exit-learner-group-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LearnerGroupPreferencesModalComponent } from

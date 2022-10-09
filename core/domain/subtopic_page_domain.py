@@ -560,7 +560,9 @@ class SubtopicPageSummary:
         parent_topic_name: str,
         thumbnail_filename: Optional[str],
         thumbnail_bg_color: Optional[str],
-        subtopic_mastery: Optional[float]
+        subtopic_mastery: Optional[float],
+        parent_topic_url_fragment: Optional[str],
+        classroom_url_fragment: Optional[str]
     ):
         """Initialize a SubtopicPageSummary object.
 
@@ -574,6 +576,10 @@ class SubtopicPageSummary:
                 image.
             subtopic_mastery: float. The mastery score of a user in the
                 subtopic.
+            parent_topic_url_fragment: str. The url fragment of the parent
+                topic.
+            classroom_url_fragment: str. The url fragment of the classroom
+                to which the parent topic belongs.
         """
         self.subtopic_id = subtopic_id
         self.subtopic_title = subtopic_title
@@ -582,6 +588,8 @@ class SubtopicPageSummary:
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
         self.subtopic_mastery = subtopic_mastery
+        self.parent_topic_url_fragment = parent_topic_url_fragment
+        self.classroom_url_fragment = classroom_url_fragment
 
     def to_dict(self) -> SubtopicPageSummaryDict:
         """Returns a dict representing this SubtopicPageSummary domain object.
@@ -596,5 +604,7 @@ class SubtopicPageSummary:
             'parent_topic_name': self.parent_topic_name,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
-            'subtopic_mastery': self.subtopic_mastery
+            'subtopic_mastery': self.subtopic_mastery,
+            'parent_topic_url_fragment': self.parent_topic_url_fragment,
+            'classroom_url_fragment': self.classroom_url_fragment
         }

@@ -1074,7 +1074,7 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
                 },
                 'default_value': 'false'
             }
-        }                    
+        }
     }
 
     @acl_decorators.can_access_learner_groups
