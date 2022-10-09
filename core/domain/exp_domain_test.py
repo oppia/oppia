@@ -5980,6 +5980,8 @@ title: ''
     ) -> None:
         """Tests the fixing of RTE content data from version less than 58."""
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
         sample_yaml_content_for_rte: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -6114,6 +6116,9 @@ tags:
 title: ''
 """)
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+# pylint: disable=anomalous-backslash-in-string
         latest_sample_yaml_content_for_rte: str = (
             """author_notes: ''
 auto_tts_enabled: false

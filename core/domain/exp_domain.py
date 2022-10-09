@@ -3067,7 +3067,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _remove_unwanted_content_ids_from_translations_and_voiceovers(
-        cls, state_dict: state_domain.StateDict
+        cls, state_dict: state_domain.StateDict, state_schema: int
     ) -> None:
         """Helper function to remove the content IDs from the translations
         and voiceovers which are deleted from the state.
@@ -3125,7 +3125,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 .convert_customization_args_dict_to_customization_args(
                     interaction['id'],
                     interaction['customization_args'],
-                    state_schema_version=53
+                    state_schema_version=state_schema
                 )
             )
             for ca_name in customisation_args:
@@ -3172,7 +3172,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state_dict in states_dict.values():
             cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
-                state_dict)
+                state_dict, state_schema=51)
 
         return states_dict
 
@@ -4371,7 +4371,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             # Update translations and voiceovers.
             cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
-                state_dict)
+                state_dict, state_schema=52)
 
         return states_dict
 
@@ -4381,8 +4381,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
     empty_values = [
             '&quot;&quot;', '\\"&quot;&quot;\\"', '', '\'\'', '\"\"', '<p></p>']
     @classmethod
-    def _is_tag_removed_with_invalid_attributes(cls, tag, attr) -> bool:
-        """"""
+    def _is_tag_removed_with_invalid_attributes(
+        cls, tag: bs4.BeautifulSoup, attr: str
+    ) -> bool:
+        """Returns True when the tag is removed due to invalid attribute.
+
+        Args:
+            tag: bs4.BeautifulSoup. The RTE tag.
+            attr: str. The attribute that needs to be checked.
+
+        Returns:
+            bool. Returns True when the tag has been deleted.
+        """
         if not tag.has_attr(attr):
             tag.decompose()
             return True
@@ -4540,6 +4550,35 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return str(soup).replace('<br/>', '<br>')
 
     @classmethod
+    def _is_tag_removed_with_empty_content(
+        cls,
+        tag: bs4.BeautifulSoup,
+        content: Union[str, List[str]],
+        *,
+        is_collapsible: bool = False
+    ) -> bool:
+        """Returns True when the tag is removed for having empty content.
+
+        Args:
+            tag: bs4.BeautifulSoup. The RTE tag.
+            content: Union[str, List[str]]. The content that needs to be
+                checked.
+
+        Returns:
+            bool. Returns True when the tag has been deleted.
+        """
+        if is_collapsible:
+            if content.strip() in cls.empty_values:
+                tag.decompose()
+                return True
+        else:
+            if len(content) == 0:
+                tag.decompose()
+                return True
+
+        return False
+
+    @classmethod
     def fix_tabs_and_collapsible_tags(cls, html: str) -> str:
         """Fixes all tabs and collapsible tags, performs the following:
         - `oppia-noninteractive-tabs`
@@ -4558,26 +4597,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str. Returns the updated html value.
         """
         soup = bs4.BeautifulSoup(html, 'html.parser')
-        empty_values = [
-            '&quot;&quot;', '\\"&quot;&quot;\\"', '', '\'\'', '\"\"', '<p></p>']
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
         for tag in tabs_tags:
             if tag.has_attr('tab_contents-with-value'):
                 tab_content_json = utils.unescape_html(
                     tag['tab_contents-with-value'])
-
                 tab_content_list = json.loads(tab_content_json)
-
-                if len(tab_content_list) == 0:
-                    tag.decompose()
+                if cls._is_tag_removed_with_empty_content(
+                    tag, tab_content_list, is_collapsible=False):
                     continue
+
                 for tab_content in tab_content_list:
                     tab_content['content'] = cls.fix_rte_tags(
                         tab_content['content'],
                         is_tags_nested_inside_tabs_or_collapsible=True
                     )
-                if len(tab_content_list) == 0:
-                    tag.decompose()
+
+                if cls._is_tag_removed_with_empty_content(
+                    tag, tab_content_list, is_collapsible=False):
                     continue
                 tab_content_json = json.dumps(tab_content_list)
                 tag['tab_contents-with-value'] = utils.escape_html(
@@ -4593,32 +4630,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 collapsible_content_json = (
                     utils.unescape_html(tag['content-with-value'])
                 )
-                collapsible_content_list = json.loads(
+                collapsible_content = json.loads(
                     collapsible_content_json)
-                if len(collapsible_content_list) == 0:
-                    tag.decompose()
+                if cls._is_tag_removed_with_empty_content(
+                    tag, collapsible_content, is_collapsible=True):
                     continue
 
-                collapsible_content_list = cls.fix_rte_tags(
-                    collapsible_content_list,
+                collapsible_content = cls.fix_rte_tags(
+                    collapsible_content,
                     is_tags_nested_inside_tabs_or_collapsible=True
                 )
-                if len(collapsible_content_list) == 0:
-                    tag.decompose()
+                if cls._is_tag_removed_with_empty_content(
+                    tag, collapsible_content, is_collapsible=True):
                     continue
-                collapsible_content_json = json.dumps(collapsible_content_list)
+
+                collapsible_content_json = json.dumps(collapsible_content)
                 tag['content-with-value'] = utils.escape_html(
                     collapsible_content_json)
             else:
                 tag.decompose()
                 continue
 
-            if tag.has_attr('heading-with-value'):
-                if tag['heading-with-value'].strip() in empty_values:
-                    tag.decompose()
-                    continue
-            else:
-                tag.decompose()
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'heading-with-value'):
                 continue
 
         return str(soup).replace('<br/>', '<br>')
