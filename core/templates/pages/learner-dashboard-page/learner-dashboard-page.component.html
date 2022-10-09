@@ -222,7 +222,7 @@
             <tr>
               <td>
                 <button (click)="showAllThreads()"
-                        class="btn btn-secondary oppia-btn-secondary">
+                        class="btn btn-secondary oppia-btn-secondary oppia-box-size">
                   <i class="fas fa-chevron-left"
                      title="{{ 'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
                   </i>
@@ -254,12 +254,12 @@
 
                         <span *ngIf="!message.authorPictureDataUrl"
                               class="d-inline-block">
-                          <i class="profile-alignment fas fa-user-circle fa-2x"></i>
+                          <i class="oppia-profile-alignment fas fa-user-circle fa-2x"></i>
                         </span>
                       </span>
 
                       <span *ngIf="message.authorUsername"
-                            class="feedback-message-author-name ">
+                            class="feedback-message-author-name">
                         <strong>{{ message.authorUsername }}</strong>
                       </span>
                       <span *ngIf="!message.authorUsername"
@@ -357,7 +357,10 @@
 </div>
 
 <style>
-  .profile-alignment {
+  .oppia-profile-alignment {
     vertical-align: middle;
+  }
+  .oppia-box-size {
+    padding: 2px 8px;
   }
 </style>
