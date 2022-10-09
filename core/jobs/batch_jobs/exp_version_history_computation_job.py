@@ -441,6 +441,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         new_vh_model.update_timestamps()
                         version_history_models[version - 1] = new_vh_model
                     except Exception as e:
+                        logging.info('For exploration %s' % (exp_id))
                         for i in range(1, version + 1):
                             logging.info(
                                 'Commit commands at version %d: %s' % (
