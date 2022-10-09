@@ -385,17 +385,16 @@ class DraftUpgradeUtil:
                                 raise InvalidDraftConversionException(
                                     'Conversion cannot be completed.')
 
-                            else:
-                                fixed_translation = (
-                                    exp_domain.Exploration.fix_rte_tags(
-                                        written_translation['translation']))
-                                fixed_translation = (
-                                    exp_domain.Exploration.
-                                    fix_tabs_and_collapsible_tags(
-                                        fixed_translation)
-                                )
-                                written_translation['translation'] = (
+                            fixed_translation = (
+                                exp_domain.Exploration.fix_rte_tags(
+                                    written_translation['translation']))
+                            fixed_translation = (
+                                exp_domain.Exploration.
+                                fix_tabs_and_collapsible_tags(
                                     fixed_translation)
+                            )
+                            written_translation['translation'] = (
+                                fixed_translation)
         return draft_change_list
 
     @classmethod

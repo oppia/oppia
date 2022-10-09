@@ -3074,6 +3074,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             state_dict: state_domain.StateDict. The state dictionary.
+            state_schema: int. The state schema from which we are using
+                this functionality.
         """
         interaction = state_dict['interaction']
         content_id_list = [state_dict['content']['content_id']]
@@ -3260,6 +3262,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             choices: List[state_domain.SubtitledHtmlDict]. A list of choices.
             answer_groups: List[state_domain.AnswerGroupDict]. The list of
                 answer groups.
+            state_dict: state_domain.StateDict. The exploration state.
             is_item_selection_interaction: bool. If the answer group belongs
                 to ItemSelectionInput interaction or not.
         """
@@ -4097,8 +4100,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             ['allowMultipleItemsInSamePosition']['value']
         )
         invalid_rules = []
-        ele_x_at_y_rules = []
-        off_by_one_rules: List[List[str]] = []
+        ele_x_at_y_rules: List[Dict[str, Union[str, int]]] = []
+        off_by_one_rules: List[List[List[str]]] = []
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -4106,7 +4109,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group['rule_specs']:
                 rule_inputs = rule_spec['inputs']
                 assert isinstance(rule_inputs, dict)
-                rule_spec_x: Union[List[str], List[List[str]]] = (
+                rule_spec_x = (
                     rule_inputs['x'])
 
                 if (
@@ -4120,7 +4123,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
                     else:
                         assert isinstance(rule_spec_x, list)
-                        off_by_one_rules.append(rule_spec_x)
+                        temp = []
+                        for x in rule_spec_x:
+                            assert isinstance(x, list)
+                            temp.append(x)
+
+                        off_by_one_rules.append(temp)
 
                 # In `HasElementXBeforeElementY` rule, `X` value
                 # should not be equal to `Y` value.
@@ -4154,10 +4162,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         # `IsEqualToOrdering` rule should always come before
                         # `HasElementXAtPositionY` where element `X` is present
                         # at position `Y` in `IsEqualToOrdering` rule.
-                        for ele in ele_x_at_y_rules:
-                            assert isinstance(ele, dict)
-                            ele_position = ele['position']
-                            ele_element = ele['element']
+                        for ele_x_at_y_rule in ele_x_at_y_rules:
+                            assert isinstance(ele_x_at_y_rule, dict)
+                            ele_position = ele_x_at_y_rule['position']
+                            ele_element = ele_x_at_y_rule['element']
                             assert isinstance(ele_position, int)
                             rule_choice = rule_spec_x[ele_position - 1]
 
@@ -4176,10 +4184,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             for item in layer:
                                 item_to_layer_idx[item] = layer_idx
 
-                        for ele in off_by_one_rules:
-                            assert isinstance(ele, list)
+                        for off_by_one_rule in off_by_one_rules:
+                            assert isinstance(off_by_one_rule, list)
                             wrong_positions = 0
-                            for layer_idx, layer in enumerate(ele):
+                            for layer_idx, layer in enumerate(off_by_one_rule):
                                 for item in layer:
                                     if layer_idx != item_to_layer_idx[item]:
                                         wrong_positions += 1
@@ -4346,7 +4354,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state dictionary.
         """
         for state_name, state_dict in states_dict.items():
-            interaction_id_to_fix_func = {
+            interaction_id_to_fix_func: Dict[str, Callable[..., None]] = {
                 'Continue': cls._fix_continue_interaction,
                 'EndExploration': cls._fix_end_interaction,
                 'NumericInput': cls._fix_numeric_input_interaction,
@@ -4356,7 +4364,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'ItemSelectionInput': cls._fix_item_selection_input_interaction,
                 'DragAndDropSortInput': (
                     cls._fix_drag_and_drop_input_interaction),
-                'TextInput':  cls._fix_text_input_interaction
+                'TextInput': cls._fix_text_input_interaction
             }
             interaction_id = state_dict['interaction']['id']
             if interaction_id in interaction_id_to_fix_func:
@@ -4379,7 +4387,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # Fix validation errors for exploration state RTE.
     # ################################################.
     empty_values = [
-            '&quot;&quot;', '\\"&quot;&quot;\\"', '', '\'\'', '\"\"', '<p></p>']
+        '&quot;&quot;', '\\"&quot;&quot;\\"', '', '\'\'', '\"\"', '<p></p>']
+
     @classmethod
     def _is_tag_removed_with_invalid_attributes(
         cls, tag: bs4.BeautifulSoup, attr: str
@@ -4563,11 +4572,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             tag: bs4.BeautifulSoup. The RTE tag.
             content: Union[str, List[str]]. The content that needs to be
                 checked.
+            is_collapsible: bool. True if the tag is collapsible tag.
 
         Returns:
             bool. Returns True when the tag has been deleted.
         """
         if is_collapsible:
+            assert isinstance(content, str)
             if content.strip() in cls.empty_values:
                 tag.decompose()
                 return True
@@ -4607,15 +4618,23 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     tag, tab_content_list, is_collapsible=False):
                     continue
 
+                empty_tab_contents = []
                 for tab_content in tab_content_list:
                     tab_content['content'] = cls.fix_rte_tags(
                         tab_content['content'],
                         is_tags_nested_inside_tabs_or_collapsible=True
                     )
+                    if tab_content['content'].strip() in cls.empty_values:
+                        empty_tab_contents.append(tab_content)
+
+                # Remove empty tab content from the tag.
+                for empty_content in empty_tab_contents:
+                    tab_content_list.remove(empty_content)
 
                 if cls._is_tag_removed_with_empty_content(
                     tag, tab_content_list, is_collapsible=False):
                     continue
+
                 tab_content_json = json.dumps(tab_content_list)
                 tag['tab_contents-with-value'] = utils.escape_html(
                     tab_content_json)
