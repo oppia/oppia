@@ -231,11 +231,6 @@ export class PreferencesPageComponent {
     preferencesProfilePictureDataUrlPromise.then((data) => {
       this.profilePictureDataUrl = decodeURIComponent(
         data.profile_picture_data_url);
-      this.subscriptionList = data.subscription_list;
-      this.subscriptionList.forEach((subscription) => {
-        subscription.creator_picture_data_url = (
-          decodeURIComponent(subscription.creator_picture_data_url));
-      });
     });
 
 
@@ -264,6 +259,11 @@ export class PreferencesPageComponent {
         data.preferred_site_language_code;
       this.preferredAudioLanguageCode =
         data.preferred_audio_language_code;
+      this.subscriptionList = data.subscription_list;
+      this.subscriptionList.forEach((subscription) => {
+        subscription.creator_picture_data_url = (
+          decodeURIComponent(subscription.creator_picture_data_url));
+      });
       this.hasPageLoaded = true;
     });
 

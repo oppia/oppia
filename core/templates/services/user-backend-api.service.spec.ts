@@ -201,7 +201,6 @@ describe('User Backend Api Service', () => {
   it('should return user preferences profile picture data', fakeAsync(() => {
     let samplePreferencesProfilePictureData: ProfilePictureDataBackendDict = {
       profile_picture_data_url: '',
-      subscription_list: []
     };
     userBackendApiService.getPreferencesProfilePictureDataUrlAsync().then(
       (PreferencesProfilePictureDataUrl) => {
@@ -267,6 +266,7 @@ describe('User Backend Api Service', () => {
       default_dashboard: 'learner',
       user_bio: '',
       subject_interests: '',
+      subscription_list: []
     };
     userBackendApiService.getPreferencesAsync().then((preferencesData) => {
       expect(preferencesData).toEqual(samplePreferencesData);

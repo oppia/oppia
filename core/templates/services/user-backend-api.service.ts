@@ -41,11 +41,11 @@ export interface NonEmailPreferencesBackendDict {
   'default_dashboard': string;
   'user_bio': string;
   'subject_interests': string;
+  'subscription_list': SubscriptionSummary[];
 }
 
 export interface ProfilePictureDataBackendDict {
   'profile_picture_data_url': string;
-  'subscription_list': SubscriptionSummary[];
 }
 
 
@@ -153,7 +153,7 @@ export class UserBackendApiService {
 
   async updatePreferencesDataAsync(
       updateType: string,
-      data: boolean | string | string[]
+      data: string | string[]
   ): Promise<NonEmailPreferencesBackendDict> {
     return this.http.put<NonEmailPreferencesBackendDict>(
       this.PREFERENCES_DATA_URL, {

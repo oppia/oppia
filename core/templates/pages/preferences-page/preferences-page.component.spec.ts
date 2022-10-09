@@ -47,12 +47,7 @@ describe('Preferences Page Component', () => {
   let mockUserBackendApiService: MockUserBackendApiService;
 
   let preferencesProfilePictureDataUrl: ProfilePictureDataBackendDict = {
-    profile_picture_data_url: '',
-    subscription_list: [{
-      creator_picture_data_url: 'picture_url',
-      creator_username: 'creator',
-      creator_impact: 0
-    }]
+    profile_picture_data_url: ''
   };
 
   let emailPreferences: EmailPreferencesBackendDict = {
@@ -69,6 +64,11 @@ describe('Preferences Page Component', () => {
     default_dashboard: 'creator',
     user_bio: 'test user bio',
     subject_interests: '',
+    subscription_list: [{
+      creator_picture_data_url: 'picture_url',
+      creator_username: 'creator',
+      creator_impact: 0
+    }]
   };
 
   class MockWindowRef {
@@ -102,6 +102,11 @@ describe('Preferences Page Component', () => {
         default_dashboard: 'creator',
         user_bio: 'test user bio',
         subject_interests: '',
+        subscription_list: [{
+          creator_picture_data_url: 'picture_url',
+          creator_username: 'creator',
+          creator_impact: 0
+        }]
       });
     }
 
@@ -115,11 +120,6 @@ describe('Preferences Page Component', () => {
     ): Promise<ProfilePictureDataBackendDict> {
       return Promise.resolve({
         profile_picture_data_url: '',
-        subscription_list: [{
-          creator_picture_data_url: 'picture_url',
-          creator_username: 'creator',
-          creator_impact: 0
-        }]
       });
     }
 
@@ -229,7 +229,7 @@ describe('Preferences Page Component', () => {
     expect(componentInstance.preferredSiteLanguageCode).toEqual(
       preferencesData.preferred_site_language_code);
     expect(componentInstance.subscriptionList).toEqual(
-      preferencesProfilePictureDataUrl.subscription_list);
+      preferencesData.subscription_list);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));

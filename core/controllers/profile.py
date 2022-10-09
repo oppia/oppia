@@ -244,26 +244,8 @@ class ProfilePictureDataUrlHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
 
-        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
-            self.user_id)
-        creators_settings = user_services.get_users_settings(
-            creators_subscribed_to)
-        subscription_list = []
-        for index, creator_settings in enumerate(creators_settings):
-            subscription_summary = {
-                'creator_picture_data_url': (
-                    creator_settings.profile_picture_data_url),
-                'creator_username': creator_settings.username,
-                'creator_impact': (
-                    user_services.get_user_impact_score(
-                        creators_subscribed_to[index]))
-            }
-
-            subscription_list.append(subscription_summary)
-
         self.values.update({
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
-            'subscription_list': subscription_list
+            'profile_picture_data_url': user_settings.profile_picture_data_url
         })
         self.render_json(self.values)
 
@@ -286,6 +268,23 @@ class PreferencesHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
 
+        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
+            self.user_id)
+        creators_settings = user_services.get_users_settings(
+            creators_subscribed_to)
+        subscription_list = []
+        for index, creator_settings in enumerate(creators_settings):
+            subscription_summary = {
+                'creator_picture_data_url': (
+                    creator_settings.profile_picture_data_url),
+                'creator_username': creator_settings.username,
+                'creator_impact': (
+                    user_services.get_user_impact_score(
+                        creators_subscribed_to[index]))
+            }
+
+            subscription_list.append(subscription_summary)
+
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
             'preferred_site_language_code': (
@@ -296,7 +295,8 @@ class PreferencesHandler(base.BaseHandler):
                 user_settings.preferred_translation_language_code),
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
-            'subject_interests': user_settings.subject_interests
+            'subject_interests': user_settings.subject_interests,
+            'subscription_list': subscription_list
         })
         self.render_json(self.values)
 
