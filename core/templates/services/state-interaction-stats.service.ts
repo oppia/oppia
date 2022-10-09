@@ -95,18 +95,27 @@ export class StateInteractionStatsService {
    */
   async computeStatsAsync(
       expId: string, state: State): Promise<StateInteractionStats> {
-    if (this.statsCache.has(state.name)) {
-      return this.statsCache.get(state.name);
+    const stateName = state.name;
+    if (stateName === null) {
+      throw new Error('State name cannot be null.');
+    }
+    if (this.statsCache.has(stateName)) {
+      return this.statsCache.get(stateName) as Promise<StateInteractionStats>;
+    }
+
+    const interactionId = state.interaction.id;
+    if (!interactionId) {
+      throw new Error('Cannot compute stats for a state with no interaction.');
     }
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-        state.interaction.id));
+        interactionId));
     const statsPromise = (
       this.stateInteractionStatsBackendApiService.getStatsAsync(
         expId,
-        state.name)).then(vizInfo => ({
+        stateName)).then(vizInfo => ({
           explorationId: expId,
-          stateName: state.name,
+          stateName: stateName,
           visualizationsInfo: vizInfo.map(info => ({
             addressedInfoIsSupported: info.addressedInfoIsSupported,
             data: info.data.map(datum => ({
@@ -116,14 +125,14 @@ export class StateInteractionStatsService {
                 info.addressedInfoIsSupported ?
                 this.answerClassificationService
                   .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer, interactionRulesService) :
+                    stateName, state, datum.answer, interactionRulesService) :
                 undefined)
             }) as AnswerData),
             id: info.id,
             options: info.options
           }) as VisualizationInfo),
         }) as StateInteractionStats);
-    this.statsCache.set(state.name, statsPromise);
+    this.statsCache.set(stateName, statsPromise);
     return statsPromise;
   }
 }

@@ -31,7 +31,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 })
 export class ExplorationInitStateNameService
     extends ExplorationPropertyService {
-  savedMemento: string;
+  savedMemento!: string;
   propertyName: string = 'init_state_name';
   constructor(
     protected alertsService: AlertsService,

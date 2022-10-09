@@ -30,10 +30,10 @@ import { GraphData } from 'services/compute-graph.service';
 })
 export class ExplorationGraphModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() isEditable: boolean;
+  @Input() isEditable!: boolean;
 
-  currentStateName: string;
-  graphData: GraphData;
+  currentStateName!: string | null;
+  graphData!: GraphData;
 
   constructor(
     private graphDataService: GraphDataService,

@@ -38,11 +38,11 @@ import './hint-and-solution-buttons.component.css';
 })
 export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  private _editorPreviewMode: boolean;
+  private _editorPreviewMode!: boolean;
   hintIndexes: number[] = [];
-  activeHintIndex: number;
+  activeHintIndex!: number | null;
   solutionModalIsActive: boolean = false;
-  displayedCard: StateCard;
+  displayedCard!: StateCard;
   currentlyOnLatestCard: boolean = true;
   isVisible: boolean = true;
 
@@ -65,8 +65,12 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
           this.displayedCard = newCard;
+          const solution = newCard.getSolution();
+          if (solution === null) {
+            throw new Error('Solution is null');
+          }
           this.hintsAndSolutionManagerService.reset(
-            newCard.getHints(), newCard.getSolution());
+            newCard.getHints(), solution);
           this.resetLocalHintsArray();
         }
       )

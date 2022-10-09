@@ -34,7 +34,7 @@ interface RteComponentSpecs {
   tooltip: string;
 }
 
-interface RteHelperService {
+export interface RteHelperService {
   createCustomizationArgDictFromAttrs: (attrs) => Record<string, unknown>;
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;

@@ -87,8 +87,12 @@ export class QuestionPlayerEngineService {
   private loadInitialQuestion(
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
+    const questionId = this.questions[0].getId();
+    if (questionId === null) {
+      throw new Error('The first question should have a valid id.');
+    }
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, this.questions[0].getId());
+      AppConstants.ENTITY_TYPE.QUESTION, questionId);
     const initialState = this.questions[0].getStateData();
 
     const questionHtml = this.makeQuestion(initialState, []);
@@ -105,19 +109,30 @@ export class QuestionPlayerEngineService {
     const nextFocusLabel = this.focusManagerService.generateFocusLabel();
 
     const interactionId = interaction.id;
-    let interactionHtml = null;
-
-    if (interactionId) {
-      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
-        interactionId, interaction.customizationArgs, true, nextFocusLabel,
-        null);
+    if (interactionId === null) {
+      throw new Error('Interaction ID cannot be null.');
     }
+
+    let interactionHtml = (
+      this.explorationHtmlFormatterService.getInteractionHtml(
+        interactionId, interaction.customizationArgs, true, nextFocusLabel,
+        null));
+
+    const stateName = initialState.name;
+    if (stateName === null) {
+      throw new Error('Expected state to have a name.');
+    }
+
+    const contentId = initialState.content.contentId;
+    if (contentId === null) {
+      throw new Error('Expected state content to have a content id.');
+    }
+
     const initialCard =
       StateCard.createNewCard(
-        null, questionHtml, interactionHtml, interaction,
-        initialState.recordedVoiceovers,
-        initialState.writtenTranslations, initialState.content.contentId,
-        this.audioTranslationLanguageService);
+        stateName, questionHtml, interactionHtml, interaction,
+        initialState.recordedVoiceovers, initialState.writtenTranslations,
+        contentId, this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
   }
 
@@ -131,6 +146,9 @@ export class QuestionPlayerEngineService {
 
   private getNextInteractionHtml(labelForFocusTarget: string): string {
     const interactionId = this.getNextStateData().interaction.id;
+    if (interactionId === null) {
+      throw new Error('Interaction ID cannot be null.');
+    }
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
@@ -168,8 +186,12 @@ export class QuestionPlayerEngineService {
 
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
+    const questionId = this.getCurrentQuestionId();
+    if (questionId === null) {
+      throw new Error('The current question should have a valid id.');
+    }
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, this.getCurrentQuestionId());
+      AppConstants.ENTITY_TYPE.QUESTION, questionId);
   }
 
   getCurrentIndex(): number {
@@ -184,7 +206,7 @@ export class QuestionPlayerEngineService {
     return this.questions[this.currentIndex];
   }
 
-  getCurrentQuestionId(): string {
+  getCurrentQuestionId(): string | null {
     return this.questions[this.currentIndex].getId();
   }
 
@@ -227,7 +249,7 @@ export class QuestionPlayerEngineService {
           refresherExplorationId: string | null,
           missingPrerequisiteSkillId: string | null,
           remainOnCurrentCard: boolean,
-          taggedSkillMisconceptionId: string,
+          taggedSkillMisconceptionId: string | null,
           wasOldStateInitial: boolean,
           isFirstHit: boolean,
           isFinalQuestion: boolean,
@@ -240,9 +262,13 @@ export class QuestionPlayerEngineService {
     this.setAnswerIsBeingProcessed(true);
     const oldState = this.getCurrentStateData();
     const recordedVoiceovers = oldState.recordedVoiceovers;
+    const oldStateName = oldState.name;
+    if (oldStateName === null) {
+      throw new Error('Expected state to have a name.');
+    }
     const classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
-        null, oldState.interaction, answer,
+        oldStateName, oldState.interaction, answer,
         interactionRulesService));
     const answerGroupIndex = classificationResult.answerGroupIndex;
     const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
@@ -264,6 +290,9 @@ export class QuestionPlayerEngineService {
     const feedbackHtml =
       this.makeFeedback(outcome.feedback.html, [oldParams]);
     const feedbackContentId = outcome.feedback.contentId;
+    if (feedbackContentId === null) {
+      throw new Error('Expected feedback content id to be defined.');
+    }
     const feedbackAudioTranslations = (
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
     if (feedbackHtml === null) {
@@ -309,20 +338,23 @@ export class QuestionPlayerEngineService {
 
       questionHtml = questionHtml + this.getRandomSuffix();
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
+      const contentId = this.getNextStateData().content.contentId;
+      if (contentId === null) {
+        throw new Error('Expected content id to be defined.');
+      }
       nextCard = StateCard.createNewCard(
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
         this.getNextStateData().writtenTranslations,
-        this.getNextStateData().content.contentId,
-        this.audioTranslationLanguageService
+        contentId, this.audioTranslationLanguageService
       );
     }
     successCallback(
       nextCard, refreshInteraction, feedbackHtml,
       feedbackAudioTranslations,
       null, null, onSameCard, taggedSkillMisconceptionId,
-      null, null, isFinalQuestion, _nextFocusLabel);
+      false, false, isFinalQuestion, _nextFocusLabel);
     return answerIsCorrect;
   }
 }

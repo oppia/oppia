@@ -47,12 +47,13 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionCustomizationArgs, NumberWithUnitsCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
 import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { BaseTranslatableObject } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -65,7 +66,7 @@ export class ExplorationStatesService {
   )[] = [];
 
   stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
-  private _states: States | null = null;
+  private _states!: States;
   private _refreshGraphEventEmitter: EventEmitter<unknown> = new EventEmitter();
 
   constructor(
@@ -160,10 +161,13 @@ export class ExplorationStatesService {
   };
 
   private _CONTENT_ID_EXTRACTORS = {
-    answer_groups: (answerGroups) => {
-      let contentIds = new Set();
+    answer_groups: (answerGroups: AnswerGroup[]) => {
+      let contentIds: Set<string> = new Set();
       answerGroups.forEach((answerGroup) => {
-        contentIds.add(answerGroup.outcome.feedback.contentId);
+        let contentId = answerGroup.outcome.feedback.contentId;
+        if (contentId !== null) {
+          contentIds.add(contentId);
+        }
         answerGroup.rules.forEach((rule) => {
           Object.keys(rule.inputs).forEach(inputName => {
             const ruleInput = rule.inputs[inputName];
@@ -171,48 +175,66 @@ export class ExplorationStatesService {
             // BaseTranslatableObject having dict structure with contentId
             // as a key.
             if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-              contentIds.add(ruleInput.contentId);
+              let input = ruleInput as BaseTranslatableObject;
+              let contentId = input.contentId;
+              if (contentId !== null) {
+                contentIds.add(contentId);
+              }
             }
           });
         });
       });
       return contentIds;
     },
-    default_outcome: (defaultOutcome) => {
-      let contentIds = new Set();
+    default_outcome: (defaultOutcome: Outcome) => {
+      let contentIds: Set<string> = new Set();
       if (defaultOutcome) {
-        contentIds.add(defaultOutcome.feedback.contentId);
+        let contentId = defaultOutcome.feedback.contentId;
+        if (contentId !== null) {
+          contentIds.add(contentId);
+        }
       }
       return contentIds;
     },
-    hints: (hints) => {
-      let contentIds = new Set();
+    hints: (hints: Hint[]) => {
+      let contentIds: Set<string> = new Set();
       hints.forEach((hint) => {
-        contentIds.add(hint.hintContent.contentId);
+        let contentId = hint.hintContent.contentId;
+        if (contentId !== null) {
+          contentIds.add(contentId);
+        }
       });
       return contentIds;
     },
-    solution: (solution) => {
-      let contentIds = new Set();
-      if (solution) {
-        contentIds.add(solution.explanation.contentId);
+    solution: (solution: Solution) => {
+      let contentIds: Set<string> = new Set();
+      let contentId = solution.explanation.contentId;
+      if (solution && contentId !== null) {
+        contentIds.add(contentId);
       }
       return contentIds;
     },
-    widget_customization_args: (customizationArgs) => {
+    widget_customization_args: (
+        customizationArgs: InteractionCustomizationArgs
+    ) => {
       return new Set(
-        Interaction.getCustomizationArgContentIds(customizationArgs));
+        Interaction.getCustomizationArgContentIds(customizationArgs)
+      ) as Set<string>;
     }
   };
 
-  private _getElementsInFirstSetButNotInSecond(setA, setB): string[] {
+  private _getElementsInFirstSetButNotInSecond(
+      setA: Set<string>, setB: Set<string>
+  ): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
     return diffList as string[];
   }
 
-  private _setState(stateName: string, stateData, refreshGraph: boolean): void {
+  private _setState(
+      stateName: string, stateData: State, refreshGraph: boolean
+  ): void {
     this._states.setState(stateName, cloneDeep(stateData));
     if (refreshGraph) {
       this._refreshGraphEventEmitter.emit();
@@ -257,11 +279,14 @@ export class ExplorationStatesService {
   getStatePropertyMemento(
       stateName: string, backendName: StatePropertyNames
   ): StatePropertyValues {
-    let accessorList = this.PROPERTY_REF_DATA[backendName];
-    let propertyRef = this._states.getState(stateName);
+    let accessorList = this.PROPERTY_REF_DATA[
+      backendName as keyof typeof this.PROPERTY_REF_DATA
+    ];
+    let propertyRef: State | string;
+    propertyRef = this._states.getState(stateName);
     try {
       accessorList.forEach((key: string) => {
-        propertyRef = propertyRef[key];
+        propertyRef = propertyRef[key as keyof typeof propertyRef];
       });
     } catch (e) {
       let additionalInfo = (
@@ -271,7 +296,9 @@ export class ExplorationStatesService {
         '\nChange list: ' + JSON.stringify(
           this.changeListService.getChangeList()) +
         '\nAll states names: ' + this._states.getStateNames());
-      e.message += additionalInfo;
+      if (e instanceof Error) {
+        e.message += additionalInfo;
+      }
       throw e;
     }
 
@@ -340,9 +367,11 @@ export class ExplorationStatesService {
 
     if (this._BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
       newBackendValue = (
-        this.convertToBackendRepresentation(newValue, backendName));
+        this.convertToBackendRepresentation(newValue, backendName)
+      ) as StatePropertyValues;
       oldBackendValue = (
-        this.convertToBackendRepresentation(oldValue, backendName));
+        this.convertToBackendRepresentation(oldValue, backendName)
+      ) as StatePropertyValues;
     }
 
     if (!isEqual(oldValue, newValue)) {
@@ -350,11 +379,16 @@ export class ExplorationStatesService {
         stateName, backendName, newBackendValue, oldBackendValue);
 
       let newStateData = this._states.getState(stateName);
-      let accessorList = this.PROPERTY_REF_DATA[backendName];
+      let accessorList = this.PROPERTY_REF_DATA[
+        backendName as keyof typeof this.PROPERTY_REF_DATA
+      ];
 
       if (this._CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = this._CONTENT_ID_EXTRACTORS[backendName](oldValue);
-        let newContentIds = this._CONTENT_ID_EXTRACTORS[backendName](newValue);
+        let contentIds = this._CONTENT_ID_EXTRACTORS[
+          backendName as keyof typeof this._CONTENT_ID_EXTRACTORS
+        ];
+        let oldContentIds = contentIds(oldValue as keyof typeof contentIds);
+        let newContentIds = contentIds(newValue as keyof typeof contentIds);
         let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
           oldContentIds, newContentIds);
         let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
@@ -368,7 +402,8 @@ export class ExplorationStatesService {
           newStateData.writtenTranslations.addContentId(contentId);
         });
       }
-      let propertyRef = newStateData;
+      let propertyRef: Record<string, string> | State;
+      propertyRef = newStateData;
       for (let i = 0; i < accessorList.length - 1; i++) {
         propertyRef = propertyRef[accessorList[i]];
       }
@@ -388,9 +423,11 @@ export class ExplorationStatesService {
 
   convertToBackendRepresentation(
       frontendValue: StatePropertyValues, backendName: string
-  ): string {
-    let conversionFunction = this._BACKEND_CONVERSIONS[backendName];
-    return conversionFunction(frontendValue);
+  ): NumberWithUnitsCustomizationArgsBackendDict | null {
+    let conversionFunction = this._BACKEND_CONVERSIONS[
+      backendName as keyof typeof this._BACKEND_CONVERSIONS
+    ];
+    return conversionFunction(frontendValue as keyof typeof conversionFunction);
   }
 
   init(statesBackendDict: StateObjectsBackendDict): void {
@@ -402,6 +439,10 @@ export class ExplorationStatesService {
       let solution = this._states.getState(stateName).interaction.solution;
       if (solution) {
         let interactionId = this._states.getState(stateName).interaction.id;
+        if (interactionId === null) {
+          throw new Error(
+            'Cannot save a solution for an interaction with no ID.');
+        }
         let result = (
           this.answerClassificationService.getMatchingClassificationResult(
             stateName,

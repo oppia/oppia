@@ -26,6 +26,7 @@ import { StateWrittenTranslationsService } from 'components/state-editor/state-e
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
 
 class MockNgbModal {
@@ -38,11 +39,11 @@ class MockNgbModal {
 
 describe('Translation status service', () => {
   let tss: TranslationStatusService;
-  let ess = null;
-  let srvs = null;
-  let swts = null;
-  let ttams = null;
-  let tls = null;
+  let ess: ExplorationStatesService;
+  let srvs: StateRecordedVoiceoversService;
+  let swts: StateWrittenTranslationsService;
+  let ttams: TranslationTabActiveModeService;
+  let tls: TranslationLanguageService;
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
   let NO_ASSETS_AVAILABLE_COLOR = '#D14836';
@@ -195,7 +196,9 @@ describe('Translation status service', () => {
         linked_skill_id: null,
         solicit_answer_details: false,
         classifier_model_id: null,
-        param_changes: []
+        param_changes: [],
+        next_content_id_index: 0,
+        card_is_checkpoint: false,
       },
       Second: {
         content: {
@@ -263,7 +266,9 @@ describe('Translation status service', () => {
         linked_skill_id: null,
         solicit_answer_details: false,
         classifier_model_id: null,
-        param_changes: []
+        param_changes: [],
+        next_content_id_index: 0,
+        card_is_checkpoint: false,
       },
       Third: {
         content: {
@@ -303,7 +308,9 @@ describe('Translation status service', () => {
         linked_skill_id: null,
         solicit_answer_details: false,
         classifier_model_id: null,
-        param_changes: []
+        param_changes: [],
+        next_content_id_index: 0,
+        card_is_checkpoint: false,
       }
     };
     ess.init(statesWithAudioDict);
@@ -374,7 +381,7 @@ describe('Translation status service', () => {
     expect(explorationTranslationsRequiredCount).toBe(9);
 
     // To test changes after adding a new state.
-    ess.addState('Fourth');
+    ess.addState('Fourth', () => {});
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
     ess.saveInteractionId('Fourth', 'EndExploration');
     tss.refresh();
@@ -399,7 +406,7 @@ describe('Translation status service', () => {
         .getExplorationContentNotAvailableCount();
       expect(explorationAudioNotAvailableCount).toBe(6);
 
-      ess.addState('Fourth');
+      ess.addState('Fourth', () => {});
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
       ess.saveInteractionId('Fourth', 'EndExploration');
       tss.refresh();
@@ -417,7 +424,7 @@ describe('Translation status service', () => {
       tss.getExplorationContentNotAvailableCount());
     expect(explorationTranslationNotAvailableCount).toBe(6);
 
-    ess.addState('Fourth');
+    ess.addState('Fourth', () => {});
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
     ess.saveInteractionId('Fourth', 'EndExploration');
     tss.refresh();
@@ -439,7 +446,7 @@ describe('Translation status service', () => {
     expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
     // To test changes after adding an audio translation to "content"
     // in the first state.
-    srvs.displayed.addVoiceover('content', 'en', 'file.mp3', 1000);
+    srvs.displayed.addVoiceover('content', 'en', 'file.mp3', 1000, 1000);
     srvs.saveDisplayedValue();
     var value = srvs.displayed;
     ess.saveRecordedVoiceovers('First', value);
@@ -536,7 +543,7 @@ describe('Translation status service', () => {
     var value = srvs.displayed;
     // To test changes after adding an audio translation to "content"
     // in the first state.
-    value.addVoiceover('content', 'en', 'file.mp3', 1000);
+    value.addVoiceover('content', 'en', 'file.mp3', 1000, 1000);
     srvs.saveDisplayedValue();
     ess.saveRecordedVoiceovers('First', value);
     activeStateContentIdStatusColor = tss

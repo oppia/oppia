@@ -54,7 +54,7 @@ class MockWindowRef {
       }
     },
     history: {
-      pushState(data, title: string, url?: string | null) {}
+      pushState(data: string, title: string, url?: string | null) {}
     }
   };
 }
@@ -266,6 +266,10 @@ describe('Search bar component', () => {
 
   it ('should open submenu', () => {
     spyOn(navigationService, 'openSubmenu');
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'KeyboardEvent'." We need to suppress this error because of the
+    // need to test validations.
+    // @ts-ignore
     component.openSubmenu(null, null);
     expect(navigationService.openSubmenu).toHaveBeenCalled();
   });
@@ -274,6 +278,10 @@ describe('Search bar component', () => {
     spyOn(navigationService, 'onMenuKeypress');
     let activeMenuName = 'test_menu';
     navigationService.activeMenuName = activeMenuName;
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'KeyboardEvent'." We need to suppress this error because of the
+    // need to test validations.
+    // @ts-ignore
     component.onMenuKeypress(null, null, null);
     expect(component.activeMenuName).toEqual(activeMenuName);
   });
@@ -370,26 +378,14 @@ describe('Search bar component', () => {
     spyOn(component, 'onSearchQueryChangeExec');
     spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
     spyOn(searchService.onSearchBarLoaded, 'emit');
-    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'subscribe')
-      .and.callFake((callb) => {
-        callb(['en', 'es']);
-        callb(['en', 'es']);
-        return null;
-      });
-    spyOn(translateService.onLangChange, 'subscribe').and.callFake((callb) => {
-      callb();
-      return null;
-    });
-    spyOn(classroomBackendApiService.onInitializeTranslation, 'subscribe')
-      .and.callFake((callb) => {
-        callb();
-        return null;
-      });
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'subscribe');
+    spyOn(translateService.onLangChange, 'subscribe');
+    spyOn(classroomBackendApiService.onInitializeTranslation, 'subscribe');
     spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
     component.searchQueryChanged = {
-      pipe: (param1, parm2) => {
+      pipe: (param1: string, parm2: string) => {
         return {
-          subscribe(callb) {
+          subscribe(callb: () => void) {
             callb();
           }
         };
@@ -417,6 +413,10 @@ describe('Search bar component', () => {
   });
 
   it('should open sub menu', () => {
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'KeyboardEvent'." We need to suppress this error because of the
+    // need to test validations.
+    // @ts-ignore
     component.openSubmenu(null, null);
   });
 });

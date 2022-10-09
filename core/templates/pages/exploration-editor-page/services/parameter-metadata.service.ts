@@ -58,9 +58,15 @@ export class ParameterMetadataService {
           result.push(ParamMetadata.createWithSetAction(
             pc.name, this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
         } else {
+          const customizationArgsValue = pc.customizationArgs.value;
+          if (customizationArgsValue === undefined) {
+            throw new Error(
+              'Expected customizationArgsValue to be defined, but found ' +
+              'undefined');
+          }
           let paramsReferenced = (
             this.expressionInterpolationService.getParamsFromString(
-              pc.customizationArgs.value));
+              customizationArgsValue));
           for (let j = 0; j < paramsReferenced.length; j++) {
             result.push(ParamMetadata.createWithGetAction(
               paramsReferenced[j], this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
@@ -91,14 +97,14 @@ export class ParameterMetadataService {
 
     // Next, the content is evaluated.
     this.expressionInterpolationService.getParamsFromString(
-      state.content.html).forEach((paramName) => {
+      state.content.html).forEach((paramName, index) => {
       result.push(ParamMetadata.createWithGetAction(
-        paramName, this.PARAM_SOURCE_CONTENT, null));
+        paramName, this.PARAM_SOURCE_CONTENT, '0'));
     });
 
     // Next, the answer is received.
     result.push(ParamMetadata.createWithSetAction(
-      'answer', this.PARAM_SOURCE_ANSWER, null));
+      'answer', this.PARAM_SOURCE_ANSWER, '0'));
 
     // Finally, the rule feedback strings are evaluated.
     state.interaction.answerGroups.forEach((group) => {
@@ -141,10 +147,10 @@ export class ParameterMetadataService {
     let states = this.explorationStatesService.getStates();
 
     // Determine all parameter names that are used within this exploration.
-    let allParamNames = [];
+    let allParamNames: string[] = [];
     let expParamChangesMetadata = this.getMetadataFromParamChanges(
       this.explorationParamChangesService.savedMemento as ParamChange[]);
-    let stateParamMetadatas = {};
+    let stateParamMetadatas: Record<string, ParamMetadata[]> = {};
 
     expParamChangesMetadata.forEach((expParamMetadataItem) => {
       if (allParamNames.indexOf(expParamMetadataItem.paramName) === -1) {
@@ -189,7 +195,7 @@ export class ParameterMetadataService {
       }
 
       let queue = [];
-      let seen = {};
+      let seen: Record<string, boolean> = {};
       for (let i = 0; i < initNodeIds.length; i++) {
         seen[initNodeIds[i]] = true;
         let paramStatus = this.getParamStatus(

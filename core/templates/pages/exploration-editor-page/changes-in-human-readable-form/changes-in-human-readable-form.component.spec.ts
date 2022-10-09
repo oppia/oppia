@@ -20,7 +20,8 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
 import { LostChangeBackendDict, LostChangeObjectFactory, LostChangeValue } from 'domain/exploration/LostChangeObjectFactory';
-import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
 
 describe('Changes in Human Readable Form Component', () => {
@@ -160,6 +161,8 @@ describe('Changes in Human Readable Form Component', () => {
         .querySelector('.oppia-lost-changes').outerHTML;
 
       let result = removeComments(html);
+      let lostChangeValue = (
+        component.lostChanges[0].newValue as LostChangeValue);
       expect(result).toBe(
         '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
         '<ul>' +
@@ -177,7 +180,9 @@ describe('Changes in Human Readable Form Component', () => {
         '<div class="state-edit-desc">' +
         '<strong>Edited content: </strong>' +
         // eslint-disable-next-line dot-notation
-        '<div class="content">' + component.lostChanges[0].newValue['html'] +
+        '<div class="content">' + lostChangeValue[
+          'html' as keyof LostChangeValue
+        ] +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -653,6 +658,9 @@ describe('Changes in Human Readable Form Component', () => {
       .querySelector('.oppia-lost-changes').outerHTML;
 
     let result = removeComments(html);
+    let lostChangeValue = (
+      component.lostChanges[0].newValue as LostChangeValue) as Outcome;
+    let feedbackValue = lostChangeValue.feedback as SubtitledHtml;
     expect(result).toBe(
       '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
@@ -673,13 +681,15 @@ describe('Changes in Human Readable Form Component', () => {
       '<i>Destination: ' +
       '</i>' +
       // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['dest'] + ' </p>' +
+      lostChangeValue[
+        'dest' as keyof LostChangeValue
+      ] + ' </p>' +
       '<div class="sub-edit">' +
       '<i>Feedback: ' +
       '</i>' +
       '<div class="feedback"> ' +
       // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['feedback'].html + ' </div>' +
+      feedbackValue.html + ' </div>' +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -725,6 +735,8 @@ describe('Changes in Human Readable Form Component', () => {
       .querySelector('.oppia-lost-changes').outerHTML;
 
     let result = removeComments(html);
+    let lostChangeValue = (
+      component.lostChanges[0].newValue as LostChangeValue);
     expect(result).toBe(
       '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
@@ -745,7 +757,9 @@ describe('Changes in Human Readable Form Component', () => {
       '<i>Destination: ' +
       '</i>' +
       // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['dest'] + ' </p>' +
+      lostChangeValue[
+        'dest' as keyof LostChangeValue
+      ] + ' </p>' +
       '</div>' +
       '</div>' +
       '</div>' +

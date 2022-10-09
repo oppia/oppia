@@ -38,7 +38,7 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
+import { RteOutputDisplayComponent } from 'extensions/rich_text_components/rte-output-display.component';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
@@ -98,20 +98,20 @@ export class TranslationError {
   templateUrl: './translation-modal.component.html'
 })
 export class TranslationModalComponent {
-  @Input() opportunity: TranslationOpportunity;
-  activeDataFormat: string;
+  @Input() opportunity!: TranslationOpportunity;
+  activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
-  activeContentType: string;
-  activeRuleDescription: string;
-  uploadingTranslation = false;
-  subheading: string;
-  heading: string;
-  loadingData = true;
-  moreAvailable = false;
+  activeContentType!: string;
+  activeRuleDescription!: string;
+  uploadingTranslation: boolean = false;
+  subheading!: string;
+  heading!: string;
+  loadingData: boolean = true;
+  moreAvailable: boolean = false;
   textToTranslate: string | string[] = '';
-  languageDescription: string;
-  activeStatus: Status;
-  HTML_SCHEMA: {
+  languageDescription!: string | null;
+  activeStatus!: Status;
+  HTML_SCHEMA!: {
     'type': string;
     'ui_config': UiConfig;
   };
@@ -125,12 +125,12 @@ export class TranslationModalComponent {
   };
 
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
-  activeLanguageCode: string;
+  activeLanguageCode!: string;
   isActiveLanguageReviewer: boolean = false;
-  hadCopyParagraphError = false;
-  hasImgTextError = false;
-  hasIncompleteTranslationError = false;
-  editorIsShown = true;
+  hadCopyParagraphError: boolean = false;
+  hasImgTextError: boolean = false;
+  hasIncompleteTranslationError: boolean = false;
+  editorIsShown: boolean = true;
   isContentExpanded: boolean = false;
   isTranslationExpanded: boolean = true;
   isContentOverflowing: boolean = false;
@@ -200,6 +200,9 @@ export class TranslationModalComponent {
       });
     this.userService.getUserContributionRightsDataAsync().then(
       userContributionRights => {
+        if (userContributionRights === null) {
+          throw new Error('User contribution rights not found.');
+        }
         const reviewableLanguageCodes = (
           userContributionRights.can_review_translation_for_language_codes);
         if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
@@ -289,6 +292,12 @@ export class TranslationModalComponent {
       ruleType,
       interactionId
     } = translatableItem;
+    if (ruleType === undefined) {
+      throw new Error('Rule type is undefined.');
+    }
+    if (interactionId === undefined) {
+      throw new Error('Interaction id is undefined.');
+    }
     this.activeContentType = this.getFormattedContentType(
       contentType, interactionId
     );
@@ -404,12 +413,14 @@ export class TranslationModalComponent {
       // img_2021029_210552_zbmdt94_height_54_width_490.png&amp;quot;">
       // </oppia-noninteractive-image>
       if (element.localName === 'oppia-noninteractive-image') {
-        const attribute = element.attributes[type].value;
-        return attribute.substring(
-          textWrapperLength, attribute.length - textWrapperLength);
+        const attribute = element.attributes[
+          type as keyof NamedNodeMap] as Attr;
+        const attributeValue = attribute.value;
+        return attributeValue.substring(
+          textWrapperLength, attributeValue.length - textWrapperLength);
       }
     });
-    return attributes.filter(attribute => attribute);
+    return attributes.filter(attributeValue => attributeValue) as string[];
   }
 
   getImageAttributeTexts(
@@ -436,7 +447,7 @@ export class TranslationModalComponent {
     if (originalElements.length === 0) {
       return false;
     }
-    const hasMatchingTranslatedElement = element => (
+    const hasMatchingTranslatedElement = (element: string) => (
       translatedElements.includes(element) && originalElements.length > 0 &&
       !mathEquationRegex.test(element));
     return originalElements.some(hasMatchingTranslatedElement);

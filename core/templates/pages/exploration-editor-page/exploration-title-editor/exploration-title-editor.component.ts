@@ -31,13 +31,13 @@ import { ExplorationTitleService } from '../services/exploration-title.service';
 export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  @Input() labelText: string;
-  @Input() titleEditorClass: string;
-  @Input() formStyle: string;
-  @Input() focusLabel: string;
+  @Input() labelText!: string;
+  @Input() titleEditorClass!: string;
+  @Input() formStyle!: string;
+  @Input() focusLabel!: string;
   @Output() onInputFieldBlur = new EventEmitter<void>();
 
-  MAX_CHARS_IN_EXPLORATION_TITLE: number;
+  MAX_CHARS_IN_EXPLORATION_TITLE!: number;
 
   constructor(
     private explorationTitleService: ExplorationTitleService,

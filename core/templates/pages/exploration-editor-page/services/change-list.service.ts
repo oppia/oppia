@@ -37,6 +37,7 @@ import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGr
 import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
 import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 
 export type StatePropertyValues = (
   AnswerGroup[] |
@@ -130,7 +131,7 @@ export class ChangeListService {
     written_translations: true
   };
 
-  changeListAddedTimeoutId = null;
+  changeListAddedTimeoutId!: ReturnType<typeof setTimeout>;
   DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
   constructor(
@@ -159,7 +160,8 @@ export class ChangeListService {
       });
   }
 
-  private autosaveChangeListOnChange(explorationChangeList) {
+  private autosaveChangeListOnChange(
+      explorationChangeList: ExplorationChange[] | LostChange[]) {
     // Asynchronously send an autosave request, and check for errors in the
     // response:
     // If error is present -> Check for the type of error occurred
@@ -168,12 +170,12 @@ export class ChangeListService {
     // - Changes are not mergeable when a version mismatch occurs.
     // - Non-strict Validation Fail.
     this.explorationDataService.autosaveChangeListAsync(
-      explorationChangeList,
+      explorationChangeList as ExplorationChange[],
       response => {
         if (!response.changes_are_mergeable) {
           if (!this.autosaveInfoModalsService.isModalOpen()) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
-              explorationChangeList);
+              explorationChangeList as LostChange[]);
           }
         }
         this.autosaveInProgressEventEmitter.emit(false);
@@ -398,6 +400,9 @@ export class ChangeListService {
       return;
     }
     let lastChange = this.explorationChangeList.pop();
+    if (lastChange === undefined) {
+      throw new Error('The last change was undefined');
+    }
     this.undoneChangeStack.push(lastChange);
     this.autosaveChangeListOnChange(this.explorationChangeList);
   }

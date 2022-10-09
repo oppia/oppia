@@ -52,8 +52,8 @@ describe('Router Service', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let windowRef: WindowRef;
-  let hasStateSpy;
-  let isInitializedSpy;
+  let hasStateSpy: jasmine.Spy;
+  let isInitializedSpy: jasmine.Spy;
 
   beforeEach((() => {
     TestBed.configureTestingModule({
@@ -109,11 +109,7 @@ describe('Router Service', () => {
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 
-    spyOn($.fn, 'fadeOut').and.callFake(cb => {
-      cb();
-      setTimeout(() => {},);
-      return null;
-    });
+    spyOn($.fn, 'fadeOut');
 
     expect(routerService.getActiveTabName()).toBe('main');
     routerService.navigateToPreviewTab();
@@ -139,7 +135,7 @@ describe('Router Service', () => {
 
   it('should navigate to main tab if path is ""', fakeAsync(() => {
     window.location.hash = '';
-    routerService._changeTab(undefined);
+    routerService._changeTab('');
 
     tick(300);
 

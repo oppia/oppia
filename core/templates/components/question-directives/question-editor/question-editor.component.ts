@@ -44,17 +44,17 @@ import { LoaderService } from 'services/loader.service';
   templateUrl: './question-editor.component.html'
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
-  @Input() userCanEditQuestion: boolean;
-  @Input() misconceptionsBySkill: MisconceptionSkillMap;
-  @Input() question: Question;
-  @Input() questionId: string;
-  @Input() questionStateData: State;
+  @Input() userCanEditQuestion!: boolean;
+  @Input() misconceptionsBySkill!: MisconceptionSkillMap;
+  @Input() question!: Question;
+  @Input() questionId!: string;
+  @Input() questionStateData!: State;
   @Output() questionChange = new EventEmitter<void>();
 
   componentSubscriptions = new Subscription();
-  interactionIsShown: boolean;
-  oppiaBlackImgUrl: string;
-  stateEditorIsInitialized: boolean;
+  interactionIsShown!: boolean;
+  oppiaBlackImgUrl!: string;
+  stateEditorIsInitialized!: boolean;
 
   constructor(
     private changeDetectionRef: ChangeDetectorRef,
@@ -196,7 +196,11 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     }
     this.solutionValidityService.init(['question']);
     const stateData = this.questionStateData;
-    stateData.interaction.defaultOutcome.setDestination(null);
+    const outcome = stateData.interaction.defaultOutcome;
+    if (outcome === null) {
+      throw new Error('Default outcome cannot be null.');
+    }
+    outcome.setDestination(this.questionId);
     if (stateData) {
       this.stateEditorService.onStateEditorInitialized.emit(stateData);
 

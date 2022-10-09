@@ -29,11 +29,11 @@ import { MisconceptionUpdatedValues } from './question-misconception-editor.comp
 })
 export class TagMisconceptionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() taggedSkillMisconceptionId: string;
-  misconceptionsBySkill: MisconceptionSkillMap;
-  tempSelectedMisconception: Misconception;
-  tempSelectedMisconceptionSkillId: string;
-  tempMisconceptionFeedbackIsUsed: boolean;
+  @Input() taggedSkillMisconceptionId!: string;
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  tempSelectedMisconception!: Misconception | null;
+  tempSelectedMisconceptionSkillId!: string | null;
+  tempMisconceptionFeedbackIsUsed!: boolean;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

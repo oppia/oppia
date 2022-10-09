@@ -25,9 +25,9 @@ import { ExplorationObjectiveService } from 'pages/exploration-editor-page/servi
   templateUrl: './exploration-objective-editor.component.html'
 })
 export class ExplorationObjectiveEditorComponent {
-  @Input() labelText: string;
-  @Input() formStyle: string;
-  @Input() objectiveEditorClass: string;
+  @Input() labelText!: string;
+  @Input() formStyle!: string;
+  @Input() objectiveEditorClass!: string;
   @Output() onInputFieldBlur = new EventEmitter<void>();
 
   constructor(

@@ -43,7 +43,7 @@ describe('Translation opportunities component', () => {
   let component: TranslationOpportunitiesComponent;
   let fixture: ComponentFixture<TranslationOpportunitiesComponent>;
   let translationModal: NgbModalRef;
-  let httpTestingController;
+  let httpTestingController: HttpTestingController;
   let loggedInUserInfo = new UserInfo(
     ['EXPLORATION_EDITOR'], false, false, false, false, false,
     'en', 'username', 'test@example.com', true
@@ -316,8 +316,7 @@ describe('Translation opportunities component', () => {
   it('should not show translation opportunities when language is not ' +
     'selected', fakeAsync(() => {
     spyOn(
-      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-      null);
+      translationLanguageService, 'getActiveLanguageCode').and.callThrough();
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
     expect(component.languageSelected).toBe(false);
 
@@ -329,8 +328,7 @@ describe('Translation opportunities component', () => {
   it('should show translation opportunities when language is changed'
     , fakeAsync(() => {
       spyOn(
-        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-        null);
+        translationLanguageService, 'getActiveLanguageCode').and.callThrough();
       spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
       component.ngOnInit();
       expect(component.languageSelected).toBe(false);

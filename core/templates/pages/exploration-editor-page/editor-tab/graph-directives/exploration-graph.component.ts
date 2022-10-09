@@ -35,7 +35,7 @@ import { ExplorationGraphModalComponent } from '../templates/modal-templates/exp
   templateUrl: './exploration-graph.component.html'
 })
 export class ExplorationGraphComponent {
-  checkpointCountWarning: string;
+  checkpointCountWarning!: string;
 
   constructor(
     private alertsService: AlertsService,
@@ -63,7 +63,7 @@ export class ExplorationGraphComponent {
     this.routerService.navigateToMainTab(stateName);
   }
 
-  getActiveStateName(): string {
+  getActiveStateName(): string | null {
     return this.stateEditorService.getActiveStateName();
   }
 

@@ -39,14 +39,14 @@ import { ExplorationTaskType } from 'domain/improvements/exploration-task.model'
   providedIn: 'root'
 })
 export class ExplorationImprovementsService implements OnInit {
-  initializationHasStarted: boolean;
-  openHbrTasks: HighBounceRateTask[];
-  ngrTasksOpenSinceInit: NeedsGuidingResponsesTask[];
-  config: ExplorationImprovementsConfig;
-  improvementsTabIsAccessible: boolean;
-  initPromise: Promise<void>;
-  resolveInitPromise: () => void;
-  rejectInitPromise: () => void;
+  initializationHasStarted!: boolean;
+  openHbrTasks!: HighBounceRateTask[];
+  ngrTasksOpenSinceInit!: NeedsGuidingResponsesTask[];
+  config!: ExplorationImprovementsConfig;
+  improvementsTabIsAccessible!: boolean;
+  initPromise!: Promise<void>;
+  resolveInitPromise!: () => void;
+  rejectInitPromise!: () => void;
 
   constructor(
     private explorationRightsService: ExplorationRightsService,

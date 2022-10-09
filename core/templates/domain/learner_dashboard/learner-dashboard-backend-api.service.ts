@@ -84,7 +84,7 @@ interface LearnerDashboardCollectionsDataBackendDict {
 }
 
 
-interface LearnerDashboardExplorationsDataBackendDict {
+export interface LearnerDashboardExplorationsDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
   'incomplete_explorations_list': LearnerExplorationSummaryBackendDict[];
   'exploration_playlist': LearnerExplorationSummaryBackendDict[];
@@ -145,7 +145,7 @@ interface LearnerCompletedChaptersCountData {
 
 export interface AddMessagePayload {
   'updated_status': boolean;
-  'updated_subject': string;
+  'updated_subject': string | null;
   'text': string;
 }
 
@@ -346,7 +346,7 @@ export class LearnerDashboardBackendApiService {
   }
 
   async fetchLearnerDashboardFeedbackUpdatesDataAsync(
-      paginatedThreadsList = []
+      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = []
   ):
   Promise<LearnerDashboardFeedbackUpdatesData> {
     return this._fetchLearnerDashboardFeedbackUpdatesDataAsync(

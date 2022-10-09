@@ -134,7 +134,7 @@ describe('Topic creation service', () => {
     spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
       result: {
-        then: (successCallback: (arg1) => void, errorCallback) => {
+        then: (successCallback: (arg1: {}) => void, errorCallback) => {
           successCallback({
             isValid: () => {
               return false;

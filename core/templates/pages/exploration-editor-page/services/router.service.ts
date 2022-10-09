@@ -189,7 +189,7 @@ export class RouterService {
     }
   }
 
-  _actuallyNavigate(pathType: string, newStateName: string): void {
+  _actuallyNavigate(pathType: string, newStateName: string | null): void {
     if (newStateName) {
       this.stateEditorService.setActiveStateName(newStateName);
     }
@@ -229,8 +229,11 @@ export class RouterService {
 
   navigateToMainTab(stateName: string): void {
     this._savePendingChanges();
-    let oldState = decodeURI(
-      this._getCurrentStateFromLocationPath());
+    const state = this._getCurrentStateFromLocationPath();
+    if (state === null) {
+      return;
+    }
+    let oldState = decodeURI(state);
 
     if (oldState === ('/' + stateName)) {
       return;

@@ -46,8 +46,8 @@ describe('Contributor dashboard page', () => {
   };
   let focusManagerService: FocusManagerService;
   let windowRef: WindowRef;
-  let getTranslatableTopicNamesAsyncSpy;
-  let getUserInfoAsyncSpy;
+  let getTranslatableTopicNamesAsyncSpy: jasmine.Spy;
+  let getUserInfoAsyncSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -163,16 +163,11 @@ describe('Contributor dashboard page', () => {
       fakeAsync(() => {
         getTranslatableTopicNamesAsyncSpy.and.returnValue(
           Promise.resolve([]));
-        // The `topicName` is set to undefined below since ngOnInit() does not
-        // initialize the variable as undefined. This means that if another
-        // frontend test is run before this test, the topicName will be set to
-        // the value of the previous test.
-        component.topicName = undefined;
 
         component.ngOnInit();
         tick();
 
-        expect(component.topicName).toBe(undefined);
+        expect(component.topicName).toBeUndefined();
         expect(translationTopicService.setActiveTopicName)
           .not.toHaveBeenCalled();
       }));

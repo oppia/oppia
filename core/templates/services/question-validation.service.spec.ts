@@ -18,17 +18,17 @@
 
 import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { QuestionValidationService } from './question-validation.service';
 
 describe('Question Validation Service', () => {
   let misconceptionObjectFactory: MisconceptionObjectFactory;
-  let mockMisconceptionObject;
-  let mockQuestionDict;
+  let mockMisconceptionObject: MisconceptionSkillMap;
+  let mockQuestionDict: QuestionBackendDict;
   let questionObjectFactory: QuestionObjectFactory;
   let qvs: QuestionValidationService;
-  let ses;
+  let ses: StateEditorService;
 
   beforeEach(() => {
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
@@ -40,111 +40,125 @@ describe('Question Validation Service', () => {
 
   beforeEach(() => {
     mockQuestionDict = {
-      id: 'question_1',
+      id: '',
       question_state_data: {
+        classifier_model_id: null,
+        param_changes: [],
+        next_content_id_index: 1,
+        solicit_answer_details: false,
         content: {
-          html: 'Question 1',
-          content_id: 'content_1'
+          content_id: '1',
+          html: 'Question 1'
+        },
+        written_translations: {
+          translations_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
+          }
         },
         interaction: {
           answer_groups: [{
             outcome: {
-              dest: 'outcome 1',
+              dest: 'State 1',
               dest_if_really_stuck: null,
               feedback: {
-                content_id: 'content_5',
-                html: ''
+                content_id: 'feedback_1',
+                html: '<p>Try Again.</p>'
               },
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
               labelled_as_correct: true,
-              param_changes: [],
-              refresher_exploration_id: null
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: {x: 0}
             }],
-            tagged_skill_misconception_id: null
-          }, {
+            training_data: [],
+            tagged_skill_misconception_id: null,
+          },
+          {
             outcome: {
-              dest: 'outcome 1',
+              dest: 'State 2',
               dest_if_really_stuck: null,
               feedback: {
-                content_id: 'content_5',
-                html: ''
+                content_id: 'feedback_2',
+                html: '<p>Try Again.</p>'
               },
-              labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              labelled_as_correct: true,
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: {x: 0}
             }],
-            tagged_skill_misconception_id: 'abc-1'
+            training_data: [],
+            tagged_skill_misconception_id: 'misconceptionId',
           }],
-          confirmed_unclassified_answers: [],
+          default_outcome: {
+            dest: 'dest',
+            dest_if_really_stuck: null,
+            labelled_as_correct: true,
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            param_changes: [],
+            feedback: {
+              content_id: 'feedback_id',
+              html: '<p>Dummy Feedback</p>'
+            }
+          },
+          id: 'TextInput',
           customization_args: {
+            rows: {
+              value: 1
+            },
             placeholder: {
               value: {
-                content_id: 'ca_placeholder_0',
-                unicode_str: ''
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
               }
-            },
-            rows: { value: 1 }
+            }
           },
-          default_outcome: {
-            dest: null,
-            dest_if_really_stuck: null,
-            feedback: {
-              html: 'Correct Answer',
-              content_id: 'content_2'
-            },
-            param_changes: [],
-            labelled_as_correct: false
-          },
+          confirmed_unclassified_answers: [],
           hints: [
             {
               hint_content: {
-                html: 'Hint 1',
-                content_id: 'content_3'
+                content_id: 'hint_1',
+                html: '<p>This is a hint.</p>'
               }
             }
           ],
           solution: {
-            correct_answer: 'This is the correct answer',
-            answer_is_exclusive: false,
+            correct_answer: 'Solution',
             explanation: {
-              html: 'Solution explanation',
-              content_id: 'content_4'
-            }
-          },
-          id: 'TextInput'
+              content_id: 'solution',
+              html: '<p>This is a solution.</p>'
+            },
+            answer_is_exclusive: false
+          }
         },
-        param_changes: [],
+        linked_skill_id: null,
+        card_is_checkpoint: true,
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content_1: {},
-            content_2: {},
-            content_3: {},
-            content_4: {},
-            content_5: {}
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
           }
-        },
-        written_translations: {
-          translations_mapping: {
-            content_1: {},
-            content_2: {},
-            content_3: {},
-            content_4: {},
-            content_5: {}
-          }
-        },
-        solicit_answer_details: false
+        }
       },
-      language_code: 'en',
+      question_state_data_schema_version: 2,
+      language_code: '',
       version: 1,
-      linked_skill_ids: ['abc'],
-      inapplicable_skill_misconception_ids: ['abc-2']
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: []
     };
     mockMisconceptionObject = {
       abc: [
@@ -175,7 +189,7 @@ describe('Question Validation Service', () => {
   });
 
   it('should return false if solution is invalid', () => {
-    ses.isCurrentSolutionValid.and.returnValue(false);
+    ses.isCurrentSolutionValid = () => false;
     expect(
       qvs.isQuestionValid(
         questionObjectFactory.createFromBackendDict(mockQuestionDict),

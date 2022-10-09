@@ -35,9 +35,9 @@ import { PracticeSessionsBackendApiService } from './practice-session-backend-ap
 })
 export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  topicName: string;
-  stringifiedSubtopicIds: string;
-  questionPlayerConfig: QuestionPlayerConfig;
+  topicName!: string;
+  stringifiedSubtopicIds!: string;
+  questionPlayerConfig!: QuestionPlayerConfig;
 
   constructor(
     private urlService: UrlService,

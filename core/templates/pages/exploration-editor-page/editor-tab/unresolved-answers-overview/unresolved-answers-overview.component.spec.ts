@@ -96,7 +96,7 @@ describe('Unresolved Answers Overview Component', () => {
     ngbModal = TestBed.inject(NgbModal);
 
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
-    spyOn(explorationStatesService, 'getState').and.returnValue(null);
+    spyOn(explorationStatesService, 'getState').and.callThrough();
 
     component.ngOnInit();
   });
@@ -208,7 +208,7 @@ describe('Unresolved Answers Overview Component', () => {
 
   it('should fetch unresolved state stats from backend', () => {
     spyOn(stateTopAnswersStatsService, 'getUnresolvedStateStats').and
-      .returnValue(null);
-    expect(component.getUnresolvedStateStats()).toEqual(null);
+      .callThrough();
+    expect(component.getUnresolvedStateStats()).toBeNull();
   });
 });

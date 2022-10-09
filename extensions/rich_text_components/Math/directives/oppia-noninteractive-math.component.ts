@@ -61,9 +61,9 @@ interface ImageContainerStyle {
   styleUrls: []
 })
 export class NoninteractiveMath implements OnInit, OnChanges {
-  @Input() mathContentWithValue: string;
-  imageContainerStyle: ImageContainerStyle;
-  imageUrl: string | ArrayBuffer | SafeResourceUrl;
+  @Input() mathContentWithValue!: string;
+  imageContainerStyle!: ImageContainerStyle;
+  imageUrl!: string | ArrayBuffer | SafeResourceUrl | null;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -125,13 +125,20 @@ export class NoninteractiveMath implements OnInit, OnChanges {
           AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
             this.imageLocalStorageService.isInStorage(
               mathExpressionContent.svg_filename))) {
+          const imageData = this.imageLocalStorageService.getRawImageData(
+            mathExpressionContent.svg_filename);
+          if (imageData === null) {
+            throw new Error('Image data not found in local storage.');
+          }
           this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-            this.imageLocalStorageService.getRawImageData(
-              mathExpressionContent.svg_filename));
+            imageData);
         } else {
+          const entityType = this.contextService.getEntityType();
+          if (entityType === undefined) {
+            throw new Error('Entity type cannot be undefined.');
+          }
           this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-            this.contextService.getEntityType(),
-            this.contextService.getEntityId(),
+            entityType, this.contextService.getEntityId(),
             mathExpressionContent.svg_filename);
         }
       } catch (e) {
@@ -139,7 +146,9 @@ export class NoninteractiveMath implements OnInit, OnChanges {
           '\nEntity type: ' + this.contextService.getEntityType() +
           '\nEntity ID: ' + this.contextService.getEntityId() +
           '\nFilepath: ' + mathExpressionContent.svg_filename);
-        e.message += additionalInfo;
+        if (e instanceof Error) {
+          e.message += additionalInfo;
+        }
         throw e;
       }
     }

@@ -34,8 +34,8 @@ export class ExplorationSaveModalComponent
   showDiff: boolean = false;
   MAX_COMMIT_MESSAGE_LENGTH = String(AppConstants.MAX_COMMIT_MESSAGE_LENGTH);
 
-  @Input() isExplorationPrivate: boolean;
-  @Input() diffData: DiffNodeData;
+  @Input() isExplorationPrivate!: boolean;
+  @Input() diffData!: DiffNodeData;
 
   constructor(
     private ngbActiveModal: NgbActiveModal

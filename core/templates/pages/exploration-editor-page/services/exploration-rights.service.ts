@@ -30,14 +30,14 @@ import { ExplorationRightsBackendData } from './exploration-rights-backend-api.s
   providedIn: 'root'
 })
 export class ExplorationRightsService {
-  ownerNames: string[];
-  editorNames: string[];
-  voiceArtistNames: string[];
-  viewerNames: string[];
-  private _status: string;
-  private _clonedFrom: string;
-  private _isCommunityOwned: boolean;
-  private _viewableIfPrivate: boolean;
+  ownerNames!: string[];
+  editorNames!: string[];
+  voiceArtistNames!: string[];
+  viewerNames!: string[];
+  private _status!: string;
+  private _clonedFrom!: string;
+  private _isCommunityOwned!: boolean;
+  private _viewableIfPrivate!: boolean;
 
   constructor(
     private alertsService: AlertsService,
@@ -85,10 +85,13 @@ export class ExplorationRightsService {
   }
 
   makeCommunityOwned(): Promise<void> {
+    const version = this.explorationDataService.data.version;
+    if (version === undefined) {
+      throw new Error('Exploration version is undefined');
+    }
     return this.explorationRightsBackendApiService
       .makeCommunityOwnedPutData(
-        this.explorationDataService.explorationId,
-        this.explorationDataService.data.version, true)
+        this.explorationDataService.explorationId, version, true)
       .then((response: ExplorationRightsBackendData) => {
         this.alertsService.clearWarnings();
         this.init(
@@ -101,10 +104,13 @@ export class ExplorationRightsService {
 
   saveRoleChanges(
       newMemberUsername: string, newMemberRole: string): Promise<void> {
+    const version = this.explorationDataService.data.version;
+    if (version === undefined) {
+      throw new Error('Exploration version is undefined');
+    }
     return this.explorationRightsBackendApiService.saveRoleChangesPutData(
-      this.explorationDataService.explorationId,
-      this.explorationDataService.data.version,
-      newMemberRole, newMemberUsername)
+      this.explorationDataService.explorationId, version, newMemberRole,
+      newMemberUsername)
       .then((response: ExplorationRightsBackendData) => {
         this.alertsService.clearWarnings();
         this.init(
@@ -119,9 +125,13 @@ export class ExplorationRightsService {
 
   setViewability(
       viewableIfPrivate: boolean): Promise<void> {
+    const version = this.explorationDataService.data.version;
+    if (version === undefined) {
+      throw new Error('Exploration version is undefined');
+    }
     return this.explorationRightsBackendApiService.setViewabilityPutData(
-      this.explorationDataService.explorationId,
-      this.explorationDataService.data.version, viewableIfPrivate).then(
+      this.explorationDataService.explorationId, version, viewableIfPrivate
+    ).then(
       (response: ExplorationRightsBackendData) => {
         this.alertsService.clearWarnings();
         this.init(
@@ -146,10 +156,13 @@ export class ExplorationRightsService {
   }
 
   saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
+    const version = this.explorationDataService.data.version;
+    if (version === undefined) {
+      throw new Error('Exploration version is undefined');
+    }
     return this.explorationRightsBackendApiService
       .saveModeratorChangeToBackendAsyncPutData(
-        this.explorationDataService.explorationId,
-        this.explorationDataService.data.version, emailBody).then(
+        this.explorationDataService.explorationId, version, emailBody).then(
         (response: ExplorationRightsBackendData) => {
           this.alertsService.clearWarnings();
           this.init(
@@ -158,10 +171,8 @@ export class ExplorationRightsService {
             response.rights.status, response.rights.cloned_from,
             response.rights.community_owned, response.rights.viewable_if_private
           );
-        }).catch(() => {
-        this.init(
-          null, null, null, null,
-          null, null, null, null);
+        }).catch((response) => {
+        this.alertsService.addWarning(response.error.error);
       });
   }
 

@@ -234,11 +234,11 @@ export class HintsAndSolutionManagerService {
     }
   }
 
-  get onSolutionViewedEventEmitter(): EventEmitter<unknown> {
+  get onSolutionViewedEventEmitter(): EventEmitter<void> {
     return this._solutionViewedEventEmitter;
   }
 
-  get onHintConsumed(): EventEmitter<unknown> {
+  get onHintConsumed(): EventEmitter<void> {
     return this._hintConsumedEventEmitter;
   }
 }

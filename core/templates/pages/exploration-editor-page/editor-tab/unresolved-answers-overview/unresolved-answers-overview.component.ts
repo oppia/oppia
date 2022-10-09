@@ -30,6 +30,7 @@ import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.se
 import { TeachOppiaModalComponent } from '../templates/modal-templates/teach-oppia-modal.component';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { ExternalSaveService } from 'services/external-save.service';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-unresolved-answers-overview',
@@ -38,8 +39,8 @@ import { ExternalSaveService } from 'services/external-save.service';
 
 export class UnresolvedAnswersOverviewComponent
   implements OnInit {
-  unresolvedAnswersOverviewIsShown: boolean;
-  SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean;
+  unresolvedAnswersOverviewIsShown!: boolean;
+  SHOW_TRAINABLE_UNRESOLVED_ANSWERS!: boolean;
 
   constructor(
     private editabilityService: EditabilityService,
@@ -60,6 +61,9 @@ export class UnresolvedAnswersOverviewComponent
 
   isUnresolvedAnswersOverviewShown(): boolean {
     let activeStateName = this.stateEditorService.getActiveStateName();
+    if (activeStateName === null) {
+      throw new Error('State name should not be null.');
+    }
     return this.stateTopAnswersStatsService.hasStateStats(activeStateName) &&
       this.isStateRequiredToBeResolved(activeStateName);
   }
@@ -70,14 +74,18 @@ export class UnresolvedAnswersOverviewComponent
 
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    return Boolean(interactionId) && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey
+    ].is_linear;
   }
 
   isCurrentInteractionTrainable(): boolean {
     let interactionId = this.getCurrentInteractionId();
     return (
-      interactionId &&
-      INTERACTION_SPECS[interactionId].is_trainable);
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[
+        interactionId as InteractionSpecsKey
+      ].is_trainable);
   }
 
   isEditableOutsideTutorialMode(): boolean {
@@ -97,8 +105,11 @@ export class UnresolvedAnswersOverviewComponent
   }
 
   getUnresolvedStateStats(): AnswerStats[] {
-    return this.stateTopAnswersStatsService.getUnresolvedStateStats(
-      this.stateEditorService.getActiveStateName());
+    let stateName = this.stateEditorService.getActiveStateName();
+    if (stateName === null) {
+      throw new Error('State name should not be null.');
+    }
+    return this.stateTopAnswersStatsService.getUnresolvedStateStats(stateName);
   }
 
   ngOnInit(): void {

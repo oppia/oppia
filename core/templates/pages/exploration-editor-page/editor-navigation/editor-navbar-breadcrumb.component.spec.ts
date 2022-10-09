@@ -84,7 +84,7 @@ describe('Editor Navbar Breadcrumb component', () => {
 
   it('should initialize component properties after controller is initialized',
     () => {
-      expect(component.navbarTitle).toBe(null);
+      expect(component.navbarTitle).toBeNull();
     });
 
   it('should go to settings tabs and focus on exploration title input' +
@@ -101,7 +101,7 @@ describe('Editor Navbar Breadcrumb component', () => {
 
   it('should get an empty current tab name when there is no active tab',
     () => {
-      spyOn(routerService, 'getActiveTabName').and.returnValue(null);
+      spyOn(routerService, 'getActiveTabName').and.callThrough();
       expect(component.getCurrentTabName()).toBe('');
     });
 

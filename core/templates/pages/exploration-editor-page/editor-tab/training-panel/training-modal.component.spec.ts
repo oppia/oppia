@@ -32,6 +32,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/Answer
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 
 class MockActiveModal {
@@ -49,10 +50,10 @@ class MockStateInteractionIdService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1, item2) {
+  saveInteractionAnswerGroups(item1: string, item2: string) {
   }
 
-  saveInteractionDefaultOutcome(item1, item2) {
+  saveInteractionDefaultOutcome(item1: string, item2: string) {
   }
 
   getState() {
@@ -162,23 +163,18 @@ describe('Training Modal Component', () => {
     component.classification = {
       answerGroupIndex: 2,
       newOutcome: new Outcome(
-        'dest', null, null, true,
-        [],
-        null, null
-      )
+        '', '', new SubtitledHtml('html', 'html'),
+        false, [], '', '')
     };
     component.unhandledAnswer = 'string';
 
-    spyOn(answerGroupObjectFactory, 'createNew').and.returnValue(null);
+    spyOn(answerGroupObjectFactory, 'createNew').and.callThrough();
     spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
     spyOn(responsesService, 'getAnswerGroupCount')
       .and.returnValue(1);
     spyOn(responsesService, 'getAnswerGroups')
       .and.returnValue([{}] as AnswerGroup[]);
-    spyOn(responsesService, 'save')
-      .and.callFake((answerGroups, getDefaultOutcome, save) => {
-        save(null, null);
-      });
+    spyOn(responsesService, 'save');
 
     component.ngOnInit();
     component.onConfirm();
@@ -192,10 +188,8 @@ describe('Training Modal Component', () => {
     component.classification = {
       answerGroupIndex: 1,
       newOutcome: new Outcome(
-        'dest', null, null, true,
-        [],
-        null, null
-      )
+        'dest', '', new SubtitledHtml('html', 'html'),
+        false, [], '', '')
     };
     component.unhandledAnswer = 'string';
 
@@ -212,10 +206,8 @@ describe('Training Modal Component', () => {
     component.classification = {
       answerGroupIndex: 1,
       newOutcome: new Outcome(
-        'dest', null, null, true,
-        [],
-        null, null
-      )
+        'dest', '', new SubtitledHtml('html', 'html'),
+        false, [], '', '')
     };
     component.unhandledAnswer = 'string';
 

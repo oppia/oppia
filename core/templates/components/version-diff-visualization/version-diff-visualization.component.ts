@@ -21,6 +21,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { State } from 'domain/state/StateObjectFactory';
 import { StateDiffModalComponent } from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
 
 interface NodesData {
@@ -32,7 +33,7 @@ interface NodesData {
 }
 
 interface LegendGraph {
-  nodes: object;
+  nodes: Record<string, string>;
   links: {
     source: string;
     target: string;
@@ -44,8 +45,8 @@ interface LegendGraph {
 
 export interface DiffNodeData {
   nodes: NodesData;
-  v2States: object;
-  v1States: object;
+  v2States: Record<string, State>;
+  v1States: Record<string, State>;
   finalStateIds: string[];
   v2InitStateId: string;
   links: string[];
@@ -113,15 +114,15 @@ export class VersionDiffVisualizationComponent implements OnInit {
   // - v1States: the states dict for the earlier version of the
   // exploration
   // - v2States: the states dict for the later version of the exploration.
-  @Input() diffData: DiffNodeData;
+  @Input() diffData!: DiffNodeData;
 
   // The header for the pane of the state comparison modal corresponding
   // to the earlier version of the exploration.
-  @Input() earlierVersionHeader: string;
+  @Input() earlierVersionHeader!: string;
 
   // The header for the pane of the state comparison modal corresponding
   // to the later version of the exploration.
-  @Input() laterVersionHeader: string;
+  @Input() laterVersionHeader!: string;
 
   // Constants for color of nodes in diff graph.
   COLOR_ADDED: string = '#4EA24E';
@@ -146,19 +147,21 @@ export class VersionDiffVisualizationComponent implements OnInit {
   // Object whose keys are legend node names and whose values are
   // 'true' or false depending on whether the state property is used in
   // the diff graph. (Will be used to generate legend).
-  _stateTypeUsed: object = {};
-  diffGraphNodes: object = {};
-  nodesData: NodesData;
+  _stateTypeUsed: Record<string, boolean> = {};
+  diffGraphNodes: Record<string, string> = {};
+  nodesData!: NodesData;
 
-  diffGraphData: DiffGraphData;
-  diffGraphNodeColors: DiffGraphNodeColors;
-  v1InitStateId: string;
-  diffGraphSecondaryLabels: DiffGraphSecondaryLabels;
-  DIFF_GRAPH_LINK_PROPERTY_MAPPING: DIFF_GRAPH_LINK_PROPERTY_MAPPING;
-  legendGraph: LegendGraph;
-  LEGEND_GRAPH_COLORS: LEGEND_GRAPH_COLORS | object;
-  LEGEND_GRAPH_SECONDARY_LABELS: LEGEND_GRAPH_SECONDARY_LABELS | object;
-  LEGEND_GRAPH_LINK_PROPERTY_MAPPING: LEGEND_GRAPH_LINK_PROPERTY_MAPPING;
+  diffGraphData!: DiffGraphData;
+  diffGraphNodeColors!: DiffGraphNodeColors;
+  v1InitStateId!: string;
+  diffGraphSecondaryLabels!: DiffGraphSecondaryLabels;
+  DIFF_GRAPH_LINK_PROPERTY_MAPPING!: DIFF_GRAPH_LINK_PROPERTY_MAPPING;
+  legendGraph!: LegendGraph;
+  LEGEND_GRAPH_COLORS!: LEGEND_GRAPH_COLORS | Record<string, string>;
+  LEGEND_GRAPH_SECONDARY_LABELS!:
+    LEGEND_GRAPH_SECONDARY_LABELS | Record<string, string>;
+
+  LEGEND_GRAPH_LINK_PROPERTY_MAPPING!: LEGEND_GRAPH_LINK_PROPERTY_MAPPING;
 
   constructor(
     private ngbModal: NgbModal,
@@ -168,7 +171,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
   // stateId is the unique ID assigned to a state during the
   // calculation of the state graph.
   onClickStateInDiffGraph(stateId: string): void {
-    let oldStateName = undefined;
+    let oldStateName = null;
     if (this.nodesData[stateId].newestStateName !==
       this.nodesData[stateId].originalStateName) {
       oldStateName = this.nodesData[stateId].originalStateName;
@@ -189,7 +192,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
   //   deleted.
   showStateDiffModal(
       newStateName: string,
-      oldStateName: string,
+      oldStateName: string | null,
       stateProperty: string
   ): void {
     let modalRef: NgbModalRef = this.ngbModal.open(StateDiffModalComponent, {
@@ -311,15 +314,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
       finalStateIds: this.diffData.finalStateIds
     };
 
-    // Generate the legend graph.
-    this.legendGraph = {
-      nodes: {},
-      links: [],
-      finalStateIds: [],
-      initStateId: null
-    };
-
-    let _lastUsedStateType = null;
+    let _lastUsedStateType: string | null = null;
     for (let stateProperty in this._stateTypeUsed) {
       if (this._stateTypeUsed[stateProperty]) {
         this.legendGraph.nodes[stateProperty] = stateProperty;
@@ -334,8 +329,9 @@ export class VersionDiffVisualizationComponent implements OnInit {
         this.legendGraph.initStateId = stateProperty;
       }
     }
-
-    this.legendGraph.finalStateIds = [_lastUsedStateType];
+    if (_lastUsedStateType) {
+      this.legendGraph.finalStateIds = [_lastUsedStateType];
+    }
   }
 }
 angular.module('oppia').directive('oppiaVersionDiffVisualization',

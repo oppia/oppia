@@ -99,10 +99,11 @@ export class StateTopAnswersStatsService {
   }
 
   getStateStats(stateName: string): AnswerStats[] {
-    if (!this.hasStateStats(stateName)) {
+    let topAnswersStats = this.topAnswersStatsByStateName.get(stateName);
+    if (!this.hasStateStats(stateName) || !topAnswersStats) {
       throw new Error(stateName + ' does not exist.');
     }
-    return [...this.topAnswersStatsByStateName.get(stateName).answers];
+    return [...topAnswersStats.answers];
   }
 
   getUnresolvedStateStats(stateName: string): AnswerStats[] {
@@ -118,7 +119,7 @@ export class StateTopAnswersStatsService {
 
   onStateAdded(stateName: string): void {
     this.topAnswersStatsByStateName.set(
-      stateName, new AnswerStatsEntry([], null));
+      stateName, new AnswerStatsEntry([], ''));
   }
 
   onStateDeleted(stateName: string): void {
@@ -126,8 +127,11 @@ export class StateTopAnswersStatsService {
   }
 
   onStateRenamed(oldStateName: string, newStateName: string): void {
-    this.topAnswersStatsByStateName.set(
-      newStateName, this.topAnswersStatsByStateName.get(oldStateName));
+    let topAnswersStats = this.topAnswersStatsByStateName.get(oldStateName);
+    if (topAnswersStats === undefined) {
+      throw new Error(oldStateName + ' does not exist.');
+    }
+    this.topAnswersStatsByStateName.set(newStateName, topAnswersStats);
     this.topAnswersStatsByStateName.delete(oldStateName);
   }
 

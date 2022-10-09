@@ -29,14 +29,16 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { QuestionSuggestionBackendApiService } from '../services/question-suggestion-backend-api.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Question, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { Skill, SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { State, StateBackendDict } from 'domain/state/StateObjectFactory';
+import { ImagesData } from 'services/image-local-storage.service';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     skillId: null;
   };
 }
@@ -61,9 +63,16 @@ class MockNgbModal {
 
 class MockContributionAndReviewService {
   updateQuestionSuggestionAsync(
-      suggestionId, skillDifficulty, questionStateData, imagesData) {
+      suggestionId: string,
+      skillDifficulty: string,
+      questionStateData: string,
+      imagesData: File[],
+  ) {
     return {
-      then: (successCallback, errorCallback) => {
+      then: (
+          successCallback: () => void,
+          errorCallback: () => void
+      ) => {
         successCallback();
       }
     };
@@ -72,9 +81,16 @@ class MockContributionAndReviewService {
 
 class MockQuestionSuggestionBackendApiService {
   submitSuggestionAsync(
-      question, associatedSkill, skillDifficulty, imagesData) {
+      question: Question,
+      associatedSkill: string,
+      skillDifficulty: string,
+      imagesData: File[],
+  ) {
     return {
-      then: (successCallback, errorCallback) => {
+      then: (
+          successCallback: () => void,
+          errorCallback: () => void
+      ) => {
         successCallback();
       }
     };
@@ -84,9 +100,9 @@ class MockQuestionSuggestionBackendApiService {
 class MockAlertsService {
   warnings = [];
 
-  addInfoMessage(value1, value2) {}
+  addInfoMessage(value1: string, value2: string) {}
 
-  addSuccessMessage(value) {}
+  addSuccessMessage(value: string) {}
 }
 
 describe('Question Suggestion Editor Modal Component', () => {
@@ -95,17 +111,17 @@ describe('Question Suggestion Editor Modal Component', () => {
   let ngbActiveModal: NgbActiveModal;
   let alertsService: AlertsService;
   let contributionAndReviewService: ContributionAndReviewService;
-  let csrfTokenService = null;
+  let csrfTokenService: CsrfTokenService;
   let ngbModal: NgbModal;
-  let questionObjectFactory = null;
-  let questionUndoRedoService = null;
-  let siteAnalyticsService = null;
-  let skillObjectFactory = null;
-  let stateEditorService = null;
-  let question = null;
-  let questionId = null;
-  let questionStateData = null;
-  let skill = null;
+  let questionObjectFactory: QuestionObjectFactory;
+  let questionUndoRedoService: QuestionUndoRedoService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let skillObjectFactory: SkillObjectFactory;
+  let stateEditorService: StateEditorService;
+  let question: Question;
+  let questionId: string;
+  let questionStateData: State;
+  let skill: Skill;
   let skillDifficulty = 0.3;
 
   beforeEach(waitForAsync(() => {
@@ -181,22 +197,27 @@ describe('Question Suggestion Editor Modal Component', () => {
       id: '1',
       description: 'test description',
       misconceptions: [{
-        id: '2',
+        id: 2,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
         must_be_addressed: false
       }],
+      next_misconception_id: 3,
+      prerequisite_skill_ids: [],
       rubrics: [],
       skill_contents: skillContentsDict,
+      superseding_skill_id: 'id',
       language_code: 'en',
       version: 3,
+      all_questions_merged: false,
     };
     skill = skillObjectFactory.createFromBackendDict(skillDict);
     component.skill = skill;
     question = questionObjectFactory.createFromBackendDict({
       id: skill.getId(),
       question_state_data: {
+        classifier_model_id: null,
         content: {
           html: 'Question 1',
           content_id: 'content_1'
@@ -212,9 +233,12 @@ describe('Question Suggestion Editor Modal Component', () => {
               },
               labelled_as_correct: true,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
             rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
           }],
           confirmed_unclassified_answers: [],
           customization_args: {
@@ -227,14 +251,16 @@ describe('Question Suggestion Editor Modal Component', () => {
             rows: { value: 1 }
           },
           default_outcome: {
-            dest: null,
+            dest: 'dest',
             dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
               content_id: 'content_2'
             },
             param_changes: [],
-            labelled_as_correct: true
+            labelled_as_correct: true,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
           hints: [{
             hint_content: {
@@ -256,15 +282,23 @@ describe('Question Suggestion Editor Modal Component', () => {
         recorded_voiceovers: {
           voiceovers_mapping: {}
         },
+        solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {}
         },
+        linked_skill_id: null,
+        next_content_id_index: 6,
       },
+      question_state_data_schema_version: 0,
+      language_code: 'en',
+      version: 1,
+      linked_skill_ids: [],
       inapplicable_skill_misconception_ids: ['1-2']
     });
     component.question = question;
-    questionId = question.getId();
-    component.questionId = question.getId();
+    questionId = question.getId() as string;
+    component.questionId = question.getId() as string;
     questionStateData = question.getStateData();
     component.questionStateData = question.getStateData();
     component.suggestionId = '1';
@@ -297,13 +331,7 @@ describe('Question Suggestion Editor Modal Component', () => {
   });
 
   it('should update the question', () => {
-    spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
-      .and.callFake((
-          suggestionId, skillDifficulty, questionStateData, imagesData,
-          successCallback, errorCallback) => {
-        successCallback(null);
-        return null;
-      });
+    spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync');
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     component.question = question;
     component.skillDifficulty = skillDifficulty;
@@ -317,13 +345,7 @@ describe('Question Suggestion Editor Modal Component', () => {
 
   it('should fail to update the question when no changes are made',
     () => {
-      spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
-        .and.callFake((
-            suggestionId, skillDifficulty, questionStateData, imagesData,
-            successCallback, errorCallback) => {
-          successCallback(null);
-          return null;
-        });
+      spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync');
       spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
       spyOn(alertsService, 'addInfoMessage');
 

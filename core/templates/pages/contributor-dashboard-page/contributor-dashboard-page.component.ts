@@ -38,21 +38,21 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class ContributorDashboardPageComponent
   implements OnInit {
-  OPPIA_AVATAR_LINK_URL: string = AppConstants.OPPIA_AVATAR_LINK_URL;
-  defaultHeaderVisible: boolean;
-  profilePictureDataUrl: SafeUrl | string;
-  username: string;
-  userInfoIsLoading: boolean;
-  userIsLoggedIn: boolean;
-  userIsReviewer: boolean;
-  userCanReviewTranslationSuggestionsInLanguages: string[];
-  userCanReviewVoiceoverSuggestionsInLanguages: string[];
-  userCanReviewQuestions: boolean;
-  tabsDetails: ContributorDashboardTabsDetails;
-  OPPIA_AVATAR_IMAGE_URL: string;
-  languageCode: string;
-  topicName: string;
-  activeTabName: string;
+  OPPIA_AVATAR_LINK_URL: string | null = AppConstants.OPPIA_AVATAR_LINK_URL;
+  defaultHeaderVisible!: boolean;
+  profilePictureDataUrl!: SafeUrl | string;
+  username!: string | null;
+  userInfoIsLoading!: boolean;
+  userIsLoggedIn!: boolean;
+  userIsReviewer!: boolean;
+  userCanReviewTranslationSuggestionsInLanguages!: string[];
+  userCanReviewVoiceoverSuggestionsInLanguages!: string[];
+  userCanReviewQuestions!: boolean;
+  tabsDetails!: ContributorDashboardTabsDetails;
+  OPPIA_AVATAR_IMAGE_URL!: string;
+  languageCode!: string;
+  topicName!: string;
+  activeTabName!: string;
 
   constructor(
     private contributionAndReviewService: ContributionAndReviewService,
@@ -92,7 +92,8 @@ export class ContributorDashboardPageComponent
   }
 
   showLanguageSelector(): boolean {
-    const activeTabDetail = this.tabsDetails[this.activeTabName];
+    const activeTabDetail = this.tabsDetails[
+      this.activeTabName as keyof ContributorDashboardTabsDetails];
     return activeTabDetail.customizationOptions.includes('language');
   }
 
@@ -104,7 +105,8 @@ export class ContributorDashboardPageComponent
   }
 
   showTopicSelector(): boolean {
-    const activeTabDetail = this.tabsDetails[this.activeTabName];
+    const activeTabDetail = this.tabsDetails[
+      this.activeTabName as keyof ContributorDashboardTabsDetails];
     const activeSuggestionType =
       this.contributionAndReviewService.getActiveSuggestionType();
     const activeTabType = this.contributionAndReviewService.getActiveTabType();
@@ -125,7 +127,7 @@ export class ContributorDashboardPageComponent
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
-    const languageDescriptions = [];
+    const languageDescriptions: string[] = [];
     languageCodes.forEach((languageCode) => {
       languageDescriptions.push(
         this.languageUtilService.getAudioLanguageDescription(
@@ -135,7 +137,6 @@ export class ContributorDashboardPageComponent
   }
 
   ngOnInit(): void {
-    this.profilePictureDataUrl = null;
     this.username = '';
     this.userInfoIsLoading = true;
     this.userIsLoggedIn = false;
@@ -148,12 +149,19 @@ export class ContributorDashboardPageComponent
     const prevSelectedTopicName = (
       this.localStorageService.getLastSelectedTranslationTopicName());
 
+    if (prevSelectedTopicName === null) {
+      throw new Error('No topic name found in local storage.');
+    }
+
     this.windowRef.nativeWindow.addEventListener('scroll', () => {
       this.scrollFunction();
     });
 
     this.userService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
+        if (userContributionRights === null) {
+          throw new Error('User contribution rights not found.');
+        }
         this.userCanReviewTranslationSuggestionsInLanguages = (
           this.getLanguageDescriptions(
             userContributionRights

@@ -36,8 +36,8 @@ import { QuestionPlayerConfig } from 'pages/exploration-player-page/learner-expe
 })
 export class ReviewTestPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  questionPlayerConfig: QuestionPlayerConfig;
-  storyName: string;
+  questionPlayerConfig!: QuestionPlayerConfig;
+  storyName!: string;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -54,6 +54,9 @@ export class ReviewTestPageComponent implements OnInit, OnDestroy {
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     const storyUrlFragment = (
       this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    if (storyUrlFragment === null) {
+      throw new Error('Story url fragment cannot be null.');
+    }
     const classroomUrlFragment = (
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
     const reviewTestsUrl = this.urlInterpolationService.interpolateUrl(

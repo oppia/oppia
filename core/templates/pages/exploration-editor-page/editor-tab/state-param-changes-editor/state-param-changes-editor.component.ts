@@ -29,7 +29,7 @@ import { StateParamChangesService } from
   styleUrls: []
 })
 export class StateParamChangesEditorComponent implements OnInit {
-  spcs: StateParamChangesService;
+  spcs!: StateParamChangesService;
   constructor(public stateParamChangesService: StateParamChangesService) {}
 
   ngOnInit(): void {

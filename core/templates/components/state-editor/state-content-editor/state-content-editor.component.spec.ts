@@ -36,7 +36,7 @@ describe('StateHintsEditorComponent', () => {
   let externalSaveService: ExternalSaveService;
   let stateContentService: StateContentService;
 
-  var _getContent = function(contentId, contentString) {
+  var _getContent = function(contentId: string, contentString: string) {
     return SubtitledHtml.createFromBackendDict({
       content_id: contentId,
       html: contentString

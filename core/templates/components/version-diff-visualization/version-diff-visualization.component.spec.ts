@@ -94,21 +94,15 @@ describe('Version Diff Visualization Component', () => {
           originalStateName: 'F'
         },
       },
-      v2States: {
-        C: {},
-        D: {}
-      },
-      v1States: {
-        A: {},
-        B: {}
-      }
+      v2States: {},
+      v1States: {}
     };
   });
 
   it('should set component properties on initialization', () => {
     expect(component.diffGraphSecondaryLabels).toEqual(undefined);
     expect(component.diffGraphNodeColors).toEqual(undefined);
-    expect(component.v1InitStateId).toEqual(undefined);
+    expect(component.v1InitStateId).toBeUndefined();
     expect(component.diffGraphData).toEqual(undefined);
     expect(component.legendGraph).toEqual(undefined);
 
@@ -178,12 +172,12 @@ describe('Version Diff Visualization Component', () => {
             originalStateName: 'A'
           }
         },
-        v2States: null,
-        v1States: null,
-        finalStateIds: null,
-        v2InitStateId: null,
-        links: null,
-        v1InitStateId: null,
+        v2States: {},
+        v1States: {},
+        finalStateIds: [],
+        v2InitStateId: '',
+        links: [],
+        v1InitStateId: '',
       }
     );
 
@@ -193,7 +187,7 @@ describe('Version Diff Visualization Component', () => {
   it('should open state diff modal when user clicks on a state in' +
     ' difference graph', () => {
     class MockComponentInstance {
-      compoenentInstance: {
+      compoenentInstance!: {
         newState: null;
         newStateName: 'A';
         oldState: null;
@@ -229,23 +223,17 @@ describe('Version Diff Visualization Component', () => {
             originalStateName: 'B'
           }
         },
-        v2States: {
-          A: {},
-          B: {}
-        },
-        v1States: {
-          A: {},
-          B: {}
-        },
-        finalStateIds: null,
-        v2InitStateId: null,
-        links: null,
-        v1InitStateId: null,
+        v2States: {},
+        v1States: {},
+        finalStateIds: [],
+        v2InitStateId: '',
+        links: [],
+        v1InitStateId: '',
       }
     );
 
     class MockComponentInstance {
-      compoenentInstance: {
+      compoenentInstance!: {
         newState: {};
         newStateName: 'A';
         oldState: {};

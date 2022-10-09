@@ -41,7 +41,7 @@ describe('Exploration Graph Component', () => {
   let routerService: RouterService;
   let stateEditorService: StateEditorService;
   let ngbModal: NgbModal;
-  let isEditableSpy;
+  let isEditableSpy: jasmine.Spy;
 
   class MockNgbModal {
     open() {

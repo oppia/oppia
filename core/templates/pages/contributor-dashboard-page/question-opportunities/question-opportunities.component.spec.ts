@@ -29,9 +29,10 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 import { QuestionOpportunitiesComponent } from './question-opportunities.component';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { UserInfo } from 'domain/user/user-info.model';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     skillId: null;
   };
 }
@@ -52,9 +53,9 @@ describe('Question opportunities component', () => {
   let ngbModal: NgbModal;
   let questionUndoRedoService: QuestionUndoRedoService;
   let siteAnalyticsService: SiteAnalyticsService;
-  let skillObjectFactory;
-  let userService;
-  let opportunitiesArray = [];
+  let skillObjectFactory: SkillObjectFactory;
+  let userService: UserService;
+  let opportunitiesArray: SkillOpportunity[] = [];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -159,9 +160,11 @@ describe('Question opportunities component', () => {
       } as NgbModalRef
     );
     spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve({
-      isLoggedIn: () => true
-    }));
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
     component.ngOnInit();
     tick();
 
@@ -173,10 +176,11 @@ describe('Question opportunities component', () => {
 
   it('should open requires login modal when trying to select a question and' +
     ' a skill difficulty and user is not logged', () => {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve({
-        isLoggedIn: () => false
-      }));
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
     component.ngOnInit();
 
     spyOn(ngbModal, 'open');
@@ -197,10 +201,11 @@ describe('Question opportunities component', () => {
         result: Promise.resolve()
       } as NgbModalRef
     );
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve({
-        isLoggedIn: () => true
-      }));
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
     component.ngOnInit();
 
     component.onClickSuggestQuestionButton('1');
@@ -239,6 +244,10 @@ describe('Question opportunities component', () => {
         },
         language_code: 'en',
         version: 3,
+        all_questions_merged: false,
+        next_misconception_id: 0,
+        prerequisite_skill_ids: [],
+        superseding_skill_id: ''
       }), 1);
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -246,10 +255,11 @@ describe('Question opportunities component', () => {
 
   it('should create a question when closing create question modal',
     fakeAsync(() => {
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve({
-          isLoggedIn: () => true
-        }));
+      let userInfo = new UserInfo(
+        ['USER_ROLE'], true, false, false, false, true,
+        'en', 'username1', 'tester@example.com', true
+      );
+      spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
 
       component.ngOnInit();
       tick();
@@ -276,6 +286,10 @@ describe('Question opportunities component', () => {
             },
             language_code: 'en',
             version: 3,
+            all_questions_merged: false,
+            next_misconception_id: 0,
+            prerequisite_skill_ids: [],
+            superseding_skill_id: ''
           }),
           skillDifficulty: 1
         })
@@ -290,10 +304,11 @@ describe('Question opportunities component', () => {
 
   it('should suggest a question when dismissing create question modal',
     fakeAsync(() => {
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve({
-          isLoggedIn: () => true
-        }));
+      let userInfo = new UserInfo(
+        ['USER_ROLE'], true, false, false, false, true,
+        'en', 'username1', 'tester@example.com', true
+      );
+      spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
 
       component.ngOnInit();
       tick();
@@ -320,6 +335,10 @@ describe('Question opportunities component', () => {
             },
             language_code: 'en',
             version: 3,
+            all_questions_merged: false,
+            next_misconception_id: 0,
+            prerequisite_skill_ids: [],
+            superseding_skill_id: ''
           }),
           skillDifficulty: 1
         })
@@ -340,10 +359,11 @@ describe('Question opportunities component', () => {
         result: Promise.reject()
       } as NgbModalRef
     );
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve({
-        isLoggedIn: () => true
-      }));
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
     component.ngOnInit();
 
 

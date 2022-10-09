@@ -29,7 +29,7 @@ import { AngularNameService } from 'pages/exploration-editor-page/services/angul
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { TrainingDataService } from './training-data.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { InteractionAnswer } from 'interactions/answer-defs';
@@ -47,6 +47,7 @@ import { NumericInputRulesService } from 'interactions/NumericInput/directives/n
 import { PencilCodeEditorRulesService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
@@ -75,14 +76,14 @@ interface classification {
 })
 export class TrainingModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() unhandledAnswer: InteractionAnswer;
+  @Input() unhandledAnswer!: InteractionAnswer;
   @Output() finishTrainingCallback: EventEmitter<void> =
     new EventEmitter();
 
   trainingDataAnswer: InteractionAnswer | string = '';
   // See the training panel directive in ExplorationEditorTab for an
   // explanation on the structure of this object.
-  classification: classification;
+  classification!: classification;
   addingNewResponse: boolean = false;
 
   constructor(
@@ -105,7 +106,9 @@ export class TrainingModalComponent
   ngOnInit(): void {
     this.classification = {
       answerGroupIndex: 0,
-      newOutcome: null
+      newOutcome: new Outcome(
+        '', '', new SubtitledHtml('html', 'html'),
+        false, [], '', '')
     };
     this.addingNewResponse = false;
 
@@ -119,13 +122,15 @@ export class TrainingModalComponent
     this.responsesService.save(
       answerGroups, this.responsesService.getDefaultOutcome(),
       (newAnswerGroups, newDefaultOutcome) => {
+        let stateName = this.stateEditorService.getActiveStateName();
+        if (stateName === null || newDefaultOutcome === null) {
+          throw new Error('Cannot save new answer group.');
+        }
         this.explorationStatesService.saveInteractionAnswerGroups(
-          this.stateEditorService.getActiveStateName(),
-          cloneDeep(newAnswerGroups));
+          stateName, cloneDeep(newAnswerGroups));
 
         this.explorationStatesService.saveInteractionDefaultOutcome(
-          this.stateEditorService.getActiveStateName(),
-          cloneDeep(newDefaultOutcome));
+          stateName, cloneDeep(newDefaultOutcome));
 
         this.graphDataService.recompute();
         this.explorationWarningsService.updateWarnings();
@@ -161,6 +166,9 @@ export class TrainingModalComponent
   init(): void {
     let currentStateName =
       this.stateEditorService.getActiveStateName();
+    if (currentStateName === null) {
+      throw new Error('Cannot train on an un-named state.');
+    }
     let state = this.explorationStatesService.getState(currentStateName);
 
     // Retrieve the interaction ID.
@@ -172,7 +180,9 @@ export class TrainingModalComponent
 
     // Inject RulesService dynamically.
     let rulesService = (
-      this.injector.get(RULES_SERVICE_MAPPING[rulesServiceName]));
+      this.injector.get(RULES_SERVICE_MAPPING[
+        rulesServiceName as keyof typeof RULES_SERVICE_MAPPING
+      ])) as InteractionRulesService;
 
     let classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(

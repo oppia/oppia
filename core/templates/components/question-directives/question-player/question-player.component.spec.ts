@@ -53,7 +53,7 @@ describe('Question Player Component', () => {
   let explorationPlayerStateServiceEmitter = new EventEmitter();
   let questionPlayerStateServiceEmitter = new EventEmitter();
   let userInfo = new UserInfo(
-    null, true, false, false, false,
+    [], true, false, false, false,
     true, 'en', 'username1', 'tester@example.org', true);
 
   class MockWindowRef {
@@ -80,7 +80,7 @@ describe('Question Player Component', () => {
   }
 
   class MockLocation {
-    onUrlChange(callback) {
+    onUrlChange(callback: () => void) {
       callback();
     }
   }
@@ -306,8 +306,14 @@ describe('Question Player Component', () => {
     expect(component.showActionButtonsFooter()).toBe(true);
 
     component.questionPlayerConfig = {
-      resultActionButtons: []
-    } as QuestionPlayerConfig;
+      resultActionButtons: [],
+      questionPlayerMode: {
+        modeType: '',
+        passCutoff: 0,
+      },
+      skillDescriptions: [],
+      skillList: []
+    };
     expect(component.showActionButtonsFooter()).toBe(false);
   });
 
@@ -359,10 +365,10 @@ describe('Question Player Component', () => {
   it('should calculate score based on question state data', () => {
     let questionStateData = {
       ques1: {
-        answers: null,
+        answers: [],
         usedHints: [],
         viewedSolution: false,
-        linkedSkillIds: null
+        linkedSkillIds: []
       },
       ques2: {
         answers: [{
@@ -378,6 +384,11 @@ describe('Question Player Component', () => {
       }
     };
     component.questionPlayerConfig = {
+      resultActionButtons: [],
+      questionPlayerMode: {
+        modeType: '',
+        passCutoff: 0,
+      },
       skillList: ['skillId1'],
       skillDescriptions: ['description1']
     } as QuestionPlayerConfig;
@@ -400,7 +411,7 @@ describe('Question Player Component', () => {
         answers: [],
         usedHints: ['hint1'],
         viewedSolution: false,
-        linkedSkillIds: null
+        linkedSkillIds: []
       },
       ques2: {
         answers: [{
@@ -636,8 +647,7 @@ describe('Question Player Component', () => {
 
   it('should prevent page reload or exit in between' +
   'practice session', () => {
-    spyOn(preventPageUnloadEventService, 'addListener').and
-      .callFake((callback) => callback());
+    spyOn(preventPageUnloadEventService, 'addListener');
 
     component.ngOnInit();
 

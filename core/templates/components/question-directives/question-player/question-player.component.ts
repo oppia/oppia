@@ -85,22 +85,22 @@ export interface QuestionPlayerConfig {
   templateUrl: './question-player.component.html'
 })
 export class QuestionPlayerComponent implements OnInit, OnDestroy {
-  @Input() questionPlayerConfig: QuestionPlayerConfig;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig;
 
   componentSubscription = new Subscription();
-  resultsLoaded: boolean;
-  currentQuestion: number;
-  totalQuestions: number;
-  currentProgress: number;
-  totalScore: number;
-  allQuestions: number;
-  finalCorrect: number;
-  scorePerSkillMapping: ScorePerSkillMapping;
-  testIsPassed: boolean;
-  masteryPerSkillMapping: MasteryPerSkillMapping;
-  failedSkillIds: string[];
-  userIsLoggedIn: boolean;
-  canCreateCollections: boolean;
+  resultsLoaded!: boolean;
+  currentQuestion!: number;
+  totalQuestions!: number;
+  currentProgress!: number;
+  totalScore!: number;
+  allQuestions!: number;
+  finalCorrect!: number;
+  scorePerSkillMapping!: ScorePerSkillMapping;
+  testIsPassed!: boolean;
+  masteryPerSkillMapping!: MasteryPerSkillMapping;
+  failedSkillIds!: string[];
+  userIsLoggedIn!: boolean;
+  canCreateCollections!: boolean;
 
   constructor(
     private contextService: ContextService,
@@ -246,8 +246,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   hasUserPassedTest(): boolean {
-    let testIsPassed = true;
-    let failedSkillIds = [];
+    let testIsPassed: boolean = true;
+    let failedSkillIds: string[] = [];
     if (this.isInPassOrFailMode()) {
       Object.keys(this.scorePerSkillMapping).forEach((skillId) => {
         let correctionRate = this.scorePerSkillMapping[skillId].score /
@@ -317,7 +317,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     modelRef.componentInstance.skillId = skillId;
     modelRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
     modelRef.componentInstance.openConceptCardModal.subscribe(
-      (value) => {
+      (value: string[]) => {
         this.openConceptCardModal(value);
       }
     );
@@ -384,7 +384,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   createScorePerSkillMapping(): void {
-    let scorePerSkillMapping = {};
+    let scorePerSkillMapping: Record<string, ScorePerSkill> = {};
 
     if (this.questionPlayerConfig.skillList) {
       for (let i = 0;
@@ -404,7 +404,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   createMasteryPerSkillMapping(): void {
-    let masteryPerSkillMapping = {};
+    let masteryPerSkillMapping: Record<string, number> = {};
     if (this.questionPlayerConfig.skillList) {
       for (let i = 0;
         i < this.questionPlayerConfig.skillList.length; i++) {
@@ -417,7 +417,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   createMasteryChangePerQuestion(
       questionData: QuestionData): MasteryChangePerQuestion {
-    let masteryChangePerQuestion = {};
+    let masteryChangePerQuestion: Record<string, number> = {};
     for (let i = 0; i < questionData.linkedSkillIds.length; i++) {
       let skillId = questionData.linkedSkillIds[i];
       masteryChangePerQuestion[skillId] =
@@ -449,7 +449,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       'action-button-icon">&#xE88A</i>';
     }
     return this._sanitizer.sanitize(
-      SecurityContext.HTML, iconHtml);
+      SecurityContext.HTML, iconHtml) as string;
   }
 
   performAction(actionButton: ActionButton): void {
@@ -467,8 +467,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   getWorstSkillIds(): string[] {
-    let minScore = 0.95;
-    let worstSkillIds = [];
+    let minScore: number = 0.95;
+    let worstSkillIds: [number, string][] = [];
     Object.keys(this.scorePerSkillMapping).forEach((skillId) => {
       let skillScoreData = this.scorePerSkillMapping[skillId];
       let scorePercentage = skillScoreData.score / skillScoreData.total;
@@ -481,7 +481,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   openConceptCardModal(skillIds: string[]): void {
-    let skills = [];
+    let skills: string[] = [];
     skillIds.forEach((skillId) => {
       skills.push(
         this.scorePerSkillMapping[skillId].description);
@@ -563,7 +563,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.userIsLoggedIn = null;
+      this.userIsLoggedIn = false;
       this.userService.getUserInfoAsync().then((userInfo) => {
         this.canCreateCollections = userInfo.canCreateCollections();
         this.userIsLoggedIn = userInfo.isLoggedIn();

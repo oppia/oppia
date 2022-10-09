@@ -79,7 +79,7 @@ describe('StateTopAnswersStatsService', () => {
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
-        training_data: null,
+        training_data: [],
         tagged_skill_misconception_id: null,
       }],
       default_outcome: {

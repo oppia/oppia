@@ -81,7 +81,7 @@ describe('Exploration Graph Modal Component', () => {
     graphDataService = TestBed.inject(GraphDataService);
     stateEditorService = TestBed.inject(StateEditorService);
 
-    spyOn(graphDataService, 'getGraphData').and.returnValue(null);
+    spyOn(graphDataService, 'getGraphData').and.callThrough();
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
     spyOn(ngbActiveModal, 'close').and.stub();
 

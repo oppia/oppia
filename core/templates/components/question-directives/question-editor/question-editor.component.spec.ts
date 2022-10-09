@@ -103,7 +103,7 @@ describe('Question Editor Component', () => {
               missing_prerequisite_skill_id: null,
             },
             rule_specs: [],
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null
           }],
           confirmed_unclassified_answers: [],
@@ -117,7 +117,7 @@ describe('Question Editor Component', () => {
             rows: { value: 1 }
           },
           default_outcome: {
-            dest: null,
+            dest: 'dest',
             dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
@@ -178,9 +178,9 @@ describe('Question Editor Component', () => {
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
       },
-      inapplicable_skill_misconception_ids: null,
+      inapplicable_skill_misconception_ids: [],
       language_code: 'en',
       linked_skill_ids: [],
       question_state_data_schema_version: 44,
@@ -204,7 +204,7 @@ describe('Question Editor Component', () => {
   });
 
   it('should set component properties on initialization', () => {
-    expect(component.oppiaBlackImgUrl).toBe(undefined);
+    expect(component.oppiaBlackImgUrl).toBeUndefined();
     expect(component.interactionIsShown).toBe(undefined);
     expect(component.stateEditorIsInitialized).toBe(undefined);
 
@@ -330,7 +330,7 @@ describe('Question Editor Component', () => {
   it('should save interaction answer groups when interaction is saved', () => {
     spyOn(stateEditorService, 'setInteractionAnswerGroups');
 
-    component.saveInteractionAnswerGroups(null);
+    component.saveInteractionAnswerGroups([]);
 
     expect(stateEditorService.setInteractionAnswerGroups).toHaveBeenCalledWith(
       null
@@ -359,6 +359,10 @@ describe('Question Editor Component', () => {
   it('should set interaction solution when interaction is saved', () => {
     spyOn(stateEditorService, 'setInteractionSolution');
 
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'ExplorationHtmlFormatterService'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     let solution = new Solution(null, null, null, null);
     component.saveSolution(solution);
 
