@@ -37,7 +37,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             KeyError, generator_id
         ):
-             value_generators_domain.Registry.get_generator_class_by_id(generator_id)
+            value_generators_domain.Registry.get_generator_class_by_id(generator_id)
 
     def test_value_generator_registry(self) -> None:
         copier_id = 'Copier'
@@ -86,7 +86,6 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
                 'Copier'
             ).get_html_template()
         )
-
 
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
