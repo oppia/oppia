@@ -441,7 +441,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(suggestions['change'], change_dict)
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
-            suggestions['change']['old_value']['content_id'], 'content')
+            suggestions['change']['old_value']['content_id'], 'content_0')
         self.logout()
 
     def test_get_suggestions_to_review_list(self):
@@ -487,7 +487,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(suggestions[0]['change'], change_dict)
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
-            suggestions[0]['change']['old_value']['content_id'], 'content')
+            suggestions[0]['change']['old_value']['content_id'], 'content_0')
 
         self.logout()
 

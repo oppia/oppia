@@ -3419,8 +3419,6 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     AUTHOR_USERNAME = 'author'
     AUTHOR_EMAIL = 'author@example.com'
-    VIEWER_USERNAME = 'user'
-    VIEWER_EMAIL = 'user@example.com'
     TARGET_TYPE = feconf.ENTITY_TYPE_EXPLORATION
     SUGGESTION_TYPE_1 = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
     SUGGESTION_TYPE_2 = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
@@ -6720,7 +6718,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
+            'content_0', '<p>old content html</p>').to_dict()
         exploration.states['State 1'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 2'].update_content(

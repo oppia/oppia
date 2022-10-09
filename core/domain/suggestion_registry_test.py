@@ -650,7 +650,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
         change = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_ADD_STATE,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': suggestion.change.state_name,
             'new_value': 'new suggestion content',
@@ -2459,7 +2459,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [
-            u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>', u'']
+            u'', u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self) -> None:
@@ -2672,7 +2672,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         question_state_dict: state_domain.StateDict = {
             'content': {
                 'html': '<p>Text</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'classifier_model_id': None,
             'linked_skill_id': None,
@@ -2690,7 +2690,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                             'dest_if_really_stuck': None,
                             'feedback': {
                                 'html': '<p>assas</p>',
-                                'content_id': 'feedback_0'
+                                'content_id': 'feedback_2'
                             },
                             'labelled_as_correct': True,
                             'param_changes': [],
@@ -2735,7 +2735,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'dest_if_really_stuck': None,
                     'feedback': {
                         'html': '<p>wer</p>',
-                        'content_id': 'default_outcome'
+                        'content_id': 'default_outcome_1'
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
@@ -2746,7 +2746,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'html': '<p>assaas</p>',
-                            'content_id': 'hint_1'
+                            'content_id': 'hint_3'
                         }
                     }
                 ],
@@ -2755,10 +2755,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'feedback_0': {},
-                    'hint_1': {}
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'feedback_2': {},
+                    'hint_3': {}
                 }
             },
             'solicit_answer_details': False,
@@ -2781,6 +2781,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill1'],
+                    'next_content_id_index': 4,
                     'inapplicable_skill_misconception_ids': []
                 },
                 'skill_id': 'skill1',

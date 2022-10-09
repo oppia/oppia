@@ -6850,5 +6850,5 @@ export default {
     "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
     "edits_allowed"
   ],
-  "NON_METADATA_PROPERTIES": ["id", "states"]
+  "NON_METADATA_PROPERTIES": ["id", "states", "next_content_id_index"]
 } as const;

@@ -31,6 +31,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
@@ -872,11 +873,22 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         exploration = self.save_new_valid_exploration(
             '44', feconf.SYSTEM_COMMITTER_ID, objective='The objective',
             category='Algebra')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.assertEqual(exploration.version, 1)
 
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
+            'state_name': 'New state',
+            'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'New state',

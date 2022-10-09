@@ -3142,7 +3142,8 @@ title: Title
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
         end_state_name: Optional[str] = None,
         interaction_id: str = 'TextInput',
-        correctness_feedback_enabled: bool = False
+        correctness_feedback_enabled: bool = False,
+        content_html: str = '',
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
 
@@ -3157,6 +3158,7 @@ title: Title
             interaction_id: str. The id of the interaction.
             correctness_feedback_enabled: bool. Whether correctness feedback is
                 enabled for the exploration.
+            content_html: str. The html for the state content.
 
         Returns:
             Exploration. The exploration domain object.
@@ -3166,9 +3168,10 @@ title: Title
             language_code=language_code)
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index)
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.content.html = content_html
         self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], interaction_id,
-            content_id_generator)
+            init_state, interaction_id, content_id_generator)
 
         exploration.objective = objective
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
@@ -3182,6 +3185,7 @@ title: Title
                 content_id_generator.generate(
                     translation_domain.ContentType.DEFAULT_OUTCOME))
             end_state = exploration.states[end_state_name]
+            end_state.content.html = content_html
             self.set_interaction_for_state(
                 end_state, 'EndExploration', content_id_generator)
             end_state.update_interaction_default_outcome(None)
@@ -3215,7 +3219,8 @@ title: Title
         category: str = 'A category',
         objective: str = 'An objective',
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
-        correctness_feedback_enabled: bool = False
+        correctness_feedback_enabled: bool = False,
+        content_html: str = ''
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration with a sequence of states.
 
@@ -3235,6 +3240,7 @@ title: Title
             language_code: str. The language_code of this exploration.
             correctness_feedback_enabled: bool. Whether the correctness feedback
                 is enabled or not for the exploration.
+            content_html: str. The html for the state content.
 
         Returns:
             Exploration. The exploration domain object.
@@ -3255,6 +3261,9 @@ title: Title
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index)
 
+        init_state = exploration.states[state_names[0]]
+        init_state.content.html = content_html
+
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
         for state_name in state_names[1:]:
             exploration.add_state(
@@ -3263,6 +3272,8 @@ title: Title
                     translation_domain.ContentType.CONTENT),
                 content_id_generator.generate(
                     translation_domain.ContentType.DEFAULT_OUTCOME))
+            curent_state = exploration.states[state_name]
+            curent_state.content.html = content_html
         for from_state_name, dest_state_name in (
                 zip(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]

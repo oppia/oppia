@@ -1278,7 +1278,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(
             new_state, 'TextInput', content_id_generator)
         second_state = state_domain.State.create_default_state(
-            'ABC',
+            'BCD',
             content_id_generator.generate(
                 translation_domain.ContentType.CONTENT),
             content_id_generator.generate(
@@ -5067,7 +5067,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5090,8 +5090,8 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_2
-            - ca_choices_3
+            - ca_choices_4
+            - ca_choices_5
             - invalid_content_id
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -5100,9 +5100,9 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_2
+          - content_id: ca_choices_4
             html: <p>Choice 1</p>
-          - content_id: ca_choices_3
+          - content_id: ca_choices_5
             html: <p>Choice 2</p>
         maxAllowableSelectionCount:
           value: 2
@@ -5112,7 +5112,7 @@ states:
         dest: (untitled state)
         dest_if_really_stuck: null
         feedback:
-          content_id: feedback_1
+          content_id: default_outcome_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -5123,20 +5123,20 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-        - ca_choices_2
+        - ca_choices_4
         explanation:
-          content_id: solution
+          content_id: solution_3
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        solution_3: {}
     solicit_answer_details: false
   END:
     card_is_checkpoint: false
@@ -5158,12 +5158,9 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_6: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 52
+states_schema_version: 53
 tags: []
 title: Title
 """)
@@ -5317,7 +5314,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5345,15 +5342,15 @@ states:
           rule_type: IsEqualToOrdering
         - inputs:
             x:
-            - - ca_choices_2
+            - - ca_choices_4
           rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
         - inputs:
-            x: ca_choices_2
+            x: ca_choices_4
             y: 1
           rule_type: HasElementXAtPositionY
         - inputs:
-            x: ca_choices_2
-            y: ca_choices_3
+            x: ca_choices_4
+            y: ca_choices_5
           rule_type: HasElementXBeforeElementY
         tagged_skill_misconception_id: null
         training_data: []
@@ -5363,15 +5360,15 @@ states:
           value: true
         choices:
           value:
-          - content_id: ca_choices_2
+          - content_id: ca_choices_4
             html: <p>Choice 1</p>
-          - content_id: ca_choices_3
+          - content_id: ca_choices_5
             html: <p>Choice 2</p>
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
         feedback:
-          content_id: feedback_1
+          content_id: default_outcome_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -5382,21 +5379,21 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-        - - ca_choices_2
-          - ca_choices_3
+        - - ca_choices_4
+          - ca_choices_5
         explanation:
-          content_id: solution
+          content_id: solution_3
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        solution_3: {}
     solicit_answer_details: false
   END:
     card_is_checkpoint: false
@@ -5418,7 +5415,7 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_6: {}
     solicit_answer_details: false
 states_schema_version: 53
 tags: []
@@ -5532,16 +5529,17 @@ correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
+next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: ''
     interaction:
       answer_groups: []
@@ -5549,13 +5547,13 @@ states:
       customization_args:
         buttonText:
           value:
-            content_id: ca_buttonText
+            content_id: ca_buttonText_2
             unicode_str: Continue
       default_outcome:
         dest: END
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -5565,28 +5563,18 @@ states:
       id: Continue
       solution: null
     linked_skill_id: null
-    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText: {}
-        content: {}
-        default_outcome: {}
+        ca_buttonText_2: {}
+        content_0: {}
+        default_outcome_1: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_buttonText:
-          bn:
-            data_format: unicode
-            needs_update: false
-            translation: hello
-        content: {}
-        default_outcome: {}
   END:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_3
       html: <p>Congratulations, you have finished!</p>
     interaction:
       answer_groups: []
@@ -5599,16 +5587,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 52
+states_schema_version: 53
 tags: []
 title: Title
 """)
@@ -5784,7 +5768,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ] = {
             'placeholder': {
                 'value': {
-                    'content_id': 'ca_placeholder_0',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='placeholder'),
                     'unicode_str': 'Enter here.'
                 }
             },
@@ -5795,11 +5781,15 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ] = {
             'choices': {'value': [
                 {
-                    'content_id': 'ca_choices_0',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='choices'),
                     'html': '<p>This is value1 for MultipleChoice</p>'
                 },
                 {
-                    'content_id': 'ca_choices_1',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='choices'),
                     'html': '<p>This is value2 for MultipleChoice</p>'
                 }
             ]},
@@ -5810,15 +5800,21 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ] = {
             'choices': {'value': [
                 {
-                    'content_id': 'ca_choices_0',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='choices'),
                     'html': '<p>This is value1 for ItemSelection</p>'
                 },
                 {
-                    'content_id': 'ca_choices_1',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='choices'),
                     'html': '<p>This is value2 for ItemSelection</p>'
                 },
                 {
-                    'content_id': 'ca_choices_2',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='choices'),
                     'html': '<p>This is value3 for ItemSelection</p>'
                 }
             ]},
@@ -5830,11 +5826,15 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ] = {
             'choices': {'value': [
                 {
-                    'content_id': 'ca_choices_0',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='choices'),
                     'html': '<p>This is value1 for DragAndDropSortInput</p>'
                 },
                 {
-                    'content_id': 'ca_choices_1',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='choices'),
                     'html': '<p>This is value2 for DragAndDropSortInput</p>'
                 }
             ]},
@@ -5848,7 +5848,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         default_outcome = state_domain.Outcome(
             'state2', None, state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for state1</p>'),
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME),
+                '<p>Default outcome for state1</p>'),
             False, [], None, None
         )
         state1.update_interaction_default_outcome(default_outcome)
@@ -5856,12 +5858,16 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         hint_list2 = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>'
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>Hello, this is html1 for state2</p>'
                 )
             ),
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>'
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>Hello, this is html2 for state2</p>'
                 )
             ),
         ]
@@ -5871,7 +5877,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.SOLUTION),
                 'html': '<p>This is solution for state1</p>'
             }
         }
@@ -5885,8 +5892,10 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'state1', None, state_domain.SubtitledHtml(
-                        'feedback_1', '<p>Outcome2 for state2</p>'),
-                    False, [], None, None),
+                        content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Outcome2 for state2</p>'
+                    ), False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals',
@@ -5904,7 +5913,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'state3', None, state_domain.SubtitledHtml(
-                        'feedback_2', '<p>Outcome1 for state2</p>'),
+                        content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Outcome1 for state2</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -5919,7 +5930,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1', None, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Outcome for state3</p>'),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                    '<p>Outcome for state3</p>'),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -5966,7 +5979,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ]
 
         actual_outcome_list = exploration.get_all_html_content_strings()
-
         self.assertItemsEqual(set(actual_outcome_list), set(expected_html_list))
 
 
@@ -6089,7 +6101,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_3),
-
             'Changed content of End state.')
 
         # Changing content of first state.
@@ -6245,7 +6256,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Changed Contents and Hint')
 
         test_dict: Dict[str, str] = {}
@@ -6444,7 +6454,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Changed Contents and Hint')
 
         # Changes to the properties affected by or affecting
@@ -6569,7 +6578,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Changed Contents and Hints')
 
         # Changes to the properties affecting customization_args
@@ -6985,7 +6993,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Changed Customization Args and related properties again')
 
         # Changes to the customization_args in same
@@ -7096,7 +7103,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Added answer groups and solution')
 
         # Changes to the properties that are not related to
@@ -7156,7 +7162,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Changed Contents and Hint')
 
         change_list_3 = [exp_domain.ExplorationChange({
@@ -7584,7 +7589,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Added answer groups and solution')
 
         # Changes to the answer_groups and the properties that
@@ -7773,7 +7777,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Changed Answer Groups and related properties')
 
         # Changes to the answer group in same state again
@@ -7915,7 +7918,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Added answer groups and solution')
 
         # Changes to the properties unrelated to the solutions.
@@ -7977,7 +7979,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Changed Contents and Hint')
 
         # Changes to the solutions and the properties that affects
@@ -8385,7 +8386,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Added answer groups and solution')
 
         # Changes to the solutions and the properties that affects
@@ -8571,7 +8571,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Changed Solutions and affected properties')
 
         # Change to the solution of same state again
@@ -8637,7 +8636,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Added Hint and Solution in Introduction state')
 
         test_dict: Dict[str, str] = {}
@@ -8821,7 +8819,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Made changes in interaction, contents, solutions, answer_groups in both states') # pylint: disable=line-too-long
 
         # Changes to the old hints and also deleted and added
@@ -8947,7 +8944,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Added Hint and Solution in Introduction state')
 
         # Changes to the old hints and also deleted and added
@@ -9038,7 +9034,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Changes in the hints again.')
 
         change_list_3 = [exp_domain.ExplorationChange({
@@ -9245,7 +9240,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Made changes in interaction, contents, solutions, answer_groups in introduction state.') # pylint: disable=line-too-long
 
         # Changes to properties of second state.
@@ -9311,7 +9305,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Made changes in solutions in introduction state and content, state_name in end state.') # pylint: disable=line-too-long
 
         # Changes to the exploration properties to check
@@ -9454,7 +9447,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Changes in the Exploration Properties.')
 
         change_list_2 = [exp_domain.ExplorationChange({
@@ -9507,16 +9499,12 @@ class ExplorationChangesMergeabilityUnitTests(
         # voiceovers can be added later on.
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
-            'old_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                'html': ''
-            },
+            'old_value': None,
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': {
                 'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.CONTENT),
                 'html': '<p>First State Content.</p>'
             }
         }), exp_domain.ExplorationChange({
@@ -9525,8 +9513,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'placeholder': {
                     'value': {
                         'unicode_str': '',
-                        'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
+                        'content_id': 'cust_arg_1'
                     }
                 },
                 'rows': {
@@ -9540,7 +9527,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'value': {
                         'unicode_str': 'Placeholder',
                         'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
+                            translation_domain.ContentType.CUSTOMIZATION_ARG,
+                            extra_prefix='placeholder')
                     }
                 },
                 'rows': {
@@ -9554,8 +9542,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'refresher_exploration_id': None,
                 'feedback': {
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                    'content_id': 'feedback_5',
                     'html': ''
                 },
                 'param_changes': [
@@ -9572,7 +9559,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'refresher_exploration_id': None,
                 'feedback': {
                     'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.DEFAULT_OUTCOME),
                     'html': '<p>Feedback 1.</p>'
                 },
                 'param_changes': [
@@ -9590,7 +9577,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'hint_content': {
                         'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.HINT),
                         'html': '<p>Hint 1.</p>'
                     }
                 }
@@ -9604,7 +9591,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'explanation': {
                     'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 },
                 'correct_answer': 'Solution'
@@ -9612,22 +9599,20 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                'content_id': 'content_6',
                 'html': ''
             },
             'state_name': 'End',
             'cmd': 'edit_state_property',
             'new_value': {
                 'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.CONTENT),
                 'html': '<p>Second State Content.</p>'
             }
         })]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Added various contents.')
 
         # Adding change to the field which is neither
@@ -9641,7 +9626,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Added single unrelated change.')
 
         # Adding some voiceovers to the first state.
@@ -9695,10 +9679,10 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'new_value': {
                 'voiceovers_mapping': {
-                    'hint_1': {},
-                    'default_outcome': {},
-                    'solution': {},
-                    'ca_placeholder_0': {
+                    'hint_8': {},
+                    'default_outcome_7': {},
+                    'solution_9': {},
+                    'ca_placeholder_6': {
                         'en': {
                             'needs_update': False,
                             'filename': 'ca_placeholder_0-en-mfy5l6logg.mp3',
@@ -9706,7 +9690,7 @@ class ExplorationChangesMergeabilityUnitTests(
                             'duration_secs': 10.971375
                         }
                     },
-                    'content': {
+                    'content_5': {
                         'en': {
                             'needs_update': False,
                             'filename': 'content-en-xrss3z3nso.mp3',
@@ -9725,7 +9709,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_3),
-
             'Added some voiceovers.')
 
         # Adding voiceovers again to the same first state
@@ -9820,7 +9803,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_6),
-
             'Changing Content in First State.')
         changes_are_mergeable_3 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_5)
@@ -9849,7 +9831,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_6),
-
             'Changing Content in Second State.')
 
         changes_are_not_mergeable = exp_services.are_changes_mergeable(
@@ -9869,15 +9850,14 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                'content_id': 'content_5',
                 'html': ''
             },
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': {
                 'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.CONTENT),
                 'html': '<p>First State Content.</p>'
             }
         }), exp_domain.ExplorationChange({
@@ -9886,8 +9866,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'placeholder': {
                     'value': {
                         'unicode_str': '',
-                        'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
+                        'content_id': 'cust_arg_5'
                     }
                 },
                 'rows': {
@@ -9901,7 +9880,8 @@ class ExplorationChangesMergeabilityUnitTests(
                     'value': {
                         'unicode_str': 'Placeholder',
                         'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
+                            translation_domain.ContentType.CUSTOMIZATION_ARG,
+                            extra_prefix='placeholder')
                     }
                 },
                 'rows': {
@@ -9915,8 +9895,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'refresher_exploration_id': None,
                 'feedback': {
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                    'content_id': 'feedback_7',
                     'html': ''
                 },
                 'param_changes': [
@@ -9933,7 +9912,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'refresher_exploration_id': None,
                 'feedback': {
                     'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.DEFAULT_OUTCOME),
                     'html': '<p>Feedback 1.</p>'
                 },
                 'param_changes': [
@@ -9951,7 +9930,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 {
                     'hint_content': {
                         'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.HINT),
                         'html': '<p>Hint 1.</p>'
                     }
                 }
@@ -9965,7 +9944,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'answer_is_exclusive': False,
                 'explanation': {
                     'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.SOLUTION),
                     'html': '<p>Explanation.</p>'
                 },
                 'correct_answer': 'Solution'
@@ -9973,22 +9952,20 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                'content_id': 'content',
                 'html': ''
             },
             'state_name': 'End',
             'cmd': 'edit_state_property',
             'new_value': {
                 'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            translation_domain.ContentType.CONTENT),
                 'html': '<p>Second State Content.</p>'
             }
         })]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Added various contents.')
 
         # Adding some voiceovers to the first state.
@@ -10042,10 +10019,10 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'new_value': {
                 'voiceovers_mapping': {
-                    'hint_1': {},
-                    'default_outcome': {},
-                    'solution': {},
-                    'ca_placeholder_0': {
+                    'hint_8': {},
+                    'default_outcome_7': {},
+                    'solution_9': {},
+                    'ca_placeholder_6': {
                         'en': {
                             'needs_update': False,
                             'filename': 'ca_placeholder_0-en-mfy5l6logg.mp3',
@@ -10053,7 +10030,7 @@ class ExplorationChangesMergeabilityUnitTests(
                             'duration_secs': 10.971375
                         }
                     },
-                    'content': {
+                    'content_5': {
                         'en': {
                             'needs_update': False,
                             'filename': 'content-en-xrss3z3nso.mp3',
@@ -10069,7 +10046,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_2),
-
             'Added some voiceovers.')
 
         # Adding voiceovers again to the same first state
@@ -10234,7 +10210,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list),
-
             'Changed various properties in both states.')
 
         # Change to the unrelated property to check that
@@ -10423,7 +10398,6 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             self.append_next_content_id_index_change(change_list_3),
-
             'Added and deleted states.')
 
         # Checking that old changes that could be
@@ -10677,7 +10651,6 @@ class ExplorationChangesMergeabilityUnitTests(
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 self.append_next_content_id_index_change(change_list),
-
                 'Changed various properties in both states.')
 
             change_list_2 = [exp_domain.ExplorationChange({
@@ -10841,7 +10814,6 @@ class ExplorationChangesMergeabilityUnitTests(
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 self.append_next_content_id_index_change(change_list_2),
-
                 'Added and deleted states.')
             change_list_3 = [exp_domain.ExplorationChange({
                 'old_value': {
@@ -10862,21 +10834,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 self.EXP_0_ID, 1, change_list_3)
             self.assertEqual(changes_are_not_mergeable, False)
 
-            change_list_3_dict = [{
-                'cmd': 'edit_state_property',
-                'property_name': 'content',
-                'state_name': 'Introduction',
-                'new_value': {
-                    'html': '<p>Hello Aryaman!</p>',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-                'old_value': {
-                    'html': '',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-            }]
+            change_list_3_dict = [change.to_dict() for change in change_list_3]
 
             expected_email_html_body = (
                 '(Sent from dev-project-id)<br/><br/>'
@@ -10924,7 +10882,6 @@ class ExplorationChangesMergeabilityUnitTests(
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 self.append_next_content_id_index_change(change_list),
-
                 'Changed various properties in both states.')
 
             # State name changed.
@@ -10937,7 +10894,6 @@ class ExplorationChangesMergeabilityUnitTests(
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 self.append_next_content_id_index_change(change_list_2),
-
                 'Changed various properties in both states.')
 
             change_list_3 = [exp_domain.ExplorationChange({
@@ -10959,21 +10915,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 self.EXP_0_ID, 2, change_list_3)
             self.assertEqual(changes_are_not_mergeable, False)
 
-            change_list_3_dict = [{
-                'cmd': 'edit_state_property',
-                'property_name': 'content',
-                'state_name': 'End',
-                'new_value': {
-                    'html': '<p>End State Changed</p>',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-                'old_value': {
-                    'html': 'End State',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-            }]
+            change_list_3_dict = [change.to_dict() for change in change_list_3]
             expected_email_html_body = (
                 '(Sent from dev-project-id)<br/><br/>'
                 'Hi Admin,<br><br>'
@@ -11004,32 +10946,6 @@ class ExplorationChangesMergeabilityUnitTests(
             changes_are_not_mergeable_2 = exp_services.are_changes_mergeable(
                 self.EXP_0_ID, 2, change_list_4)
             self.assertEqual(changes_are_not_mergeable_2, False)
-
-            change_list_4_dict = [{
-                'cmd': 'add_written_translation',
-                'state_name': 'End',
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                'language_code': 'de',
-                'content_html': 'N/A',
-                'translation_html': '<p>State 2 Content Translation.</p>',
-                'data_format': 'html'
-            }]
-            expected_email_html_body_2 = (
-                '(Sent from dev-project-id)<br/><br/>'
-                'Hi Admin,<br><br>'
-                'Some draft changes were rejected in exploration %s because '
-                'the changes were conflicting and could not be saved. Please '
-                'see the rejected change list below:<br>'
-                'Discarded change list: %s <br><br>'
-                'Frontend Version: %s<br>'
-                'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_4_dict, 2, 3)
-            )
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 2)
-            self.assertEqual(expected_email_html_body_2, messages[1].html)
 
 
 class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):

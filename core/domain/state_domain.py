@@ -3342,7 +3342,7 @@ class State(translation_domain.BaseTranslatableObject):
         if default_outcome is not None:
             yield (
                 default_outcome['feedback'],
-                translation_domain.ContentType.FEEDBACK,
+                translation_domain.ContentType.DEFAULT_OUTCOME,
                 None)
 
         answer_groups = interaction['answer_groups']

@@ -55,7 +55,7 @@ if MYPY: # pragma: no cover
 ])
 
 
-EXP_V46__DICT = utils.dict_from_yaml(
+EXP_V46_DICT = utils.dict_from_yaml(
 """
 author_notes: ''
 auto_tts_enabled: true
@@ -222,18 +222,18 @@ class MigrateExplorationJobTests(
 
         exp_model = exp_models.ExplorationModel(
             id=self.NEW_EXP_ID,
-            category=EXP_V46__DICT['category'],
-            title=EXP_V46__DICT['title'],
-            objective=EXP_V46__DICT['objective'],
-            language_code=EXP_V46__DICT['language_code'],
-            tags=EXP_V46__DICT['tags'],
-            blurb=EXP_V46__DICT['blurb'],
-            author_notes=EXP_V46__DICT['author_notes'],
-            states_schema_version=EXP_V46__DICT['states_schema_version'],
-            init_state_name=EXP_V46__DICT['init_state_name'],
-            states=EXP_V46__DICT['states'],
-            auto_tts_enabled=EXP_V46__DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46__DICT[
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
                 'correctness_feedback_enabled']
         )
         rights_manager.create_new_exploration_rights(
@@ -370,18 +370,18 @@ class MigrateExplorationJobTests(
     def test_unmigrated_exp_is_migrated(self) -> None:
         exp_model = exp_models.ExplorationModel(
             id=self.NEW_EXP_ID,
-            category=EXP_V46__DICT['category'],
-            title=EXP_V46__DICT['title'],
-            objective=EXP_V46__DICT['objective'],
-            language_code=EXP_V46__DICT['language_code'],
-            tags=EXP_V46__DICT['tags'],
-            blurb=EXP_V46__DICT['blurb'],
-            author_notes=EXP_V46__DICT['author_notes'],
-            states_schema_version=EXP_V46__DICT['states_schema_version'],
-            init_state_name=EXP_V46__DICT['init_state_name'],
-            states=EXP_V46__DICT['states'],
-            auto_tts_enabled=EXP_V46__DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46__DICT[
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
                 'correctness_feedback_enabled']
         )
         rights_manager.create_new_exploration_rights(
@@ -492,18 +492,18 @@ class MigrateExplorationJobTests(
     def test_unmigrated_exp_with_unsupported_content_is_migrated(self) -> None:
         exp_model = exp_models.ExplorationModel(
             id=self.NEW_EXP_ID,
-            category=EXP_V46__DICT['category'],
-            title=EXP_V46__DICT['title'],
-            objective=EXP_V46__DICT['objective'],
-            language_code=EXP_V46__DICT['language_code'],
-            tags=EXP_V46__DICT['tags'],
-            blurb=EXP_V46__DICT['blurb'],
-            author_notes=EXP_V46__DICT['author_notes'],
-            states_schema_version=EXP_V46__DICT['states_schema_version'],
-            init_state_name=EXP_V46__DICT['init_state_name'],
-            states=EXP_V46__DICT['states'],
-            auto_tts_enabled=EXP_V46__DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46__DICT[
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
                 'correctness_feedback_enabled']
         )
         rights_manager.create_new_exploration_rights(
@@ -717,18 +717,18 @@ class AuditExplorationMigrationJobTests(
     def test_unmigrated_exp_is_migrated(self) -> None:
         exp_model = exp_models.ExplorationModel(
             id=self.NEW_EXP_ID,
-            category=EXP_V46__DICT['category'],
-            title=EXP_V46__DICT['title'],
-            objective=EXP_V46__DICT['objective'],
-            language_code=EXP_V46__DICT['language_code'],
-            tags=EXP_V46__DICT['tags'],
-            blurb=EXP_V46__DICT['blurb'],
-            author_notes=EXP_V46__DICT['author_notes'],
-            states_schema_version=EXP_V46__DICT['states_schema_version'],
-            init_state_name=EXP_V46__DICT['init_state_name'],
-            states=EXP_V46__DICT['states'],
-            auto_tts_enabled=EXP_V46__DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46__DICT[
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
                 'correctness_feedback_enabled']
         )
         rights_manager.create_new_exploration_rights(

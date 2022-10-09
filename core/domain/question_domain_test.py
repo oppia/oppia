@@ -1161,10 +1161,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'state': self.question_state_dict,
             'state_schema_version': 35
         }
-
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        self.assertEqual(test_value['state']['next_content_id_index'], 0) # type: ignore[misc]
+        test_value['state']['next_content_id_index'] = 0 # type: ignore[misc]
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
@@ -1947,8 +1946,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'state': self.question_state_dict,
             'state_schema_version': 43
         }
-
-        self.assertNotIn('card_is_checkpoint', test_value['state'])
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
+        del test_value['state']['card_is_checkpoint']  # type: ignore[misc]
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])

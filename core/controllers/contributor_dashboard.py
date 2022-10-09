@@ -569,8 +569,10 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
             raise self.PageNotFoundException()
-        state_names_to_content_id_mapping = exp.get_translatable_text(
-            target_language_code)
+        state_names_to_content_id_mapping = (
+            translation_services.get_translatable_text(
+                exp, target_language_code)
+        )
         if state_name not in state_names_to_content_id_mapping:
             raise self.PageNotFoundException()
         content_id_to_translatable_item_mapping = (
@@ -582,7 +584,7 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
                 continue
 
             source_text = content_id_to_translatable_item_mapping[
-                content_id].content
+                content_id].content_value
             translated_texts[content_id] = (
                 translation_services.get_and_cache_machine_translation(
                     exp.language_code, target_language_code, source_text)
