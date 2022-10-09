@@ -489,38 +489,45 @@ class SuggestionListHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'choices': feconf.SUGGESTION_TYPE_CHOICES
-                }
+                },
+                'default_value': None
             },
             'target_type': {
                 'schema': {
                     'type': 'basestring',
                     'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
-                }
+                },
+                'default_value': None
             },
             'target_id': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default_value': None
             },
             'status': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default_value': None
             },
             'author_id': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default_value': None
             },
             'final_reviewer_id': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default_value': None
             },
             'score_category': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default_value': None
             },
             'language_code': {
                 'schema': {
@@ -528,18 +535,8 @@ class SuggestionListHandler(base.BaseHandler):
                     'validators': [{
                         'id': 'is_supported_audio_language_code'
                     }]
-<<<<<<< HEAD
                 }
             }
-=======
-                },
-                'default_value': None
-<<<<<<< HEAD
-            },
->>>>>>> 4759d892a (remove redundant validation)
-=======
-            }
->>>>>>> b81f25b11 (removed redundant comma)
         }
     }
 
