@@ -3664,7 +3664,6 @@ def generate_version_history_models(exploration_id: str) -> dict:
                     committer_ids=committer_ids[version - 1]
                 )
             vh_models[version - 1] = vh_model
-        print('kela', len(vh_models))
         exp_models.ExplorationVersionHistoryModel.update_timestamps_multi(vh_models)
         exp_models.ExplorationVersionHistoryModel.put_multi(vh_models)
 
