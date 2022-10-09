@@ -36,7 +36,7 @@ from scripts import servers
 
 import psutil
 
-from typing import Callable, Iterator, List, Sequence, Tuple
+from typing import Callable, Iterator, List, Optional, Sequence, Tuple
 
 
 class ManagedProcessTests(test_utils.TestBase):
@@ -579,10 +579,11 @@ class ManagedProcessTests(test_utils.TestBase):
                 return
             original_os_remove(path)
 
-        def mock_os_path_exists(path: str) -> bool:
+        def mock_os_path_exists(path: str) -> Optional[bool]:
             if path == common.REDIS_DUMP_PATH:
                 return True
-            return original_os_path_exists(path)
+            original_os_path_exists(path)
+            return None
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap_to_always_return(
@@ -688,10 +689,11 @@ class ManagedProcessTests(test_utils.TestBase):
                 return
             original_os_remove(path)
 
-        def mock_os_path_exists(path: str) -> bool:
+        def mock_os_path_exists(path: str) -> Optional[bool]:
             if path == common.PORTSERVER_SOCKET_FILEPATH:
                 return True
-            return original_os_path_exists(path)
+            original_os_path_exists(path)
+            return None
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap_with_checks(

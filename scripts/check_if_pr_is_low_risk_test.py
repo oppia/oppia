@@ -25,7 +25,7 @@ from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
 from scripts import common
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 
 class MockResponse(io.StringIO):
@@ -218,19 +218,19 @@ class LoadDiffTests(test_utils.GenericTestBase):
 
     def test_parse_diff_failure_no_diff(self) -> None:
 
-        def mock_run_cmd(tokens: List[str]) -> str:
+        def mock_run_cmd(tokens: List[str]) -> Optional[str]:
             if '--name-status' in tokens:
-                cmd_string = (
+                return (
                     'M       modified\n'
                 )
             if tokens[-1] == 'modified':
-                cmd_string = (
+                return (
                     'diff --git a/modififed b/modified\n'
                     'index 11af605ef2b7..89d00105ca66 100644\n'
                     '--- a/modified\n'
                     '+++ b/modified\n'
                 )
-            return cmd_string
+            return None
 
         def mock_print(unused_str: str) -> None:
             pass
