@@ -147,23 +147,4 @@ describe('Learner groups tab Component', () => {
       expect(component.invitedToLearnerGroups).toEqual([]);
     })
   );
-
-  it('should exit learner group successfully',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          learnerGroupTitle: 'sampleTitle',
-        },
-        result: Promise.resolve()
-      } as NgbModalRef);
-
-      component.learnerOfLearnerGroups = [sampleShortLearnerGroupSummary];
-
-      component.exitLearnerGroup(sampleShortLearnerGroupSummary);
-      tick(100);
-      fixture.detectChanges();
-
-      expect(component.learnerOfLearnerGroups).toEqual([]);
-    })
-  );
 });

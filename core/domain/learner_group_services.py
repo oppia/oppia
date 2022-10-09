@@ -403,7 +403,9 @@ def get_matching_subtopic_syllabus_item_dicts(
                     'parent_topic_name': topic.name,
                     'thumbnail_filename': subtopic.thumbnail_filename,
                     'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                    'subtopic_mastery': None
+                    'subtopic_mastery': None,
+                    'parent_topic_url_fragment': topic.url_fragment,
+                    'classroom_url_fragment': None
                 })
 
     return matching_subtopic_syllabus_item_dicts
@@ -465,7 +467,8 @@ def get_matching_story_syllabus_item_dicts(
                     story.story_contents.nodes
                 ],
                 'topic_name': topic.name,
-                'topic_url_fragment': topic.url_fragment
+                'topic_url_fragment': topic.url_fragment,
+                'classroom_url_fragment': None
             })
 
     return matching_story_syllabus_item_dicts

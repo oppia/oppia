@@ -418,7 +418,8 @@ def get_learner_group_syllabus_story_summaries(
                 topic_id_to_topic_map[story.corresponding_topic_id].name,
             'topic_url_fragment':
                 topic_id_to_topic_map[
-                    story.corresponding_topic_id].url_fragment
+                    story.corresponding_topic_id].url_fragment,
+            'classroom_url_fragment': None
         }
         for (story, summary_dict) in
         zip(all_stories, story_summaries_dicts)

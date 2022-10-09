@@ -461,7 +461,9 @@ def get_learner_group_syllabus_subtopic_page_summaries(
                 'parent_topic_name': topic.name,
                 'thumbnail_filename': subtopic.thumbnail_filename,
                 'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                'subtopic_mastery': None
+                'subtopic_mastery': None,
+                'parent_topic_url_fragment': topic.url_fragment,
+                'classroom_url_fragment': None
             })
 
     return all_learner_group_subtopic_page_summaries
