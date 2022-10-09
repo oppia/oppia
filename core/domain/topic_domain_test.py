@@ -912,7 +912,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
         new_filename = 'new_filename.svg'
-        new_filesize = '12345'
+        new_filesize = 12345
         subtopic_index = self.topic.get_subtopic_index(1)
         self.topic.update_subtopic_thumbnail_filename_and_size(
             1, new_filename, new_filesize
