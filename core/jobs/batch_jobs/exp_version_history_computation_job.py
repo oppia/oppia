@@ -32,7 +32,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional, Tuple, Type, Union
+from typing import Dict, List, Optional, Tuple, Union
 from typing_extensions import TypedDict
 
 MYPY = False
@@ -49,7 +49,8 @@ class UnformattedModelGroupDict(TypedDict):
 
     all_exp_models: List[exp_domain.Exploration]
     exp_models_vlatest: List[exp_domain.Exploration]
-    commit_log_models: List[exp_models.ExplorationCommitLogEntryModel]
+    commit_log_models: List[Optional[
+        exp_models.ExplorationCommitLogEntryModel]]
     version_history_models: (
         List[Optional[exp_models.ExplorationVersionHistoryModel]]
     )
@@ -60,7 +61,8 @@ class FormattedModelGroupDict(TypedDict):
 
     exp_vlatest: exp_domain.Exploration
     all_explorations: List[exp_domain.Exploration]
-    commit_log_models: List[exp_models.ExplorationCommitLogEntryModel]
+    commit_log_models: List[Optional[
+        exp_models.ExplorationCommitLogEntryModel]]
     version_history_models: (
         List[Optional[exp_models.ExplorationVersionHistoryModel]]
     )
@@ -72,7 +74,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
     def convert_to_formatted_model_group(
         self, model_group: UnformattedModelGroupDict
     ) -> Optional[FormattedModelGroupDict]:
-        """Returns True if the given model group is valid.
+        """Returns True if the given model group is valid .
 
         Args:
             model_group: UnformattedModelGroupDict. The model group to be
@@ -146,15 +148,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     for exploration in all_explorations:
                         if exploration is not None:
                             explorations_without_none.append(exploration)
-                    commit_logs_without_none: List[
-                        exp_models.ExplorationCommitLogEntryModel] = []
-                    for commit_log in all_commit_log_models: # type: ignore[assignment]
-                        if commit_log is not None:
-                            commit_logs_without_none.append(commit_log)
                     response_dict = {
                         'exp_vlatest': exp_model_vlatest,
                         'all_explorations': explorations_without_none,
-                        'commit_log_models': commit_logs_without_none,
+                        'commit_log_models': all_commit_log_models,
                         'version_history_models': all_version_history_models
                     }
         return response_dict
@@ -324,6 +321,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             exp_id = exp_vlatest.id
 
             commit_log_model_v1 = commit_log_models[0]
+            assert commit_log_model_v1 is not None
             committer_id_v1 = commit_log_model_v1.user_id
             states_vh_at_v1 = {
                 state_name: state_domain.StateVersionHistory(
@@ -345,6 +343,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
             for version in range(2, exp_version + 1):
                 commit_log_model = commit_log_models[version - 1]
+                assert commit_log_model is not None
                 committer_id: str = commit_log_model.user_id
                 change_list: List[exp_domain.ExplorationChange] = []
                 for change_dict in commit_log_model.commit_cmds:
@@ -779,16 +778,11 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     for exploration in all_explorations:
                         if exploration is not None:
                             explorations_without_none.append(exploration)
-                    commit_logs_without_none: List[
-                        exp_models.ExplorationCommitLogEntryModel] = []
-                    for commit_log in all_commit_log_models: # type: ignore[assignment]
-                        if commit_log is not None:
-                            commit_logs_without_none.append(commit_log)
                     if model_group_is_valid:
                         response_dict = {
                             'exp_vlatest': exp_model_vlatest,
                             'all_explorations': explorations_without_none,
-                            'commit_log_models': commit_logs_without_none,
+                            'commit_log_models': all_commit_log_models,
                             'version_history_models': all_version_history_models
                         }
         return response_dict
@@ -873,6 +867,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         # verified as it will be None for all the states and exploration
         # metadata.
         commit_log_model = commit_log_models[0]
+        assert commit_log_model is not None
         committer_id = commit_log_model.user_id
         vh_model = vh_models[0]
         assert vh_model is not None
@@ -912,6 +907,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 vh_model = vh_models[version - 1]
                 assert vh_model is not None
                 commit_log_model = commit_log_models[version - 1]
+                assert commit_log_model is not None
                 committer_id = commit_log_model.user_id
                 change_list: List[exp_domain.ExplorationChange] = []
                 for change_dict in commit_log_model.commit_cmds:
