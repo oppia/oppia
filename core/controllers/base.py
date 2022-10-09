@@ -390,7 +390,6 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 request_arg_keys.append(arg)
                 handler_args[arg] = self.request.get(arg)
-                
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
         # needed for analytics).

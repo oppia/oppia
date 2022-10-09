@@ -484,7 +484,61 @@ class SuggestionListHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
 
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
+        'GET': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                },
+                'default_value': None
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                },
+                'default_value': None
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'status': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'author_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'final_reviewer_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'score_category': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            }
+        }
     }
 
     @acl_decorators.open_access
@@ -497,11 +551,6 @@ class SuggestionListHandler(base.BaseHandler):
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
         query_fields_and_values = list(self.request.GET.items())
-
-        for query in query_fields_and_values:
-            if query[0] not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
-                raise self.InvalidInputException(
-                    'Not allowed to query on field %s' % query[0])
 
         suggestions = suggestion_services.query_suggestions(
             query_fields_and_values)
