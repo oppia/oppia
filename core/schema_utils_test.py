@@ -959,6 +959,52 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_username_string('oppia'))
         self.assertFalse(is_valid_username_string(''))
 
+    def test_has_expected_subtitled_content_length(self) -> None:
+        """Checks whether the given subtitled content does not exceed the
+        given length.
+
+        Returns:
+            bool. A boolean value representing whether the content matches
+            the given max length.
+        """
+        has_expected_subtitled_content_length = (
+            schema_utils.get_validator('has_expected_subtitled_content_length'))
+
+        obj = {
+            'content_id': 'id',
+            'unicode_str': 'Continueeeeeeeeeeeeeeee'
+        }
+        self.assertFalse(has_expected_subtitled_content_length(obj, 20))
+
+        obj['unicode_str'] = 'Continue'
+        self.assertTrue(has_expected_subtitled_content_length(obj, 20))
+
+    def test_has_subtitled_html_content_uniquified(self) -> None:
+        """Checks whether the subtitled html content has unique value or not.
+
+        Returns:
+            bool. A boolean value representing whether the content has unique
+            value.
+        """
+        has_subtitled_html_content_uniquified = (
+            schema_utils.get_validator('has_subtitled_html_content_uniquified')
+        )
+
+        obj_list = [
+            {
+                'content_id': 'id_1',
+                'html': '<p>1</p>'
+            },
+            {
+                'content_id': 'id_2',
+                'html': '<p>1</p>'
+            }
+        ]
+        self.assertFalse(has_subtitled_html_content_uniquified(obj_list))
+
+        obj_list[1]['html'] = '<p>2</p>'
+        self.assertTrue(has_subtitled_html_content_uniquified(obj_list))
+
     def test_has_length(self) -> None:
         """Tests if static method has_length returns true iff
         given list has length of the given value.
