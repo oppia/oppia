@@ -1493,7 +1493,7 @@ def _pseudonymize_blog_post_models(
     ] = blog_post_model_class.query(
         blog_post_model_class.author_id == user_id
     ).fetch()
-    blog_post_ids = {model.id for model in blog_post_models_list}
+    blog_related_model_ids = {model.id for model in blog_post_models_list}
 
     blog_post_summary_model_class = blog_models.BlogPostSummaryModel
     blog_post_summary_models: Sequence[
@@ -1501,10 +1501,19 @@ def _pseudonymize_blog_post_models(
     ] = blog_post_summary_model_class.query(
         blog_post_summary_model_class.author_id == user_id
     ).fetch()
-    blog_post_ids |= {model.id for model in blog_post_summary_models}
+    blog_related_model_ids |= {model.id for model in blog_post_summary_models}
+
+    blog_author_details_model_class = blog_models.BlogAuthorDetailsModel
+    blog_author_details_model = blog_author_details_model_class.get_by_author(
+        user_id)
+    if blog_author_details_model:
+        blog_related_model_ids |= {blog_author_details_model.id}
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.Names.BLOG, list(blog_post_ids))
+        pending_deletion_request,
+        models.Names.BLOG,
+        list(blog_related_model_ids)
+    )
 
     # We want to remove the user ID from the list of editor ids on all the
     # blog post rights models related to the user.
@@ -1529,7 +1538,8 @@ def _pseudonymize_blog_post_models(
         blog_post_models_list: List[
             Union[
                 blog_models.BlogPostModel,
-                blog_models.BlogPostSummaryModel
+                blog_models.BlogPostSummaryModel,
+                blog_models.BlogAuthorDetailsModel
             ]
         ] = [
             model for model in blog_posts_related_models
@@ -1542,7 +1552,8 @@ def _pseudonymize_blog_post_models(
         blog_post_summary_models_list: List[
             Union[
                 blog_models.BlogPostModel,
-                blog_models.BlogPostSummaryModel
+                blog_models.BlogPostSummaryModel,
+                blog_models.BlogAuthorDetailsModel
             ]
         ] = [
             model for model in blog_posts_related_models
@@ -1554,14 +1565,24 @@ def _pseudonymize_blog_post_models(
         datastore_services.put_multi(
             blog_post_models_list + blog_post_summary_models_list)
 
+        for model in blog_posts_related_models:
+            if isinstance(model, blog_author_details_model_class):
+                if model.author_id == user_id:
+                    model.author_id = pseudonymized_id
+                    model.update_timestamps()
+                    model.put()
+
     blog_post_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
             models.Names.BLOG.value])
-    for blog_post_id, pseudonymized_id in blog_post_ids_to_pids.items():
+    for blog_related_ids, pseudonymized_id in blog_post_ids_to_pids.items():
         blog_posts_related_models = [
             model for model in itertools.chain(
-                blog_post_models_list, blog_post_summary_models)
-            if model.id == blog_post_id
+                blog_post_models_list,
+                blog_post_summary_models,
+                [blog_author_details_model]
+                )
+            if model is not None and model.id == blog_related_ids
         ]
         transaction_slices = utils.grouper(
             blog_posts_related_models,

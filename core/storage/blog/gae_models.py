@@ -47,6 +47,13 @@ class BlogPostModelDataDict(TypedDict):
     published_on: float
 
 
+class BlogAuthorDetailsModelDict(TypedDict):
+    """Dictionary representing the export data of  BlogAuthorDetailsModel."""
+
+    author_name: str
+    author_bio: str
+
+
 class BlogPostModel(base_models.BaseModel):
     """Model to store blog post data. Functionality to allow authors to revert
     back to earlier versions is not being built in as we do not want to maintain
@@ -502,3 +509,150 @@ class BlogPostRightsModel(base_models.BaseModel):
         entity.put()
 
         return entity
+
+
+class BlogAuthorDetailsModel(base_models.BaseModel):
+    """Model for storing user's blog author details.
+
+    The id/key of instances of this model is randomly generated string of
+    length 12."""
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
+
+    author_id = datastore_services.StringProperty(indexed=True, required=True)
+    # The publicly viewable name of the user to display as author name in blog
+    # posts.
+    author_name = datastore_services.StringProperty(indexed=True)
+    # User specified biography to be shown on their blog author page.
+    author_bio = datastore_services.TextProperty(indexed=False)
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to pseudonymize corresponding to a user:
+        id field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether BlogAuthorUserModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.author_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def export_data(cls, user_id: str) -> Dict[str, BlogAuthorDetailsModelDict]:
+        """Exports the data from BlogAuthorDetailModel into dict format for
+        Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from BlogAuthorDetailModel.
+
+        Raises:
+            Exception. BlogAuthorDetailsModel with the given author id not
+                found.
+        """
+
+        author_model = cls.query(cls.author_id == user_id).get()
+        if not author_model:
+            raise Exception(
+            'Entity for class BlogAuthorDetailsModel with author id %s not'
+            ' found' % user_id)
+        return {
+            'author_name': author_model.author_name,
+            'author_bio': author_model.author_bio
+        }
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user to export."""
+        return dict(super(BlogAuthorDetailsModel, cls).get_export_policy(), **{
+            # We do not export the author id of the model because we should not
+            # export internal user ids.
+            'id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'author_name': base_models.EXPORT_POLICY.EXPORTED,
+            'author_bio': base_models.EXPORT_POLICY.EXPORTED,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
+
+    @classmethod
+    def generate_new_instance_id(cls) -> str:
+        """Generates a ID which is unique and is in the form of random hash of
+        12 chars.
+
+        Returns:
+            str. A instance ID that is different from the IDs of all the
+            existing models.
+
+        Raises:
+            Exception. There were too many collisions with existing model IDs
+                when attempting to generate a new ID.
+        """
+        for _ in range(base_models.MAX_RETRIES):
+            instance_id = utils.convert_to_hash(
+                str(utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH)
+            if not cls.get_by_id(instance_id):
+                return instance_id
+        raise Exception(
+            'New instance id generator is producing too many collisions.')
+
+    @classmethod
+    def create(
+        cls, author_id: str, author_name: str, author_bio: str
+    ) -> None:
+        """Creates a new BlogAuthorDetailsModel entry.
+
+        Args:
+            author_id: str. The user ID of the author.
+            author_name: str. The author name of the user.
+            author_bio: str. The author bio of the user.
+
+        Raises:
+            Exception. A blog author details model with the given ID exists
+                already.
+        """
+        if cls.query(cls.author_id == author_id).get():
+            raise Exception(
+                'A blog author details model for given user already exists.')
+        model_id = cls.generate_new_instance_id()
+        entity = cls(
+            id=model_id,
+            author_id=author_id,
+            author_name=author_name,
+            author_bio=author_bio)
+        entity.update_timestamps()
+        entity.put()
+
+    @classmethod
+    def get_by_author(cls, author_id: str) -> Optional[BlogAuthorDetailsModel]:
+        """Retrieves the author details objects for the given author id.
+
+        Args:
+            author_id: str. User ID of the author.
+
+        Returns:
+            BlogAuthorDetailsModel. BlogAuthorDetailsModel corresponding to the
+            given author_id.
+        """
+        return cls.query(cls.author_id == author_id).get()

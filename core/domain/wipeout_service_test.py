@@ -5096,6 +5096,14 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         self.blog_post_rights_model.update_timestamps()
         self.blog_post_rights_model.put()
 
+        blog_models.BlogAuthorDetailsModel.create(
+            author_id=self.user_1_id,
+            author_name='blog author',
+            author_bio='general bio'
+        )
+        self.author_details_model = (
+            blog_models.BlogAuthorDetailsModel.get_by_author(self.user_1_id))
+
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
@@ -5125,6 +5133,17 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_summary_model.author_id,
             pseudonymizable_user_id_mapping[self.BLOG_1_ID]
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.author_details_model is not None
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_id(
+            self.author_details_model.id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert blog_author_model is not None
+        self.assertEqual(
+            blog_author_model.author_id,
+            pseudonymizable_user_id_mapping[blog_author_model.id]
         )
 
         # Verify that the user id is removed from the list of editor ids in
@@ -5176,6 +5195,18 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             new_blog_post_model.author_id,
             pseudonymizable_user_id_mapping[self.BLOG_1_ID]
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.author_details_model is not None
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_id(
+            self.author_details_model.id)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert blog_author_model is not None
+        self.assertEqual(
+            blog_author_model.author_id,
+            pseudonymizable_user_id_mapping[blog_author_model.id]
         )
 
         # Verify that the user id is removed from the list of editor ids in
@@ -5269,6 +5300,16 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                 blog_post_summary_model.author_id,
                 pseudonymizable_user_id_mapping[blog_post_summary_model.id]
             )
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.author_details_model is not None
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_id(
+            self.author_details_model.id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert blog_author_model is not None
+        self.assertEqual(
+            blog_author_model.author_id,
+            pseudonymizable_user_id_mapping[blog_author_model.id]
+        )
 
         # Verify that user id is removed from the list of editor ids in all
         # BlogPostRights models.

@@ -83,7 +83,10 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
             )
-        self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
+        self.assertEqual(
+            self.BLOG_EDITOR_USERNAME,
+            json_response['author_details']['author_name']
+        )
         self.assertEqual(json_response['published_blog_post_summary_dicts'], [])
         self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
         self.logout()
@@ -151,6 +154,68 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
+    def test_put_author_data(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'author_name': 'new user name',
+            'author_bio': 'general oppia user and blog post author'
+        }
+
+        pre_update_author_details = blog_services.get_blog_author_details(
+            self.blog_editor_id).to_dict()
+        self.assertEqual(
+            pre_update_author_details['author_name'],
+            self.BLOG_EDITOR_USERNAME
+        )
+        self.assertEqual(pre_update_author_details['author_bio'], '')
+
+        json_response = self.put_json(
+            '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
+            payload, csrf_token=csrf_token)
+
+        self.assertEqual(
+            json_response['author_details']['author_name'], 'new user name')
+        self.assertEqual(
+            json_response['author_details']['author_bio'],
+            'general oppia user and blog post author'
+        )
+
+        self.logout()
+
+    def test_put_author_details_with_invalid_author_name(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'author_name': 1234,
+            'author_bio': 'general oppia user and blog post author'
+        }
+        pre_update_author_details = blog_services.get_blog_author_details(
+            self.blog_editor_id).to_dict()
+        self.assertEqual(
+            pre_update_author_details['author_name'], self.BLOG_EDITOR_USERNAME)
+
+        self.put_json(
+            '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
+            payload, csrf_token=csrf_token,
+            expected_status_int=400)
+
+    def test_put_author_details_with_invalid_author_bio(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'author_name': 'new user',
+            'author_bio': 1234
+        }
+        pre_update_author_details = blog_services.get_blog_author_details(
+            self.blog_editor_id).to_dict()
+        self.assertEqual(pre_update_author_details['author_bio'], '')
+
+        self.put_json(
+            '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
+            payload, csrf_token=csrf_token,
+            expected_status_int=400)
+
 
 class BlogPostHandlerTests(test_utils.GenericTestBase):
 
@@ -186,7 +251,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
-            'author_username': self.BLOG_EDITOR_USERNAME,
+            'author_name': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
             'tags': [],
@@ -206,10 +271,11 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             )
-        self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
+        self.assertEqual(
+            self.BLOG_EDITOR_USERNAME, json_response['author_name'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
-            'author_username': self.BLOG_EDITOR_USERNAME,
+            'author_name': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
             'tags': [],

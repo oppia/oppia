@@ -267,7 +267,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.get_html_response(
             '%s/can_access_blog_author_profile_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME
-            ),expected_status_int=200
+            ), expected_status_int=200
         )
         self.logout()
 
@@ -276,7 +276,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.get_html_response(
             '%s/can_access_blog_author_profile_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME
-            ),expected_status_int=200
+            ), expected_status_int=200
         )
         self.logout()
 
@@ -288,7 +288,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.get_json(
             '%s/can_access_blog_author_profile_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.VIEWER_EMAIL
-            ),expected_status_int=404
+            ), expected_status_int=404
         )
         self.logout()
 
@@ -300,6 +300,6 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.get_json(
             '%s/can_access_blog_author_profile_page/invalid_username' % (
             ACCESS_VALIDATION_HANDLER_PREFIX
-            ),expected_status_int=404
+            ), expected_status_int=404
         )
         self.logout()

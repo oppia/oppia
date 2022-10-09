@@ -2938,62 +2938,6 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     return exp_fetchers.get_exploration_user_data(user_id, exploration_id)
 
 
-def create_blog_author_details_model(user_id: str) -> None:
-    """Creates a new blog author details model.
-
-    Args:
-        user_id: str. The user ID of the blog author.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    # Adding an if statement for mypy type checks to pass.
-    if user_settings.username:
-        user_models.BlogAuthorDetailsModel.create(
-            user_id,
-            user_settings.username,
-            user_settings.user_bio
-        )
-
-
-def get_blog_author_details(user_id: str) -> user_domain.BlogAuthorDetails:
-    """Returns the blog author details for the given user id. If
-    blogAuthorDetailsModel is not present, a new model with default values is
-    created.
-
-    Args:
-        user_id: str. The user id of the blog author.
-
-    Returns:
-        BlogAuthorDetails. The blog author details for the given user id.
-    """
-    author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)
-    if author_model is None:
-        create_blog_author_details_model(user_id)
-        author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)
-
-    return user_domain.BlogAuthorDetails(
-        author_model.author_name,
-        author_model.author_bio,
-        author_model.last_updated
-    )
-
-
-def update_blog_author_details(
-    user_id: str, author_name: str, author_bio: str
-) -> None:
-    """Updates the author name and bio for the given user id.
-
-    Args:
-        user_id: str. The user id of the blog author.
-        author_name: str. The publicly viewable name of the author.
-        author_bio: str. The bio of the blog author.
-    """
-    blog_author_model = user_models.BlogAuthorDetailsModel.get_by_id(user_id)
-    blog_author_model.author_name = author_name
-    blog_author_model.author_bio = author_bio
-    blog_author_model.update_timestamps()
-    blog_author_model.put()
-
-
 def is_user_blog_post_author(user_id: str) -> bool:
     """Checks whether user can write blog posts.
 

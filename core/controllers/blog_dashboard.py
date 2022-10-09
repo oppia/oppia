@@ -95,7 +95,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         author_details = (
-            user_services.get_blog_author_details(self.user_id).to_dict())
+            blog_services.get_blog_author_details(self.user_id).to_dict())
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
@@ -139,11 +139,11 @@ class BlogDashboardDataHandler(base.BaseHandler):
         """Updates author details of the user."""
         author_name = self.normalized_payload.get('author_name')
         author_bio = self.normalized_payload.get('author_bio')
-        user_services.update_blog_author_details(
+        blog_services.update_blog_author_details(
             self.user_id, author_name, author_bio
         )
         author_details = (
-            user_services.get_blog_author_details(self.user_id).to_dict())
+            blog_services.get_blog_author_details(self.user_id).to_dict())
 
         self.values.update({
             'author_details': author_details,
@@ -207,12 +207,11 @@ class BlogPostHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(
             blog_post.author_id, strict=False)
         if user_settings:
-            profile_picture_data_url = (
-                user_settings.profile_picture_data_url)
+            profile_picture_data_url = user_settings.profile_picture_data_url
         else:
             profile_picture_data_url = None
 
-        author_details = user_services.get_blog_author_details(
+        author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
         max_no_of_tags = config_domain.Registry.get_config_property(
             'max_number_of_tags_assigned_to_blog_post').value

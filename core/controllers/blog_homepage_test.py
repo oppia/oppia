@@ -20,7 +20,6 @@ import logging
 from core import feconf
 from core.domain import blog_services
 from core.domain import config_domain
-from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -101,6 +100,41 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             json_response['blog_post_summary_dicts'][0]['title'],
             'Sample Title'
         )
+        self.assertEqual(
+            json_response['blog_post_summary_dicts'][0]['author_username'],
+            self.BLOG_ADMIN_USERNAME
+        )
+        self.assertEqual(
+            json_response['blog_post_summary_dicts'][0]['author_name'],
+            self.BLOG_ADMIN_USERNAME
+        )
+
+    def test_get_blog_homepage_data_with_author_account_deleted(self):
+        blog_services.create_blog_author_details_model(self.blog_admin_id)
+        blog_services.update_blog_author_details(
+            self.blog_admin_id, 'new author name', 'general user bio')
+        # Deleting user setting model.
+        blog_admin_model = (
+            user_models.UserSettingsModel.get_by_id(self.blog_admin_id))
+        blog_admin_model.deleted = True
+        blog_admin_model.update_timestamps()
+        blog_admin_model.put()
+
+        self.login(self.user_email)
+        json_response = self.get_json(
+            '%s?offset=0' % (feconf.BLOG_HOMEPAGE_DATA_URL),
+            )
+        self.assertEqual(
+            len(json_response['blog_post_summary_dicts']), 1)
+        self.assertEqual(json_response['no_of_blog_post_summaries'], 1)
+        self.assertEqual(
+            json_response['blog_post_summary_dicts'][0]['author_username'],
+            'author account deleted'
+        )
+        self.assertEqual(
+            json_response['blog_post_summary_dicts'][0]['author_name'],
+            'new author name'
+        )
 
 
 class BlogPostDataHandlerTest(test_utils.GenericTestBase):
@@ -131,6 +165,9 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         }
         blog_services.update_blog_post(self.blog_post_one.id, self.change_dict)
         blog_services.publish_blog_post(self.blog_post_one.id)
+        blog_services.create_blog_author_details_model(self.blog_admin_id)
+        blog_services.update_blog_author_details(
+            self.blog_admin_id, 'new author name', 'general user bio')
 
     def test_get_post_page_data(self):
         self.login(self.user_email)
@@ -139,8 +176,9 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post.url_fragment),
             )
         self.assertEqual(
-            self.BLOG_ADMIN_USERNAME,
-            json_response['blog_post_dict']['author_name'])
+            'new author name', json_response['blog_post_dict']['author_name'])
+        self.assertEqual(
+            self.BLOG_ADMIN_USERNAME, json_response['author_username'])
         self.assertEqual(
             '<p>Hello Bloggers</p>',
             json_response['blog_post_dict']['content'])
@@ -163,13 +201,34 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
                 feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
             )
         self.assertEqual(
-            self.BLOG_ADMIN_USERNAME,
-            json_response['blog_post_dict']['author_name'])
+            'new author name', json_response['blog_post_dict']['author_name'])
+        self.assertEqual(
+            self.BLOG_ADMIN_USERNAME, json_response['author_username'])
         self.assertEqual(
             '<p>Hello Blog</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 1)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
+
+        # Deleting blog admin's user setting model.
+        blog_admin_model = (
+            user_models.UserSettingsModel.get_by_id(self.blog_admin_id))
+        blog_admin_model.deleted = True
+        blog_admin_model.update_timestamps()
+        blog_admin_model.put()
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
+            )
+        self.assertEqual(
+            'new author name', json_response['blog_post_dict']['author_name'])
+        self.assertEqual(
+            'author account deleted', json_response['author_username'])
+        self.assertEqual(
+            '<p>Hello Blog</p>',
+            json_response['blog_post_dict']['content'])
+        self.assertEqual(len(json_response['summary_dicts']), 1)
+        self.assertIsNone(json_response['profile_picture_data_url'])
 
     def test_should_get_correct_recommendations_for_post_page(self):
         self.signup(
@@ -296,16 +355,22 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         }
         blog_services.update_blog_post(self.blog_post.id, self.change_dict)
         blog_services.publish_blog_post(self.blog_post.id)
+        blog_services.create_blog_author_details_model(self.blog_admin_id)
+        blog_services.update_blog_author_details(
+            self.blog_admin_id, 'new author name', 'general user bio')
 
     def test_get_authors_page_data(self):
         self.login(self.user_email)
         json_response = self.get_json(
-            '%s/%s' % (
-                feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+            '%s/%s?offset=0' % (
+                feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX,
                 self.BLOG_ADMIN_USERNAME),
             )
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
+            json_response['summary_dicts'][0]['author_username'])
+        self.assertEqual(
+            'new author name',
             json_response['summary_dicts'][0]['author_name'])
         self.assertEqual(
             len(json_response['summary_dicts']), 1)
@@ -313,47 +378,11 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
 
         blog_services.unpublish_blog_post(self.blog_post.id)
         json_response = self.get_json(
-            '%s/%s' % (
-                feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+            '%s/%s?offset=0' % (
+                feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX,
                 self.BLOG_ADMIN_USERNAME),
             )
         self.assertEqual(json_response['summary_dicts'], [])
-
-    def test_get_authors_data_raises_exception_if_user_deleted_account(self):
-        self.login(self.user_email)
-        json_response = self.get_json(
-            '%s/%s' % (
-                feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
-                self.BLOG_ADMIN_USERNAME),
-            )
-        self.assertEqual(
-            self.BLOG_ADMIN_USERNAME,
-            json_response['summary_dicts'][0]['author_name'])
-        blog_admin_model = (
-            user_models.UserSettingsModel.get_by_id(self.blog_admin_id))
-        blog_admin_model.deleted = True
-        blog_admin_model.update_timestamps()
-        blog_admin_model.put()
-        self.get_json(
-            '%s/%s' % (
-                feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
-                self.BLOG_ADMIN_USERNAME),
-            expected_status_int=404)
-
-    def test_raise_exception_if_username_provided_is_not_of_author(self):
-        self.login(self.user_email)
-        self.get_json(
-            '%s/%s' % (
-                feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
-                self.BLOG_ADMIN_USERNAME),
-            )
-        user_services.remove_user_role(
-            self.blog_admin_id, feconf.ROLE_ID_BLOG_ADMIN)
-        self.get_json(
-            '%s/%s' % (
-                feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
-                self.BLOG_ADMIN_USERNAME),
-            expected_status_int=404)
 
 
 class BlogPostSearchHandlerTest(test_utils.GenericTestBase):

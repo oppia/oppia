@@ -6057,6 +6057,9 @@ export default {
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
 
+  // A regular expression for allowed characters in author name field for Author
+  // details Model.
+  "VALID_AUTHOR_NAME_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",

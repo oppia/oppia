@@ -1269,6 +1269,36 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.add_user_role(
                 user_id, feconf.ROLE_ID_MOBILE_LEARNER)
 
+    def test_is_user_blog_post_author_returns_true_for_authors(self) -> None:
+        # When user is a blog admin.
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        # Precheck before adding blog admin role.
+        self.assertFalse(user_services.is_user_blog_post_author(blog_admin_id))
+
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+
+        self.assertTrue(user_services.is_user_blog_post_author(blog_admin_id))
+
+        # When user is a blog editor.
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        # Precheck before adding blog editor role.
+        self.assertFalse(user_services.is_user_blog_post_author(blog_editor_id))
+
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.assertTrue(user_services.is_user_blog_post_author(blog_editor_id))
+
+        #  Assigning multiple roles to blog editor.
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_RELEASE_COORDINATOR)
+        self.assertTrue(user_services.is_user_blog_post_author(blog_editor_id))
+
     def test_removing_role_from_mobile_learner_user_raises_exception(
         self
     ) -> None:

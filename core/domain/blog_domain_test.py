@@ -22,9 +22,15 @@ from core import utils
 from core.constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
+from core.platform import models
 from core.tests import test_utils
 
 from typing import List
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import blog_models
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class BlogPostDomainUnitTests(test_utils.GenericTestBase):
@@ -631,3 +637,55 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tag_elements(
             'Expected each tag in \'tags\' to be a string, received: '
             '\'123\'')
+
+
+class BlogAuthorDetailsTests(test_utils.GenericTestBase):
+    """Tests for blog author details domain objects."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup('a@example.com', 'A')
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+
+        blog_models.BlogAuthorDetailsModel.create(
+            self.user_id_a, 'author', 'general bio')
+        self.author_details = blog_services.get_blog_author_details(
+            self.user_id_a)
+
+    def _assert_valid_author_name(
+        self, expected_error_substring: str, name: str
+    ) -> None:
+        """Checks that author name passes validation."""
+        with self.assertRaisesRegex(
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogAuthorDetails.require_valid_author_name(name)
+
+    def test_author_username_validation_for_author_details(self) -> None:
+        self._assert_valid_author_name(
+            'Empty author name supplied.', '')
+        self._assert_valid_author_name(
+            'A author name can have at most 35 characters.', 'user' * 10)
+        self._assert_valid_author_name(
+            'Author name can only have alphanumeric characters and spaces.',
+            'name..name'
+        )
+        self._assert_valid_author_name(
+            'Author name can only have alphanumeric characters and spaces.',
+            'ABC12&heloo'
+        )
+        self._assert_valid_author_name(
+            'This name contains reserved username. Please use some ' +
+            'other name', 'name admin')
+
+        blog_domain.BlogAuthorDetails.require_valid_author_name('test username')
+
+    def test_to_human_readable_dict(self) -> None:
+        """Checks conversion of BlogAuthorDetails to dict."""
+        assert self.author_details is not None
+        expected_dict = {
+            'author_name': self.author_details.author_name,
+            'author_bio': self.author_details.author_bio,
+            'last_updated': utils.convert_naive_datetime_to_string(
+                self.author_details.last_updated)
+        }
+        self.assertEqual(self.author_details.to_dict(), expected_dict)

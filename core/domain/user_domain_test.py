@@ -1693,23 +1693,3 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
                 'user1', ['group_id_1'], [learner_group_user_details], 1),
             'Learner cannot be invited to join learner group group_id_1 since '
             'they are already its learner.')
-
-
-class BlogAuthorDetailsTests(test_utils.GenericTestBase):
-    """Tests for blog author details domain objects."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup('a@example.com', 'A')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')
-
-        user_models.BlogAuthorDetailsModel.create(
-            self.user_id_a, 'author', 'general bio')
-
-    def _assert_valid_author_name(
-        self, expected_error_substring: str, name: str
-    ) -> None:
-        """Checks that author name passes validation."""
-        with self.assertRaisesRegex(
-            utils.ValidationError, expected_error_substring):
-            user_domain.BlogAuthorDetails.require_valid_author_name(name)

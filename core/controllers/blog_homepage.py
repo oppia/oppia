@@ -49,11 +49,16 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
     for summary in summaries:
         summary_dict = summary.to_dict()
         user_settings = user_services.get_user_settings(
+            summary_dict['author_id'], strict=False)
+        if user_settings:
+            summary_dict['profile_pic_url'] = (
+                user_settings.profile_picture_data_url)
+            summary_dict['author_username'] = user_settings.username
+        else:
+            summary_dict['profile_pic_url'] = None
+            summary_dict['author_username'] = 'author account deleted'
+        author_details = blog_services.get_blog_author_details(
             summary_dict['author_id'])
-        author_details = user_services.get_blog_author_details(
-            summary_dict['author_id'])
-        summary_dict['author_username'] = user_settings.username
-        summary_dict['profile_pic_url'] = user_settings.profile_picture_data_url
         summary_dict['author_name'] = author_details.author_name
         del summary_dict['author_id']
         summary_dicts.append(summary_dict)
@@ -179,8 +184,16 @@ class BlogPostDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception(
                     'The blog post page with the given url doesn\'t exist.'))
-        user_settings = user_services.get_user_settings(blog_post.author_id)
-        author_details = user_services.get_blog_author_details(
+        user_settings = user_services.get_user_settings(
+            blog_post.author_id, strict=False)
+        if user_settings:
+            profile_picture_data_url = (
+                user_settings.profile_picture_data_url)
+            author_username = user_settings.username
+        else:
+            profile_picture_data_url = None
+            author_username = 'author account deleted'
+        author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
         blog_post_dict = (
             blog_services.get_blog_post_from_model(blog_post).to_dict())
@@ -231,8 +244,8 @@ class BlogPostDataHandler(base.BaseHandler):
                 break
 
         self.values.update({
-            'author_username': user_settings.username,
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'author_username': author_username,
+            'profile_picture_data_url': profile_picture_data_url,
             'blog_post_dict': blog_post_dict,
             'summary_dicts': _get_blog_card_summary_dicts_for_homepage(
                 summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST])
@@ -270,7 +283,7 @@ class AuthorsPageHandler(base.BaseHandler):
             user_services.get_user_settings_from_username(author_username)
         )
 
-        author_details = user_services.get_blog_author_details(
+        author_details = blog_services.get_blog_author_details(
             user_settings.user_id).to_dict()
         num_of_published_blog_post_summaries = (
                 blog_services
