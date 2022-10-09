@@ -74,7 +74,8 @@ export class UserService {
   }
 
   async setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<ProfilePictureDataBackendDict> {
+      newProfileImageDataUrl: string
+  ): Promise<ProfilePictureDataBackendDict> {
     return this.userBackendApiService.setProfileImageDataUrlAsync(
       newProfileImageDataUrl);
   }

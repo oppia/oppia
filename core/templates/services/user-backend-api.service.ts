@@ -101,8 +101,9 @@ export class UserBackendApiService {
       });
   }
 
-  async setProfileImageDataUrlAsync(newProfileImageDataUrl: string):
-    Promise<ProfilePictureDataBackendDict> {
+  async setProfileImageDataUrlAsync(
+      newProfileImageDataUrl: string
+  ): Promise<ProfilePictureDataBackendDict> {
     return this.updatePreferencesProfilePictureDataUrlAsync(
       newProfileImageDataUrl);
   }
@@ -133,19 +134,19 @@ export class UserBackendApiService {
   }
 
   async getPreferencesAsync():
-    Promise<NonEmailPreferencesBackendDict> {
+      Promise<NonEmailPreferencesBackendDict> {
     return this.http.get<NonEmailPreferencesBackendDict>(
       this.PREFERENCES_DATA_URL).toPromise();
   }
 
   async getPreferencesProfilePictureDataUrlAsync():
-    Promise<ProfilePictureDataBackendDict> {
+      Promise<ProfilePictureDataBackendDict> {
     return this.http.get<ProfilePictureDataBackendDict>(
       this.PREFERENCES_PROFILE_PICTURE_DATA_URL).toPromise();
   }
 
   async getEmailPreferencesAsync():
-    Promise<EmailPreferencesBackendDict> {
+      Promise<EmailPreferencesBackendDict> {
     return this.http.get<EmailPreferencesBackendDict>(
       this.EMAIL_PREFFERENCES).toPromise();
   }
@@ -173,7 +174,7 @@ export class UserBackendApiService {
   }
 
   async updateEmailPreferencesAsync(
-      data: boolean | EmailPreferencesBackendDict
+      data: EmailPreferencesBackendDict
   ): Promise<UpdatePreferencesResponse> {
     return this.http.put<UpdatePreferencesResponse>(
       this.EMAIL_PREFFERENCES, {

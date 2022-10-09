@@ -207,8 +207,6 @@ class EmailPreferencesHandler(base.BaseHandler):
     def put(self):
         """Handles PUT requests."""
         data = self.normalized_payload.get('data')
-        bulk_email_signup_message_should_be_shown = False
-
         bulk_email_signup_message_should_be_shown = (
             user_services.update_email_preferences(
                 self.user_id, data['can_receive_email_updates'],

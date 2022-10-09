@@ -100,7 +100,8 @@ export class PreferencesPageComponent {
   ): void {
     this.preventPageUnloadEventService.addListener();
     this.userBackendApiService.updatePreferencesDataAsync(
-      updateType, data).then(() => {
+      updateType, data
+    ).then(() => {
       this.preventPageUnloadEventService.removeListener();
       this.alertsService.addInfoMessage('Saved!', 1000);
     });
@@ -145,7 +146,8 @@ export class PreferencesPageComponent {
   ): void {
     this.preventPageUnloadEventService.addListener();
     this.userBackendApiService.updateEmailPreferencesAsync(
-      data).then((returnData) => {
+      data
+    ).then((returnData) => {
       this.preventPageUnloadEventService.removeListener();
       if (returnData.bulk_email_signup_message_should_be_shown) {
         this.canReceiveEmailUpdates = false;
@@ -226,7 +228,6 @@ export class PreferencesPageComponent {
 
     let preferencesProfilePictureDataUrlPromise = (
       this.userBackendApiService.getPreferencesProfilePictureDataUrlAsync());
-
     preferencesProfilePictureDataUrlPromise.then((data) => {
       this.profilePictureDataUrl = decodeURIComponent(
         data.profile_picture_data_url);
@@ -240,7 +241,6 @@ export class PreferencesPageComponent {
 
     let emailPreferencesPromise = (
       this.userBackendApiService.getEmailPreferencesAsync());
-
     emailPreferencesPromise.then((data) => {
       this.canReceiveEmailUpdates = data.can_receive_email_updates;
       this.canReceiveEditorRoleEmail = (
