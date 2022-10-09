@@ -70,7 +70,7 @@ describe('Exploration translation and voiceover tab', function() {
     });
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('This is second card.'));
+      await forms.toRichText('This is second card.'), true);
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -78,7 +78,7 @@ describe('Exploration translation and voiceover tab', function() {
     // Setup a terminating state.
     await explorationEditorMainTab.moveToState('final card');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('This is final card.'));
+      await forms.toRichText('This is final card.'), true);
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.saveChanges('Done!');
     await explorationEditorPage.publishCardExploration(
