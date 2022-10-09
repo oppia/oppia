@@ -298,12 +298,22 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         draft_change_list_v52_6 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
                 'state_name': 'New state',
-                'old_value': state_domain.SubtitledHtml(
-                    'content', '').to_dict(),
-                'new_value': state_domain.SubtitledHtml(
-                    'content', ['content']).to_dict()
+                'old_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html', '', False)
+                    }
+                }).to_dict(),
+                'new_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html', ['content'], True
+                        )
+                    }
+                }).to_dict()
             })
         ]
 
