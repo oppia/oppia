@@ -28,11 +28,12 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 from typing_extensions import Final, TypedDict
 
 
 empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
+
 
 # TODO(#15982): Here we use type Any because `customization_args` can accept
 # various data types.
@@ -471,14 +472,26 @@ def validate_rte_tags(
             )
 
 
-def _content_in_tabs_tag_is_empty(content_list, name):
-    """"""
-    if name not in content_list:
+def _content_in_tabs_tag_is_empty(
+    content_dict: Dict[str, str], name: str
+) -> None:
+    """Raises error when the content inside the tabs tag is empty.
+
+    Args:
+        content_dict: Dict[str]. The dictionary containing the content of
+            tags tag.
+        name: str. The content name that needs to be validated.
+
+    Raises:
+        ValidationError. Content not present in the dictionary.
+        ValidationError. Content inside the dictionary is empty.
+    """
+    if name not in content_dict:
         raise utils.ValidationError(
             'No %s attribute is present inside the tabs tag.' % (name)
         )
 
-    if content_list[name].strip() in empty_values:
+    if content_dict[name].strip() in empty_values:
         raise utils.ValidationError(
             '%s present inside tabs tag is empty.' % (name)
         )
@@ -511,23 +524,23 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
             raise utils.ValidationError(
                 'No content attribute is present inside the tabs tag.'
             )
-        else:
-            tab_content_json = utils.unescape_html(
-                tag['tab_contents-with-value'])
-            tab_content_list = json.loads(tab_content_json)
-            if len(tab_content_list) == 0:
-                raise utils.ValidationError(
-                    'No tabs are present inside the tabs tag.'
-                )
 
-            for tab_content in tab_content_list:
-                _content_in_tabs_tag_is_empty(tab_content, 'title')
-                _content_in_tabs_tag_is_empty(tab_content, 'content')
+        tab_content_json = utils.unescape_html(
+            tag['tab_contents-with-value'])
+        tab_content_list = json.loads(tab_content_json)
+        if len(tab_content_list) == 0:
+            raise utils.ValidationError(
+                'No tabs are present inside the tabs tag.'
+            )
 
-                validate_rte_tags(
-                    tab_content['content'],
-                    is_tag_nested_inside_tabs_or_collapsible=True
-                )
+        for tab_content in tab_content_list:
+            _content_in_tabs_tag_is_empty(tab_content, 'title')
+            _content_in_tabs_tag_is_empty(tab_content, 'content')
+
+            validate_rte_tags(
+                tab_content['content'],
+                is_tag_nested_inside_tabs_or_collapsible=True
+            )
 
     collapsibles_tags = soup.find_all('oppia-noninteractive-collapsible')
     for tag in collapsibles_tags:
@@ -535,33 +548,33 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
             raise utils.ValidationError(
                 'No content attribute present in collapsible tag.'
             )
-        else:
-            collapsible_content_json = (
-                utils.unescape_html(tag['content-with-value'])
-            )
-            collapsible_content = json.loads(
-                collapsible_content_json).replace('\\"', '')
-            if collapsible_content.strip() in empty_values:
-                raise utils.ValidationError(
-                    'No collapsible content is present inside the tag.'
-                )
 
-            validate_rte_tags(
-                collapsible_content,
-                is_tag_nested_inside_tabs_or_collapsible=True
+        collapsible_content_json = (
+            utils.unescape_html(tag['content-with-value'])
+        )
+        collapsible_content = json.loads(
+            collapsible_content_json).replace('\\"', '')
+        if collapsible_content.strip() in empty_values:
+            raise utils.ValidationError(
+                'No collapsible content is present inside the tag.'
             )
+
+        validate_rte_tags(
+            collapsible_content,
+            is_tag_nested_inside_tabs_or_collapsible=True
+        )
 
         if not tag.has_attr('heading-with-value'):
             raise utils.ValidationError(
                 'No heading attribute present in collapsible tag.'
             )
-        else:
-            collapsible_heading_json = (
-                utils.unescape_html(tag['heading-with-value'])
+
+        collapsible_heading_json = (
+            utils.unescape_html(tag['heading-with-value'])
+        )
+        collapsible_heading = json.loads(
+            collapsible_heading_json).replace('\\"', '')
+        if collapsible_heading.strip() in empty_values:
+            raise utils.ValidationError(
+                'Heading attribute inside the collapsible tag is empty.'
             )
-            collapsible_heading = json.loads(
-                collapsible_heading_json).replace('\\"', '')
-            if collapsible_heading.strip() in empty_values:
-                raise utils.ValidationError(
-                    'Heading attribute inside the collapsible tag is empty.'
-                )
