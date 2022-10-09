@@ -25,7 +25,8 @@ import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-gro
   selector: 'oppia-view-learner-group-details-modal',
   templateUrl: './view-learner-group-details-modal.component.html'
 })
-export class ViewLearnerGroupDetailsModalComponent extends ConfirmOrCancelModal {
+export class ViewLearnerGroupDetailsModalComponent
+  extends ConfirmOrCancelModal {
   learnerGroup!: ShortLearnerGroupSummary;
 
   constructor(

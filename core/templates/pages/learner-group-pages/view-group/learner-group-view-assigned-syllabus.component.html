@@ -39,9 +39,13 @@
           </div>
           <div class="assigned-syllabus-card-description">
             <a [href]="getStoryLink(storySummaries[getIndexToDisplay(displayedItem)])"
-               class="btn-primary" *ngIf="storySummaries[getIndexToDisplay(displayedItem)].getCompletedNodeTitles().length == 0">Get Started!</a>
+               class="btn-primary" *ngIf="storySummaries[getIndexToDisplay(displayedItem)].getCompletedNodeTitles().length == 0">
+              <span translate="I18N_GET_STARTED_PAGE_HEADING"></span>
+            </a>
             <a [href]="getStoryLink(storySummaries[getIndexToDisplay(displayedItem)])"
-               class="btn-primary" *ngIf="storySummaries[getIndexToDisplay(displayedItem)].getCompletedNodeTitles().length > 0">Continue</a>
+               class="btn-primary" *ngIf="storySummaries[getIndexToDisplay(displayedItem)].getCompletedNodeTitles().length > 0">
+              <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
+            </a>
           </div>
         </div>
       </div>
@@ -71,7 +75,9 @@
           </div>
           <div class="assigned-syllabus-card-description">
             <a [href]="getPracticeSessionLink(subtopicSummaries[getIndexToDisplay(displayedItem)])"
-               class="btn-primary">Start Practicing</a>
+               class="btn-primary">
+              <span translate="I18N_PRACTICE_SESSION_START_BUTTON_TEXT"></span>
+            </a>
           </div>
         </div>
       </div>

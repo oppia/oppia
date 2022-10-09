@@ -155,17 +155,16 @@ export class LearnerGroupsTabComponent {
         learnerGroupSummary.id, this.username, true,
         data.progressSharingPermission
       ).then((learnerGroup) => {
-          let acceptedLearnerGroupSummary = new ShortLearnerGroupSummary(
-            learnerGroup.id, learnerGroup.title, learnerGroup.description,
-            learnerGroup.facilitatorUsernames,
-            learnerGroup.learnerUsernames.length
-          );
-          this.invitedToLearnerGroups = this.invitedToLearnerGroups.filter(
-            (invitedGroup) => invitedGroup.id !== learnerGroupSummary.id
-          );
-          this.learnerOfLearnerGroups.push(acceptedLearnerGroupSummary);
-        }
-      );
+        let acceptedLearnerGroupSummary = new ShortLearnerGroupSummary(
+          learnerGroup.id, learnerGroup.title, learnerGroup.description,
+          learnerGroup.facilitatorUsernames,
+          learnerGroup.learnerUsernames.length
+        );
+        this.invitedToLearnerGroups = this.invitedToLearnerGroups.filter(
+          (invitedGroup) => invitedGroup.id !== learnerGroupSummary.id
+        );
+        this.learnerOfLearnerGroups.push(acceptedLearnerGroupSummary);
+      });
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

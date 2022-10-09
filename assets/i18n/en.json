@@ -946,6 +946,7 @@
     "I18N_PLAYER_VIEWS_TOOLTIP": "Views",
     "I18N_PRACTICE_SESSION_PAGE_BREADCRUMB": "Practice Session",
     "I18N_PRACTICE_SESSION_PAGE_TITLE": "Practice Session: <[topicName]> - Oppia",
+    "I18N_PRACTICE_SESSION_START_BUTTON_TEXT": "Start Practicing",
     "I18N_PREFERENCES_AUDIO_LANGUAGE_LABEL": "Audio language",
     "I18N_PREFERENCES_BIO": "Bio",
     "I18N_PREFERENCES_BIO_EXPLAIN_TEXT": "This field is optional. Anything you write here is public and world-viewable.",

@@ -29,7 +29,6 @@ import {
   LearnerGroupAllLearnersInfo,
   LearnerGroupAllLearnersInfoBackendDict
 } from './learner-group-all-learners-info.model';
-import { ShortLearnerGroupSummary, ShortLearnerGroupSummaryBackendDict } from './short-learner-group-summary.model';
 
 
 interface DeleteLearnerGroupBackendResponse {

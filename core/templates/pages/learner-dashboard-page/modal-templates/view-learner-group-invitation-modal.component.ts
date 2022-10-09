@@ -25,7 +25,8 @@ import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-gro
   selector: 'oppia-view-learner-group-invitation-modal',
   templateUrl: './view-learner-group-invitation-modal.component.html'
 })
-export class ViewLearnerGroupInvitationModalComponent extends ConfirmOrCancelModal {
+export class ViewLearnerGroupInvitationModalComponent
+  extends ConfirmOrCancelModal {
   learnerGroup!: ShortLearnerGroupSummary;
   progressSharingPermission: boolean = true;
 

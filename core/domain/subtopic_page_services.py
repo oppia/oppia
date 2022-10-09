@@ -407,7 +407,6 @@ def get_multi_users_subtopic_pages_progress(
                 subtopic_mastery: Optional[float] = None
 
                 # Subtopic mastery is average of skill masteries.
-                print(skill_mastery_dict.values(), '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
                 if skill_mastery_dict:
                     subtopic_mastery = (
                         sum(skill_mastery_dict.values()) /

@@ -18,22 +18,19 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
-import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
-
-import './learner-group-view-assigned-syllabus.component.css';
-import { UrlService } from 'services/contextual/url.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
 import { PracticeSessionPageConstants } from 'pages/practice-session-page/practice-session-page.constants';
 
+
+import './learner-group-view-assigned-syllabus.component.css';
 
 @Component({
   selector: 'oppia-learner-group-view-assigned-syllabus',
@@ -45,15 +42,10 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   subtopicSummaries!: LearnerGroupSubtopicSummary[];
   storySummaries!: StorySummary[];
   displayOrderOfSyllabusItems: string[] = [];
-  EXPLORE_PAGE_PREFIX = '/explore/';
-  topicNames
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
-    private learnerGroupBackendApiService:
-      LearnerGroupBackendApiService,
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService
   ) {}

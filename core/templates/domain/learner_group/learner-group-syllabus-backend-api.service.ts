@@ -122,7 +122,8 @@ export class LearnerGroupSyllabusBackendApiService {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
-          '/learner_group_learner_specific_progress_handler/<learner_group_id>', {
+          '/learner_group_learner_specific_progress_handler/' +
+          '<learner_group_id>', {
             learner_group_id: learnerGroupId
           }
         )

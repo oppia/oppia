@@ -1074,8 +1074,7 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
                 },
                 'default_value': 'false'
             }
-        }
-                    
+        }                    
     }
 
     @acl_decorators.can_access_learner_groups
@@ -1097,8 +1096,6 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
         progress_sharing_permission = (
             self.normalized_payload.get(
                 'progress_sharing_permission') == 'true')
-
-        print(progress_sharing_permission, '0000000000000')
 
         learner_group_services.update_progress_sharing_permission(
             self.user_id, learner_group_id, progress_sharing_permission)
