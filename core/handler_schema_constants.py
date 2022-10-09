@@ -66,7 +66,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'StateCompleteEventHandler',
     'StateHitEventHandler',
     'SubtopicPageDataHandler',
-    'SubtopicViewerPage',
     'SuggestionEmailHandler',
     'SuggestionListHandler',
     'SuggestionToExplorationActionHandler',
