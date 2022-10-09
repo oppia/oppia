@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the decline learner group invitation
+ * @fileoverview Unit tests for the view learner group details
  * modal component.
  */
 
@@ -22,7 +22,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { DeclineInvitationModalComponent } from './decline-invitaiton-modal.component';
+import { ViewLearnerGroupDetailsModalComponent } from
+  './view-learner-group-details-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -34,14 +35,14 @@ class MockActiveModal {
   }
 }
 
-describe('Decline Invitations Modal Component', function() {
-  let component: DeclineInvitationModalComponent;
-  let fixture: ComponentFixture<DeclineInvitationModalComponent>;
+describe('View Learner Group Details Modal Component', function() {
+  let component: ViewLearnerGroupDetailsModalComponent;
+  let fixture: ComponentFixture<ViewLearnerGroupDetailsModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        DeclineInvitationModalComponent,
+        ViewLearnerGroupDetailsModalComponent,
         MockTranslatePipe
       ],
       providers: [{
@@ -53,7 +54,7 @@ describe('Decline Invitations Modal Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeclineInvitationModalComponent);
+    fixture = TestBed.createComponent(ViewLearnerGroupDetailsModalComponent);
     component = fixture.componentInstance;
 
     fixture.detectChanges();

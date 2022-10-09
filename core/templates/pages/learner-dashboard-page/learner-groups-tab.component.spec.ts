@@ -30,6 +30,8 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 
 describe('Learner groups tab Component', () => {
   let component: LearnerGroupsTabComponent;
@@ -37,11 +39,16 @@ describe('Learner groups tab Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
   let ngbModal: NgbModal;
+  let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let mockResizeEmitter: EventEmitter<void>;
 
   const sampleShortLearnerGroupSummary = new ShortLearnerGroupSummary(
-    'sampleId', 'sampleTitle', 'sampleDescription', ['username1'], 5
+    'sampleId', 'sampleTitle', 'sampleDescription', ['username1'], 2
+  );
+  const sampleLearnerGroupSummary = new LearnerGroupData(
+    'sampleId', 'sampleTitle', 'sampleDescription', ['username1'],
+    ['user1', `user2`], [], ['subtopic1', 'subtopic2'], ['story1', 'story2']
   );
 
   beforeEach(async(() => {
@@ -78,6 +85,8 @@ describe('Learner groups tab Component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService);
+    learnerGroupBackendApiService = TestBed.inject(
+      LearnerGroupBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
 
     component.username = 'username';
@@ -145,6 +154,47 @@ describe('Learner groups tab Component', () => {
       fixture.detectChanges();
 
       expect(component.invitedToLearnerGroups).toEqual([]);
+    })
+  );
+
+  it('should accept learner group invitation successfully',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          learnerGroup: sampleShortLearnerGroupSummary,
+        },
+        result: Promise.resolve({
+          progressSharingPermission: false
+        })
+      } as NgbModalRef);
+      spyOn(learnerGroupBackendApiService, 'updateLearnerGroupInviteAsync')
+        .and.returnValue(Promise.resolve(sampleLearnerGroupSummary));
+
+      component.invitedToLearnerGroups = [sampleShortLearnerGroupSummary];
+      component.learnerOfLearnerGroups = [];
+
+      component.acceptLearnerGroupInvitation(sampleShortLearnerGroupSummary);
+      tick(100);
+      fixture.detectChanges();
+
+      expect(component.invitedToLearnerGroups).toEqual([]);
+      expect(component.learnerOfLearnerGroups).toEqual(
+        [sampleShortLearnerGroupSummary]);
+    })
+  );
+
+  it('should view learner group details successfully',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          learnerGroup: sampleShortLearnerGroupSummary,
+        },
+        result: Promise.resolve()
+      } as NgbModalRef);
+
+      component.viewLearnerGroupDetails(sampleShortLearnerGroupSummary);
+      tick(100);
+      fixture.detectChanges();
     })
   );
 });

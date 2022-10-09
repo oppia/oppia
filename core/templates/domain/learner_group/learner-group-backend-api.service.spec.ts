@@ -389,6 +389,62 @@ describe('Learner Group Backend API Service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should fetch progress sharing permission of learner correctly',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      const PROGRESS_SHARING_PERMISSION_URL = (
+        '/learner_group_progress_sharing_permission_handler/groupId'
+      );
+      const sampleSharingPermission = {
+        progress_sharing_permission: true
+      };
+
+      learnerGroupBackendApiService
+        .fetchProgressSharingPermissionOfLearnerAsync('groupId')
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        PROGRESS_SHARING_PERMISSION_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleSharingPermission);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(true);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should successfully update progress sharing permission of learner',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      const sampleSharingPermission = {
+        progress_sharing_permission: true
+      };
+
+      const PROGRESS_SHARING_PERMISSION_URL = (
+        '/learner_group_progress_sharing_permission_handler/groupId'
+      );
+
+      learnerGroupBackendApiService.updateProgressSharingPermissionAsync(
+        'groupId', true).then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        PROGRESS_SHARING_PERMISSION_URL);
+      expect(req.request.method).toEqual('PUT');
+      req.flush(sampleSharingPermission);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(true);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
   it('should check if learner group feature is enabled correctly',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');

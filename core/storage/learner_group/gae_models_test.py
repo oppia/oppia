@@ -261,3 +261,29 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             learner_group_models.LearnerGroupModel.get_by_facilitator_id(
                 'user_1'))
         self.assertEqual(learner_group_model[0].id, 'learner_group_32')
+
+    def test_get_by_invited_learner_user_id(self) -> None:
+        """Test get_by_invited_learner_user_id."""
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel
+                .get_by_invited_learner_user_id(
+                    'user_1'))
+        self.assertEqual(len(learner_grp_models), 0)
+
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel
+                .get_by_invited_learner_user_id(
+                    'user_5'))
+        self.assertEqual(learner_grp_models[0].id, 'learner_group_32')
+
+    def test_get_by_learner_user_id(self) -> None:
+        """Test get_by_learner_user_id."""
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel.get_by_learner_user_id(
+                'user_1'))
+        self.assertEqual(len(learner_grp_models), 0)
+
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel.get_by_learner_user_id(
+                'user_3'))
+        self.assertEqual(learner_grp_models[0].id, 'learner_group_32')

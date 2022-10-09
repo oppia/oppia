@@ -34,7 +34,7 @@ class MockActiveModal {
   }
 }
 
-describe('Decline Invitations Modal Component', function() {
+describe('Decline Invitation Modal Component', function() {
   let component: DeclineInvitationModalComponent;
   let fixture: ComponentFixture<DeclineInvitationModalComponent>;
 

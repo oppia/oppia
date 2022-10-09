@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the decline learner group invitation
+ * @fileoverview Unit tests for the view learner group invitation
  * modal component.
  */
 
@@ -22,7 +22,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { DeclineInvitationModalComponent } from './decline-invitaiton-modal.component';
+import { ViewLearnerGroupInvitationModalComponent } from
+  './view-learner-group-invitation-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -34,14 +35,15 @@ class MockActiveModal {
   }
 }
 
-describe('Decline Invitations Modal Component', function() {
-  let component: DeclineInvitationModalComponent;
-  let fixture: ComponentFixture<DeclineInvitationModalComponent>;
+describe('View Learner Group Invitation Modal Component', function() {
+  let component: ViewLearnerGroupInvitationModalComponent;
+  let fixture: ComponentFixture<ViewLearnerGroupInvitationModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        DeclineInvitationModalComponent,
+        ViewLearnerGroupInvitationModalComponent,
         MockTranslatePipe
       ],
       providers: [{
@@ -53,7 +55,9 @@ describe('Decline Invitations Modal Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeclineInvitationModalComponent);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    fixture = TestBed.createComponent(
+      ViewLearnerGroupInvitationModalComponent);
     component = fixture.componentInstance;
 
     fixture.detectChanges();
@@ -61,5 +65,23 @@ describe('Decline Invitations Modal Component', function() {
 
   it('should check whether component is initialized', () => {
     expect(component).toBeDefined();
+  });
+
+  it('should confirm', () => {
+    spyOn(ngbActiveModal, 'close');
+    component.confirm();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      progressSharingPermission: component.progressSharingPermission
+    });
+  });
+
+  it('should toggle progress sharing permission correctly', () => {
+    component.progressSharingPermission = true;
+
+    component.toggleProgressSharingPermission();
+    expect(component.progressSharingPermission).toBe(false);
+
+    component.toggleProgressSharingPermission();
+    expect(component.progressSharingPermission).toBe(true);
   });
 });

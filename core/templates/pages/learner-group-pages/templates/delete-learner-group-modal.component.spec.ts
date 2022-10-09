@@ -14,14 +14,14 @@
 
 
 /**
- * @fileoverview Unit tests for the remove item modal component.
+ * @fileoverview Unit tests for the delete learner group modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { RemoveItemModalComponent } from './remove-item-modal.component';
+import { DeleteLearnerGroupModalComponent } from './delete-learner-group-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -33,14 +33,14 @@ class MockActiveModal {
   }
 }
 
-describe('Remove Item Modal Component', function() {
-  let component: RemoveItemModalComponent;
-  let fixture: ComponentFixture<RemoveItemModalComponent>;
+describe('Delete Learner Group Modal Component', function() {
+  let component: DeleteLearnerGroupModalComponent;
+  let fixture: ComponentFixture<DeleteLearnerGroupModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        RemoveItemModalComponent,
+        DeleteLearnerGroupModalComponent,
         MockTranslatePipe
       ],
       providers: [{
@@ -52,7 +52,7 @@ describe('Remove Item Modal Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RemoveItemModalComponent);
+    fixture = TestBed.createComponent(DeleteLearnerGroupModalComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);

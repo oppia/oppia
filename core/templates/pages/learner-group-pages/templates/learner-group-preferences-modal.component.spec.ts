@@ -14,8 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the decline learner group invitation
- * modal component.
+ * @fileoverview Unit tests for the learner group preferences modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -34,8 +33,9 @@ class MockActiveModal {
   }
 }
 
-describe('Decline Invitations Modal Component', function() {
+describe('Learner Group Preferences Modal Component', function() {
   let component: LearnerGroupPreferencesModalComponent;
+  let ngbActiveModal: NgbActiveModal;
   let fixture: ComponentFixture<LearnerGroupPreferencesModalComponent>;
 
   beforeEach(waitForAsync(() => {
@@ -53,6 +53,7 @@ describe('Decline Invitations Modal Component', function() {
   }));
 
   beforeEach(() => {
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
     fixture = TestBed.createComponent(LearnerGroupPreferencesModalComponent);
     component = fixture.componentInstance;
 
@@ -61,5 +62,23 @@ describe('Decline Invitations Modal Component', function() {
 
   it('should check whether component is initialized', () => {
     expect(component).toBeDefined();
+  });
+
+  it('should confirm', () => {
+    spyOn(ngbActiveModal, 'close');
+    component.confirm();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      progressSharingPermission: component.progressSharingPermission
+    });
+  });
+
+  it('should toggle progress sharing permission correctly', () => {
+    component.progressSharingPermission = true;
+
+    component.toggleProgressSharingPermission();
+    expect(component.progressSharingPermission).toBe(false);
+
+    component.toggleProgressSharingPermission();
+    expect(component.progressSharingPermission).toBe(true);
   });
 });

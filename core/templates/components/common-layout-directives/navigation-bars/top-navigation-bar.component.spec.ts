@@ -39,6 +39,7 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -94,6 +95,7 @@ describe('TopNavigationBarComponent', () => {
   let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
   let classroomBackendApiService: ClassroomBackendApiService;
+  let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
@@ -153,6 +155,8 @@ describe('TopNavigationBarComponent', () => {
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    learnerGroupBackendApiService = TestBed.inject(
+      LearnerGroupBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     accessValidationBackendApiService = TestBed
       .inject(AccessValidationBackendApiService);
@@ -448,6 +452,18 @@ describe('TopNavigationBarComponent', () => {
     expect(i18nService.updateUserPreferredLanguage).toHaveBeenCalledWith(
       langCode);
   });
+
+  it('should check if learner groups feature is enabled', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(
+      learnerGroupBackendApiService, 'isLearnerGroupFeatureEnabledAsync')
+      .and.resolveTo(true);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(true);
+  }));
 
   it('should check if classroom promos are enabled', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
