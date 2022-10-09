@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the edit learner group page.
+ * @fileoverview Module for the view learner group page.
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';

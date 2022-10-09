@@ -432,7 +432,7 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue(
-        '/learner-groups/groupId');
+        '/learner-group/groupId');
       ecs.removeCustomEntityContext();
     });
 

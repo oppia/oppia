@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the learner group syllabus.
+ * @fileoverview Component for the learner group view of assigned syllabus.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
