@@ -897,6 +897,29 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         ):
             topic.remove_skill_id_from_subtopic(1, skill_id)
 
+    def test_update_subtopic_thumbnail(self) -> None:
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two')]
+        new_filename = 'new_filename.svg'
+        new_filesize = '12345'
+        subtopic_index = self.topic.get_subtopic_index(1)
+        self.topic.update_subtopic_thumbnail_filename_and_size(
+            1, new_filename, new_filesize
+        )
+        self.assertEqual(
+            new_filename, self.topic.subtopics[subtopic_index].thumbnail_filename
+        )
+        self.assertEqual(
+            new_filesize, self.topic.subtopics[subtopic_index].thumbnail_size_in_bytes
+        )
+
     def test_move_skill_id_from_subtopic_to_subtopic(self) -> None:
         """Checks that move_skill_id_to_subtopic works when moving a skill_id
         from an existing subtopic to a new subtopic returns the expected
