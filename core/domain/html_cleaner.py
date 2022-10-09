@@ -32,6 +32,8 @@ from typing import Any, Dict, List, Tuple
 from typing_extensions import Final, TypedDict
 
 
+empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
+
 # TODO(#15982): Here we use type Any because `customization_args` can accept
 # various data types.
 class ComponentsDict(TypedDict):
@@ -195,24 +197,8 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
     return components
 
 
-def _initialize_bs4_and_empty_values_variable(
-    html_data: str
-) -> Tuple[bs4.BeautifulSoup, List[str]]:
-    """Initializes bs4 and empty values variable.
-
-    Args:
-        html_data: str. The html data.
-
-    Returns:
-        tuple. Tuple of initialized bs4 and empty values variable.
-    """
-    soup = bs4.BeautifulSoup(html_data, 'html.parser')
-    empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
-    return (soup, empty_values)
-
-
 def _raise_validation_errors_for_escaped_html_tag(
-    tag: bs4.BeautifulSoup, attr: str, tag_name: str, empty_values: List[str]
+    tag: bs4.BeautifulSoup, attr: str, tag_name: str
 ) -> None:
     """Raises validation for the errored escaped html tag.
 
@@ -220,7 +206,6 @@ def _raise_validation_errors_for_escaped_html_tag(
         tag: bs4.BeautifulSoup. The tag which needs to be validated.
         attr: str. The attribute name that needs to be validated inside the tag.
         tag_name: str. The tag name.
-        empty_values: List[str]. The list of empty values.
 
     Raises:
         ValidationError. Tag does not have the attribute.
@@ -238,7 +223,7 @@ def _raise_validation_errors_for_escaped_html_tag(
 
 
 def _raise_validation_errors_for_unescaped_html_tag(
-    tag: bs4.BeautifulSoup, attr: str, tag_name: str, empty_values: List[str]
+    tag: bs4.BeautifulSoup, attr: str, tag_name: str
 ) -> None:
     """Raises validation for the errored unescaped html tag.
 
@@ -246,7 +231,6 @@ def _raise_validation_errors_for_unescaped_html_tag(
         tag: bs4.BeautifulSoup. The tag which needs to be validated.
         attr: str. The attribute name that needs to be validated inside the tag.
         tag_name: str. The tag name.
-        empty_values: List[str]. The list of empty values.
 
     Raises:
         ValidationError. Tag does not have the attribute.
@@ -317,7 +301,7 @@ def validate_rte_tags(
         ValidationError. Collapsible tag present inside tabs or another
             collapsible.
     """
-    soup, empty_values = _initialize_bs4_and_empty_values_variable(html_data)
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
     for tag in soup.find_all('oppia-noninteractive-image'):
         if not tag.has_attr('alt-with-value'):
             raise utils.ValidationError(
@@ -351,7 +335,7 @@ def validate_rte_tags(
             )
 
         filepath_value = utils.unescape_html(
-                tag['filepath-with-value'])[1:-1].replace('\\"', '')
+            tag['filepath-with-value'])[1:-1].replace('\\"', '')
         if filepath_value.strip() in empty_values:
             raise utils.ValidationError(
                 'Image tag \'filepath-with-value\' attribute should not '
@@ -362,15 +346,13 @@ def validate_rte_tags(
         _raise_validation_errors_for_unescaped_html_tag(
             tag,
             'text-with-value',
-            'SkillReview',
-            empty_values
+            'SkillReview'
         )
 
         _raise_validation_errors_for_unescaped_html_tag(
             tag,
             'skill_id-with-value',
-            'SkillReview',
-            empty_values
+            'SkillReview'
         )
 
     for tag in soup.find_all('oppia-noninteractive-video'):
@@ -378,15 +360,13 @@ def validate_rte_tags(
         _raise_validation_errors_for_escaped_html_tag(
             tag,
             'start-with-value',
-            'Video',
-            empty_values
+            'Video'
         )
 
         _raise_validation_errors_for_escaped_html_tag(
             tag,
             'end-with-value',
-            'Video',
-            empty_values
+            'Video'
         )
 
         start_value = float(tag['start-with-value'].strip())
@@ -414,8 +394,7 @@ def validate_rte_tags(
         _raise_validation_errors_for_unescaped_html_tag(
             tag,
             'video_id-with-value',
-            'Video',
-            empty_values
+            'Video'
         )
 
     for tag in soup.find_all('oppia-noninteractive-link'):
@@ -428,8 +407,7 @@ def validate_rte_tags(
         _raise_validation_errors_for_unescaped_html_tag(
             tag,
             'url-with-value',
-            'Link',
-            empty_values
+            'Link'
         )
 
     for tag in soup.find_all('oppia-noninteractive-math'):
@@ -493,6 +471,19 @@ def validate_rte_tags(
             )
 
 
+def _content_in_tabs_tag_is_empty(content_list, name):
+    """"""
+    if name not in content_list:
+        raise utils.ValidationError(
+            'No %s attribute is present inside the tabs tag.' % (name)
+        )
+
+    if content_list[name].strip() in empty_values:
+        raise utils.ValidationError(
+            '%s present inside tabs tag is empty.' % (name)
+        )
+
+
 def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
     """Validates `Tabs` and `Collapsible` RTE tags
 
@@ -513,10 +504,14 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
             present.
         ValidationError. Collapsible heading-with-value attribute is empty.
     """
-    soup, empty_values = _initialize_bs4_and_empty_values_variable(html_data)
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
     tabs_tags = soup.find_all('oppia-noninteractive-tabs')
     for tag in tabs_tags:
-        if tag.has_attr('tab_contents-with-value'):
+        if not tag.has_attr('tab_contents-with-value'):
+            raise utils.ValidationError(
+                'No content attribute is present inside the tabs tag.'
+            )
+        else:
             tab_content_json = utils.unescape_html(
                 tag['tab_contents-with-value'])
             tab_content_list = json.loads(tab_content_json)
@@ -526,38 +521,21 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
                 )
 
             for tab_content in tab_content_list:
-                if 'title' not in tab_content:
-                    raise utils.ValidationError(
-                        'No title attribute is present inside the tabs tag.'
-                    )
-
-                if tab_content['title'].strip() in empty_values:
-                    raise utils.ValidationError(
-                        'Title present inside tabs tag is empty.'
-                    )
-
-                if 'content' not in tab_content:
-                    raise utils.ValidationError(
-                        'No content attribute is present inside the tabs tag.'
-                    )
-
-                if tab_content['content'].strip() in empty_values:
-                    raise utils.ValidationError(
-                        'Content present inside tabs tag is empty.'
-                    )
+                _content_in_tabs_tag_is_empty(tab_content, 'title')
+                _content_in_tabs_tag_is_empty(tab_content, 'content')
 
                 validate_rte_tags(
                     tab_content['content'],
                     is_tag_nested_inside_tabs_or_collapsible=True
                 )
-        else:
-            raise utils.ValidationError(
-                'No content attribute is present inside the tabs tag.'
-            )
 
     collapsibles_tags = soup.find_all('oppia-noninteractive-collapsible')
     for tag in collapsibles_tags:
-        if tag.has_attr('content-with-value'):
+        if not tag.has_attr('content-with-value'):
+            raise utils.ValidationError(
+                'No content attribute present in collapsible tag.'
+            )
+        else:
             collapsible_content_json = (
                 utils.unescape_html(tag['content-with-value'])
             )
@@ -572,22 +550,18 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
                 collapsible_content,
                 is_tag_nested_inside_tabs_or_collapsible=True
             )
-        else:
-            raise utils.ValidationError(
-                'No content attribute present in collapsible tag.'
-            )
 
-        if tag.has_attr('heading-with-value'):
-            collapsible_heading_json = (
-                utils.unescape_html(tag['heading-with-value'])
-            )
-            collapsible_heading_list = json.loads(
-                collapsible_heading_json).replace('\\"', '')
-            if collapsible_heading_list.strip() in empty_values:
-                raise utils.ValidationError(
-                    'Heading attribute inside the collapsible tag is empty.'
-                )
-        else:
+        if not tag.has_attr('heading-with-value'):
             raise utils.ValidationError(
                 'No heading attribute present in collapsible tag.'
             )
+        else:
+            collapsible_heading_json = (
+                utils.unescape_html(tag['heading-with-value'])
+            )
+            collapsible_heading = json.loads(
+                collapsible_heading_json).replace('\\"', '')
+            if collapsible_heading.strip() in empty_values:
+                raise utils.ValidationError(
+                    'Heading attribute inside the collapsible tag is empty.'
+                )

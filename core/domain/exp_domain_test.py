@@ -1453,7 +1453,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-tabs>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'Title present inside tabs tag is empty.')
+            self.new_exploration, 'title present inside tabs tag is empty.')
 
         self.state.content.html = (
             '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
@@ -1472,7 +1472,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '&amp;quot;}]\'></oppia-noninteractive-tabs>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'Content present inside tabs tag is empty.')
+            self.new_exploration, 'content present inside tabs tag is empty.')
 
         self.state.content.html = (
             '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
