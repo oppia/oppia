@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import copy
-
 from core import feconf
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -827,7 +825,8 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 exp_versions_diff.old_to_new_state_names.items()
             ):
                 if old_state_name != new_state_name: # pragma: no cover
-                    effective_old_to_new_state_names[old_state_name] = new_state_name
+                    effective_old_to_new_state_names[
+                        old_state_name] = new_state_name
             for old_state_name, new_state_name in (
                 effective_old_to_new_state_names.items()
             ):
