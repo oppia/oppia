@@ -190,3 +190,46 @@
   font-size: 14px;
   padding: 8px 22px;
 }
+
+@media screen and (max-width: 880px) {
+  .oppia-learner-group-view-assigned-syllabus .assigned-syllabus-card-title {
+    font-size: 18px;
+  }
+
+  .oppia-learner-group-view-assigned-syllabus .same-row-container,
+  .oppia-learner-group-view-assigned-syllabus .progress-text {
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-view-assigned-syllabus .assigned-sylabus-card {
+    flex-direction: column;
+    position: relative;
+  }
+
+  .oppia-learner-group-view-assigned-syllabus .assigned-syllabus-item-image {
+    width: 100%;
+  }
+
+  .oppia-learner-group-view-assigned-syllabus .assigned-syllabus-info {
+    padding: 15px 15px;
+  }
+
+  .oppia-learner-group-view-assigned-syllabus .progress-circle-container {
+    right: 10px;
+    top: 10px;
+  }
+
+  .oppia-learner-group-view-assigned-syllabus .same-row-container {
+    position: unset;
+  }
+
+  .oppia-learner-group-view-assigned-syllabus .type-tag-pill {
+    font-size: 12px;
+  }
+
+  .oppia-learner-group-view-assigned-syllabus .type-tag-pill:after {
+    border-width: 12.5px 0 12.5px 15px;
+  }
+}

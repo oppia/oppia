@@ -71,7 +71,6 @@
 .oppia-view-learner-group .oppia-dashboard-view-tabs {
   display: flex;
   justify-content: space-around;
-  padding: 0 40px;
 }
 
 .oppia-view-learner-group .oppia-dashboard-view-tabs-item {
@@ -116,7 +115,8 @@
   text-align: center;
 }
 
-.exit-learner-group-modal .modal-dialog {
+.exit-learner-group-modal .modal-dialog,
+.learner-group-preferences-modal .modal-dialog {
   margin: 200px auto;
 }
 
@@ -125,12 +125,41 @@
   padding-left: 40px
 }
 
-.exit-learner-group-modal .modal-body {
+.exit-learner-group-modal .modal-body,
+.learner-group-preferences-modal .modal-body {
   padding: 0 40px 30px;
 }
 
-.exit-learner-group-modal .modal-footer {
+.exit-learner-group-modal .modal-footer,
+.learner-group-preferences-modal .modal-footer {
   border-top: unset;
   padding-bottom: 40px;
   padding-right: 40px;
+}
+
+.learner-group-preferences-modal .modal-header {
+  border-bottom: unset;
+  font-size: 24px;
+  padding: 25px 40px 15px 40px;
+}
+
+.learner-group-preferences-modal .modal-header-title {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.learner-group-preferences-modal .modal-body .mat-radio-label {
+  white-space: unset;
+}
+
+@media screen and (max-width: 540px) {
+  .oppia-view-learner-group .learner-group-overview-summary-card-content {
+    display: grid;
+  }
+
+  .oppia-view-learner-group .group-info-container {
+    display: grid;
+    grid-gap: 20px;
+  }
 }

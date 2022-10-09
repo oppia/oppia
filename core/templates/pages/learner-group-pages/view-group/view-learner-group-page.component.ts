@@ -36,6 +36,7 @@ import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summ
 import { ExitLearnerGroupModalComponent } from 'pages/learner-dashboard-page/modal-templates/exit-learner-group-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { LearnerGroupPreferencesModalComponent } from '../templates/learner-group-preferences-modal.component';
 
 
 import './view-learner-group-page.component.css';
@@ -55,6 +56,7 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
   username!: string;
   learnerProgress!: LearnerGroupUserProgress;
   storiesChaptersProgress: ChapterProgressSummary[] = [];
+  progressSharingPermission!: boolean;
 
   constructor(
     private loaderService: LoaderService,
@@ -79,6 +81,11 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
         this.learnerGroupId
       ).then(learnerGroupInfo => {
         this.learnerGroup = learnerGroupInfo;
+        this.learnerGroupBackendApiService
+          .fetchProgressSharingPermissionOfLearnerAsync(this.learnerGroup.id)
+          .then(progressSharingPermission => {
+            this.progressSharingPermission = progressSharingPermission;
+          });
         let userInfoPromise = this.userService.getUserInfoAsync();
         userInfoPromise.then(userInfo => {
           this.username = userInfo.getUsername();
@@ -162,12 +169,38 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.learnerGroupTitle = this.learnerGroup.title;
 
     modalRef.result.then(() => {
+      this.loaderService.showLoadingScreen('Loading');
       this.learnerGroupBackendApiService.exitLearnerGroupAsync(
         this.learnerGroup.id, this.username
       ).then(() => {
         this.windowRef.nativeWindow.location.href = '/learner-dashboard';
-        this.loaderService.showLoadingScreen('Loading');
       });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  viewLearnerGroupPreferences(): void {
+    let modalRef = this.ngbModal.open(
+      LearnerGroupPreferencesModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'learner-group-preferences-modal'
+      }
+    );
+    modalRef.componentInstance.learnerGroup = this.learnerGroup;
+    modalRef.componentInstance.progressSharingPermission = (
+      this.progressSharingPermission);
+
+    modalRef.result.then((data) => {
+      this.learnerGroupBackendApiService
+        .updateProgressSharingPermissionAsync(
+          this.learnerGroup.id, data.progressSharingPermission
+        ).then((updatedProgressSharingPermission) => {
+          this.progressSharingPermission = updatedProgressSharingPermission;
+        });
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

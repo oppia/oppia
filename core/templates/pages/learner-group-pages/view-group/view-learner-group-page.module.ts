@@ -26,11 +26,16 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 import { ViewLearnerGroupPageComponent } from
   './view-learner-group-page.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { LearnerGroupLearnerSpecificProgressComponent } from '../edit-group/learner-group-learner-specific-progress.component';
+import { LearnerGroupOverviewComponent } from '../edit-group/learner-group-overview.component';
+import { LearnerGroupViewAssignedSyllabusComponent } from './learner-group-view-assigned-syllabus.component';
+import { ExitLearnerGroupModalComponent } from 'pages/learner-dashboard-page/modal-templates/exit-learner-group-modal.component';
+import { LearnerGroupPreferencesModalComponent } from '../templates/learner-group-preferences-modal.component';
 
 @NgModule({
   imports: [
@@ -49,14 +54,16 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     LearnerGroupOverviewComponent,
     LearnerGroupViewAssignedSyllabusComponent,
     LearnerGroupLearnerSpecificProgressComponent,
-    ExitLearnerGroupModalComponent
+    ExitLearnerGroupModalComponent,
+    LearnerGroupPreferencesModalComponent
   ],
   entryComponents: [
     ViewLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
     LearnerGroupViewAssignedSyllabusComponent,
     LearnerGroupLearnerSpecificProgressComponent,
-    ExitLearnerGroupModalComponent
+    ExitLearnerGroupModalComponent,
+    LearnerGroupPreferencesModalComponent
   ],
   providers: [
     {
@@ -93,10 +100,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { LearnerGroupLearnerSpecificProgressComponent } from '../edit-group/learner-group-learner-specific-progress.component';
-import { LearnerGroupOverviewComponent } from '../edit-group/learner-group-overview.component';
-import { LearnerGroupViewAssignedSyllabusComponent } from './learner-group-view-assigned-syllabus.component';
-import { ExitLearnerGroupModalComponent } from 'pages/learner-dashboard-page/modal-templates/exit-learner-group-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

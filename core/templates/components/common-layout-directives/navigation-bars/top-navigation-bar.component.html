@@ -471,6 +471,14 @@
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
           </a>
         </li>
+        <li class="nav-item"
+            *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
+          <a (click)="closeSubmenuIfNotMobile($event)"
+             href="/facilitator-dashboard"
+             class="dropdown-item nav-link">
+            <span [innerHTML]="'I18N_TOPNAV_FACILITATOR_DASHBOARD' | translate"></span>
+          </a>
+        </li>
         <li class="nav-item">
           <a *ngIf="(isCurriculumAdmin || isTopicManager)"
              (click)="closeSubmenuIfNotMobile($event)"
@@ -487,7 +495,8 @@
             <span [innerHTML]="'I18N_TOPNAV_BLOG_DASHBOARD' | translate"></span>
           </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item"
+            *ngIf="isModerator">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"

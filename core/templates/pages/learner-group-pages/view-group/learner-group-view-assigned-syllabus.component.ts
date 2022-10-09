@@ -66,8 +66,6 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
           this.subtopicSummaries = groupSyllabus.subtopicsProgress;
           this.storySummaries = groupSyllabus.storiesProgress;
           this.setDisplayOrderOfSyllabusItems();
-          console.log(this.subtopicSummaries, 'subtopicSummaries');
-          console.log(this.storySummaries, 'storySummaries');
         });
     }
   }

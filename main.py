@@ -1037,6 +1037,9 @@ URLS = [
         r'/learner_group_learner_invitation_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerInvitationHandler),
     get_redirect_route(
+        r'/learner_group_progress_sharing_permission_handler/<learner_group_id>', # pylint: disable=line-too-long
+        learner_group.LearnerGroupProgressSharingPermissionHandler),
+    get_redirect_route(
         r'/exit_learner_group_handler/<learner_group_id>',
         learner_group.ExitLearnerGroupHandler),
     get_redirect_route(

@@ -755,3 +755,37 @@ def remove_subtopic_page_reference_from_learner_groups(
     learner_group_models.LearnerGroupModel.update_timestamps_multi(
         models_to_put)
     learner_group_models.LearnerGroupModel.put_multi(models_to_put)
+
+
+def update_progress_sharing_permission(
+    user_id: str,
+    group_id: str,
+    new_progress_sharing_permission: str
+) -> None:
+    """Updates the progress sharing permission of the learner group.
+
+    Args:
+        user_id: str. The id of the user.
+        group_id: str. The id of the learner group.
+        new_progress_sharing_permission: str. The new progress sharing
+            permission of the learner group.
+    """
+    learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
+        user_id, strict=True
+    )
+
+    old_user_details = learner_grps_user_model.learner_groups_user_details
+    learner_grps_user_model.learner_groups_user_details = []
+    for group_details in old_user_details:
+        if group_details['group_id'] == group_id:
+            learner_grps_user_model.learner_groups_user_details.append({
+                'group_id': group_id,
+                'progress_sharing_is_turned_on':
+                    new_progress_sharing_permission
+            })
+        else:
+            learner_grps_user_model.learner_groups_user_details.append(
+                group_details)
+
+    learner_grps_user_model.update_timestamps()
+    learner_grps_user_model.put()

@@ -1046,6 +1046,68 @@ class ViewLearnerGroupPage(base.BaseHandler):
         self.render_template('view-learner-group-page.mainpage.html')
 
 
+class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
+    """The handler for fetching and updating progress sharing permissions of
+    a learner for a given learner group.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'progress_sharing_permission': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': 'false'
+            }
+        }
+                    
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id):
+        """Handles GET requests."""
+
+        progress_sharing_permission = (
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [self.user_id], learner_group_id)[0]
+        )
+        self.render_json({
+            'progress_sharing_permission': progress_sharing_permission
+        })
+
+    @acl_decorators.can_access_learner_groups
+    def put(self, learner_group_id):
+        """Handles PUT requests."""
+
+        progress_sharing_permission = (
+            self.normalized_payload.get(
+                'progress_sharing_permission') == 'true')
+
+        print(progress_sharing_permission, '0000000000000')
+
+        learner_group_services.update_progress_sharing_permission(
+            self.user_id, learner_group_id, progress_sharing_permission)
+
+        self.render_json({
+            'progress_sharing_permission': progress_sharing_permission
+        })
+
+
 class LearnerGroupsFeatureStatusHandler(base.BaseHandler):
     """The handler for checking whether the learner groups feature is
     enabled.
@@ -1058,8 +1120,9 @@ class LearnerGroupsFeatureStatusHandler(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_learner_groups
     def get(self):
+        """Handles GET requests."""
         self.render_json({
             'feature_is_enabled': (
                 config_domain.LEARNER_GROUPS_ARE_ENABLED.value)

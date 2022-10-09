@@ -9,9 +9,9 @@
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
   margin: 18px 0 25px 0;
+  max-width: 736px;
   min-height: 179px;
   padding: 32px 30px 40px;
-  width: 736px;
 }
 
 .learner-groups-tab .invited-to-learner-groups-section {
@@ -19,8 +19,8 @@
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
   margin: 18px 0 25px 0;
+  max-width: 736px;
   min-height: 179px;
-  width: 736px;
 }
 
 .learner-groups-tab .invited-to-learner-groups-section .mat-expansion-panel-header {
@@ -225,10 +225,26 @@
   }
 
   .learner-groups-tab .oppia-learner-group-summary-card-title {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .learner-groups-tab .oppia-learner-group-summary-card-learners {
-    font-size: 12px;
+    font-size: 14px;
+  }
+
+  .learner-groups-tab .oppia-learner-groups-feature-info-desc-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .learner-groups-tab .oppia-learner-group-summary-card {
+    align-items: unset;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .learner-groups-tab .learner-group-view-details-button {
+    font-size: 14px;
+    margin-right: 0;
   }
 }

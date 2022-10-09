@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,35 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for view learner group invitation modal.
+ * @fileoverview Component for Remove Item modal.
  */
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 
 @Component({
-  selector: 'oppia-view-learner-group-invitation-modal',
-  templateUrl: './view-learner-group-invitation-modal.component.html'
+  selector: 'oppia-delete-learner-group-modal',
+  templateUrl: './delete-learner-group-modal.component.html'
 })
-export class ViewLearnerGroupInvitationModalComponent extends ConfirmOrCancelModal {
-  learnerGroup!: ShortLearnerGroupSummary;
-  progressSharingPermission: boolean = true;
+export class DeleteLearnerGroupModalComponent extends ConfirmOrCancelModal {
+  learnerGroupTitle!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
-  }
-
-  toggleProgressSharingPermission(): void {
-    this.progressSharingPermission = !this.progressSharingPermission;
-  }
-
-  confirm(): void {
-    this.ngbActiveModal.close({
-      progressSharingPermission: this.progressSharingPermission,
-    });
   }
 }

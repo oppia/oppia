@@ -198,40 +198,6 @@ describe('LearnerGroupPreferencesComponent', () => {
     expect(component.invitedLearners).toEqual(['username1', 'username2']);
   });
 
-  it('should add new learner to learner group successfully', fakeAsync(() => {
-    const demoLearnerGroupBackendDict = {
-      id: 'groupId',
-      title: 'title',
-      description: 'description',
-      facilitator_usernames: ['facilitator_username'],
-      learner_usernames: [],
-      invited_learner_usernames: ['username1', 'username2'],
-      subtopic_page_ids: [],
-      story_ids: ['story_id_1']
-    };
-    const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
-      demoLearnerGroupBackendDict);
-    const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
-      username: 'username1',
-      profile_picture_data_url: 'picture',
-      error: ''
-    });
-
-    spyOn(learnerGroupBackendApiService, 'updateLearnerGroupInviteAsync')
-      .and.returnValue(Promise.resolve(learnerGroup));
-
-    component.learnerGroup = demoLearnerGroup;
-    component.currentLearnersInfo = [];
-    component.invitedLearnersInfo = [newLearnerInfo];
-
-    component.addLearnerToLearnerGroup(newLearnerInfo);
-    tick(100);
-    fixture.detectChanges();
-
-    expect(component.learnerGroup).toEqual(learnerGroup);
-    expect(component.currentLearnersInfo).toEqual([newLearnerInfo]);
-  }));
-
   it('should get user profile image data url correctly', () => {
     const dataUrl = '%2Fimages%2Furl%2F1';
     expect(component.getProfileImageDataUrl(dataUrl)).toBe('/images/url/1');

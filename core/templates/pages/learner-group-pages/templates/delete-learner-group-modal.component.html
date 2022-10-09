@@ -1,0 +1,30 @@
+<div class="modal-header">
+  <h3>
+    <span><p>{{'I18N_DELETE_LEARNER_GROUP' | translate}}</p></span>
+  </h3>
+</div>
+
+<div class="modal-body">
+  <p [innerHTML]="'I18N_DELETE_LEARNER_GROUP_MODAL_BODY_TEXT' | translate:{groupName: learnerGroupTitle}"></p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-primary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
+  <button class="btn btn-danger" (click)="confirm()" [innerHTML]="'I18N_BLOG_POST_EDITOR_DELETE_BUTTON' | translate"></button>
+</div>
+
+<style>
+  .btn-primary {
+    background-color: #00645c;
+    border: solid 1px #00645c;
+    margin-right: 20px;
+    padding: 6px 16px;
+  }
+
+  .btn-danger {
+    background: #fff;
+    border: solid 1px #a53417;
+    color: #a53417;
+    padding: 6px 16px;
+  }
+</style>

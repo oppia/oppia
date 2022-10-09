@@ -40,6 +40,10 @@ interface LearnerGroupFeatureIsEnabledBackendDict {
   feature_is_enabled: boolean;
 }
 
+interface LearnerGroupProgressSharingPermissionBackendDict {
+  progress_sharing_permission: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -239,12 +243,54 @@ export class LearnerGroupBackendApiService {
     });
   }
 
+  async fetchProgressSharingPermissionOfLearnerAsync(learnerGroupId: string):
+  Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const permissionStatusUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_progress_sharing_permission_handler/' +
+          '<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+      this.http.get<LearnerGroupProgressSharingPermissionBackendDict>(
+        permissionStatusUrl).toPromise().then(response => {
+        resolve(response.progress_sharing_permission);
+      });
+    });
+  }
+
+  async updateProgressSharingPermissionAsync(
+      learnerGroupId: string,
+      progressSharingPermission: boolean
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const permissionStatusUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_progress_sharing_permission_handler/' +
+          '<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+      const putData = {
+        progress_sharing_permission: progressSharingPermission.toString()
+      };
+
+      this.http.put<LearnerGroupProgressSharingPermissionBackendDict>(
+        permissionStatusUrl, putData).toPromise().then(response => {
+        resolve(response.progress_sharing_permission);
+      });
+    });
+  }
+
   async _isLearnerGroupFeatureEnabledAsync():
   Promise<boolean> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = '/learner_groups_feature_status_handler';
+      const featureStatusUrl = '/learner_groups_feature_status_handler';
       this.http.get<LearnerGroupFeatureIsEnabledBackendDict>(
-        learnerGroupUrl).toPromise().then(response => {
+        featureStatusUrl).toPromise().then(response => {
         resolve(response.feature_is_enabled);
       });
     });
