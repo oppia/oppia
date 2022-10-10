@@ -616,6 +616,7 @@ class ManagedProcessTests(test_utils.TestBase):
             os, 'listdir', value=[]))
 
         managed_web_browser = servers.create_managed_web_browser(123)
+        self.assertIsNotNone(managed_web_browser)
         assert managed_web_browser is not None
         self.exit_stack.enter_context(managed_web_browser)
 
@@ -641,6 +642,7 @@ class ManagedProcessTests(test_utils.TestBase):
             os, 'listdir', value=[]))
 
         managed_web_browser = servers.create_managed_web_browser(123)
+        self.assertIsNotNone(managed_web_browser)
         assert managed_web_browser is not None
         self.exit_stack.enter_context(managed_web_browser)
 
