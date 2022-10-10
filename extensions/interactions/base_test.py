@@ -776,6 +776,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for interaction_id in all_interaction_ids:
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
+            # '_dependency_ids' is a private attribute of Base Interaction
+            # which gets overwritten by the derived interactions. To access it,
+            # we use the property 'dependency_ids'. To check if the property
+            # returns correctly, we are accessing private attribute for this
+            # test.
             self.assertEqual(
                 interaction.dependency_ids, interaction._dependency_ids) # pylint: disable=protected-access
 
