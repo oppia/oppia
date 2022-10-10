@@ -195,7 +195,7 @@
     <p class="guide-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3' | translate }}<br>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4' | translate }}</p>
     <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
     <div [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }"
-         style="margin-left: -25px;">
+         class="oppia-tooltip-container">
       <copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></copy-url>
     </div>
   </div>

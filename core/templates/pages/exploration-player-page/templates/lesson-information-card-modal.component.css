@@ -397,6 +397,10 @@
   width: 100%;
 }
 
+.save-progress-menu .uid-box .oppia-tooltip-container {
+  margin-left: -25px;
+}
+
 .save-progress-menu .uid-box .guide-text {
   padding: 10px 20px;
   text-align: left;
