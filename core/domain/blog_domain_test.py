@@ -689,3 +689,24 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
                 self.author_details.last_updated)
         }
         self.assertEqual(self.author_details.to_dict(), expected_dict)
+
+    def test_author_details_model_passes_validation(self) -> None:
+        """Tests validation for author details model."""
+        assert self.author_details is not None
+        self.author_details.author_name = 'Sample Name'
+        self.author_details.author_bio = ''
+
+        self.author_details.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_author_details_model_raises_error_for_invalid_bio(self) -> None:
+        """Tests validation for author details model."""
+        assert self.author_details is not None
+        self.author_details.author_name = 'Sample Name'
+        self.author_details.author_bio = 123 # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected Author Bio to be a string,'
+            ' received %s' % self.author_details.author_bio):
+            self.author_details.validate()

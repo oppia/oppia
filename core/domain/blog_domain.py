@@ -750,3 +750,16 @@ class BlogAuthorDetails:
             'author_bio': self.author_bio,
             'last_updated': last_updated
         }
+
+    def validate(self) -> None:
+        """Validates various properties of the blog author details object.
+
+        Raises:
+            ValidationError. One or more attributes of blog post are invalid.
+        """
+        self.require_valid_author_name(self.author_name)
+
+        if not isinstance(self.author_bio, str):
+            raise utils.ValidationError(
+                'Expected Author Bio to be a string,'
+                ' received %s' % self.author_bio)

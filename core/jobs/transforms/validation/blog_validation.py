@@ -258,3 +258,15 @@ def blog_post_rights_model_relationships(
     yield model.id, [blog_models.BlogPostModel]
     yield model.id, [blog_models.BlogPostSummaryModel]
     yield model.editor_ids, [user_models.UserSettingsModel]
+
+
+@validation_decorators.RelationshipsOf(blog_models.BlogAuthorDetailsModel)
+def blog_author_details_model_relationships(
+    model: Type[blog_models.BlogAuthorDetailsModel]
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType,
+        List[Type[user_models.UserSettingsModel]]
+    ]]:
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.author_id, [user_models.UserSettingsModel]

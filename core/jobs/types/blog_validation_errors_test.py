@@ -68,6 +68,27 @@ class DuplicateBlogUrlErrorTests(
             ' is not unique' % utils.quoted(blog_post_model.url_fragment))
 
 
+class DuplicateblogAuthorModelErrorTests(
+        base_validation_errors_test.AuditErrorsTestBase):
+
+    def test_message(self) -> None:
+        author_details_model = blog_models.BlogAuthorDetailsModel(
+            id='id1',
+            author_name='user one',
+            author_id='user',
+            author_bio='')
+
+        error = blog_validation_errors.DuplicateblogAuthorModelError(
+            author_details_model)
+
+        self.assertEqual(
+            error.stderr,
+            'DuplicateblogAuthorModelError in BlogAuthorDetailsModel(id="id1"):'
+            ' author id=%s is not unique' % utils.quoted(
+                author_details_model.author_id)
+        )
+
+
 class InconsistentLastUpdatedTimestampsErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 

@@ -66,6 +66,12 @@ class RelationshipsOfTests(test_utils.TestBase):
                 'BlogPostRightsModel', 'editor_ids'),
             ['UserSettingsModel'])
 
+    def test_blog_author_details_model_relationships(self) -> None:
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'BlogAuthorDetailsModel', 'author_id'),
+            ['UserSettingsModel'])
+
 
 class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 

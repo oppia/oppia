@@ -586,7 +586,6 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         return dict(super(BlogAuthorDetailsModel, cls).get_export_policy(), **{
             # We do not export the author id of the model because we should not
             # export internal user ids.
-            'id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'author_name': base_models.EXPORT_POLICY.EXPORTED,
             'author_bio': base_models.EXPORT_POLICY.EXPORTED,
