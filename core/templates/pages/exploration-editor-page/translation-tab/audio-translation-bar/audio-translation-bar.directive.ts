@@ -273,7 +273,8 @@ angular.module('oppia').directive('audioTranslationBar', [
             $scope.voiceoverRecorder.stopRecord();
             $scope.recordingComplete = true;
             cancelTimer();
-            $scope.voiceoverRecorder.getMp3Data().then(function(audio) {
+
+            $scope.voiceoverRecorder.getMp3Data().subscribe((audio) => {
               var fileType = 'audio/mp3';
               $scope.audioBlob = new Blob(audio, {type: fileType});
               // Free the browser from web worker.
@@ -281,6 +282,10 @@ angular.module('oppia').directive('audioTranslationBar', [
               // Create audio play and pause for unsaved recording.
               var url = $window.URL.createObjectURL($scope.audioBlob);
               // Create visualizer for playing unsaved audio.
+              if ($scope.waveSurfer) {
+                $scope.waveSurfer.destroy();
+              }
+
               $scope.waveSurfer = WaveSurfer.create({
                 container: '#visualized',
                 waveColor: '#009688',
@@ -288,6 +293,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                 height: 38
               });
               $scope.waveSurfer.load(url);
+              $rootScope.$applyAsync();
             });
           };
 

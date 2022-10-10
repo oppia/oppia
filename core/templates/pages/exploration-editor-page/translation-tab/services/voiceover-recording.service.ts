@@ -41,7 +41,7 @@ export class VoiceoverRecordingService {
   defer: EventEmitter<string> = new EventEmitter();
 
   constructor(
-     private loggerService: LoggerService
+    private loggerService: LoggerService
   ) { }
 
   _stopRecord(): void {
