@@ -7962,7 +7962,13 @@ states:
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
-      solution: null
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - <p>1</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
     linked_skill_id: null
     next_content_id_index: 26
     param_changes: []
@@ -8114,7 +8120,13 @@ states:
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
-      solution: null
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - <p>1</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
     linked_skill_id: null
     next_content_id_index: 26
     param_changes: []
@@ -8306,7 +8318,13 @@ states:
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
-      solution: null
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - <p></p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
     linked_skill_id: null
     next_content_id_index: 28
     param_changes: []

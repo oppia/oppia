@@ -3327,6 +3327,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
+        # Remove solution if invalid choice is present.
+        if state_dict['interaction']['solution'] is not None:
+            solution = state_dict['interaction']['solution']['correct_answer']
+            if isinstance(solution, list) and any(
+                invalid_choice['html'] in solution for invalid_choice in
+                choices_to_remove
+            ):
+                state_dict['interaction']['solution'] = None
+
         for choice_to_remove in choices_to_remove:
             choices.remove(choice_to_remove)
 
