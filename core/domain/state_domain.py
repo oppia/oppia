@@ -1295,9 +1295,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 matched_denominator: (
                     InteractionInstance.MatchedDenominatorDict
                 ) = {
-                        'ans_group_index': int(ans_group_index),
-                        'rule_spec_index': int(rule_spec_index),
-                        'denominator': 0
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'denominator': 0
                 }
 
                 if rule_spec.rule_type in (
