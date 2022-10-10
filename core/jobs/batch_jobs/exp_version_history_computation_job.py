@@ -457,7 +457,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                             change_dict
                                         )
                                     )
-                                except Exception:
+                                except Exception: # pragma: no cover
                                     continue
                             exp_versions_diff = (
                                 exp_domain.ExplorationVersionsDiff(
