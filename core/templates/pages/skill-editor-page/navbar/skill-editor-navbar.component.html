@@ -1,34 +1,47 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" id="skill-editor-navbar-desktop"
-    ng-if="!isLoadingSkill()">
-  <li class="oppia-publish-button-container" ng-if="getActiveTabName() !== 'questions'">
-    <div uib-dropdown>
+<ul class="nav navbar-nav oppia-navbar-nav float-right"
+    id="skill-editor-navbar-desktop"
+    *ngIf="!isLoadingSkill()">
+  <li class="oppia-publish-button-container"
+      *ngIf="getActiveTabName() !== 'questions'">
+    <div ngbDropdown>
       <button class="btn btn-light oppia-save-changes-button oppia-save-publish-changes-button e2e-test-save-or-publish-skill"
-              ng-class="{'btn-success': isSkillSaveable()}"
-              ng-click="saveChanges()"
-              ng-disabled="!isSkillSaveable()">
-        <span ng-if="!isSaveInProgress()">
+              [ngClass]="{'btn-success': isSkillSaveable()}"
+              (click)="saveChanges()"
+              [disabled]="!isSkillSaveable()">
+        <span *ngIf="!isSaveInProgress()">
           <span title="Publish Changes">
             <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish Changes">
             </i>
             <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
             <span class="d-none d-md-block float-left oppia-changes-count-text e2e-test-changes-count-text"
-                  ng-if="getChangeListCount() > 0">
-              (<[getChangeListCount()]>)
+                  *ngIf="getChangeListCount() > 0">
+              ({{getChangeListCount()}})
             </span>
           </span>
         </span>
 
-        <span ng-if="isSaveInProgress()">
+        <span *ngIf="isSaveInProgress()">
           <span class="oppia-save-publish-button-label">Publishing</span>
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" class="btn btn-light uib-dropdown-toggle dropdown-toggle oppia-dropdown-toggle-icon
-              ng-disabled="!getChangeListCount()" aria-label="Dropdown toggle" uib-dropdown-toggle>
+      <button type="button"
+              class="btn btn-light dropdown-toggle oppia-dropdown-toggle oppia-dropdown-toggle-icon"
+              [disabled]="!getChangeListCount()"
+              aria-label="Dropdown toggle"
+              ngbDropdownToggle>
       </button>
-      <ul uib-dropdown-menu role="menu" class="oppia-discard-draft-button-container" ng-style="{ width: getChangeListCount() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}" class="dropdown-item">Discard Draft</a></li>
+      <ul ngbDropdownMenu
+          class="oppia-discard-draft-button-container"
+          [ngStyle]="{ width: getChangeListCount() ? '150px' : '120px' }">
+        <li title="Discard all pending changes">
+          <a (click)="discardChanges()"
+             [ngClass]="{'oppia-disabled-link': !getChangeListCount()}"
+             class="dropdown-item">
+             Discard Draft
+          </a>
+        </li>
       </ul>
     </div>
   </li>
@@ -38,42 +51,55 @@
   <div class="skill-nav-mobile">
     <div class="skill-navbar-mobile-tabs">
       <div class="skill-nav-dropdown-container">
-        <div class="skill-nav-skill-nav-dropdown-options" ng-if="showNavigationOptions">
-          <div class="skill-nav-dropdown-option" ng-click="selectMainTab()">
-            <i class="fas fa-pen navbar-tab-icon"></i><span>Editor</span>
+        <div class="skill-nav-skill-nav-dropdown-options"
+             *ngIf="showNavigationOptions">
+          <div class="skill-nav-dropdown-option"
+               (click)="selectMainTab()">
+            <i class="fas fa-pen navbar-tab-icon"></i>
+            <span>Editor</span>
           </div>
-          <div class="skill-nav-dropdown-option" ng-click="selectQuestionsTab()">
-            <i class="fas fa-book-open navbar-tab-icon"></i><span>Questions</span>
+          <div class="skill-nav-dropdown-option"
+               (click)="selectQuestionsTab()">
+            <i class="fas fa-book-open navbar-tab-icon"></i>
+            <span>Questions</span>
           </div>
-          <div class="skill-nav-dropdown-option" ng-click="selectPreviewTab()">
-            <i class="fas fa-play navbar-tab-icon"></i><span>Preview</span>
+          <div class="skill-nav-dropdown-option"
+               (click)="selectPreviewTab()">
+            <i class="fas fa-play navbar-tab-icon"></i>
+            <span>Preview</span>
           </div>
         </div>
         <div class="skill-nav-dropdown-content">
-          <div class="skill-nav-dropdown-text" ng-click="toggleWarningText()">
-            <i ng-if="!getTotalWarningsCount()" class="fas fa-pen"></i>
-            <span><[activeTab]></span>
+          <div class="skill-nav-dropdown-text"
+               (click)="toggleWarningText()">
+            <i class="fas fa-pen"></i>
+            <span>{{activeTab}}</span>
           </div>
-          <div class="skill-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
+          <div class="skill-nav-dropdown-icon"
+               (click)="toggleNavigationOptions()">
             <i class="fa fa-caret-down"></i>
           </div>
         </div>
       </div>
       <div class="skill-nav-dropdown-container save-options-dropdown">
-        <div class="skill-nav-skill-nav-dropdown-options" ng-if="showSkillEditOptions">
-          <div class="skill-nav-dropdown-option" ng-click="saveChanges()">
+        <div class="skill-nav-skill-nav-dropdown-options"
+             *ngIf="showSkillEditOptions">
+          <div class="skill-nav-dropdown-option"
+               (click)="saveChanges()">
             <i class="fas fa-save navbar-tab-icon"></i>
             <span>Save Changes</span>
           </div>
         </div>
         <div class="skill-nav-dropdown-content right-container">
-          <div class="skill-nav-dropdown-text" ng-click="discardChanges()">
+          <div class="skill-nav-dropdown-text"
+               (click)="discardChanges()">
             Discard Changes
-            <span ng-if="getChangeListCount() > 0">
-              (<[getChangeListCount()]>)
+            <span *ngIf="getChangeListCount() > 0">
+              ({{getChangeListCount()}})
             </span>
           </div>
-          <div class="skill-nav-dropdown-icon" ng-click="toggleSkillEditOptions()">
+          <div class="skill-nav-dropdown-icon"
+               (click)="toggleSkillEditOptions()">
             <i class="fa fa-caret-down"></i>
           </div>
         </div>
@@ -85,54 +111,54 @@
 
 
 <style>
-  skill-editor-navbar .skill-editor-nav-mobile {
+  .skill-editor-nav-mobile {
     display: none;
   }
-  skill-editor-navbar .oppia-publish-button-container {
+  .oppia-publish-button-container {
     margin-right: 5px;
     margin-top: 8px;
   }
-  skill-editor-navbar .oppia-changes-count-text {
+  .oppia-changes-count-text {
     margin-left: 2px;
     opacity: 0.5;
   }
-  skill-editor-navbar .oppia-dropdown-toggle-icon {
+  .oppia-dropdown-toggle-icon {
     height: 34px;
   }
-  skill-editor-navbar .oppia-discard-draft-button-container {
+  .oppia-discard-draft-button-container {
     min-width: 125px;
     right: inherit;
   }
-  skill-editor-navbar .oppia-save-publish-changes-button {
+  .oppia-save-publish-changes-button {
     float: left;
-    width: 158px;
+    width: 180px;
   }
 
   @media screen and (max-width: 768px) {
-    skill-editor-navbar #skill-editor-navbar-desktop {
+    #skill-editor-navbar-desktop {
       display: none;
     }
-    skill-editor-navbar .skill-editor-nav-mobile {
+    .skill-editor-nav-mobile {
       display: block;
     }
-    skill-editor-navbar .skill-editor-navbar-mobile-tabs {
+    .skill-editor-navbar-mobile-tabs {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-evenly;
       padding: 10px 0;
     }
-    skill-editor-navbar .discard-changes-btn-container {
+    .discard-changes-btn-container {
       display: flex;
       flex-wrap: wrap;
       width: 50%;
     }
-    skill-editor-navbar .discard-changes-btn {
+    .discard-changes-btn {
       background-color: #008098;
       color: #fff;
       font-weight: bold;
       width: 100%;
     }
-    skill-editor-navbar .publish-skill-btn {
+    .publish-skill-btn {
       background-color: #fff;
       border: 2px solid #008098;
       color: #008098;
