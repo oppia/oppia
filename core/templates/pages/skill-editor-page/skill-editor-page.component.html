@@ -5,54 +5,72 @@
         Skill Editor
       </div>
       <div class="navbar-tabs navbar-icons">
-        <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount(), 'navbar-tab-active': $ctrl.getActiveTabName() === 'main'}"
-            ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>"
-            ng-click="$ctrl.selectMainTab()" class="navbar-tab nav-list-item">
-          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="e2e-test-main-tab">
-            <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}"></i>
+        <li [ngClass]="{'dropdown': getWarningsCount(), 'navbar-tab-active': getActiveTabName() === 'main'}"
+            (click)="selectMainTab()"
+            class="navbar-tab nav-list-item">
+          <a ngbTooltip="Main Editor"
+             placement="bottom"
+             class="e2e-test-main-tab">
+            <i class="fas fa-pen navbar-tab-icon"
+               [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}">
+            </i>
           </a>
-          <div ng-show="$ctrl.getWarningsCount()"
+          <div [hidden]="!getWarningsCount()"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-               ng-mouseover="$ctrl.warningsAreShown=true" ng-mouseleave="$ctrl.warningsAreShown=false">
+               (mouseover)="warningsAreShown"
+               (mouseleave)="!warningsAreShown">
             <span class="oppia-editor-warnings-count">
-              <[$ctrl.getWarningsCount()]>
+              {{getWarningsCount()}}
             </span>
           </div>
-          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box skill-editor-warning-box" ng-if="$ctrl.warningsAreShown">
+          <ul ngbDropdownMenu
+              class="dropdown-menu oppia-editor-warnings-box skill-editor-warning-box"
+              *ngIf="warningsAreShown">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text"
-                ng-if="$ctrl.skill" ng-repeat="issue in $ctrl.skill.getValidationIssues() track by $index">
+                *ngFor="let issue of skill.getValidationIssues(); trackBy : index">
               <hr class="oppia-editor-warnings-separator">
-              <[issue]>
+              {{issue}}
             </li>
           </ul>
         </li>
         <li class="navbar-tab icon nav-list-item e2e-test-questions-tab"
-            ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}"
-            ng-click="$ctrl.selectQuestionsTab()">
-          <a uib-tooltip="Questions" tooltip-placement="bottom" aria-label="Questions">
-            <i class="fas fa-book-open navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}"></i>
+            [ngClass]="{'navbar-tab-active': getActiveTabName() === 'questions'}"
+            (click)="selectQuestionsTab()">
+          <a ngbTooltip="Questions"
+             placement="bottom"
+             aria-label="Questions">
+            <i class="fas fa-book-open navbar-tab-icon"
+               [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'questions'}">
+            </i>
           </a>
         </li>
-        <li class="navbar-tab icon nav-list-item" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview'}" ng-click="$ctrl.selectPreviewTab()" >
-          <a class="nav-link" uib-tooltip="Preview" tooltip-placement="bottom" aria-label="Preview">
-            <i class="fas fa-play navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}"></i>
+        <li class="navbar-tab icon nav-list-item"
+            [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview'}"
+            (click)="selectPreviewTab()" >
+          <a class="nav-link"
+             ngbTooltip="Preview"
+             placement="bottom"
+             aria-label="Preview">
+            <i class="fas fa-play navbar-tab-icon"
+              [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}">
+            </i>
           </a>
         </li>
       </div>
     </div>
   </div>
 
-  <div ng-if="$ctrl.getActiveTabName() === 'main'">
-    <skill-editor-main-tab></skill-editor-main-tab>
+  <div *ngIf="getActiveTabName() === 'main'">
+    <oppia-skill-editor-main-tab></oppia-skill-editor-main-tab>
   </div>
 
-  <div ng-if="$ctrl.getActiveTabName() === 'questions'">
-    <questions-tab></questions-tab>
+  <div *ngIf="getActiveTabName() === 'questions'">
+    <oppia-questions-tab></oppia-questions-tab>
   </div>
 
-  <div ng-if="$ctrl.getActiveTabName() === 'preview'">
-    <skill-preview-tab></skill-preview-tab>
+  <div *ngIf="getActiveTabName() === 'preview'">
+    <oppia-skill-preview-tab></oppia-skill-preview-tab>
   </div>
 </div>
 

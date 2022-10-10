@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,187 +16,175 @@
  * @fileoverview Component for the skill editor page.
  */
 
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-
-require('interactions/interactionsQuestionsRequires.ts');
-require('objects/objectComponentsRequires.ts');
-
-require('base-components/base-content.component.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.component.ts');
-require(
-  'pages/skill-editor-page/editor-tab/skill-editor-main-tab.directive.ts');
-require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
-require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
-require(
-  'pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts');
-require(
-  'pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
-require('pages/interaction-specs.constants.ajs.ts');
-require('services/bottom-navbar-status.service.ts');
-require('services/page-title.service.ts');
-require('services/prevent-page-unload-event.service.ts');
-require('services/ngb-modal.service.ts');
-require('services/local-storage.service.ts');
-require(
-  'pages/skill-editor-page/services/' +
-  'skill-editor-staleness-detection.service.ts');
-
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Subscription } from 'rxjs';
+import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LocalStorageService } from 'services/local-storage.service';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { SkillEditorRoutingService } from './services/skill-editor-routing.service';
+import { SkillEditorStalenessDetectionService } from './services/skill-editor-staleness-detection.service';
+import { SkillEditorStateService } from './services/skill-editor-state.service';
 
-angular.module('oppia').component('skillEditorPage', {
-  template: require('./skill-editor-page.component.html'),
-  controller: [
-    '$location', '$rootScope', 'BottomNavbarStatusService',
-    'LocalStorageService',
-    'NgbModal', 'PreventPageUnloadEventService',
-    'SkillEditorRoutingService',
-    'SkillEditorStalenessDetectionService', 'SkillEditorStateService',
-    'UndoRedoService', 'UrlService', 'WindowRef',
-    'MAX_COMMIT_MESSAGE_LENGTH',
-    function(
-        $location, $rootScope, BottomNavbarStatusService, LocalStorageService,
-        NgbModal, PreventPageUnloadEventService,
-        SkillEditorRoutingService,
-        SkillEditorStalenessDetectionService, SkillEditorStateService,
-        UndoRedoService, UrlService, WindowRef,
-        MAX_COMMIT_MESSAGE_LENGTH) {
-      var ctrl = this;
-      let skillIsInitialized = false;
-      ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
-      ctrl.directiveSubscriptions = new Subscription();
+@Component({
+  selector: 'oppia-skill-editor-page',
+  templateUrl: './skill-editor-page.component.html'
+})
+export class SkillEditorPageComponent implements OnInit {
+  constructor(
+    private bottomNavbarStatusService:
+      BottomNavbarStatusService,
+    private localStorageService: LocalStorageService,
+    private ngbModal: NgbModal,
+    private preventPageUnloadEventService:
+      PreventPageUnloadEventService,
+    private skillEditorRoutingService: SkillEditorRoutingService,
+    private skillEditorStateService: SkillEditorStateService,
+    private skillEditorStalenessDetectionService:
+      SkillEditorStalenessDetectionService,
+    private undoRedoService: UndoRedoService,
+    private urlService: UrlService,
+    private windowRef: WindowRef,
+  ) {}
 
-      // When the URL path changes, reroute to the appropriate tab in the
-      // Skill editor page if back and forward button pressed in browser.
-      $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
-        if (newPath !== '') {
-          SkillEditorRoutingService._changeTab(newPath);
-          $rootScope.$applyAsync();
-        }
+  skill: Skill;
+  skillIsInitialized = false;
+  directiveSubscriptions = new Subscription();
+
+  getActiveTabName(): string {
+    return this.skillEditorRoutingService.getActiveTabName();
+  }
+
+  selectMainTab(): void {
+    this.skillEditorRoutingService.navigateToMainTab();
+  }
+
+  selectPreviewTab(): void {
+    this.skillEditorRoutingService.navigateToPreviewTab();
+  }
+
+  selectQuestionsTab(): void {
+    // This check is needed because if a skill has unsaved changes to
+    // misconceptions, then these will be reflected in the questions
+    // created at that time, but if page is refreshed/changes are
+    // discarded, the misconceptions won't be saved, but there will be
+    // some questions with these now non-existent misconceptions.
+    if (this.undoRedoService.getChangeCount() > 0) {
+      const modalRef = this.ngbModal.open(SavePendingChangesModalComponent, {
+        backdrop: true
       });
 
-      ctrl.getActiveTabName = function() {
-        return SkillEditorRoutingService.getActiveTabName();
-      };
-      ctrl.selectMainTab = function() {
-        SkillEditorRoutingService.navigateToMainTab();
-      };
-      ctrl.selectPreviewTab = function() {
-        SkillEditorRoutingService.navigateToPreviewTab();
-      };
-      ctrl.selectQuestionsTab = function() {
-        // This check is needed because if a skill has unsaved changes to
-        // misconceptions, then these will be reflected in the questions
-        // created at that time, but if page is refreshed/changes are
-        // discarded, the misconceptions won't be saved, but there will be
-        // some questions with these now non-existent misconceptions.
-        if (UndoRedoService.getChangeCount() > 0) {
-          const modalRef = NgbModal.open(SavePendingChangesModalComponent, {
-            backdrop: true
-          });
-
-          modalRef.componentInstance.body = (
-            'Please save all pending changes ' +
+      modalRef.componentInstance.body = (
+        'Please save all pending changes ' +
             'before viewing the questions list.');
 
-          modalRef.result.then(function() {}, function() {
-            // Note to developers:
-            // This callback is triggered when the Cancel button is clicked.
-            // No further action is needed.
-          });
-        } else {
-          SkillEditorRoutingService.navigateToQuestionsTab();
-        }
-      };
-      ctrl.getWarningsCount = function() {
-        return ctrl.skill ? ctrl.skill.getValidationIssues().length : 0;
-      };
-
-      ctrl.onClosingSkillEditorBrowserTab = function() {
-        const skill = SkillEditorStateService.getSkill();
-
-        const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-          LocalStorageService.getEntityEditorBrowserTabsInfo(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
-        if (skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
-            UndoRedoService.getChangeCount() > 0) {
-          skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
-        }
-        skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
-
-        LocalStorageService.updateEntityEditorBrowserTabsInfo(
-          skillEditorBrowserTabsInfo,
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_SKILL_EDITOR_BROWSER_TABS);
-      };
-
-      const createOrUpdateSkillEditorBrowserTabsInfo = function() {
-        const skill = SkillEditorStateService.getSkill();
-
-        let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-          LocalStorageService.getEntityEditorBrowserTabsInfo(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
-        if (skillIsInitialized) {
-          skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
-          skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
-        } else {
-          if (skillEditorBrowserTabsInfo) {
-            skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
-            skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
-          } else {
-            skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-              'skill', skill.getId(), skill.getVersion(), 1, false);
-          }
-          skillIsInitialized = true;
-        }
-
-        LocalStorageService.updateEntityEditorBrowserTabsInfo(
-          skillEditorBrowserTabsInfo,
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_SKILL_EDITOR_BROWSER_TABS);
-      };
-
-      const onCreateOrUpdateSkillEditorBrowserTabsInfo = function(event) {
-        if (event.key === (
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_SKILL_EDITOR_BROWSER_TABS)
-        ) {
-          SkillEditorStalenessDetectionService
-            .staleTabEventEmitter.emit();
-          SkillEditorStalenessDetectionService
-            .presenceOfUnsavedChangesEventEmitter.emit();
-          $rootScope.$applyAsync();
-        }
-      };
-
-      ctrl.$onInit = function() {
-        BottomNavbarStatusService.markBottomNavbarStatus(true);
-        PreventPageUnloadEventService.addListener(
-          UndoRedoService.getChangeCount.bind(UndoRedoService));
-        SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
-        ctrl.skill = SkillEditorStateService.getSkill();
-        ctrl.directiveSubscriptions.add(
-          SkillEditorStateService.onSkillChange.subscribe(() => {
-            createOrUpdateSkillEditorBrowserTabsInfo();
-            $rootScope.$applyAsync();
-          })
-        );
-        skillIsInitialized = false;
-        SkillEditorStalenessDetectionService.init();
-        WindowRef.nativeWindow.addEventListener(
-          'beforeunload', ctrl.onClosingSkillEditorBrowserTab);
-        LocalStorageService.registerNewStorageEventListener(
-          onCreateOrUpdateSkillEditorBrowserTabsInfo);
-      };
+      modalRef.result.then(() => {}, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    } else {
+      this.skillEditorRoutingService.navigateToQuestionsTab();
     }
-  ]
-});
+  }
+
+  getWarningsCount(): number {
+    return this.skill ? this.skill.getValidationIssues().length : 0;
+  }
+
+  onClosingSkillEditorBrowserTab(): void {
+    const skill = this.skillEditorStateService.getSkill();
+
+    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      this.localStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+
+    if (skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+            this.undoRedoService.getChangeCount() > 0) {
+      skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+    }
+    skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+    this.localStorageService.updateEntityEditorBrowserTabsInfo(
+      skillEditorBrowserTabsInfo,
+      EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_SKILL_EDITOR_BROWSER_TABS);
+  }
+
+  createOrUpdateSkillEditorBrowserTabsInfo(): void {
+    const skill = this.skillEditorStateService.getSkill();
+
+    let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      this.localStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+
+    if (this.skillIsInitialized) {
+      skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
+      skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+    } else {
+      if (skillEditorBrowserTabsInfo !== null) {
+        skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
+        skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+      } else {
+        skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+          'skill', skill.getId(), skill.getVersion(), 1, false);
+      }
+      this.skillIsInitialized = true;
+    }
+
+    this.localStorageService.updateEntityEditorBrowserTabsInfo(
+      skillEditorBrowserTabsInfo,
+      EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_SKILL_EDITOR_BROWSER_TABS);
+  }
+
+  onCreateOrUpdateSkillEditorBrowserTabsInfo(event: StorageEvent): void {
+    if (event.key === (
+      EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_SKILL_EDITOR_BROWSER_TABS)
+    ) {
+      this.skillEditorStalenessDetectionService
+        .staleTabEventEmitter.emit();
+      this.skillEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter.emit();
+    }
+  }
+
+  ngOnInit(): void {
+    this.bottomNavbarStatusService.markBottomNavbarStatus(true);
+    this.preventPageUnloadEventService.addListener(
+      this.undoRedoService.getChangeCount.bind(this.undoRedoService));
+    this.skillEditorStateService.loadSkill(this.urlService.getSkillIdFromUrl());
+    this.skill = this.skillEditorStateService.getSkill();
+    this.directiveSubscriptions.add(
+      this.skillEditorStateService.onSkillChange.subscribe(() => {
+        this.createOrUpdateSkillEditorBrowserTabsInfo();
+      })
+    );
+    this.skillIsInitialized = false;
+    this.skillEditorStalenessDetectionService.init();
+    this.windowRef.nativeWindow.addEventListener(
+      'beforeunload', (event) => {
+        this.onClosingSkillEditorBrowserTab();
+      });
+    this.windowRef.nativeWindow.addEventListener(
+      'storage', (event) => {
+        this.onCreateOrUpdateSkillEditorBrowserTabsInfo(event);
+      });
+  }
+}
+
+angular.module('oppia').directive('oppiaSkillEditorPage',
+  downgradeComponent({
+    component: SkillEditorPageComponent
+  }) as angular.IDirectiveFactory);

@@ -49,6 +49,11 @@ import { SkillPreviewModalComponent } from './editor-tab/skill-preview-modal.com
 import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card-editor/skill-concept-card-editor.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { SkillEditorNavabarComponent } from './navbar/skill-editor-navbar.component';
+import { SkillQuestionsTabComponent } from './questions-tab/skill-questions-tab.component';
+import { SkillPreviewTabComponent } from './skill-preview-tab/skill-preview-tab.component';
+import { SkillEditorMainTabComponent } from './editor-tab/skill-editor-main-tab.component';
+import { SkillEditorPageComponent } from './skill-editor-page.component';
 
 @NgModule({
   imports: [
@@ -67,6 +72,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   declarations: [
     DeleteMisconceptionModalComponent,
     SkillConceptCardEditorComponent,
+    SkillEditorNavabarComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     SkillPrerequisiteSkillsEditorComponent,
@@ -78,11 +84,16 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
-    SkillMisconceptionsEditorComponent
+    SkillMisconceptionsEditorComponent,
+    SkillQuestionsTabComponent,
+    SkillPreviewTabComponent,
+    SkillEditorMainTabComponent,
+    SkillEditorPageComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
     SkillConceptCardEditorComponent,
+    SkillEditorNavabarComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     SkillPrerequisiteSkillsEditorComponent,
@@ -94,7 +105,11 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
-    SkillMisconceptionsEditorComponent
+    SkillMisconceptionsEditorComponent,
+    SkillQuestionsTabComponent,
+    SkillPreviewTabComponent,
+    SkillEditorMainTabComponent,
+    SkillEditorPageComponent
   ],
   providers: [
     {

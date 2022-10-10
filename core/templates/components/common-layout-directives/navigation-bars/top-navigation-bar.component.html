@@ -30,12 +30,13 @@
     </picture>
   </a>
 </div>
-<div class="nav-mobile-header-text-container"
-     *ngIf="headerText?.length">
-  <span class="nav-mobile-header-editor">
+<div class="nav-mobile-header-text-container">
+  <span *ngIf="headerText?.length"
+        class="nav-mobile-header-editor">
     {{ headerText }}
   </span>
-  <span class="nav-mobile-header-text">
+  <span *ngIf="subheaderText?.length"
+        class="nav-mobile-header-text">
     {{ subheaderText }}
   </span>
 </div>
