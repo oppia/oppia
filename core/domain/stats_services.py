@@ -36,6 +36,7 @@ from typing_extensions import Literal
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from core.domain import state_domain
     from mypy_imports import stats_models
     from mypy_imports import transaction_services
 
@@ -1104,7 +1105,7 @@ def get_sample_answers(
     exploration_id: str,
     exploration_version: int,
     state_name: str
-) -> List[Optional[str]]:
+) -> List[state_domain.AcceptableCorrectAnswerTypes]:
     """Fetches a list of sample answers that were submitted to the specified
     exploration state (at the given version of the exploration).
 
