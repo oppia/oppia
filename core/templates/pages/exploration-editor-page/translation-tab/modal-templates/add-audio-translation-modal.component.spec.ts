@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AddAudioTranslationModalController.
+ * @fileoverview Unit tests for AddAudioTranslationModalComponent.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -34,7 +34,7 @@ class MockActiveModal {
   }
 }
 
-describe('Add Audio Translation Modal Controller', () => {
+describe('Add Audio Translation Modal component', () => {
   let component: AddAudioTranslationModalComponent;
   let fixture: ComponentFixture<AddAudioTranslationModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -81,7 +81,7 @@ describe('Add Audio Translation Modal Controller', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize component properties after controller is initialized',
+  it('should initialize component properties after component is initialized',
     () => {
       expect(component.saveButtonText).toBe('Save');
       expect(component.saveInProgress).toBe(false);

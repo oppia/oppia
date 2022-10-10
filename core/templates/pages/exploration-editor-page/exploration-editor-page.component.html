@@ -18,15 +18,15 @@
           <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
         </a>
         <div [hidden]="!(countWarnings())" class="oppia-editor-warnings-indicator"
-             (mouseover)="warningsAreShown=true"
-             (mouseleave)="warningsAreShown=false"
+             (mouseover)="isWarningsAreShown(true)"
+             (mouseleave)="isWarningsAreShown(false)"
              [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
           <span class="oppia-editor-warnings-count">
             {{ countWarnings() }}
           </span>
-          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
+          <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
             <span class="oppia-editor-warnings-header">Warnings</span>
-            <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
+            <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(); index as index">
               <hr class="oppia-editor-warnings-separator">
               <span *ngIf="warning && (warning.type === 'critical')">
                 <strong>{{ warning.message }}</strong>

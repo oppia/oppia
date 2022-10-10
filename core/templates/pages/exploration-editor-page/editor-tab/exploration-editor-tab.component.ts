@@ -18,6 +18,7 @@
 
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { JoyrideService } from 'ngx-joyride';
 import cloneDeep from 'lodash/cloneDeep';
@@ -30,7 +31,6 @@ import { UserExplorationPermissionsService } from '../services/user-exploration-
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { RouterService } from '../services/router.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
@@ -63,7 +63,6 @@ export class ExplorationEditorTabComponent
     explorationId: string;
     stateName: string;
     index: number = 0;
-
     joyRideSteps: string[] = [
       'editorTabTourContainer',
       'editorTabTourContentEditorTab',
@@ -108,8 +107,8 @@ export class ExplorationEditorTabComponent
         (value) => {
           // This code make the joyride visible over navbar
           // by overriding the properties of joyride-step__holder class.
-          document.querySelectorAll<HTMLElement>(
-            '.joyride-step__holder')[0].style.zIndex = '1007';
+          document.querySelector<HTMLElement>(
+            '.joyride-step__holder').style.zIndex = '1007';
 
           if (value.number === 2) {
             $('html, body').animate({

@@ -59,6 +59,7 @@ import { GraphDataService } from './services/graph-data.service';
 import { RouterService } from './services/router.service';
 import { StateTutorialFirstTimeService } from './services/state-tutorial-first-time.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -72,50 +73,45 @@ class MockNgbModal {
   }
 }
 
-describe('Exploration editor page component', function() {
+describe('Exploration editor page component', () => {
   let component: ExplorationEditorPageComponent;
   let fixture: ComponentFixture<ExplorationEditorPageComponent>;
-  let cls: ChangeListService = null;
-  let as: AlertsService = null;
-  var efbas = null;
-  var eis = null;
-  var ers = null;
-  var eps = null;
-  var ess = null;
-  var esaves = null;
-  var ets = null;
-  var ews: ExplorationWarningsService;
-  var gds = null;
-  var pts = null;
-  var rs: RouterService;
-  let autosaveInfoModalsService = null;
-  var sas = null;
-  var sers = null;
-  var sts = null;
-  var stfts = null;
-  var tds: ThreadDataBackendApiService;
-  var userService = null;
-  var ueps = null;
-  var ics = null;
-  var mockEnterEditorForTheFirstTime = null;
-  var registerAcceptTutorialModalEventSpy;
-  var registerDeclineTutorialModalEventSpy;
-  var focusManagerService = null;
-
+  let cls: ChangeListService;
+  let as: AlertsService;
+  let efbas: ExplorationFeaturesBackendApiService;
+  let eis: ExplorationImprovementsService;
+  let ers: ExplorationRightsService;
+  let eps: ExplorationPropertyService;
+  let ess: ExplorationStatesService;
+  let esaves: ExplorationSaveService;
+  let ets: ExplorationTitleService;
+  let ews: ExplorationWarningsService;
+  let gds: GraphDataService;
+  let pts: PageTitleService;
+  let rs: RouterService;
+  let autosaveInfoModalsService: AutosaveInfoModalsService;
+  let sas: SiteAnalyticsService;
+  let sers: StateEditorRefreshService;
+  let sts: StateTutorialFirstTimeService;
+  let stfts: StateTutorialFirstTimeService;
+  let tds: ThreadDataBackendApiService;
+  let userService: UserService;
+  let ueps: UserExplorationPermissionsService;
+  let ics: InternetConnectivityService;
+  let mockEnterEditorForTheFirstTime: EventEmitter<void>;
+  let registerAcceptTutorialModalEventSpy;
+  let registerDeclineTutorialModalEventSpy;
+  let focusManagerService: FocusManagerService;
   let ngbModal: NgbModal;
-
-  var refreshGraphEmitter = new EventEmitter();
-
-  let mockRefreshTranslationTabEventEmitter = new EventEmitter();
-  var autosaveIsInProgress = new EventEmitter();
-  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
-  var mockOpenEditorTutorialEmitter = new EventEmitter();
-  var mockOpenTranslationTutorialEmitter = new EventEmitter();
-
-  var mockInitExplorationPageEmitter = new EventEmitter();
-
-  var explorationId = 'exp1';
-  var explorationData = {
+  let refreshGraphEmitter = new EventEmitter<void>();
+  let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
+  let autosaveIsInProgress = new EventEmitter<boolean>();
+  let mockConnectionServiceEmitter = new EventEmitter<boolean>();
+  let mockOpenEditorTutorialEmitter = new EventEmitter<void>();
+  let mockOpenTranslationTutorialEmitter = new EventEmitter<void>();
+  let mockInitExplorationPageEmitter = new EventEmitter<void>();
+  let explorationId = 'exp1';
+  let explorationData = {
     exploration_is_linked_to_story: true,
     states: {
       Introduction: {
@@ -325,7 +321,7 @@ describe('Exploration editor page component', function() {
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve({}));
+        .and.returnValue(Promise.resolve(null));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -335,7 +331,11 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getFeedbackThreadsAsync')
         .and.returnValue(Promise.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve({canEdit: true, canVoiceover: true}));
+        .and.returnValue(Promise.resolve(
+          {
+            canEdit: true,
+            canVoiceover: true
+          } as ExplorationPermissions));
       spyOnProperty(rs, 'onRefreshTranslationTab')
         .and.returnValue(mockRefreshTranslationTabEventEmitter);
       spyOn(cls, 'getChangeList').and.returnValue(null);
@@ -365,7 +365,7 @@ describe('Exploration editor page component', function() {
       spyOn(sers.onRefreshStateEditor, 'emit');
 
       rs.navigateToMainTab(null);
-
+      component.isWarningsAreShown(true);
       tick();
 
       mockOpenEditorTutorialEmitter.emit();
@@ -464,7 +464,7 @@ describe('Exploration editor page component', function() {
     it('should navigate between tabs', () => {
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
-      var focusSpy = spyOn(component, 'setFocusOnActiveTab');
+      let focusSpy = spyOn(component, 'setFocusOnActiveTab');
       spyOn(rs, 'navigateToMainTab').and.stub();
       component.selectMainTab();
       expect(rs.navigateToMainTab).toHaveBeenCalled();
@@ -501,7 +501,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should set focus on active tab', () => {
-      var focusSpy = spyOn(focusManagerService, 'setFocus');
+      let focusSpy = spyOn(focusManagerService, 'setFocus');
       component.setFocusOnActiveTab('history');
 
       expect(focusSpy).toHaveBeenCalledWith('usernameInputField');
@@ -555,7 +555,7 @@ describe('Exploration editor page component', function() {
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve({}));
+        .and.returnValue(Promise.resolve(null));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -566,7 +566,11 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getFeedbackThreadsAsync')
         .and.returnValue(Promise.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve({canEdit: true, canVoiceover: true}));
+        .and.returnValue(Promise.resolve(
+          {
+            canEdit: true,
+            canVoiceover: true
+          } as ExplorationPermissions));
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
         mockOpenEditorTutorialEmitter);
       spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
@@ -598,7 +602,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should navigate to editor tab when internet disconnects', () => {
-      var activeTabNameSpy = spyOn(rs, 'getActiveTabName');
+      let activeTabNameSpy = spyOn(rs, 'getActiveTabName');
       activeTabNameSpy.and.returnValue('settings');
       spyOn(rs, 'navigateToMainTab');
       mockConnectionServiceEmitter.emit(false);
@@ -609,7 +613,7 @@ describe('Exploration editor page component', function() {
   });
 
   describe('when user permission is false and draft changes are true', () => {
-    var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+    let mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
     beforeEach(() => {
       ueps = TestBed.inject(UserExplorationPermissionsService);
@@ -619,7 +623,7 @@ describe('Exploration editor page component', function() {
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve({}));
+        .and.returnValue(Promise.resolve(null));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -632,7 +636,11 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getFeedbackThreadsAsync')
         .and.returnValue(Promise.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve({canEdit: true, canVoiceover: true}));
+        .and.returnValue(Promise.resolve(
+          {
+            canEdit: true,
+            canVoiceover: true
+          } as ExplorationPermissions));
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue(Promise.resolve(new UserInfo(
           ['USER_ROLE'], true, true, false, false, false, null, null, null,
@@ -775,7 +783,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should get active tab name', () => {
-      var activeTabNameSpy = spyOn(rs, 'getActiveTabName');
+      let activeTabNameSpy = spyOn(rs, 'getActiveTabName');
 
       activeTabNameSpy.and.returnValue('preview');
       expect(component.getActiveTabName()).toBe('preview');
@@ -795,7 +803,7 @@ describe('Exploration editor page component', function() {
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       mockEnterEditorForTheFirstTime = new EventEmitter();
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve({}));
+        .and.returnValue(Promise.resolve(null));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -807,7 +815,10 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getFeedbackThreadsAsync')
         .and.returnValue(Promise.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve({canEdit: true}));
+        .and.returnValue(Promise.resolve(
+          {
+            canEdit: true
+          } as ExplorationPermissions));
       spyOnProperty(sts, 'onEnterEditorForTheFirstTime').and.returnValue(
         mockEnterEditorForTheFirstTime);
 

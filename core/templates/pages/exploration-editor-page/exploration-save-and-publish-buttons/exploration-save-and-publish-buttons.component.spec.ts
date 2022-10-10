@@ -51,7 +51,7 @@ describe('Exploration save and publish buttons component', () => {
   let editabilityService: EditabilityService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
 
-  let mockExternalSaveEventEmitter = new EventEmitter();
+  let mockExternalSaveEventEmitter = new EventEmitter<void>();
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
 
    class MockExternalSaveService {

@@ -18,12 +18,12 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { WrittenTranslation, WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
@@ -112,10 +112,10 @@ describe('State Translation Editor Component', () => {
     TranslationTabActiveContentIdService;
   let writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
 
-  let mockActiveContentIdChangedEventEmitter = new EventEmitter();
-  let mockActiveLanguageChangedEventEmitter = new EventEmitter();
-  let mockExternalSaveEventEmitter = new EventEmitter();
-  let stateName = 'State1';
+  let mockActiveContentIdChangedEventEmitter = new EventEmitter<string>();
+  let mockActiveLanguageChangedEventEmitter = new EventEmitter<void>();
+  let mockExternalSaveEventEmitter = new EventEmitter<void>();
+  let stateName: string = 'State1';
   let state = {
     classifier_model_id: '1',
     content: {

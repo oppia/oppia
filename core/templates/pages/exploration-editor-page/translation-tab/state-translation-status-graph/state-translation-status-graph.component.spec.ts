@@ -45,7 +45,7 @@ describe('State Translation Status Graph Component', () => {
   const refreshStateTranslationSpy = jasmine.createSpy(
     'refreshStateTranslationSpy');
 
-  let stateName = 'State1';
+  let stateName: string = 'State1';
   let state = {
     recordedVoiceovers: {},
     writtenTranslations: {}

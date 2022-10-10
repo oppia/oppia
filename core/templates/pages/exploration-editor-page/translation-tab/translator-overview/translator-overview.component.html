@@ -19,13 +19,15 @@
     <div *ngIf="canShowTabModeSwitcher()" class="oppia-mode-change-section">
       <label class="oppia-mode-change-label">Mode: </label>
       <button class="oppia-translation-tab-mode-changer oppia-translation-mode e2e-test-translation-mode"
-              [ngbTooltip]="'Translation mode'" placement="bottom"
+              [ngbTooltip]="'Translation mode'"
+              placement="bottom"
               [ngClass]="{'oppia-active-mode' : inTranslationMode}"
               (click)="changeActiveMode(TRANSLATION_MODE)">
         <i class="fas fa-language"></i>
       </button>
       <button class="oppia-translation-tab-mode-changer oppia-voiceover-mode e2e-test-voiceover-mode"
-              [ngbTooltip]="'Voiceover mode'" placement="bottom"
+              [ngbTooltip]="'Voiceover mode'"
+              placement="bottom"
               [ngClass]="{'oppia-active-mode' : inVoiceoverMode}"
               (click)="changeActiveMode(VOICEOVER_MODE)">
         <i class="fas fa-microphone"></i>

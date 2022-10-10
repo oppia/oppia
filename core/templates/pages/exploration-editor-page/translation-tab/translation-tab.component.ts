@@ -18,9 +18,10 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { JoyrideService } from 'ngx-joyride';
 import { Subscription } from 'rxjs';
 import { WelcomeTranslationModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
@@ -33,7 +34,6 @@ import { RouterService } from '../services/router.service';
 import { StateTutorialFirstTimeService } from '../services/state-tutorial-first-time.service';
 import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
 import { TranslationTabActiveModeService } from './services/translation-tab-active-mode.service';
-import { JoyrideService } from 'ngx-joyride';
 
 @Component({
   selector: 'oppia-translation-tab',
@@ -42,13 +42,13 @@ import { JoyrideService } from 'ngx-joyride';
 export class TranslationTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  _ID_TUTORIAL_TRANSLATION_LANGUAGE = (
+  _ID_TUTORIAL_TRANSLATION_LANGUAGE: string = (
     '#tutorialTranslationLanguage');
 
-  _ID_TUTORIAL_TRANSLATION_STATE = (
+  _ID_TUTORIAL_TRANSLATION_STATE: string = (
     '#tutorialTranslationState');
 
-  _ID_TUTORIAL_TRANSLATION_OVERVIEW = (
+  _ID_TUTORIAL_TRANSLATION_OVERVIEW: string = (
     '#tutorialTranslationOverview');
 
   isTranslationTabBusy: boolean;
@@ -124,8 +124,8 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
         (value) => {
           // This code make the joyride visible over navbar
           // by overriding the properties of joyride-step__holder class.
-          document.querySelectorAll<HTMLElement>(
-            '.joyride-step__holder')[0].style.zIndex = '1007';
+          document.querySelector<HTMLElement>(
+            '.joyride-step__holder').style.zIndex = '1007';
         },
         (value) => {},
         () => {

@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,9 +39,9 @@ export class AddAudioTranslationModalComponent
    saveButtonText: string;
    saveInProgress: boolean;
    errorMessage: string;
-   BUTTON_TEXT_SAVE = 'Save';
-   BUTTON_TEXT_SAVING = 'Saving...';
-   ERROR_MESSAGE_BAD_FILE_UPLOAD = (
+   BUTTON_TEXT_SAVE: string = 'Save';
+   BUTTON_TEXT_SAVING: string = 'Saving...';
+   ERROR_MESSAGE_BAD_FILE_UPLOAD: string = (
      'There was an error uploading the audio file.');
 
    constructor(

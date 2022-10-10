@@ -84,16 +84,17 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   checkRevertExplorationValidUrl: string;
   explorationDownloadUrl: string;
   improvementsTabIsEnabled: boolean;
-  reconnectedMessageTimeoutMilliseconds = 4000;
-  disconnectedMessageTimeoutMilliseconds = 5000;
-  autosaveIsInProgress = false;
-  connectedToInternet = true;
-  explorationEditorPageHasInitialized = false;
+  reconnectedMessageTimeoutMilliseconds: number = 4000;
+  disconnectedMessageTimeoutMilliseconds: number = 5000;
+  autosaveIsInProgress: boolean = false;
+  connectedToInternet: boolean = true;
+  explorationEditorPageHasInitialized: boolean = false;
   activeThread: string;
-  currentUserIsCurriculumAdmin;
-  currentUserIsModerator;
-  currentUser;
-  currentVersion;
+  warningsAreShown: boolean;
+  currentUserIsCurriculumAdmin: boolean;
+  currentUserIsModerator: boolean;
+  currentUser: string;
+  currentVersion: number;
   areExplorationWarningsVisible: boolean;
   isModalOpenable: boolean = true;
 
@@ -451,6 +452,10 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
     });
+  }
+
+  isWarningsAreShown(value: boolean): void {
+    this.warningsAreShown = value;
   }
 
   ngOnInit(): void {

@@ -66,8 +66,8 @@ describe('Translation tab component', () => {
   let stateEditorService: StateEditorService;
   let stateTutorialFirstTimeService: StateTutorialFirstTimeService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
-  let refreshTranslationTabEmitter = new EventEmitter();
-  let enterTranslationForTheFirstTimeEmitter = new EventEmitter();
+  let refreshTranslationTabEmitter = new EventEmitter<void>();
+  let enterTranslationForTheFirstTimeEmitter = new EventEmitter<void>();
 
   class MockJoyrideService {
     startTour() {
@@ -141,11 +141,9 @@ describe('Translation tab component', () => {
       .and.returnValue(enterTranslationForTheFirstTimeEmitter);
     spyOnProperty(routerService, 'onRefreshTranslationTab')
       .and.returnValue(refreshTranslationTabEmitter);
-    spyOn(document, 'querySelectorAll').and.returnValue([{
-      style: {
-        zIndex: '5'
-      }
-    }] as unknown as NodeListOf<Element>);
+    let element = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue((
+      element as HTMLElement));
 
     explorationStatesService.init({
       Introduction: {

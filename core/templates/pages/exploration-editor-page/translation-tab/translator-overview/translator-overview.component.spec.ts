@@ -48,7 +48,7 @@ describe('Translator Overview component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationStatusService: TranslationStatusService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
-  let explorationLanguageCode = 'hi';
+  let explorationLanguageCode: string = 'hi';
   let focusManagerService: FocusManagerService;
   let routerService: RouterService;
 

@@ -177,11 +177,9 @@ describe('Exploration editor tab component', () => {
     spyOnProperty(
       stateEditorRefreshService, 'onRefreshStateEditor').and.returnValue(
       mockRefreshStateEditorEventEmitter);
-    spyOn(document, 'querySelectorAll').and.returnValue([{
-      style: {
-        zIndex: '5'
-      }
-    }] as unknown as NodeListOf<Element>);
+    let element = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue((
+      element as HTMLElement));
 
     explorationStatesService.init({
       'First State': {
