@@ -71,7 +71,7 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
     thumbnail_bg_color: 'red',
     subtopic_mastery: 0.6,
     parent_topic_url_fragment: 'topic_1',
-    classroom_url_fragment: 'classroom_1'
+    classroom_url_fragment: undefined
   };
   const sampleLearnerGroupSubtopicSummary2 = (
     LearnerGroupSubtopicSummary.createFromBackendDict(
@@ -259,6 +259,13 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
     expect(component.getPracticeSessionLink(sampleLearnerGroupSubtopicSummary))
       .toBe('/learn/classroom_1/topic_1/practice/session?' +
       'selected_subtopic_ids=%5B1%5D');
+  });
+
+  it('should get # as practice link url when classroom or topic url is not ' +
+    'present', () => {
+    expect(
+      component.getPracticeSessionLink(sampleLearnerGroupSubtopicSummary2)
+    ).toBe('#');
   });
 
   it('should get subtopic mastery level correctly', () => {

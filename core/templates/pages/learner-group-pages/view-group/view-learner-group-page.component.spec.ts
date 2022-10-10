@@ -260,6 +260,7 @@ describe('ViewLearnerGroupPageComponent', () => {
     spyOn(loaderService, 'showLoadingScreen');
 
     component.learnerGroup = learnerGroup;
+    component.username = 'username1';
 
     component.exitLearnerGroup();
     tick(100);

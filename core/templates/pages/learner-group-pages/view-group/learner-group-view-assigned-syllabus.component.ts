@@ -153,15 +153,16 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   }
 
   getStoryLink(storySummary: StorySummary): string {
-    if (!storySummary.getClassroomUrlFragment() ||
-      !storySummary.getTopicUrlFragment()) {
+    const classroomUrlFragment = storySummary.getClassroomUrlFragment();
+    const topicUrlFragment = storySummary.getTopicUrlFragment();
+    if (classroomUrlFragment === undefined || topicUrlFragment === undefined) {
       return '#';
     }
     let storyLink = this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
-        classroom_url_fragment: storySummary.getClassroomUrlFragment(),
+        classroom_url_fragment: classroomUrlFragment,
         story_url_fragment: storySummary.getUrlFragment(),
-        topic_url_fragment: storySummary.getTopicUrlFragment()
+        topic_url_fragment: topicUrlFragment
       });
     return storyLink;
   }
@@ -169,10 +170,15 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   getPracticeSessionLink(
       subtopicSummary: LearnerGroupSubtopicSummary
   ): string {
+    const classroomUrlFragment = subtopicSummary.parentTopicUrlFragment;
+    const topicUrlFragment = subtopicSummary.classroomUrlFragment;
+    if (classroomUrlFragment === undefined || topicUrlFragment === undefined) {
+      return '#';
+    }
     let practiceSessionsLink = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
-        topic_url_fragment: subtopicSummary.parentTopicUrlFragment,
-        classroom_url_fragment: subtopicSummary.classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
         stringified_subtopic_ids: JSON.stringify([subtopicSummary.subtopicId])
       });
     return practiceSessionsLink;
@@ -181,16 +187,21 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   getSubtopicMasteryLevel(
       subtopicSummary: LearnerGroupSubtopicSummary
   ): string {
-    if (subtopicSummary.subtopicMastery >= 1) {
-      return 'I18N_SKILL_LEVEL_PROFICIENT';
-    } else if (subtopicSummary.subtopicMastery >= 0.8) {
-      return 'I18N_SKILL_LEVEL_INTERMEDIATE';
-    } else if (subtopicSummary.subtopicMastery >= 0.6) {
-      return 'I18N_SKILL_LEVEL_BEGINNER';
-    } else if (subtopicSummary.subtopicMastery > 0) {
-      return 'I18N_SKILL_LEVEL_NEEDS_WORK';
+    let masteryLevel = 'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET';
+    const subtopicMastery = subtopicSummary.subtopicMastery;
+    if (!subtopicMastery) {
+      return masteryLevel;
     }
-    return 'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET';
+    if (subtopicMastery >= 1) {
+      masteryLevel = 'I18N_SKILL_LEVEL_PROFICIENT';
+    } else if (subtopicMastery >= 0.8) {
+      masteryLevel = 'I18N_SKILL_LEVEL_INTERMEDIATE';
+    } else if (subtopicMastery >= 0.6) {
+      masteryLevel = 'I18N_SKILL_LEVEL_BEGINNER';
+    } else if (subtopicMastery > 0) {
+      masteryLevel = 'I18N_SKILL_LEVEL_NEEDS_WORK';
+    }
+    return masteryLevel;
   }
 }
 

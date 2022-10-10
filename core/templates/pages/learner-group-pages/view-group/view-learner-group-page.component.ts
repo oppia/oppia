@@ -54,7 +54,7 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
   activeTab!: string;
   learnerGroupId!: string;
   learnerGroup!: LearnerGroupData;
-  username!: string;
+  username: string | null = null;
   learnerProgress!: LearnerGroupUserProgress;
   progressSharingPermission!: boolean;
 
@@ -162,12 +162,14 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.learnerGroupTitle = this.learnerGroup.title;
 
     modalRef.result.then(() => {
-      this.loaderService.showLoadingScreen('Exiting Group');
-      this.learnerGroupBackendApiService.exitLearnerGroupAsync(
-        this.learnerGroup.id, this.username
-      ).then(() => {
-        this.windowRef.nativeWindow.location.href = '/learner-dashboard';
-      });
+      if (this.username) {
+        this.loaderService.showLoadingScreen('Exiting Group');
+        this.learnerGroupBackendApiService.exitLearnerGroupAsync(
+          this.learnerGroup.id, this.username
+        ).then(() => {
+          this.windowRef.nativeWindow.location.href = '/learner-dashboard';
+        });
+      }
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
