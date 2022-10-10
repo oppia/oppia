@@ -10,11 +10,19 @@
       </div>
       <div class="oppia-teach-button-container">
         <form action="classroomUrl">
-          <button type="submit" (click)="onClickStartLearningButton()"
-                  class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_TEACH_PAGE_ACTION_START_LEARNING' | translate">
+          <button type="submit"
+                  (click)="onClickStartLearningButton()"
+                  class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
+            {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
           </button>
         </form>
+      </div>
+      <div *ngIf="androidPageIsEnabled" class="oppia-teach-button-container">
+        <button type="submit"
+                (click)="onClickAccessAndroidButton()"
+                class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
+          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
+        </button>
       </div>
     </div>
 
@@ -27,11 +35,19 @@
       </h2>
       <div class="oppia-teach-button-container mobile-button">
         <form action="classroomUrl">
-          <button type="submit" (click)="onClickStartLearningButton()"
-                  class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_TEACH_PAGE_ACTION_START_LEARNING' | translate">
+          <button type="submit"
+                  (click)="onClickStartLearningButton()"
+                  class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
+            {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
           </button>
         </form>
+      </div>
+      <div *ngIf="androidPageIsEnabled" class="oppia-splash-button-container">
+        <button type="submit"
+                (click)="onClickAccessAndroidButton()"
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200">
+          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
+        </button>
       </div>
     </div>
 
@@ -422,16 +438,16 @@
 
   .teach-page .oppia-teach-button-one {
     background-color: #015c53;
-    border-radius: 0;
+    border-radius: 5px;
     color: #fff;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 16px;
     font-weight: bold;
-    margin-bottom: 1vw;
+    margin-bottom: 40px;
     margin-top: -20px;
     min-width: 250px;
     padding: 10px;
-    text-transform: uppercase;
+    text-transform: none;
   }
   .teach-page .oppia-teach-bottom-button {
     background-color: #015c53;

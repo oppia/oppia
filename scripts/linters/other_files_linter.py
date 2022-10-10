@@ -49,7 +49,7 @@ WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
 MERGE_STEP = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
     'backend_tests.yml', 'pending-review-notification.yml',
-    'revert-web-wiki-updates.yml')
+    'revert-web-wiki-updates.yml', 'frontend_tests.yml')
 
 THIRD_PARTY_LIBS = [
     {

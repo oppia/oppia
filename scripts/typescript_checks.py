@@ -50,7 +50,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/button-directives/hint-and-solution-buttons.component.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
-    'core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller.spec.ts',
+    'core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.spec.ts',
     'core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller.spec.ts',
     'core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller.ts',
     'core/templates/components/entity-creation-services/story-creation.service.spec.ts',
@@ -308,8 +308,8 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts',
     'core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts',
     'core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts',
-    'core/templates/pages/exploration-editor-page/statistics-tab/templates/state-stats-modal.controller.spec.ts',
-    'core/templates/pages/exploration-editor-page/suggestion-modal-for-editor-view/exploration-editor-suggestion-modal.controller.spec.ts',
+    'core/templates/pages/exploration-editor-page/statistics-tab/templates/state-stats-modal.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/statistics-tab/templates/state-stats-modal.component.ts',
     'core/templates/pages/exploration-editor-page/suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service.spec.ts',
     'core/templates/pages/exploration-editor-page/suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/audio-translation-bar/audio-translation-bar.directive.spec.ts',
@@ -330,7 +330,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.component.ts',
-    'core/templates/pages/exploration-player-page/exploration-player-page.import.ts',
     'core/templates/pages/exploration-player-page/layout-directives/content-language-selector.component.spec.ts',
     'core/templates/pages/exploration-player-page/layout-directives/content-language-selector.component.ts',
     'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.spec.ts',
@@ -511,8 +510,8 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/visualizations/oppia-visualization-click-hexbins.directive.ts',
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.spec.ts',
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.ts',
-    'extensions/visualizations/oppia-visualization-sorted-tiles.directive.spec.ts',
-    'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
+    'extensions/visualizations/oppia-visualization-sorted-tiles.component.spec.ts',
+    'extensions/visualizations/oppia-visualization-sorted-tiles.component.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
