@@ -58,7 +58,7 @@ export class HintsAndSolutionManagerService {
   // Variable tooltipIsOpen is a flag which says that the tooltip is currently
   // visible to the learner.
   tooltipIsOpen: boolean = false;
-  // This is set to true as soon as a hint/solution is clicked or when the
+  // This is set to true as soon as a hint is clicked or when the
   // tooltip has been triggered.
   hintsDiscovered: boolean = false;
 
@@ -98,6 +98,8 @@ export class HintsAndSolutionManagerService {
     this._timeoutElapsedEventEmitter.emit();
   }
 
+  // To be called from conversation-skin component
+  // when no separate path for the stuck learner exists.
   releaseSolution(): void {
     this.solutionReleased = true;
     this._timeoutElapsedEventEmitter.emit();
@@ -129,8 +131,6 @@ export class HintsAndSolutionManagerService {
     let funcToEnqueue = null;
     if (!this.areAllHintsExhausted()) {
       funcToEnqueue = this.releaseHint;
-    } else if (!!this.solutionForLatestCard && !this.solutionReleased) {
-      funcToEnqueue = this.releaseSolution;
     }
     if (funcToEnqueue) {
       this.enqueueTimeout(
@@ -181,7 +181,6 @@ export class HintsAndSolutionManagerService {
   }
 
   displaySolution(): Solution {
-    this.hintsDiscovered = true;
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();
     if (this.tooltipTimeout) {
