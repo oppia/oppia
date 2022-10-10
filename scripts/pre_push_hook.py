@@ -351,7 +351,8 @@ def start_linter(files: List[bytes]) -> int:
     cmd_list: List[Union[str, bytes]] = [
         PYTHON_CMD, '-m', LINTER_MODULE, LINTER_FILE_FLAG
     ]
-    cmd_list.extend(files)
+    for file in files:
+        cmd_list.append(file.decode('utf-8'))
     task = subprocess.Popen(cmd_list)
     task.communicate()
     return task.returncode
