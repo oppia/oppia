@@ -33,7 +33,7 @@ export class ComponentOverviewComponent {
     private clipboard: Clipboard,
     private i18nLanguageCodeService: I18nLanguageCodeService) {}
 
-    copyUrlButton(): void {
+  copyUrlButton(): void {
     this.clipboard.copy(this.urlToCopy);
     this.showTooltip = true;
     setTimeout(() => {
