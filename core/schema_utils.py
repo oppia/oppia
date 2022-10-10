@@ -767,6 +767,8 @@ class _Validators:
         Returns:
             bool. Whether the given object is empty.
         """
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(obj, dict)
         if obj['html'] in ('', '<p></p>'):
             return False
         return True
