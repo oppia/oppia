@@ -188,10 +188,21 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should open the reassign modal', function() {
-    var uibModalSpy = spyOn($uibModalInstance, 'open').and.returnValue({
-      result: Promise.resolve()
-    });
+    class MockNgbModalRef {
+      componentInstance: {
+        subtopics: null;
+      };
+    }
+    var deferred = $q.defer();
+    deferred.resolve(1);
+    let uibModalSpy = spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: MockNgbModalRef,
+        result: deferred.promise
+      } as NgbModalRef
+    );
     $scope.reassignSkillsInSubtopics();
+    $rootScope.$apply();
     expect(uibModalSpy).toHaveBeenCalled();
   });
 

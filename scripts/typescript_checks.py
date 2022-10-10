@@ -415,6 +415,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topic-editor-page/modal-templates/create-new-story-modal.controller.spec.ts',
     'core/templates/pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component.spec.ts',
     'core/templates/pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component.ts',
+    'core/templates/pages/topic-editor-page/modal-templates/rearrange-skills-in-subtopics-modal.component.spec.ts',
     'core/templates/pages/topic-editor-page/modal-templates/rearrange-skills-in-subtopics-modal.component.ts',
     'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.component.ts',
     'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar.component.spec.ts',
