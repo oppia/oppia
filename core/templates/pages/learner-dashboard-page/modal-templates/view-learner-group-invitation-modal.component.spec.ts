@@ -65,7 +65,7 @@ describe('View Learner Group Invitation Modal Component', function() {
       ViewLearnerGroupInvitationModalComponent);
     component = fixture.componentInstance;
     component.learnerGroup = shortLearnerGroup;
-  
+
     fixture.detectChanges();
   });
 

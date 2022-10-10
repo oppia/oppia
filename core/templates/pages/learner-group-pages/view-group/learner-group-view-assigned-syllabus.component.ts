@@ -170,8 +170,8 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   getPracticeSessionLink(
       subtopicSummary: LearnerGroupSubtopicSummary
   ): string {
-    const classroomUrlFragment = subtopicSummary.parentTopicUrlFragment;
-    const topicUrlFragment = subtopicSummary.classroomUrlFragment;
+    const classroomUrlFragment = subtopicSummary.classroomUrlFragment;
+    const topicUrlFragment = subtopicSummary.parentTopicUrlFragment;
     if (classroomUrlFragment === undefined || topicUrlFragment === undefined) {
       return '#';
     }

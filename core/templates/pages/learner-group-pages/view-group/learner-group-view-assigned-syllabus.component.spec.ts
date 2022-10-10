@@ -257,8 +257,10 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
 
   it('should get practice session link correctly', () => {
     expect(component.getPracticeSessionLink(sampleLearnerGroupSubtopicSummary))
-      .toBe('/learn/classroom_1/topic_1/practice/session?' +
-      'selected_subtopic_ids=%5B1%5D');
+      .toBe(
+        '/learn/classroom_1/topic_1/practice/session?' +
+        'selected_subtopic_ids=%5B1%5D'
+      );
   });
 
   it('should get # as practice link url when classroom or topic url is not ' +
