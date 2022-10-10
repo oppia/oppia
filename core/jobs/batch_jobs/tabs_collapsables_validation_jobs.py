@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import json
+import logging
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -253,6 +254,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     'Nested collapsables'
                 )
 
+    # Here we use object because I need to access the static method and that
+    # can be accessed via using the class.
     @staticmethod
     def invalid_tabs_rte_tag(
         states_dict: Dict[str, state_domain.State]
@@ -292,7 +295,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                                 states_with_errored_values
                             )
                         )
-                except Exception:
+                except Exception as e:
+                    logging.exception('No content attr in tabs -> %s', e)
                     states_with_errored_values.append(
                         'No content attr in tabs'
                     )
@@ -308,6 +312,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                 )
         return errored_values
 
+    # Here we use object because I need to access the static method and that
+    # can be accessed via using the class.
     @staticmethod
     def invalid_collapsibles_rte_tag(
         states_dict: Dict[str, state_domain.State]
@@ -349,7 +355,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                             states_with_errored_values
                         )
                     )
-                except Exception:
+                except Exception as e:
+                    logging.exception('No content attr in collapsible -> %s', e)
                     states_with_errored_values.append(
                         'No content attr in collapsible tag'
                     )
@@ -365,6 +372,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         states_with_errored_values.append(
                             'collapsible heading empty')
                 except Exception:
+                    logging.exception('No hading attr in collapsible -> %s', e)
                     states_with_errored_values.append(
                         'No heading attr in collapsible tag'
                     )
