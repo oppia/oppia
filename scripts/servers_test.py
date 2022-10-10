@@ -28,9 +28,7 @@ import subprocess
 import sys
 import threading
 import time
-from unittest import mock
 
-from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import scripts_test_utils
@@ -855,99 +853,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('--max-old-space-size=2056', popen_calls[0].program_args)
 
-    def test_managed_webdriver_with_explicit_chrome_version(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            subprocess, 'check_call', lambda _: None, expected_args=[
-                (
-                    [common.NODE_BIN_PATH,
-                     common.WEBDRIVER_MANAGER_BIN_PATH, 'update',
-                     '--versions.chrome', '123'],
-                ),
-            ]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'wait_for_port_to_be_in_use', lambda _: None,
-            expected_args=[(4444,)]))
-
-        self.exit_stack.enter_context(
-            servers.managed_webdriver_server(chrome_version='123'))
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s start --versions.chrome 123 --quiet --standalone' % (
-                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
-
-    def test_managed_webdriver_on_mac_os(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Darwin'))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            subprocess, 'check_call'))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            subprocess, 'check_output', lambda _: b'4.5.6.78', expected_args=[
-                (
-                    ['/Applications/Google Chrome.app/Contents/MacOS'
-                     '/Google Chrome',
-                     '--version'],
-                ),
-            ]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            utils,
-            'url_open',
-            lambda _: mock.Mock(read=lambda: b'4.5.6'),
-            expected_args=[
-                (
-                    'https://chromedriver.storage.googleapis.com'
-                    '/LATEST_RELEASE_4.5.6',
-                ),
-            ]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'wait_for_port_to_be_in_use', lambda _: None,
-            expected_args=[(4444,)]))
-
-        self.exit_stack.enter_context(servers.managed_webdriver_server())
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s start --versions.chrome 4.5.6 --quiet --standalone' % (
-                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
-
-    def test_managed_webdriver_on_non_mac_os(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            subprocess, 'check_call'))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            subprocess, 'check_output', lambda _: b'1.2.3.45', expected_args=[
-                (['google-chrome', '--version'],),
-            ]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            utils, 'url_open',
-            lambda _: mock.Mock(read=lambda: b'1.2.3'),
-            expected_args=[
-                (
-                    'https://chromedriver.storage.googleapis.com'
-                    '/LATEST_RELEASE_1.2.3',
-                ),
-            ]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'wait_for_port_to_be_in_use', lambda _: None,
-            expected_args=[(4444,)]))
-
-        self.exit_stack.enter_context(servers.managed_webdriver_server())
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s start --versions.chrome 1.2.3 --quiet --standalone' % (
-                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
-
-    def test_managed_webdriver_fails_to_get_chrome_version(self):
+    def test_managed_webdriverio_server_fails_to_get_chrome_version(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
         self.exit_stack.enter_context(self.swap_to_always_raise(
@@ -957,102 +863,9 @@ class ManagedProcessTests(test_utils.TestBase):
 
         expected_regexp = 'Failed to execute "google-chrome --version" command'
         with self.assertRaisesRegex(Exception, expected_regexp):
-            self.exit_stack.enter_context(servers.managed_webdriver_server())
+            self.exit_stack.enter_context(servers.managed_webdriverio_server())
 
         self.assertEqual(len(popen_calls), 0)
-
-    def test_managed_webdriver_on_window_os(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Windows'))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            subprocess, 'check_call'))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            subprocess, 'check_output', value=b'1.2.3.45'))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            utils, 'url_open', value=mock.Mock(read=lambda: b'1.2.3')))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            common, 'is_x64_architecture', value=True))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'inplace_replace_file_context',
-            lambda *_: contextlib.nullcontext(), expected_args=[
-                (
-                    common.CHROME_PROVIDER_FILE_PATH,
-                    re.escape('this.osArch = os.arch();'),
-                    'this.osArch = "x64";',
-                ),
-                (
-                    common.GECKO_PROVIDER_FILE_PATH,
-                    re.escape('this.osArch = os.arch();'),
-                    'this.osArch = "x64";',
-                ),
-            ]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'wait_for_port_to_be_in_use', lambda _: None,
-            expected_args=[(4444,)]))
-
-        self.exit_stack.enter_context(servers.managed_webdriver_server())
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s start --versions.chrome 1.2.3 --quiet --standalone' % (
-                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
-
-    def test_managed_protractor_with_invalid_sharding_instances(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
-            self.exit_stack.enter_context(
-                servers.managed_protractor_server(sharding_instances=0))
-
-        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
-            self.exit_stack.enter_context(
-                servers.managed_protractor_server(sharding_instances=-1))
-
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 0)
-
-    def test_managed_protractor(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        self.exit_stack.enter_context(servers.managed_protractor_server())
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-        program_args = popen_calls[0].program_args
-        self.assertIn(
-            '%s --unhandled-rejections=strict %s %s' % (
-                common.NODE_BIN_PATH, common.PROTRACTOR_BIN_PATH,
-                common.PROTRACTOR_CONFIG_FILE_PATH),
-            program_args)
-        self.assertNotIn('--inspect-brk', program_args)
-        self.assertIn('--params.devMode=True', program_args)
-        self.assertIn('--suite full', program_args)
-
-    def test_managed_protractor_with_explicit_args(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        self.exit_stack.enter_context(servers.managed_protractor_server(
-            suite_name='abc', sharding_instances=3, debug_mode=True,
-            dev_mode=False, stdout=subprocess.PIPE))
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
-        program_args = popen_calls[0].program_args
-        # From debug_mode=True.
-        self.assertIn('--inspect-brk', program_args)
-        # From sharding_instances=3.
-        self.assertIn('--capabilities.shardTestFiles=True', program_args)
-        self.assertIn('--capabilities.maxInstances=3', program_args)
-        # From dev_mode=True.
-        self.assertIn('--params.devMode=False', program_args)
-        # From suite='full'.
-        self.assertIn('--suite abc', program_args)
 
     def test_managed_webdriverio_with_invalid_sharding_instances(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1086,6 +899,10 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertNotIn('DEBUG=true', program_args)
         self.assertIn('--suite full', program_args)
         self.assertIn('--params.devMode=True', program_args)
+
+    def test_managed_webdriverio_mobile(self):
+        with servers.managed_webdriverio_server(mobile=True):
+            self.assertEqual(os.getenv('MOBILE'), 'true')
 
     def test_managed_webdriverio_with_explicit_args(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())

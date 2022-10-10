@@ -169,7 +169,7 @@ class BaseModel(datastore_services.Model):
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
-    # We use type Any for *args and **kwargs to denote compatibility with the
+    # Here we use type Any because we need to denote the compatibility with the
     # overridden constructor of the parent class i.e datastore_services.Model
     # here.
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -246,7 +246,7 @@ class BaseModel(datastore_services.Model):
             'The has_reference_to_user_id() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
-    # Using Dict[str, Any] here so that the return type of all the export_data
+    # Here we use type Any because the return type of all the export_data
     # methods in BaseModel's subclasses is a subclass of Dict[str, Any].
     # Otherwise subclass methods will throw [override] error.
     @staticmethod
@@ -594,7 +594,7 @@ class BaseHumanMaintainedModel(BaseModel):
     last_updated_by_human = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
 
-    # We use type Any for *args and **kwargs to denote compatibility with the
+    # Here we use type Any because we need to denote the compatibility with the
     # overridden put method of the parent class i.e. BaseModel here.
     def put(self, *args: Any, **kwargs: Any) -> None:
         """Unsupported operation on human-maintained models."""
@@ -690,10 +690,9 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, EXPORT_POLICY]:
-        """Model contains data corresponding to a user,
-        but this isn't exported because the history of commits is not
-        relevant to a user for the purposes of Takeout, since commits do not
-        contain any personal user data.
+        """Model contains data corresponding to a user, but this isn't exported
+        because all user-related data for a commit is already being exported
+        as part of the corresponding SnapshotMetadataModel.
         """
         return dict(BaseModel.get_export_policy(), **{
             'user_id': EXPORT_POLICY.NOT_APPLICABLE,
@@ -903,14 +902,16 @@ class VersionedModel(BaseModel):
         if self.deleted:
             raise Exception('This model instance has been deleted.')
 
-    # TODO(#13523): Change 'snapshot' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # Here we use type Any because the method 'compute_snapshot' defined in
+    # subclasses of VersionedModel can return different Dict/TypedDict types.
+    # So, to allow every Dict/TypedDict type we used Any here.
     def compute_snapshot(self) -> Dict[str, Any]:
         """Generates a snapshot (dict) from the model property values."""
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/Typed Dict to
-    # remove Any from type-annotation below.
+    # Here we use type Any because the method '_reconstitute' defined in
+    # subclasses of VersionedModel can accept different Dict/TypedDict types.
+    # So, to allow every Dict/TypedDict type we used Any here.
     def _reconstitute(
         self: SELF_VERSIONED_MODEL,
         snapshot_dict: Dict[str, Any]
@@ -1054,7 +1055,7 @@ class VersionedModel(BaseModel):
             'versioned_model': self,
         }
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def delete( # type: ignore[override]
@@ -1115,20 +1116,22 @@ class VersionedModel(BaseModel):
             commit_cmds = [{
                 'cmd': self.CMD_DELETE_COMMIT
             }]
-            models_to_put = cast(
-                List[BaseModel],
-                self.compute_models_to_commit(
-                    committer_id,
-                    feconf.COMMIT_TYPE_DELETE,
-                    commit_message,
-                    commit_cmds,
-                    self._prepare_additional_models()
-                ).values()
+            models_to_put = self.compute_models_to_commit(
+                committer_id,
+                feconf.COMMIT_TYPE_DELETE,
+                commit_message,
+                commit_cmds,
+                self._prepare_additional_models()
             )
-            BaseModel.update_timestamps_multi(models_to_put)
-            BaseModel.put_multi(models_to_put)
+            models_to_put_values = []
+            for model_to_put in models_to_put.values():
+                # Here, we are narrowing down the type from object to BaseModel.
+                assert isinstance(model_to_put, BaseModel)
+                models_to_put_values.append(model_to_put)
+            BaseModel.update_timestamps_multi(models_to_put_values)
+            BaseModel.put_multi(models_to_put_values)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
@@ -1238,18 +1241,17 @@ class VersionedModel(BaseModel):
                 snapshot_content_models.append(
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
-            # We need the cast here in order to convey to MyPy that all these
-            # lists can be merged together for the purpose of putting them into
-            # the datastore.
-            entities = (
-                cast(List[BaseModel], snapshot_metadata_models) +
-                cast(List[BaseModel], snapshot_content_models) +
-                cast(List[BaseModel], versioned_models)
-            )
+            entities: List[BaseModel] = []
+            for snapshot_model in snapshot_metadata_models:
+                entities.append(snapshot_model)
+            for content_model in snapshot_content_models:
+                entities.append(content_model)
+            for versioned_model in versioned_models:
+                entities.append(versioned_model)
             cls.update_timestamps_multi(entities)
             BaseModel.put_multi_transactional(entities)
 
-    # We use type Any for *args and **kwargs to denote compatibility with the
+    # Here we use type Any because we need to denote the compatibility with the
     # overridden constructor of the parent class i.e BaseModel here.
     def put(self, *args: Any, **kwargs: Any) -> None:
         """For VersionedModels, this method is replaced with commit()."""
@@ -1303,18 +1305,20 @@ class VersionedModel(BaseModel):
             else feconf.COMMIT_TYPE_EDIT
         )
 
-        models_to_put = cast(
-            List[BaseModel],
-            self.compute_models_to_commit(
+        models_to_put = self.compute_models_to_commit(
                 committer_id,
                 commit_type,
                 commit_message,
                 commit_cmds,
                 self._prepare_additional_models()
-            ).values()
-        )
-        BaseModel.update_timestamps_multi(models_to_put)
-        BaseModel.put_multi_transactional(models_to_put)
+            )
+        models_to_put_values = []
+        for model_to_put in models_to_put.values():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model_to_put, BaseModel)
+            models_to_put_values.append(model_to_put)
+        BaseModel.update_timestamps_multi(models_to_put_values)
+        BaseModel.put_multi_transactional(models_to_put_values)
 
     @classmethod
     def revert(
@@ -1364,18 +1368,20 @@ class VersionedModel(BaseModel):
         new_model._reconstitute_from_snapshot_id(snapshot_id)  # pylint: disable=protected-access
         new_model.version = current_version
 
-        models_to_put = cast(
-            List[BaseModel],
-            new_model.compute_models_to_commit(
-                committer_id,
-                feconf.COMMIT_TYPE_REVERT,
-                commit_message,
-                commit_cmds,
-                new_model._prepare_additional_models()
-            ).values()
+        models_to_put = new_model.compute_models_to_commit(
+            committer_id,
+            feconf.COMMIT_TYPE_REVERT,
+            commit_message,
+            commit_cmds,
+            new_model._prepare_additional_models()
         )
-        BaseModel.update_timestamps_multi(list(models_to_put))
-        BaseModel.put_multi_transactional(list(models_to_put))
+        models_to_put_values = []
+        for model_to_put in models_to_put.values():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model_to_put, BaseModel)
+            models_to_put_values.append(model_to_put)
+        BaseModel.update_timestamps_multi(models_to_put_values)
+        BaseModel.put_multi_transactional(models_to_put_values)
 
     @overload
     @classmethod
@@ -1551,8 +1557,8 @@ class VersionedModel(BaseModel):
         version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
-    # Here, the signature of get method is different from the get method in
-    # superclass. Thus to avoid MyPy error, we used ignore here.
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(  # type: ignore[override]
         cls: Type[SELF_VERSIONED_MODEL],
@@ -1639,8 +1645,9 @@ class VersionedModel(BaseModel):
                     'Invalid version number %s for model %s with id %s'
                     % (version_numbers[ind], cls.__name__, model_instance_id))
 
-        # We need the cast here to make sure that returned_models only contains
-        # BaseSnapshotMetadataModel and not None.
+        # Here we use cast because we need to make sure that returned_models
+        # only contains BaseSnapshotMetadataModel and not None. In above code,
+        # we are already throwing an error if None value is encountered.
         returned_models_without_none = cast(
             List[BaseSnapshotMetadataModel], returned_models)
         return [{
@@ -1738,8 +1745,6 @@ class BaseSnapshotMetadataModel(BaseModel):
             cls.content_user_ids == user_id,
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
     def create(
         cls: Type[SELF_BASE_SNAPSHOT_METADATA_MODEL],
@@ -1841,8 +1846,9 @@ class BaseSnapshotContentModel(BaseModel):
             'content': EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'content' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # Here we use type Any because the method 'create' defined in subclasses
+    # of BaseSnapshotContentModel can accept different Dict/TypedDict types.
+    # So, to allow every Dict/TypedDict type we used Any here.
     @classmethod
     def create(
         cls: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL],

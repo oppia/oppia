@@ -21,7 +21,7 @@ import { NgZone } from '@angular/core';
 import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
-interface RteComponentSpecs {
+export interface RteComponentSpecs {
   backendId: string;
   customizationArgSpecs: {
     name: string; value: unknown; 'default_value': unknown;

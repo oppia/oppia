@@ -42,7 +42,7 @@ from extensions.objects.models import objects
 
 from typing import (
     Callable, Dict, List, Mapping, Optional, Sequence,
-    Set, Tuple, Union, cast
+    Set, Tuple, Union, cast, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 
@@ -993,11 +993,6 @@ class ExplorationCommitLogEntryDict(TypedDict):
 class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 
-    # Here, Any is used because argument `commit_cmds` can accept
-    # List of dictionaries that can contain arbitrary no of keys
-    # with different types of values like int, str, List[str], Dict
-    # and other types too. So, to make the argument generalized for
-    # every dictionary we used Any type here.
     def __init__(
         self,
         created_on: datetime.datetime,
@@ -1254,6 +1249,14 @@ class VersionedExplorationStatesDict(TypedDict):
 
     states_schema_version: int
     states: Dict[str, state_domain.StateDict]
+
+
+class SerializableExplorationDict(ExplorationDict):
+    """Dictionary representing the serializable Exploration object."""
+
+    version: int
+    created_on: str
+    last_updated: str
 
 
 class Exploration(translation_domain.BaseTranslatableObject):
@@ -2523,6 +2526,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: str,
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> str: ...
+
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: List[str],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> List[str]: ...
+
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: List[List[str]],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> List[List[str]]: ...
+
         # Here we use MyPy ignore because MyPy expects a return value in
         # every condition when we define a return type but here we are
         # returning only in if-else conditions and we are not returning
@@ -2533,7 +2557,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             new_type: str,
             value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict]
-        ) -> Union[List[str], str]:
+        ) -> Union[List[List[str]], List[str], str]:
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -2575,28 +2599,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes its type as
-                # recursive, like if this method returns List[str] then MyPy
-                # assumes its type as List[List[str]]. So, because of this,
-                # MyPy throws an error. Thus to avoid the error, we used
-                # ignore here.
+                # Here we use cast because this 'elif' condition forces value
+                # to have type List[str].
+                set_of_content_ids = cast(List[str], value)
                 return [
-                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
+                    migrate_rule_inputs_and_answers(
                         'TranslatableHtmlContentId', html, choices
-                    ) for html in value
+                    ) for html in set_of_content_ids
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes its type as
-                # recursive, like if this method returns List[str] then MyPy
-                # assumes its type as List[List[str]]. So, because of this,
-                # MyPy throws an error. Thus to avoid the error, we used
-                # ignore here.
+                # Here we use cast because this 'elif' condition forces value
+                # to have type List[List[str]].
+                list_of_set_of_content_ids = cast(
+                    List[List[str]], value
+                )
                 return [
-                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
+                    migrate_rule_inputs_and_answers(
                         'SetOfTranslatableHtmlContentIds', html_set, choices
-                    ) for html_set in value
+                    ) for html_set in list_of_set_of_content_ids
                 ]
 
         for state_dict in states_dict.values():
@@ -3052,7 +3072,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     for param_name, value in rule_spec['inputs'].items():
                         interaction_id = interaction['id']
                         param_type = (
-                            interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
+                            interaction_registry.Registry.get_interaction_by_id(
                                 interaction_id
                             ).get_rule_param_type(
                                 rule_spec['rule_type'], param_name
@@ -3450,8 +3470,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 is not specified.
             Exception. The exploration schema version is not valid.
         """
-        # Here, cast is used to narrow down the return type of dict_from_yaml()
-        # from Dict[str, Any] to VersionedExplorationDict.
+        # Here we use cast because we are narrowing down the return type of
+        # dict_from_yaml() from Dict[str, Any] to VersionedExplorationDict.
         try:
             exploration_dict = cast(
                 VersionedExplorationDict,
@@ -3558,16 +3578,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str. The YAML representation of this exploration.
         """
         exp_dict = self.to_dict()
-        # The dictionary returned by `to_dict()` method is ExplorationDict
-        # and ExplorationDict does not contain `schema_version` key, but here
-        # we are defining a `schema_version` key which causes MyPy to throw
-        # error TypedDict has no key 'schema_version'. Thus to silent the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
+        # method is ExplorationDict and ExplorationDict does not contain
+        # `schema_version` key, but here we are defining a `schema_version` key
+        # which causes MyPy to throw error 'TypedDict has no key schema_version'
+        # thus to silence the error, we used ignore here.
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
-        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
+        # TypedDict.
         del exp_dict['id']  # type: ignore[misc]
 
         return utils.yaml_from_dict(exp_dict)
@@ -3608,7 +3629,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        exploration_dict = self.to_dict()
+        # Here we use MyPy ignore because to_dict() method returns a general
+        # dictionary representation of domain object (ExplorationDict) which
+        # does not contain properties like created_on and last_updated but
+        # MyPy expects exploration_dict, a dictionary which contains all the
+        # properties of domain object. That's why we are explicitly changing
+        # the type of exploration_dict here, which causes MyPy to throw an
+        # error. Thus, to silence the error, we added an ignore here.
+        exploration_dict: SerializableExplorationDict = self.to_dict()  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
         # parameter.
@@ -3617,19 +3645,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # files must add a version parameter to their files with the correct
         # version of this object. The line below must then be moved to
         # to_dict().
-        # The dictionary returned by `to_dict()` method is ExplorationDict
-        # and ExplorationDict does not contain `version`, `created_on` and
-        # `last_updated` keys, but here we are defining those keys which
-        # causes MyPy to throw error TypedDict has no `version` key. Thus
-        # to silent the error, we used ignore here.
-        exploration_dict['version'] = self.version  # type: ignore[misc]
+        exploration_dict['version'] = self.version
 
         if self.created_on:
-            exploration_dict['created_on'] = (  # type: ignore[misc]
+            exploration_dict['created_on'] = (
                 utils.convert_naive_datetime_to_string(self.created_on))
 
         if self.last_updated:
-            exploration_dict['last_updated'] = (  # type: ignore[misc]
+            exploration_dict['last_updated'] = (
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
         return json.dumps(exploration_dict)

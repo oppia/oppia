@@ -18,10 +18,6 @@
  */
 
 export default {
-  // Whether to allow custom event reporting to Google Analytics.
-  // Mock gtag function is used when disabled.
-  "CAN_SEND_ANALYTICS_EVENTS": false,
-
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
@@ -4951,6 +4947,8 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": ["tabs", "skillreview"],
+
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -5926,6 +5924,7 @@ export default {
   // classroom in the classroom page URL. E.g. in /learn/math/...,
   // 'math' is the 'classroom URL fragment'.
   "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
+  "MAX_CHARS_IN_CLASSROOM_NAME": 39,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 12,
   // This represents the maximum number of characters in the URL fragment for
@@ -6007,10 +6006,6 @@ export default {
       }
     }
   },
-
-  // Data required for Google Analytics.
-  "ANALYTICS_ID": "",
-  "SITE_NAME_FOR_ANALYTICS": "",
 
   // Data required for Firebase authentication.
   //
@@ -6137,6 +6132,9 @@ export default {
     "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
   ],
 
+  // Supported functions for math interactions.
+  "SUPPORTED_FUNCTION_NAMES": ["sqrt", "abs"],
+
   "OSK_MAIN_TAB": "mainTab",
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",
@@ -6172,6 +6170,9 @@ export default {
 
   // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson on Oppia - a free platform for teaching and learning!",
+
+  // eslint-disable-next-line max-len
+  "DEFUALT_BLOG_POST_SHARE_TWITTER_TEXT": "Check out this new blog post on Oppia!",
 
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
@@ -6335,6 +6336,42 @@ export default {
       "ROUTE": "about-foundation",
       "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
+    },
+    "EXPLORATION_PLAYER": {
+      "ROUTE": "explore/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "EXPLORATION_PLAYER_EMBED": {
+      "ROUTE": "embed/exploration/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "ANDROID": {
+      "ROUTE": "android",
+      "TITLE": "Android | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
     },
     "CONTACT": {
       "ROUTE": "contact",
@@ -6671,6 +6708,64 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        }
+      ]
+    },
+    "BLOG_HOMEPAGE": {
+      "ROUTE": "blog",
+      "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        }
+      ]
+    },
+    "BLOG_HOMEPAGE_SEARCH": {
+      "ROUTE": "blog/search/find",
+      "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        }
+      ]
+    },
+    "BLOG_POST_PAGE": {
+      "ROUTE": "blog/:blog_post_url_fragment",
+      "TITLE": "I18N_BLOG_POST_PAGE_TITLE",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
         }
       ]
     },
