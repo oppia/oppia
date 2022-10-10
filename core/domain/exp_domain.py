@@ -1373,17 +1373,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             lnk = lnk_attr.replace('&quot;', '').replace(' ', '')
             txt = txt_attr.replace('&quot;', '').replace(' ', '')
 
-            # If the text or the link is empty.
             if len(lnk) == 0 or len(txt) == 0:
                 link.decompose()
                 continue
 
-            # If link is http.
             if utils.get_url_scheme(lnk) == 'http':
-                # Replace http with https.
                 lnk = lnk.replace('http', 'https')
 
-            # If link is invalid.
             if utils.get_url_scheme(lnk) not in constants.ACCEPTABLE_SCHEMES:
                 link.decompose()
                 continue
@@ -3211,9 +3207,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_dict['written_translations']['translations_mapping'])
             new_translations_mapping = {}
             for content_id, translation_item in translations_mapping.items():
-                if content_id != 'content':
-                    new_translations_mapping[content_id] = translation_item
-                else:
+                if content_id == 'content':
                     for language_code in translations_mapping[content_id]:
                         written_translation = (
                             translation_item[language_code]

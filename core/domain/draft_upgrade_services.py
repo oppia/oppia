@@ -151,11 +151,9 @@ class DraftUpgradeUtil:
             lnk = lnk_attr.replace('&quot;', '').replace(' ', '')
             txt = txt_attr.replace('&quot;', '').replace(' ', '')
 
-            # If the text or the link is empty.
             if len(lnk) == 0 or len(txt) == 0:
                 return False
 
-            # If link is invalid.
             if utils.get_url_scheme(lnk) not in constants.ACCEPTABLE_SCHEMES:
                 return False
 
