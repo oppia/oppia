@@ -4,7 +4,7 @@ const puppeteer = require("puppeteer");
 puppeteer
   .launch({
     headless: false,
-    args: ["--start-fullscreen", "--use-fake-ui-for-media-stream"],
+    args: ["--start-fullscreen", "--use-fake-ui-for-media-stream"], // giving microphone and other browser permissions
   })
   .then(async (browser) => {
     //browser new page
