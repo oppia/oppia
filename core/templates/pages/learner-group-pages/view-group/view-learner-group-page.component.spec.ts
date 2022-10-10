@@ -29,6 +29,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from 'services/page-title.service';
 import { ViewLearnerGroupPageComponent } from './view-learner-group-page.component';
 import { ContextService } from 'services/context.service';
+import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { LoaderService } from 'services/loader.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import { UserService } from 'services/user.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -38,6 +45,15 @@ class MockTranslateService {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: '',
+    },
+    gtag: () => {}
+  };
+}
+
 describe('ViewLearnerGroupPageComponent', () => {
   let component: ViewLearnerGroupPageComponent;
   let fixture: ComponentFixture<ViewLearnerGroupPageComponent>;
@@ -45,21 +61,63 @@ describe('ViewLearnerGroupPageComponent', () => {
   let translateService: TranslateService;
   let contextService: ContextService;
   let pageTitleService: PageTitleService;
+  let ngbModal: NgbModal;
+  let loaderService: LoaderService;
+  let windowRef: MockWindowRef;
+  let userService: UserService;
+  let learnerGroupSyllabusBackendApiService:
+    LearnerGroupSyllabusBackendApiService;
 
-  const learnerGroupBackendDict = {
-    id: 'groupId',
-    title: 'title',
-    description: 'description',
-    facilitator_usernames: ['facilitator_username'],
-    learner_usernames: ['username2'],
-    invited_learner_usernames: ['username1'],
-    subtopic_page_ids: ['subtopic_page_id'],
-    story_ids: []
+  const sampleLearnerGroupSubtopicSummaryDict = {
+    subtopic_id: 1,
+    subtopic_title: 'subtopicTitle',
+    parent_topic_id: 'topicId1',
+    parent_topic_name: 'parentTopicName',
+    thumbnail_filename: 'thumbnailFilename',
+    thumbnail_bg_color: 'red',
+    subtopic_mastery: 0.95
   };
-  const learnerGroup = LearnerGroupData.createFromBackendDict(
-    learnerGroupBackendDict);
+
+  const sampleStorySummaryBackendDict = {
+    id: 'sample_story_id',
+    title: 'Story title',
+    node_titles: ['Chapter 1'],
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#F8BF74',
+    description: 'Description',
+    story_is_published: true,
+    completed_node_titles: ['Chapter 1'],
+    url_fragment: 'story-url-fragment',
+    all_node_dicts: [],
+    topic_name: 'Topic one',
+    topic_url_fragment: 'topic-one',
+    classroom_url_fragment: 'math'
+  };
+
+  const sampleLearnerGroupUserProgDict = {
+    username: 'username2',
+    progress_sharing_is_turned_on: true,
+    profile_picture_data_url: 'picture',
+    stories_progress: [sampleStorySummaryBackendDict],
+    subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
+  };
+  const sampleLearnerGroupUserProg = (
+    LearnerGroupUserProgress.createFromBackendDict(
+      sampleLearnerGroupUserProgDict)
+  );
+
+  const learnerGroup = new LearnerGroupData(
+    'groupId', 'title', 'description', ['facilitator_username'],
+    ['username2'], ['username1'], ['subtopic_page_id'], []
+  );
+
+  const userInfo = new UserInfo(
+    ['USER_ROLE'], true, false, false, false, true,
+    'en', 'username1', 'tester@example.com', true
+  );
 
   beforeEach(() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
@@ -67,6 +125,10 @@ describe('ViewLearnerGroupPageComponent', () => {
         MockTranslatePipe
       ],
       providers: [
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        },
         {
           provide: TranslateService,
           useClass: MockTranslateService
@@ -82,6 +144,11 @@ describe('ViewLearnerGroupPageComponent', () => {
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
     contextService = TestBed.inject(ContextService);
+    ngbModal = TestBed.inject(NgbModal);
+    loaderService = TestBed.inject(LoaderService);
+    userService = TestBed.inject(UserService);
+    learnerGroupSyllabusBackendApiService = TestBed.inject(
+      LearnerGroupSyllabusBackendApiService);
     fixture = TestBed.createComponent(ViewLearnerGroupPageComponent);
     component = fixture.componentInstance;
 
@@ -93,6 +160,16 @@ describe('ViewLearnerGroupPageComponent', () => {
   it('should initialize', fakeAsync(() => {
     spyOn(learnerGroupBackendApiService, 'fetchLearnerGroupInfoAsync')
       .and.returnValue(Promise.resolve(learnerGroup));
+    spyOn(
+      learnerGroupBackendApiService,
+      'fetchProgressSharingPermissionOfLearnerAsync'
+    ).and.returnValue(Promise.resolve(true));
+    spyOn(
+      learnerGroupSyllabusBackendApiService,
+      'fetchLearnerSpecificProgressInAssignedSyllabus'
+    ).and.returnValue(Promise.resolve(sampleLearnerGroupUserProg));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo));
     spyOn(component, 'subscribeToOnLangChange');
     spyOn(translateService.onLangChange, 'subscribe');
 
@@ -101,15 +178,27 @@ describe('ViewLearnerGroupPageComponent', () => {
 
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.OVERVIEW);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.OVERVIEW);
     expect(component.learnerGroup).toEqual(learnerGroup);
     expect(component.getLearnersCount()).toBe(1);
+    expect(component.username).toBe('username1');
+    expect(component.progressSharingPermission).toBe(true);
   }));
 
   it('should call set page title whenever the language is changed',
     fakeAsync(() => {
       spyOn(learnerGroupBackendApiService, 'fetchLearnerGroupInfoAsync')
         .and.returnValue(Promise.resolve(learnerGroup));
+      spyOn(
+        learnerGroupBackendApiService,
+        'fetchProgressSharingPermissionOfLearnerAsync'
+      ).and.returnValue(Promise.resolve(true));
+      spyOn(
+        learnerGroupSyllabusBackendApiService,
+        'fetchLearnerSpecificProgressInAssignedSyllabus'
+      ).and.returnValue(Promise.resolve(sampleLearnerGroupUserProg));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo));
 
       component.ngOnInit();
       tick();
@@ -128,24 +217,81 @@ describe('ViewLearnerGroupPageComponent', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_EDIT_LEARNER_GROUP_PAGE_TITLE');
+      'I18N_LEARNER_GROUP_PAGE_TITLE');
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_EDIT_LEARNER_GROUP_PAGE_TITLE');
+      'I18N_LEARNER_GROUP_PAGE_TITLE');
   });
 
   it('should set active tab and check if tab is active correctly', () => {
     component.setActiveTab(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS);
 
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS);
 
     let tabIsActive = component.isTabActive(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS);
     expect(tabIsActive).toBeTrue();
 
     tabIsActive = component.isTabActive(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.OVERVIEW);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.OVERVIEW);
     expect(tabIsActive).toBeFalse();
   });
+
+  it('should get count of completed stories by learner correctly', () => {
+    component.learnerProgress = sampleLearnerGroupUserProg;
+    expect(component.getCompletedStoriesCountByLearner()).toBe(1);
+  });
+
+  it('should get count of mastered subtopics by learner correctly', () => {
+    component.learnerProgress = sampleLearnerGroupUserProg;
+    expect(component.getMasteredSubtopicsCountOfLearner()).toBe(1);
+  });
+
+  it('should successfully exit learner group', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        learnerGroupTitle: learnerGroup.title,
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
+    spyOn(learnerGroupBackendApiService, 'exitLearnerGroupAsync')
+      .and.returnValue(Promise.resolve(learnerGroup));
+    spyOn(loaderService, 'showLoadingScreen');
+
+    component.learnerGroup = learnerGroup;
+
+    component.exitLearnerGroup();
+    tick(100);
+
+    expect(windowRef.nativeWindow.location.href).toBe('/learner-dashboard');
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
+      'Exiting Group');
+  }));
+
+  it('should correctly view and update learner group preferences',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          learnerGroup: learnerGroup,
+          progressSharingPermission: true
+        },
+        result: Promise.resolve({
+          progressSharingPermission: false
+        })
+      } as NgbModalRef);
+      spyOn(
+        learnerGroupBackendApiService,
+        'updateProgressSharingPermissionAsync'
+      ).and.returnValue(Promise.resolve(false));
+
+      component.learnerGroup = learnerGroup;
+      component.progressSharingPermission = true;
+
+      component.viewLearnerGroupPreferences();
+      tick(100);
+
+      expect(component.progressSharingPermission).toBe(false);
+    })
+  );
 });

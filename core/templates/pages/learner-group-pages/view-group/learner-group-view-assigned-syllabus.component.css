@@ -95,53 +95,6 @@
   width: 0;
 }
 
-.oppia-learner-group-view-assigned-syllabus .back-to-syllabus-button {
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.oppia-learner-group-view-assigned-syllabus .add-new-syllabus-items-title {
-  color: #00609c;
-  font-size: 24px;
-  font-style: 'Capriola';
-  margin: 30px 0;
-}
-
-.oppia-learner-group-view-assigned-syllabus .add-new-syllabus-buttons {
-  display: flex;
-  font-size: 18px;
-  font-weight: 700;
-  gap: 25px;
-  justify-content: right;
-}
-
-.oppia-learner-group-view-assigned-syllabus .oppia-cancel-button {
-  border: solid 1px #00645c;
-  border-radius: 4px;
-  color: #00645c;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 500;
-  padding: 6px 16px;
-}
-
-.oppia-learner-group-view-assigned-syllabus .oppia-cancel-button:hover {
-  background: #00645c;
-  color: #fff;
-}
-
-
-.oppia-learner-group-view-assigned-syllabus .oppia-save-button {
-  background: #00645c;
-  border: solid 1px #00645c;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 500;
-  padding: 6px 20px;
-}
-
 .oppia-learner-group-view-assigned-syllabus .progress-circle-container {
   align-items: center;
   display: flex;

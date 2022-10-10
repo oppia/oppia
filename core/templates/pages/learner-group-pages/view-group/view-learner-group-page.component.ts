@@ -32,8 +32,6 @@ import { LearnerGroupSyllabusBackendApiService } from
   'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { UserService } from 'services/user.service';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
 import { ExitLearnerGroupModalComponent } from
   '../templates/exit-learner-group-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -58,7 +56,6 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
   learnerGroup!: LearnerGroupData;
   username!: string;
   learnerProgress!: LearnerGroupUserProgress;
-  storiesChaptersProgress: ChapterProgressSummary[] = [];
   progressSharingPermission!: boolean;
 
   constructor(
@@ -70,7 +67,6 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
-    private storyViewerBackendApiService: StoryViewerBackendApiService,
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService
   ) {}
@@ -89,22 +85,16 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
           .then(progressSharingPermission => {
             this.progressSharingPermission = progressSharingPermission;
           });
-        let userInfoPromise = this.userService.getUserInfoAsync();
-        userInfoPromise.then(userInfo => {
+        this.userService.getUserInfoAsync().then(userInfo => {
           this.username = userInfo.getUsername();
-          this.learnerGroupSyllabusBackendApiService
-            .fetchLearnerSpecificProgressInAssignedSyllabus(
-              this.learnerGroupId
-            ).then(learnerProgress => {
-              this.learnerProgress = learnerProgress;
-              this.loaderService.hideLoadingScreen();
-            });
-          this.storyViewerBackendApiService.fetchProgressInStoriesChapters(
-            this.username, this.learnerGroup.storyIds
-          ).then(storiesChaptersProgress => {
-            this.storiesChaptersProgress = storiesChaptersProgress;
-          });
         });
+        this.learnerGroupSyllabusBackendApiService
+          .fetchLearnerSpecificProgressInAssignedSyllabus(
+            this.learnerGroupId
+          ).then(learnerProgress => {
+            this.learnerProgress = learnerProgress;
+            this.loaderService.hideLoadingScreen();
+          });
       });
     }
     this.subscribeToOnLangChange();
@@ -172,7 +162,7 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.learnerGroupTitle = this.learnerGroup.title;
 
     modalRef.result.then(() => {
-      this.loaderService.showLoadingScreen('Loading');
+      this.loaderService.showLoadingScreen('Exiting Group');
       this.learnerGroupBackendApiService.exitLearnerGroupAsync(
         this.learnerGroup.id, this.username
       ).then(() => {

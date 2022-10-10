@@ -226,7 +226,7 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     modalRef.componentInstance.learnerGroupTitle = this.learnerGroup.title;
 
     modalRef.result.then(() => {
-      this.loaderService.showLoadingScreen('Loading');
+      this.loaderService.showLoadingScreen('Deleting Group');
       this.learnerGroupBackendApiService.deleteLearnerGroupAsync(
         this.learnerGroup.id
       ).then(() => {

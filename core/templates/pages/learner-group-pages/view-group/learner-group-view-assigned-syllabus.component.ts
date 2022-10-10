@@ -153,8 +153,6 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   }
 
   getStoryLink(storySummary: StorySummary): string {
-    // This component is being used in the topic editor as well and
-    // we want to disable the linking in this case.
     if (!storySummary.getClassroomUrlFragment() ||
       !storySummary.getTopicUrlFragment()) {
       return '#';
@@ -183,7 +181,7 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   getSubtopicMasteryLevel(
       subtopicSummary: LearnerGroupSubtopicSummary
   ): string {
-    if (subtopicSummary.subtopicMastery === 1) {
+    if (subtopicSummary.subtopicMastery >= 1) {
       return 'I18N_SKILL_LEVEL_PROFICIENT';
     } else if (subtopicSummary.subtopicMastery >= 0.8) {
       return 'I18N_SKILL_LEVEL_INTERMEDIATE';

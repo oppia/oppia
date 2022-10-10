@@ -20,6 +20,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { LearnerGroupPreferencesModalComponent } from './learner-group-preferences-modal.component';
 
@@ -37,6 +38,11 @@ describe('Learner Group Preferences Modal Component', function() {
   let component: LearnerGroupPreferencesModalComponent;
   let ngbActiveModal: NgbActiveModal;
   let fixture: ComponentFixture<LearnerGroupPreferencesModalComponent>;
+
+  const learnerGroup = new LearnerGroupData(
+    'groupId', 'title', 'description', ['facilitator_username'],
+    ['username2'], ['username1'], ['subtopic_page_id'], []
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -56,6 +62,7 @@ describe('Learner Group Preferences Modal Component', function() {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     fixture = TestBed.createComponent(LearnerGroupPreferencesModalComponent);
     component = fixture.componentInstance;
+    component.learnerGroup = learnerGroup;
 
     fixture.detectChanges();
   });

@@ -48,7 +48,7 @@ describe('Learner groups tab Component', () => {
   );
   const sampleLearnerGroupSummary = new LearnerGroupData(
     'sampleId', 'sampleTitle', 'sampleDescription', ['username1'],
-    ['user1', `user2`], [], ['subtopic1', 'subtopic2'], ['story1', 'story2']
+    ['user1', 'user2'], [], ['subtopic1', 'subtopic2'], ['story1', 'story2']
   );
 
   beforeEach(async(() => {

@@ -28,7 +28,7 @@ import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 export class LearnerGroupPreferencesModalComponent
   extends ConfirmOrCancelModal {
   learnerGroup!: LearnerGroupData;
-  progressSharingPermission!: boolean;
+  progressSharingPermission: boolean = true;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

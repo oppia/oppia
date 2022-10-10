@@ -21,6 +21,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ViewLearnerGroupInvitationModalComponent } from
   './view-learner-group-invitation-modal.component';
@@ -39,6 +40,10 @@ describe('View Learner Group Invitation Modal Component', function() {
   let component: ViewLearnerGroupInvitationModalComponent;
   let fixture: ComponentFixture<ViewLearnerGroupInvitationModalComponent>;
   let ngbActiveModal: NgbActiveModal;
+
+  const shortLearnerGroup = new ShortLearnerGroupSummary(
+    'sampleId2', 'sampleTitle 2', 'sampleDescription 2', ['username1'], 7
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -59,7 +64,8 @@ describe('View Learner Group Invitation Modal Component', function() {
     fixture = TestBed.createComponent(
       ViewLearnerGroupInvitationModalComponent);
     component = fixture.componentInstance;
-
+    component.learnerGroup = shortLearnerGroup;
+  
     fixture.detectChanges();
   });
 

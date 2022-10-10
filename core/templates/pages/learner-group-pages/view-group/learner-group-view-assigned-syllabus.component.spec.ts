@@ -27,11 +27,11 @@ import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerGroupSubtopicSummary } from
   'domain/learner_group/learner-group-subtopic-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { LearnerGroupSyllabus } from
-  'domain/learner_group/learner-group-syllabus.model';
 import { LearnerGroupViewAssignedSyllabusComponent } from
   './learner-group-view-assigned-syllabus.component';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { LearnerGroupUserProgress } from
+  'domain/learner_group/learner-group-user-progress.model';
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
@@ -54,7 +54,9 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
     parent_topic_name: 'parentTopicName',
     thumbnail_filename: 'thumbnailFilename',
     thumbnail_bg_color: 'red',
-    subtopic_mastery: 0.5
+    subtopic_mastery: 0.5,
+    parent_topic_url_fragment: 'topic_1',
+    classroom_url_fragment: 'classroom_1'
   };
   const sampleLearnerGroupSubtopicSummary = (
     LearnerGroupSubtopicSummary.createFromBackendDict(
@@ -67,8 +69,13 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
     parent_topic_name: 'parentTopicName',
     thumbnail_filename: 'thumbnailFilename',
     thumbnail_bg_color: 'red',
-    subtopic_mastery: 0.6
+    subtopic_mastery: 0.6,
+    parent_topic_url_fragment: 'topic_1',
+    classroom_url_fragment: 'classroom_1'
   };
+  const sampleLearnerGroupSubtopicSummary2 = (
+    LearnerGroupSubtopicSummary.createFromBackendDict(
+      sampleSubtopicSummaryDict2));
 
   const sampleStorySummaryBackendDict = {
     id: 'story_id_0',
@@ -103,18 +110,19 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
     classroom_url_fragment: 'math',
     topic_url_fragment: 'topic'
   };
-
-  const mockSyllabusItemsBackendDict = {
-    learner_group_id: 'groupId',
-    story_summary_dicts: [
-      sampleStorySummaryBackendDict,
-      sampleStorySummaryBackendDict2],
-    subtopic_summary_dicts: [
-      sampleSubtopicSummaryDict,
-      sampleSubtopicSummaryDict2]
+  const learnerProgressDict = {
+    username: 'user1',
+    progress_sharing_is_turned_on: true,
+    profile_picture_data_url: 'picture',
+    stories_progress: [
+      sampleStorySummaryBackendDict, sampleStorySummaryBackendDict2
+    ],
+    subtopic_pages_progress: [
+      sampleSubtopicSummaryDict, sampleSubtopicSummaryDict2
+    ]
   };
-  const mockSyllabusItems = LearnerGroupSyllabus.createFromBackendDict(
-    mockSyllabusItemsBackendDict);
+  const mockLearnerProgress = LearnerGroupUserProgress.createFromBackendDict(
+    learnerProgressDict);
 
   const learnerGroupBackendDict = {
     id: 'groupId',
@@ -168,16 +176,18 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
 
   it('should initialize', fakeAsync(() => {
     spyOn(
-      learnerGroupSyllabusBackendApiService, 'fetchLearnerGroupSyllabus'
-    ).and.returnValue(Promise.resolve(mockSyllabusItems));
+      learnerGroupSyllabusBackendApiService,
+      'fetchLearnerSpecificProgressInAssignedSyllabus'
+    ).and.returnValue(Promise.resolve(mockLearnerProgress));
     expect(component.learnerGroup).toEqual(learnerGroup);
 
     component.ngOnInit();
     tick(100);
 
-    expect(component.storySummaries).toEqual(mockSyllabusItems.storySummaries);
+    expect(component.storySummaries).toEqual(
+      mockLearnerProgress.storiesProgress);
     expect(component.subtopicSummaries).toEqual(
-      mockSyllabusItems.subtopicPageSummaries);
+      mockLearnerProgress.subtopicsProgress);
     expect(component.displayOrderOfSyllabusItems).toEqual([
       'story-0', 'story-1', 'subtopic-0', 'subtopic-1']);
   }));
@@ -197,5 +207,90 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
 
     expect(component.getStoryThumbnailUrl(sampleStorySummary)).toEqual(
       '/story/thumbnail/url');
+  });
+
+  it('should get circular progress', () => {
+    let cssStyle = component.calculateCircularProgressCss(0);
+    expect(cssStyle).toEqual(
+      'linear-gradient(90deg, transparent 50%, #CCCCCC 50%)' +
+      ', linear-gradient(90deg, #CCCCCC 50%, transparent 50%)');
+
+    cssStyle = component.calculateCircularProgressCss(60);
+    expect(cssStyle).toEqual(
+      'linear-gradient(270deg, #00645C 50%, transparent 50%), ' +
+      'linear-gradient(-54deg, #00645C 50%, #CCCCCC 50%)'
+    );
+  });
+
+  it('should get story progress correctly', () => {
+    let progress = component.getProgressOfStory(sampleStorySummary);
+    expect(progress).toEqual(100);
+  });
+
+  it('should get story link correctly', () => {
+    expect(component.getStoryLink(sampleStorySummary)).toBe(
+      '/learn/math/topic/story/story-title');
+  });
+
+  it('should get # as story link url when classroom or topic url is not ' +
+    'present', () => {
+    const sampleStorySummaryBackendDict = {
+      id: '0',
+      title: 'Story Title',
+      description: 'Story Description',
+      node_titles: ['Chapter 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      story_is_published: true,
+      completed_node_titles: ['Chapter 1'],
+      url_fragment: 'story-title',
+      all_node_dicts: [],
+      topic_name: 'Topic',
+      classroom_url_fragment: undefined,
+      topic_url_fragment: 'topic'
+    };
+    const storySummary = StorySummary.createFromBackendDict(
+      sampleStorySummaryBackendDict);
+
+    expect(component.getStoryLink(storySummary)).toBe('#');
+  });
+
+  it('should get practice session link correctly', () => {
+    expect(component.getPracticeSessionLink(sampleLearnerGroupSubtopicSummary))
+      .toBe('/learn/classroom_1/topic_1/practice/session?' +
+      'selected_subtopic_ids=%5B1%5D');
+  });
+
+  it('should get subtopic mastery level correctly', () => {
+    const sampleSubtopicSummary3 = new LearnerGroupSubtopicSummary(
+      'topicId1', 'topic name', 3, 'sub title', 'filename', '#F8BF74', 0.85
+    );
+    const sampleSubtopicSummary4 = new LearnerGroupSubtopicSummary(
+      'topicId1', 'topic name', 4, 'sub title', 'filename4', '#F8BF74', 1
+    );
+    const sampleSubtopicSummary5 = new LearnerGroupSubtopicSummary(
+      'topicId1', 'topic name', 4, 'sub title', 'filename4', '#F8BF74'
+    );
+
+    let masteryLevel = component.getSubtopicMasteryLevel(
+      sampleLearnerGroupSubtopicSummary);
+    expect(masteryLevel).toBe('I18N_SKILL_LEVEL_NEEDS_WORK');
+
+    masteryLevel = component.getSubtopicMasteryLevel(
+      sampleLearnerGroupSubtopicSummary2);
+    expect(masteryLevel).toBe('I18N_SKILL_LEVEL_BEGINNER');
+
+    masteryLevel = component.getSubtopicMasteryLevel(
+      sampleSubtopicSummary3);
+    expect(masteryLevel).toBe('I18N_SKILL_LEVEL_INTERMEDIATE');
+
+    masteryLevel = component.getSubtopicMasteryLevel(
+      sampleSubtopicSummary4);
+    expect(masteryLevel).toBe('I18N_SKILL_LEVEL_PROFICIENT');
+
+    masteryLevel = component.getSubtopicMasteryLevel(
+      sampleSubtopicSummary5);
+    expect(masteryLevel).toBe(
+      'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET');
   });
 });
