@@ -61,7 +61,7 @@ export class BaseContentComponent {
     private cookieService: CookieService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     /**
@@ -191,7 +191,15 @@ export class BaseContentComponent {
 @Directive({
   selector: 'navbar-breadcrumb'
 })
-export class BaseContentNavBarBreadCrumbDirective {}
+export class BaseContentNavBarBreadCrumbDirective { }
+
+/**
+ * This directive is used as selector for nav options transclusion.
+ */
+@Directive({
+  selector: 'nav-options'
+})
+export class BaseContentNavOptionsDirective { }
 
 /**
  * This directive is used as selector for navbar pre logo action transclusion.
@@ -199,7 +207,7 @@ export class BaseContentNavBarBreadCrumbDirective {}
 @Directive({
   selector: 'navbar-pre-logo-action'
 })
-export class BaseContentNavBarPreLogoActionDirective {}
+export class BaseContentNavBarPreLogoActionDirective { }
 
 
 /**
@@ -208,7 +216,7 @@ export class BaseContentNavBarPreLogoActionDirective {}
 @Directive({
   selector: 'page-footer'
 })
-export class BaseContentPageFooterDirective {}
+export class BaseContentPageFooterDirective { }
 
 angular.module('oppia').directive('oppiaBaseContent',
   downgradeComponent({

@@ -909,6 +909,7 @@ ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_PAGE_URL = '/blog-admin'
+CLASSROOM_ADMIN_PAGE_URL = '/classroom-admin'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
@@ -1062,6 +1063,7 @@ SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
+TOPIC_ID_TO_TOPIC_NAME = '/topic_id_to_topic_name_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_NAME_HANDLER = '/topic_name_handler'
@@ -1087,6 +1089,7 @@ EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
+CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

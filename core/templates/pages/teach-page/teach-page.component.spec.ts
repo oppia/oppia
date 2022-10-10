@@ -31,6 +31,15 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { of } from 'rxjs';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    AndroidBetaLandingPage: {
+      isEnabled: false
+    }
+  };
+}
 
 class MockWindowRef {
   _window = {
@@ -43,6 +52,10 @@ class MockWindowRef {
         this._href = val;
       },
       replace: (val: string) => {}
+    },
+    sessionStorage: {
+      last_uploaded_audio_lang: 'en',
+      removeItem: (name: string) => {}
     },
     gtag: () => {}
   };
@@ -69,7 +82,8 @@ describe('Teach Page', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: MockWindowRef;
-  var resizeEvent = new Event('resize');
+  let resizeEvent = new Event('resize');
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   beforeEach(async() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
@@ -89,6 +103,10 @@ describe('Teach Page', () => {
             isWindowNarrow: () => true,
             getResizeEvent: () => of(resizeEvent)
           }
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         },
         SiteAnalyticsService,
         UrlInterpolationService,
@@ -256,5 +274,24 @@ describe('Teach Page', () => {
   it('should get testimonials correctly', () => {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
+  });
+
+  it('should direct users to the android page on click', function() {
+    expect(windowRef.nativeWindow.location.href).not.toEqual('/android');
+
+    component.onClickAccessAndroidButton();
+
+    expect(windowRef.nativeWindow.location.href).toEqual('/android');
+  });
+
+  it('should show android button if the feature is enabled', () => {
+    // The androidPageIsEnabled property is set when the component is
+    // constructed and the value is not modified after that so there is no
+    // pre-check for this test.
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
+
+    const component = TestBed.createComponent(TeachPageComponent);
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

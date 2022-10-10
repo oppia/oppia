@@ -12,8 +12,14 @@
       <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_ONE_CONTENT' | translate"></p>
       <div class="oppia-about-button-container">
         <button type="submit" (click)="onClickVisitClassroomButton()"
-                class="btn oppia-about-button oppia-about-button-browse"
-                [innerHTML]="'I18N_ACTION_VISIT_CLASSROOM' | translate" >
+                class="btn oppia-about-button oppia-about-button-browse">
+          {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
+        </button>
+      </div>
+      <div *ngIf="androidPageIsEnabled" class="oppia-about-button-container">
+        <button type="submit" (click)="onClickAccessAndroidButton()"
+                class="btn oppia-about-button oppia-about-button-browse">
+          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
         </button>
       </div>
     </div>
