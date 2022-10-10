@@ -82,7 +82,8 @@ import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answ
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
-
+import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
+import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
 @NgModule({
   imports: [
     BrowserModule,
@@ -147,7 +148,9 @@ import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-t
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
-    ExplorationEditorTabComponent
+    ExplorationEditorTabComponent,
+    ExplorationSaveAndPublishButtonsComponent,
+    ExplorationSavePromptModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -194,7 +197,9 @@ import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-t
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
-    ExplorationEditorTabComponent
+    ExplorationEditorTabComponent,
+    ExplorationSaveAndPublishButtonsComponent,
+    ExplorationSavePromptModalComponent
   ],
   providers: [
     {
