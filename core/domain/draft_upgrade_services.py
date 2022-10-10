@@ -148,10 +148,8 @@ class DraftUpgradeUtil:
             if lnk_attr is None or txt_attr is None:
                 return False
 
-            lnk = lnk_attr.replace('&quot;', '')
-            lnk = lnk.replace(' ', '')
-            txt = txt_attr.replace('&quot;', '')
-            txt = txt.replace(' ', '')
+            lnk = lnk_attr.replace('&quot;', '').replace(' ', '')
+            txt = txt_attr.replace('&quot;', '').replace(' ', '')
 
             # If the text or the link is empty.
             if len(lnk) == 0 or len(txt) == 0:
@@ -377,7 +375,8 @@ class DraftUpgradeUtil:
                 # 'CMD_EDIT_EXPLORATION_PROPERTY'.
                 new_value: AllowedDraftChangeListTypes = exp_change.new_value
                 if exp_change.property_name == (
-                    exp_domain.STATE_PROPERTY_CONTENT):
+                    exp_domain.STATE_PROPERTY_CONTENT
+                ):
                     # Ruling out the possibility of different types
                     # for mypy type checking.
                     assert isinstance(exp_change.new_value, dict)
@@ -386,7 +385,8 @@ class DraftUpgradeUtil:
                     html_content = new_value['html']
 
                     if not cls.are_links_are_valid(
-                        html_content):
+                        html_content
+                    ):
                         raise InvalidDraftConversionException(
                             'Conversion cannot be completed.'
                         )
@@ -407,7 +407,8 @@ class DraftUpgradeUtil:
                                 raise InvalidDraftConversionException
 
                             if not cls.are_links_are_valid(
-                                written_translation['translation']):
+                                written_translation['translation']
+                            ):
                                 raise InvalidDraftConversionException(
                                     'Conversion cannot be completed.'
                                 )

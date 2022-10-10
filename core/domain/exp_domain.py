@@ -1370,10 +1370,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 link.decompose()
                 continue
 
-            lnk = lnk_attr.replace('&quot;', '')
-            lnk = lnk.replace(' ', '')
-            txt = txt_attr.replace('&quot;', '')
-            txt = txt.replace(' ', '')
+            lnk = lnk_attr.replace('&quot;', '').replace(' ', '')
+            txt = txt_attr.replace('&quot;', '').replace(' ', '')
 
             # If the text or the link is empty.
             if len(lnk) == 0 or len(txt) == 0:
