@@ -29,7 +29,7 @@ jobs:
             JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.standard-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
             echo "::set-output name=job-strategy-matrix::$JOB_STRATEGY_MATRIX"
           fi          
-  frontend:
+  frontend-karma-tests:
     needs: generate-job-strategy-matrix
     runs-on:  ${{ matrix.os }}
     strategy:
@@ -75,7 +75,7 @@ jobs:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
   report-failure:
-    needs: frontend
+    needs: frontend-karma-tests
     runs-on: ubuntu-22.04
     if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
     steps:
