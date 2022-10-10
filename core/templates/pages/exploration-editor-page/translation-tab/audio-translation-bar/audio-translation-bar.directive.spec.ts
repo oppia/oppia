@@ -225,14 +225,17 @@ describe('Audio translation bar directive', function() {
     });
     spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
+    let mockVoiceoverRecorderEventEmitter = new EventEmitter();
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
-      $q.resolve([]));
+      mockVoiceoverRecorderEventEmitter);
     var waveSurferObjSpy = {
       load: () => {},
       on: () => {},
       pause: () => {},
       play: () => {},
+      destroy: () => {}
     };
+    $scope.waveSurfer = waveSurferObjSpy;
     // This throws "Argument of type '{ load: () => void; ... }'
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
@@ -243,6 +246,9 @@ describe('Audio translation bar directive', function() {
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
     $scope.checkAndStartRecording();
+    mockVoiceoverRecorderEventEmitter.emit();
+    $scope.$apply();
+    mockVoiceoverRecorderEventEmitter.emit();
     $scope.$apply();
 
     $scope.elapsedTime = 298;
@@ -350,8 +356,9 @@ describe('Audio translation bar directive', function() {
 
   it('should play and pause unsaved audio when wave surfer calls on method' +
     ' callback', fakeAsync(() => {
+    let mockVoiceoverRecorderEventEmitter = new EventEmitter();
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
-      $q.resolve([]));
+      mockVoiceoverRecorderEventEmitter);
     var waveSurferObjSpy = {
       load: () => {},
       on: (evt, callback) => {
@@ -359,8 +366,10 @@ describe('Audio translation bar directive', function() {
       },
       pause: () => {},
       play: () => {},
+      destroy: () => {}
     };
     spyOn(waveSurferObjSpy, 'play');
+    $scope.waveSurfer = waveSurferObjSpy;
     // This throws "Argument of type '{ load: () => void; ... }'
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
@@ -370,6 +379,12 @@ describe('Audio translation bar directive', function() {
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
     $scope.stopRecording();
+    mockVoiceoverRecorderEventEmitter.emit();
+    tick();
+    $scope.$apply();
+
+    $scope.stopRecording();
+    mockVoiceoverRecorderEventEmitter.emit();
     tick();
     $scope.$apply();
 
@@ -380,8 +395,10 @@ describe('Audio translation bar directive', function() {
 
   it('should play and pause unsaved audio when wave surfer on method does' +
     ' not call the callbacl', function() {
+    let mockVoiceoverRecorderEventEmitter = new EventEmitter();
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
-      $q.resolve([]));
+      mockVoiceoverRecorderEventEmitter);
+
     var waveSurferObjSpy = {
       load: () => {},
       on: () => {},
@@ -399,6 +416,7 @@ describe('Audio translation bar directive', function() {
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
     $scope.stopRecording();
+    mockVoiceoverRecorderEventEmitter.emit();
     $scope.$apply();
 
     $scope.playAndPauseUnsavedAudio();
@@ -411,6 +429,7 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should toggle start and stop recording on keyup event', function() {
+    let mockVoiceoverRecorderEventEmitter = new EventEmitter();
     $scope.canVoiceover = true;
     $scope.isAudioAvailable = false;
 
@@ -427,7 +446,7 @@ describe('Audio translation bar directive', function() {
       isRecording: true
     });
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
-      $q.resolve([]));
+      mockVoiceoverRecorderEventEmitter);
     var waveSurferObjSpy = {
       load: () => {},
       on: () => {},
@@ -444,6 +463,7 @@ describe('Audio translation bar directive', function() {
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
     document.body.dispatchEvent(keyEvent);
+    mockVoiceoverRecorderEventEmitter.emit();
 
     expect($scope.recordingComplete).toBe(true);
 
