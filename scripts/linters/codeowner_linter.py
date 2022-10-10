@@ -154,7 +154,7 @@ class CodeownerLintChecksManager:
         """Checks that the most important patterns are at the bottom
         of the CODEOWNERS file.
 
-        Arguments:
+        Args:
             important_patterns: list(str). List of the important
                 patterns for CODEOWNERS file.
         """

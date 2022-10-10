@@ -196,7 +196,7 @@ def git_diff_name_status(
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
         git_cmd.append('--diff-filter={}'.format(diff_filter))
-    git_cmd.extend([left.encode('utf-8'), right.encode('utf-8')])  # type: ignore[list-item]
+    git_cmd.extend([left, right])
     # Append -- to avoid conflicts between branch and directory name.
     # More here: https://stackoverflow.com/questions/26349191
     git_cmd.append('--')
@@ -253,7 +253,8 @@ def compare_to_remote(
         remote: str. Name of the git remote being pushed to.
         local_branch: str. Name of the git branch being pushed to.
         remote_branch: str|None. The name of the branch on the remote
-            to test against. If None same as local branch.
+            to test against. If None, the remote branch is considered
+            to be the same as the local branch.
 
     Returns:
         list(FileDiff). List of FileDiffs that are modified, changed,

@@ -180,10 +180,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             stderr=subprocess.PIPE)
         process_for_remote_url = subprocess.Popen(
             [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # Here we use MyPy ignore because here we are assigning a value to the
-        # 'communicate' method, and according to MyPy, assignment to a method
-        # is not allowed.
-        process_for_remote_url.communicate = mock_communicate  # type: ignore[assignment]
         def mock_popen(
             cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
@@ -192,9 +188,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
+        communicate_swap = self.swap(
+            process_for_remote_url, 'communicate', mock_communicate
+        )
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
-            pre_push_hook.get_remote_name()
+        with communicate_swap:
+            with popen_swap:
+                with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
+                    pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_no_remote_set(self) -> None:
         process_for_remote = subprocess.Popen(

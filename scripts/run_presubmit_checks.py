@@ -73,7 +73,8 @@ def main(args: Optional[List[str]] = None) -> None:
     # else matched_branch_num=0.
     matched_branch_num = subprocess.check_output(
         [
-        'git', 'ls-remote', '--heads', 'origin', current_branch, '|', 'wc', '-l'
+            'git', 'ls-remote', '--heads', 'origin', current_branch, '|',
+            'wc', '-l'
         ],
         text=True
     )
@@ -90,7 +91,8 @@ def main(args: Optional[List[str]] = None) -> None:
 
     all_changed_files = subprocess.check_output(
         [
-        'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch
+            'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
+            branch
         ],
         text=True
     )

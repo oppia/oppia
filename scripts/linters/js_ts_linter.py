@@ -26,7 +26,7 @@ import subprocess
 
 import esprima
 
-from typing import Any, Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 from typing_extensions import Final
 
 from .. import common
@@ -56,10 +56,8 @@ INJECTABLES_TO_IGNORE: Final = [
 ]
 
 
-# Here we use type Any because the argument 'kwargs' can accept an
-# arbitrary number of keyword arguments with different types of values.
 def _parse_js_or_ts_file(
-    filepath: str, file_content: str, **kwargs: Any
+    filepath: str, file_content: str, comment: bool = False
 ) -> Union[esprima.nodes.Module, esprima.nodes.Script]:
     """Runs the correct function to parse the given file's source code.
 
@@ -74,7 +72,8 @@ def _parse_js_or_ts_file(
     Args:
         filepath: str. Path of the source file.
         file_content: str. Code to compile.
-        **kwargs: dict(*: *). Passed along to esprima.
+        comment: bool. Whether to collect comments while parsing the js or ts
+            files.
 
     Returns:
         Union[Script, Module]. Parsed contents produced by esprima.
@@ -82,23 +81,23 @@ def _parse_js_or_ts_file(
     parse_function = (
         esprima.parseScript if filepath.endswith('.js') else
         esprima.parseModule)
-    return parse_function(file_content, **kwargs)
+    return parse_function(file_content, comment=comment)
 
 
 def _get_expression_from_node_if_one_exists(
-    parsed_node: esprima.nodes.Node, components_to_check: List[str]
+    parsed_node: esprima.nodes.Node, possible_component_names: List[str]
 ) -> esprima.nodes.Node:
     """This function first checks whether the parsed node represents
     the required angular component that needs to be derived by checking if
-    its in the 'components_to_check' list. If yes, then it  will return the
-    expression part of the node from which the component can be derived.
+    it's in the 'possible_component_names' list. If yes, then it will return
+    the expression part of the node from which the component can be derived.
     If no, it will return None. It is done by filtering out
     'AssignmentExpression' (as it represents an assignment) and 'Identifier'
     (as it represents a static expression).
 
     Args:
         parsed_node: Node. Parsed node of the body of a JS file.
-        components_to_check: list(str). List of angular components to check
+        possible_component_names: list(str). List of angular components to check
             in a JS file. These include directives, factories, controllers,
             etc.
 
@@ -129,7 +128,7 @@ def _get_expression_from_node_if_one_exists(
         return
     # Get the component in the JS file.
     component = expression.callee.property.name
-    if component not in components_to_check:
+    if component not in possible_component_names:
         return
     return expression
 

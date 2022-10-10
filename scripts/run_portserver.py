@@ -57,7 +57,7 @@ import socket
 import sys
 import threading
 
-from typing import Any, Callable, Deque, List, Optional, Sequence, Set
+from typing import Any, Callable, Deque, List, Optional, Sequence
 from typing_extensions import Final
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
@@ -383,14 +383,14 @@ def _parse_command_line(args: Optional[List[str]] = None) -> argparse.Namespace:
     return parser.parse_args(args=args)
 
 
-def _parse_port_ranges(pool_str: str) -> Set[int]:
+def _parse_port_ranges(pool_str: str) -> List[int]:
     """Given a 'N-P,X-Y' description of port ranges, return a set of ints.
 
     Args:
         pool_str: str. The N-P,X-Y description of port ranges.
 
     Returns:
-        set(int). The port numbers in the port ranges.
+        List[int]. The port numbers in the port ranges.
     """
     ports = set()
     for range_str in pool_str.split(','):
@@ -404,7 +404,7 @@ def _parse_port_ranges(pool_str: str) -> Set[int]:
             logging.info('Ignoring out of bounds port range %r.', range_str)
             continue
         ports.update(set(range(start, end + 1)))
-    return ports
+    return list(ports)
 
 
 class Server:
@@ -540,7 +540,7 @@ def main(args: Optional[List[str]] = None) -> None:
         )
         sys.exit(1)
 
-    request_handler = PortServerRequestHandler(list(ports_to_serve))
+    request_handler = PortServerRequestHandler(ports_to_serve)
 
     server = Server(
         request_handler.handle_port_request,
