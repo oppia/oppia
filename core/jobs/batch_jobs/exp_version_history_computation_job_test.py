@@ -240,9 +240,11 @@ class ComputeExplorationVersionHistoryJobTests(
         # Having invalid change list is not possible if the exploration is
         # updated using exp_services. Hence, we have to simulate the scenario
         # manually by changing the commit logs.
-        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
-            exp_models.ExplorationModel.get_snapshot_id(
-                self.EXP_ID_1, 3
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                exp_models.ExplorationModel.get_snapshot_id(
+                    self.EXP_ID_1, 3
+                )
             )
         )
         snapshot_metadata_model.commit_cmds = [
@@ -414,9 +416,11 @@ class ComputeExplorationVersionHistoryJobTests(
                 'state_name': 'A new state'
             })
         ], 'A commit messages.')
-        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
-            exp_models.ExplorationModel.get_snapshot_id(
-                self.EXP_ID_1, 2
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                exp_models.ExplorationModel.get_snapshot_id(
+                    self.EXP_ID_1, 2
+                )
             )
         )
         snapshot_metadata_model.commit_cmds.append({
@@ -452,9 +456,11 @@ class ComputeExplorationVersionHistoryJobTests(
         ], 'A commit messages.')
 
         # Corrupting the commit logs manually.
-        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
-            exp_models.ExplorationModel.get_snapshot_id(
-                self.EXP_ID_1, 2
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                exp_models.ExplorationModel.get_snapshot_id(
+                    self.EXP_ID_1, 2
+                )
             )
         )
         snapshot_metadata_model.commit_cmds.append({
@@ -697,9 +703,11 @@ class VerifyVersionHistoryModelsJobTests(
                 'state_name': 'A new state'
             })
         ], 'A commit messages.')
-        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
-            exp_models.ExplorationModel.get_snapshot_id(
-                self.EXP_ID_1, 2
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                exp_models.ExplorationModel.get_snapshot_id(
+                    self.EXP_ID_1, 2
+                )
             )
         )
         snapshot_metadata_model.commit_cmds.append({
