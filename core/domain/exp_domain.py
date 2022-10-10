@@ -3503,7 +3503,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         answer_group['outcome']['dest'] == state_name
                     ):
                         seen_rules_with_try_again_dest_node.append(rule_spec)
-                    elif (
+                    if (
                         rule_spec not in seen_rules_with_diff_dest_node and
                         answer_group['outcome']['dest'] != state_name
                     ):
@@ -3677,7 +3677,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                elif rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
+                if rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
                     try:
                         assert isinstance(rule_inputs['x'], float)
                         rule_value = float(rule_inputs['x'])
@@ -3691,7 +3691,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                elif rule_spec['rule_type'] == 'Equals':
+                if rule_spec['rule_type'] == 'Equals':
                     try:
                         assert isinstance(rule_inputs['x'], float)
                         rule_value = float(rule_inputs['x'])
@@ -3705,7 +3705,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                elif rule_spec['rule_type'] == 'IsLessThan':
+                if rule_spec['rule_type'] == 'IsLessThan':
                     try:
                         assert isinstance(rule_inputs['x'], float)
                         rule_value = float(rule_inputs['x'])
@@ -3719,7 +3719,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                elif rule_spec['rule_type'] == 'IsWithinTolerance':
+                if rule_spec['rule_type'] == 'IsWithinTolerance':
                     try:
                         rule_value_x = rule_inputs['x']
                         assert isinstance(rule_value_x, float)
@@ -3740,7 +3740,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                elif rule_spec['rule_type'] == 'IsGreaterThan':
+                if rule_spec['rule_type'] == 'IsGreaterThan':
                     try:
                         assert isinstance(rule_inputs['x'], float)
                         rule_value = float(rule_inputs['x'])
@@ -3754,7 +3754,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                elif rule_spec['rule_type'] == 'IsInclusivelyBetween':
+                if rule_spec['rule_type'] == 'IsInclusivelyBetween':
                     try:
                         value_a = rule_inputs['a']
                         assert isinstance(value_a, float)

@@ -6034,10 +6034,12 @@ states:
         <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
         <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\"></oppia-noninteractive-collapsible>
         <oppia-noninteractive-collapsible heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
         <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title1&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;Content2&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
         <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-image filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
         <oppia-noninteractive-tabs></oppia-noninteractive-tabs>
-        <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-collapsible&amp;gt;&amp;lt;/oppia-noninteractive-collapsible&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>'
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-collapsible&amp;gt;&amp;lt;/oppia-noninteractive-collapsible&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[]\"></oppia-noninteractive-tabs>'
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6170,14 +6172,14 @@ states:
         video_id-with-value=\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;"
         heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>
         <oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;You
-        have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>    <oppia-noninteractive-tabs
+        have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>     <oppia-noninteractive-tabs
         tab_contents-with-value="[{&amp;quot;title&amp;quot;: &amp;quot;Title1&amp;quot;,
         &amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},
         {&amp;quot;title&amp;quot;: &amp;quot;Title2&amp;quot;, &amp;quot;content&amp;quot;:
         &amp;quot;&amp;lt;p&amp;gt;Content2&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image
         alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
         caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
-        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>   '
+        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>    '
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
