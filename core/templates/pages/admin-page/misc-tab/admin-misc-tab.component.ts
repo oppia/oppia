@@ -62,7 +62,7 @@ export class AdminMiscTabComponent {
   constructor(
     private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
-    private adminTaskManagerService: AdminTaskManagerService,
+    private adminTaskManagerService: AdminTaskManagerService
   ) {}
 
   clearSearchIndex(): void {
