@@ -112,14 +112,15 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     [None] * exp_model_vlatest.version
                 )
                 for snapshot_metadata in snapshot_metadata_models:
-                    if snapshot_metadata is not None:
+                    if (
+                        snapshot_metadata is not None and
+                        int(snapshot_metadata.get_version_string()) >= 1 and
+                        int(snapshot_metadata.get_version_string()) <= (
+                            exp_model_vlatest.version)
+                    ):
                         version = int(snapshot_metadata.get_version_string())
-                        if (
-                            version >= 1 and
-                            version <= exp_model_vlatest.version
-                        ):
-                            all_snapshot_metadata_models[
-                                version - 1] = snapshot_metadata
+                        all_snapshot_metadata_models[
+                            version - 1] = snapshot_metadata
                 model_group_is_valid = (
                     all_snapshot_metadata_models.count(None) == 0
                 )
@@ -440,19 +441,19 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     except Exception as e:
                         logging.info('For exploration %s' % (exp_id))
                         for i in range(1, version + 1):
+                            sm_model = snapshot_metadata_models[i - 1]
+                            assert sm_model is not None
                             logging.info(
                                 'Commit commands at version %d: %s' % (
-                                    i, snapshot_metadata_models[i - 1].commit_cmds
+                                    i, sm_model.commit_cmds
                                 )
                             )
-                            change_list: List[
+                            changes: List[
                                 exp_domain.ExplorationChange
                             ] = []
-                            for change_dict in (
-                                snapshot_metadata_models[i - 1].commit_cmds
-                            ):
+                            for change_dict in sm_model.commit_cmds:
                                 try:
-                                    change_list.append(
+                                    changes.append(
                                         exp_domain.ExplorationChange(
                                             change_dict
                                         )
@@ -461,7 +462,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                     continue
                             exp_versions_diff = (
                                 exp_domain.ExplorationVersionsDiff(
-                                    change_list
+                                    changes
                                 )
                             )
                             logging.info(
@@ -480,11 +481,11 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                 )
                             )
                         for i in range(1, version):
+                            vh_model = version_history_models[i - 1]
+                            assert vh_model is not None
                             logging.info(
                                 'State version history at version %d: %s' % (
-                                    i, version_history_models[
-                                        i - 1
-                                    ].state_version_history
+                                    i, vh_model.state_version_history
                                 )
                             )
                         return (exp_id, [], e, version)
@@ -788,14 +789,15 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     [None] * exp_model_vlatest.version
                 )
                 for snapshot_metadata in snapshot_metadata_models:
-                    if snapshot_metadata is not None:
+                    if (
+                        snapshot_metadata is not None and
+                        int(snapshot_metadata.get_version_string()) >= 1 and
+                        int(snapshot_metadata.get_version_string()) <= (
+                            exp_model_vlatest.version)
+                    ):
                         version = int(snapshot_metadata.get_version_string())
-                        if (
-                            version >= 1 and
-                            version <= exp_model_vlatest.version
-                        ):
-                            all_snapshot_metadata_models[
-                                version - 1] = snapshot_metadata
+                        all_snapshot_metadata_models[
+                            version - 1] = snapshot_metadata
                 model_group_is_valid = (
                     all_snapshot_metadata_models.count(None) == 0
                 )
@@ -831,7 +833,8 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                         response_dict = {
                             'exp_vlatest': exp_model_vlatest,
                             'all_explorations': explorations_without_none,
-                            'snapshot_metadata_models': all_snapshot_metadata_models,
+                            'snapshot_metadata_models': (
+                                all_snapshot_metadata_models),
                             'version_history_models': all_version_history_models
                         }
         return response_dict
