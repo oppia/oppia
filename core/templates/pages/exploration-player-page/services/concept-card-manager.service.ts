@@ -38,6 +38,7 @@
    private _timeoutElapsedEventEmitter = new EventEmitter();
    onTimeoutElapsed$ = this._timeoutElapsedEventEmitter.asObservable();
  
+   conceptCardForStateExists: boolean = false;
    conceptCardReleased: boolean = false;
    conceptCardConsumed: boolean = false;
    wrongAnswersSinceConceptCardConsumed: number = 0;
@@ -128,9 +129,9 @@
        this.tooltipTimeout = null;
      }
  
-     if (this.hintsForLatestCard.length > 0) {
+     if (this.conceptCardForStateExists) {
        this.enqueueTimeout(
-         this.releaseHint,
+         this.releaseConceptCard,
          ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
      }
    }
