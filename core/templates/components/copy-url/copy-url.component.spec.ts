@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ComponentOverviewComponent } from './copy-exploration-url.component';
+import { ComponentOverviewComponent } from './copy-url.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
@@ -65,9 +65,9 @@ describe('Copy Exploration URL component', function() {
   it('should correctly copy progress URL', () => {
     spyOn(clipboard, 'copy').and.callThrough();
     let explorationURL = 'https://oppia.org/progress/abcdef';
-    component.copy_url = explorationURL;
+    component.urlToCopy = explorationURL;
 
-    component.copyURL_button();
+    component.copyUrlButton();
 
     expect(clipboard.copy).toHaveBeenCalledWith(
       explorationURL);

@@ -10,8 +10,8 @@
     </p>
     <div class="oppia-share-publish-link">
       <p>Here's your exploration link:</p>
-      <copy-exploration-url [copy_url]="explorationLink"></copy-exploration-url>
     </div>
+    <copy-url [urlToCopy]="explorationLink"></copy-url>
     <sharing-links layoutType="row post-publish-modal-sharing-links"
                    layoutAlignType="center center"
                    shareType="exploration"
@@ -83,7 +83,7 @@
     left: 481px;
     position: absolute;
     top: 124px;
-  }
+   }
 
   .oppia-share-publish-body .oppia-share-publish-link i {
     color: #3f9187;

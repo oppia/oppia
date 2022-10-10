@@ -237,7 +237,7 @@
 /core/templates/services/staleness-detection.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/validators.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/yaml.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/components/copy-exploration-url/ @oppia/lace-frontend-reviewers
+/core/templates/components/copy-url/ @oppia/lace-frontend-reviewers
 
 
 # Forms pages.

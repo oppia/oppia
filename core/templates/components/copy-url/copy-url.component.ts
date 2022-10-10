@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,20 +21,20 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
-  selector: 'copy-exploration-url',
-  templateUrl: './copy-exploration-url.component.html'
+  selector: 'copy-url',
+  templateUrl: './copy-url.component.html'
 })
 
 export class ComponentOverviewComponent {
-  @Input() copy_url !: string;
+  @Input() urlToCopy !: string;
   showTooltip: boolean = false;
 
   constructor(
     private clipboard: Clipboard,
     private i18nLanguageCodeService: I18nLanguageCodeService) {}
 
-  copyURL_button(): void {
-    this.clipboard.copy(this.copy_url);
+    copyUrlButton(): void {
+    this.clipboard.copy(this.urlToCopy);
     this.showTooltip = true;
     setTimeout(() => {
       this.showTooltip = false;

@@ -174,7 +174,7 @@ import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-moda
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
-import { ComponentOverviewComponent } from './copy-exploration-url/copy-exploration-url.component';
+import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 
 @NgModule({
   imports: [

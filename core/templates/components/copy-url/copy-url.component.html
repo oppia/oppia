@@ -1,9 +1,9 @@
 <div class="uid-copy">
-  <span class="unique-progress-id">{{ copy_url }}</span>
+  <span class="unique-progress-id">{{ urlToCopy }}</span>
   <span class="uid-btn-container" [ngClass]="{ 'copy-tooltip-margin' : showTooltip }">
     <span class="uid-btn-message-box" *ngIf="showTooltip">{{ 'I18N_SAVE_PROGRESS_COPY_TOOLTIP' | translate }}</span>
     <div class="uid-btn-message-arrow" *ngIf="showTooltip"></div>
-    <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyURL_button()">{{ 'I18N_SAVE_PROGRESS_BUTTON_TEXT' | translate }}</button>
+    <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyUrlButton()">{{ 'I18N_SAVE_PROGRESS_BUTTON_TEXT' | translate }}</button>
   </span>
 </div>
 
@@ -13,6 +13,7 @@
     align-items: flex-end;
     display: flex;
     flex-direction: row;
+    justify-content: center;
     margin-bottom: 30px;
     width: 100%;
   }
@@ -24,7 +25,6 @@
     display: flex;
     flex-direction: row;
     height: 100%;
-    margin-left: -20px;
     padding: 5px;
     word-break: break-word;
   }
