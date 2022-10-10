@@ -94,6 +94,7 @@
 	"I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX": "можна додати ще теги.",
 	"I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING": "Мініатюра",
 	"I18N_BLOG_POST_EDITOR_TITLE_HEADING": "Заголовок",
+	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS": "Дозволені розширення зображень: 'jpeg', 'jpg', 'png', 'svg'",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Виберіть файл або перетягніть його сюди",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Помилка: Не вдалося прочитати файл зображення.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Додати мініатюру",
