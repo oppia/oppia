@@ -1308,22 +1308,3 @@ class LearnerAnswerInfoHandler(EditorHandler):
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
         self.render_json({})
-
-class GenerateVersionHistoryModelsHandler(EditorHandler):
-    """Downloads an exploration as a zip file, or dict of YAML strings
-    representing states.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': SCHEMA_FOR_EXPLORATION_ID
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_access_admin_page
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        response_dict = exp_services.generate_version_history_models(exploration_id)
-        self.render_json(response_dict)

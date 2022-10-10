@@ -240,19 +240,19 @@ class ComputeExplorationVersionHistoryJobTests(
         # Having invalid change list is not possible if the exploration is
         # updated using exp_services. Hence, we have to simulate the scenario
         # manually by changing the commit logs.
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_models.ExplorationModel.get_snapshot_id(
                 self.EXP_ID_1, 3
             )
         )
-        commit_log_model.commit_cmds = [
+        snapshot_metadata_model.commit_cmds = [
             exp_domain.ExplorationChange({
                 'cmd': feconf.CMD_REVERT_COMMIT,
                 'version_number': 4
             }).to_dict()
         ]
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
+        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
@@ -414,19 +414,19 @@ class ComputeExplorationVersionHistoryJobTests(
                 'state_name': 'A new state'
             })
         ], 'A commit messages.')
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_models.ExplorationModel.get_snapshot_id(
                 self.EXP_ID_1, 2
             )
         )
-        commit_log_model.commit_cmds.append({
+        snapshot_metadata_model.commit_cmds.append({
             'cmd': 'edit_state_property',
             'state_name': 'A new state',
             'property_name': 'fallbacks',
             'new_value': 'foo',
         })
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
+        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
@@ -452,17 +452,17 @@ class ComputeExplorationVersionHistoryJobTests(
         ], 'A commit messages.')
 
         # Corrupting the commit logs manually.
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_models.ExplorationModel.get_snapshot_id(
                 self.EXP_ID_1, 2
             )
         )
-        commit_log_model.commit_cmds.append({
+        snapshot_metadata_model.commit_cmds.append({
             'cmd': 'delete_state',
             'state_name': 'Some other state',
         })
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
+        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
@@ -490,39 +490,6 @@ class ComputeExplorationVersionHistoryJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1')
-        ])
-
-    # The following tests are to fully cover all branches but most of them
-    # don't have any logical significance.
-    def test_misc_1(self) -> None:
-        assert self.user_1_id is not None
-        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel(
-            id=('rights-%s-%s' % (self.EXP_ID_1, 1)),
-            user_id=self.user_1_id,
-            exploration_id=self.EXP_ID_1,
-            commit_type='',
-            commit_message='',
-            commit_cmds=[],
-            version=None,
-            post_commit_status='private',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        )
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout(
-                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult(
-                'CREATED OR MODIFIED VERSION HISTORY MODELS SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult(
-                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 1'
-            )
         ])
 
 
@@ -730,19 +697,19 @@ class VerifyVersionHistoryModelsJobTests(
                 'state_name': 'A new state'
             })
         ], 'A commit messages.')
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_models.ExplorationModel.get_snapshot_id(
                 self.EXP_ID_1, 2
             )
         )
-        commit_log_model.commit_cmds.append({
+        snapshot_metadata_model.commit_cmds.append({
             'cmd': 'edit_state_property',
             'state_name': 'A new state',
             'property_name': 'fallbacks',
             'new_value': 'foo',
         })
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
+        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
