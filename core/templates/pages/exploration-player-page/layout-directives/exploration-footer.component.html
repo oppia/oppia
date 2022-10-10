@@ -38,7 +38,6 @@
         <div *ngIf="!windowIsNarrow && conceptCardForStateExists">
           <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
               *ngIf="isConceptCardButtonVisible()"
-              [ngClass]="{'viewed': isConceptCardConsumed()}"
               (click)="showConceptCard()">
             <i class="fas fa-lightbulb"></i>
           </button>

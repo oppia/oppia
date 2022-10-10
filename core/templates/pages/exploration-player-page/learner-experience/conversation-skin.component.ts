@@ -78,6 +78,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 import './conversation-skin.component.css';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -183,6 +184,7 @@ export class ConversationSkinComponent {
     private focusManagerService: FocusManagerService,
     private guestCollectionProgressService: GuestCollectionProgressService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
+    private conceptCardManagerService: ConceptCardManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private imagePreloaderService: ImagePreloaderService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
@@ -1159,6 +1161,7 @@ export class ConversationSkinComponent {
           if (remainOnCurrentCard) {
             // Stay on the same card.
             this.hintsAndSolutionManagerService.recordWrongAnswer();
+            this.conceptCardManagerService.recordWrongAnswer();
             this.playerTranscriptService.addNewResponse(feedbackHtml);
             let helpCardAvailable = false;
             if (feedbackHtml &&

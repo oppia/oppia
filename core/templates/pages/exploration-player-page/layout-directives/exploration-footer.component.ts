@@ -44,6 +44,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 import './exploration-footer.component.css';
+import { QuestionPlayerConceptCardModalComponent } from 'components/question-directives/question-player/question-player-concept-card-modal.component';
+import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 
 
 @Component({
@@ -188,6 +190,10 @@ export class ExplorationFooterComponent {
     );
   }
 
+  isConceptCardButtonVisible(): boolean {
+    return true; 
+  }
+
   showProgressReminderModal(): void {
     const mostRecentlyReachedCheckpointIndex = (
       this.getMostRecentlyReachedCheckpointIndex()
@@ -301,6 +307,27 @@ export class ExplorationFooterComponent {
     });
   }
 
+  openConceptCardModal(): void {
+    // The catch at the end was needed according to this thread:
+    // https://github.com/angular-ui/bootstrap/issues/6501, where in
+    // AngularJS 1.6.3, $uibModalInstance.cancel() throws console error.
+    // The catch prevents that when clicking outside as well as for
+    // cancel.
+    const modalRef = this.ngbModal.open(
+      OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+      {backdrop: true}
+    );
+    modalRef.componentInstance.skillId = this.linkedSkillId;
+    modalRef.result.then(() => {}, (res) => {
+      this.contextService.removeCustomEntityContext();
+      const allowedDismissActions = (
+        ['cancel', 'escape key press', 'backdrop click']);
+      if (!allowedDismissActions.includes(res)) {
+        throw new Error(res);
+      }
+    });
+  }
+
   showInformationCard(): void {
     let stringifiedExpIds = JSON.stringify(
       [this.explorationId]);
@@ -329,27 +356,15 @@ export class ExplorationFooterComponent {
   }
 
   showConceptCard(): void {
-    if (this.linkedSkillId) {
-      this.openInformationCardModal();
+    let state = this.explorationEngineService.getState();
+    this.linkedSkillId = state.linkedSkillId;
+    console.log(this.linkedSkillId);
+      this.openConceptCardModal();
 
       // Update user has viewed lesson info modal once if
       // lesson info modal button is clicked.
-      if (!this.learnerHasViewedLessonInfoTooltip) {
-        this.learnerHasViewedLessonInfo();
-      }
-    } else {
-      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
-        stringifiedExpIds,
-        includePrivateExplorations
-      ).then((response) => {
-        this.expInfo = response.summaries[0];
-        this.openInformationCardModal();
-      }, () => {
-        this.loggerService.error(
-          'Concept card failed to load for exploration ' +
-          this.explorationId);
-      });
-    }
+
+    
   }
 
   getStaticImageUrl(imagePath: string): string {
