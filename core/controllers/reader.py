@@ -770,8 +770,7 @@ class StateCompleteEventHandler(base.BaseHandler):
                         # Version must be greater than zero.
                         'min_value': 1
                     }]
-                },
-                'default_value': None
+                }
             }
         }
     }
