@@ -1,0 +1,20 @@
+<div class="questions">
+  <oppia-questions-list [allSkillSummaries]="[]"
+                        [skillDescriptionsAreShown]="false"
+                        [selectSkillModalIsShown]="false"
+                        [canEditQuestion]="true"
+                        [skillIdToRubricsObject]="skillIdToRubricsObject"
+                        [selectedSkillId]="skill?.getId()"
+                        [groupedSkillSummaries]="groupedSkillSummaries">
+  </oppia-questions-list>
+</div>
+
+<style>
+  .oppia-page-card {
+    margin: 0;
+  }
+
+  .questions {
+    padding-bottom: 10px;
+  }
+</style>

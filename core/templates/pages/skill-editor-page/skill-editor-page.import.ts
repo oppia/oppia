@@ -38,5 +38,5 @@ require('pages/skill-editor-page/skill-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
+require('pages/skill-editor-page/navbar/skill-editor-navbar.component.ts');
 require('pages/skill-editor-page/skill-editor-page.component.ts');
