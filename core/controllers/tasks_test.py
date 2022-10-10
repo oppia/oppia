@@ -141,7 +141,6 @@ class TasksTests(test_utils.EmailTestBase):
             # Check that there are three messages.
             self.assertEqual(len(messages), 3)
 
-
     def test_email_is_sent_when_contributor_achieves_a_new_rank(self):
         """Tests ContributorDashboardAchievementEmailHandler functionality."""
 
