@@ -158,7 +158,7 @@ class DraftUpgradeUtil:
                 return False
 
             # If link is invalid.
-            if utils.get_url_scheme(lnk) not in constants.acceptable_schemes:
+            if utils.get_url_scheme(lnk) not in constants.ACCEPTABLE_SCHEMES:
                 return False
 
         return True

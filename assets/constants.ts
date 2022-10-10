@@ -23,7 +23,7 @@ export default {
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
 
   // Acceptable URL schemes for links.
-  "acceptable_schemes": ["https", ""],
+  "ACCEPTABLE_SCHEMES": ["https", ""],
 
   // The default classroom URL fragment to use when the provided classroom URL
   // fragment in the controller is invalid.

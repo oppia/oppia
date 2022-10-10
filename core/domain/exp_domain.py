@@ -1386,7 +1386,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 lnk = lnk.replace('http', 'https')
 
             # If link is invalid.
-            if utils.get_url_scheme(lnk) not in constants.acceptable_schemes:
+            if utils.get_url_scheme(lnk) not in constants.ACCEPTABLE_SCHEMES:
                 link.decompose()
                 continue
 
