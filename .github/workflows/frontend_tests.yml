@@ -75,7 +75,7 @@ jobs:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
   report-failure:
-    needs: frontend
+    needs: frontend-karma-tests
     runs-on: ubuntu-22.04
     if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
     steps:
