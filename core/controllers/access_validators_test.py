@@ -287,7 +287,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.login(self.VIEWER_EMAIL)
         self.get_json(
             '%s/can_access_blog_author_profile_page/%s' % (
-            ACCESS_VALIDATION_HANDLER_PREFIX, self.VIEWER_EMAIL
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.VIEWER_USERNAME
             ), expected_status_int=404
         )
         self.logout()

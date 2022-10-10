@@ -540,7 +540,6 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         self.assertEqual(
             blog_models.BlogAuthorDetailsModel.get_export_policy(), {
-                'id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'author_name': base_models.EXPORT_POLICY.EXPORTED,
                 'author_bio': base_models.EXPORT_POLICY.EXPORTED,
@@ -591,7 +590,6 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
             self.USER_2_ID, self.USER_2_NAME, self.GENERIC_USER_BIO)
         model_instance = blog_models.BlogAuthorDetailsModel.get_by_author(
             self.USER_2_ID)
-        self.assertIsNone(model_instance)
         # Ruling out the possibility of None for mypy type checking.
         assert model_instance is not None
         self.assertEqual(model_instance.author_id, self.USER_2_ID)
