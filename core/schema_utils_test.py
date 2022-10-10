@@ -292,11 +292,6 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
 
     # Check that the id corresponds to a valid normalizer function.
     validator_fn = schema_utils.get_validator(validator['id'])
-    print("****************************")
-    print(customization_keys)
-    print(set(inspect.getfullargspec(validator_fn).args))
-    print(validator_fn)
-    print(validator)
     assert set(inspect.getfullargspec(validator_fn).args) == set(
         customization_keys + ['obj']), (
             'Missing keys: %s, Extra keys: %s' % (

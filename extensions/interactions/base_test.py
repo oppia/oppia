@@ -136,10 +136,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """Check whether a string is alphanumeric."""
         return bool(re.compile('^[a-zA-Z0-9_]+$').match(input_string))
 
+    # Here we use type Any because the schema has type Any included and this
+    # is just a helper function which requires `schema` as an arguments.
     def _set_expect_invalid_default_value(
         self, schema: Dict[str, Any], value: bool = False
     ) -> None:
-        """"""
+        """Helper function to set expect_invalid_default_value to avoid
+        schema validations for the default value.
+
+        Args:
+            schema: Dict[str, Any]. The schema that needs to be validated.
+            value: bool. The boolean value that needs to be set.
+        """
         if 'validators' in schema:
             for validator in schema['validators']:
                 validator['expect_invalid_default_value'] = value
