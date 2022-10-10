@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const { check } = require("yargs");
 
 //adding headless flag to false and maximizing browser height-width
 puppeteer
@@ -50,6 +51,17 @@ puppeteer
     await page.waitForSelector(selector);
     await page.click(selector);
 
-    console.log("Successfully tested uploading audio!");
+    selector = 'button.e2e-test-play-pause-audio-button';
+    await page.waitForSelector(selector)
+    await page.waitForTimeout(500);
+    await page.click(selector);
+    
+    // checking that uploaded audio also plays!
+    selector = 'i.fa-pause';
+    await page.waitForSelector(selector);
+    await page.waitForTimeout(1000);
+    await page.click(selector);
+
+    console.log("Successfully played uploaded audio!");
     await browser.close();
   });
