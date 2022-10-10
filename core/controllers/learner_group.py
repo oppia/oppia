@@ -1117,7 +1117,7 @@ class LearnerGroupsFeatureStatusHandler(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.can_access_learner_groups
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.render_json({
