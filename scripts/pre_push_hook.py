@@ -352,7 +352,6 @@ def start_linter(files: List[bytes]) -> int:
     cmd_list: List[Union[str, bytes]] = [
         PYTHON_CMD, '-m', LINTER_MODULE, LINTER_FILE_FLAG
     ]
-    print(files, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     cmd_list.extend(files)
     task = subprocess.Popen(cmd_list)
     task.communicate()
