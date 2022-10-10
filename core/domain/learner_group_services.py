@@ -763,14 +763,14 @@ def remove_subtopic_page_reference_from_learner_groups(
 def update_progress_sharing_permission(
     user_id: str,
     group_id: str,
-    new_progress_sharing_permission: str
+    new_progress_sharing_permission: bool
 ) -> None:
     """Updates the progress sharing permission of the learner group.
 
     Args:
         user_id: str. The id of the user.
         group_id: str. The id of the learner group.
-        new_progress_sharing_permission: str. The new progress sharing
+        new_progress_sharing_permission: bool. The new progress sharing
             permission of the learner group.
     """
     learner_grps_user_model = user_models.LearnerGroupsUserModel.get(

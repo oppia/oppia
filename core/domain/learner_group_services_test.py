@@ -167,6 +167,21 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             learner_group_services.is_user_facilitator(
                 self.LEARNER_ID, self.LEARNER_GROUP_ID))
 
+    def test_is_user_learner(self) -> None:
+        self.assertFalse(
+            learner_group_services.is_user_learner(
+                self.FACILITATOR_ID, self.LEARNER_GROUP_ID))
+        self.assertFalse(
+            learner_group_services.is_user_learner(
+                self.LEARNER_ID, self.LEARNER_GROUP_ID))
+
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID, True)
+
+        self.assertTrue(
+            learner_group_services.is_user_learner(
+                self.LEARNER_ID, self.LEARNER_GROUP_ID))
+
     def test_get_matching_syllabus_to_add_with_default_filters(self) -> None:
         # Test 1: Default filters with topic name matching.
         matching_syllabus = (
@@ -493,3 +508,22 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert learner_group is not None
         self.assertEqual(learner_group.story_ids, ['story_id2'])
+
+    def test_update_progress_sharing_permission(self) -> None:
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID, True)
+
+        self.assertEqual(
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [self.LEARNER_ID], self.LEARNER_GROUP_ID
+            ), [True]
+        )
+
+        learner_group_services.update_progress_sharing_permission(
+            self.LEARNER_ID, self.LEARNER_GROUP_ID, False)
+
+        self.assertEqual(
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [self.LEARNER_ID], self.LEARNER_GROUP_ID
+            ), [False]
+        )
