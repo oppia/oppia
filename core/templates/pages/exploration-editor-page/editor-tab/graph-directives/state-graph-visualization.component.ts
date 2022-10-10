@@ -458,8 +458,8 @@ export class StateGraphVisualization
     }
 
     if (this.centerAtCurrentState) {
-      // SetTimeout is required to ensure code runs once all the current call stack has finished execution
-      // call stack is finished executing.
+      // SetTimeout is required to ensure code runs
+      // once all the current call stack has finished execution.
       setTimeout(() => {
         this.centerGraph();
       });
@@ -486,8 +486,8 @@ export class StateGraphVisualization
 
     this.directiveSubscriptions.add(
       this.routerService.onCenterGraph.subscribe(() => {
-        // This Code will run once all the current
-        // call stack is finished executing.
+        // SetTimeout is required to ensure code runs
+        // once all the current call stack has finished execution.
         setTimeout(() => {
           this.centerGraph();
           this.redrawGraph();
