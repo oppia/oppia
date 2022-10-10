@@ -25,7 +25,7 @@ import { UrlInterpolationService } from
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { TopicRightsBackendDict } from './topic-rights.model';
 
-interface TopicRightsBackendResponse {
+export interface TopicRightsBackendResponse {
   'topic_id': string;
   'topic_is_published': boolean;
   'manager_ids': string[];
