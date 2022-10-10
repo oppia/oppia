@@ -1,4 +1,4 @@
-name: Feature request form for non-technical users
+name: Simplified Feature request form
 description: Suggest an idea for this project
 title: "[Feature Request]: "
 labels: ["triage needed", "enhancement"]

@@ -1,4 +1,4 @@
-name: Bug report form for non-technical users
+name: Simplified Bug report form
 description: Create a report to help us improve
 title: "[BUG]: "
 labels: [triage needed, bug]
