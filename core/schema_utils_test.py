@@ -735,7 +735,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             with self.assertRaisesRegex((AssertionError, KeyError), error_msg):
+                print("before schema - ", schema)
                 validate_schema(schemas) # type: ignore[arg-type]
+                print("after schema - ", schema)
 
     def test_normalize_against_schema_raises_exception(self) -> None:
         """Tests if normalize against schema raises exception

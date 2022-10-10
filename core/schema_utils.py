@@ -290,19 +290,18 @@ def normalize_against_schema(
         if SCHEMA_KEY_VALIDATORS in schema:
             for validator in schema[SCHEMA_KEY_VALIDATORS]:
                 kwargs = dict(validator)
+                expect_invalid_default_value = False
                 if 'expect_invalid_default_value' in kwargs:
                     expect_invalid_default_value = kwargs[
                         'expect_invalid_default_value']
                     del kwargs['expect_invalid_default_value']
-                else:
-                    expect_invalid_default_value = False
                 del kwargs['id']
                 validator_func = get_validator(validator['id'])
                 if (
                     validator_func(normalized_obj, **kwargs) is False and
                     expect_invalid_default_value is False
                 ):
-                    raise utils.ValidationError(
+                    raise AssertionError(
                         'Validation failed: %s (%s) for object %s' % (
                             validator['id'], kwargs, normalized_obj)
                     )

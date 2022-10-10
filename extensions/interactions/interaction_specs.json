@@ -648,8 +648,7 @@
             "type": "custom",
             "obj_type": "SubtitledHtml",
             "validators": [{
-              "id": "has_subtitled_html_non_empty",
-              "expect_invalid_default_value": false
+              "id": "has_subtitled_html_non_empty"
             }],
             "replacement_ui_config": {
               "html": {
