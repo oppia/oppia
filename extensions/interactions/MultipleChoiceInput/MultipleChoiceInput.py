@@ -55,15 +55,14 @@ class MultipleChoiceInput(base.BaseInteraction):
                     'min_value': 1,
                 },
                 {
-                    'id': 'has_subtitled_html_content_uniquified'
+                    'id': 'has_unique_subtitled_contents'
                 }
             ],
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
                 'validators': [{
-                    'id': 'has_subtitled_html_non_empty',
-                    'is_default': False
+                    'id': 'has_subtitled_html_non_empty'
                 }],
                 'replacement_ui_config': {
                     'html': {

@@ -157,7 +157,7 @@
             "obj_type": "SubtitledHtml",
             "validators": [{
               "id": "has_subtitled_html_non_empty",
-              "is_default": false
+              "expect_invalid_default_value": false
             }],
             "replacement_ui_config": {
               "html": {
@@ -256,7 +256,7 @@
             "obj_type": "SubtitledHtml",
             "validators": [{
               "id": "has_subtitled_html_non_empty",
-              "is_default": false
+              "expect_invalid_default_value": false
             }],
             "replacement_ui_config": {
               "html": {
@@ -649,7 +649,7 @@
             "obj_type": "SubtitledHtml",
             "validators": [{
               "id": "has_subtitled_html_non_empty",
-              "is_default": false
+              "expect_invalid_default_value": false
             }],
             "replacement_ui_config": {
               "html": {

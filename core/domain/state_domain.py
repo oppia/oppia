@@ -1667,13 +1667,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                 f'rule above.'
                             )
 
-        choices = self.customization_args['choices'].value
-        if len(choices) < 2:
-            raise utils.ValidationError(
-                'Atleast 2 choices should be there '
-                'in DragAndDropSortInput interaction.'
-            )
-
     def _validate_text_input(self) -> None:
         """Validates the TextInput interaction.
 

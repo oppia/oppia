@@ -1218,20 +1218,24 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'never be matched because it is made redundant by the above rules')
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' having '
             'rule type \'IsWithinTolerance\' have \'tol\' value less than or '
             'equal to zero in NumericInput interaction.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' having '
             'rule type \'IsInclusivelyBetween\' have `a` value greater than `b`'
             ' value in NumericInput interaction.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'NumericInput interaction is already present.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule \'2\' from answer group \'0\' will '
             'never be matched because it is made redundant by the above rules')
@@ -1401,36 +1405,43 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state.interaction.customization_args[
             'requireSimplestForm'].value = True
         rule_specs = state.interaction.answer_groups[0].rule_specs
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'FractionInput interaction is already present.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
             'not have value in simple form '
             'in FractionInput interaction.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
             'not have value in proper fraction '
             'in FractionInput interaction.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
             'not have value in proper fraction '
             'in FractionInput interaction.')
         rule_specs.remove(rule_specs[1])
+
         state.interaction.customization_args[
             'allowImproperFraction'].value = True
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' has '
             'non zero integer part in FractionInput interaction.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule \'2\' from answer group \'0\' of '
             'FractionInput interaction will never be matched because it is '
             'made redundant by the above rules')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule \'3\' from answer group \'0\' of '
             'FractionInput interaction having rule type HasFractionalPart'
@@ -1438,6 +1449,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'made redundant by the above rules')
         rule_specs.remove(rule_specs[1])
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule \'3\' from answer group \'0\' of '
             'FractionInput interaction will never be matched because it is '
@@ -1555,6 +1567,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule type equal is coming after rule type equivalent having '
             'same value in FractionInput interaction.'
         )
+
         rule_specs.remove(rule_specs[1])
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
@@ -1604,10 +1617,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
             state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
         ]
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'MultipleChoiceInput interaction is already present.'
         )
+
         rule_specs.remove(rule_specs[1])
         self.state.interaction.customization_args[
             'choices'].value[2].html = '<p>2</p>'
@@ -1663,10 +1678,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'minAllowableSelectionCount'].value = 3
         self.state.interaction.customization_args[
             'maxAllowableSelectionCount'].value = 1
+
         self._assert_validation_error(
             self.new_exploration, 'Min value which is 3 is greater than max '
             'value which is 1 in ItemSelectionInput interaction.'
         )
+
         self.state.interaction.customization_args[
             'minAllowableSelectionCount'].value = 4
         self.state.interaction.customization_args[
@@ -1675,6 +1692,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration, 'Number of choices which is 3 is lesser '
                 'than the min value selection which is 4 in ItemSelectionInput '
                 'interaction.')
+
         self.state.interaction.customization_args[
             'minAllowableSelectionCount'].value = 1
         self.state.interaction.customization_args[
@@ -1684,6 +1702,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'ItemSelectionInput interaction is already present.'
         )
         rule_specs.remove(rule_specs[1])
+
         self.state.interaction.customization_args[
             'minAllowableSelectionCount'].value = 1
         self.state.interaction.customization_args[
@@ -1693,6 +1712,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'group \'0\' either less than min_selection_value or greater than '
             'max_selection_value in ItemSelectionInput interaction.'
         )
+
         self.state.interaction.customization_args[
             'minAllowableSelectionCount'].value = 1
         self.state.interaction.customization_args[
@@ -1852,17 +1872,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
         self.state.interaction.customization_args[
             'allowMultipleItemsInSamePosition'].value = False
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'0\' of answer group \'0\' '
             'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
             ' should not be there when the multiple items in same position '
             'setting is turned off in DragAndDropSortInput interaction.')
         rule_specs.remove(rule_specs[0])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'0\' of answer group \'0\' '
             'have multiple items at same place when multiple items in same '
             'position settings is turned off in DragAndDropSortInput '
             'interaction.')
+
         self.state.interaction.customization_args[
             'allowMultipleItemsInSamePosition'].value = True
         self._assert_validation_error(
@@ -1870,28 +1893,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'the value 1 and value 2 cannot be same when rule type is '
             'HasElementXBeforeElementY of DragAndDropSortInput interaction.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\'of answer group \'0\', '
             'having rule type IsEqualToOrdering should not have empty values.')
         rule_specs.remove(rule_specs[1])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'2\' of answer group \'0\' of '
             'DragAndDropInput interaction is already present.')
         rule_specs.remove(rule_specs[0])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule - 1 of answer group 0 '
             'will never be match because it is made redundant by the '
             'HasElementXAtPositionY rule above.')
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule - 1 of answer group 0 will never '
             'be match because it is made redundant by the '
             'IsEqualToOrderingWithOneItemAtIncorrectPosition rule above.')
         rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            self.new_exploration, 'Atleast 2 choices should be there '
-            'in DragAndDropSortInput interaction.')
 
     def test_text_interaction(self) -> None:
         """Tests Text interaction."""
@@ -2070,29 +2094,34 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'is made redundant by the above \'contains\' rule.')
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
             'rule type \'StartsWith\' will never be matched because it '
             'is made redundant by the above \'StartsWith\' rule.')
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
             'rule type \'StartsWith\' will never be matched because it '
             'is made redundant by the above \'contains\' rule.')
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
             'rule type \'Equals\' will never be matched because it '
             'is made redundant by the above \'contains\' rule.')
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
+
         self._assert_validation_error(
             self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
             'rule type \'Equals\' will never be matched because it '
             'is made redundant by the above \'StartsWith\' rule.')
         rule_specs.remove(rule_specs[0])
+
         self._assert_validation_error(
             self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
             'TextInput interaction is already present.')

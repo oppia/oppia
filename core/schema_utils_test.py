@@ -184,7 +184,7 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
             }
         },
         'is_uniquified': {},
-        'has_subtitled_html_content_uniquified': {}
+        'has_unique_subtitled_contents': {}
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {
@@ -221,11 +221,7 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
         }
     },
     SCHEMA_TYPE_CUSTOM: {
-        'has_subtitled_html_non_empty': {
-            'is_default': {
-                'type': SCHEMA_TYPE_BOOL
-            }
-        },
+        'has_subtitled_html_non_empty': {},
         'has_expected_subtitled_content_length': {
             'max_value': {
                 'type': SCHEMA_TYPE_INT
@@ -296,6 +292,11 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
 
     # Check that the id corresponds to a valid normalizer function.
     validator_fn = schema_utils.get_validator(validator['id'])
+    print("****************************")
+    print(customization_keys)
+    print(set(inspect.getfullargspec(validator_fn).args))
+    print(validator_fn)
+    print(validator)
     assert set(inspect.getfullargspec(validator_fn).args) == set(
         customization_keys + ['obj']), (
             'Missing keys: %s, Extra keys: %s' % (
@@ -979,15 +980,15 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         obj['unicode_str'] = 'Continue'
         self.assertTrue(has_expected_subtitled_content_length(obj, 20))
 
-    def test_has_subtitled_html_content_uniquified(self) -> None:
+    def test_has_unique_subtitled_contents(self) -> None:
         """Checks whether the subtitled html content has unique value or not.
 
         Returns:
             bool. A boolean value representing whether the content has unique
             value.
         """
-        has_subtitled_html_content_uniquified = (
-            schema_utils.get_validator('has_subtitled_html_content_uniquified')
+        has_unique_subtitled_contents = (
+            schema_utils.get_validator('has_unique_subtitled_contents')
         )
 
         obj_list = [
@@ -1000,10 +1001,10 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                 'html': '<p>1</p>'
             }
         ]
-        self.assertFalse(has_subtitled_html_content_uniquified(obj_list))
+        self.assertFalse(has_unique_subtitled_contents(obj_list))
 
         obj_list[1]['html'] = '<p>2</p>'
-        self.assertTrue(has_subtitled_html_content_uniquified(obj_list))
+        self.assertTrue(has_unique_subtitled_contents(obj_list))
 
     def test_has_length(self) -> None:
         """Tests if static method has_length returns true iff

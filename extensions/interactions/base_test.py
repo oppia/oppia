@@ -38,7 +38,7 @@ from core.tests import test_utils
 from extensions import domain
 from extensions.interactions import base
 
-from typing import Dict, List, Set, Tuple, Type
+from typing import Any, Dict, List, Set, Tuple, Type
 from typing_extensions import Final, Literal
 
 # File names ending in any of these suffixes will be ignored when checking the
@@ -136,6 +136,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """Check whether a string is alphanumeric."""
         return bool(re.compile('^[a-zA-Z0-9_]+$').match(input_string))
 
+    def _set_expect_invalid_default_value(
+        self, schema: Dict[str, Any], value: bool = False
+    ) -> None:
+        """"""
+        if 'validators' in schema:
+            for validator in schema['validators']:
+                validator['expect_invalid_default_value'] = value
+        if 'items' in schema:
+            if 'validators' in schema['items']:
+                for item_validator in schema['items']['validators']:
+                    item_validator['expect_invalid_default_value'] = value
+
     def _validate_customization_arg_specs(
         self, customization_args: List[domain.CustomizationArgSpec]
     ) -> None:
@@ -155,10 +167,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertGreater(len(ca_spec.description), 0)
 
             schema_utils_test.validate_schema(ca_spec.schema)
+            self._set_expect_invalid_default_value(ca_spec.schema, True)
             self.assertEqual(
                 ca_spec.default_value,
                 schema_utils.normalize_against_schema(
-                    ca_spec.default_value, ca_spec.schema, is_default=True))
+                    ca_spec.default_value, ca_spec.schema))
 
             if ca_spec.schema['type'] == 'custom':
                 obj_class = object_registry.Registry.get_object_class_by_type(
@@ -166,6 +179,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     ca_spec.default_value,
                     obj_class.normalize(ca_spec.default_value))
+            self._set_expect_invalid_default_value(ca_spec.schema, False)
 
     def _validate_answer_visualization_specs(
         self,
@@ -258,8 +272,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'schema': {
                     'type': 'int',
                     'validators': [{
+                        'expect_invalid_default_value': False,
                         'id': 'is_at_least', 'min_value': 1
                     }, {
+                        'expect_invalid_default_value': False,
                         'id': 'is_at_most', 'max_value': 10
                     }]
                 },
