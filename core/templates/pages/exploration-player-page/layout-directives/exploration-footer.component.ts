@@ -46,6 +46,7 @@ import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-pa
 import './exploration-footer.component.css';
 import { QuestionPlayerConceptCardModalComponent } from 'components/question-directives/question-player/question-player-concept-card-modal.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 
 
 @Component({
@@ -103,7 +104,8 @@ export class ExplorationFooterComponent {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private checkpointCelebrationUtilityService:
-      CheckpointCelebrationUtilityService
+      CheckpointCelebrationUtilityService,
+    private conceptCardManagerService: ConceptCardManagerService
   ) {}
 
   ngOnInit(): void {
@@ -191,7 +193,7 @@ export class ExplorationFooterComponent {
   }
 
   isConceptCardButtonVisible(): boolean {
-    return true; 
+    return this.conceptCardManagerService.isConceptCardViewable();
   }
 
   showProgressReminderModal(): void {

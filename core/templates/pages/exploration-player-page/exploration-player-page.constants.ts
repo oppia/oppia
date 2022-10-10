@@ -32,6 +32,20 @@ export const ExplorationPlayerConstants = {
   // and the appearance of the hint.
   DELAY_FOR_HINT_FEEDBACK_MSEC: 100,
 
+  // The enforced waiting period before the concept card
+  // icon appears.
+  WAIT_FOR_CONCEPT_CARD_MSEC: 60000,
+
+  // The time delay after all the hints are exhausted, or after
+  // the concept card is used. This is the stage when the learner
+  // is said to be really stuck.
+  WAIT_BEFORE_REALLY_STUCK_MSEC: 120000,
+
+  // The threshold for incorrect answers submitted after either
+  // exhausting all the hints, or after using the concept card,
+  // after which the learner is said to be really stuck.
+  MAX_INCORRECT_ANSWERS_BEFORE_REALLY_STUCK: 3,
+
   // Array of i18n IDs for the possible hint request strings.
   HINT_REQUEST_STRING_I18N_IDS: [
     'I18N_PLAYER_HINT_REQUEST_STRING_1',

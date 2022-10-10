@@ -31,25 +31,30 @@
    timeout: NodeJS.Timeout | null = null;
    tooltipTimeout: NodeJS.Timeout | null = null;
  
-   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 20000;
+   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 65000;
  
    // Emitter to show that concept card is used.
    _conceptCardConsumedEventEmitter = new EventEmitter();
+
+   // Emitter to show that the learner is really stuck.
+   _learnerReallyStuckEventEmitter = new EventEmitter();
+   
    private _timeoutElapsedEventEmitter = new EventEmitter();
    onTimeoutElapsed$ = this._timeoutElapsedEventEmitter.asObservable();
  
-   conceptCardForStateExists: boolean = false;
+   conceptCardForStateExists: boolean = true; //TEMPORARILY.
    conceptCardReleased: boolean = false;
    conceptCardConsumed: boolean = false;
    wrongAnswersSinceConceptCardConsumed: number = 0;
    correctAnswerSubmitted: boolean = false;
+   learnerIsReallyStuck: boolean = false;
  
  
    // Variable tooltipIsOpen is a flag which says that the tooltip is currently
    // visible to the learner.
    tooltipIsOpen: boolean = false;
-   // This is set to true as soon as a hint/solution is clicked or when the
-   // tooltip has been triggered.
+   // This is set to true as soon as the concept card icon is clicked or when
+   // the tooltip has been triggered.
    conceptCardDiscovered: boolean = false;
  
    constructor(private playerPositionService: PlayerPositionService) {
@@ -87,6 +92,15 @@
      }
      this._timeoutElapsedEventEmitter.emit();
    }
+
+   isLearnerReallyStuck(): boolean {
+     return this.learnerIsReallyStuck;
+   }
+
+   emitLearnerStuckedness(): void {
+     this.learnerIsReallyStuck = true;
+     this._learnerReallyStuckEventEmitter.emit();
+   }
  
    consumeconceptCard(): void {
      this.conceptCardDiscovered = true;
@@ -96,23 +110,21 @@
        this.tooltipTimeout = null;
      }
      this.conceptCardConsumed = true;
+
      this._conceptCardConsumedEventEmitter.emit();
+
      this.wrongAnswersSinceConceptCardConsumed = 0;
  
      let funcToEnqueue = null;
      // Here we add func to enque that would wait for
      // 2 mins to dictate whether the leaner is stuck.
-
-    //  if (!this.areAllHintsExhausted()) {
-    //    funcToEnqueue = this.releaseHint;
-    //  } else if (!!this.solutionForLatestCard && !this.solutionReleased) {
-    //    funcToEnqueue = this.releaseSolution;
-    //  }
-    //  if (funcToEnqueue) {
-    //    this.enqueueTimeout(
-    //      funcToEnqueue,
-    //      ExplorationPlayerConstants.WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
-    //  }
+     
+    funcToEnqueue = this.emitLearnerStuckedness;
+     if (funcToEnqueue) {
+       this.enqueueTimeout(
+         funcToEnqueue,
+         ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+     }
    }
  
    reset(): void {
@@ -132,39 +144,9 @@
      if (this.conceptCardForStateExists) {
        this.enqueueTimeout(
          this.releaseConceptCard,
-         ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
+         ExplorationPlayerConstants.WAIT_FOR_CONCEPT_CARD_MSEC);
      }
    }
- 
-   // WARNING: This method has a side-effect. If the retrieved hint is a
-   // pending hint that's being viewed, it starts the timer for the next
-   // hint.
-
-   // Don't need this mp.
-
-    //    displayHint(index: number): SubtitledHtml | null {
-    //      if (index === this.numHintsConsumed &&
-    //        this.numHintsConsumed < this.numHintsReleased) {
-    //        // The latest hint has been consumed. Start the timer.
-    //        this.consumeHint();
-    //      }
-    
-    //      if (index < this.numHintsReleased) {
-    //        return this.hintsForLatestCard[index].hintContent;
-    //      }
-    //      return null;
-    //    }
- 
-//    displaySolution(): Solution {
-//      this.hintsDiscovered = true;
-//      this.solutionConsumed = true;
-//      this._solutionViewedEventEmitter.emit();
-//      if (this.tooltipTimeout) {
-//        clearTimeout(this.tooltipTimeout);
-//        this.tooltipTimeout = null;
-//      }
-//      return this.solutionForLatestCard;
-//    }
 
  
    isConceptCardTooltipOpen(): boolean {
@@ -179,25 +161,21 @@
      return this.conceptCardConsumed;
    }
  
-   // IMPPPPPP (Links to convo.skin.ts)
    recordWrongAnswer(): void {
- 
-     if (!this.isConceptCardViewable()) {
-       if (
-         this.numHintsReleased === 0 &&
-         this.wrongAnswersSinceLastHintConsumed >= 2) {
-         this.accelerateHintRelease();
-       } else if (
-         this.numHintsReleased > 0 &&
-         this.wrongAnswersSinceLastHintConsumed >= 1) {
-         this.accelerateHintRelease();
-       }
+     if (this.isConceptCardViewable()) {
+       this.wrongAnswersSinceConceptCardConsumed++;
      }
+     if (this.wrongAnswersSinceConceptCardConsumed >
+      ExplorationPlayerConstants.
+        MAX_INCORRECT_ANSWERS_BEFORE_REALLY_STUCK) {
+          // Learner is really stuck.
+          this._learnerReallyStuckEventEmitter.emit();
+      }
    }
  
-   get onHintConsumed(): EventEmitter<unknown> {
-     return this._conceptCardConsumedEventEmitter;
-   }
+  //  get onHintConsumed(): EventEmitter<unknown> {
+  //    return this._conceptCardConsumedEventEmitter;
+  //  }
  }
  
  angular.module('oppia').factory(
