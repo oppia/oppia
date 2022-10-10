@@ -186,6 +186,7 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
   oppia-search-bar .oppia-input-group input {
     border-bottom-left-radius: 10px;
     border-top-left-radius: 10px;
+    margin-left: -4.5vw;
   }
   .oppia-search-bar-input::-webkit-input-placeholder {
     color: #999;
@@ -205,6 +206,7 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     border-radius: 10px;
     color: #fff;
     height: 40px;
+    margin-left: 1px;
     margin-top: 10px;
     max-width: none;
     padding: 8px 7px 0 6px;
