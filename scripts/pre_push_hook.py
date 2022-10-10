@@ -39,7 +39,7 @@ import subprocess
 import sys
 
 from types import TracebackType
-from typing import Dict, List, Optional, Tuple, Type, Union
+from typing import Dict, List, Optional, Tuple, Type
 from typing_extensions import Final
 
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
@@ -348,7 +348,7 @@ def get_refs() -> List[GitRef]:
 
 def start_linter(files: List[bytes]) -> int:
     """Starts the lint checks and returns the returncode of the task."""
-    cmd_list: List[Union[str, bytes]] = [
+    cmd_list: List[str] = [
         PYTHON_CMD, '-m', LINTER_MODULE, LINTER_FILE_FLAG
     ]
     for file in files:
