@@ -81,9 +81,16 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
+import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
+import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
+import { NeedsGuidingResponsesTaskComponent } from './improvements-tab/needs-guiding-responses-task.component';
+import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
+import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
+import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
 import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
 import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
 import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -150,7 +157,13 @@ import { ExplorationSavePromptModalComponent } from './modal-templates/explorati
     HistoryTabComponent,
     ExplorationEditorTabComponent,
     ExplorationSaveAndPublishButtonsComponent,
-    ExplorationSavePromptModalComponent
+    ExplorationSavePromptModalComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    PieChartComponent,
+    StateStatsModalComponent,
+    StatisticsTabComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -199,7 +212,13 @@ import { ExplorationSavePromptModalComponent } from './modal-templates/explorati
     HistoryTabComponent,
     ExplorationEditorTabComponent,
     ExplorationSaveAndPublishButtonsComponent,
-    ExplorationSavePromptModalComponent
+    ExplorationSavePromptModalComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    PieChartComponent,
+    StateStatsModalComponent,
+    StatisticsTabComponent,
   ],
   providers: [
     {

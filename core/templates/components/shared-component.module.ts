@@ -155,6 +155,11 @@ import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashbo
 import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { AnswerContentModalComponent } from './common-layout-directives/common-elements/answer-content-modal.component';
+import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualization-sorted-tiles.component';
+import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
+import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
+import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -328,7 +333,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent
+    AnswerContentModalComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    VisualizationSortedTilesComponent,
   ],
 
   entryComponents: [
@@ -449,7 +459,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent
+    AnswerContentModalComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    VisualizationSortedTilesComponent,
   ],
 
   exports: [
@@ -581,7 +596,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent
+    AnswerContentModalComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    VisualizationSortedTilesComponent,
   ],
 })
 
