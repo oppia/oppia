@@ -296,7 +296,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                             )
                         )
                 except Exception as e:
-                    logging.exception('No content attr in tabs -> %s', e)
+                    logging.exception('No content attr in tabs')
                     states_with_errored_values.append(
                         'No content attr in tabs'
                     )
@@ -355,8 +355,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                             states_with_errored_values
                         )
                     )
-                except Exception as e:
-                    logging.exception('No content attr in collapsible -> %s', e)
+                except Exception:
+                    logging.exception('No content attr in collapsible')
                     states_with_errored_values.append(
                         'No content attr in collapsible tag'
                     )
@@ -372,7 +372,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         states_with_errored_values.append(
                             'collapsible heading empty')
                 except Exception:
-                    logging.exception('No hading attr in collapsible -> %s', e)
+                    logging.exception('No hading attr in collapsible')
                     states_with_errored_values.append(
                         'No heading attr in collapsible tag'
                     )
