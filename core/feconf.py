@@ -896,8 +896,6 @@ TASK_URL_FLAG_EXPLORATION_EMAILS = (
     '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
-TASK_URL_SUGGESTION_EMAILS = (
-    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS = (
     '%s/email/contributordashboardachievementnotificationemailhandler' % (
         TASKQUEUE_URL_PREFIX))

@@ -1126,9 +1126,6 @@ URLS.extend((
         r'%s' % feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS,
         tasks.UnsentFeedbackEmailHandler),
     get_redirect_route(
-        r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
-        tasks.SuggestionEmailHandler),
-    get_redirect_route(
         r'%s' % (
             feconf
             .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS),
