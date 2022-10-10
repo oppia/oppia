@@ -409,6 +409,11 @@ var ExplorationEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.waitForPreviewTabToLoad = async function() {
+    await waitFor.visibilityOf(
+      previewTabLearnerViewCard, 'Preview Tab learner card is not visible');
+  };
+
   this.navigateToSettingsTab = async function() {
     let width = (await browser.getWindowSize()).width;
     if (width > 768) {
