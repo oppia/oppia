@@ -6923,7 +6923,18 @@ states:
       translations_mapping:
         content: {}
 states_schema_version: 52
-tags: []
+tags:
+- a
+- b
+- c
+- d
+- e
+- f
+- g
+- h
+- i
+- j
+- k
 title: ''
 """)
 
@@ -7071,7 +7082,17 @@ states:
       translations_mapping:
         content: {}
 states_schema_version: 53
-tags: []
+tags:
+- a
+- b
+- c
+- d
+- e
+- f
+- g
+- h
+- i
+- j
 title: ''
 """)
 
