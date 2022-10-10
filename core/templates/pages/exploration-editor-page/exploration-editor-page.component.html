@@ -113,8 +113,8 @@
       </div>
     </div>
 
-    <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'" exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
-    </exploration-editor-tab>
+    <oppia-exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'" [exploration-is-linked-to-story]="$ctrl.explorationIsLinkedToStory">
+    </oppia-exploration-editor-tab>
 
     <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">
     </translation-tab>

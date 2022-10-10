@@ -81,6 +81,7 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
+import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
 
 @NgModule({
   imports: [
@@ -96,6 +97,7 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     FormsModule,
     MatPaginatorModule,
     RouterModule.forRoot([]),
+    JoyrideModule.forRoot(),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -144,7 +146,8 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    ExplorationEditorTabComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -190,7 +193,8 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    ExplorationEditorTabComponent
   ],
   providers: [
     {
@@ -225,6 +229,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { JoyrideModule } from 'ngx-joyride';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -37,6 +37,7 @@ import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 import { BaseModule } from 'base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { JoyrideModule } from 'ngx-joyride';
 
 // Components.
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
@@ -192,12 +193,13 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    JoyrideModule.forRoot(),
     RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
     MatProgressSpinnerModule,
-    NgbModalModule
+    NgbModalModule,
   ],
 
   providers: [
