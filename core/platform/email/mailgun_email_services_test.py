@@ -216,11 +216,8 @@ class EmailTests(test_utils.GenericTestBase):
                     'Hola 😂 - invitation to collaborate',
                     'plaintext_body 😂',
                     'Hi abc,<br> 😂')
-                # The '\nNoneType: None' represents the stacktrace which is not
-                # available in the backend tests.
                 self.assertIn(
-                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.'
-                    '\nNoneType: None',
+                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.',
                     logs
                 )
 
@@ -237,11 +234,8 @@ class EmailTests(test_utils.GenericTestBase):
                     'Hola 😂 - invitation to collaborate',
                     'plaintext_body 😂',
                     'Hi abc,<br> 😂')
-                # The '\nNoneType: None' represents the stacktrace which is not
-                # available in the backend tests.
                 self.assertIn(
-                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.'
-                    '\nNoneType: None',
+                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.',
                     logs
                 )
 

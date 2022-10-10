@@ -392,12 +392,10 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             with get_last_week_dashboard_stats_swap:
                 last_week_stats = self.get_json(
                     feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
-            # The '\nNoneType: None' represents the stacktrace which is
-            # not available in the backend tests.
             self.assertEqual(logs, [
                 '\'last_week_stats\' should contain only one key-value pair'
                 ' denoting last week dashboard stats of the user keyed by a'
-                ' datetime string.\nNoneType: None'
+                ' datetime string.'
             ])
         self.assertIsNone(last_week_stats)
 

@@ -182,7 +182,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 continue
 
             with self.swap_to_always_return(
-                    secrets_services, 'get_secret', 'secret'
+                secrets_services, 'get_secret', 'secret'
             ):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
@@ -460,13 +460,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 response.body
             )
 
-        # The '\nNoneType: None' represents the stacktrace which is
-        # not available in the backend tests.
         self.assert_matches_regexps(
             logs,
             [
                 'Cannot find user auth_id with email %s on '
-                'page http://localhost/\nNoneType: None' % self.NEW_USER_EMAIL
+                'page http://localhost/' % self.NEW_USER_EMAIL
             ]
         )
         self.assertEqual(call_counter.times_called, 1)

@@ -461,13 +461,11 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
                 response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
 
                 self.assertEqual(len(logs), 1)
-                # The '\nNoneType: None' represents the stacktrace which is
-                # not available in the backend tests.
                 self.assertEqual(
                     logs[0],
                     '2 blog post summaries were fetched to load the search'
                     '/filter by result page. You may be running up against the '
-                    'default query limits.\nNoneType: None')
+                    'default query limits.')
                 self.assertEqual(
                     len(response_dict['blog_post_summaries_list']), 2)
                 self.assertEqual(response_dict['search_offset'], 2)

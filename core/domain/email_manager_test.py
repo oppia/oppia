@@ -6677,12 +6677,10 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
                 with self.capture_logging(min_level=logging.WARNING) as logs:
                     self.assertTrue(
                         email_manager.verify_mailchimp_secret('secret'))
-                    # The '\nNoneType: None' represents the stacktrace which is
-                    # not available in the backend tests.
                     self.assertEqual(
                         [
                             'Cloud Secret Manager is not able to get '
-                            'MAILCHIMP_WEBHOOK_SECRET.\nNoneType: None',
+                            'MAILCHIMP_WEBHOOK_SECRET.',
                         ],
                         logs
                     )
@@ -6708,14 +6706,11 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
                 with self.capture_logging(min_level=logging.WARNING) as logs:
                     self.assertFalse(
                         email_manager.verify_mailchimp_secret('secret'))
-                    # The '\nNoneType: None' represents the stacktrace which is
-                    # not available in the backend tests.
                     self.assertEqual(
                         [
                             'Cloud Secret Manager is not able to get '
-                            'MAILCHIMP_WEBHOOK_SECRET.\nNoneType: None',
+                            'MAILCHIMP_WEBHOOK_SECRET.',
                             'Mailchimp webhook secret is not available.'
-                            '\nNoneType: None'
                         ],
                         logs
                     )
