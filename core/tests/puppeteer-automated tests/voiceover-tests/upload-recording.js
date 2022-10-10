@@ -42,7 +42,14 @@ puppeteer
     await page.waitForSelector(selector);
     await page.click(selector);
 
+    const inputUploadHandle = await page.$('input[type=file]');
+    let fileToUpload = 'A4.mp3';
+    inputUploadHandle.uploadFile(fileToUpload);
+
+    selector = 'button.e2e-test-save-uploaded-audio-button';
+    await page.waitForSelector(selector);
+    await page.click(selector);
 
     console.log("Successfully tested uploading audio!");
-    // await browser.close();
+    await browser.close();
   });
