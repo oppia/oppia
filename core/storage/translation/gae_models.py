@@ -137,7 +137,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_type: feconf.TranslatableEntityType,
         entity_id: str,
         entity_version: int
-    ) -> Sequence[Optional[EntityTranslationsModel]]:
+    ) -> Sequence[EntityTranslationsModel]:
         """Gets EntityTranslationsModels corresponding to the given entity, for
         all languages in which such models exist.
 

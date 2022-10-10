@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import question_domain
+from core.domain import question_fetchers
 from core.domain import skill_services
 from core.domain import suggestion_services
 from core.domain import translation_domain
@@ -285,3 +286,24 @@ class MigrateQuestionSuggestionsJobTests(
             job_run_result.JobRunResult(
                 stdout='SUGGESTION MIGRATED SUCCESS: 1')
         ])
+
+    def test_migration_errors_are_reported_in_job_result(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_id = (
+            self.save_new_question_suggestion_with_state_data_schema_v27(
+            self.author_id, skill_id)
+        )
+        migrate_state_schema_raise = self.swap_to_always_raise(
+            question_fetchers, 'migrate_state_schema')
+        with migrate_state_schema_raise:
+            self.assert_job_output_is([
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'SUGGESTION MIGRATED ERROR: "(\'%s\', '
+                        'Exception())": 1' % suggestion_id)
+                ),
+                job_run_result.JobRunResult(
+                    stdout='QUESTION MODELS COUNT SUCCESS: 1'),
+            ])

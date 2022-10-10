@@ -131,9 +131,8 @@ def get_all_entity_translations_for_entity(
     )
     entity_translation_objects = []
     for model in entity_translation_models:
-        if model:
-            domain_object = _get_entity_translation_from_model(model)
-            entity_translation_objects.append(domain_object)
+        domain_object = _get_entity_translation_from_model(model)
+        entity_translation_objects.append(domain_object)
 
     return entity_translation_objects
 

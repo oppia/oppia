@@ -84,15 +84,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
             with datastore_services.get_ndb_context():
                 if exp_services.get_story_id_linked_to_exploration(
                         exp_id) is not None:
-                    try:
                         exp_services.validate_exploration_for_story(
                             exploration, True)
-                    except exp_services.UnsupportedRTEContentValidationError:
-                        # The unsupported RTE content error is supressed as we
-                        # need to fix the error in existing exploration before
-                        # enabling this check.
-                        pass
-
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_id, e))

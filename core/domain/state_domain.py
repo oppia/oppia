@@ -151,8 +151,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 translatable_contents_collection
                 .add_fields_from_translatable_object(self.outcome)
             )
-        # Instead of hardcoding interactions name here, Interaction can
-        # have a flag indicating whether the rule_specs can have translations.
+        # TODO(#16256): Instead of hardcoding interactions name here,
+        # Interaction can have a flag indicating whether the rule_specs can have
+        # translations.
         for rule_spec in self.rule_specs:
             if kwargs['interaction_id'] not in ['TextInput', 'SetInput']:
                 break

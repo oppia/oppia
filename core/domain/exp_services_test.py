@@ -1492,9 +1492,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(
-            exp_services.UnsupportedRTEContentValidationError, error_string
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
 

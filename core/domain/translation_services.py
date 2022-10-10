@@ -111,7 +111,6 @@ def add_new_translation(
         content_id: str. The Id of the content.
         translated_content: TranslatedContent. The translated content object.
     """
-
     entity_translation = translation_fetchers.get_entity_translation(
         entity_type, entity_id, entity_version, language_code)
     entity_translation.translations[content_id] = translated_content

@@ -130,6 +130,7 @@ describe('Statistics Tab Component', () => {
           language_code: null,
           objective: null,
           correctness_feedback_enabled: null,
+          next_content_id_index: 5
         } as ReadOnlyExplorationBackendDict,
         can_edit: null,
         exploration_metadata: null,
