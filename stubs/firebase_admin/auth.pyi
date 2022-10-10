@@ -83,6 +83,9 @@ def create_session_cookie(
 ) -> str: ...
 
 
+def create_user(**kwargs: Any) -> UserRecord: ...
+
+
 def update_user(uid: str, **kwargs: Any) -> None: ...
 
 
