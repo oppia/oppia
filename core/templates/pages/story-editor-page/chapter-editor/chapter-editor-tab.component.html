@@ -11,17 +11,17 @@
   </span>
 </div>
 <div ng-if="$ctrl.node">
-  <story-node-editor node-id="$ctrl.node.getId()"
-                     thumbnail-filename="$ctrl.node.getThumbnailFilename()"
-                     thumbnail-bg-color="$ctrl.node.getThumbnailBgColor()"
-                     outline="$ctrl.node.getOutline()"
-                     description="$ctrl.node.getDescription()"
-                     exploration-id="$ctrl.node.getExplorationId()"
-                     outline-finalized="$ctrl.node.getOutlineStatus()"
-                     destination-node-ids="$ctrl.node.getDestinationNodeIds()"
-                     prerequisite-skill-ids="$ctrl.node.getPrerequisiteSkillIds()"
-                     acquired-skill-ids="$ctrl.node.getAcquiredSkillIds()">
-  </story-node-editor>
+  <oppia-story-node-editor [node-id]="$ctrl.node.getId()"
+                           [thumbnail-filename]="$ctrl.node.getThumbnailFilename()"
+                           [thumbnail-bg-color]="$ctrl.node.getThumbnailBgColor()"
+                           [outline]="$ctrl.node.getOutline()"
+                           [description]="$ctrl.node.getDescription()"
+                           [exploration-id]="$ctrl.node.getExplorationId()"
+                           [outline-finalized]="$ctrl.node.getOutlineStatus()"
+                           [destination-node-ids]="$ctrl.node.getDestinationNodeIds()"
+                           [prerequisite-skill-ids]="$ctrl.node.getPrerequisiteSkillIds()"
+                           [acquired-skill-ids]="$ctrl.node.getAcquiredSkillIds()">
+  </oppia-story-node-editor>
 </div>
 <style>
   chapter-editor-tab .story-chapter-name {

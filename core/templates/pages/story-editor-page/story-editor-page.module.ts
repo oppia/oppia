@@ -57,14 +57,16 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryPreviewTabComponent,
+    StoryNodeEditorComponent,
   ],
   entryComponents: [
     StoryEditorNavbarBreadcrumbComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryPreviewTabComponent,
+    StoryNodeEditorComponent,
   ],
   providers: [
     {
@@ -97,6 +99,7 @@ class StoryEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { StoryNodeEditorComponent } from './editor-tab/story-node-editor.directive';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

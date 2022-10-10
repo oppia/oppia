@@ -13,479 +13,477 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the story node editor.
+ * @fileoverview Component for the story node editor.
  */
 
-require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-require(
-  'components/skill-selector/skill-selector.component.ts');
-require(
-  'pages/story-editor-page/modal-templates/' +
-  'new-chapter-title-modal.controller.ts');
-require(
-  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
-require('domain/story/story-update.service.ts');
-require('domain/exploration/exploration-id-validation.service.ts');
-require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/alerts.service.ts');
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-backend-api.service.ts');
-
-require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/ngb-modal.service.ts');
-require('services/page-title.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require('domain/skill/skill-backend-api.service.ts');
+import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { StoryUpdateService } from 'domain/story/story-update.service';
+import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { PageTitleService } from 'services/page-title.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { StoryEditorStateService } from '../services/story-editor-state.service';
 
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import storyNodeConstants from 'assets/constants';
+@Component({
+  selector: 'oppia-story-node-editor',
+  templateUrl: 'story-node-editor.directive.html'
+})
+export class StoryNodeEditorComponent {
+  @Input() nodeId: string;
+  @Input() outline;
+  @Input() description: string;
+  @Input() explorationId: string;
+  @Input() thumbnailFilename: string;
+  @Input() thumbnailBgColor: string;
+  @Input() outlineIsFinalized: boolean;
+  @Input() destinationNodeIds;
+  @Input() prerequisiteSkillIds;
+  @Input() acquiredSkillIds;
 
-angular.module('oppia').directive('storyNodeEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        getId: '&nodeId',
-        getOutline: '&outline',
-        getDescription: '&description',
-        getExplorationId: '&explorationId',
-        getThumbnailFilename: '&thumbnailFilename',
-        getThumbnailBgColor: '&thumbnailBgColor',
-        isOutlineFinalized: '&outlineFinalized',
-        getDestinationNodeIds: '&destinationNodeIds',
-        getPrerequisiteSkillIds: '&prerequisiteSkillIds',
-        getAcquiredSkillIds: '&acquiredSkillIds'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
-      controller: [
-        '$rootScope', '$scope', '$timeout',
-        'AlertsService',
-        'ExplorationIdValidationService', 'FocusManagerService', 'NgbModal',
-        'PageTitleService', 'SkillBackendApiService',
-        'StoryEditorStateService', 'StoryUpdateService',
-        'TopicsAndSkillsDashboardBackendApiService',
-        'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
-        'MAX_CHARS_IN_EXPLORATION_TITLE', function(
-            $rootScope, $scope, $timeout,
-            AlertsService,
-            ExplorationIdValidationService, FocusManagerService, NgbModal,
-            PageTitleService, SkillBackendApiService,
-            StoryEditorStateService, StoryUpdateService,
-            TopicsAndSkillsDashboardBackendApiService,
-            WindowDimensionsService, MAX_CHARS_IN_CHAPTER_DESCRIPTION,
-            MAX_CHARS_IN_EXPLORATION_TITLE) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
-          $scope.MAX_CHARS_IN_EXPLORATION_TITLE = (
-            MAX_CHARS_IN_EXPLORATION_TITLE);
-          $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
-            MAX_CHARS_IN_CHAPTER_DESCRIPTION);
-          var _recalculateAvailableNodes = function() {
-            $scope.newNodeId = null;
-            $scope.availableNodes = [];
-            var linearNodesList =
-              $scope.story.getStoryContents().getLinearNodesList();
-            var linearNodeIds = linearNodesList.map(function(node) {
-              return node.getId();
-            });
-            for (var i = 0; i < $scope.storyNodeIds.length; i++) {
-              if ($scope.storyNodeIds[i] === $scope.getId()) {
-                continue;
-              }
-              if (
-                $scope.getDestinationNodeIds().indexOf(
-                  $scope.storyNodeIds[i]) !== -1) {
-                continue;
-              }
-              if (linearNodeIds.indexOf($scope.storyNodeIds[i]) === -1) {
-                $scope.availableNodes.push({
-                  id: $scope.storyNodeIds[i],
-                  text: $scope.nodeIdToTitleMap[$scope.storyNodeIds[i]]
-                });
-              }
-            }
-          };
-          var categorizedSkills = null;
-          var untriagedSkillSummaries = null;
-          var _init = function() {
-            $scope.story = StoryEditorStateService.getStory();
-            $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
-            $scope.nodeIdToTitleMap =
-              $scope.story.getStoryContents().getNodeIdsToTitleMap(
-                $scope.storyNodeIds);
-            $scope.skillInfoHasLoaded = false;
-            _recalculateAvailableNodes();
-            $scope.allowedBgColors = (
-              storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
-            var skillSummaries = StoryEditorStateService.getSkillSummaries();
-            TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-              .then(function(response) {
-                categorizedSkills = response.categorizedSkillsDict;
-                untriagedSkillSummaries = response.untriagedSkillSummaries;
-                $scope.skillInfoHasLoaded = true;
-                $rootScope.$applyAsync();
-              });
-            for (var idx in skillSummaries) {
-              $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
-                skillSummaries[idx].description;
-            }
-            $scope.getPrerequisiteSkillsDescription();
+  chapterPreviewCardIsShown = false;
+  mainChapterCardIsShown = true;
+  explorationInputButtonsAreShown = false;
+  chapterOutlineButtonsAreShown = false;
+  skillIdToSummaryMap = {};
+  chapterOutlineIsShown: boolean = false;
+  chapterTodoCardIsShown: boolean = false;
+  prerequisiteSkillIsShown: boolean = false;
+  acquiredSkillIsShown = false;
+  explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
+  expIdCanBeSaved = true;
 
-            $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
-            $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
-            PageTitleService.setNavbarSubtitleForMobileView(
-              $scope.currentTitle);
-            $scope.editableTitle = $scope.currentTitle;
-            $scope.currentDescription = $scope.getDescription();
-            $scope.editableDescription = $scope.currentDescription;
-            $scope.editableThumbnailFilename = $scope.getThumbnailFilename();
-            $scope.editableThumbnailBgColor = $scope.getThumbnailBgColor();
-            $scope.oldOutline = $scope.getOutline();
-            $scope.editableOutline = $scope.getOutline();
-            $scope.explorationId = $scope.getExplorationId();
-            $scope.currentExplorationId = $scope.explorationId;
-            $scope.expIdIsValid = true;
-            $scope.invalidExpErrorIsShown = false;
-            $scope.nodeTitleEditorIsShown = false;
-            $scope.OUTLINE_SCHEMA = {
-              type: 'html',
-              ui_config: {
-                startupFocusEnabled: false,
-                rows: 100
-              }
-            };
-          };
+  story;
+  storyNodeIds;
+  nodeIdToTitleMap;
+  skillInfoHasLoaded = false;
+  allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
+  isStoryPublished: () => boolean;
+  currentTitle: string;
+  editableTitle: string;
+  currentDescription: string;
+  editableDescription: string;
+  editableThumbnailFilename: string;
+  editableThumbnailBgColor: string;
+  oldOutline;
+  editableOutline;
+  currentExplorationId;
+  expIdIsValid;
+  invalidExpErrorIsShown;
+  nodeTitleEditorIsShown;
 
-          $scope.getSkillEditorUrl = function(skillId) {
-            return '/skill_editor/' + skillId;
-          };
+  OUTLINE_SCHEMA = {
+    type: 'html',
+    ui_config: {
+      startupFocusEnabled: false,
+      rows: 100
+    }
+  };
 
-          $scope.getPrerequisiteSkillsDescription = function() {
-            const skills = $scope.getPrerequisiteSkillIds();
-            if (skills && skills.length > 0) {
-              SkillBackendApiService.fetchMultiSkillsAsync(skills).then(
-                function(response) {
-                  for (let idx in response) {
-                    $scope.skillIdToSummaryMap[response[idx].getId()] =
-                      response[idx].getDescription();
-                  }
-                  $rootScope.$applyAsync();
-                }, function(error) {
-                  AlertsService.addWarning();
-                }
-              );
-            }
-          };
+  private _categorizedSkills;
+  private _untriagedSkillSummaries;
 
-          $scope.checkCanSaveExpId = function() {
-            $scope.expIdCanBeSaved = $scope.explorationIdPattern.test(
-              $scope.explorationId) || !$scope.explorationId;
-            $scope.invalidExpErrorIsShown = false;
-          };
-          $scope.updateTitle = function(newTitle) {
-            if (newTitle !== $scope.currentTitle) {
-              var titleIsValid = true;
-              for (var idx in $scope.story.getStoryContents().getNodes()) {
-                var node = $scope.story.getStoryContents().getNodes()[idx];
-                if (node.getTitle() === newTitle) {
-                  titleIsValid = false;
-                  AlertsService.addInfoMessage(
-                    'A chapter already exists with given title.', 5000);
-                }
-              }
-              if (titleIsValid) {
-                StoryUpdateService.setStoryNodeTitle(
-                  $scope.story, $scope.getId(), newTitle);
-                $scope.currentTitle = newTitle;
-              }
-            }
-          };
+  subscriptions = new Subscription();
+  newNodeId;
+  availableNodes;
 
-          $scope.updateDescription = function(newDescription) {
-            if (newDescription !== $scope.currentDescription) {
-              StoryUpdateService.setStoryNodeDescription(
-                $scope.story, $scope.getId(), newDescription);
-              $scope.currentDescription = newDescription;
-            }
-          };
+  constructor(
+    private alertsService: AlertsService,
+    private explorationIdValidationService: ExplorationIdValidationService,
+    private focusManagerService: FocusManagerService,
+    private ngbModal: NgbModal,
+    private pageTitleService: PageTitleService,
+    private skillBackendApiService: SkillBackendApiService,
+    private storyEditorStateService: StoryEditorStateService,
+    private storyUpdateService: StoryUpdateService,
+    private topicsAndSkillsDashboardBackendApiService:
+    TopicsAndSkillsDashboardBackendApiService,
+    private windowDimensionsService: WindowDimensionsService
+  ) {}
 
-          $scope.updateThumbnailFilename = function(newThumbnailFilename) {
-            if (newThumbnailFilename !== $scope.editableThumbnailFilename) {
-              StoryUpdateService.setStoryNodeThumbnailFilename(
-                $scope.story, $scope.getId(), newThumbnailFilename);
-              $scope.editableThumbnailFilename = newThumbnailFilename;
-            }
-            $scope.$applyAsync();
-          };
+  private _init(): void {
+    this.story = this.storyEditorStateService.getStory();
+    this.storyNodeIds = this.story.getStoryContents().getNodeIds();
+    this.nodeIdToTitleMap = this.story.getStoryContents().getNodeIdsToTitleMap(
+      this.storyNodeIds);
+    this.skillInfoHasLoaded = false;
 
-          $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
-            if (newThumbnailBgColor !== $scope.editableThumbnailBgColor) {
-              StoryUpdateService.setStoryNodeThumbnailBgColor(
-                $scope.story, $scope.getId(), newThumbnailBgColor);
-              $scope.editableThumbnailBgColor = newThumbnailBgColor;
-            }
-          };
+    this._recalculateAvailableNodes();
 
-          $scope.viewNodeEditor = function(nodeId) {
-            StoryEditorStateService.onViewStoryNodeEditor.emit(nodeId);
-          };
+    let skillSummaries = this.storyEditorStateService.getSkillSummaries();
 
-          $scope.finalizeOutline = function() {
-            StoryUpdateService.finalizeStoryNodeOutline(
-              $scope.story, $scope.getId());
-          };
+    this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+      .then((response) => {
+        this._categorizedSkills = response.categorizedSkillsDict;
+        this._untriagedSkillSummaries = response.untriagedSkillSummaries;
+        this.skillInfoHasLoaded = true;
+      });
 
-          $scope.updateExplorationId = function(explorationId) {
-            $scope.toggleExplorationInputButtons();
-            if (StoryEditorStateService.isStoryPublished()) {
-              if (explorationId === '' || explorationId === null) {
-                AlertsService.addInfoMessage(
-                  'You cannot remove an exploration from a published story.',
-                  5000);
-                return;
-              }
-              ExplorationIdValidationService.isExpPublishedAsync(
-                explorationId).then(function(expIdIsValid) {
-                $scope.expIdIsValid = expIdIsValid;
-                if ($scope.expIdIsValid) {
-                  StoryUpdateService.setStoryNodeExplorationId(
-                    $scope.story, $scope.getId(), explorationId);
-                  $scope.currentExplorationId = explorationId;
-                } else {
-                  $scope.invalidExpErrorIsShown = true;
-                }
-              });
-            } else {
-              if (explorationId === '') {
-                AlertsService.addInfoMessage(
-                  'Please click the delete icon to remove an exploration ' +
-                  'from the story.', 5000);
-                return;
-              }
-              StoryUpdateService.setStoryNodeExplorationId(
-                $scope.story, $scope.getId(), explorationId);
-              $scope.currentExplorationId = explorationId;
-              if (explorationId === null) {
-                $scope.explorationId = null;
-              }
-            }
-          };
+    for (let idx in skillSummaries) {
+      this.skillIdToSummaryMap[skillSummaries[idx].id] =
+      skillSummaries[idx].description;
+    }
 
-          $scope.removePrerequisiteSkillId = function(skillId) {
-            StoryUpdateService.removePrerequisiteSkillIdFromNode(
-              $scope.story, $scope.getId(), skillId);
-            $scope.$applyAsync();
-          };
+    this.isStoryPublished = this.storyEditorStateService.isStoryPublished;
+    this.currentTitle = this.nodeIdToTitleMap[this.nodeId];
+    this.pageTitleService.setNavbarSubtitleForMobileView(this.currentTitle);
+    this.editableTitle = this.currentTitle;
+    this.currentDescription = this.description;
+    this.editableDescription = this.currentDescription;
+    this.editableThumbnailFilename = this.thumbnailFilename;
+    this.editableThumbnailBgColor = this.thumbnailBgColor;
+    this.oldOutline = this.outline;
+    this.editableOutline = this.outline;
+    this.currentExplorationId = this.explorationId;
+    this.expIdIsValid = true;
+    this.invalidExpErrorIsShown = false;
+    this.nodeTitleEditorIsShown = false;
+  }
 
-          $scope.addPrerequisiteSkillId = function() {
-            var sortedSkillSummaries = (
-              StoryEditorStateService.getSkillSummaries());
-            var allowSkillsFromOtherTopics = true;
-            var skillsInSameTopicCount = 0;
-            let modalRef: NgbModalRef = NgbModal.open(
-              SelectSkillModalComponent, {
-                backdrop: 'static',
-                windowClass: 'skill-select-modal',
-                size: 'xl'
-              });
-            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
-            modalRef.componentInstance.skillsInSameTopicCount = (
-              skillsInSameTopicCount);
-            modalRef.componentInstance.categorizedSkills = categorizedSkills;
-            modalRef.componentInstance.allowSkillsFromOtherTopics = (
-              allowSkillsFromOtherTopics);
-            modalRef.componentInstance.untriagedSkillSummaries = (
-              untriagedSkillSummaries);
-            modalRef.result.then(function(summary) {
-              try {
-                $scope.skillIdToSummaryMap[summary.id] = summary.description;
-                StoryUpdateService.addPrerequisiteSkillIdToNode(
-                  $scope.story, $scope.getId(), summary.id);
-                // The catch parameter type can only be any or unknown. The type
-                // 'unknown' is safer than type 'any' because it reminds us
-                // that we need to performsome sorts of type-checks before
-                // operating on our values.
-              } catch (err: unknown) {
-                if (err instanceof Error) {
-                  AlertsService.addInfoMessage(
-                    err.message, 5000);
-                }
-              }
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$applyAsync();
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
+  getSkillEditorUrl(skillId: string): string {
+    return '/skill_editor/' + skillId;
+  }
 
-          $scope.addAcquiredSkillId = function() {
-            var sortedSkillSummaries = (
-              StoryEditorStateService.getSkillSummaries());
-            var allowSkillsFromOtherTopics = false;
-            var skillsInSameTopicCount = 0;
-            var topicName = StoryEditorStateService.getTopicName();
-            var categorizedSkillsInTopic = {};
-            categorizedSkillsInTopic[topicName] = categorizedSkills[topicName];
-            let modalRef: NgbModalRef = NgbModal.open(
-              SelectSkillModalComponent, {
-                backdrop: 'static',
-                windowClass: 'skill-select-modal',
-                size: 'xl'
-              });
-            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
-            modalRef.componentInstance.skillsInSameTopicCount = (
-              skillsInSameTopicCount);
-            modalRef.componentInstance.categorizedSkills = categorizedSkills;
-            modalRef.componentInstance.allowSkillsFromOtherTopics = (
-              allowSkillsFromOtherTopics);
-            modalRef.componentInstance.untriagedSkillSummaries = (
-              untriagedSkillSummaries);
-            modalRef.result.then(function(summary) {
-              try {
-                StoryUpdateService.addAcquiredSkillIdToNode(
-                  $scope.story, $scope.getId(), summary.id);
-              } catch (err) {
-                AlertsService.addInfoMessage(
-                  'Given skill is already an acquired skill', 5000);
-              }
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$applyAsync();
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
+  getPrerequisiteSkillsDescription(): void {
+    const skills = this.prerequisiteSkillIds;
 
-          $scope.removeAcquiredSkillId = function(skillId) {
-            StoryUpdateService.removeAcquiredSkillIdFromNode(
-              $scope.story, $scope.getId(), skillId);
-            $scope.$applyAsync();
-          };
+    if (skills && skills.length > 0) {
+      this.skillBackendApiService.fetchMultiSkillsAsync(skills).then(
+        (response) => {
+          for (let idx in response) {
+            this.skillIdToSummaryMap[response[idx].getId()] = (
+              response[idx].getDescription());
+          }
+        }, (error) => {
+          this.alertsService.addWarning('');
+        });
+    }
+  }
 
-          $scope.unfinalizeOutline = function() {
-            StoryUpdateService.unfinalizeStoryNodeOutline(
-              $scope.story, $scope.getId());
-          };
+  checkCanSaveExpId(): void {
+    this.expIdCanBeSaved = this.explorationIdPattern.test(
+      this.explorationId) || !this.explorationId;
+    this.invalidExpErrorIsShown = false;
+  }
 
-          $scope.openNodeTitleEditor = function() {
-            $scope.nodeTitleEditorIsShown = true;
-          };
+  updateTitle(newTitle: string): void {
+    if (newTitle !== this.currentTitle) {
+      let titleIsValid = true;
 
-          $scope.closeNodeTitleEditor = function() {
-            $scope.nodeTitleEditorIsShown = false;
-          };
-
-          $scope.isOutlineModified = function(outline) {
-            return ($scope.oldOutline !== outline);
-          };
-
-          $scope.updateOutline = function(newOutline) {
-            if ($scope.isOutlineModified(newOutline)) {
-              StoryUpdateService.setStoryNodeOutline(
-                $scope.story, $scope.getId(), newOutline);
-              $scope.oldOutline = newOutline;
-            }
-          };
-
-          $scope.togglePreview = function() {
-            $scope.chapterPreviewCardIsShown = (
-              !$scope.chapterPreviewCardIsShown);
-          };
-
-          $scope.togglePrerequisiteSkillsList = function() {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              $scope.prerequisiteSkillIsShown =
-                  !$scope.prerequisiteSkillIsShown;
-            }
-          };
-          $scope.toggleChapterOutline = function() {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              $scope.chapterOutlineIsShown = !$scope.chapterOutlineIsShown;
-            }
-          };
-          $scope.toggleAcquiredSkillsList = function() {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              $scope.acquiredSkillIsShown = !$scope.acquiredSkillIsShown;
-            }
-          };
-          $scope.toggleChapterCard = function() {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              $scope.mainChapterCardIsShown = !$scope.mainChapterCardIsShown;
-            }
-          };
-          $scope.toggleChapterTodoCard = function() {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              $scope.chapterTodoCardIsShown = !$scope.chapterTodoCardIsShown;
-            }
-          };
-          $scope.toggleExplorationInputButtons = function() {
-            $scope.explorationInputButtonsAreShown = (
-              !$scope.explorationInputButtonsAreShown);
-          };
-          $scope.toggleChapterOutlineButtons = function() {
-            $scope.chapterOutlineButtonsAreShown = (
-              !$scope.chapterOutlineButtonsAreShown);
-          };
-          ctrl.$onInit = function() {
-            // Regex pattern for exploration id,
-            // EXPLORATION_AND_SKILL_ID_PATTERN
-            // is not being used here, as the chapter of the story can be saved
-            // with empty exploration id.
-            $scope.chapterPreviewCardIsShown = false;
-            $scope.mainChapterCardIsShown = true;
-            $scope.explorationInputButtonsAreShown = false;
-            $scope.chapterOutlineButtonsAreShown = false;
-            $scope.skillIdToSummaryMap = {};
-            PageTitleService.setNavbarTitleForMobileView('Chapter Editor');
-            $scope.chapterOutlineIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.chapterTodoCardIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.prerequisiteSkillIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.acquiredSkillIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
-            $scope.expIdCanBeSaved = true;
-            ctrl.directiveSubscriptions.add(
-              StoryEditorStateService.onStoryInitialized.subscribe(
-                () => _init()
-              ));
-            ctrl.directiveSubscriptions.add(
-              StoryEditorStateService.onStoryReinitialized.subscribe(
-                () => _init()
-              ));
-            ctrl.directiveSubscriptions.add(
-              StoryEditorStateService.onRecalculateAvailableNodes.subscribe(
-                () => _recalculateAvailableNodes()
-              )
-            );
-            _init();
-            // The $timeout is required because at execution time,
-            // the element may not be present in the DOM yet.Thus it ensure
-            // that the element is visible before focussing.
-            $timeout(() => {
-              FocusManagerService.setFocusWithoutScroll('storyNodeDesc');
-            }, 0);
-          };
-
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
-          };
+      for (let idx in this.story.getStoryContents().getNodes()) {
+        let node = this.story.getStoryContents().getNodes()[idx];
+        if (node.getTitle() === newTitle) {
+          titleIsValid = false;
+          this.alertsService.addInfoMessage(
+            'A chapter already exists with given title.', 5000
+          );
         }
-      ]
-    };
-  }]);
+      }
+
+      if (titleIsValid) {
+        this.storyUpdateService.setStoryNodeTitle(
+          this.story, this.nodeId, newTitle);
+        this.currentTitle = newTitle;
+      }
+    }
+  }
+
+  updateDescription(newDescription: string): void {
+    if (newDescription !== this.currentDescription) {
+      this.storyUpdateService.setStoryNodeDescription(
+        this.story, this.nodeId, newDescription);
+      this.currentDescription = newDescription;
+    }
+  }
+
+  updateThumbnailFilename(newThumbnailFilename: string): void {
+    if (newThumbnailFilename !== this.editableThumbnailFilename) {
+      this.storyUpdateService.setStoryNodeThumbnailFilename(
+        this.story, this.nodeId, newThumbnailFilename);
+    }
+  }
+
+  updateThumbnailBgColor(newThumbnailBgColor: string): void {
+    if (newThumbnailBgColor !== this.editableThumbnailBgColor) {
+      this.storyUpdateService.setStoryNodeThumbnailBgColor(
+        this.story, this.nodeId, newThumbnailBgColor);
+      this.editableThumbnailBgColor = newThumbnailBgColor;
+    }
+  }
+
+  viewNodeEditor(nodeId: string): void {
+    this.storyEditorStateService.onViewStoryNodeEditor.emit(nodeId);
+  }
+
+  finalizeOutline(): void {
+    this.storyUpdateService.finalizeStoryNodeOutline(this.story, this.nodeId);
+  }
+
+  updateExplorationid(explorationId: string): void {
+    this.toggleExplorationInputButtons();
+
+    if (this.storyEditorStateService.isStoryPublished()) {
+      if (explorationId === '' || explorationId === null) {
+        this.alertsService.addInfoMessage(
+          'You cannot remove an exploration from a published story.', 5000);
+        return;
+      }
+
+      this.explorationIdValidationService.isExpPublishedAsync(explorationId)
+        .then((expIdIsValid) => {
+          this.expIdIsValid = expIdIsValid;
+
+          if (this.expIdIsValid) {
+            this.storyUpdateService.setStoryNodeExplorationId(
+              this.story, this.nodeId, explorationId);
+            this.currentExplorationId = explorationId;
+          } else {
+            this.invalidExpErrorIsShown = true;
+          }
+        });
+    } else {
+      if (explorationId === '') {
+        this.alertsService.addInfoMessage(
+          'Please click the delete icon to remove an exploration ' +
+          'from the story.', 5000);
+        return;
+      }
+
+      this.storyUpdateService.setStoryNodeExplorationId(
+        this.story, this.nodeId, explorationId);
+      this.currentExplorationId = explorationId;
+      if (explorationId === null) {
+        this.explorationId = null;
+      }
+    }
+  }
+
+  removePrerequisiteSkillId(skillId: string): void {
+    this.storyUpdateService.removePrerequisiteSkillIdFromNode(
+      this.story, this.nodeId, skillId);
+  }
+
+  addPrerequisiteSkillId(): void {
+    let sortedSkillSummaries = this.storyEditorStateService.getSkillSummaries();
+    let allowSkillsFromOtherTopics = true;
+    let skillsInSameTopicCount = 0;
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      SelectSkillModalComponent, {
+        backdrop: 'static',
+        windowClass: 'skill-select-modal',
+        size: 'xl'
+      }
+    );
+
+    modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+    modalRef.componentInstance.skillsInSameTopicCount = (
+      skillsInSameTopicCount);
+    modalRef.componentInstance.categorizedSkills = this._categorizedSkills;
+    modalRef.componentInstance.allowSkillsFromOtherTopics = (
+      allowSkillsFromOtherTopics);
+    modalRef.componentInstance.untriagedSkillSummaries = (
+      this._untriagedSkillSummaries);
+
+    modalRef.result.then((summary) => {
+      try {
+        this.skillIdToSummaryMap[summary.id] = summary.description;
+        this.storyUpdateService.addPrerequisiteSkillIdToNode(
+          this.story, this.nodeId, summary.id);
+        // The catch parameter type can only be any or unknown. The type
+        // 'unknown' is safer than type 'any' because it reminds us
+        // that we need to performsome sorts of type-checks before
+        // operating on our values.
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          this.alertsService.addInfoMessage(
+            err.message, 5000);
+        }
+      }
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  addAcquiredSkillId(): void {
+    let sortedSkillSummaries = (
+      this.storyEditorStateService.getSkillSummaries());
+    let allowSkillsFromOtherTopics = false;
+    let skillsInSameTopicCount = 0;
+    let topicName = this.storyEditorStateService.getTopicName();
+    let categorizedSkillsInTopic = {};
+    categorizedSkillsInTopic[topicName] = this._categorizedSkills[topicName];
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      SelectSkillModalComponent, {
+        backdrop: 'static',
+        windowClass: 'skill-select-modal',
+        size: 'xl'
+      });
+
+    modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+    modalRef.componentInstance.skillsInSameTopicCount = (
+      skillsInSameTopicCount);
+    modalRef.componentInstance.categorizedSkills = this._categorizedSkills;
+    modalRef.componentInstance.allowSkillsFromOtherTopics = (
+      allowSkillsFromOtherTopics);
+    modalRef.componentInstance.untriagedSkillSummaries = (
+      this._untriagedSkillSummaries);
+
+    modalRef.result.then((summary) => {
+      try {
+        this.storyUpdateService.addAcquiredSkillIdToNode(
+          this.story, this.nodeId, summary.id);
+      } catch (err) {
+        this.alertsService.addInfoMessage(
+          'Given skill is already an acquired skill', 5000);
+      }
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  removeAcquiredSkillId(skillId: string): void {
+    this.storyUpdateService.removeAcquiredSkillIdFromNode(
+      this.story, this.nodeId, skillId);
+  }
+
+  unfinalizeOutline(): void {
+    this.storyUpdateService.unfinalizeStoryNodeOutline(this.story, this.nodeId);
+  }
+
+  openNodeTitleEditor(): void {
+    this.nodeTitleEditorIsShown = true;
+  }
+
+  closeNodeTitleEditor(): void {
+    this.nodeTitleEditorIsShown = false;
+  }
+
+  isOutlineModified(outline): boolean {
+    return this.oldOutline !== outline;
+  }
+
+  updatedOutline(newOutline): void {
+    if (this.isOutlineModified(newOutline)) {
+      this.storyUpdateService.setStoryNodeOutline(
+        this.story, this.nodeId, newOutline);
+      this.oldOutline = newOutline;
+    }
+  }
+
+  togglePreview(): void {
+    this.chapterPreviewCardIsShown = !this.chapterPreviewCardIsShown;
+  }
+
+  togglePreqrequisiteSkillsList(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.prerequisiteSkillIsShown = !this.prerequisiteSkillIsShown;
+    }
+  }
+
+  toggleChapterOutline(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.chapterOutlineIsShown = !this.chapterOutlineButtonsAreShown;
+    }
+  }
+
+  toggleAcquiredSkillsList(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.acquiredSkillIsShown = !this.acquiredSkillIsShown;
+    }
+  }
+
+  toggleChapterCard(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.mainChapterCardIsShown = !this.mainChapterCardIsShown;
+    }
+  }
+
+  toggleExplorationInputButtons(): void {
+    this.explorationInputButtonsAreShown = (
+      !this.explorationInputButtonsAreShown);
+  }
+
+  toggleChapterOutlineButtons(): void {
+    this.chapterOutlineButtonsAreShown = !this.chapterOutlineButtonsAreShown;
+  }
+
+  private _recalculateAvailableNodes(): void {
+    this.newNodeId = null;
+    this.availableNodes = [];
+    let linearNodesList = this.story.getStoryContents().getLinearNodesList();
+
+    let linearNodeIds = linearNodesList.map((node) => node.getId());
+
+    for (let i = 0; i < this.storyNodeIds.length; i++) {
+      if (this.storyNodeIds[i] === this.nodeId) {
+        continue;
+      }
+
+      if (this.destinationNodeIds().indexOf(this.storyNodeIds[i] !== -1)) {
+        continue;
+      }
+
+      if (linearNodeIds.indexOf(this.storyNodeIds[i]) === -1) {
+        this.availableNodes.push({
+          id: this.storyNodeIds[i],
+          text: this.nodeIdToTitleMap[this.storyNodeIds[i]]
+        });
+      }
+    }
+  }
+
+  ngOnInit(): void {
+    this.pageTitleService.setNavbarTitleForMobileView('Chapter Editor');
+    this.chapterOutlineIsShown = !this.windowDimensionsService.isWindowNarrow();
+    this.chapterTodoCardIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.prerequisiteSkillIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.acquiredSkillIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+
+    this.subscriptions.add(
+      this.storyEditorStateService.onStoryInitialized.subscribe(
+        () => this._init())
+    );
+
+    this.subscriptions.add(
+      this.storyEditorStateService.onStoryReinitialized.subscribe(
+        () => this._init())
+    );
+
+    this.subscriptions.add(
+      this.storyEditorStateService.onRecalculateAvailableNodes.subscribe(
+        () => this._recalculateAvailableNodes()
+      )
+    );
+
+    this._init();
+
+    // The setTimeout is required because at execution time,
+    // the element may not be present in the DOM yet.Thus it ensure
+    // that the element is visible before focussing.
+    setTimeout(() => {
+      this.focusManagerService.setFocusWithoutScroll('storyNodeDesc');
+    }, 0);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaStoryNodeEditor', downgradeComponent({
+  component: StoryNodeEditorComponent
+}));
