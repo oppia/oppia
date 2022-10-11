@@ -63,6 +63,7 @@ export class ExplorationEngineService {
   visitedStateNames: string[] = [];
   currentStateName: string;
   nextStateName: string;
+  nextStateIfStuckName: string | null;
 
   // Param changes to be used ONLY in editor preview mode.
   manualParamChanges: ParamChange[];
@@ -431,6 +432,7 @@ export class ExplorationEngineService {
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard | null,
         focusLabel: string
       ) => void
   ): boolean {
@@ -454,6 +456,7 @@ export class ExplorationEngineService {
     // at oldState.interaction.default_outcome.
     let outcome = {...classificationResult.outcome};
     let newStateName: string = outcome.dest;
+    let nextStateNameIfStuck: string | null = outcome.destIfReallyStuck;
 
     if (!this._editorPreviewMode) {
       let feedbackIsUseful: boolean = (
@@ -476,6 +479,7 @@ export class ExplorationEngineService {
     let refresherExplorationId = outcome.refresherExplorationId;
     let missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
     let newState = this.exploration.getState(newStateName);
+    let nextStateIfStuck = this.exploration.getState(nextStateNameIfStuck);
     let isFirstHit = Boolean(
       this.visitedStateNames.indexOf(newStateName) === -1);
     if (oldStateName !== newStateName) {
@@ -548,12 +552,21 @@ export class ExplorationEngineService {
       this.exploration.getState(this.nextStateName).writtenTranslations,
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService);
+    
+    let nextCardIfReallyStuck = StateCard.createNewCard(
+      this.nextStateIfStuckName, questionHtml, nextInteractionHtml,
+      this.exploration.getInteraction(this.nextStateName),
+      this.exploration.getState(this.nextStateName).recordedVoiceovers,
+      this.exploration.getState(this.nextStateName).writtenTranslations,
+      this.exploration.getState(this.nextStateName).content.contentId,
+      this.audioTranslationLanguageService);
+
     successCallback(
       nextCard, refreshInteraction, feedbackHtml,
       feedbackAudioTranslations, refresherExplorationId,
       missingPrerequisiteSkillId, onSameCard, null,
       (oldStateName === this.exploration.initStateName), isFirstHit, false,
-      _nextFocusLabel);
+      nextCardIfReallyStuck, _nextFocusLabel);
     return answerIsCorrect;
   }
 

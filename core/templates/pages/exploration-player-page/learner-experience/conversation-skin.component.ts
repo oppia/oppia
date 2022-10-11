@@ -1106,7 +1106,7 @@ export class ConversationSkinComponent {
           feedbackAudioTranslations, refresherExplorationId,
           missingPrerequisiteSkillId, remainOnCurrentCard,
           taggedSkillMisconceptionId, wasOldStateInitial,
-          isFirstHit, isFinalQuestion, focusLabel) => {
+          isFirstHit, isFinalQuestion, nextCardIfReallyStuck, focusLabel,) => {
         this.nextCard = nextCard;
         if (!this._editorPreviewMode &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
@@ -1159,6 +1159,30 @@ export class ConversationSkinComponent {
           if (remainOnCurrentCard) {
             // Stay on the same card.
             this.hintsAndSolutionManagerService.recordWrongAnswer();
+
+
+            // If learner is really stuck detected.
+            // Might as well change feedbackHtml too.
+            // Change next card
+
+
+            if (feedbackHtml) {
+              this.playerTranscriptService.addNewResponse(feedbackHtml);
+              // if (!this.displayedCard.isInteractionInline()) {
+              //   this.playerPositionService.onHelpCardAvailable.emit({
+              //     helpCardHtml: null,
+              //     hasContinueButton: true
+              //   });
+              // }
+              this.playerPositionService.onNewCardAvailable.emit();
+              this._nextFocusLabel = (
+                ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+              this.focusManagerService.setFocusIfOnDesktop(
+                this._nextFocusLabel);
+              this.scrollToBottom();
+            }
+
+
             this.playerTranscriptService.addNewResponse(feedbackHtml);
             let helpCardAvailable = false;
             if (feedbackHtml &&
