@@ -115,7 +115,7 @@ describe('Classroom Admin Data Service', () => {
       classroomAdminDataService.existingClassroomNames = [
         'chemistry', 'physics'];
 
-      classroomAdminDataService.isClassroomValid(
+      classroomAdminDataService.validateClassroom(
         classroomData, existingClassroom);
 
       expect(classroomData.setClassroomValidityFlag).toHaveBeenCalled();

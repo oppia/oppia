@@ -96,9 +96,6 @@ module.exports = {
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
-    exploration_player:
-      commonPrefix + '/pages/exploration-player-page/' +
-      'exploration-player-page.import.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
@@ -359,17 +356,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['exploration_player'],
-      filename: 'exploration-player-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/exploration-player-page/' +
-        'exploration-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

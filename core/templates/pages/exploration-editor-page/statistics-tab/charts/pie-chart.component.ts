@@ -16,74 +16,104 @@
  * @fileoverview Directive for pie chart visualization.
  */
 
-angular.module('oppia').component('pieChart', {
-  bindings: {
-    // A read-only array representing the table of chart data.
-    data: '&',
-    // A read-only object containing several chart options. This object
-    // should have the following keys: pieHole, pieSliceTextStyleColor,
-    // chartAreaWidth, colors, height, legendPosition, width.
-    options: '&'
-  },
-  controller: ['$element', '$scope', 'WindowDimensionsService', function(
-      $element, $scope, WindowDimensionsService) {
-    var ctrl = this;
-    ctrl.resizeSubscription = null;
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
-    ctrl.$onInit = function() {
-      if (!$.isArray(ctrl.data())) {
-        return;
-      }
-      var options = ctrl.options();
-      var chart = null;
+export type ChartLegendPosition = (
+  'bottom' | 'left' | 'in' | 'none' | 'right' | 'top');
 
-      var redrawChart = function() {
-        if (chart !== null) {
-          chart.draw(google.visualization.arrayToDataTable(ctrl.data()), {
-            title: options.title,
-            pieHole: options.pieHole,
-            pieSliceTextStyle: {
-              color: options.pieSliceTextStyleColor,
-            },
-            pieSliceBorderColor: options.pieSliceBorderColor,
-            pieSliceText: 'none',
-            chartArea: {
-              left: options.left,
-              width: options.chartAreaWidth
-            },
-            colors: options.colors,
-            height: options.height,
-            legend: {
-              position: options.legendPosition || 'none'
-            },
-            width: options.width
-          });
-        }
-      };
+@Component({
+  selector: 'oppia-pie-chart',
+  templateUrl: './pie-chart.component.html'
+})
+export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
+   @ViewChild('pieChart') pieChart: ElementRef;
 
-      // Need to wait for load statement in editor template to finish.
-      // https://stackoverflow.com/questions/42714876/
-      google.charts.setOnLoadCallback(function() {
-        if (!chart) {
-          chart = new google.visualization.PieChart($element[0]);
-          redrawChart();
-          $scope.$applyAsync();
-        }
-      });
+   // A read-only array representing the table of chart data.
+   @Input() data: string[];
+   // A read-only object containing several chart options. This object
+   // should have the following keys: pieHole, pieSliceTextStyleColor,
+   // chartAreaWidth, colors, height, legendPosition, width.
+   @Input() options: {
+     chartAreaWidth: number;
+     colors: string[];
+     height: number;
+     left: number;
+     legendPosition: string;
+     pieHole: number;
+     pieSliceBorderColor: string;
+     pieSliceTextStyleColor: string;
+     title: string;
+     width: number;
+   };
 
-      $scope.$watch('data()', redrawChart);
+   directiveSubscriptions = new Subscription();
+   chart: google.visualization.PieChart;
 
-      ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
-        .subscribe(evt => {
-          redrawChart();
-          $scope.$applyAsync();
-        });
-    };
+   constructor(
+     private windowDimensionsService: WindowDimensionsService,
+   ) { }
 
-    ctrl.$onDestroy = function() {
-      if (ctrl.resizeSubscription) {
-        ctrl.resizeSubscription.unsubscribe();
-      }
-    };
-  }]
-});
+   redrawChart(): void {
+     if (this.chart !== null) {
+       (this.chart)
+         .draw(google.visualization.arrayToDataTable(this.data), {
+           title: this.options.title,
+           pieHole: this.options.pieHole,
+           pieSliceTextStyle: {
+             color: this.options.pieSliceTextStyleColor,
+           },
+           pieSliceBorderColor: this.options.pieSliceBorderColor,
+           pieSliceText: 'none',
+           chartArea: {
+             left: this.options.left,
+             width: this.options.chartAreaWidth
+           },
+           colors: this.options.colors,
+           height: this.options.height,
+           legend: {
+             position: (
+               this.options.legendPosition || 'none') as ChartLegendPosition
+           },
+           width: this.options.width
+         });
+     }
+   }
+
+   ngAfterViewInit(): void {
+     // Need to wait for load statement in editor template to finish.
+     // https://stackoverflow.com/questions/42714876/
+     google.charts.setOnLoadCallback(() => {
+       if (!this.chart) {
+         setTimeout(() => {
+           this.chart = new google.visualization.PieChart(
+             this.pieChart.nativeElement);
+           this.redrawChart();
+         });
+       }
+     });
+   }
+
+   ngOnInit(): void {
+     this.directiveSubscriptions.add(
+       this.windowDimensionsService.getResizeEvent().subscribe(
+         () => {
+           setTimeout(() => {
+             this.redrawChart();
+           });
+         }
+       )
+     );
+   }
+
+   ngOnDestroy(): void {
+     this.directiveSubscriptions.unsubscribe();
+   }
+}
+
+angular.module('oppia').directive('oppiaPieChart',
+   downgradeComponent({
+     component: PieChartComponent
+   }) as angular.IDirectiveFactory);

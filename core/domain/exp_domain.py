@@ -3072,7 +3072,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     for param_name, value in rule_spec['inputs'].items():
                         interaction_id = interaction['id']
                         param_type = (
-                            interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
+                            interaction_registry.Registry.get_interaction_by_id(
                                 interaction_id
                             ).get_rule_param_type(
                                 rule_spec['rule_type'], param_name

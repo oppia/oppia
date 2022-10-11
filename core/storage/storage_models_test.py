@@ -42,7 +42,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         and not just inherited from.
         """
 
-        for clazz in test_utils.get_storage_model_classes():  # type: ignore[no-untyped-call]
+        for clazz in test_utils.get_storage_model_classes():
             if (clazz.__name__ in
                     test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES):
                 continue
@@ -50,7 +50,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
 
     def test_all_model_module_names_unique(self) -> None:
         names_of_ndb_model_subclasses = [
-            clazz.__name__ for clazz in test_utils.get_storage_model_classes()]  # type: ignore[no-untyped-call]
+            clazz.__name__ for clazz in test_utils.get_storage_model_classes()]
 
         self.assertEqual(
             len(set(names_of_ndb_model_subclasses)),
@@ -73,7 +73,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for clazz in self._get_base_or_versioned_model_child_classes():
             if (clazz.get_deletion_policy() ==
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
-                with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                with self.assertRaisesRegex(
                     NotImplementedError,
                     re.escape(
                         'The has_reference_to_user_id() method is missing from '
@@ -98,7 +98,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """
         all_models = [
             clazz
-            for clazz in test_utils.get_storage_model_classes()  # type: ignore[no-untyped-call]
+            for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
                 test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
@@ -117,7 +117,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """Ensure every field in every model has an export policy defined."""
         all_models = [
             clazz
-            for clazz in test_utils.get_storage_model_classes()  # type: ignore[no-untyped-call]
+            for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
                 test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
