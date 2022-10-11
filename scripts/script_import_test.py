@@ -29,13 +29,17 @@ import sys
 
 from core.tests import test_utils
 
+from typing import List
+
 
 class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     """Tests import of install third party libs."""
 
-    def test_import_with_missing_packages(self):
-        commands = []
-        def mock_run(cmd_tokens, *_args, **_kwargs):
+    def test_import_with_missing_packages(self) -> None:
+        commands: List[List[str]] = []
+        def mock_run(
+            cmd_tokens: List[str], *_args: str, **_kwargs: str
+        ) -> None:
             commands.append(cmd_tokens)
         run_swap = self.swap(subprocess, 'run', mock_run)
 

@@ -18,17 +18,20 @@ from __future__ import annotations
 
 import builtins
 import io
+import urllib
 
 from core import utils
 from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
 from scripts import common
 
+from typing import Dict, List, Optional, Tuple
+
 
 class MockResponse(io.StringIO):
     """Mock for the objects returned by urllib2.url_open."""
 
-    def __init__(self, data='', code=200):
+    def __init__(self, data: str = '', code: int = 200) -> None:
         """Create a new mock object for the objects returned by
         url_open.
 
@@ -39,28 +42,28 @@ class MockResponse(io.StringIO):
         super().__init__(data)
         self.code = code
 
-    def getcode(self):
+    def getcode(self) -> int:
         """Get the HTTP response code."""
         return self.code
 
 
 class ParsePrUrlTests(test_utils.GenericTestBase):
 
-    def test_valid_url(self):
+    def test_valid_url(self) -> None:
         parsed = check_if_pr_is_low_risk.parse_pr_url(
             'https://github.com/foobar/oppia/pull/23')
         self.assertEqual(parsed, ('foobar', 'oppia', '23'))
 
-    def test_valid_url_ending_slash(self):
+    def test_valid_url_ending_slash(self) -> None:
         parsed = check_if_pr_is_low_risk.parse_pr_url(
             'https://github.com/foobar/oppia/pull/23/')
         self.assertEqual(parsed, ('foobar', 'oppia', '23'))
 
-    def test_invalid_url_empty(self):
+    def test_invalid_url_empty(self) -> None:
         parsed = check_if_pr_is_low_risk.parse_pr_url('')
         self.assertIsNone(parsed)
 
-    def test_invalid_url_malformed(self):
+    def test_invalid_url_malformed(self) -> None:
         parsed = check_if_pr_is_low_risk.parse_pr_url(
             'https://github.com/foobar/oppia/issues/23')
         self.assertIsNone(parsed)
@@ -68,16 +71,16 @@ class ParsePrUrlTests(test_utils.GenericTestBase):
 
 class LoadDiffTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.url = (
             'https://patch-diff.githubusercontent.com'
             '/raw/oppia/oppia/pull/1'
         )
 
-    def test_parse_multifile_diff(self):
+    def test_parse_multifile_diff(self) -> None:
 
-        def mock_run_cmd(tokens):
+        def mock_run_cmd(tokens: List[str]) -> str:
             if '--name-status' in tokens:
                 return (
                     'M       modified\n'
@@ -183,14 +186,14 @@ class LoadDiffTests(test_utils.GenericTestBase):
         self.assertListEqual(diff_files, expected_diff_files)
         self.assertDictEqual(file_diffs, expected_file_diffs)
 
-    def test_name_status_failure(self):
+    def test_name_status_failure(self) -> None:
 
-        def mock_run_cmd(unused_tokens):
+        def mock_run_cmd(unused_tokens: List[str]) -> str:
             return (
                 'A B C D\n'
             )
 
-        def mock_print(unused_str):
+        def mock_print(unused_str: str) -> None:
             pass
 
         run_cmd_swap = self.swap_with_checks(
@@ -213,9 +216,9 @@ class LoadDiffTests(test_utils.GenericTestBase):
         self.assertListEqual(diff_files, [])
         self.assertDictEqual(file_diffs, {})
 
-    def test_parse_diff_failure_no_diff(self):
+    def test_parse_diff_failure_no_diff(self) -> None:
 
-        def mock_run_cmd(tokens):
+        def mock_run_cmd(tokens: List[str]) -> Optional[str]:
             if '--name-status' in tokens:
                 return (
                     'M       modified\n'
@@ -227,8 +230,9 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '--- a/modified\n'
                     '+++ b/modified\n'
                 )
+            return None
 
-        def mock_print(unused_str):
+        def mock_print(unused_str: str) -> None:
             pass
 
         run_cmd_swap = self.swap_with_checks(
@@ -261,7 +265,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
 
 class LookupPrTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.url = (
             'https://api.github.com/repos/oppia/oppia/pulls/1')
@@ -269,9 +273,11 @@ class LookupPrTests(test_utils.GenericTestBase):
             'Accept': 'application/vnd.github.v3+json'
         }
 
-    def test_pr_found(self):
+    def test_pr_found(self) -> None:
 
-        def mock_url_open(unused_request):
+        def mock_url_open(
+            unused_request: urllib.request.Request
+        ) -> MockResponse:
             data = '{"a": "foo", "b": 10}'
             return MockResponse(data=data)
 
@@ -286,11 +292,14 @@ class LookupPrTests(test_utils.GenericTestBase):
             'a': 'foo',
             'b': 10,
         }
+        assert pr is not None
         self.assertDictEqual(pr, expected_pr)
 
-    def test_pr_not_found(self):
+    def test_pr_not_found(self) -> None:
 
-        def mock_url_open(unused_request):
+        def mock_url_open(
+            unused_request: urllib.request.Request
+        ) -> MockResponse:
             return MockResponse(code=404)
 
         url_open_swap = self.swap(
@@ -300,10 +309,15 @@ class LookupPrTests(test_utils.GenericTestBase):
             pr = check_if_pr_is_low_risk.lookup_pr(
                 'oppia', 'oppia', '1')
 
-        self.assertDictEqual(pr, {})
+        self.assertEqual(pr, None)
 
 
-def _make_pr(source_repo, source_branch, base_ref, base_url=''):
+def _make_pr(
+    source_repo: str,
+    source_branch: str,
+    base_ref: str,
+    base_url: str = ''
+) -> check_if_pr_is_low_risk.PRDict:
     """Create a PR JSON object."""
     return {
         'head': {
@@ -323,7 +337,7 @@ def _make_pr(source_repo, source_branch, base_ref, base_url=''):
 
 class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
 
-    def test_valid_pr_is_low_risk(self):
+    def test_valid_pr_is_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
@@ -331,46 +345,46 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
 
         diff_files = [
             ('assets/i18n/foo.json', 'assets/i18n/foo.json')]
-        file_diffs = {}
+        file_diffs: Dict[str, List[str]] = {}
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
             pr, diff_files, file_diffs)
         self.assertEqual(msg, '')
 
-    def test_fork_pr_is_not_low_risk(self):
+    def test_fork_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'foo/oppia',
             'translatewiki-prs',
             'develop')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
-            pr, None, None)
+            pr, [], {})
         self.assertEqual(msg, 'Source repo is not oppia/oppia')
 
-    def test_other_branch_pr_is_not_low_risk(self):
+    def test_other_branch_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs ',
             'develop')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
-            pr, None, None)
+            pr, [], {})
         self.assertEqual(
             msg,
             'Source branch is not translatewiki-prs')
 
-    def test_non_develop_pr_is_not_low_risk(self):
+    def test_non_develop_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
             'foo')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
-            pr, None, None)
+            pr, [], {})
         self.assertEqual(
             msg, 'Base branch is not develop')
 
-    def test_filename_change_pr_is_not_low_risk(self):
+    def test_filename_change_pr_is_not_low_risk(self) -> None:
         filename_a = 'assets/i18n/foo.json'
         filename_b = 'assets/i18n/bar.json'
 
@@ -380,7 +394,7 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
             'develop')
 
         diff_files = [(filename_a, filename_b)]
-        file_diffs = {}
+        file_diffs: Dict[str, List[str]] = {}
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
             pr, diff_files, file_diffs)
@@ -389,7 +403,7 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
             'File name change: {} -> {}'.format(
                 filename_a, filename_b))
 
-    def test_py_file_change_pr_is_not_low_risk(self):
+    def test_py_file_change_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
@@ -397,7 +411,7 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
 
         diff_files = [
             ('assets/i18n/foo.py', 'assets/i18n/foo.py')]
-        file_diffs = {}
+        file_diffs: Dict[str, List[str]] = {}
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
             pr, diff_files, file_diffs)
@@ -407,7 +421,7 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
 
 class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
 
-    def test_valid_pr_is_low_risk(self):
+    def test_valid_pr_is_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
@@ -437,39 +451,39 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
             pr, diff_files, file_diffs)
         self.assertEqual(msg, '')
 
-    def test_fork_pr_is_not_low_risk(self):
+    def test_fork_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'foo/oppia',
             'update-changelog-for-release-v0.3.1',
             'develop')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
-            pr, None, None)
+            pr, [], {})
         self.assertEqual(msg, 'Source repo is not oppia/oppia')
 
-    def test_other_branch_pr_is_not_low_risk(self):
+    def test_other_branch_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1 ',
             'develop')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
-            pr, None, None)
+            pr, [], {})
         self.assertEqual(
             msg, 'Source branch does not indicate a changelog PR')
 
-    def test_non_develop_pr_is_not_low_risk(self):
+    def test_non_develop_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
             'foo')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
-            pr, None, None)
+            pr, [], {})
         self.assertEqual(
             msg, 'Base branch is not develop')
 
-    def test_risky_file_pr_is_not_low_risk(self):
+    def test_risky_file_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
@@ -477,14 +491,14 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
 
         diff_files = [
             ('scripts/start.py', 'scripts/start.py')]
-        file_diffs = {}
+        file_diffs: Dict[str, List[str]] = {}
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
             pr, diff_files, file_diffs)
         self.assertEqual(
             msg, 'File scripts/start.py changed and not low-risk')
 
-    def test_rename_file_pr_is_not_low_risk(self):
+    def test_rename_file_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
@@ -493,14 +507,14 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
         diff_files = [
             ('AUTHORS', 'scripts/start.py'),
         ]
-        file_diffs = {}
+        file_diffs: Dict[str, List[str]] = {}
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
             pr, diff_files, file_diffs)
         self.assertEqual(
             msg, 'File name change: AUTHORS -> scripts/start.py')
 
-    def test_package_json_addition_pr_is_not_low_risk(self):
+    def test_package_json_addition_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
@@ -521,7 +535,7 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
         self.assertEqual(
             msg, 'Only 1 line should change in package.json')
 
-    def test_risky_package_json_pr_is_not_low_risk(self):
+    def test_risky_package_json_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
@@ -540,7 +554,7 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
         self.assertEqual(
             msg, 'package.json changes not low-risk')
 
-    def test_risky_constants_pr_is_not_low_risk(self):
+    def test_risky_constants_pr_is_not_low_risk(self) -> None:
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
@@ -564,7 +578,7 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
 
 class MainTests(test_utils.GenericTestBase):
 
-    def test_low_risk_translation(self):
+    def test_low_risk_translation(self) -> None:
         url = 'https://github.com/oppia/oppia/pull/1'
         repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
@@ -575,14 +589,19 @@ class MainTests(test_utils.GenericTestBase):
         diff_files = [('a', 'b')]
         file_diffs = {'a': ['- b']}
 
-        def mock_parse_url(unused_url):
+        def mock_parse_url(unused_url: str) -> Tuple[str, str, str]:
             return 'oppia', 'oppia', '1'
 
-        def mock_lookup_pr(unused_owner, unused_repo, unused_number):
+        def mock_lookup_pr(
+            unused_owner: str, unused_repo: str, unused_number: int
+        ) -> check_if_pr_is_low_risk.PRDict:
             return pr
 
         def mock_check_if_pr_is_translation_pr(
-                pr_to_check, diff_files_to_check, file_diffs_to_check):
+            pr_to_check: check_if_pr_is_low_risk.PRDict,
+            diff_files_to_check: List[Tuple[str, str]],
+            file_diffs_to_check: Dict[str, List[str]]
+        ) -> str:
             if pr_to_check != pr:
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
@@ -595,7 +614,10 @@ class MainTests(test_utils.GenericTestBase):
             return ''
 
         def mock_check_if_pr_is_changelog_pr(
-                pr_to_check, diff_files_to_check, file_diffs_to_check):
+            pr_to_check: check_if_pr_is_low_risk.PRDict,
+            diff_files_to_check: List[Tuple[str, str]],
+            file_diffs_to_check: Dict[str, List[str]]
+        ) -> str:
             if pr_to_check != pr:
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
@@ -607,10 +629,12 @@ class MainTests(test_utils.GenericTestBase):
                     'Incorrect file_diffs passed to checker.')
             return 'Source branch does not indicate a changelog PR'
 
-        def mock_run_cmd(unused_tokens):
+        def mock_run_cmd(unused_tokens: List[str]) -> None:
             pass
 
-        def mock_load_diff(unused_base_branch):
+        def mock_load_diff(
+            unused_base_branch: str
+        ) -> Tuple[List[Tuple[str, str]], Dict[str, List[str]]]:
             return diff_files, file_diffs
 
         mock_low_risk_checkers = (
@@ -657,7 +681,7 @@ class MainTests(test_utils.GenericTestBase):
                 code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 0)
 
-    def test_low_risk_changelog(self):
+    def test_low_risk_changelog(self) -> None:
         url = 'https://github.com/oppia/oppia/pull/1'
         repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
@@ -668,14 +692,19 @@ class MainTests(test_utils.GenericTestBase):
         diff_files = [('a', 'b')]
         file_diffs = {'a': ['- b']}
 
-        def mock_parse_url(unused_url):
+        def mock_parse_url(unused_url: str) -> Tuple[str, str, str]:
             return 'oppia', 'oppia', '1'
 
-        def mock_lookup_pr(unused_owner, unused_repo, unused_number):
+        def mock_lookup_pr(
+            unused_owner: str, unused_repo: str, unused_number: int
+        ) -> check_if_pr_is_low_risk.PRDict:
             return pr
 
         def mock_check_if_pr_is_translation_pr(
-                pr_to_check, diff_files_to_check, file_diffs_to_check):
+            pr_to_check: check_if_pr_is_low_risk.PRDict,
+            diff_files_to_check: List[Tuple[str, str]],
+            file_diffs_to_check: Dict[str, List[str]]
+        ) -> str:
             if pr_to_check != pr:
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
@@ -688,7 +717,10 @@ class MainTests(test_utils.GenericTestBase):
             return 'Source branch does not indicate a translatewiki PR'
 
         def mock_check_if_pr_is_changelog_pr(
-                pr_to_check, diff_files_to_check, file_diffs_to_check):
+            pr_to_check: check_if_pr_is_low_risk.PRDict,
+            diff_files_to_check: List[Tuple[str, str]],
+            file_diffs_to_check: Dict[str, List[str]]
+        ) -> str:
             if pr_to_check != pr:
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
@@ -700,10 +732,12 @@ class MainTests(test_utils.GenericTestBase):
                     'Incorrect file_diffs passed to checker.')
             return ''
 
-        def mock_run_cmd(unused_tokens):
+        def mock_run_cmd(unused_tokens: List[str]) -> None:
             pass
 
-        def mock_load_diff(unused_base_branch):
+        def mock_load_diff(
+            unused_base_branch: str
+        ) -> Tuple[List[Tuple[str, str]], Dict[str, List[str]]]:
             return diff_files, file_diffs
 
         mock_low_risk_checkers = (
@@ -750,7 +784,7 @@ class MainTests(test_utils.GenericTestBase):
                 code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 0)
 
-    def test_risky_translation(self):
+    def test_risky_translation(self) -> None:
         url = 'https://github.com/oppia/oppia/pull/1'
         repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
@@ -761,14 +795,19 @@ class MainTests(test_utils.GenericTestBase):
         diff_files = [('a', 'b')]
         file_diffs = {'a': ['- b']}
 
-        def mock_parse_url(unused_url):
+        def mock_parse_url(unused_url: str) -> Tuple[str, str, str]:
             return 'oppia', 'oppia', '1'
 
-        def mock_lookup_pr(unused_owner, unused_repo, unused_number):
+        def mock_lookup_pr(
+            unused_owner: str, unused_repo: str, unused_number: int
+        ) -> check_if_pr_is_low_risk.PRDict:
             return pr
 
         def mock_check_if_pr_is_translation_pr(
-                pr_to_check, diff_files_to_check, file_diffs_to_check):
+            pr_to_check: check_if_pr_is_low_risk.PRDict,
+            diff_files_to_check: List[Tuple[str, str]],
+            file_diffs_to_check: Dict[str, List[str]]
+        ) -> str:
             if pr_to_check != pr:
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
@@ -781,7 +820,10 @@ class MainTests(test_utils.GenericTestBase):
             return 'Invalid change foo'
 
         def mock_check_if_pr_is_changelog_pr(
-                pr_to_check, diff_files_to_check, file_diffs_to_check):
+            pr_to_check: check_if_pr_is_low_risk.PRDict,
+            diff_files_to_check: List[Tuple[str, str]],
+            file_diffs_to_check: Dict[str, List[str]]
+        ) -> str:
             if pr_to_check != pr:
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
@@ -793,10 +835,12 @@ class MainTests(test_utils.GenericTestBase):
                     'Incorrect file_diffs passed to checker.')
             return 'Source branch does not indicate a changelog PR'
 
-        def mock_run_cmd(unused_tokens):
+        def mock_run_cmd(unused_tokens: List[str]) -> None:
             pass
 
-        def mock_load_diff(unused_base_branch):
+        def mock_load_diff(
+            unused_base_branch: str
+        ) -> Tuple[List[Tuple[str, str]], Dict[str, List[str]]]:
             return diff_files, file_diffs
 
         mock_low_risk_checkers = (
@@ -847,7 +891,7 @@ class MainTests(test_utils.GenericTestBase):
                 code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 1)
 
-    def test_risky_changelog(self):
+    def test_risky_changelog(self) -> None:
         url = 'https://github.com/oppia/oppia/pull/1'
         repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
@@ -858,14 +902,19 @@ class MainTests(test_utils.GenericTestBase):
         diff_files = [('a', 'b')]
         file_diffs = {'a': ['- b']}
 
-        def mock_parse_url(unused_url):
+        def mock_parse_url(unused_url: str) -> Tuple[str, str, str]:
             return 'oppia', 'oppia', '1'
 
-        def mock_lookup_pr(unused_owner, unused_repo, unused_number):
+        def mock_lookup_pr(
+            unused_owner: str, unused_repo: str, unused_number: int
+        ) -> check_if_pr_is_low_risk.PRDict:
             return pr
 
         def mock_check_if_pr_is_translation_pr(
-                pr_to_check, diff_files_to_check, file_diffs_to_check):
+            pr_to_check: check_if_pr_is_low_risk.PRDict,
+            diff_files_to_check: List[Tuple[str, str]],
+            file_diffs_to_check: Dict[str, List[str]]
+        ) -> str:
             if pr_to_check != pr:
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
@@ -878,7 +927,10 @@ class MainTests(test_utils.GenericTestBase):
             return 'Source branch does not indicate a translatewiki PR'
 
         def mock_check_if_pr_is_changelog_pr(
-                pr_to_check, diff_files_to_check, file_diffs_to_check):
+            pr_to_check: check_if_pr_is_low_risk.PRDict,
+            diff_files_to_check: List[Tuple[str, str]],
+            file_diffs_to_check: Dict[str, List[str]]
+        ) -> str:
             if pr_to_check != pr:
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
@@ -890,10 +942,12 @@ class MainTests(test_utils.GenericTestBase):
                     'Incorrect file_diffs passed to checker.')
             return 'Invalid change foo'
 
-        def mock_run_cmd(unused_tokens):
+        def mock_run_cmd(unused_tokens: List[str]) -> None:
             pass
 
-        def mock_load_diff(unused_base_branch):
+        def mock_load_diff(
+            unused_base_branch: str
+        ) -> Tuple[List[Tuple[str, str]], Dict[str, List[str]]]:
             return diff_files, file_diffs
 
         mock_low_risk_checkers = (
@@ -944,10 +998,10 @@ class MainTests(test_utils.GenericTestBase):
                 code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 1)
 
-    def test_url_parsing_failure(self):
+    def test_url_parsing_failure(self) -> None:
         url = 'https://github.com/oppia/oppia/pull/1'
 
-        def mock_parse_url(unused_url):
+        def mock_parse_url(unused_url: str) -> None:
             return None
 
         parse_url_swap = self.swap_with_checks(
@@ -963,13 +1017,15 @@ class MainTests(test_utils.GenericTestBase):
             ):
                 check_if_pr_is_low_risk.main(tokens=[url])
 
-    def test_pr_loading_failure(self):
+    def test_pr_loading_failure(self) -> None:
         url = 'https://github.com/oppia/oppia/pull/1'
 
-        def mock_parse_url(unused_url):
+        def mock_parse_url(unused_url: str) -> Tuple[str, str, str]:
             return 'oppia', 'oppia', '1'
 
-        def mock_lookup_pr(unused_owner, unused_repo, unused_number):
+        def mock_lookup_pr(
+            unused_owner: str, unused_repo: str, unused_number: int
+        ) -> Dict[str, str]:
             return {}
 
         parse_url_swap = self.swap_with_checks(
@@ -990,7 +1046,7 @@ class MainTests(test_utils.GenericTestBase):
             ):
                 check_if_pr_is_low_risk.main(tokens=[url])
 
-    def test_diff_loading_failure(self):
+    def test_diff_loading_failure(self) -> None:
         url = 'https://github.com/oppia/oppia/pull/1'
         repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
@@ -999,16 +1055,20 @@ class MainTests(test_utils.GenericTestBase):
             'develop',
             base_url=repo_url)
 
-        def mock_parse_url(unused_url):
+        def mock_parse_url(unused_url: str) -> Tuple[str, str, str]:
             return 'oppia', 'oppia', '1'
 
-        def mock_lookup_pr(unused_owner, unused_repo, unused_number):
+        def mock_lookup_pr(
+            unused_owner: str, unused_repo: str, unused_number: int
+        ) -> check_if_pr_is_low_risk.PRDict:
             return pr
 
-        def mock_run_cmd(unused_tokens):
+        def mock_run_cmd(unused_tokens: List[str]) -> None:
             pass
 
-        def mock_load_diff(unused_branch):
+        def mock_load_diff(
+            unused_branch: str
+        ) -> Tuple[List[Tuple[str, str]], Dict[str, List[str]]]:
             return [], {}
 
         parse_url_swap = self.swap_with_checks(
