@@ -3207,27 +3207,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_dict['written_translations']['translations_mapping'])
             new_translations_mapping = {}
             for content_id, translation_item in translations_mapping.items():
-                if content_id == 'content':
-                    for language_code in translations_mapping[content_id]:
-                        written_translation = (
-                            translation_item[language_code]
-                        )
-                        # Here, we are narrowing down the type from
-                        # Union[List[str], str] to str.
-                        assert isinstance(
-                            written_translation['translation'],
-                            str
-                        )
-                        correct_html = (
-                            cls.fix_non_interactive_links(
-                                written_translation['translation']))
-
-                        written_translation['translation'] = correct_html
-                        translation_item[language_code] = (
-                            written_translation)
-
                 new_translations_mapping[content_id] = translation_item
+                if content_id != 'content':
+                    continue
+                for language_code in translations_mapping[content_id]:
+                    written_translation = translation_item[language_code]
+                    # Here, we are narrowing down the type from
+                    # Union[List[str], str] to str.
+                    assert isinstance(
+                        written_translation['translation'], str
+                    )
+                    correct_html = cls.fix_non_interactive_links(
+                        written_translation['translation'])
 
+                    written_translation['translation'] = correct_html
+                    translation_item[language_code] = written_translation
+                            
             state_dict['written_translations']['translations_mapping'] = (
                 new_translations_mapping)
 
