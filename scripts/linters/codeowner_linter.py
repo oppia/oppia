@@ -336,7 +336,7 @@ class CodeownerLintChecksManager:
         self._check_for_important_patterns_at_bottom_of_codeowners(
             important_rules_in_critical_section)
 
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, self.failed, self.error_messages, self.error_messages)
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:

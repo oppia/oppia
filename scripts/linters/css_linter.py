@@ -103,7 +103,7 @@ class ThirdPartyCSSLintChecksManager:
                 self._get_trimmed_error_output(linter_stdout))
             failed = True
 
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, stripped_error_messages, full_error_messages)
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
@@ -116,7 +116,7 @@ class ThirdPartyCSSLintChecksManager:
         """
         if not self.all_filepaths:
             return [
-                concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+                concurrent_task_utils.TaskResult(
                     'CSS lint', False, [],
                     ['There are no HTML or CSS files to lint.'])]
 

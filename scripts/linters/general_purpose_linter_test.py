@@ -317,7 +317,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
             [
                 'There are no files to be checked.',
                 'SUCCESS  General purpose lint check passed'],
-            lint_task_report[0].get_report())  # type: ignore[no-untyped-call]
+            lint_task_report[0].get_report())
         self.assertEqual('General purpose lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
@@ -386,7 +386,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
             lint_task_report = linter.check_bad_patterns()
         self.assertEqual(
             ['SUCCESS  Bad pattern check passed'],
-            lint_task_report.get_report())  # type: ignore[no-untyped-call]
+            lint_task_report.get_report())
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 

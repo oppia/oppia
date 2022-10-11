@@ -340,7 +340,7 @@ class HTMLLintChecksManager:
             if parser.failed:
                 error_messages.extend(parser.error_messages)
                 failed = True
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
@@ -354,7 +354,7 @@ class HTMLLintChecksManager:
 
         if not self.all_filepaths:
             return [
-                concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+                concurrent_task_utils.TaskResult(
                     'HTML lint', False, [],
                     ['There are no HTML files to lint.'])]
 
@@ -446,7 +446,7 @@ class ThirdPartyHTMLLintChecksManager:
             error_messages.append(
                 self._get_trimmed_error_output(linter_stdout))
 
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
@@ -459,7 +459,7 @@ class ThirdPartyHTMLLintChecksManager:
         """
         if not self.all_filepaths:
             return [
-                concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+                concurrent_task_utils.TaskResult(
                     'HTML lint', False, [],
                     ['There are no HTML files to lint.'])]
 

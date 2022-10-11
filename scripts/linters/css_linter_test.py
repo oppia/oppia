@@ -52,7 +52,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         lint_task_report = third_party_linter.lint_css_files()
         self.assert_same_list_elements(
             ['19:16', 'Unexpected whitespace before ":"'],
-            lint_task_report.get_report())  # type: ignore[no-untyped-call]
+            lint_task_report.get_report())
         self.assertEqual('Stylelint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -90,7 +90,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         lint_task_report = third_party_linter.perform_all_lint_checks()
         self.assertEqual(
             'There are no HTML or CSS files to lint.',
-            lint_task_report[0].get_report()[0])  # type: ignore[no-untyped-call]
+            lint_task_report[0].get_report()[0])
         self.assertEqual('CSS lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 

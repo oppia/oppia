@@ -93,7 +93,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     self.assert_same_list_elements(
                         [message], stdout.trimmed_messages)
                 self.assert_failed_messages_count(
-                    stdout.get_report(), failed_count)  # type: ignore[no-untyped-call]
+                    stdout.get_report(), failed_count)
             else:
                 continue
 
@@ -235,7 +235,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             [
                 'There are no JavaScript or Typescript files to lint.',
                 'SUCCESS  JS TS lint check passed'],
-            lint_task_report[0].get_report())  # type: ignore[no-untyped-call]
+            lint_task_report[0].get_report())
         self.assertEqual('JS TS lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
@@ -246,7 +246,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             [
                 'There are no JavaScript or Typescript files to lint.',
                 'SUCCESS  JS TS lint check passed'],
-            lint_task_report[0].get_report())  # type: ignore[no-untyped-call]
+            lint_task_report[0].get_report())
         self.assertEqual('JS TS lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 

@@ -146,7 +146,7 @@ class CustomLintChecksManager:
                 error_messages.append(error_message)
                 failed = True
 
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def check_third_party_libs_type_defs(
@@ -224,7 +224,7 @@ class CustomLintChecksManager:
                     error_messages.append(error_message)
                     failed = True
 
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def check_webpack_config_file(self) -> concurrent_task_utils.TaskResult:
@@ -271,7 +271,7 @@ class CustomLintChecksManager:
                 if key in keys:
                     keys.remove(key)
 
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def check_github_workflows_use_merge_action(
@@ -296,7 +296,7 @@ class CustomLintChecksManager:
             workflow_dict = yaml.load(workflow_str, Loader=yaml.Loader)
             errors += self._check_that_workflow_steps_use_merge_action(
                 workflow_dict, workflow_path)
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, bool(errors), errors, errors)
 
     # Here we use type Any because the argument 'workflow_dict' accept

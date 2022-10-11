@@ -469,7 +469,7 @@ class GeneralPurposeLinter:
                     self._check_for_mandatory_pattern_in_file(
                         pattern_list, filepath, failed))
                 error_messages.extend(mandatory_error_messages)
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def check_bad_patterns(self) -> concurrent_task_utils.TaskResult:
@@ -528,7 +528,7 @@ class GeneralPurposeLinter:
                                 constants['message']))
                             error_messages.append(error_message)
                             total_error_count += 1
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def check_newline_at_eof(self) -> concurrent_task_utils.TaskResult:
@@ -549,7 +549,7 @@ class GeneralPurposeLinter:
                     'end of file.' % filepath)
                 error_messages.append(error_message)
                 failed = True
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def check_disallowed_flags(self) -> concurrent_task_utils.TaskResult:
@@ -579,7 +579,7 @@ class GeneralPurposeLinter:
                     ' warranted_angular_security_bypasses.py' % filepath)
                 error_messages.append(error_message)
                 failed = True
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def check_extra_js_files(self) -> concurrent_task_utils.TaskResult:
@@ -613,7 +613,7 @@ class GeneralPurposeLinter:
                 'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
                 'build.py. Otherwise, rename them to .ts')
             error_messages.append(err_msg)
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
@@ -626,7 +626,7 @@ class GeneralPurposeLinter:
         """
         if not self.all_filepaths:
             return [
-                concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+                concurrent_task_utils.TaskResult(
                     'General purpose lint', False, [],
                     ['There are no files to be checked.'])]
         task_results = [

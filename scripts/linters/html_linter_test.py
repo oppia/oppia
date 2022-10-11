@@ -174,7 +174,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             [VALID_HTML_FILEPATH], FILE_CACHE).check_html_tags_and_attributes()
         self.assertEqual(
             ['SUCCESS  HTML tag and attribute check passed'],
-            lint_task_report.get_report())  # type: ignore[no-untyped-call]
+            lint_task_report.get_report())
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 
@@ -185,7 +185,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             [
                 'There are no HTML files to lint.',
                 'SUCCESS  HTML lint check passed'],
-            lint_task_report[0].get_report())  # type: ignore[no-untyped-call]
+            lint_task_report[0].get_report())
         self.assertEqual('HTML lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
@@ -196,7 +196,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             [
                 'There are no HTML files to lint.',
                 'SUCCESS  HTML lint check passed'],
-            lint_task_report[0].get_report())  # type: ignore[no-untyped-call]
+            lint_task_report[0].get_report())
         self.assertEqual('HTML lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 

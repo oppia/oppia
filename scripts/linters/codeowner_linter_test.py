@@ -198,7 +198,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
                 linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
                 lint_task_report = linter.check_codeowner_file()
         self.assertEqual(
-            ['SUCCESS  CODEOWNERS check passed'], lint_task_report.get_report())  # type: ignore[no-untyped-call]
+            ['SUCCESS  CODEOWNERS check passed'], lint_task_report.get_report())
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 

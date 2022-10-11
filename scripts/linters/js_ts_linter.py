@@ -209,7 +209,7 @@ class JsTsLintChecksManager:
         # Select JS files which need to be checked.
         files_to_check = self.all_filepaths
         parsed_js_and_ts_files = {}
-        concurrent_task_utils.log('Validating and parsing JS and TS files ...')  # type: ignore[no-untyped-call]
+        concurrent_task_utils.log('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
             file_content = self.file_cache.read(filepath)  # type: ignore[no-untyped-call]
 
@@ -375,7 +375,7 @@ class JsTsLintChecksManager:
                     constants_to_source_filepaths_dict[
                         constant_name] = filepath
 
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def _check_angular_services_index(self) -> concurrent_task_utils.TaskResult:
@@ -426,7 +426,7 @@ class JsTsLintChecksManager:
                     )
                     error_messages.append(error_message)
                     failed = True
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
@@ -440,7 +440,7 @@ class JsTsLintChecksManager:
 
         if not self.all_filepaths:
             return [
-                concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+                concurrent_task_utils.TaskResult(
                     'JS TS lint', False, [],
                     ['There are no JavaScript or Typescript files to lint.'])]
 
@@ -570,7 +570,7 @@ class ThirdPartyJsTsLintChecksManager:
             full_error_messages.append(linter_stdout)
             error_messages.append(self._get_trimmed_error_output(linter_stdout))
 
-        return concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+        return concurrent_task_utils.TaskResult(
             name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
@@ -583,7 +583,7 @@ class ThirdPartyJsTsLintChecksManager:
         """
         if not self.all_filepaths:
             return [
-                concurrent_task_utils.TaskResult(  # type: ignore[no-untyped-call]
+                concurrent_task_utils.TaskResult(
                     'JS TS lint', False, [],
                     ['There are no JavaScript or Typescript files to lint.'])]
 
