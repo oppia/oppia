@@ -13,25 +13,48 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the improvements tab of the exploration editor.
+ * @fileoverview Component for the improvements tab of the exploration editor.
  */
 
-angular.module('oppia').component('needsGuidingResponsesTask', {
-  template: require('./needs-guiding-responses-task.component.html'),
-  bindings: {task: '<', stats: '<'},
-  controller: [
-    'RouterService',
-    function(RouterService) {
-      this.$onInit = () => {
-        this.sortedTilesData = this.stats.answerStats;
-        this.sortedTilesOptions = {header: '', use_percentages: true};
-        this.sortedTilesTotalFrequency = (
-          this.stats.stateStats.totalAnswersCount);
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
+import { SupportingStateStats } from 'services/exploration-improvements-task-registry.service';
+import { RouterService } from '../services/router.service';
 
-        this.navigateToStateEditor = () => {
-          RouterService.navigateToMainTab(this.task.targetId);
-        };
-      };
-    }
-  ],
-});
+@Component({
+  selector: 'oppia-needs-guiding-responses-task',
+  templateUrl: './needs-guiding-responses-task.component.html'
+})
+export class NeedsGuidingResponsesTaskComponent implements OnInit {
+   @Input() stats: SupportingStateStats;
+   @Input() task: NeedsGuidingResponsesTask;
+
+   sortedTilesData: AnswerStats[];
+   sortedTilesTotalFrequency: number;
+   sortedTilesOptions: {
+     header: string;
+     use_percentages: boolean;
+   };
+
+   constructor(
+     private routerService: RouterService,
+   ) { }
+
+   navigateToStateEditor(): void {
+     this.routerService.navigateToMainTab(this.task.targetId);
+   }
+
+   ngOnInit(): void {
+     this.sortedTilesData = [...this.stats.answerStats];
+     this.sortedTilesOptions = {header: '', use_percentages: true};
+     this.sortedTilesTotalFrequency = (
+       this.stats.stateStats.totalAnswersCount);
+   }
+}
+
+angular.module('oppia').directive('oppiaNeedsGuidingResponsesTask',
+   downgradeComponent({
+     component: NeedsGuidingResponsesTaskComponent
+   }) as angular.IDirectiveFactory);
