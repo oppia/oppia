@@ -92,11 +92,11 @@
                 <[getEmptyContentMessage()]>
               </span>
               <span>
-                <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                   ng-click="onContentClick($event)"
-                                   html-data="getRequiredHtml(caContent.content)"
-                                   class="oppia-rte-editor">
-                </angular-html-bind>
+                <oppia-rte-output-display ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                          ng-click="onContentClick($event)"
+                                          [rte-string]="getRequiredHtml(caContent.content)"
+                                          class="oppia-rte-editor">
+                </oppia-rte-output-display>
               </span>
             </div>
             <div class="oppia-editor-card-section" ng-if="caContent.content._unicode">
@@ -166,11 +166,11 @@
                     <[getEmptyContentMessage()]>
                   </span>
                   <span>
-                    <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                       ng-click="onContentClick($event)"
-                                       html-data="getRequiredHtml(answerGroup.outcome.feedback)"
-                                       class="oppia-rte-editor">
-                    </angular-html-bind>
+                    <oppia-rte-output-display [rte-string]="getRequiredHtml(answerGroup.outcome.feedback)"
+                                              ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                              ng-click="onContentClick($event)"
+                                              class="oppia-rte-editor">
+                    </oppia-rte-output-display>
                   </span>
                 </div>
               </div>
@@ -203,11 +203,11 @@
             <div ng-if="activeAnswerGroupIndex === stateAnswerGroups.length">
               <div class="oppia-editor-card-section e2e-test-feedback-<[stateAnswerGroups.length]>-text">
                 <div class="oppia-rule-body-container">
-                  <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                     ng-click="onContentClick($event)"
-                                     html-data="getRequiredHtml(stateDefaultOutcome.feedback)"
-                                     class="oppia-rte-editor">
-                  </angular-html-bind>
+                  <oppia-rte-output-display ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                            ng-click="onContentClick($event)"
+                                            [rte-string]="getRequiredHtml(stateDefaultOutcome.feedback)"
+                                            class="oppia-rte-editor">
+                  </oppia-rte-output-display>
                 </div>
               </div>
             </div>
@@ -238,11 +238,11 @@
                 <[getEmptyContentMessage()]>
               </span>
               <span>
-                <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                   ng-click="onContentClick($event)"
-                                   html-data="getRequiredHtml(hint.hintContent)"
-                                   class="oppia-rte-editor">
-                </angular-html-bind>
+                <oppia-rte-output-display [rte-string]="getRequiredHtml(hint.hintContent)"
+                                          ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                          ng-click="onContentClick($event)"
+                                          class="oppia-rte-editor">
+                </oppia-rte-output-display>
               </span>
             </div>
           </div>
@@ -255,11 +255,11 @@
         <[getEmptyContentMessage()]>
       </span>
       <span>
-        <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                           ng-click="onContentClick($event)"
-                           html-data="getRequiredHtml(stateSolution.explanation)"
-                           class="oppia-rte-editor">
-        </angular-html-bind>
+        <oppia-rte-output-display ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                  ng-click="onContentClick($event)"
+                                  [rte-string]="getRequiredHtml(stateSolution.explanation)"
+                                  class="oppia-rte-editor">
+        </oppia-rte-output-display>
       </span>
     </div>
   </div>
