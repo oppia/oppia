@@ -89,13 +89,13 @@ describe('States Object Factory', () => {
     newState = {
       classifier_model_id: null,
       content: {
-        content_id: 'content',
+        content_id: 'content_7',
         html: ''
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
+          content_7: {},
+          default_outcome_8: {}
         }
       },
       interaction: {
@@ -109,7 +109,7 @@ describe('States Object Factory', () => {
           dest: 'new state',
           dest_if_really_stuck: null,
           feedback: {
-            content_id: 'default_outcome',
+            content_id: 'default_outcome_8',
             html: ''
           },
           param_changes: [],
@@ -127,13 +127,13 @@ describe('States Object Factory', () => {
     newState2 = {
       classifier_model_id: null,
       content: {
-        content_id: 'content',
+        content_id: 'content_5',
         html: ''
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
+          content_5: {},
+          default_outcome_6: {}
         }
       },
       interaction: {
@@ -151,7 +151,7 @@ describe('States Object Factory', () => {
           dest: 'new state',
           dest_if_really_stuck: null,
           feedback: {
-            content_id: 'default_outcome',
+            content_id: 'default_outcome_6',
             html: ''
           },
           param_changes: [],
@@ -472,10 +472,6 @@ describe('States Object Factory', () => {
     'that state to a terminal state', () => {
     let newStates = ssof.createFromBackendDict(statesDict);
     newStates.addState('new state', 'content_5', 'default_outcome_6');
-
-    expect(newStates.getState('new state')).toEqual(
-      sof.createFromBackendDict('new state', newState2));
-
     expect(newStates.hasState('new state')).toBe(true);
     expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
     expect((Object.keys(newStates.getStateObjects())).length).toBe(2);

@@ -32,38 +32,38 @@ interface ContentReplacers {
   [format: string]: (arg0: TranslatableField, arg1: TranslatedContent) => void;
 }
 
-export class BaseTranslatableObject {
-  private contentReplacers: ContentReplacers = {
-    html: (
-        translatableField,
-        writtenTranslation
-    ): void => {
-      (translatableField as SubtitledHtml).html = (
-        writtenTranslation.translation as string);
-    },
-    unicode: (
-        translatableField: TranslatableField,
-        writtenTranslation: TranslatedContent
-    ): void => {
-      (translatableField as SubtitledUnicode).unicode = (
-        writtenTranslation.translation as string);
-    },
-    set_of_normalized_string: (
-        translatableField: TranslatableField,
-        writtenTranslation: TranslatedContent
-    ): void => {
-      (translatableField as TranslatableSetOfNormalizedString)
-        .normalizedStrSet = writtenTranslation.translation as string[];
-    },
-    set_of_unicode_string: (
-        translatableField: TranslatableField,
-        writtenTranslation: TranslatedContent
-    ): void => {
-      (translatableField as TranslatableSetOfUnicodeString).unicodeStrSet = (
-        writtenTranslation.translation as string[]);
-    }
-  };
+const CONTENT_REPLACERS: ContentReplacers = {
+  html: (
+      translatableField,
+      writtenTranslation
+  ): void => {
+    (translatableField as SubtitledHtml).html = (
+      writtenTranslation.translation as string);
+  },
+  unicode: (
+      translatableField: TranslatableField,
+      writtenTranslation: TranslatedContent
+  ): void => {
+    (translatableField as SubtitledUnicode).unicode = (
+      writtenTranslation.translation as string);
+  },
+  set_of_normalized_string: (
+      translatableField: TranslatableField,
+      writtenTranslation: TranslatedContent
+  ): void => {
+    (translatableField as TranslatableSetOfNormalizedString)
+      .normalizedStrSet = writtenTranslation.translation as string[];
+  },
+  set_of_unicode_string: (
+      translatableField: TranslatableField,
+      writtenTranslation: TranslatedContent
+  ): void => {
+    (translatableField as TranslatableSetOfUnicodeString).unicodeStrSet = (
+      writtenTranslation.translation as string[]);
+  }
+};
 
+export class BaseTranslatableObject {
   static getContentValue(content: TranslatableField): string | string[] | null {
     if (content instanceof SubtitledHtml) {
       return content.html;
@@ -99,10 +99,10 @@ export class BaseTranslatableObject {
       const contentId = translatableField.contentId as string;
       let writtenTranslation = entityTranslations.getWrittenTranslation(
         contentId);
-      if (writtenTranslation !== null) {
+      if (writtenTranslation !== null && !writtenTranslation.needsUpdate) {
         let dataFormat: string = writtenTranslation.dataFormat;
-        if (this.contentReplacers.hasOwnProperty(dataFormat)) {
-          this.contentReplacers[dataFormat](
+        if (CONTENT_REPLACERS.hasOwnProperty(dataFormat)) {
+          CONTENT_REPLACERS[dataFormat](
             translatableField, writtenTranslation);
         }
       }

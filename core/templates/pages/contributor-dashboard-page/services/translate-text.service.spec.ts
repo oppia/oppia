@@ -27,8 +27,8 @@ describe('TranslateTextService', () => {
   let httpTestingController;
   const getTranslatableItem = (text) => {
     return {
-      data_format: 'html',
-      content: text,
+      content_format: 'html',
+      content_value: text,
       content_type: 'content',
       interaction_id: null,
       rule_type: null

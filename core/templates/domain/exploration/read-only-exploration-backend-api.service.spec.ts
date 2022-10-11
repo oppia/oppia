@@ -359,7 +359,8 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        correctness_feedback_enabled: false
+        correctness_feedback_enabled: false,
+        next_content_id_index: 1
       },
       exploration_metadata: {
         title: '',
@@ -386,6 +387,7 @@ describe('Read only exploration backend API service', () => {
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
+      displayable_language_codes: [],
       preferred_language_codes: [],
       has_viewed_lesson_info_modal_once: false,
       furthest_reached_checkpoint_exp_version: 1,

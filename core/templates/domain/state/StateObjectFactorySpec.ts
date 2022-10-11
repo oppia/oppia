@@ -63,21 +63,10 @@ describe('State Object Factory', () => {
     next_content_id_index: 0,
     param_changes: [],
     recorded_voiceovers: {
-      voiceovers_mapping: {
-        content: {},
-        default_outcome: {}
-      }
+      voiceovers_mapping: {}
     },
     solicit_answer_details: false,
-    card_is_checkpoint: false,
-    written_translations: {
-      translations_mapping: {
-        content: {},
-        default_outcome: {},
-        hint_1: {},
-        rule_input_2: {}
-      }
-    }
+    card_is_checkpoint: false
   };
 
   type DefaultOutcome = (
@@ -122,7 +111,7 @@ describe('State Object Factory', () => {
           dest: '(untitled state)',
           dest_if_really_stuck: null,
           feedback: {
-            content_id: 'default_outcome',
+            content_id: 'default_outcome_1',
             html: ''
           },
           param_changes: [],

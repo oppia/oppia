@@ -17,7 +17,7 @@
  */
 
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
@@ -53,6 +53,12 @@ describe('Content translation manager service', () => {
   let entityTranslation: EntityTranslation;
 
   class MockActiveModal {
+    open() {
+      return {
+        result: null
+      };
+    }
+
     close(): void {
       return;
     }
@@ -229,7 +235,7 @@ describe('Content translation manager service', () => {
   it('should switch to a new language', fakeAsync(() => {
     ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
-    flushMicrotasks();
+    tick();
 
     const card = pts.transcript[0];
     const interaction = card.getInteraction();
@@ -255,6 +261,7 @@ describe('Content translation manager service', () => {
     });
     expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>fr default outcome</p>');
+    discardPeriodicTasks();
   }));
 
   it('should switch to a new language expect invalid translations', fakeAsync(
@@ -274,7 +281,7 @@ describe('Content translation manager service', () => {
       };
 
       entityTranslation.markTranslationAsNeedingUpdate('hint_0');
-      spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
+      etbs.fetchEntityTranslationAsync = jasmine.createSpy().and.returnValue(
         Promise.resolve(entityTranslation)
       );
       ctms.displayTranslations('fr');
@@ -293,6 +300,7 @@ describe('Content translation manager service', () => {
       });
       expect(interaction.defaultOutcome?.feedback.html).toBe(
         '<p>fr default outcome</p>');
+      discardPeriodicTasks();
     }));
 
   it('should switch back to the original language', fakeAsync(() => {
@@ -325,16 +333,20 @@ describe('Content translation manager service', () => {
     });
     expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>en default outcome</p>');
+    discardPeriodicTasks();
   }));
 
   it('should emit to onStateCardContentUpdateEmitter when the ' +
-     'language is changed', () => {
+     'language is changed', fakeAsync(() => {
     const onStateCardContentUpdate = spyOn(
       ctms.onStateCardContentUpdate, 'emit');
     ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
+    tick();
+
     expect(onStateCardContentUpdate).toHaveBeenCalled();
-  });
+    discardPeriodicTasks();
+  }));
 
   it('should return translation HTML if it exist', fakeAsync(
     () => {
@@ -344,6 +356,7 @@ describe('Content translation manager service', () => {
       let translatedHtml = ctms.getHtmlTranslations(
         'fr', ['hint_0', 'solution']);
       expect(translatedHtml).toEqual(['<p>fr hint</p>', '<p>fr solution</p>']);
+      discardPeriodicTasks();
     }));
 
   it('should return empty list if content_id in translation does not exist',
@@ -353,6 +366,7 @@ describe('Content translation manager service', () => {
 
       let translatedHtml = ctms.getHtmlTranslations('fr', ['hint_1']);
       expect(translatedHtml).toEqual([]);
+      discardPeriodicTasks();
     }));
 
   it('should return empty list if translation does not exist', fakeAsync(
@@ -363,6 +377,7 @@ describe('Content translation manager service', () => {
       let translatedHtml = ctms.getHtmlTranslations(
         'hi', ['hint_0', 'solution']);
       expect(translatedHtml).toEqual([]);
+      discardPeriodicTasks();
     }));
 
   it('should not return non html translations', fakeAsync(() => {
@@ -372,6 +387,7 @@ describe('Content translation manager service', () => {
     let translatedHtml = ctms.getHtmlTranslations(
       'fr', ['hint_0', 'ca_placeholder_0']);
     expect(translatedHtml).toEqual(['<p>fr hint</p>']);
+    discardPeriodicTasks();
   }));
 
   it('should not switch rules if the replacement is empty', () => {
@@ -481,7 +497,7 @@ describe('Content translation manager service', () => {
       delete InteractionSpecsConstants.INTERACTION_SPECS.DummyInteraction;
     });
 
-    it('should replace translatable customization args', () => {
+    it('should replace translatable customization args', fakeAsync(() => {
       const card = pts.transcript[0];
       const interaction = card.getInteraction();
 
@@ -490,7 +506,7 @@ describe('Content translation manager service', () => {
       entityTranslation.translationMapping.ca_1 = new TranslatedContent(
         'fr 2', 'unicode', false);
 
-      spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
+      etbs.fetchEntityTranslationAsync = jasmine.createSpy().and.returnValue(
         Promise.resolve(entityTranslation)
       );
 
@@ -514,6 +530,8 @@ describe('Content translation manager service', () => {
 
       ctms.setOriginalTranscript('en');
       ctms.displayTranslations('fr');
+      tick();
+
       expect(interaction.customizationArgs).toEqual({
         dummyCustArg: {value: [{
           content: suof.createFromBackendDict({
@@ -530,6 +548,7 @@ describe('Content translation manager service', () => {
           show: true
         }]}
       });
-    });
+      discardPeriodicTasks();
+    }));
   });
 });

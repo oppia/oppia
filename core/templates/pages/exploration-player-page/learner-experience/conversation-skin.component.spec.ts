@@ -1878,6 +1878,8 @@ describe('Conversation skin component', () => {
         .and.returnValue('en');
       spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
         .and.returnValue('es');
+      spyOn(contentTranslationManagerService, 'displayTranslations')
+        .and.returnValue();
       spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
       spyOn(componentInstance, 'isSupplementalCardNonempty').and.returnValue(
         false);

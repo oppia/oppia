@@ -175,6 +175,8 @@ export class TranslationStatusService implements OnInit {
             });
           }
 
+          console.error(stateName, allContentIds);
+
           this.explorationTranslationContentRequiredCount += (
             allContentIds.length);
 

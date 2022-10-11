@@ -95,7 +95,7 @@ describe('HintEditorComponent', () => {
 
   it('should throw error if content id is invalid', () => {
     component.hint = new Hint(
-      SubtitledHtml.createDefault('content', 'data'));
+      SubtitledHtml.createDefault('content', null));
     component.hintMemento = new Hint(
       SubtitledHtml.createDefault('html text', 'contentID'));
 
