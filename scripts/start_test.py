@@ -25,8 +25,6 @@ from scripts import extend_index_yaml
 from scripts import install_third_party_libs
 from scripts import servers
 
-from typing import Any
-
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
@@ -42,7 +40,7 @@ class MockCompilerContextManager():
     def __enter__(self) -> MockCompiler:
         return MockCompiler()
 
-    def __exit__(self, *unused_args: Any) -> None:
+    def __exit__(self, *unused_args: str) -> None:
         pass
 
 
