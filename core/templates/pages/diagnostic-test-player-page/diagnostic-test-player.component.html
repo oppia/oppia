@@ -1,1 +1,33 @@
-<h1>Hello diagnostic test</h1>
+<button>
+  BACK
+</button>
+<h3>Learner Diagnostic Test</h3>
+<mat-card class="introductory-card">
+  <div>
+    <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+        [href]="OPPIA_AVATAR_LINK_URL"
+        target="_blank"
+        rel="noopener">
+      <img class="conversation-skin-oppia-avatar"
+            [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+    </a>
+  </div>
+  <div>
+    <p>This test will help us recommend a topic for you.</p>
+    <p>
+      Please note that you will not be able to return to previous questions
+      after moving to the next question.
+    </p>
+  </div>
+  <button>
+    START THE TEST
+  </button>
+</mat-card>
+
+<style>
+  .introductory-card {
+    margin: auto;
+    width: 500px;
+    height: 500px;
+  }
+</style>
