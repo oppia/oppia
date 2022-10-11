@@ -32,7 +32,7 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
-interface AssignedSkillTopicData {
+export interface AssignedSkillTopicData {
   [topicName: string]: string;
 }
 interface GroupedSkillSummaryDictionaries {
