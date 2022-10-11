@@ -323,7 +323,7 @@ def validate_rte_tags(
             )
 
         caption_value = utils.unescape_html(
-                tag['caption-with-value'])[1:-1].replace('\\"', '')
+            tag['caption-with-value'])[1:-1].replace('\\"', '')
         if len(caption_value.strip()) > 500:
             raise utils.ValidationError(
                 'Image tag \'caption-with-value\' attribute should not '
@@ -472,7 +472,7 @@ def validate_rte_tags(
             )
 
 
-def _content_in_tabs_tag_is_empty(
+def _raise_validation_errors_for_empty_tabs_content(
     content_dict: Dict[str, str], name: str
 ) -> None:
     """Raises error when the content inside the tabs tag is empty.
@@ -534,8 +534,10 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
             )
 
         for tab_content in tab_content_list:
-            _content_in_tabs_tag_is_empty(tab_content, 'title')
-            _content_in_tabs_tag_is_empty(tab_content, 'content')
+            _raise_validation_errors_for_empty_tabs_content(
+                tab_content, 'title')
+            _raise_validation_errors_for_empty_tabs_content(
+                tab_content, 'content')
 
             validate_rte_tags(
                 tab_content['content'],
