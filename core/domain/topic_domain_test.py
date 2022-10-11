@@ -1032,6 +1032,51 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             )
         self.assertEqual(2, len(self.topic.subtopics))
 
+    def test_update_practice_tab_is_displayed(self) -> None:
+        self.topic.update_practice_tab_is_displayed(True)
+        self.assertTrue(self.topic.practice_tab_is_displayed)
+
+    def test_update_page_title_fragment_for_web(self) -> None:
+        updated_frag='updated fragment'
+        self.topic.update_page_title_fragment_for_web(updated_frag)
+        self.assertEqual(self.topic.page_title_fragment_for_web, updated_frag)
+
+    def test_update_meta_tag_content(self) -> None:
+        updated_meta_tag = 'updated meta tag'
+        self.topic.update_meta_tag_content(updated_meta_tag)
+        self.assertEqual(self.topic.meta_tag_content, updated_meta_tag)
+
+    def test_update_description(self) -> None:
+        updated_desc = 'updated description'
+        self.topic.update_description(updated_desc)
+        self.assertEqual(self.topic.description, updated_desc)
+
+    def test_update_thumbnail_file_and_size(self) -> None:
+        updated_file_name = 'file_name.svg'
+        updated_size = 1234
+        self.topic.update_thumbnail_filename_and_size(
+            updated_file_name,
+            updated_size
+        )
+        self.assertEqual(self.topic.thumbnail_filename,updated_file_name)
+        self.assertEqual(self.topic.thumbnail_size_in_bytes,updated_size)
+
+    def test_update_url_fragment(self) -> None:
+        url_frag = 'url fragment'
+        self.topic.update_url_fragment(url_frag)
+        self.assertEqual(self.topic.url_fragment, url_frag)
+
+    def test_update_name(self) -> None:
+        incorrect_name = 123
+        updated_name = 'updated name'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Name should be a string.'
+        ):
+            self.topic.update_name(incorrect_name)
+        self.topic.update_name(updated_name)
+        self.assertEqual(self.topic.name, updated_name)
+
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
         Topic during export and import.
