@@ -113,21 +113,25 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                             'math content attr is empty'
                         )
                     try:
-                        math_content = json.loads(
-                            tag['math_content-with-value'])
+                        math_content = html_validation_service.unescape_html(
+                                tag['math_content-with-value'])
+                        math_content = json.loads(math_content)
                         if math_content['raw_latex'].strip() in (
                                 '&quot;&quot;', '', '\'\'', '\"\"'):
                             states_with_errored_values.append(
                                 'raw lattex attr empty'
                             )
-                    except Exception:
+                    except Exception as e:
+                        print("******************************* - ", e)
+                        logging.exception('raw lattex error')
                         states_with_errored_values.append(
                             'raw lattex attr not exists'
                         )
 
                     try:
-                        math_content = json.loads(
-                            tag['math_content-with-value'])
+                        math_content = html_validation_service.unescape_html(
+                                tag['math_content-with-value'])
+                        math_content = json.loads(math_content)
                         svg_filename = math_content['svg_filename']
                         if svg_filename.strip() in (
                             '&quot;&quot;', '', '\'\'', '\"\"'):
@@ -139,7 +143,9 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                                 'svg_filename attr does not have svg extension'
                             )
 
-                    except Exception:
+                    except Exception as e:
+                        print("******************************* - ", e)
+                        logging.exception('raw lattex error')
                         states_with_errored_values.append(
                             'svg_filename attr not exists'
                         )
