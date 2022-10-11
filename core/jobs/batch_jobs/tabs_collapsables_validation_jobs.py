@@ -122,8 +122,6 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                                 'raw lattex attr empty'
                             )
                     except Exception as e:
-                        print("******************************* - ", e)
-                        logging.exception('raw lattex error')
                         states_with_errored_values.append(
                             'raw lattex attr not exists'
                         )
@@ -144,8 +142,6 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                             )
 
                     except Exception as e:
-                        print("******************************* - ", e)
-                        logging.exception('raw lattex error')
                         states_with_errored_values.append(
                             'svg_filename attr not exists'
                         )
