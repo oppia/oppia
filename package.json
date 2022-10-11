@@ -193,6 +193,7 @@
     "requireindex": "^1.2.0",
     "rxjs": "^6.0.0",
     "rxjs-marbles": "^6.0.0",
+    "taiko": "^1.0.25",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^5.2.0",
     "wdio-intercept-service": "^4.2.2"

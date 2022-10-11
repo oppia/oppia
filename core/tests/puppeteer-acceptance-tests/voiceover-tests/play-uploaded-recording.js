@@ -1,5 +1,4 @@
 const puppeteer = require("puppeteer");
-const { check } = require("yargs");
 
 //adding headless flag to false and maximizing browser height-width
 puppeteer

@@ -27,7 +27,7 @@ ENV headless_chrome=true
 ENV TAIKO_SKIP_DOCUMENTATION=true
 
 # Uncomment the lines below to use chrome bundled with this image
-#ENV TAIKO_SKIP_CHROMIUM_DOWNLOAD=true
+ENV TAIKO_SKIP_CHROMIUM_DOWNLOAD=true
 #ENV TAIKO_BROWSER_PATH=/usr/bin/google-chrome
  
 # Set working directory

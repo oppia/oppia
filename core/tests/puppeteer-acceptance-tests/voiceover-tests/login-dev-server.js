@@ -21,5 +21,3 @@ module.exports.login = async () => {
     selector = ".oppia-learner-dashboard-main-content";
     await page.waitForSelector(selector);
   };
-
-  // this.login();
