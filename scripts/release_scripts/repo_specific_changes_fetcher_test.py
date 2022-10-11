@@ -136,7 +136,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             mock_get_changed_storage_models_filenames)
 
         with versions_swap, setup_scripts_swap, storage_models_swap:
-            expected_changes = []
+            expected_changes: List[str] = []
             self.assertEqual(
                 repo_specific_changes_fetcher.get_changes('release_tag'),
                 expected_changes)

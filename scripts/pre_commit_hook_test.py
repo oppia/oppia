@@ -50,7 +50,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return True
         def mock_exists(unused_file: str) -> bool:
             return True
-        def mock_is_windows():
+        def mock_is_windows() -> bool:
             return True
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
