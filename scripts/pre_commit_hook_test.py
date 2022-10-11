@@ -48,20 +48,24 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return True
         def mock_exists(unused_file):
             return True
+        def mock_is_windows():
+            return True
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', None)
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
         subprocess_swap = self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
-            pre_commit_hook.install_hook()
+            with is_windows_swap:
+                pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
-        self.assertTrue(
-            'pre-commit hook file is now executable!' in self.print_arr)
+        self.assertNotIn(
+            'pre-commit hook file is now executable!', self.print_arr)
 
     def test_install_hook_with_error_in_making_pre_push_executable(self):
         def mock_islink(unused_file):
