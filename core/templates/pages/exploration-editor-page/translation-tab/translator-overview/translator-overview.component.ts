@@ -126,6 +126,8 @@ angular.module('oppia').component('translatorOverview', {
 
         $window.localStorage.setItem(
           LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
+
+        RouterService.onCenterGraph.emit();
       };
 
       $scope.getTranslationProgressAriaLabel = function() {

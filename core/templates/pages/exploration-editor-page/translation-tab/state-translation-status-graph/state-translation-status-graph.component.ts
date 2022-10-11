@@ -42,10 +42,12 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
   template: require('./state-translation-status-graph.component.html'),
   controller: [
     '$scope', 'ExplorationStatesService', 'GraphDataService',
+    'RouterService',
     'StateEditorService', 'StateRecordedVoiceoversService',
     'TranslationStatusService',
     function(
         $scope, ExplorationStatesService, GraphDataService,
+        RouterService,
         StateEditorService, StateRecordedVoiceoversService,
         TranslationStatusService) {
       var ctrl = this;
@@ -75,6 +77,8 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
         }
 
         $scope.$apply();
+
+        RouterService.onCenterGraph.emit();
       };
     }
   ]
