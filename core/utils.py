@@ -1350,11 +1350,13 @@ def quoted(s: str) -> str:
     return json.dumps(s)
 
 
-def url_open(source_url: str) -> urllib.request._UrlopenRet:
+def url_open(
+    source_url: Union[str, urllib.request.Request]
+) -> urllib.request._UrlopenRet:
     """Opens a URL and returns the response.
 
     Args:
-        source_url: str. The URL.
+        source_url: Union[str, Request]. The URL.
 
     Returns:
         urlopen. The 'urlopen' object.
