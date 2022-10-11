@@ -24,7 +24,7 @@ jobs:
       - uses: 'actions/cache@v2'
         id: python-cache
         with:
-          path: ${{ env,pythonLocation}}/lib/python3.7/site-packages/*
+          path: f
           key: ${{ runner.os }}-3.7-${{ github.sha}}
           restore-keys: |
             ${{ runner.os }}-3.7-${{ github.sha}}
@@ -82,7 +82,7 @@ jobs:
       - uses: 'actions/cache@v2'
         id: python-cache
         with:
-          path: ${{ env,pythonLocation}}/lib/python3.7/site-packages/*
+          path: ~/.cache/pip
           key: ${{ runner.os }}-3.7-${{ github.sha}}
           restore-keys: |
             ${{ runner.os }}-3.7-${{ github.sha}}
