@@ -5695,7 +5695,7 @@ export default {
       // eslint-disable-next-line max-len
       "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any).",
       // eslint-disable-next-line max-len
-      "Refer to Glossary - (https://docs.google.com/spreadsheets/d/13NMEnYqLZuMbeX1Z6XXG-femHkKNAN8KwjhaC67EkxI/edit#gid=0)[https://docs.google.com/spreadsheets/d/13NMEnYqLZuMbeX1Z6XXG-femHkKNAN8KwjhaC67EkxI/edit#gid=0]."
+      "Refer to Glossary - [https://docs.google.com/spreadsheets/d/13NMEnYqLZuMbeX1Z6XXG-femHkKNAN8KwjhaC67EkxI/edit#gid=0](https://docs.google.com/spreadsheets/d/13NMEnYqLZuMbeX1Z6XXG-femHkKNAN8KwjhaC67EkxI/edit#gid=0)."
     ],
     // Spanish.
     "es": [
