@@ -1067,13 +1067,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.url_fragment, url_frag)
 
     def test_update_name(self) -> None:
-        incorrect_name = 123
         updated_name = 'updated name'
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Name should be a string.'
-        ):
-            self.topic.update_name(incorrect_name)
         self.topic.update_name(updated_name)
         self.assertEqual(self.topic.name, updated_name)
 
