@@ -174,6 +174,8 @@ var BlogDashboardPage = function() {
       'Confirm Publish Blog Post button', confirmButton);
     await waitFor.visibilityOfSuccessToast(
       'Blog Post Saved and Published Succesfully.');
+    await waitFor.invisibilityOfSuccessToast(
+      'Blog Post Saved and Published Succesfully.');
   };
 
   this.selectTags = async function(tags) {
