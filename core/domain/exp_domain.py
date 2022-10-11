@@ -5073,15 +5073,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         tags = exploration_dict['tags']
         if len(tags) > 0:
-            exp_tags = []
-            for tag in tags:
-                if tag not in exp_tags:
-                    exp_tags.append(tag)
-            exp_tags = [tag for tag in exp_tags if tag != '']
-            exp_tags = [tag for tag in exp_tags if len(tag) <= 30]
-            if len(exp_tags) > 10:
-                exp_tags = exp_tags[:10]
-            exploration_dict['tags'] = exp_tags
+            exp_tags = sorted(list(set(tags)))
+            exp_tags = [tag for tag in exp_tags if tag and len(tag) <= 30]
+            exploration_dict['tags'] = exp_tags[:10]
         exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
             exploration_dict['states'], exploration_dict['language_code'])
         exploration_dict['states_schema_version'] = 53
