@@ -1037,7 +1037,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(self.topic.practice_tab_is_displayed)
 
     def test_update_page_title_fragment_for_web(self) -> None:
-        updated_frag='updated fragment'
+        updated_frag = 'updated fragment'
         self.topic.update_page_title_fragment_for_web(updated_frag)
         self.assertEqual(self.topic.page_title_fragment_for_web, updated_frag)
 
@@ -1058,8 +1058,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             updated_file_name,
             updated_size
         )
-        self.assertEqual(self.topic.thumbnail_filename,updated_file_name)
-        self.assertEqual(self.topic.thumbnail_size_in_bytes,updated_size)
+        self.assertEqual(self.topic.thumbnail_filename, updated_file_name)
+        self.assertEqual(self.topic.thumbnail_size_in_bytes, updated_size)
 
     def test_update_url_fragment(self) -> None:
         url_frag = 'url fragment'
