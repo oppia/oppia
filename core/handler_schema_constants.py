@@ -45,7 +45,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'LeaveForRefresherExpEventHandler',
     'MemoryCacheAdminHandler',
     'MergeSkillHandler',
-    'NewTopicHandler',
     'NotificationHandler',
     'NotificationsDashboardHandler',
     'NotificationsDashboardPage',
