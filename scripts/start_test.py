@@ -20,11 +20,10 @@ from core.constants import constants
 from core.tests import test_utils
 from scripts import build
 from scripts import common
+from scripts import contributor_dashboard_debug
 from scripts import extend_index_yaml
 from scripts import install_third_party_libs
 from scripts import servers
-
-from typing import Any
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
@@ -41,7 +40,7 @@ class MockCompilerContextManager():
     def __enter__(self) -> MockCompiler:
         return MockCompiler()
 
-    def __exit__(self, *unused_args: Any) -> None:
+    def __exit__(self, *unused_args: str) -> None:
         pass
 
 
@@ -234,6 +233,38 @@ class SetupTests(test_utils.GenericTestBase):
                         with self.swap_print:
                             start.main(args=['--source_maps'])
 
+        self.assertIn(
+            [
+                'INFORMATION',
+                (
+                    'Local development server is ready! Opening a default web '
+                    'browser window pointing to it: '
+                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
+                )
+            ],
+            self.print_arr)
+
+    def test_start_servers_successfully_in_contributor_dashboard_debug_mode(
+        self
+    ) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import start
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}])
+        populate_data_swap = self.swap_with_call_counter(
+            contributor_dashboard_debug.ContributorDashboardDebugInitializer,
+            'populate_debug_data'
+        )
+        with self.swap_cloud_datastore_emulator, self.swap_webpack_compiler:
+            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
+                with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
+                    with self.swap_extend_index_yaml, swap_build:
+                        with self.swap_create_server, self.swap_print:
+                            with populate_data_swap as populate_data_counter:
+                                start.main(args=['--contributor_dashboard'])
+
+        self.assertEqual(populate_data_counter.times_called, 1)
         self.assertIn(
             [
                 'INFORMATION',
