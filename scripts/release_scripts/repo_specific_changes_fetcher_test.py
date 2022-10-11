@@ -106,16 +106,22 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
     def test_get_changes(self) -> None:
         def mock_get_changed_schema_version_constant_names(
             unused_release_tag_to_diff_against: str
-        ) -> List[str]:
-            return ['version_change']
+        ) -> List[str] | None:
+            if self.call_counter:
+                return ['version_change']
+            return None
         def mock_get_setup_scripts_changes_status(
             unused_release_tag_to_diff_against: str
-        ) -> Dict[str, bool]:
-            return {'setup_changes': True}
+        ) -> Dict[str, bool] | None:
+            if self.call_counter:
+                return {'setup_changes': True}
+            return None
         def mock_get_changed_storage_models_filenames(
             unused_release_tag_to_diff_against: str
-        ) -> List[str]:
-            return ['storage_changes']
+        ) -> List[str] | None:
+            if self.call_counter:
+                return ['storage_changes']
+            return None
 
         versions_swap = self.swap(
             repo_specific_changes_fetcher,
