@@ -887,9 +887,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Whether the interaction is linear.
         """
-        return bool(interaction_registry.Registry.get_interaction_by_id(
+        return interaction_registry.Registry.get_interaction_by_id(
             self.id).is_linear
-        )
 
     def is_supported_on_android_app(self) -> bool:
         """Determines whether the interaction is a valid interaction that is

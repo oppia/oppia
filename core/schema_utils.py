@@ -299,8 +299,8 @@ def normalize_against_schema(
                 del kwargs['id']
                 validator_func = get_validator(validator['id'])
                 if (
-                    validator_func(normalized_obj, **kwargs) is False and
-                    expect_invalid_default_value is False
+                    not validator_func(normalized_obj, **kwargs) and
+                    not expect_invalid_default_value
                 ):
                     raise AssertionError(
                         'Validation failed: %s (%s) for object %s' % (
@@ -753,9 +753,7 @@ class _Validators:
         """
         # Ruling out the possibility of different types for mypy type checking.
         assert isinstance(obj, dict)
-        if len(obj['unicode_str']) > max_value:
-            return False
-        return True
+        return len(obj['unicode_str']) <= max_value
 
     @staticmethod
     def has_subtitled_html_non_empty(obj: objects.SubtitledHtml) -> bool:
@@ -769,9 +767,7 @@ class _Validators:
         """
         # Ruling out the possibility of different types for mypy type checking.
         assert isinstance(obj, dict)
-        if obj['html'] in ('', '<p></p>'):
-            return False
-        return True
+        return obj['html'] not in ('', '<p></p>')
 
     @staticmethod
     def has_unique_subtitled_contents(
