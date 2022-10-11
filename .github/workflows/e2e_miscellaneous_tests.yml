@@ -73,14 +73,9 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run e2e Blog Dashboard Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run:  for run in {1..15}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="blogDashboard" --prod_env; done
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="blogDashboard" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 1
-      - name: Run e2e Blog Dashboard Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run:  for run in {1..15}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="blogDashboard" --prod_env; done
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run e2e Publication Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="publication"  --skip-install --skip-build --server_log_level="info" --prod_env
