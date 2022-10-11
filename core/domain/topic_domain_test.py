@@ -1004,6 +1004,34 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             expected_uncategorized_skills
         )
 
+    def test_add_subtopic(self) -> None:
+        """Checkts that if next_subtopic_id isn't correct
+        an exception is raised. Also checks for the sub topic
+        getting added to the topic.
+        """
+        incorrect_new_subtopic_id = 3
+        correct_new_subtopic_id = 2
+        expected_subtopic_id = self.topic.next_subtopic_id
+        with self.assertRaisesRegex(
+            Exception,
+            'The given new subtopic id %s is not equal to the expected next '
+            'subtopic id: %s' % (
+                incorrect_new_subtopic_id,
+                expected_subtopic_id
+            )
+        ):
+            self.topic.add_subtopic(
+                incorrect_new_subtopic_id,
+                'subtopic_3',
+                'url_frag'
+            )
+        self.topic.add_subtopic(
+            correct_new_subtopic_id,
+            'subtopic_title',
+            'url_frag'
+            )
+        self.assertEqual(2, len(self.topic.subtopics))
+
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
         Topic during export and import.
