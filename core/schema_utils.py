@@ -114,6 +114,7 @@ def normalize_against_schema(
 
     Raises:
         Exception. The object fails to validate against the schema.
+        AssertionError. The validation for schema validators fails.
     """
     # Here we use type Any because 'normalized_obj' can be of type int, str,
     # Dict, List and other types too.
