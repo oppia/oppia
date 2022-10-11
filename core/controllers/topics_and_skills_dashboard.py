@@ -296,6 +296,51 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
 class NewTopicHandler(base.BaseHandler):
     """Creates a new topic."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            },
+            'url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'description': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'filename': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'thumbnailBgColor': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'page_title_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
