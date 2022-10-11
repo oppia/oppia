@@ -214,7 +214,11 @@ def check_test_flakiness(output_lines: List[bytes], suite_name: str) -> bool:
         _print_color_message('Unable to convert json response: %s' % e)
         return False
 
-    if 'log' in report:
+    # If response doesn't have 'log' attribute, it will raise ValueError when
+    # changed to json format as FlakeReportDict. The error will be caught above
+    # and the case where the below if condition is false will never arise.
+    # Hence, we use the no branch flag.
+    if 'log' in report: # pragma: no branch
         log_str = '\n'.join(report['log'])
         _print_color_message(
             'Logs from test result logging server:\n %s' % log_str)

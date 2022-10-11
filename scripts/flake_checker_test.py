@@ -433,7 +433,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             allow_redirects: bool,  # pylint: disable=unused-argument
             headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
-            response = {
+            response: flake_checker.FlakeReportDict = {
+                'log': [],
+                'result': False,
                 'flake': {
                     'suite': 'suiteName',
                     'test': 'testName',
