@@ -638,6 +638,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
 
 class LearnerGroupLearnerSpecificProgressHandler(test_utils.GenericTestBase):
+    """Tests fetching of learner specific progress of a learner group."""
 
     LEARNER_1_EMAIL = 'user1@example.com'
     LEARNER_1_USERNAME = 'user1'
@@ -1322,6 +1323,7 @@ class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
 
 
 class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
+    """Checks fetching of learner groups for the learner dashboard."""
 
     def setUp(self):
         super().setUp()
@@ -1380,6 +1382,7 @@ class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
 
 
 class ExitLearnerGroupHandlerTests(test_utils.GenericTestBase):
+    """Checks the exit learner group handler."""
 
     def setUp(self):
         super().setUp()
@@ -1423,6 +1426,7 @@ class ExitLearnerGroupHandlerTests(test_utils.GenericTestBase):
 class LearnerGroupProgressSharingPermissionHandlerTests(
     test_utils.GenericTestBase
 ):
+    """Checks fetching and updating of progress sharing permission."""
 
     def setUp(self):
         super().setUp()
