@@ -31,6 +31,8 @@ jobs:
       - name: echo github sha
         run: |
           echo ${{ github.sha }}
+          echo ${{ env.pythonLocation }}
+          echo ${{ github.pythonLocation }}
       - uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v2
@@ -82,7 +84,7 @@ jobs:
       - uses: 'actions/cache@v2'
         id: python-cache
         with:
-          path: ~/.cache/pip
+          path: ${{ env.pythonLocation }}/lib/python3.7/site-packages/*
           key: ${{ runner.os }}-3.7-${{ github.sha}}
           restore-keys: |
             ${{ runner.os }}-3.7-${{ github.sha}}
