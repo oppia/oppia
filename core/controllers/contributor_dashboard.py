@@ -811,20 +811,648 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
         response = {}
 
         if stats.translation_contribution_stats is not None:
-            response['translation_contribution_stats'] = _get_client_side_stats(
-                stats.translation_contribution_stats)
+            response['translation_contribution_stats'] = [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hu',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi-en',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi-en',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi-en',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi-en',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                ]
 
         if stats.translation_review_stats is not None:
-            response['translation_review_stats'] = _get_client_side_stats(
-                stats.translation_review_stats)
+            response['translation_review_stats'] = [
+                {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi-en',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi-en',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi-en',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+                {
+                        'language_code': 'hi-en',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                },
+            ]
 
         if stats.question_contribution_stats is not None:
-            response['question_contribution_stats'] = _get_client_side_stats(
-                stats.question_contribution_stats)
+            response['question_contribution_stats'] = [
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+                {
+                    'topic_name': 'published_topic_name',
+                    'submitted_questions_count': 1,
+                    'accepted_questions_count': 1,
+                    'accepted_questions_without_reviewer_edits_count': 0,
+                    'first_contribution_date': 'Mar 2021',
+                    'last_contribution_date': 'Mar 2021'
+                },
+            ]
 
         if stats.question_review_stats is not None:
-            response['question_review_stats'] = _get_client_side_stats(
-                stats.question_review_stats)
+            response['question_review_stats'] = [
+                {
+                        'topic_name': 'published_topic_name',
+                        'reviewed_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_with_reviewer_edits_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+            ]
 
         self.render_json(response)
 

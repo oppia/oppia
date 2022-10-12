@@ -31,6 +31,17 @@
             {{ tab.text }}
           </div>
         </div>
+        <div class="oppia-contributions-option-group-label"
+             *ngIf="userIsLoggedIn && accomplismentsEnabled">
+          Accomplishments
+        </div>
+        <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of accomplishmentsTabs">
+          <div *ngIf="tab && tab.enabled"
+               (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType)"
+               [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+            {{ tab.text }}
+          </div>
+        </div>
       </div>
 
     </div>
@@ -56,20 +67,31 @@
           </button>
         </div>
       </div>
+      <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn && accomplismentsEnabled">
+        <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments">
+          <div class="oppia-contributions-navbar-item" *ngFor="let tab of accomplishmentsTabs">
+            <button *ngIf="tab && tab.enabled"
+                    class="oppia-contributions-navbar-button"
+                    (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType)"
+                    [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="oppia-contributions-show-review-container">
+  <div [ngClass]="!isAccomplishmentsTab ? 'oppia-contributions-show-review-container' : 'oppia-contributor-accomplishments-container'">
     <div class="oppia-login-required" *ngIf="!userDetailsLoading && !userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
-      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab()"
+      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTab"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab"
                                 [showOpportunityButton]="true">
       </oppia-opportunities-list>
-      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab()">
+      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !isAccomplishmentsTab">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
@@ -85,6 +107,11 @@
                                   [opportunityHeadingTruncationLength]="30"
                                   [showOpportunityButton]="false">
         </oppia-opportunities-list>
+      </div>
+      <div *ngIf="isAccomplishmentsTab && accomplismentsEnabled && activeAccomplishmentType === 'stats'">
+        <contributor-stats
+                            [type]="defaultContributionType">
+        </contributor-stats>
       </div>
     </div>
   </div>
@@ -109,7 +136,6 @@
     background-color: white;
     display: none;
     font-size: 20px;
-    margin-bottom: 3%;
     padding: 0 20px;
     width: 100%;
   }
@@ -179,6 +205,10 @@
 
   .oppia-contributions-show-review-container {
     background-color: white;
+    width: 75%;
+  }
+
+  .oppia-contributor-accomplishments-container {
     width: 75%;
   }
 
@@ -294,7 +324,6 @@
       align-items: center;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
       padding-bottom: 30px;
       padding-top: 5px;
     }
@@ -330,7 +359,6 @@
       width: 100px;
     }
     .oppia-contributions-dropdown-section {
-      margin-bottom: 20px;
       padding: auto 2vw;
       width: 100%;
     }

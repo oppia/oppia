@@ -42,7 +42,8 @@ ParamNames = params.ParamNames
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    params.ParamNames.DUMMY_FEATURE
+    params.ParamNames.DUMMY_FEATURE,
+    params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must

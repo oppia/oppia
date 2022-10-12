@@ -36,6 +36,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 export interface Suggestion {
   change: {
@@ -89,7 +90,9 @@ export interface SuggestionDetails {
 }
 
 export interface TabDetails {
-  suggestionType: string;
+  tabType: string;
+  suggestionType?: string;
+  accomplishmentType?: string;
   text: string;
   enabled: boolean;
 }
@@ -106,15 +109,19 @@ export class ContributionsAndReview
   SUGGESTION_TYPE_TRANSLATE: string;
   TAB_TYPE_CONTRIBUTIONS: string;
   TAB_TYPE_REVIEWS: string;
+  TAB_TYPE_ACCOMPLISHMENTS: string;
   activeExplorationId: string;
   contributions: Record<string, SuggestionDetails> | object;
   userDetailsLoading: boolean;
   userIsLoggedIn: boolean;
   activeTabType: string;
   activeSuggestionType: string;
+  activeAccomplishmentType: string;
   dropdownShown: boolean;
+  isAccomplishmentsTab: boolean;
   activeDropdownTabChoice: string;
   reviewTabs: TabDetails[] = [];
+  accomplishmentsTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
   tabNameToOpportunityFetchFunction: {
     [key: string]: {
@@ -122,6 +129,8 @@ export class ContributionsAndReview
     };
   };
 
+  accomplismentsEnabled: boolean = false;
+  defaultContributionType: string = 'translationContribution';
   SUGGESTION_LABELS = {
     review: {
       text: 'Awaiting review',
@@ -148,6 +157,7 @@ export class ContributionsAndReview
     private skillBackendApiService: SkillBackendApiService,
     private translationTopicService: TranslationTopicService,
     private userService: UserService,
+    private featureService: PlatformFeatureService
   ) {}
 
   getQuestionContributionsSummary(
@@ -310,10 +320,15 @@ export class ContributionsAndReview
     });
   }
 
-  isActiveTab(tabType: string, suggestionType: string): boolean {
+  isActiveTab(tabType: string, subType: string): boolean {
+    if (tabType === this.TAB_TYPE_ACCOMPLISHMENTS) {
+      return (
+        this.activeTabType === tabType &&
+        this.activeAccomplishmentType === subType);
+    }
     return (
       this.activeTabType === tabType &&
-      this.activeSuggestionType === suggestionType);
+      this.activeSuggestionType === subType);
   }
 
   isReviewTranslationsTab(): boolean {
@@ -379,6 +394,13 @@ export class ContributionsAndReview
   }
 
   getActiveDropdownTabChoice(): string {
+    if (this.activeTabType === this.TAB_TYPE_ACCOMPLISHMENTS) {
+      if (this.activeAccomplishmentType === 'stats') {
+        return 'Contribution Stats';
+      }
+      return 'Badges';
+    }
+
     if (this.activeTabType === this.TAB_TYPE_REVIEWS) {
       if (this.activeSuggestionType === this.SUGGESTION_TYPE_QUESTION) {
         return 'Review Questions';
@@ -393,16 +415,27 @@ export class ContributionsAndReview
     return 'Translations';
   }
 
-  switchToTab(tabType: string, suggestionType: string): void {
-    this.activeSuggestionType = suggestionType;
+  switchToTab(tabType: string, subType: string): void {
     this.activeTabType = tabType;
+    this.dropdownShown = false;
+    if (tabType === this.TAB_TYPE_ACCOMPLISHMENTS) {
+      this.isAccomplishmentsTab = true;
+      this.activeAccomplishmentType = subType;
+      this.activeDropdownTabChoice = this.getActiveDropdownTabChoice();
+      this.activeSuggestionType = '';
+      this.contributionAndReviewService.setActiveSuggestionType('');
+      return;
+    }
+    this.activeSuggestionType = subType;
     this.contributionAndReviewService.setActiveTabType(tabType);
-    this.contributionAndReviewService.setActiveSuggestionType(suggestionType);
+    this.contributionAndReviewService.setActiveSuggestionType(subType);
     this.activeDropdownTabChoice = this.getActiveDropdownTabChoice();
     this.dropdownShown = false;
     this.activeExplorationId = null;
     this.contributionOpportunitiesService
       .reloadOpportunitiesEventEmitter.emit();
+    this.activeAccomplishmentType = '';
+    this.isAccomplishmentsTab = false;
   }
 
   toggleDropdown(): void {
@@ -491,6 +524,7 @@ export class ContributionsAndReview
     this.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
+    this.TAB_TYPE_ACCOMPLISHMENTS = 'accomplishments';
     this.activeExplorationId = null;
     this.contributions = {};
     this.userDetailsLoading = true;
@@ -498,17 +532,36 @@ export class ContributionsAndReview
     this.activeTabType = '';
     this.activeSuggestionType = '';
     this.dropdownShown = false;
+    this.isAccomplishmentsTab = false;
     this.activeDropdownTabChoice = '';
     this.reviewTabs = [];
+    this.accomplismentsEnabled = (
+      this.featureService.status.ContributorDashboardAccomplishments.isEnabled);
     this.contributionTabs = [
       {
+        tabType: this.TAB_TYPE_CONTRIBUTIONS,
         suggestionType: this.SUGGESTION_TYPE_QUESTION,
         text: 'Questions',
         enabled: false
       },
       {
+        tabType: this.TAB_TYPE_CONTRIBUTIONS,
         suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
         text: 'Translations',
+        enabled: true
+      }
+    ];
+    this.accomplishmentsTabs = [
+      {
+        accomplishmentType: 'stats',
+        tabType: this.TAB_TYPE_ACCOMPLISHMENTS,
+        text: 'Contribution Stats',
+        enabled: true
+      },
+      {
+        accomplishmentType: 'badges',
+        tabType: this.TAB_TYPE_ACCOMPLISHMENTS,
+        text: 'Badges',
         enabled: true
       }
     ];
@@ -544,6 +597,7 @@ export class ContributionsAndReview
             }
             if (userCanReviewQuestionSuggestions) {
               this.reviewTabs.push({
+                tabType: this.TAB_TYPE_REVIEWS,
                 suggestionType: this.SUGGESTION_TYPE_QUESTION,
                 text: 'Review Questions',
                 enabled: false
@@ -554,6 +608,7 @@ export class ContributionsAndReview
               userCanReviewTranslationSuggestionsInLanguages
                 .length > 0) {
               this.reviewTabs.push({
+                tabType: this.TAB_TYPE_REVIEWS,
                 suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
                 text: 'Review Translations',
                 enabled: false

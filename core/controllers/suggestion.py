@@ -109,6 +109,10 @@ class SuggestionHandler(base.BaseHandler):
             self.user_id,
             self.normalized_payload.get('change'),
             self.normalized_payload.get('description'))
+        
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            suggestion_services.update_translation_contribution_stats_at_submission(suggestion)
 
         suggestion_change = suggestion.change
         if (
@@ -187,6 +191,9 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         else:
             raise self.InvalidInputException('Invalid action.')
 
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        suggestion_services.update_translation_review_stats(suggestion)
+
         self.render_json(self.values)
 
 
@@ -255,6 +262,9 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                 suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
             raise self.InvalidInputException('Invalid action.')
+
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        suggestion_services.update_question_review_stats(suggestion)
 
         self.render_json(self.values)
 

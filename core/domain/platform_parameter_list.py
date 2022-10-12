@@ -34,6 +34,7 @@ class ParamNames(enum.Enum):
 
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
+    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = 'contributor_dashboard_accomplishments'
 
 
 # Platform parameters should all be defined below.
@@ -60,4 +61,10 @@ Registry.create_feature_flag(
     ParamNames.CHECKPOINT_CELEBRATION,
     'This flag is for the checkpoint celebration feature.',
     platform_parameter_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
+    'This flag is for the contributor dashboard accomplishments feature.',
+    platform_parameter_domain.FeatureStages.DEV,
 )
