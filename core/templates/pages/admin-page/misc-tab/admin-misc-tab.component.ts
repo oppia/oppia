@@ -16,12 +16,12 @@
  * @fileoverview Component for the miscellaneous tab in the admin panel.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { FixCommitCommandBackendApiService } from 'services/fix-commit-command-backend-api.service';
 import { AdminPageConstants } from '../admin-page.constants';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 
@@ -65,7 +65,8 @@ export class AdminMiscTabComponent {
     private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private http: HttpClient
+    private fixCommitCommandBackendApiService:
+      FixCommitCommandBackendApiService
   ) {}
 
   clearSearchIndex(): void {
@@ -296,13 +297,10 @@ export class AdminMiscTabComponent {
   }
 
   fixCommitCommands(): void {
-    this.http.post('/fix_commit_commands/', {})
-      .toPromise()
-      .then(() => {
-        this.message = 'Successfully fixed commit commands';
-      })
-      .catch(() => {
-        this.message = 'Fixing commit commands failed';
+    this.fixCommitCommandBackendApiService
+      .fixCommitCommandsAsync()
+      .then((message) => {
+        this.message = message;
       });
   }
 }
