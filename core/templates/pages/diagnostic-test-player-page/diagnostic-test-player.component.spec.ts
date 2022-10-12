@@ -21,7 +21,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 
 
@@ -42,7 +41,6 @@ describe('Diagnostic test player component', () => {
   let component: DiagnosticTestPlayerComponent;
   let fixture: ComponentFixture<DiagnosticTestPlayerComponent>;
   let windowRef: MockWindowRef;
-  let loaderService: LoaderService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
 
   beforeEach(() => {
@@ -56,40 +54,36 @@ describe('Diagnostic test player component', () => {
         DiagnosticTestPlayerComponent,
       ],
       providers: [
-        LoaderService,
         PreventPageUnloadEventService,
         { provide: WindowRef, useValue: windowRef },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(DiagnosticTestPlayerComponent);
     component = fixture.componentInstance;
-    loaderService = TestBed.inject(LoaderService);
-    preventPageUnloadEventService = (
-      TestBed.inject(PreventPageUnloadEventService));
+    preventPageUnloadEventService = TestBed.inject(
+      PreventPageUnloadEventService);
   });
 
   it('should initilize the component', () => {
     const avatarImageLocation = '/assets/images/avatar/oppia_avatar_100px.svg';
-    spyOn(preventPageUnloadEventService, 'addListener').and
-      .callFake((callback) => callback());
+    spyOn(preventPageUnloadEventService, 'addListener').and.stub();
 
     component.ngOnInit();
 
     expect(preventPageUnloadEventService.addListener)
-      .toHaveBeenCalledWith(jasmine.any(Function));
+      .toHaveBeenCalled();
     expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual(avatarImageLocation);
   });
 
   it('should open classroom on clicking back button', () => {
-    spyOn(loaderService, 'showLoadingScreen');
-
     component.returnBackToClassroom();
 
     expect(windowRef.nativeWindow.location.href).toBe(
       '/learn/math'
     );
-    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   });
 });

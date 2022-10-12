@@ -42,14 +42,11 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
-    this.preventPageUnloadEventService.addListener(
-      () => true
-    );
+    this.preventPageUnloadEventService.addListener();
   }
 
   returnBackToClassroom(): void {
     this.windowRef.nativeWindow.location.href = '/learn/math';
-    this.loaderService.showLoadingScreen('Loading');
   }
 }
 
