@@ -23,7 +23,7 @@ from core.tests import test_utils
 class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
     """Test class for the diagnostic test player page."""
 
-    def test_diagnostic_test_page_access(self):
+    def test_diagnostic_test_page_access(self) -> None:
         self.get_html_response(
             feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
             expected_status_int=200

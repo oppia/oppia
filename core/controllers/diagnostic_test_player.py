@@ -18,15 +18,20 @@ from __future__ import annotations
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from typing import Any, Dict
 
 
 class DiagnosticTestPlayerPage(base.BaseHandler):
     """Renders the diagnostic test player page."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
-    @acl_decorators.open_access
-    def get(self):
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self) -> None:
         """Handles GET requests."""
-        self.render_template('diagnostic-test-player-page.mainpage.html')
+        self.render_template('diagnostic-test-player-page.mainpage.html') # type: ignore[no-untyped-call]
