@@ -1079,8 +1079,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Name should be a string.'
         ):
             # Here we use MyPy ignore because we need to pass
-            # a non-string to test the full function
-            self.topic.update_name(updated_name) # type:ignore
+            # a non-string to test the full function.
+            self.topic.update_name(updated_name) # type: ignore
 
     @classmethod
     def _schema_update_vers_dict(
