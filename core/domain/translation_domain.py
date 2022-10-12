@@ -462,7 +462,8 @@ class BaseTranslatableObject:
             ):
                 raise utils.ValidationError(
                     'Expected all content id indexes to be less than the "next '
-                    'content id index", but received content id %s' % content_id
+                    'content id index(%s)", but received content id %s' % (
+                        next_content_id_index, content_id)
                 )
 
 

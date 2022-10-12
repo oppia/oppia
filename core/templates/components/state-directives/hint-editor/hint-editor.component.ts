@@ -84,9 +84,6 @@ export class HintEditorComponent implements OnInit, OnDestroy {
 
     if (contentHasChanged) {
       const hintContentId = this.hint.hintContent.contentId;
-      if (hintContentId === null) {
-        throw new Error('Expected content id to be non-null');
-      }
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [hintContentId]);
     }

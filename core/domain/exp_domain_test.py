@@ -1077,6 +1077,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # d_state becomes bypassable. Hence, making d_state a checkpoint raises
         # validation error.
         d_state.update_card_is_checkpoint(True)
+        self.exploration.update_next_content_id_index(
+            self.content_id_generator.next_content_id_index)
         with self.assertRaisesRegex(
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
@@ -1317,6 +1319,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state_name: new_state,
             'BCD': second_state
         }
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
         self._assert_validation_error(
             exploration, 'destination ABC is not a valid')
 
@@ -1721,6 +1725,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             init_state, 'TextInput', content_id_generator)
         init_state.update_interaction_answer_groups(answer_groups)
         init_state.update_interaction_default_outcome(default_outcome)
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
         exploration.validate()
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
@@ -1832,6 +1838,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name], 'TextInput',
             content_id_generator)
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
         exploration.validate()
 
         exploration.language_code = 'fake_code'
@@ -6320,7 +6328,9 @@ class ExplorationChangesMergeabilityUnitTests(
         # Using the old change_list_3 here because they already covers
         # the changes related to interaction in first state.
         exp_services.update_exploration(
-            self.owner_id, self.EXP_1_ID, change_list_3, 'Changed Interaction')
+            self.owner_id, self.EXP_1_ID,
+            self.append_next_content_id_index_change(change_list_3),
+            'Changed Interaction')
 
         # Changes related to interaction in the second state
         # to check for mergeability.
@@ -6731,7 +6741,8 @@ class ExplorationChangesMergeabilityUnitTests(
         # Using the old change_list_2 here because they already covers
         # the changes related to customization args in first state.
         exp_services.update_exploration(
-            self.owner_id, self.EXP_1_ID, change_list_2,
+            self.owner_id, self.EXP_1_ID,
+            self.append_next_content_id_index_change(change_list_2),
             'Changed Interactions and Customization_args in One State')
 
         # Changes to the properties related to the customization args
@@ -8189,7 +8200,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'Added Answer Group and Solution in One state')
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_1_ID, change_list_3,
+            self.owner_id, self.EXP_1_ID,
+            self.append_next_content_id_index_change(change_list_3),
             'Changed Answer Groups and Solutions in One State')
 
         test_dict: Dict[str, str] = {}

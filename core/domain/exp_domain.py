@@ -1728,6 +1728,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected next_content_id_index to be an int, received '
                 '%s' % self.next_content_id_index)
+
+        # Validates translatable contents in the exploration.
+        self.validate_translatable_contents(self.next_content_id_index)
+
         if not isinstance(self.edits_allowed, bool):
             raise utils.ValidationError(
                 'Expected edits_allowed to be a bool, received '

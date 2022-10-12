@@ -211,7 +211,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 'rule_type': 'Equals',
                 'inputs': {
                     'x': {
-                        'contentId': 'rule_input_4',
+                        'contentId': 'rule_input_3',
                         'normalizedStrSet': ['abc']
                     }
                 },
@@ -7750,6 +7750,12 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                     content_id_generator.generate(
                         translation_domain.ContentType.DEFAULT_OUTCOME)
                 )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index,
+                'old_value': 0
             })], 'Added state')
 
         new_model = self.version_history_model_class.get(
@@ -7776,6 +7782,12 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                     content_id_generator.generate(
                         translation_domain.ContentType.DEFAULT_OUTCOME)
                 )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index,
+                'old_value': 0
             })], 'Added state')
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
@@ -8098,29 +8110,34 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         content_id_generator = translation_domain.ContentIdGenerator(
             self.exploration.next_content_id_index)
         change_list_from_v1_to_v2 = [
-          exp_domain.ExplorationChange({
+            exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'first',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'first',
+                'state_name': 'second',
                 'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-          }), exp_domain.ExplorationChange({
-              'cmd': exp_domain.CMD_ADD_STATE,
-              'state_name': 'second',
-              'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-          })
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index,
+                'old_value': 0
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_from_v1_to_v2,
@@ -8188,6 +8205,12 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                     content_id_generator.generate(
                         translation_domain.ContentType.DEFAULT_OUTCOME)
                 )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index,
+                'old_value': 0
             })], 'Added a state')
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
@@ -8201,6 +8224,12 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                     content_id_generator.generate(
                         translation_domain.ContentType.DEFAULT_OUTCOME)
                 )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index,
+                'old_value': 0
             })], 'Added a state')
         new_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))

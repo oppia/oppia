@@ -93,17 +93,6 @@ describe('HintEditorComponent', () => {
       .toHaveBeenCalled();
   }));
 
-  it('should throw error if content id is invalid', () => {
-    component.hint = new Hint(
-      SubtitledHtml.createDefault('content', null));
-    component.hintMemento = new Hint(
-      SubtitledHtml.createDefault('html text', 'contentID'));
-
-    expect(() => {
-      component.saveThisHint();
-    }).toThrowError('Expected content id to be non-null');
-  });
-
   it('should open hint editor when user clicks on \'Edit hint\'', () => {
     component.isEditable = true;
     component.hintMemento = new Hint(

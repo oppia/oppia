@@ -549,19 +549,18 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id, strict=False), None)
 
     def test_update_question(self) -> None:
-        content_id_generator = translation_domain.ContentIdGenerator()
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator)
-        change_list = [question_domain.QuestionChange({
+        change_list = [ question_domain.QuestionChange({
+            'cmd': 'update_question_property',
+            'property_name': 'next_content_id_index',
+            'old_value': 0,
+            'new_value': self.content_id_generator.next_content_id_index,
+        }), question_domain.QuestionChange({
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
-        }), question_domain.QuestionChange({
-            'cmd': 'update_question_property',
-            'property_name': 'next_content_id_index',
-            'old_value': 0,
-            'new_value': content_id_generator.next_content_id_index,
         })]
         question_services.update_question(
             self.editor_id, self.question_id, change_list,
