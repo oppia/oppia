@@ -1,16 +1,18 @@
-<div ng-cloak>
-  <md-card class="oppia-editor-card" ng-if="!loadingMessage">
-    <div ng-if="explorationHasBeenVisited">
+<div>
+  <mat-card class="oppia-editor-card" *ngIf="!loadingMessage">
+    <div *ngIf="explorationHasBeenVisited">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
-        <pie-chart data="pieChartData" options="pieChartOptions">
-        </pie-chart>
+        <oppia-pie-chart *ngIf="pieChartData && pieChartOptions"
+                         [data]="pieChartData"
+                         [options]="pieChartOptions">
+        </oppia-pie-chart>
         <p class="text-center">
-          <span ng-if="numPassersby"
+          <span *ngIf="numPassersby"
                 class="e2e-test-num-passersby font-weight-bold">
-            <[numPassersby]> learners browsed this exploration. They left before reaching the second card.
+            {{ numPassersby }} learners browsed this exploration. They left before reaching the second card.
           </span>
-          <span ng-if="!numPassersby" class="font-weight-bold">
+          <span *ngIf="!numPassersby" class="font-weight-bold">
             No learners have browsed this exploration yet.
           </span>
         </p>
@@ -19,20 +21,19 @@
         <div class="container">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-              <state-graph-visualization [graph-data]="statsGraphData"
-                                         [node-fill]="darkseagreen"
-                                         [version-graph-data]="null"
-                                         (on-click-function)="onClickStateInStatsGraph($event)">
+              <state-graph-visualization [nodeFill]="darkseagreen"
+                                         [versionGraphData]="null"
+                                         (onClickFunction)="onClickStateInStatsGraph($event)">
               </state-graph-visualization>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div ng-if="!explorationHasBeenVisited">
+    <div *ngIf="!explorationHasBeenVisited">
       <em>
         This exploration has not been visited by anyone yet, so there are no statistics to display.
       </em>
     </div>
-  </md-card>
+  </mat-card>
 </div>
