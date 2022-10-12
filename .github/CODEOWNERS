@@ -353,8 +353,8 @@
 /core/domain/playthrough_issue_registry*.py @oppia/learner-analytics-reviewers
 /core/domain/stats*.py @oppia/learner-analytics-reviewers
 /core/domain/visualization_registry*.py @oppia/learner-analytics-reviewers
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @oppia/learner-analytics-reviewers
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component*.ts @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.html @oppia/learner-analytics-reviewers
 /core/templates/components/statistics-directives/ @oppia/learner-analytics-reviewers
 /core/templates/domain/statistics/ @oppia/learner-analytics-reviewers
 /core/templates/domain/improvements/ @oppia/learner-analytics-reviewers
