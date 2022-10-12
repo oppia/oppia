@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import datetime
-from re import A
 
 from core import android_validation_constants
 from core import feconf
@@ -27,7 +26,6 @@ from core import utils
 from core.constants import constants
 from core.domain import topic_domain
 from core.domain import user_services
-from core.domain.subtopic_page_domain import VersionedSubtopicPageContentsDict
 from core.tests import test_utils
 
 
@@ -1079,7 +1077,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         current_schema: int,
         topic: topic_domain.Topic
     ) -> topic_domain.VersionedSubtopicsDict:
-        """Sets up the VersionendSubtopicsDict for the schema update tests"""
+        """Sets up the VersionendSubtopicsDict for the schema update tests."""
         topic.update_subtopic_title(1,'abcdefghijklmnopqrstuvwxyz')
         subtopic_dict = topic.subtopics[topic.get_subtopic_index(1)].to_dict()
         vers_subtopic_dict = topic_domain.VersionedSubtopicsDict(
