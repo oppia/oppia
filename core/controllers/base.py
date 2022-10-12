@@ -469,6 +469,23 @@ class BaseHandler(webapp2.RequestHandler):
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
+        print('\n'*3)
+        print('------------'*3)
+        print('Request url = ',self.request.uri)
+        print('Handler class name = ',handler_class_name)
+        print('handler_args = ',handler_args)
+        print('Arguments = ', self.request.arguments())
+        print('Iterating over arguments...')
+        for j in self.request.arguments():
+            print(j, self.normalized_request.get(j))
+        print('URL path elements = ', self.request.route_kwargs)
+        print('Request method = ',request_method)
+        print('HANDLER_ARGS_SCHEMAS =  ', self.HANDLER_ARGS_SCHEMAS)
+        print('URL_PATH_ARGS_SCHEMAS = , ', self.URL_PATH_ARGS_SCHEMAS)
+        print('GET_HANDLER_ERROR_RETURN_TYPE', self.GET_HANDLER_ERROR_RETURN_TYPE)
+        print('------------'*3)
+        print('\n'*3)
+
     @property
     def current_user_is_site_maintainer(self):
         """Returns whether the current user is a site maintainer.
