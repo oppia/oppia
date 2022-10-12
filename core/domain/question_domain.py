@@ -1862,7 +1862,6 @@ class Question(translation_domain.BaseTranslatableObject):
         self.question_state_data.validate({}, False)
         self.validate_translatable_contents(self.next_content_id_index)
 
-
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""
 

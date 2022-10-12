@@ -3311,6 +3311,11 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
                 'new_state_name': 'a'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index,
+                'old_value': 0
             })
         ], 'A commit message.')
 

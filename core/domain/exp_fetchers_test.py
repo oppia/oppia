@@ -403,6 +403,12 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                         self.content_id_generator_1.generate(
                             translation_domain.ContentType.DEFAULT_OUTCOME)
                     )
+                }), exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'next_content_id_index',
+                        'new_value': (
+                            self.content_id_generator_1.next_content_id_index),
+                        'old_value': 0
                 })
             ], 'A commit message.'
         )

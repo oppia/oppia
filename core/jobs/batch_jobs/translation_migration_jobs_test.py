@@ -19,18 +19,16 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain, rights_manager, state_domain
-from core.domain import question_fetchers
-from core.domain import skill_services
-from core.domain import suggestion_services
-from core.domain import translation_domain
+from core.domain import exp_domain
+from core.domain import rights_manager
+from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Union
+from typing import Sequence
 from typing_extensions import Final
 
 MYPY = False
@@ -172,7 +170,9 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         model.commit(self.author_id, 'commit_message', commit_cmds_dict)
 
     def test_entity_translation_model_generated_from_old_exp(self) -> None:
-        entity_translation_models = (
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = (
             translation_models.EntityTranslationsModel.get_all().fetch())
 
         self.assertEqual(len(entity_translation_models), 0)
@@ -190,7 +190,9 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         self.assertEqual(len(entity_translation_models), 2)
 
     def test_job_raises_error_for_failing_exp_traversal_steps(self) -> None:
-        entity_translation_models = (
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = (
             translation_models.EntityTranslationsModel.get_all().fetch())
 
         self.assertEqual(len(entity_translation_models), 0)
@@ -211,9 +213,10 @@ class EntityTranslationsModelGenerationOneOffJobTests(
 
         self.assertEqual(len(entity_translation_models), 0)
 
-
     def test_job_raises_error_for_failing_model_creation_steps(self) -> None:
-        entity_translation_models = (
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = (
             translation_models.EntityTranslationsModel.get_all().fetch())
 
         self.assertEqual(len(entity_translation_models), 0)

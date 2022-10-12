@@ -214,6 +214,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         question = question_fetchers.get_questions_by_ids([question_id])[0]
 
+        assert question is not None
         self.assertEqual(
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION
@@ -229,5 +230,6 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         with current_state_schema_version_swap:
             question = question_fetchers.get_questions_by_ids([question_id])[0]
 
+        assert question is not None
         self.assertEqual(
             question.question_state_data_schema_version, 52)

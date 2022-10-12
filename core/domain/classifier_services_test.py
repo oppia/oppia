@@ -890,6 +890,11 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
                     translation_domain.ContentType.DEFAULT_OUTCOME)
             )
         }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index,
+            'old_value': 0
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,

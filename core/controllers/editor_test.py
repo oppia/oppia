@@ -910,7 +910,12 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
                         content_id_generator.generate(
                             translation_domain.ContentType.DEFAULT_OUTCOME)
                     )
-                })], 'Addes state')
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                    'old_value': 0
+            })], 'Addes state')
 
         snapshots = exp_services.get_exploration_snapshots_metadata(exp_id)
 
@@ -976,7 +981,13 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
                         content_id_generator.generate(
                             translation_domain.ContentType.DEFAULT_OUTCOME)
                     )
-                })], 'Addes state')
+                }), exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'next_content_id_index',
+                        'new_value': content_id_generator.next_content_id_index,
+                        'old_value': 0
+                })
+            ], 'Addes state')
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_stats = stats_services.get_exploration_stats(

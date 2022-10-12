@@ -551,7 +551,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_update_question(self) -> None:
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator)
-        change_list = [ question_domain.QuestionChange({
+        change_list = [question_domain.QuestionChange({
             'cmd': 'update_question_property',
             'property_name': 'next_content_id_index',
             'old_value': 0,

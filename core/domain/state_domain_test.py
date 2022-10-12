@@ -2219,6 +2219,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 exploration.validate()
         self.set_interaction_for_state(
             init_state, 'TextInput', content_id_generator)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         self.assertEqual(init_state.interaction.id, 'TextInput')
         self.assertEqual(init_state.solicit_answer_details, False)
         exploration.validate()

@@ -495,6 +495,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
                     'state_name': 'Introduction',
                     'new_value': solution_dict
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                    'old_value': 0
                 })], 'Add state name')
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
