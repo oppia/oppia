@@ -3,10 +3,10 @@
   <li class="oppia-navbar-dropdown-menu">
     <div ngbDropdown>
       <button class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-left"
-              [ngClass]="{'btn-success': isTopicSaveable()}"
+              [ngClass]="{'btn-success': topicIsSaveable}"
               (click)="saveChanges()"
-              [disabled]="!isTopicSaveable()">
-        <span *ngIf="!isSaveInProgress()">
+              [disabled]="!topicIsSaveable">
+        <span *ngIf="!saveInProgress">
           <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon oppia-topic-editor-save-icon"
              alt="Save Topic">
           </i>
@@ -17,7 +17,7 @@
           </span>
         </span>
 
-        <span *ngIf="isSaveInProgress()">
+        <span *ngIf="saveInProgress">
           <span class="oppia-save-publish-button-label">Saving</span>
           <loading-dots></loading-dots>
         </span>
@@ -46,8 +46,8 @@
             *ngIf="!topicRights.isPublished()"
             class="btn btn-light oppia-editor-publish-button e2e-test-publish-topic-button"
             (click)="publishTopic()"
-            [ngClass]="{'btn-success': !isTopicSaveable() && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
-            [disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+            [ngClass]="{'btn-success': !topicIsSaveable && warningsCount === 0 && prepublishValidationIssues.length === 0}"
+            [disabled]="topicIsSaveable || warningsCount > 0 || prepublishValidationIssues.length > 0">
       <i class="fas fa-cloud-upload-alt md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
       </i>
@@ -59,7 +59,7 @@
             (click)="unpublishTopic()"
             *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
             class="btn btn-light"
-            [disabled]="isTopicSaveable()">
+            [disabled]="topicIsSaveable">
       Unpublish Topic
     </button>
   </li>
@@ -115,13 +115,13 @@
         <div class="oppia-topic-nav-dropdown-option">
           <div *ngIf="!topicRights.isPublished()"
                (click)="publishTopic()"
-               [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+               [attr.disabled]="topicIsSaveable || warningsCount > 0 || prepublishValidationIssues.length > 0">
             <i class="oppia-material-icons">&#xE254;</i>
             <span>Publish Topic</span>
           </div>
           <div (click)="unpublishTopic()"
                *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
-               [attr.disabled]="isTopicSaveable()">
+               [attr.disabled]="topicIsSaveable">
             <i class="oppia-material-icons">&#xE254;</i>
             <span>Unpublish Topic</span>
           </div>
@@ -130,10 +130,10 @@
       <div class="oppia-topic-nav-dropdown-content oppia-right-container">
         <div class="oppia-topic-nav-dropdown-text"
              (click)="saveChanges()">
-          <span *ngIf="isSaveInProgress()">
+          <span *ngIf="saveInProgress">
             <span>Saving</span>
           </span>
-          <span *ngIf="!isSaveInProgress()">
+          <span *ngIf="!saveInProgress">
             Save Changes
           </span>
           <span *ngIf="changeListLength > 0">
