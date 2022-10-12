@@ -19,6 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { AppConstants } from 'app.constants';
 import { ContributionAndReviewStatsBackendApiService }
   from './contribution-and-review-stats-backend-api.service';
 
@@ -96,7 +97,8 @@ export class ContributionAndReviewStatsService {
     return (
       this.contributionAndReviewStatsBackendApiService
         .fetchContributionAndReviewStatsAsync(
-          'translation', 'submission', username));
+          AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION, username));
   }
 
   async fetchTranslationReviewStats(
@@ -105,7 +107,8 @@ export class ContributionAndReviewStatsService {
     return (
       this.contributionAndReviewStatsBackendApiService
         .fetchContributionAndReviewStatsAsync(
-          'translation', 'review', username));
+          AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW, username));
   }
 
   async fetchQuestionContributionStats(
@@ -114,7 +117,8 @@ export class ContributionAndReviewStatsService {
     return (
       this.contributionAndReviewStatsBackendApiService
         .fetchContributionAndReviewStatsAsync(
-          'question', 'submission', username));
+          AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION, username));
   }
 
   async fetchQuestionReviewStats(
@@ -123,7 +127,8 @@ export class ContributionAndReviewStatsService {
     return (
       this.contributionAndReviewStatsBackendApiService
         .fetchContributionAndReviewStatsAsync(
-          'question', 'review ', username));
+          AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW, username));
   }
 }
 
