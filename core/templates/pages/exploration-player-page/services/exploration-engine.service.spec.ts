@@ -42,12 +42,12 @@ import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateModule } from 'tests/unit-test-utils';
 
 
-export class MockTranslateService {
-  instant(val: string): string {
-    return val;
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams: Object | undefined): string {
+    return key;
   }
 }
 
@@ -70,6 +70,7 @@ describe('Exploration engine service ', () => {
     ReadOnlyExplorationBackendApiService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
+  let translateService: TranslateService;
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
@@ -381,10 +382,7 @@ describe('Exploration engine service ', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        MockTranslateModule
-      ],
+      imports: [HttpClientTestingModule],
       providers: [
         {
           provide: TranslateService,
@@ -417,6 +415,7 @@ describe('Exploration engine service ', () => {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     textInputService = TestBed.get(TextInputRulesService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    translateService = TestBed.inject(TranslateService);
   });
 
   beforeEach(() => {
