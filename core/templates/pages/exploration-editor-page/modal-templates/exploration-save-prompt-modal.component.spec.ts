@@ -62,7 +62,7 @@ describe('Exploration Save Prompt Modal Component', () => {
     fixture.detectChanges();
   });
 
-  it('should intianlize component properly', () => {
+  it('should initialize component properly', () => {
     spyOn(ngbActiveModal, 'close').and.stub();
 
     component.confirm();

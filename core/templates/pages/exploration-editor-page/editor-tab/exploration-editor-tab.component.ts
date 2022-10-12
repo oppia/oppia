@@ -357,20 +357,6 @@ export class ExplorationEditorTabComponent
           this.stateEditorService.onStateEditorInitialized.emit(stateData);
         }
 
-        // Shivam PTAL.
-        // $scope.$watch(() => {
-        //   return (
-        //     this.stateEditorService.checkEventListenerRegistrationStatus());
-        // }, () => {
-        //   if (
-        //     this.stateEditorService.checkEventListenerRegistrationStatus() &&
-        //   this.explorationStatesService.isInitialized()) {
-        //     let stateData = (
-        //       this.explorationStatesService.getState(this.stateName));
-        //     this.stateEditorService.onStateEditorInitialized.emit(stateData);
-        //   }
-        // });
-
         let content = this.explorationStatesService.getStateContentMemento(
           this.stateName);
         if (content.html || stateData.interaction.id) {
