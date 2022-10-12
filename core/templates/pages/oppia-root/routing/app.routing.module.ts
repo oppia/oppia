@@ -37,6 +37,25 @@ const routes: Route[] = [
       .then(m => m.AboutFoundationPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
+    loadChildren: () => import(
+      'pages/exploration-player-page/exploration-player-page.module')
+      .then(m => m.ExplorationPlayerPageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .EXPLORATION_PLAYER_EMBED.ROUTE),
+    loadChildren: () => import(
+      'pages/exploration-player-page/exploration-player-page.module')
+      .then(m => m.ExplorationPlayerPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,
+    loadChildren: () => import('pages/android-page/android-page.module')
+      .then(m => m.AndroidPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import(
@@ -176,6 +195,31 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/volunteer-page/volunteer-page.module')
       .then(m => m.VolunteerPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-home-page/blog-home-page.module')
+      .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-home-page/blog-home-page.module')
+      .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-post-page/blog-post-page.module')
+      .then(m => m.BlogPostPageModule)
   }
 ];
 

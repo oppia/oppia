@@ -26,20 +26,32 @@ from core import schema_utils_test
 from core.tests import test_utils
 from extensions.objects.models import objects
 
+from typing import Any, Dict, List, Sequence, Tuple, Type, Union
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     """Tests normalization of typed objects."""
 
+    # Here we use type Any because here we are providing different types of
+    # tuples for testing purposes.
     def check_normalization(
-            self, object_class, mappings, invalid_items_with_error_messages):
+        self,
+        object_class: Type[objects.BaseObject],
+        mappings: Sequence[Tuple[Any, Any]],
+        invalid_items_with_error_messages: List[Tuple[Any, str]]
+    ) -> None:
         """Test that values are normalized correctly.
 
         Args:
             object_class: object(BaseObject). The class whose normalize()
                 method is to be tested.
-            mappings: list(tuple(str, str)). The first element of
+            mappings: list(tuple(*, *)). The first element of
                 each item is expected to be normalized to the second.
-            invalid_items_with_error_messages: list(tuple(str, str)). A list of
+            invalid_items_with_error_messages: list(tuple(*, str)). A list of
                 values and corresponding error messages. Each of the value is
                 expected to raise an Exception when normalized.
         """
@@ -55,7 +67,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(Exception, error_msg):
                 object_class.normalize(item)
 
-    def test_boolean_validation(self):
+    def test_boolean_validation(self) -> None:
         """Tests objects of type Boolean."""
         mappings = [('', False), (False, False), (True, True), (None, False)]
         invalid_values_with_error_messages = [
@@ -67,7 +79,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Boolean, mappings, invalid_values_with_error_messages)
 
-    def test_real_validation(self):
+    def test_real_validation(self) -> None:
         """Tests objects of type Real."""
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
                     ('-1', -1), (3.00, 3), (3.05, 3.05), ('3.05', 3.05), ]
@@ -85,7 +97,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Real, mappings, invalid_values_with_error_messages)
 
-    def test_int_validation(self):
+    def test_int_validation(self) -> None:
         """Tests objects of type Int."""
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0),
                     ('-1', -1), (-1, -1), (3.00, 3), (3.05, 3), ]
@@ -103,7 +115,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Int, mappings, invalid_values_with_error_messages)
 
-    def test_nonnegative_int_validation(self):
+    def test_nonnegative_int_validation(self) -> None:
         """Tests objects of type NonnegativeInt."""
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (3.00, 3),
                     (3.05, 3), ]
@@ -142,7 +154,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.NonnegativeInt, mappings,
             invalid_values_with_error_messages)
 
-    def test_positive_int_validation(self):
+    def test_positive_int_validation(self) -> None:
         """Tests objects of type PositiveInt."""
         mappings = [(20, 20), ('20', 20), ('02', 2), (3.00, 3),
                     (3.05, 3), ]
@@ -193,7 +205,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.PositiveInt, mappings, invalid_values_with_error_messages)
 
-    def test_code_evaluation_validation(self):
+    def test_code_evaluation_validation(self) -> None:
         """Tests objects of type codeEvaluation."""
         mappings = [(
             {'code': 'a', 'output': '', 'evaluation': '', 'error': ''},
@@ -216,7 +228,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.CodeEvaluation, mappings,
             invalid_values_with_error_messages)
 
-    def test_coord_two_dim_validation(self):
+    def test_coord_two_dim_validation(self) -> None:
         """Tests objects of type CoordTwoDim."""
         mappings = [([3.5, 1.3], [3.5, 1.3]), ([0, 1], [0, 1])]
         invalid_values_with_error_messages = [
@@ -229,7 +241,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.CoordTwoDim, mappings, invalid_values_with_error_messages)
 
-    def test_list_validation(self):
+    def test_list_validation(self) -> None:
         """Tests objects of type ListOfUnicodeString."""
         mappings = [(['b', 'a'], ['b', 'a']), ([], [])]
         invalid_values_with_error_messages = [
@@ -244,7 +256,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.ListOfUnicodeString, mappings,
             invalid_values_with_error_messages)
 
-    def test_music_phrase(self):
+    def test_music_phrase(self) -> None:
         """Tests objects of type MusicPhrase."""
         mappings = [(
             [{'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}},
@@ -278,7 +290,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.MusicPhrase, mappings, invalid_values_with_error_messages)
 
-    def test_list_of_tabs(self):
+    def test_list_of_tabs(self) -> None:
         """Tests objects of type ListOfDict."""
         mappings = [([
             {'content': '<p>Hello</p>', 'title': 'Tabs'},
@@ -304,7 +316,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.ListOfTabs, mappings, invalid_values_with_error_messages)
 
-    def test_set_of_unicode_string_validation(self):
+    def test_set_of_unicode_string_validation(self) -> None:
         """Tests objects of type SetOfUnicodeString."""
         mappings = [
             (['ff', 'a', u'¡Hola!'], [u'ff', u'a', u'¡Hola!']),
@@ -337,7 +349,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.SetOfUnicodeString, mappings,
             invalid_values_with_error_messages)
 
-    def test_unicode_string_validation(self):
+    def test_unicode_string_validation(self) -> None:
         """Tests objects of type UnicodeString."""
         mappings = [
             ('Abc   def', u'Abc   def'), (u'¡Hola!', u'¡Hola!'),
@@ -357,7 +369,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.UnicodeString, mappings, invalid_values_with_error_messages)
 
-    def test_html_validation(self):
+    def test_html_validation(self) -> None:
         """Tests objects of type HTML."""
         # TODO(sll): Add more tests.
         mappings = [
@@ -384,7 +396,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Html, mappings, invalid_values_with_error_messages)
 
-    def test_normalized_string_validation(self):
+    def test_normalized_string_validation(self) -> None:
         """Tests objects of type NormalizedString."""
         mappings = [
             ('Abc   def', u'Abc def'), (u'¡hola!', u'¡hola!')
@@ -405,7 +417,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.NormalizedString, mappings,
             invalid_values_with_error_messages)
 
-    def test_math_latex_string_validation(self):
+    def test_math_latex_string_validation(self) -> None:
         """Tests objects of type MathExpressionContent."""
         mappings = [(
             {'raw_latex': '123456789', 'svg_filename': ''},
@@ -444,7 +456,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             invalid_values_with_error_messages
         )
 
-    def test_skill_id_string_validation(self):
+    def test_skill_id_string_validation(self) -> None:
         """Tests objects of type SkillSelector."""
         mappings = [
             ('skill_id', u'skill_id'), (u'abcdef123_', u'abcdef123_'),
@@ -464,7 +476,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.SkillSelector, mappings, invalid_values_with_error_messages)
 
-    def test_sanitized_url_validation(self):
+    def test_sanitized_url_validation(self) -> None:
         mappings = [
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
@@ -505,7 +517,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.SanitizedUrl, mappings, invalid_values_with_error_messages)
 
-    def test_checked_proof_validation(self):
+    def test_checked_proof_validation(self) -> None:
         """Tests objects of type CheckedProof."""
         valid_example_1 = {
             'assumptions_string': 'p',
@@ -527,7 +539,9 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (valid_example_1, valid_example_1),
             (valid_example_2, valid_example_2)]
 
-        invalid_values_with_error_messages = [
+        invalid_values_with_error_messages: List[Tuple[
+            Union[None, Dict[str, Union[str, bool]]], str
+        ]] = [
             ({}, 'Cannot convert to checked proof {}'),
             (None, 'Cannot convert to checked proof None'),
             (
@@ -555,7 +569,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.CheckedProof, mappings, invalid_values_with_error_messages)
 
-    def test_graph(self):
+    def test_graph(self) -> None:
         """Tests objects of type Graph."""
         empty_graph = {
             'vertices': [],
@@ -603,7 +617,10 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (directed_graph, directed_graph),
         ]
 
-        invalid_values_with_error_messages = [
+        invalid_values_with_error_messages: List[Tuple[
+            Union[None, int, str, Dict[str, List[str]], domain.GraphDict],
+            str
+        ]] = [
             (None, 'Cannot convert to graph None'),
             (1, 'Cannot convert to graph 1'),
             ({}, 'Cannot convert to graph {}'),
@@ -673,7 +690,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Graph, mappings, invalid_values_with_error_messages)
 
-    def test_graph_property_validation(self):
+    def test_graph_property_validation(self) -> None:
         """Tests objects of type GraphProperty."""
 
         mappings = [
@@ -694,7 +711,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.GraphProperty, mappings, invalid_values_with_error_messages)
 
-    def test_fraction(self):
+    def test_fraction(self) -> None:
         """Tests objects of type Fraction."""
         mappings = [(
             self._create_fraction_dict(True, 0, 0, 1),
@@ -705,14 +722,23 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         )]
 
         invalid_values_with_error_messages = [
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             (
-                self._create_fraction_dict('non-boolean', 1, 2, 3),
+                self._create_fraction_dict('non-boolean', 1, 2, 3),  # type: ignore[arg-type]
                 'Expected bool, received non-boolean'),
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             (
-                self._create_fraction_dict(True, 'non-int', 2, 3),
+                self._create_fraction_dict(True, 'non-int', 2, 3),  # type: ignore[arg-type]
                 'Could not convert str to int: non-int'),
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             (
-                self._create_fraction_dict(None, None, None, None),
+                self._create_fraction_dict(None, None, None, None),  # type: ignore[arg-type]
                 'Expected bool, received None'),
             (
                 self._create_fraction_dict(False, 10, 1, -3),
@@ -763,7 +789,12 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.Fraction, mappings, invalid_values_with_error_messages)
 
     def _create_fraction_dict(
-            self, is_negative, whole_number, numerator, denominator):
+        self,
+        is_negative: bool,
+        whole_number: int,
+        numerator: int,
+        denominator: int
+    ) -> objects.FractionDict:
         """Returns the fraction object in the dict format.
 
         Args:
@@ -782,7 +813,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'denominator': denominator
         }
 
-    def test_position_of_terms_validation(self):
+    def test_position_of_terms_validation(self) -> None:
         """Tests objects of type PositionOfTerms."""
 
         mappings = [
@@ -803,7 +834,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.PositionOfTerms, mappings,
             invalid_values_with_error_messages)
 
-    def test_algebraic_identifier_validation(self):
+    def test_algebraic_identifier_validation(self) -> None:
         """Tests objects of type AlgebraicIdentifier."""
 
         mappings = [('a', 'a'), ('alpha', 'alpha'), ('Z', 'Z')]
@@ -822,7 +853,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.AlgebraicIdentifier, mappings,
             invalid_values_with_error_messages)
 
-    def test_ratio_validation(self):
+    def test_ratio_validation(self) -> None:
         """Tests objects of type RatioExpression."""
 
         mappings = [([1, 2], [1, 2]), ([1, 2, 3], [1, 2, 3])]
@@ -837,7 +868,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.RatioExpression, mappings,
             invalid_values_with_error_messages)
 
-    def test_set_of_algebraic_identifier_validation(self):
+    def test_set_of_algebraic_identifier_validation(self) -> None:
         """Tests objects of type SetOfAlgebraicIdentifier."""
 
         mappings = [
@@ -872,7 +903,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
-    def test_schemas_used_to_define_objects_are_valid(self):
+    def test_schemas_used_to_define_objects_are_valid(self) -> None:
         count = 0
         for name, member in inspect.getmembers(objects):
             if inspect.isclass(member):
@@ -895,8 +926,8 @@ class SchemaValidityTests(test_utils.GenericTestBase):
 
         self.assertEqual(count, 53)
 
-    def test_get_schema_method_raises_error_in_base_object(self):
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+    def test_get_schema_method_raises_error_in_base_object(self) -> None:
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The get_schema() method is missing from the derived class. It '
@@ -908,7 +939,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
 
-    def test_default_values_for_objects_are_valid(self):
+    def test_default_values_for_objects_are_valid(self) -> None:
         for _, member in inspect.getmembers(objects):
             if inspect.isclass(member) and member.default_value is not None:
                 if member.__name__ == 'BaseTranslatableObject':
@@ -962,19 +993,22 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
 
 class NormalizedRectangleTests(test_utils.GenericTestBase):
 
-    def test_normalize(self):
+    def test_normalize(self) -> None:
         normalized_rectangle = objects.NormalizedRectangle2D()
         self.assertEqual(normalized_rectangle.normalize(
             [[0, 1], [1, 0]]), [[0.0, 0.0], [0.0, 0.0]])
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             TypeError, 'Cannot convert to Normalized Rectangle '):
-            normalized_rectangle.normalize('')
+            normalized_rectangle.normalize('')  # type: ignore[arg-type]
 
 
 class CodeStringTests(test_utils.GenericTestBase):
 
-    def test_normalize(self):
+    def test_normalize(self) -> None:
         code_string = objects.CodeString()
         self.assertEqual(code_string.normalize(code_string.default_value), '')
 
@@ -985,7 +1019,7 @@ class CodeStringTests(test_utils.GenericTestBase):
 
 class BaseTranslatableObjectTests(test_utils.GenericTestBase):
 
-    def test_translatable_objects_naming(self):
+    def test_translatable_objects_naming(self) -> None:
         for name, member in inspect.getmembers(objects):
             if not inspect.isclass(member):
                 continue
@@ -1001,7 +1035,7 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
             elif 'ContentId' not in name:
                 self.assertNotIn('Translatable', name)
 
-    def test_abstract_base_class_raises_not_implemented_error(self):
+    def test_abstract_base_class_raises_not_implemented_error(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
             'The _value_key_name and _value_schema for this class must both '
@@ -1018,7 +1052,7 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                     'a': 'thing to translate'
                 })
 
-    def test_base_translatable_object_normalization(self):
+    def test_base_translatable_object_normalization(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
             'The _value_key_name and _value_schema for this class must both '
@@ -1027,16 +1061,19 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                 'contentId': 5
             })
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             NotImplementedError,
             'The _value_key_name and _value_schema for this class must both '
             'be set'):
-            objects.BaseTranslatableObject.normalize_value(5)
+            objects.BaseTranslatableObject.normalize_value(5)  # type: ignore[arg-type]
 
 
 class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 
-    def test_normalization(self):
+    def test_normalization(self) -> None:
         with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 5'):
             objects.TranslatableUnicodeString.normalize({
@@ -1061,10 +1098,13 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
             'unicodeStr': 'abc'
         })
 
-    def test_normalize_value(self):
+    def test_normalize_value(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
                 AssertionError, 'Expected unicode string, received 5'):
-            objects.TranslatableUnicodeString.normalize_value(5)
+            objects.TranslatableUnicodeString.normalize_value(5)  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(
             AssertionError,
@@ -1078,7 +1118,7 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 
 class TranslatableHtmlTests(test_utils.GenericTestBase):
 
-    def test_normalization(self):
+    def test_normalization(self) -> None:
         with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML'):
             objects.TranslatableHtml.normalize({
                 'contentId': 'rule_input',
@@ -1115,9 +1155,12 @@ class TranslatableHtmlTests(test_utils.GenericTestBase):
             'html': 'goodtext'
         })
 
-    def test_normalize_value(self):
+    def test_normalize_value(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML'):
-            objects.TranslatableHtml.normalize_value(5)
+            objects.TranslatableHtml.normalize_value(5)  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML'):
             objects.TranslatableHtml.normalize_value(['abc'])
@@ -1146,7 +1189,7 @@ class TranslatableHtmlTests(test_utils.GenericTestBase):
 
 class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
 
-    def test_normalization(self):
+    def test_normalization(self) -> None:
         with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'):
             objects.TranslatableSetOfNormalizedString.normalize({
@@ -1176,15 +1219,21 @@ class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
             'normalizedStrSet': ['1', '2']
         })
 
-    def test_normalize_value(self):
+    def test_normalize_value(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'):
-            objects.TranslatableSetOfNormalizedString.normalize_value(5)
+            objects.TranslatableSetOfNormalizedString.normalize_value(5)  # type: ignore[arg-type]
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 2'):
             objects.TranslatableSetOfNormalizedString.normalize_value(
-                ['1', 2, '3'])
+                ['1', 2, '3'])  # type: ignore[list-item]
 
         with self.assertRaisesRegex(
             AssertionError, 'Validation failed: is_uniquified'):
@@ -1199,7 +1248,7 @@ class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
 
 class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
 
-    def test_normalization(self):
+    def test_normalization(self) -> None:
         with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'):
             objects.TranslatableSetOfUnicodeString.normalize({
@@ -1229,15 +1278,21 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
             'unicodeStrSet': ['1', '2']
         })
 
-    def test_normalize_value(self):
+    def test_normalize_value(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'):
-            objects.TranslatableSetOfUnicodeString.normalize_value(5)
+            objects.TranslatableSetOfUnicodeString.normalize_value(5)  # type: ignore[arg-type]
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 2'):
             objects.TranslatableSetOfUnicodeString.normalize_value(
-                ['1', 2, '3'])
+                ['1', 2, '3'])  # type: ignore[list-item]
 
         with self.assertRaisesRegex(
             AssertionError, 'Validation failed: is_uniquified'):
@@ -1250,12 +1305,15 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
 
 class JsonEncodedInStringTests(test_utils.GenericTestBase):
 
-    def test_normalization(self):
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_normalization(self) -> None:
         list_of_ids = ['0', '1']
         with self.assertRaisesRegex(
             Exception, 'Expected string received 2 of type %s' % type(2)
         ):
-            objects.JsonEncodedInString.normalize(2)
+            objects.JsonEncodedInString.normalize(2)  # type: ignore[arg-type]
 
         self.assertEqual(
             objects.JsonEncodedInString.normalize(

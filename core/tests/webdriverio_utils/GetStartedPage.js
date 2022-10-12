@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the get_started page, for use in Protractor
+ * @fileoverview Page object for the get_started page, for use in Webdriverio
  * tests.
  */
 var waitFor = require('./waitFor.js');

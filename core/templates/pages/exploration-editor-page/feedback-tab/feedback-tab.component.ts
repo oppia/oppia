@@ -16,245 +16,231 @@
  * @fileoverview Component for the exploration editor feedback tab.
  */
 
-import { CreateFeedbackThreadModalComponent } from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
+import { CreateFeedbackThreadModalComponent } from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
+import { AlertsService } from 'services/alerts.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { EditabilityService } from 'services/editability.service';
+import { LoaderService } from 'services/loader.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { UserService } from 'services/user.service';
+import { ChangeListService } from '../services/change-list.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { ThreadDataBackendApiService } from './services/thread-data-backend-api.service';
+import { ThreadStatusDisplayService } from './services/thread-status-display.service';
+import { FeedbackThread } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/change-list.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-data-backend-api.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-status-display.service.ts');
-require(
-  'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
-  'suggestion-modal-for-exploration-editor.service.ts');
-require('services/alerts.service.ts');
-require('services/date-time-format.service.ts');
-require('services/editability.service.ts');
-require('services/user.service.ts');
+@Component({
+  selector: 'oppia-feedback-tab',
+  templateUrl: './feedback-tab.component.html'
+})
+export class FeedbackTabComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
+  STATUS_CHOICES = this.threadStatusDisplayService.STATUS_CHOICES;
+  activeThread: SuggestionThread;
+  userIsLoggedIn: boolean;
+  threadIsStale: boolean;
+  threadData: FeedbackThread[];
+  messageSendingInProgress: boolean;
+  feedbackMessage: {
+    status: string;
+    text: string;
+  };
 
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require('services/ngb-modal.service.ts');
+  constructor(
+    private alertsService: AlertsService,
+    private changeListService: ChangeListService,
+    private dateTimeFormatService: DateTimeFormatService,
+    private editabilityService: EditabilityService,
+    private explorationStatesService: ExplorationStatesService,
+    private focusManagerService: FocusManagerService,
+    private loaderService: LoaderService,
+    private ngbModal: NgbModal,
+    private threadDataBackendApiService: ThreadDataBackendApiService,
+    private threadStatusDisplayService: ThreadStatusDisplayService,
+    private userService: UserService,
+  ) { }
 
-angular.module('oppia').component('feedbackTab', {
-  template: require('./feedback-tab.component.html'),
-  controller: [
-    '$q', '$rootScope', 'AlertsService', 'ChangeListService',
-    'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
-    'FocusManagerService', 'LoaderService', 'NgbModal',
-    'SuggestionModalForExplorationEditorService',
-    'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
-    'UserService',
-    function(
-        $q, $rootScope, AlertsService, ChangeListService,
-        DateTimeFormatService, EditabilityService, ExplorationStatesService,
-        FocusManagerService, LoaderService, NgbModal,
-        SuggestionModalForExplorationEditorService,
-        ThreadDataBackendApiService, ThreadStatusDisplayService,
-        UserService) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
+  _resetFeedbackMessageFields(): void {
+    this.feedbackMessage.status =
+       this.activeThread && this.activeThread.status;
+    this.feedbackMessage.text = '';
+  }
 
-      var _resetTmpMessageFields = function() {
-        ctrl.tmpMessage.status =
-          ctrl.activeThread && ctrl.activeThread.status;
-        ctrl.tmpMessage.text = '';
-      };
+  clearActiveThread(): void {
+    this.activeThread = null;
+    this._resetFeedbackMessageFields();
+  }
 
-      ctrl.clearActiveThread = function() {
-        ctrl.activeThread = null;
-        _resetTmpMessageFields();
-      };
-
-      // Fetches the threads again if any thread is updated.
-      ctrl.fetchUpdatedThreads = function() {
-        let activeThreadId =
-          ctrl.activeThread && ctrl.activeThread.threadId;
-        return ThreadDataBackendApiService.getFeedbackThreadsAsync().then(
-          data => {
-            ctrl.threadData = data;
-            ctrl.threadIsStale = false;
-            if (activeThreadId !== null) {
-              // Fetching threads invalidates old thread domain objects, so we
-              // need to update our reference to the active thread afterwards.
-              ctrl.activeThread = ThreadDataBackendApiService.getThread(
-                activeThreadId);
-            }
-            LoaderService.hideLoadingScreen();
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
-      };
-
-      ctrl.onBackButtonClicked = function() {
-        ctrl.clearActiveThread();
-        if (ctrl.threadIsStale) {
-          ctrl.fetchUpdatedThreads();
+  // Fetches the threads again if any thread is updated.
+  fetchUpdatedThreads(): Promise<void> {
+    let activeThreadId =
+       this.activeThread && this.activeThread.threadId;
+    return this.threadDataBackendApiService.getFeedbackThreadsAsync().then(
+      data => {
+        this.threadData = data;
+        this.threadIsStale = false;
+        if (activeThreadId !== null) {
+          // Fetching threads invalidates old thread domain objects, so we
+          // need to update our reference to the active thread afterwards.
+          this.activeThread = this.threadDataBackendApiService.getThread(
+            activeThreadId) as SuggestionThread;
         }
-      };
+        this.loaderService.hideLoadingScreen();
+      });
+  }
 
-      ctrl.showCreateThreadModal = function() {
-        return NgbModal.open(CreateFeedbackThreadModalComponent, {
-          backdrop: 'static'
-        }).result.then(
-          result => ThreadDataBackendApiService.createNewThreadAsync(
-            result.newThreadSubject, result.newThreadText)
-        ).then(() => {
-          ctrl.clearActiveThread();
-          AlertsService.addSuccessMessage('Feedback thread created.');
-        },
-        () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      var _isSuggestionHandled = () => {
-        return (
-          ctrl.activeThread !== null &&
-          ctrl.activeThread.isSuggestionHandled());
-      };
-
-      var _isSuggestionValid = () => {
-        return (
-          ctrl.activeThread !== null &&
-          ExplorationStatesService.hasState(
-            ctrl.activeThread.getSuggestionStateName()));
-      };
-
-      var _hasUnsavedChanges = () => {
-        return ChangeListService.getChangeList().length > 0;
-      };
-
-      ctrl.getSuggestionButtonType = () => {
-        return (
-          !_isSuggestionHandled() && _isSuggestionValid() &&
-          !_hasUnsavedChanges()) ? 'primary' : 'default';
-      };
-
-      // TODO(Allan): Implement ability to edit suggestions before applying.
-      ctrl.showSuggestionModal = () => {
-        if (ctrl.activeThread === null) {
-          throw new Error(
-            'Trying to show suggestion of a non-existent thread');
-        }
-        SuggestionModalForExplorationEditorService.showSuggestionModal(
-          ctrl.activeThread.suggestion.suggestionType, {
-            activeThread: ctrl.activeThread,
-            setActiveThread: (
-              threadId => ctrl.fetchUpdatedThreads()
-                .then(() => ctrl.setActiveThread(threadId))),
-            isSuggestionHandled: _isSuggestionHandled,
-            hasUnsavedChanges: _hasUnsavedChanges,
-            isSuggestionValid: _isSuggestionValid
-          }
-        );
-      };
-
-      ctrl.addNewMessage = function(threadId, tmpText, tmpStatus) {
-        if (threadId === null) {
-          AlertsService.addWarning(
-            'Cannot add message to thread with ID: null.');
-          return;
-        }
-        if (!tmpStatus) {
-          AlertsService.addWarning('Invalid message status: ' + tmpStatus);
-          return;
-        }
-        ctrl.threadIsStale = true;
-        ctrl.messageSendingInProgress = true;
-        let thread = ThreadDataBackendApiService.getThread(threadId);
-        if (thread === null) {
-          throw new Error(
-            'Trying to add message to a non-existent thread.');
-        }
-        ThreadDataBackendApiService.addNewMessageAsync(
-          thread, tmpText, tmpStatus).then((messages) => {
-          _resetTmpMessageFields();
-          ctrl.activeThread.messages = messages;
-          ctrl.messageSendingInProgress = false;
-          $rootScope.$apply();
-        },
-        () => {
-          ctrl.messageSendingInProgress = false;
-          $rootScope.$apply();
-        });
-      };
-
-      ctrl.setActiveThread = function(threadId) {
-        let thread = ThreadDataBackendApiService.getThread(threadId);
-        if (thread === null) {
-          throw new Error('Trying to display a non-existent thread');
-        }
-        ThreadDataBackendApiService.getMessagesAsync(thread).then(() => {
-          ctrl.activeThread = thread;
-          ThreadDataBackendApiService.markThreadAsSeenAsync(ctrl.activeThread);
-          ctrl.tmpMessage.status = ctrl.activeThread.status;
-          FocusManagerService.setFocus('tmpMessageText');
-          $rootScope.$apply();
-        });
-      };
-
-      ctrl.getLabelClass = function(status) {
-        return ThreadStatusDisplayService.getLabelClass(status);
-      };
-
-      ctrl.getHumanReadableStatus = function(status) {
-        return ThreadStatusDisplayService.getHumanReadableStatus(status);
-      };
-
-      ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-        return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-          millisSinceEpoch);
-      };
-
-      ctrl.isExplorationEditable = function() {
-        return EditabilityService.isEditable();
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
-        ctrl.activeThread = null;
-        ctrl.userIsLoggedIn = null;
-        ctrl.threadIsStale = false;
-        LoaderService.showLoadingScreen('Loading');
-
-        // Initial load of the thread list on page load.
-        ctrl.tmpMessage = {
-          status: null,
-          text: ''
-        };
-        ctrl.clearActiveThread();
-        ctrl.directiveSubscriptions.add(
-          ThreadDataBackendApiService.onFeedbackThreadsInitialized.subscribe(
-            () => {
-              ctrl.fetchUpdatedThreads();
-            }
-          ));
-
-        return $q.all([
-          UserService.getUserInfoAsync().then(
-            userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
-        ]).then(
-          () => {
-            LoaderService.hideLoadingScreen();
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
-      };
-
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+  onBackButtonClicked(): void {
+    this.clearActiveThread();
+    if (this.threadIsStale) {
+      this.fetchUpdatedThreads();
     }
-  ]
-});
+  }
+
+  _isSuggestionHandled(): boolean {
+    return (
+      this.activeThread !== null &&
+       this.activeThread.isSuggestionHandled());
+  }
+
+  _isSuggestionValid(): boolean {
+    return (
+      this.activeThread !== null &&
+       this.explorationStatesService.hasState(
+         this.activeThread.getSuggestionStateName()));
+  }
+
+  _hasUnsavedChanges(): boolean {
+    return this.changeListService.getChangeList().length > 0;
+  }
+
+  showCreateThreadModal(): void {
+    this.ngbModal.open(CreateFeedbackThreadModalComponent, {
+      backdrop: 'static'
+    }).result.then(
+      (result) => this.threadDataBackendApiService.createNewThreadAsync(
+        result.newThreadSubject, result.newThreadText).then(() => {
+        this.clearActiveThread();
+        this.alertsService.addSuccessMessage('Feedback thread created.');
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }),
+      () => {}
+    );
+  }
+
+  getSuggestionButtonType(): string {
+    return (
+       !this._isSuggestionHandled() && this._isSuggestionValid() &&
+       !this._hasUnsavedChanges()) ? 'primary' : 'default';
+  }
+
+  addNewMessage(threadId: string, tmpText: string, tmpStatus: string): void {
+    if (threadId === null) {
+      this.alertsService.addWarning(
+        'Cannot add message to thread with ID: null.');
+      return;
+    }
+
+    if (!tmpStatus) {
+      this.alertsService.addWarning('Invalid message status: ' + tmpStatus);
+      return;
+    }
+
+    this.threadIsStale = true;
+    this.messageSendingInProgress = true;
+
+    let thread = this.threadDataBackendApiService.getThread(threadId);
+
+    if (thread === null) {
+      throw new Error(
+        'Trying to add message to a non-existent thread.');
+    }
+
+    this.threadDataBackendApiService.addNewMessageAsync(
+      thread, tmpText, tmpStatus).then((messages) => {
+      this._resetFeedbackMessageFields();
+      this.activeThread.messages = messages;
+      this.messageSendingInProgress = false;
+    },
+    () => {
+      this.messageSendingInProgress = false;
+    });
+  }
+
+  setActiveThread(threadId: string): void {
+    let thread = this.threadDataBackendApiService.getThread(threadId);
+    if (thread === null) {
+      throw new Error('Trying to display a non-existent thread');
+    }
+
+    this.threadDataBackendApiService.getMessagesAsync(thread).then(() => {
+      this.activeThread = thread as SuggestionThread;
+      this.threadDataBackendApiService.markThreadAsSeenAsync(this.activeThread);
+      this.feedbackMessage.status = this.activeThread.status;
+      this.focusManagerService.setFocus('feedbackMessage');
+    });
+  }
+
+  getLabelClass(status: string): string {
+    return this.threadStatusDisplayService.getLabelClass(status);
+  }
+
+  getHumanReadableStatus(status: string): string {
+    return this.threadStatusDisplayService.getHumanReadableStatus(status);
+  }
+
+  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
+    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch);
+  }
+
+  isExplorationEditable(): boolean {
+    return this.editabilityService.isEditable();
+  }
+
+  ngOnInit(): void {
+    this.activeThread = null;
+    this.userIsLoggedIn = null;
+    this.threadIsStale = false;
+    this.loaderService.showLoadingScreen('Loading');
+
+    // Initial load of the thread list on page load.
+    this.feedbackMessage = {
+      status: null,
+      text: ''
+    };
+
+    this.clearActiveThread();
+    this.directiveSubscriptions.add(
+      this.threadDataBackendApiService.onFeedbackThreadsInitialized.subscribe(
+        () => {
+          this.fetchUpdatedThreads();
+        }
+      ));
+
+    Promise.all([
+      this.userService.getUserInfoAsync().then(
+        userInfo => this.userIsLoggedIn = userInfo.isLoggedIn()),
+    ]).then(
+      () => {
+        this.loaderService.hideLoadingScreen();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaFeedbackTab',
+   downgradeComponent({
+     component: FeedbackTabComponent
+   }) as angular.IDirectiveFactory);
