@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+import re
 
 from core import android_validation_constants
 from core import feconf
@@ -1078,7 +1079,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         topic: topic_domain.Topic
     ) -> topic_domain.VersionedSubtopicsDict:
         """Sets up the VersionendSubtopicsDict for the schema update tests."""
-        topic.update_subtopic_title(1,'abcdefghijklmnopqrstuvwxyz')
+        topic.update_subtopic_title(1, 'abcdefghijklmnopqrstuvwxyz')
         subtopic_dict = topic.subtopics[topic.get_subtopic_index(1)].to_dict()
         vers_subtopic_dict = topic_domain.VersionedSubtopicsDict(
             {
@@ -1127,6 +1128,34 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             vers_subtopic_dict['schema_version'],
             current_schema + 1
         )
+
+    def test_story_schema_update(self) -> None:
+        story_id = 'story_id'
+        story_published = True
+        schema_version = 1
+        story_ref_dict = topic_domain.StoryReference(
+            story_id,
+            story_published
+        ).to_dict()
+        vers_story_ref_dict = topic_domain.VersionedStoryReferencesDict(
+            {
+                'schema_version': 1,
+                'story_references': [story_ref_dict]
+            }
+        )
+        if schema_version == feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION == 1:
+            # Current schema version is 1, the update method is not implemented.
+            with self.assertRaisesRegex(
+                AttributeError,
+                re.escape(
+                    'type object \'Topic\' has no attribute '
+                    '\'_convert_story_reference_v1_dict_to_v2_dict\''
+                )
+            ):
+                topic_domain.Topic.update_story_references_from_model(
+                    vers_story_ref_dict,
+                    schema_version
+                )
 
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
