@@ -49,6 +49,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { TopicEditorNavbarComponent } from './navbar/topic-editor-navbar.component';
 import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.component';
+import { CreateNewStoryModalComponent } from './modal-templates/create-new-story-modal.component';
 
 @NgModule({
   imports: [
@@ -71,6 +72,7 @@ import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    CreateNewStoryModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent,
@@ -85,6 +87,7 @@ import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    CreateNewStoryModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent,

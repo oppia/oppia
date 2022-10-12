@@ -34,7 +34,9 @@ require(
 require(
   'components/forms/custom-forms-directives/' +
     'edit-thumbnail-modal.component.ts');
-require('components/entity-creation-services/story-creation.service.ts');
+require(
+  'components/entity-creation-services/' +
+  'story-creation-backend-api.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -71,8 +73,9 @@ angular.module('oppia').directive('topicEditorTab', [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
         'ImageUploadHelperService', 'NgbModal',
-        'PageTitleService', 'StoryCreationService', 'TopicEditorRoutingService',
-        'TopicEditorStateService', 'TopicUpdateService',
+        'PageTitleService', 'StoryCreationBackendApiService',
+        'TopicEditorRoutingService', 'TopicEditorStateService',
+        'TopicUpdateService',
         'TopicsAndSkillsDashboardBackendApiService', 'UndoRedoService',
         'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
         'MAX_CHARS_IN_META_TAG_CONTENT',
@@ -84,8 +87,9 @@ angular.module('oppia').directive('topicEditorTab', [
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
             ImageUploadHelperService, NgbModal,
-            PageTitleService, StoryCreationService, TopicEditorRoutingService,
-            TopicEditorStateService, TopicUpdateService,
+            PageTitleService, StoryCreationBackendApiService,
+            TopicEditorRoutingService, TopicEditorStateService,
+            TopicUpdateService,
             TopicsAndSkillsDashboardBackendApiService, UndoRedoService,
             UrlInterpolationService, WindowDimensionsService, WindowRef,
             MAX_CHARS_IN_META_TAG_CONTENT,
@@ -288,7 +292,7 @@ angular.module('oppia').directive('topicEditorTab', [
                 // No further action is needed.
               });
             } else {
-              StoryCreationService.createNewCanonicalStory();
+              StoryCreationBackendApiService.createNewCanonicalStory();
             }
           };
 

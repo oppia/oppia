@@ -17,7 +17,7 @@
  */
 
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
@@ -73,6 +73,7 @@ export class EditThumbnailModalComponent {
   allowedImageFormats = ['svg'];
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private svgSanitizerService: SvgSanitizerService,
     private ngbActiveModal: NgbActiveModal,
   ) {}
@@ -111,6 +112,7 @@ export class EditThumbnailModalComponent {
         this.setImageDimensions(
           img.naturalHeight || 150,
           img.naturalWidth || 300);
+        this.changeDetectorRef.detectChanges();
       };
       this.imgSrc = reader.result as string;
       this.updateBackgroundColor(this.tempBgColor);

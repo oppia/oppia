@@ -25,17 +25,13 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import CONSTANTS from 'assets/constants';
 
-describe('Create New Story Modal Controller', function() {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Create New Story Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
   var StoryEditorStateService = null;
 
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia'));
-
-  importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
