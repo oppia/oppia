@@ -1,19 +1,19 @@
 <div class="skill-editor">
-  <div class="skill-editor-content" ng-if="hasLoadedSkill()">
+  <div class="skill-editor-content" *ngIf="hasLoadedSkill()">
     <div class="skill-editor-components-container">
       <p class="topic-dashboard-link">
         <a href="/topics-and-skills-dashboard">
           Back to Topics Dashboard <i class="fa fa-angle-left"></i>
         </a>
-        <span><[skill.getDescription()]></span>
+        <span>{{ skill?.getDescription() }}</span>
       </p>
-      <oppia-skill-concept-card-editor (get-concept-card-change)="getConceptCardChange()"></oppia-skill-concept-card-editor>
-      <oppia-skill-misconceptions-editor (get-misconceptions-change)="getMisconceptionChange()"></oppia-skill-misconceptions-editor>
+      <oppia-skill-concept-card-editor></oppia-skill-concept-card-editor>
+      <oppia-skill-misconceptions-editor></oppia-skill-misconceptions-editor>
       <oppia-skill-prerequisite-skills-editor></oppia-skill-prerequisite-skills-editor>
       <oppia-skill-rubrics-editor></oppia-skill-rubrics-editor>
     </div>
     <div class="skill-editor-info-container">
-      <md-card class="oppia-editor-card-section skill-editor-status">
+      <mat-card class="oppia-editor-card-section skill-editor-status">
         <strong class="status-heading">
           Status
         </strong>
@@ -21,43 +21,56 @@
           <strong class="status-key">
             Topic:
           </strong>
-          <select class="form-control"
-                  ng-model="topicName"
-                  ng-options="topic as topic for (topic, subtopic) in getAssignedSkillTopicData()"
-                  ng-change="changeSelectedTopic(topicName)"
-                  ng-disabled="!isTopicDropdownEnabled()">
+          <select *ngIf="getAssignedSkillTopicData()"
+                  class="form-control"
+                  [(ngModel)]="topicName"
+                  (change)="changeSelectedTopic(topicName)"
+                  [disabled]="!isTopicDropdownEnabled()">
+            <option *ngFor="let topic of getAssignedSkillTopicData() | keyvalue" [value]="topic.key">
+              {{topic.key}}
+            </option>
           </select>
         </div>
-        <div class="status-box" ng-if="isTopicDropdownEnabled()">
+        <div class="status-box" *ngIf="isTopicDropdownEnabled()">
           <strong class="status-key">
             Subtopic:
           </strong>
-          <span ng-if="getSubtopicName()" class="status-value">
-            <[getSubtopicName()]>
+          <span *ngIf="getSubtopicName()" class="status-value">
+            {{ getSubtopicName() }}
           </span>
-          <span ng-if="!getSubtopicName()" class="status-value">
+          <span *ngIf="!getSubtopicName()" class="status-value">
             Unassigned
           </span>
         </div>
-      </md-card>
-      <md-card class="skill-editor-helper-box">
+      </mat-card>
+      <mat-card class="skill-editor-helper-box">
         <div class="skill-details-container">
           <div class="misconception-count">
-            <span class="count-value" ng-if="!hasLoadedSkill()"><loading-dots></loading-dots></span>
-            <div class="count-value" ng-if="hasLoadedSkill()"><[skill.getMisconceptions().length]></div>
+            <span class="count-value" *ngIf="!hasLoadedSkill()">
+              <loading-dots></loading-dots>
+            </span>
+            <div class="count-value" *ngIf="hasLoadedSkill()">
+              {{ skill?.getMisconceptions().length }}
+            </div>
             <div class="count-text">Misconceptions</div>
           </div>
           <div class="example-count">
-            <span class="count-value" ng-if="!hasLoadedSkill()"><loading-dots></loading-dots></span>
-            <div class="count-value" ng-if="hasLoadedSkill()"><[skill.getConceptCard().getWorkedExamples().length]></div>
+            <span class="count-value" *ngIf="!hasLoadedSkill()">
+              <loading-dots></loading-dots>
+            </span>
+            <div class="count-value" *ngIf="hasLoadedSkill()">
+              {{ skill?.getConceptCard().getWorkedExamples().length }}
+            </div>
             <div class="count-text">Worked Examples</div>
           </div>
-          <div class="create-question oppia-autofocus" ng-click="createQuestion()" focus-on="newQuestionBtn">
+          <div class="create-question oppia-autofocus"
+               (click)="createQuestion()"
+               [oppiaFocusOn]="newQuestionBtn">
             <i class="fa fa-plus-circle"></i>
             <div class="count-text create-text e2e-test-create-question">Create New Question</div>
           </div>
         </div>
-      </md-card>
+      </mat-card>
     </div>
   </div>
 </div>
