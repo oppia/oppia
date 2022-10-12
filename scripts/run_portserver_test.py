@@ -29,32 +29,32 @@ from core import utils
 from core.tests import test_utils
 from scripts import run_portserver
 
-from typing import Any, List
+from typing import List, Union
 
 
 class MockSocket:
     server_closed = False
-    port: str|int = 8181
+    port: int = 8181
 
-    def setsockopt(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def setsockopt(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def bind(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def bind(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def listen(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def listen(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def getsockname(self, *unused_args: Any) -> List[Any]: # pylint: disable=missing-docstring
+    def getsockname(self, *unused_args: str) -> List[Union[str, int]]: # pylint: disable=missing-docstring
         return ['Address', self.port]
 
-    def recv(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def recv(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def sendall(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def sendall(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def shutdown(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def shutdown(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         raise socket.error('Some error occurred.')
 
     def close(self) -> None: # pylint: disable=missing-docstring
@@ -74,21 +74,21 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.terminal_logs: list[Any] = []
-        def mock_logging(*msgs: Any) -> None:
+        self.terminal_logs: list[str] = []
+        def mock_logging(*msgs: str) -> None:
             all_messages = [*msgs]
             for msg in all_messages:
                 self.terminal_logs.append(msg)
         self.swap_log = self.swap(logging, 'info', mock_logging)
-        self.terminal_err_logs: list[Any] = []
-        def mock_logging_err(*msgs: Any) -> None:
+        self.terminal_err_logs: list[str] = []
+        def mock_logging_err(*msgs: str) -> None:
             all_messages = [*msgs]
             for msg in all_messages:
                 self.terminal_err_logs.append(msg)
         self.swap_log_err = self.swap(logging, 'error', mock_logging_err)
 
     def test_get_process_start_time_handles_ioerror(self) -> None:
-        def mock_open(*unused_args: Any, **unused_kwargs: Any) -> None:
+        def mock_open(*unused_args: str, **unused_kwargs: str) -> None:
             raise IOError('File not found.')
         pid = 12345
 
@@ -116,7 +116,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         dummy_file_object.close()
 
     def test_get_process_command_line_handles_ioerror(self) -> None:
-        def mock_open(*unused_args: Any, **unused_kwargs: Any) -> None:
+        def mock_open(*unused_args: str, **unused_kwargs: str) -> None:
             raise IOError('File not found.')
         pid = 12345
 
@@ -146,7 +146,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_sock_bind_handles_error_while_creating_socket(self) -> None:
         port = 8181
-        def mock_socket(*unused_args: Any) -> None:
+        def mock_socket(*unused_args: str) -> None:
             raise socket.error('Some error occurred.')
         swap_socket = self.swap(socket, 'socket', mock_socket)
         with swap_socket:
@@ -168,7 +168,9 @@ class RunPortserverTests(test_utils.GenericTestBase):
         class FailingMockSocket(MockSocket):
             """Socket that fails while invoking getsockname()."""
 
-            def getsockname(self, *unused_args: Any) -> List[Any]: # pylint: disable=missing-docstring
+            # Here we use MyPy ignore because here we are changing the
+            # signature of 'getsockname' for testing purposes.
+            def getsockname(self, *unused_args: str) -> None: # type: ignore[override] # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
         swap_socket = self.swap(
@@ -217,7 +219,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_should_allocate_port_handles_oserror(self) -> None:
         pid = 12345
-        def mock_kill(*unused_args: Any) -> None:
+        def mock_kill(*unused_args: str) -> None:
             raise OSError('Some XYZ error occurred.')
         swap_os_kill = self.swap_with_checks(
             os, 'kill', mock_kill, expected_args=((pid, 0),))
@@ -351,7 +353,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         class FailingMockSocket(MockSocket):
             """Socket that fails while invoking bind()."""
 
-            def bind(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+            def bind(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
         def dummy_handler(data: int) -> str:
@@ -367,9 +369,9 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_server_closes_gracefully(self) -> None:
         mock_socket = MockSocket()
-        mock_socket.port = '\08181'
+        mock_socket.port = 8181
 
-        def dummy_handler(data: Any) -> str:
+        def dummy_handler(data: bytes) -> str:
             return str(data)
         swap_hasattr = self.swap_with_checks(
             builtins, 'hasattr', lambda *unused_args: False,
@@ -388,7 +390,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_server_on_close_removes_the_socket_file(self) -> None:
         path = '8181'
-        def dummy_handler(data: Any) -> str:
+        def dummy_handler(data: bytes) -> str:
             return str(data)
         swap_hasattr = self.swap_with_checks(
             builtins, 'hasattr', lambda *unused_args: False,
