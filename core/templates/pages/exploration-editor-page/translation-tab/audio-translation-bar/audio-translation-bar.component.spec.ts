@@ -321,6 +321,7 @@ describe('Audio translation bar Component', () => {
        empty: () => {},
        pause: () => {},
        play: () => {},
+       destroy: () => {}
      };
      spyOn(waveSurferObjSpy, 'play');
      // This throws "Argument of type '{ load: () => void; ... }'
@@ -474,6 +475,7 @@ describe('Audio translation bar Component', () => {
        empty: () => {},
        pause: () => {},
        play: () => {},
+       destroy: () => {}
      };
      spyOn(waveSurferObjSpy, 'play');
      // This throws "Argument of type '{ load: () => void; ... }'
@@ -505,6 +507,7 @@ describe('Audio translation bar Component', () => {
        empty: () => {},
        pause: () => {},
        play: () => {},
+       destroy: () => {}
      };
      spyOn(waveSurferObjSpy, 'play');
      spyOn(waveSurferObjSpy, 'pause');
@@ -541,6 +544,7 @@ describe('Audio translation bar Component', () => {
        empty: () => {},
        pause: () => {},
        play: () => {},
+       destroy: () => {}
      };
      // This throws "Argument of type '{ load: () => void; ... }'
      // is not assignable to parameter of type 'WaveSurfer'."
