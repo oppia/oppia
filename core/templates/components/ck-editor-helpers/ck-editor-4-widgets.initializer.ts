@@ -206,12 +206,12 @@ export class CkEditorInitializerService {
                   customEl[capital.join('') + 'WithValue'] = (
                     htmlEscaperService.objToEscapedJson(
                       that.data[spec.name] !== undefined ?
-                      that.data.spec : ''));
+                      that.data[spec.name] : ''));
                   that.element.getChild(0).setAttribute(
                     spec.name + '-with-value',
                     htmlEscaperService.objToEscapedJson(
                       that.data[spec.name] !== undefined ?
-                      that.data.spec : ''));
+                      that.data[spec.name] : ''));
                 });
               },
               init: function() {
