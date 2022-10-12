@@ -123,7 +123,7 @@ export class ContributionAndReviewStatsService {
     return (
       this.contributionAndReviewStatsBackendApiService
         .fetchContributionAndReviewStatsAsync(
-          'question', 'review', username));
+          'question', 'review ', username));
   }
 }
 
