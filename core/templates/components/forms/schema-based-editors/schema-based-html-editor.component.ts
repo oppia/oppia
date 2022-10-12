@@ -45,6 +45,7 @@ implements ControlValueAccessor, OnInit, Validator {
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
   @Input() uiConfig!: unknown;
+  @Input() headersEnabled!: boolean;
   localValue!: string;
   onChange: (val: string) => void = () => {};
 

@@ -4,7 +4,8 @@ focusManager to manage the focus activity automatically. -->
                  *ngIf="!disabled"
                  [value]="localValue"
                  (valueChange)="updateValue($event)"
-                 [uiConfig]="uiConfig">
+                 [uiConfig]="uiConfig"
+                 [headersEnabled]="headersEnabled">
 </ck-editor-4-rte>
 
 <span *ngIf="disabled"

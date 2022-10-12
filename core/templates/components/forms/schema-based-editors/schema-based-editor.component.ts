@@ -51,6 +51,7 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   @Input() labelForFocusTarget!: string;
   @Output() inputBlur = new EventEmitter();
   @Output() inputFocus = new EventEmitter();
+  @Input() headersEnabled!: boolean;
   @Input() notRequired!: boolean;
   onChange: (val: SchemaDefaultValue) => void = () => {};
   get localValue(): SchemaDefaultValue {
