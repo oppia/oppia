@@ -637,7 +637,9 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerGroupLearnerSpecificProgressHandler(test_utils.GenericTestBase):
+class LearnerGroupLearnerSpecificProgressHandlerTests(
+    test_utils.GenericTestBase
+):
     """Tests fetching of learner specific progress of a learner group."""
 
     LEARNER_1_EMAIL = 'user1@example.com'
@@ -815,7 +817,7 @@ class LearnerGroupLearnerSpecificProgressHandler(test_utils.GenericTestBase):
         self.login(self.LEARNER_1_EMAIL)
 
         self.get_json(
-            '/learner_group_user_progress_handler/%s' % (
+            '/learner_group_learner_specific_progress_handler/%s' % (
                 'invalidId'), expected_status_int=400)
 
         self.logout()
