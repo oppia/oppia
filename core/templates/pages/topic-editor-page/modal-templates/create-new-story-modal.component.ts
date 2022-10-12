@@ -90,4 +90,3 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
       !this.storyUrlFragmentExists);
   }
 }
-
