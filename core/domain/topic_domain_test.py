@@ -1078,7 +1078,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Name should be a string.'
         ):
-            self.topic.update_name(updated_name)
+            self.topic.update_name(updated_name) # type:ignore
 
     @classmethod
     def _schema_update_vers_dict(
