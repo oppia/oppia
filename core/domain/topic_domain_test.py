@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+from re import A
 
 from core import android_validation_constants
 from core import feconf
@@ -1070,6 +1071,36 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         updated_name = 'updated name'
         self.topic.update_name(updated_name)
         self.assertEqual(self.topic.name, updated_name)
+        
+    def test_subtopic_schema1_to_schema2(self) -> None:
+        topic = self.topic
+        current_schema = 1
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two')]
+        subtopic_dict = topic.subtopics[0].to_dict()
+        vers_subtopic_dict = topic_domain.VersionedSubtopicsDict()
+        vers_subtopic_dict['schema_version'] = current_schema
+        vers_subtopic_dict['subtopics'] = [subtopic_dict]
+        topic.update_subtopics_from_model(vers_subtopic_dict, 1, topic.id)
+        self.assertEqual(
+            vers_subtopic_dict['subtopics'][0]['thumbnail_filename'],
+            None
+        )
+        self.assertEqual(
+            vers_subtopic_dict['subtopics'][0]['thumbnail_bg_color'],
+            None
+        )
+        self.assertEqual(
+            vers_subtopic_dict['schema_version'],
+            current_schema + 1
+        )
 
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
