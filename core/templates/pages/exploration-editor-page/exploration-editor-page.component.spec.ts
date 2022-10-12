@@ -405,13 +405,19 @@ describe('Exploration editor page component', function() {
     it('should start translation tutorial when on translation page',
       fakeAsync(() => {
         spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
+        spyOn(rs.onRefreshTranslationTab, 'emit');
         rs.navigateToTranslationTab();
+        tick(300);
         mockRefreshTranslationTabEventEmitter.emit();
         $scope.$apply();
         tick();
 
+        expect(rs.getActiveTabName()).toBe('translation');
+
         mockOpenTranslationTutorialEmitter.emit();
+
         expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
+        expect(rs.onRefreshTranslationTab.emit).toHaveBeenCalled();
 
         flush();
         discardPeriodicTasks();
