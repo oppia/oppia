@@ -3,16 +3,16 @@
     New Story
   </h3>
 </div>
-<form (submit)="confirm(story)">
+<form (submit)="save()">
   <div class="modal-body create-new-story">
     <div class="story-input">
       <div class="story-input-header">
         <span>Title*</span>
       </div>
-      <input class="form-control e2e-test-new-story-title-field required"
+      <input class="e2e-test-new-story-title-field required"
              [(ngModel)]="story.title"
              [ngModelOptions]="{standalone: true}"
-             maxlength="MAX_CHARS_IN_STORY_TITLE"
+             [maxlength]="MAX_CHARS_IN_STORY_TITLE"
              aria-label="Title"
              autofocus>
       <div>
@@ -29,10 +29,10 @@
       </div>
       <textarea rows="3"
                 cols="50"
-                maxlength="MAX_CHARS_IN_STORY_DESCRIPTION"
+                [maxlength]="MAX_CHARS_IN_STORY_DESCRIPTION"
                 [(ngModel)]="story.description"
                 [ngModelOptions]="{standalone: true}"
-                class="form-control e2e-test-new-story-description-field required"
+                class="e2e-test-new-story-description-field required"
                 aria-label="Description">
       </textarea>
       <span class="oppia-input-box-subtitle">
@@ -46,13 +46,12 @@
       <div class="story-input-header">
         <span>Url Fragment*</span>
       </div>
-      <input class="form-control e2e-test-new-story-url-fragment-field"
+      <input class="e2e-test-new-story-url-fragment-field"
              [(ngModel)]="story.urlFragment"
              [ngModelOptions]="{standalone: true}"
-             maxlength="MAX_CHARS_IN_STORY_URL_FRAGMENT"
+             [maxlength]="MAX_CHARS_IN_STORY_URL_FRAGMENT"
              [ngClass]="{'is-invalid': storyUrlFragmentExists || !validUrlFragmentRegex.test(story.urlFragment)}"
-             (change)="onStoryUrlFragmentChange()"
-             aria-label="Url fragment">
+             (change)="onStoryUrlFragmentChange()">
       <div>
         <span class="oppia-input-box-subtitle">
           <em>

@@ -51,28 +51,55 @@ export class StoryCreationBackendApiService {
   STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
   storyCreationInProgress = false;
 
+  private _createStory(
+      createStoryUrl: string, body: FormData,
+      successCallback: (value: StoryCreationResponse) => void,
+      errorCallback: (reason: string) => void): void {
+    this.http.post<StoryCreationResponse>(
+      createStoryUrl, body).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback({
+          storyId: response.storyId
+        });
+      }
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
+  }
+
+  async createStoryAsync(
+      createStoryUrl: string, body: FormData): Promise<StoryCreationResponse> {
+    return new Promise((resolve, reject) => {
+      this._createStory(createStoryUrl, body, resolve, reject);
+    });
+  }
+
   createNewCanonicalStory(): void {
     if (this.storyCreationInProgress) {
       return;
     }
-    this.ngbModal.open(
+
+    const modalRef = this.ngbModal.open(
       CreateNewStoryModalComponent, {
         backdrop: 'static',
-      }).result.then((newlyCreatedStory) => {
+      });
+    modalRef.result.then((newlyCreatedStory) => {
       if (!newlyCreatedStory.isValid()) {
         throw new Error('Story fields cannot be empty');
       }
       this.storyCreationInProgress = true;
       this.alertsService.clearWarnings();
-      var topic = this.topicEditorStateService.getTopic();
+      let topic = this.topicEditorStateService.getTopic();
       this.loaderService.showLoadingScreen('Creating story');
-      var createStoryUrl = this.urlInterpolationService.interpolateUrl(
+      let createStoryUrl = this.urlInterpolationService.interpolateUrl(
         this.STORY_CREATOR_URL_TEMPLATE, {
           topic_id: topic.getId()
         }
       );
-      var imagesData = this.imageLocalStorageService.getStoredImagesData();
-      var bgColor = this.imageLocalStorageService.getThumbnailBgColor();
+      let imagesData = this.imageLocalStorageService.getStoredImagesData();
+      let bgColor = this.imageLocalStorageService.getThumbnailBgColor();
       let postData = {
         title: newlyCreatedStory.title,
         description: newlyCreatedStory.description,
@@ -85,8 +112,7 @@ export class StoryCreationBackendApiService {
       body.append('payload', JSON.stringify(postData));
       body.append('image', imagesData[0].imageBlob);
 
-      this.http.post<StoryCreationResponse>(
-        createStoryUrl, (body)).toPromise().then((response) => {
+      this.createStoryAsync(createStoryUrl, body).then(response => {
         this.windowRef.nativeWindow.location = (
           this.urlInterpolationService.interpolateUrl(
             this.STORY_EDITOR_URL_TEMPLATE, {

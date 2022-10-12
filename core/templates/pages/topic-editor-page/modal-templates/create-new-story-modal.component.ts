@@ -75,6 +75,14 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
       });
   }
 
+  save(): void {
+    this.ngbActiveModal.close(this.story);
+  }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss('cancel');
+  }
+
   isValid(): boolean {
     return Boolean(
       this.story.isValid() &&
