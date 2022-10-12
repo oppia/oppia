@@ -32,7 +32,7 @@ from scripts import concurrent_task_utils
 from scripts import install_third_party_libs
 from scripts import servers
 
-from typing import Any, List
+from typing import List, Optional
 
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 SHARDS_SPEC_PATH = os.path.join(
@@ -46,7 +46,7 @@ COVERAGE_EXCLUSION_LIST_PATH = os.path.join(
 
 class MockTask:
     finished: bool = True
-    exception: Any = None
+    exception: Optional[Exception] = None
     task_results: List[concurrent_task_utils.TaskResult] = []
 
 
@@ -62,7 +62,7 @@ class MockCompilerContextManager():
     def __enter__(self) -> MockCompiler:
         return MockCompiler()
 
-    def __exit__(self, *unused_args: Any) -> None:
+    def __exit__(self, *unused_args: str) -> None:
         pass
 
 
@@ -112,7 +112,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             self.terminal_logs.append(msg)
         self.swap_logs = self.swap(concurrent_task_utils, 'log', mock_log)
         def mock_context_manager(
-                **unused_kwargs: Any) -> MockCompilerContextManager:
+            **unused_kwargs: str
+        ) -> MockCompilerContextManager:
             return MockCompilerContextManager()
         self.swap_redis_server = self.swap(
             servers, 'managed_redis_server', mock_context_manager)
@@ -131,7 +132,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 return (b'LOG_INFO_TEST: This is task output.\n', b'')
 
         def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockProcess:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unsued_kwargs: str  # pylint: disable=unused-argument
+        ) -> MockProcess:
             return MockProcess()
 
         swap_popen = self.swap_with_checks(
@@ -155,7 +157,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 return (b'', b'Error XYZ occured.')
 
         def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockProcess:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unsued_kwargs: str  # pylint: disable=unused-argument
+        ) -> MockProcess:
             return MockProcess()
 
         swap_popen = self.swap_with_checks(
@@ -360,7 +363,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         task = MockTask()
         task.finished = False
         task_output = ['Ran 9 tests in 1.244s', '98']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results.append(task_result)
 
@@ -382,7 +385,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         task = MockTask()
         task_output = ['Ran 9 tests in 1.244s', '98']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results.append(task_result)
 
@@ -405,7 +408,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         task = MockTask()
         task_output = ['Ran 9 tests in 1.234s', '100']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results.append(task_result)
 
@@ -429,7 +432,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         task = MockTask()
         task_output = ['Ran 9 tests in 1.234s', '98']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results.append(task_result)
 
@@ -459,7 +462,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         task = MockTask()
         task_output = ['XYZ', '100']
-        task_result = concurrent_task_utils.TaskResult( # type: ignore[no-untyped-call]
+        task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
         task.task_results = [task_result]
 
@@ -553,7 +556,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             lambda *unused_args, **unused_kwargs: ('', 100.00))
 
         error_msg = 'Some error in matching shards with tests.'
-        def mockcheck_shards_match_tests(**unused_kwargs: Any) -> str:
+        def mockcheck_shards_match_tests(**unused_kwargs: str) -> str:
             return error_msg
         swapcheck_shards_match_tests = self.swap_with_checks(
             run_backend_tests, 'check_shards_match_tests',
@@ -630,7 +633,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_failure_in_test_execution_throws_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        def mock_execute_tasks(*unused_args: Any) -> None:
+        def mock_execute_tasks(*unused_args: str) -> None:
             raise Exception('XYZ error occured.')
         self.swap_execute_task = self.swap(
             concurrent_task_utils, 'execute_tasks', mock_execute_tasks)
@@ -667,7 +670,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         executed_tasks = []
         test_target = (
             'scripts.new_test_file_test.NewTestFileTests.test_for_something')
-        def mock_execute(tasks: Any, *unused_args: Any) -> None:
+        def mock_execute(
+            tasks: List[concurrent_task_utils.TaskThread],
+            *unused_args: str
+        ) -> None:
             for task in tasks:
                 executed_tasks.append(task)
 
@@ -719,7 +725,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         failed_process_output = MockProcessOutput()
         failed_process_output.returncode = 1
         def mock_subprocess_run(
-                cmd: Any, **unused_kwargs: Any) -> MockProcessOutput:
+            cmd: List[str], **unused_kwargs: str
+        ) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return failed_process_output
             elif cmd == self.coverage_check_cmd:
@@ -742,7 +749,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         failed_process_output = MockProcessOutput()
         failed_process_output.returncode = 1
         def mock_subprocess_run(
-                cmd: Any, **unused_kwargs: Any) -> MockProcessOutput:
+            cmd: List[str], **unused_kwargs: str
+        ) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return MockProcessOutput()
             elif cmd == self.coverage_check_cmd:
@@ -769,7 +777,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         process = MockProcessOutput()
         process.stdout = coverage_report_output
         def mock_subprocess_run(
-                cmd: Any, **unused_kwargs: Any) -> MockProcessOutput:
+            cmd: List[str], **unused_kwargs: str
+        ) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return MockProcessOutput()
             elif cmd == self.coverage_check_cmd:
@@ -794,7 +803,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         process = MockProcessOutput()
         process.stdout = coverage_report_output
         def mock_subprocess_run(
-                cmd: Any, **unused_kwargs: Any) -> MockProcessOutput:
+            cmd: List[str], **unused_kwargs: str
+        ) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return MockProcessOutput()
             elif cmd == self.coverage_check_cmd:
@@ -818,7 +828,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         process = MockProcessOutput()
         process.stdout = coverage_report_output
         def mock_subprocess_run(
-                cmd: Any, **unused_kwargs: Any) -> MockProcessOutput:
+            cmd: List[str], **unused_kwargs: str
+        ) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return MockProcessOutput()
             elif cmd == self.coverage_check_cmd:
@@ -839,7 +850,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_run_shell_cmd(*unused_args: Any, **unused_kwargs: Any) -> None:
+        def mock_run_shell_cmd(*unused_args: str, **unused_kwargs: str) -> None:
             raise Exception('XYZ error.')
         swap_run_shell_cmd = self.swap(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd)
@@ -856,7 +867,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_run_shell_cmd(*unused_args: Any, **unused_kwargs: Any) -> str:
+        def mock_run_shell_cmd(*unused_args: str, **unused_kwargs: str) -> str:
             if self.call_count == 1:
                 return 'Task result'
             self.call_count = 1
@@ -882,7 +893,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_run_shell_cmd(*unused_args: Any, **unused_kwargs: Any) -> str:
+        def mock_run_shell_cmd(*unused_args: str, **unused_kwargs: str) -> str:
             if self.call_count == 1:
                 return 'Task result'
             self.call_count = 1
@@ -904,7 +915,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_run_shell_cmd(*unused_args: Any, **unused_kwargs: Any) -> str:
+        def mock_run_shell_cmd(*unused_args: str, **unused_kwargs: str) -> str:
             if self.call_count == 1:
                 return 'Task result'
             self.call_count = 1
