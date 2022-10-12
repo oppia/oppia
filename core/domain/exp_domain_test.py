@@ -1800,6 +1800,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Some tags duplicate each other')
 
+        exploration.tags = ['randomtextwhichisprobablygreaterthanthirty']
+        self._assert_validation_error(
+            exploration, 'Tag text length should not be more than 30.')
+
+        exploration.tags = [
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+        self._assert_validation_error(
+            exploration, 'Total number of tags should be less than 10.')
+
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()
 

@@ -1613,8 +1613,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
                     'received \'%s\'' % tag)
+
+            if len(tag) > 30:
+                raise utils.ValidationError(
+                    'Tag text length should not be more than 30.')
         if len(set(self.tags)) != len(self.tags):
             raise utils.ValidationError('Some tags duplicate each other')
+        if len(self.tags) > 10:
+            raise utils.ValidationError(
+                'Total number of tags should be less than 10.')
 
         if not isinstance(self.blurb, str):
             raise utils.ValidationError(
