@@ -1073,7 +1073,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_name(updated_name)
         self.assertEqual(self.topic.name, updated_name)
 
+    @classmethod
     def _schema_update_vers_dict(
+        cls,
         current_schema: int,
         topic: topic_domain.Topic
     ) -> topic_domain.VersionedSubtopicsDict:
