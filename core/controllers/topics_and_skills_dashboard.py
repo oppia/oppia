@@ -344,13 +344,13 @@ class NewTopicHandler(base.BaseHandler):
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
-        name = self.payload.get('name')
-        url_fragment = self.payload.get('url_fragment')
-        description = self.payload.get('description')
-        thumbnail_filename = self.payload.get('filename')
-        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
-        raw_image = self.request.get('image')
-        page_title_frag = self.payload.get('page_title_fragment')
+        name = self.normalized_payload.get('name')
+        url_fragment = self.normalized_payload.get('url_fragment')
+        description = self.normalized_payload.get('description')
+        thumbnail_filename = self.normalized_payload.get('filename')
+        thumbnail_bg_color = self.normalized_payload.get('thumbnailBgColor')
+        raw_image = self.normalized_request.get('image')
+        page_title_frag = self.normalized_payload.get('page_title_fragment')
 
         try:
             topic_domain.Topic.require_valid_name(name)
