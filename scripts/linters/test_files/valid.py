@@ -20,20 +20,22 @@ python_linter_test.py. This file contain valid python syntax.
 
 from __future__ import annotations
 
+from typing import Tuple
+
 
 class FakeClass:
     """This is a fake docstring for valid syntax purposes."""
 
-    def __init__(self, fake_arg):
+    def __init__(self, fake_arg: str) -> None:
         self.fake_arg = fake_arg
 
-    def fake_method(self, name):
+    def fake_method(self, name: str) -> Tuple[str, str]:
         """This doesn't do anything.
 
         Args:
-            name: str. Means nothing.
+            name: Means nothing.
 
         Yields:
-            tuple(str, str). The argument passed in but twice in a tuple.
+            The argument passed in but twice in a tuple.
         """
         yield (name, name)
