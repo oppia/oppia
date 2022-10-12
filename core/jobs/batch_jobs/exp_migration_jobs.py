@@ -83,9 +83,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
             with datastore_services.get_ndb_context():
                 if exp_services.get_story_id_linked_to_exploration(
-                        exp_id) is not None:
-                        exp_services.validate_exploration_for_story(
-                            exploration, True)
+                    exp_id
+                ) is not None:
+                    exp_services.validate_exploration_for_story(
+                        exploration, True)
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_id, e))

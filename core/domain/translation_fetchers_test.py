@@ -121,3 +121,15 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(entity_translation.language_code, 'hi')
+
+    def test_get_entity_translation_creates_empty_object(
+        self
+    ) -> None:
+        exp_id = 'exp1'
+        entity_translation = (
+            translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.EXPLORATION, exp_id, 5, 'hi'
+            )
+        )
+        self.assertEqual(entity_translation.language_code, 'hi')
+        self.assertEqual(entity_translation.translations, {})
