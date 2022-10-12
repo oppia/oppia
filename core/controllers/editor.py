@@ -1308,3 +1308,15 @@ class LearnerAnswerInfoHandler(EditorHandler):
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
         self.render_json({})
+
+
+class FixCommitCommandsHandler(EditorHandler):
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        exp_services.fix_commit_commands()
+        self.render_json({})

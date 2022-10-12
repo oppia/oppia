@@ -16,6 +16,7 @@
  * @fileoverview Component for the miscellaneous tab in the admin panel.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -58,11 +59,13 @@ export class AdminMiscTabComponent {
   publishedOn!: string;
   showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
+  message: string = '';
 
   constructor(
     private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
-    private adminTaskManagerService: AdminTaskManagerService
+    private adminTaskManagerService: AdminTaskManagerService,
+    private http: HttpClient
   ) {}
 
   clearSearchIndex(): void {
@@ -290,6 +293,17 @@ export class AdminMiscTabComponent {
     this.stateName = '';
     this.numAnswers = 0;
     this.showDataExtractionQueryStatus = false;
+  }
+
+  fixCommitCommands(): void {
+    this.http.post('/fix_commit_commands/', {})
+      .toPromise()
+      .then(() => {
+        this.message = 'Successfully fixed commit commands';
+      })
+      .catch(() => {
+        this.message = 'Fixing commit commands failed';
+      });
   }
 }
 

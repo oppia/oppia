@@ -1033,7 +1033,9 @@ URLS = [
         r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
-        learner_group.LearnerStoriesChaptersProgressHandler)
+        learner_group.LearnerStoriesChaptersProgressHandler),
+    get_redirect_route(
+        r'/fix_commit_commands/', editor.FixCommitCommandsHandler)
 ]
 
 # Adding redirects for topic landing pages.
