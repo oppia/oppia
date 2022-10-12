@@ -27,6 +27,7 @@ from core import utils
 from core.constants import constants
 from core.domain import topic_domain
 from core.domain import user_services
+from core.domain.subtopic_page_domain import VersionedSubtopicPageContentsDict
 from core.tests import test_utils
 
 
@@ -1071,24 +1072,33 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         updated_name = 'updated name'
         self.topic.update_name(updated_name)
         self.assertEqual(self.topic.name, updated_name)
-        
-    def test_subtopic_schema1_to_schema2(self) -> None:
-        topic = self.topic
+
+    def _schema_update_vers_dict(
+        current_schema: int,
+        topic: topic_domain.Topic
+    ) -> topic_domain.VersionedSubtopicsDict:
+        """Sets up the VersionendSubtopicsDict for the schema update tests"""
+        topic.update_subtopic_title(1,'abcdefghijklmnopqrstuvwxyz')
+        subtopic_dict = topic.subtopics[topic.get_subtopic_index(1)].to_dict()
+        vers_subtopic_dict = topic_domain.VersionedSubtopicsDict(
+            {
+                'schema_version': current_schema,
+                'subtopics': [subtopic_dict]
+            }
+        )
+        topic.update_subtopics_from_model(
+            vers_subtopic_dict,
+            current_schema,
+            topic.id
+        )
+        return vers_subtopic_dict
+
+    def test_subtopic_schema_v1_to_v2(self) -> None:
         current_schema = 1
-        topic.subtopics = [
-            topic_domain.Subtopic(
-                1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-one'),
-            topic_domain.Subtopic(
-                2, 'Another title', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-two')]
-        subtopic_dict = topic.subtopics[0].to_dict()
-        vers_subtopic_dict = topic_domain.VersionedSubtopicsDict()
-        vers_subtopic_dict['schema_version'] = current_schema
-        vers_subtopic_dict['subtopics'] = [subtopic_dict]
-        topic.update_subtopics_from_model(vers_subtopic_dict, 1, topic.id)
+        vers_subtopic_dict = TopicDomainUnitTests._schema_update_vers_dict(
+            current_schema,
+            self.topic
+        )
         self.assertEqual(
             vers_subtopic_dict['subtopics'][0]['thumbnail_filename'],
             None
@@ -1096,6 +1106,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             vers_subtopic_dict['subtopics'][0]['thumbnail_bg_color'],
             None
+        )
+        self.assertEqual(
+            vers_subtopic_dict['schema_version'],
+            current_schema + 1
+        )
+
+    def test_subtopic_schema_v2_to_v3(self) -> None:
+        expected_frag = 'abcdefghijklmnopqrstuvwxy'
+        current_schema = 2
+        vers_subtopic_dict = TopicDomainUnitTests._schema_update_vers_dict(
+            current_schema,
+            self.topic
+        )
+        self.assertEqual(
+            vers_subtopic_dict['subtopics'][0]['url_fragment'],
+            expected_frag
         )
         self.assertEqual(
             vers_subtopic_dict['schema_version'],
