@@ -586,7 +586,7 @@ def managed_webdriverio_server(
     sharding_instances: int = 1,
     chrome_version: Optional[str] = None,
     mobile: bool = False,
-    stdout=subprocess.PIPE
+    stdout: int = subprocess.PIPE
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
