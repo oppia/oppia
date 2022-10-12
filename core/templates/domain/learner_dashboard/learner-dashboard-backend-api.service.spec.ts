@@ -1007,13 +1007,13 @@ describe('Learner Dashboard Backend API Service', () => {
       expect(req.request.method).toEqual('GET');
 
       req.flush({
-        learner_of_learner_groups: [sampleShortLearnerGroupSummaryDict1],
+        learner_groups_joined: [sampleShortLearnerGroupSummaryDict1],
         invited_to_learner_groups: [sampleShortLearnerGroupSummaryDict2]
       });
       flushMicrotasks();
 
       const learnerDashboardLearnerGroupsData = {
-        learnerOfLearnerGroups: [sampleShortLearnerGroupSummary1],
+        learnerGroupsJoined: [sampleShortLearnerGroupSummary1],
         invitedToLearnerGroups: [sampleShortLearnerGroupSummary2]
       };
       expect(successHandler).toHaveBeenCalledWith(

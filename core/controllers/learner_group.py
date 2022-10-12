@@ -991,12 +991,12 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
                 'learners_count': len(learner_group.learner_user_ids)
             })
 
-        learner_of_learner_groups = (
+        learner_groups_joined = (
             learner_group_fetchers.get_learner_groups_of_learner(
                 self.user_id)
         )
         learner_of_learner_groups_data = []
-        for learner_group in learner_of_learner_groups:
+        for learner_group in learner_groups_joined:
             learner_of_learner_groups_data.append({
                 'id': learner_group.group_id,
                 'title': learner_group.title,
@@ -1007,7 +1007,7 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
             })
 
         self.render_json({
-            'learner_of_learner_groups': learner_of_learner_groups_data,
+            'learner_groups_joined': learner_of_learner_groups_data,
             'invited_to_learner_groups': invited_to_learner_groups_data
         })
 

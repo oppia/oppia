@@ -1345,7 +1345,7 @@ class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
 
-        self.assertEqual(response['learner_of_learner_groups'], [])
+        self.assertEqual(response['learner_groups_joined'], [])
         self.assertEqual(response['invited_to_learner_groups'], [])
 
         # Create a learner group.
@@ -1362,7 +1362,7 @@ class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
             '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
 
         self.assertEqual(len(response['invited_to_learner_groups']), 1)
-        self.assertEqual(len(response['learner_of_learner_groups']), 0)
+        self.assertEqual(len(response['learner_groups_joined']), 0)
         self.assertEqual(
             response['invited_to_learner_groups'][0]['id'],
             learner_group.group_id)
@@ -1375,9 +1375,9 @@ class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
             '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
 
         self.assertEqual(len(response['invited_to_learner_groups']), 0)
-        self.assertEqual(len(response['learner_of_learner_groups']), 1)
+        self.assertEqual(len(response['learner_groups_joined']), 1)
         self.assertEqual(
-            response['learner_of_learner_groups'][0]['id'],
+            response['learner_groups_joined'][0]['id'],
             learner_group.group_id)
 
         self.logout()

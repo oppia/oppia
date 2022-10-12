@@ -45,7 +45,7 @@ export class LearnerGroupsTabComponent {
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   invitedToLearnerGroups: ShortLearnerGroupSummary[] = [];
-  learnerOfLearnerGroups: ShortLearnerGroupSummary[] = [];
+  learnerGroupsJoined: ShortLearnerGroupSummary[] = [];
 
   constructor(
     private windowDimensionService: WindowDimensionsService,
@@ -60,8 +60,8 @@ export class LearnerGroupsTabComponent {
     this.learnerDashboardBackendApiService
       .fetchLearnerDashboardLearnerGroupsAsync().then(
         (learnerDashboardLearnerGroups) => {
-          this.learnerOfLearnerGroups = (
-            learnerDashboardLearnerGroups.learnerOfLearnerGroups);
+          this.learnerGroupsJoined = (
+            learnerDashboardLearnerGroups.learnerGroupsJoined);
           this.invitedToLearnerGroups = (
             learnerDashboardLearnerGroups.invitedToLearnerGroups);
         }
@@ -163,7 +163,7 @@ export class LearnerGroupsTabComponent {
         this.invitedToLearnerGroups = this.invitedToLearnerGroups.filter(
           (invitedGroup) => invitedGroup.id !== learnerGroupSummary.id
         );
-        this.learnerOfLearnerGroups.push(acceptedLearnerGroupSummary);
+        this.learnerGroupsJoined.push(acceptedLearnerGroupSummary);
       });
     }, () => {
       // Note to developers:

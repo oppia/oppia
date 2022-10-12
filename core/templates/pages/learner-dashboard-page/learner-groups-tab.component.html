@@ -160,9 +160,9 @@
       <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_GROUPS' | translate"></span>
     </div>
     <div class="oppia-learner-group-summary-cards-container"
-         *ngIf="learnerOfLearnerGroups.length > 0">
+         *ngIf="learnerGroupsJoined.length > 0">
       <div class="oppia-learner-group-summary-card"
-            *ngFor="let learnerGroupSummary of learnerOfLearnerGroups; let idx = index;">
+            *ngFor="let learnerGroupSummary of learnerGroupsJoined; let idx = index;">
         <a [href]="getLearnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
           <div class="oppia-learner-group-summary-card-title">
             {{learnerGroupSummary.title}}
@@ -177,7 +177,7 @@
         </div>
       </div>
     </div>
-    <div class="oppia-learner-groups-feature-info" *ngIf="learnerOfLearnerGroups.length == 0">
+    <div class="oppia-learner-groups-feature-info" *ngIf="learnerGroupsJoined.length == 0">
       <span class="oppia-no-learner-groups" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_NO_GROUPS' | translate"></span>
     </div>
   </div>

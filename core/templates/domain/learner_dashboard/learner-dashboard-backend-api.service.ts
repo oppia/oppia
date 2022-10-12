@@ -108,7 +108,7 @@ interface LearnerCompletedChaptersCountDataBackendDict {
 }
 
 interface LearnerDashboardLearnerGroupsBackendDict {
-  'learner_of_learner_groups': ShortLearnerGroupSummaryBackendDict[];
+  'learner_groups_joined': ShortLearnerGroupSummaryBackendDict[];
   'invited_to_learner_groups': ShortLearnerGroupSummaryBackendDict[];
 }
 
@@ -153,7 +153,7 @@ interface LearnerCompletedChaptersCountData {
 }
 
 interface LearnerDashboardLearnerGroups {
-  learnerOfLearnerGroups: ShortLearnerGroupSummary[];
+  learnerGroupsJoined: ShortLearnerGroupSummary[];
   invitedToLearnerGroups: ShortLearnerGroupSummary[];
 }
 
@@ -425,8 +425,8 @@ export class LearnerDashboardBackendApiService {
       ).toPromise().then(dashboardData => {
         resolve(
           {
-            learnerOfLearnerGroups: (
-              dashboardData.learner_of_learner_groups.map(
+            learnerGroupsJoined: (
+              dashboardData.learner_groups_joined.map(
                 shortLearnerGroupSummary => ShortLearnerGroupSummary
                   .createFromBackendDict(shortLearnerGroupSummary))),
             invitedToLearnerGroups: (

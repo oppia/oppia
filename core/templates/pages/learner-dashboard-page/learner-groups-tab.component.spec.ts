@@ -100,7 +100,7 @@ describe('Learner groups tab Component', () => {
       'fetchLearnerDashboardLearnerGroupsAsync'
     ).and.returnValue(
       Promise.resolve({
-        learnerOfLearnerGroups: [sampleShortLearnerGroupSummary],
+        learnerGroupsJoined: [sampleShortLearnerGroupSummary],
         invitedToLearnerGroups: []
       })
     );
@@ -109,7 +109,7 @@ describe('Learner groups tab Component', () => {
     tick();
 
     expect(component.invitedToLearnerGroups).toEqual([]);
-    expect(component.learnerOfLearnerGroups).toEqual(
+    expect(component.learnerGroupsJoined).toEqual(
       [sampleShortLearnerGroupSummary]);
     expect(component.windowIsNarrow).toBe(false);
   }));
@@ -171,14 +171,14 @@ describe('Learner groups tab Component', () => {
         .and.returnValue(Promise.resolve(sampleLearnerGroupSummary));
 
       component.invitedToLearnerGroups = [sampleShortLearnerGroupSummary];
-      component.learnerOfLearnerGroups = [];
+      component.learnerGroupsJoined = [];
 
       component.acceptLearnerGroupInvitation(sampleShortLearnerGroupSummary);
       tick(100);
       fixture.detectChanges();
 
       expect(component.invitedToLearnerGroups).toEqual([]);
-      expect(component.learnerOfLearnerGroups).toEqual(
+      expect(component.learnerGroupsJoined).toEqual(
         [sampleShortLearnerGroupSummary]);
     })
   );
