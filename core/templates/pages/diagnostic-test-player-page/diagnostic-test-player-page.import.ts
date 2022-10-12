@@ -16,23 +16,23 @@
  * @fileoverview Directives required in classroom-admin panel.
  */
 
- import 'core-js/es7/reflect';
- import 'zone.js';
+import 'core-js/es7/reflect';
+import 'zone.js';
 
- import 'angular-ui-sortable';
- import 'angular-ui-validate';
+import 'angular-ui-sortable';
+import 'angular-ui-validate';
 
- angular.module('oppia', [
-   require('angular-cookies'), 'ngAnimate',
-   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-   'ui.bootstrap', 'ui.sortable', 'ui.validate'
- ]);
+angular.module('oppia', [
+  require('angular-cookies'), 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'ui.bootstrap', 'ui.sortable', 'ui.validate'
+]);
 
- require('Polyfills.ts');
+require('Polyfills.ts');
 
- // The module needs to be loaded directly after jquery since it defines the
- // main module the elements are attached to.
- require(
+// The module needs to be loaded directly after jquery since it defines the
+// main module the elements are attached to.
+require(
   'pages/diagnostic-test-player-page/diagnostic-test-player-page.module.ts');
- require('App.ts');
- require('base-components/oppia-root.directive.ts');
+require('App.ts');
+require('base-components/oppia-root.directive.ts');
