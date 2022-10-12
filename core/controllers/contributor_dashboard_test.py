@@ -142,7 +142,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
-            'language_code': 'en',
+            'language_codes': ['en'],
         }
         self.expected_opportunity_dict_2 = {
             'id': '1',
@@ -152,7 +152,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
-            'language_code': 'en',
+            'language_codes': ['en'],
         }
         self.expected_opportunity_dict_3 = {
             'id': '2',
@@ -162,7 +162,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
-            'language_code': 'en',
+            'language_codes': ['en'],
         }
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
@@ -568,7 +568,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 # Introduction + Multiple choice with 2 options + End state.
                 'content_count': 5,
                 'translation_counts': {},
-                'translation_in_review_counts': {}
+                'translation_in_review_counts': {},
+                'language_codes': ['en'],
             }]
         )
 
@@ -679,7 +680,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 # Introduction + Multiple choice with 2 options + End state.
                 'content_count': 5,
                 'translation_counts': {},
-                'translation_in_review_counts': {}
+                'translation_in_review_counts': {},
+                'language_codes': ['en'],
             }]
         )
 
@@ -822,7 +824,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
-            'language_code': 'en',
+            'language_codes': ['en'],
         }
         expected_opportunity_dict_20 = {
             'id': exp_20.id,
@@ -832,7 +834,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
-            'language_code': 'en',
+            'language_codes': ['en'],
         }
         expected_opportunity_dict_30 = {
             'id': exp_30.id,
@@ -842,7 +844,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
-            'language_code': 'en',
+            'language_codes': ['en'],
         }
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
