@@ -30,7 +30,6 @@ import { DeleteWorkedExampleComponent } from 'pages/skill-editor-page/modal-temp
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { PageTitleService } from 'services/page-title.service';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { SkillPreviewModalComponent } from '../skill-preview-modal.component';
 import { Skill } from 'domain/skill/SkillObjectFactory';
@@ -66,7 +65,6 @@ export class SkillConceptCardEditorComponent implements OnInit {
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private generateContentIdService: GenerateContentIdService,
     private ngbModal: NgbModal,
-    private pageTitleService: PageTitleService,
     private skillEditorStateService: SkillEditorStateService,
     private skillUpdateService: SkillUpdateService,
     private urlInterpolationService: UrlInterpolationService,
@@ -88,8 +86,6 @@ export class SkillConceptCardEditorComponent implements OnInit {
   }
 
   initBindableFieldsDict(): void {
-    this.pageTitleService.setNavbarSubtitleForMobileView(
-      this.skillEditorStateService.getSkill().getDescription());
     this.bindableFieldsDict = {
       displayedConceptCardExplanation:
         this.skill.getConceptCard().getExplanation().html,
