@@ -12,8 +12,8 @@
           </i>
           <span class="oppia-save-publish-button-label float-left">Save Changes</span>
           <span class="d-none d-md-block float-left oppia-change-count"
-                *ngIf="getChangeListLength() > 0">
-            ({{ getChangeListLength() }})
+                *ngIf="changeListLength > 0">
+            ({{ changeListLength }})
           </span>
         </span>
 
@@ -24,16 +24,16 @@
       </button>
       <button type="button"
               class="btn btn-light dropdown-toggle dropdown-toggle oppia-dropdown-toggle-button"
-              [disabled]="!getChangeListLength()"
+              [disabled]="!changeListLength"
               aria-label="Dropdown toggle"
               ngbDropdownToggle>
       </button>
       <ul ngbDropdownMenu role="menu"
           class="oppia-dropdown-menu"
-          [ngStyle]="{ width: getChangeListLength() && topicRights.isPublished() ? '150px' : '120px' }">
+          [ngStyle]="{ width: changeListLength && topicRights.isPublished() ? '150px' : '120px' }">
         <li title="Discard all pending changes">
           <a (click)="discardChanges()"
-             [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
+             [ngClass]="{'oppia-disabled-link': !changeListLength}"
              class="dropdown-item">
             Discard Draft
           </a>
@@ -94,10 +94,10 @@
       </div>
       <div class="oppia-topic-nav-dropdown-content">
         <div class="oppia-topic-nav-dropdown-text" (click)="toggleWarningText()">
-          <i *ngIf="!getTotalWarningsCount()" class="oppia-material-icons">&#xE254;</i>
+          <i *ngIf="!totalWarningsCount" class="oppia-material-icons">&#xE254;</i>
           <span>{{ activeTab }}</span>
-          <span *ngIf="getTotalWarningsCount()">
-            ({{ getTotalWarningsCount() }} <i class="fa fa-exclamation-triangle oppia-error-icon"></i>)
+          <span *ngIf="totalWarningsCount">
+            ({{ totalWarningsCount }} <i class="fa fa-exclamation-triangle oppia-error-icon"></i>)
           </span>
         </div>
         <div class="oppia-topic-nav-dropdown-icon"
@@ -136,8 +136,8 @@
           <span *ngIf="!isSaveInProgress()">
             Save Changes
           </span>
-          <span *ngIf="getChangeListLength() > 0">
-            ({{ getChangeListLength() }})
+          <span *ngIf="changeListLength > 0">
+            ({{ changeListLength }})
           </span>
         </div>
         <div class="oppia-topic-nav-dropdown-icon"

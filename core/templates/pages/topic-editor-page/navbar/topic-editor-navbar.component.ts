@@ -52,6 +52,8 @@ export class TopicEditorNavbarComponent {
   warningsAreShown: boolean;
   navigationChoices: string[];
   activeTab: string;
+  totalWarningsCount: number;
+  changeListLength: number;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
@@ -277,6 +279,8 @@ export class TopicEditorNavbarComponent {
         () => this._validateTopic()
       )
     );
+    this.totalWarningsCount = this.getTotalWarningsCount();
+    this.changeListLength = this.getChangeListLength();
   }
 
   ngOnDestroy(): void {
