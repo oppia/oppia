@@ -35,11 +35,11 @@ class Classroom:
         """Constructs a Classroom domain object.
 
         Args:
-            name: str. The name of the classroom.
-            url_fragment: str. The url fragment of the classroom.
-            topic_ids: list(str). List of topic ids attached to the classroom.
-            course_details: str. Course details for the classroom.
-            topic_list_intro: str. Topic list introduction for the classroom.
+            name: The name of the classroom.
+            url_fragment: The url fragment of the classroom.
+            topic_ids: List of topic ids attached to the classroom.
+            course_details: Course details for the classroom.
+            topic_list_intro: Topic list introduction for the classroom.
         """
         self.name = name
         self.url_fragment = url_fragment

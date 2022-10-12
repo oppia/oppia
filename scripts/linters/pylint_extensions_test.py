@@ -616,25 +616,21 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_malformed_args_section(self):
-        node_malformed_args_section = astroid.extract_node(
-            u"""def func(arg): #@
+    def test_well_formatted_args_section(self):
+        node_with_well_formatted_args_section = astroid.extract_node(
+            u"""def func(arg: str) -> None: #@
                 \"\"\"Does nothing.
 
                 Args:
-                    arg: Argument description.
+                    arg: Argument's description.
                 \"\"\"
                 a = True
         """)
 
-        message = testutils.Message(
-            msg_id='malformed-args-section',
-            node=node_malformed_args_section
-        )
-
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
-                node_malformed_args_section)
+                node_with_well_formatted_args_section
+            )
 
     def test_malformed_returns_section(self):
         node_malformed_returns_section = astroid.extract_node(
@@ -696,29 +692,28 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_raises_section)
 
-    def test_malformed_args_argument(self):
-        node_malformed_args_argument = astroid.extract_node(
-            u"""def func(*args): #@
+    def test_presence_of_typeinfo_in_args_section_considered_as_incorrect(self):
+        node_malformed_args_section = astroid.extract_node(
+            u"""def func(arg: str) -> None: #@
                 \"\"\"Does nothing.
 
                 Args:
-                    *args: int. Argument description.
+                    arg: str. Argument description.
                 \"\"\"
                 a = True
         """)
 
         message = testutils.Message(
-            msg_id='malformed-args-argument',
-            node=node_malformed_args_argument
+            msg_id='malformed-args-section',
+            node=node_malformed_args_section
         )
-
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_functiondef(
-                node_malformed_args_argument)
+                node_malformed_args_section)
 
-    def test_well_formated_args_argument(self):
-        node_with_no_error_message = astroid.extract_node(
-            u"""def func(*args): #@
+    def test_malformed_args_argument(self):
+        node_with_malformed_args_argument = astroid.extract_node(
+            u"""def func(*args: str) -> None: #@
                 \"\"\"Does nothing.
 
                 Args:
@@ -727,54 +722,84 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 a = True
         """)
 
-        with self.checker_test_object.assertAddsMessages():
-            self.checker_test_object.checker.visit_functiondef(
-                node_with_no_error_message)
+        message = testutils.Message(
+            msg_id='malformed-args-argument',
+            node=node_with_malformed_args_argument
+        )
 
-    def test_well_formated_args_section(self):
-        node_with_no_error_message = astroid.extract_node(
-            u"""def func(arg): #@
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_malformed_args_argument)
+
+    def test_well_formated_args_argument(self):
+        node_well_formated_args_argument = astroid.extract_node(
+            u"""def func(*args: int) -> None: #@
                 \"\"\"Does nothing.
 
                 Args:
-                    arg: argument. Description.
+                    *args: Description.
                 \"\"\"
                 a = True
         """)
 
         with self.checker_test_object.assertAddsMessages():
             self.checker_test_object.checker.visit_functiondef(
-                node_with_no_error_message)
+                node_well_formated_args_argument)
 
-    def test_well_formated_returns_section(self):
-        node_with_no_error_message = astroid.extract_node(
-            u"""def func(): #@
+    def test_presence_of_typeinfo_in_returns_section_raises_error(self):
+        node_with_typeinfo_in_returns_section = astroid.extract_node(
+            u"""def func() -> int: #@
                 \"\"\"Does nothing.
 
                 Returns:
                     int. Argument escription.
                 \"\"\"
-                return args
+                return 123
         """)
 
-        with self.checker_test_object.assertAddsMessages():
-            self.checker_test_object.checker.visit_functiondef(
-                node_with_no_error_message)
+        message = testutils.Message(
+            msg_id='malformed-returns-section',
+            node=node_with_typeinfo_in_returns_section
+        )
 
-    def test_well_formated_yields_section(self):
-        node_with_no_error_message = astroid.extract_node(
-            u"""def func(): #@
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_typeinfo_in_returns_section)
+
+    def test_well_formatted_returns_section(self):
+        node_with_well_formatted_returns_section = astroid.extract_node(
+            u"""def func() -> str: #@
+                \"\"\"Does nothing.
+
+                Returns:
+                    Return value's description.
+                \"\"\"
+                return 'string_var'
+        """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_well_formatted_returns_section)
+
+    def test_presence_of_typeinfo_in_yields_section_raises_error(self):
+        node_with_typeinfo_in_yields_section = astroid.extract_node(
+            u"""def func() -> Iterator[int]: #@
                 \"\"\"Does nothing.
 
                 Yields:
-                    arg. Argument description.
+                    type. Argument description.
                 \"\"\"
-                yield args
+                yield 123
         """)
 
-        with self.checker_test_object.assertAddsMessages():
+        message = testutils.Message(
+            msg_id='malformed-yields-section',
+            node=node_with_typeinfo_in_yields_section
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_functiondef(
-                node_with_no_error_message)
+                node_with_typeinfo_in_yields_section)
 
     def test_space_after_docstring(self):
         node_space_after_docstring = astroid.extract_node(
@@ -876,11 +901,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_no_newline_at_end_of_multi_line_docstring(self):
         node_no_newline_at_end = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> None: #@
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: variable. Description.\"\"\"
+                            arg: Description.\"\"\"
                     Something
         """)
 
@@ -893,10 +918,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_no_newline_above_args(self):
         node_single_newline_above_args = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> None: #@
                 \"\"\"Do something.
                 Args:
-                    arg: argument. Description.
+                    arg: Description.
                 \"\"\"
         """)
 
@@ -929,10 +954,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_no_newline_above_return(self):
         node_with_no_space_above_return = astroid.extract_node(
-            u"""def func(): #@
+            u"""def func() -> str: #@
                 \"\"\"Returns something.
                 Returns:
-                    returns_something. Description.
+                    Return value's Description.
                 \"\"\"
                 return something
         """)
@@ -948,11 +973,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_varying_combination_of_newline_above_args(self):
         node_newline_above_args_raises = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> None: #@
                 \"\"\"Raises exception.
 
                 Args:
-                    arg: argument. Description.
+                    arg: Argument's Description.
                 Raises:
                     raises_something. Description.
                 \"\"\"
@@ -969,13 +994,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 node_newline_above_args_raises)
 
         node_newline_above_args_returns = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> str: #@
                 \"\"\"Returns Something.
 
                 Args:
-                    arg: argument. Description.
+                    arg: Argument's Description.
                 Returns:
-                    returns_something. Description.
+                    Return value's Description.
                 \"\"\"
                 return something
         """)
@@ -990,7 +1015,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 node_newline_above_args_returns)
 
         node_newline_above_returns_raises = astroid.extract_node(
-            u"""def func(): #@
+            u"""def func() -> str: #@
                 \"\"\"Do something.
 
 
@@ -999,7 +1024,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     raises_exception. Description.
 
                 Returns:
-                    returns_something. Description.
+                    Return value's Description.
                 \"\"\"
                 raise something
                 return something
@@ -1016,20 +1041,20 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_excessive_newline_above_args(self):
         node_with_two_newline = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> bool: #@
                     \"\"\"Returns something.
 
 
                     Args:
-                        arg: argument. This is  description.
+                        arg: This is description.
 
 
                     Returns:
-                        int. Returns something.
+                        Returns something.
 
 
                     Yields:
-                        yield_something. Description.
+                        Description.
                     \"\"\"
                     return True
                     yield something
@@ -1058,14 +1083,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_return_in_comment(self):
         node_with_return_in_comment = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> str: #@
                     \"\"\"Returns something.
 
                     Args:
-                        arg: argument. Description.
+                        arg: Argument's Description.
 
                     Returns:
-                        returns_something. Description.
+                        Return value's Description.
                     \"\"\"
                     "Returns: something"
                     return something
@@ -1089,20 +1114,20 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_well_placed_newline(self):
         node_with_no_error_message = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> str: #@
                     \"\"\"Returns something.
 
                     Args:
-                        arg: argument. This is description.
+                        arg: This is description.
 
                     Returns:
-                        returns_something. This is description.
+                        This is description.
 
                     Raises:
                         raises. Something.
 
                     Yields:
-                        yield_something. This is description.
+                        This is description.
                     \"\"\"
                     raise something
                     yield something
@@ -1133,11 +1158,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 raises_invalid_indentation_node)
 
         return_invalid_indentation_node = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> str: #@
                     \"\"\"This is a docstring.
 
                         Returns:
-                        str. If :true,
+                        If :true,
                             individual key=value pairs.
                     \"\"\"
                     Something
@@ -1175,11 +1200,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 invalid_raises_description_indentation_node)
 
         invalid_return_description_indentation_node = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> str: #@
                     \"\"\"This is a docstring.
 
                         Returns:
-                            str. If :true,
+                            If :true,
                                 individual key=value pairs.
                     \"\"\"
                     return Something
@@ -1192,11 +1217,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 invalid_return_description_indentation_node)
 
         invalid_yield_description_indentation_node = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> Iterator[str]: #@
                     \"\"\"This is a docstring.
 
                         Yields:
-                            str. If :true,
+                            If :true,
                                 incorrent indentation line.
                     \"\"\"
                     yield Something
@@ -1242,11 +1267,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_well_formed_multi_line_docstring(self):
         node_with_no_error_message = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> None: #@
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: variable. Description.
+                            arg: Description.
                     \"\"\"
                     Something
         """)
@@ -1257,11 +1282,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_well_formed_multi_line_description_docstring(self):
         node_with_no_error_message = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> None: #@
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: bool. If true, individual key=value
+                            arg: If true, individual key=value
                                 pairs separated by '&' are
                                 generated for each element of the value
                                 sequence for the key.
@@ -1292,16 +1317,16 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 node_with_no_error_message)
 
         node_with_no_error_message = astroid.extract_node(
-            u"""def func(arg):
+            u"""def func(arg: str) -> str:
                     \"\"\"This is a docstring.
 
                         Returns:
-                            str. The string parsed using
+                            The string parsed using
                             Jinja templating. Returns an error
                             string in case of error in parsing.
 
                         Yields:
-                            tuple. For ExplorationStatsModel,
+                            For ExplorationStatsModel,
                             a 2-tuple of the form (exp_id, value)
                             where value is of the form.
                     \"\"\"
@@ -1315,17 +1340,17 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 node_with_no_error_message)
 
         node_with_no_error_message = astroid.extract_node(
-            u"""def func(arg): #@
+            u"""def func(arg: str) -> str: #@
                     \"\"\"This is a docstring.
 
                         Returns:
-                            str. From this item there
+                            From this item there
                             is things:
                                 Jinja templating. Returns an error
                             string in case of error in parsing.
 
                         Yields:
-                            tuple. For ExplorationStatsModel:
+                            For ExplorationStatsModel:
                                 {key
                                     (sym)
                                 }.
@@ -1346,16 +1371,16 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
         invalid_args_description_node = astroid.extract_node(
             """
-        def func(test_var_one, test_var_two): #@
+        def func(test_var_one: int, test_var_two: int) -> int: #@
             \"\"\"Function to test docstring parameters.
 
             Args:
-                test_var_one: int. First test variable.
-                test_var_two: str. Second test variable.
+                test_var_one: First test variable.
+                test_var_two: Second test variable.
                 Incorrect description indentation
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
             result = test_var_one + test_var_two
             return result
@@ -1376,15 +1401,16 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         invalid_param_indentation_node = astroid.extract_node(
             """
-        def func(test_var_one): #@
+        def func(test_var_one: int) -> int: #@
             \"\"\"Function to test docstring parameters.
 
             Args:
-                 test_var_one: int. First test variable.
+                 test_var_one: First test variable.
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
+            test_var_two = 55
             result = test_var_one + test_var_two
             return result
         """)
@@ -1400,14 +1426,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         invalid_header_indentation_node = astroid.extract_node(
             """
-        def func(test_var_one): #@
+        def func(test_var_one: int) -> int: #@
             \"\"\"Function to test docstring parameters.
 
              Args:
-                 test_var_one: int. First test variable.
+                 test_var_one: First test variable.
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
             result = test_var_one + test_var_two
             return result
@@ -1428,19 +1454,19 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
         valid_free_form_node = astroid.extract_node(
             """
-        def func(test_var_one, test_var_two): #@
+        def func(test_var_one: int, test_var_two: int) -> int: #@
             \"\"\"Function to test docstring parameters.
 
             Args:
-                test_var_one: int. First test variable.
-                test_var_two: str. Second test variable:
+                test_var_one: First test variable.
+                test_var_two: Second test variable:
                     Incorrect description indentation
                         {
                             key:
                         }.
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
             result = test_var_one + test_var_two
             return result
@@ -1451,16 +1477,16 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         valid_indentation_node = astroid.extract_node(
             """
-        def func(test_var_one, test_var_two): #@
+        def func(test_var_one: int, test_var_two: int) -> int: #@
             \"\"\"Function to test docstring parameters.
 
             Args:
-                test_var_one: int. First test variable.
-                test_var_two: str. Second test variable:
+                test_var_one: First test variable.
+                test_var_two: Second test variable:
                     Correct indentaion.
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
             result = test_var_one + test_var_two
             return result
@@ -1476,15 +1502,15 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
         valid_func_node, valid_return_node = astroid.extract_node(
             """
-        def test(test_var_one, test_var_two): #@
+        def test(test_var_one: int, test_var_two: int) -> int: #@
             \"\"\"Function to test docstring parameters.
 
             Args:
-                test_var_one: int. First test variable.
-                test_var_two: str. Second test variable.
+                test_var_one: First test variable.
+                test_var_two: Second test variable.
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
             result = test_var_one + test_var_two
             return result #@
@@ -1513,15 +1539,15 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_yield_type_yield_node) = astroid.extract_node(
                 """
         class Test:
-            def __init__(self, test_var_one, test_var_two): #@
+            def __init__(self, test_var_one: int, test_var_two: int) -> int: #@
                 \"\"\"Function to test docstring parameters.
 
                 Args:
-                    test_var_one: int. First test variable.
-                    test_var_two: str. Second test variable.
+                    test_var_one: First test variable.
+                    test_var_two: Second test variable.
 
                 Returns:
-                    int. The test result.
+                    The test result.
                 \"\"\"
                 result = test_var_one + test_var_two
                 yield result #@
@@ -1538,10 +1564,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='missing-yield-doc',
                 node=missing_yield_type_func_node
-            ), testutils.Message(
-                msg_id='missing-yield-type-doc',
-                node=missing_yield_type_func_node
-            ),
+            )
         ):
             self.checker_test_object.checker.visit_yieldfrom(
                 missing_yield_type_yield_node)
@@ -1554,15 +1577,15 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_return_type_return_node) = astroid.extract_node(
                 """
         class Test:
-            def __init__(self, test_var_one, test_var_two): #@
+            def __init__(self, test_var_one: int, test_var_two: int) -> int: #@
                 \"\"\"Function to test docstring parameters.
 
                 Args:
-                    test_var_one: int. First test variable.
-                    test_var_two: str. Second test variable.
+                    test_var_one: First test variable.
+                    test_var_two: Second test variable.
 
                 Yields:
-                    int. The test result.
+                    The test result.
                 \"\"\"
                 result = test_var_one + test_var_two
                 return result #@
@@ -1579,10 +1602,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='missing-return-doc',
                 node=missing_return_type_func_node
-            ), testutils.Message(
-                msg_id='missing-return-type-doc',
-                node=missing_return_type_func_node
-            ),
+            )
         ):
             self.checker_test_object.checker.visit_return(
                 missing_return_type_return_node)
@@ -1592,12 +1612,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         valid_raise_node = astroid.extract_node(
             """
-        def func(test_var_one, test_var_two):
+        def func(test_var_one: int, test_var_two: int) -> None:
             \"\"\"Function to test docstring parameters.
 
             Args:
-                test_var_one: int. First test variable.
-                test_var_two: str. Second test variable.
+                test_var_one: First test variable.
+                test_var_two: Second test variable.
 
             Raises:
                 Exception. An exception.
@@ -1611,12 +1631,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             missing_raise_type_func_node,
             missing_raise_type_raise_node) = astroid.extract_node(
                 """
-        def func(test_var_one, test_var_two): #@
+        def func(test_var_one: int, test_var_two: int) -> None: #@
             \"\"\"Function to test raising exceptions.
 
             Args:
-                test_var_one: int. First test variable.
-                test_var_two: str. Second test variable.
+                test_var_one: First test variable.
+                test_var_two: Second test variable.
             \"\"\"
             raise Exception #@
         """)
@@ -1745,15 +1765,20 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         missing_param_func_node = astroid.extract_node(
             """
-        def func(test_var_one, test_var_two, *args, **kwargs): #@
+        def func( #@
+            test_var_one: int,
+            test_var_two: int,
+            *args: Any,
+            **kwargs: Any
+        ) -> int:
             \"\"\"Function to test docstring parameters.
 
             Args:
-                test_var_one: int. First test variable.
-                test_var_two: str. Second test variable.
+                test_var_one: First test variable.
+                test_var_two: Second test variable.
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
             result = test_var_one + test_var_two
             return result
@@ -1770,15 +1795,15 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         missing_param_func_node = astroid.extract_node(
             """
-        def func(test_var_one, test_var_two): #@
+        def func(test_var_one: int, test_var_two: int) -> int: #@
             \"\"\"Function to test docstring parameters.
 
             Args:
-                test_var_one: int. First test variable.
-                invalid_var_name: str. Second test variable.
+                test_var_one: First test variable.
+                invalid_var_name: Second test variable.
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
             result = test_var_one + test_var_two
             return result
@@ -1789,15 +1814,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 node=missing_param_func_node,
                 args=('test_var_two',),
             ), testutils.Message(
-                msg_id='missing-type-doc',
-                node=missing_param_func_node,
-                args=('test_var_two',),
-            ), testutils.Message(
                 msg_id='differing-param-doc',
-                node=missing_param_func_node,
-                args=('invalid_var_name',),
-            ), testutils.Message(
-                msg_id='differing-type-doc',
                 node=missing_param_func_node,
                 args=('invalid_var_name',),
             ),
@@ -1816,22 +1833,22 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"Function to test docstring parameters.
 
             Args:
-                test_var_one: int. First test variable.
-                test_var_two: str. Second test variable.
+                test_var_one: First test variable.
+                test_var_two: Second test variable.
 
             Returns:
-                int. The test result.
+                The test result.
             \"\"\"
 
-            def __init__(self, test_var_one, test_var_two): #@
+            def __init__(self, test_var_one: int, test_var_two: int) -> int: #@
                 \"\"\"Function to test docstring parameters.
 
                 Args:
-                    test_var_one: int. First test variable.
-                    test_var_two: str. Second test variable.
+                    test_var_one: First test variable.
+                    test_var_two: Second test variable.
 
                 Returns:
-                    int. The test result.
+                    The test result.
                 \"\"\"
                 result = test_var_one + test_var_two
                 return result

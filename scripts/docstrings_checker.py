@@ -164,7 +164,7 @@ def docstringify(docstring):
         if instance.is_valid():
             return instance
 
-    return _check_docs_utils.Docstring(docstring)
+    return GoogleDocstring(docstring)
 
 
 class GoogleDocstring(_check_docs_utils.GoogleDocstring):
@@ -173,18 +173,13 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """
 
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
+
     re_param_line = re.compile(
         r"""
-        \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
-        \s*  ( [:]
-            \s*
-            ({type}|\S*)
-            (?:,\s+optional)?
-            [.] )? \s*                  # optional type declaration
-        \s*  (.*)                       # beginning of optional description
-    """.format(
-        type=re_multiple_type,
-    ), flags=re.X | re.S | re.M)
+        \s*  \*{0,2}(\w+)             # identifier potentially with asterisks
+        \s*  ([:])
+        \s*  ([A-Z0-9](.*)[.\]}\)]+$)              # beginning of description
+    """, flags=re.X | re.S | re.M)
 
     re_returns_line = re.compile(
         r"""
@@ -203,3 +198,27 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """.format(
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
+
+    def match_param_docs(self):
+        """Returns the set of parameter names which are properly documented.
+
+        Returns:
+            set(str). A set of parameter names which are properly defined
+            in docstring.
+        """
+        params_with_doc = set()
+
+        entries = self._parse_section(self.re_param_section)
+        entries.extend(self._parse_section(self.re_keyword_param_section))
+        for entry in entries:
+            match = self.re_param_line.match(entry)
+            if not match:
+                continue
+
+            param_name = match.group(1)
+            param_desc = match.group(3)
+
+            if param_desc:
+                params_with_doc.add(param_name)
+
+        return params_with_doc
