@@ -456,7 +456,7 @@ export class ExplorationEngineService {
     // at oldState.interaction.default_outcome.
     let outcome = {...classificationResult.outcome};
     let newStateName: string = outcome.dest;
-    let nextStateNameIfStuck: string | null = outcome.destIfReallyStuck;
+    let newStateNameIfStuck: string | null = outcome.destIfReallyStuck;
 
     if (!this._editorPreviewMode) {
       let feedbackIsUseful: boolean = (
@@ -479,7 +479,7 @@ export class ExplorationEngineService {
     let refresherExplorationId = outcome.refresherExplorationId;
     let missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
     let newState = this.exploration.getState(newStateName);
-    let nextStateIfStuck = this.exploration.getState(nextStateNameIfStuck);
+    let newStateIfStuck = this.exploration.getState(newStateNameIfStuck);
     let isFirstHit = Boolean(
       this.visitedStateNames.indexOf(newStateName) === -1);
     if (oldStateName !== newStateName) {
@@ -506,6 +506,14 @@ export class ExplorationEngineService {
       this.alertsService.addWarning('Parameters should not be empty.');
       return;
     }
+    let newParamsIfStuck = (
+      newStateIfStuck ? this.makeParams(
+        oldParams, newStateIfStuck.paramChanges, [oldParams]) : oldParams);
+    if (newParamsIfStuck === null) {
+      this.answerIsBeingProcessed = false;
+      this.alertsService.addWarning('Parameters should not be empty.');
+      return;
+    }
 
     let questionHtml = this.makeQuestion(newState, [newParams, {
       answer: 'answer'
@@ -517,8 +525,19 @@ export class ExplorationEngineService {
       return;
     }
 
+    let questionHtmlIfStuck = this.makeQuestion(newStateIfStuck, [newParamsIfStuck, {
+      answer: 'answer'
+    }]);
+    if (questionHtmlIfStuck === null) {
+      this.answerIsBeingProcessed = false;
+      // TODO(#13133): Remove all question related naming conventions.
+      this.alertsService.addWarning('Question content should not be empty.');
+      return;
+    }
+
     // TODO(sll): Remove the 'answer' key from newParams.
     newParams.answer = answer;
+    newParamsIfStuck.answer = answer;
 
     this.answerIsBeingProcessed = false;
 
@@ -527,8 +546,10 @@ export class ExplorationEngineService {
       this.exploration.isInteractionInline(oldStateName)
     );
     this.nextStateName = newStateName;
+    this.nextStateIfStuckName = newStateNameIfStuck;
     let onSameCard: boolean = (oldStateName === newStateName);
 
+    // Not sure about this.
     this._updateActiveStateIfInEditorEventEmitter.emit(newStateName);
 
     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
@@ -538,12 +559,24 @@ export class ExplorationEngineService {
         this._getInteractionHtmlByStateName(_nextFocusLabel, this.nextStateName)
       );
     }
+    let nextInteractionIfStuckHtml = null;
+    if (this.exploration.getInteraction(this.nextStateIfStuckName).id) {
+      nextInteractionIfStuckHtml = (
+        this._getInteractionHtmlByStateName(_nextFocusLabel, this.nextStateIfStuckName)
+      );
+    }
+
+
+    // Not sure about this too.
     if (newParams) {
       this.learnerParamsService.init(newParams);
     }
 
     questionHtml = questionHtml + this._getRandomSuffix();
     nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
+
+    questionHtmlIfStuck = questionHtmlIfStuck + this._getRandomSuffix();
+    nextInteractionIfStuckHtml = nextInteractionIfStuckHtml + this._getRandomSuffix();
 
     let nextCard = StateCard.createNewCard(
       this.nextStateName, questionHtml, nextInteractionHtml,
@@ -554,11 +587,11 @@ export class ExplorationEngineService {
       this.audioTranslationLanguageService);
     
     let nextCardIfReallyStuck = StateCard.createNewCard(
-      this.nextStateIfStuckName, questionHtml, nextInteractionHtml,
-      this.exploration.getInteraction(this.nextStateName),
-      this.exploration.getState(this.nextStateName).recordedVoiceovers,
-      this.exploration.getState(this.nextStateName).writtenTranslations,
-      this.exploration.getState(this.nextStateName).content.contentId,
+      this.nextStateIfStuckName, questionHtmlIfStuck, nextInteractionIfStuckHtml,
+      this.exploration.getInteraction(this.nextStateIfStuckName),
+      this.exploration.getState(this.nextStateIfStuckName).recordedVoiceovers,
+      this.exploration.getState(this.nextStateIfStuckName).writtenTranslations,
+      this.exploration.getState(this.nextStateIfStuckName).content.contentId,
       this.audioTranslationLanguageService);
 
     successCallback(
