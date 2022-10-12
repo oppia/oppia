@@ -55,7 +55,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'translation_counts': {},
                     'language_codes_needing_voice_artists': ['en'],
                     'language_codes_with_assigned_voice_artists': ['hi'],
-                    'translation_in_review_counts': {}
+                    'translation_in_review_counts': {},
+                    'language_codes': ['en'],
                 }))
         # Re-initializing this swap, so that we can use this in test method.
         self.mock_supported_audio_languages_context = self.swap(
@@ -77,7 +78,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'translation_counts': {},
             'language_codes_needing_voice_artists': ['en'],
             'language_codes_with_assigned_voice_artists': [],
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'language_codes': ['en'],
         }
 
         with self.mock_supported_audio_languages_context:
