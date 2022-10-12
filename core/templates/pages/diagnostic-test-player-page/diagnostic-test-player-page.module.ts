@@ -58,10 +58,10 @@ declare var angular: ng.IAngularStatic;
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    DiagnosticTestPlayerComponent
+    DiagnosticTestPlayerComponent,
   ],
   entryComponents: [
-    DiagnosticTestPlayerComponent
+    DiagnosticTestPlayerComponent,
   ],
   providers: [
     {

@@ -1,33 +1,70 @@
-<button>
-  BACK
-</button>
-<h3>Learner Diagnostic Test</h3>
+<div>
+  <button class="btn oppia-diagnostic-test-button oppia-back-button"
+          (click)="returnBackToClassroom()">
+    BACK
+  </button>
+</div>
+<div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
 <mat-card class="introductory-card">
-  <div>
-    <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-        [href]="OPPIA_AVATAR_LINK_URL"
-        target="_blank"
-        rel="noopener">
-      <img class="conversation-skin-oppia-avatar"
-            [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
-    </a>
+  <div class="oppia-introductory-container">
+    <div class="oppia-image">
+      <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+    </div>
+    <div class="test-introduction-container">
+      <p class="test-introduction-text">
+        This test will help us recommend a topic for you.
+      </p>
+      <p class="test-introduction-text">
+        Please note that you will not be able to return to previous questions
+        after moving to the next question.
+      </p>
+    </div>
   </div>
-  <div>
-    <p>This test will help us recommend a topic for you.</p>
-    <p>
-      Please note that you will not be able to return to previous questions
-      after moving to the next question.
-    </p>
-  </div>
-  <button>
+  <button class="btn oppia-diagnostic-test-button start-test-button"
+          disabled="true">
     START THE TEST
   </button>
 </mat-card>
 
 <style>
+  .oppia-image {
+    margin-right: 5%;
+  }
+  .oppia-introductory-container {
+    display: flex;
+  }
+  .start-test-button {
+    float: right;
+    margin-top: 20px;
+  }
   .introductory-card {
+    height: 350px;
     margin: auto;
+    padding: 5%;
     width: 500px;
-    height: 500px;
+  }
+  .oppia-back-button {
+    margin: 10px;
+    position: absolute;
+  }
+  .test-introduction-text {
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+  .test-introduction-container {
+    width: 300px;
+  }
+  .oppia-diagnostic-test-session {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 3em;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .oppia-diagnostic-test-button {
+    background-color: #00645c;
+    color: #fff;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 12px;
   }
 </style>

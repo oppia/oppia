@@ -16,25 +16,40 @@
  * @fileoverview Diagnostic test player component.
  */
 
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
   templateUrl: './diagnostic-test-player.component.html'
 })
-export class DiagnosticTestPlayerComponent implements OnInit{
+export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL!: string;
 
   constructor(
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef,
+    private loaderService: LoaderService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {}
 
   ngOnInit(): void {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
+    this.preventPageUnloadEventService.addListener(
+      () => true
+    );
+  }
+
+  returnBackToClassroom(): void {
+    this.windowRef.nativeWindow.location.href = '/learn/math';
+    this.loaderService.showLoadingScreen('Loading');
   }
 }
 
