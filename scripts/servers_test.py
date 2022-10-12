@@ -926,7 +926,8 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webdriverio(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(servers.managed_webdriverio_server())
+        self.exit_stack.enter_context(
+            servers.managed_webdriverio_server(chrome_version='104.0.5112.79'))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
