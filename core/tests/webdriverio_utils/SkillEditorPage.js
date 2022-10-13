@@ -198,7 +198,9 @@ var SkillEditorPage = function() {
 
   this.clickCreateQuestionButton = async function() {
     await action.click('Create Question Button', createQuestionButton);
+    await browser.pause(2000);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
+    await browser.pause(2000);
   };
 
   this.confirmSkillDifficulty = async function() {
