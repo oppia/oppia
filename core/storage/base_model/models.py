@@ -1894,6 +1894,6 @@ class BaseMapReduceBatchResultsModel(BaseModel):
     shown after each MapReduce job run. Classes which are used by a MR job to
     store its batch results should subclass this class.
     """
-
+    
     _use_cache: bool = False
     _use_memcache: bool = False

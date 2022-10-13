@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for core.storage.base_model.gae_models."""
+"""Tests for core.storage.base_model.models."""
 
 from __future__ import annotations
 
