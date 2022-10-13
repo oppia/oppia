@@ -1165,19 +1165,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'story_references': [story_ref_dict]
             }
         )
-        if schema_version == feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION == 1:
-            # Current schema version is 1, the update method is not implemented.
-            with self.assertRaisesRegex(
-                AttributeError,
-                re.escape(
-                    'type object \'Topic\' has no attribute '
-                    '\'_convert_story_reference_v1_dict_to_v2_dict\''
-                )
-            ):
-                topic_domain.Topic.update_story_references_from_model(
-                    vers_story_ref_dict,
-                    schema_version
-                )
+        ver_story_ref2 = topic_domain.Topic.update_story_references_from_model(
+            vers_story_ref_dict,
+            schema_version
+        )
+        self.assertEqual(
+            ver_story_ref2,
+            vers_story_ref_dict
+        )
 
     def test_is_valid_topic_id(self) -> None:
         """This test is needed for complete branch coverage.
