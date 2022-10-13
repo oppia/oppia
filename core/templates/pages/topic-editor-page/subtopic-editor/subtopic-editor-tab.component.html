@@ -1,27 +1,31 @@
-<div class="subtopic-content">
-  <p class="oppia-mobile-back-to-parent" ng-click="$ctrl.navigateToTopicEditor()">
+<div *ngIf="topic"
+     class="subtopic-content">
+  <p class="oppia-mobile-back-to-parent"
+     (click)="navigateToTopicEditor()">
     <i class="fa fa-angle-left"></i>
     <span>Back to Topic</span>
   </p>
   <div class="subtopic-header-text">
-    <span class="topic-name" ng-click="$ctrl.navigateToTopicEditor()"><[$ctrl.topic.getName()]> / </span>
-    <span class="subtopic-name"><[$ctrl.editableTitle]></span>
+    <span class="topic-name" (click)="navigateToTopicEditor()">{{ topic?.getName() }} / </span>
+    <span class="subtopic-name">{{ editableTitle }}</span>
   </div>
   <div class="subtopic-content-box">
     <div class="subtopic-left-box">
-      <md-card class="subtopic-item-container oppia-mobile-collapsible-card">
-        <div class="skill-card-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleSubtopicEditorCard()">
+      <mat-card class="subtopic-item-container oppia-mobile-collapsible-card">
+        <div class="skill-card-header oppia-mobile-collapsible-card-header"
+             (click)="toggleSubtopicEditorCard()">
           <h3 class="subtopic-card-heading">Review Material</h3>
           <i class="fa fa-caret-down"
-             ng-if="!$ctrl.subtopicEditorCardIsShown"
+             *ngIf="!subtopicEditorCardIsShown"
              aria-hidden="true">
           </i>
           <i class="fa fa-caret-up"
-             ng-if="$ctrl.subtopicEditorCardIsShown"
+             *ngIf="subtopicEditorCardIsShown"
              aria-hidden="true">
           </i>
         </div>
-        <div class="oppia-subtopics-list-card oppia-mobile-collapsible-card-content" ng-if="$ctrl.subtopicEditorCardIsShown">
+        <div class="oppia-subtopics-list-card oppia-mobile-collapsible-card-content"
+             *ngIf="subtopicEditorCardIsShown">
           <div class="subtopic-title">
             <p>
               <strong>Title*</strong>
@@ -29,20 +33,21 @@
             <form class="form-horizontal" role="form">
               <input class="form-control e2e-test-subtopic-title-field"
                      type="text"
-                     ng-blur="$ctrl.updateSubtopicTitle($ctrl.editableTitle)"
-                     ng-model="$ctrl.editableTitle"
-                     maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>"
-                     ng-change="$ctrl.resetErrorMsg()">
+                     (blur)="updateSubtopicTitle(editableTitle)"
+                     [(ngModel)]="editableTitle"
+                     [ngModelOptions]="{standalone: true}"
+                     maxlength="MAX_CHARS_IN_SUBTOPIC_TITLE"
+                     (change)="resetErrorMsg()">
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Subtopic title should be at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+                  Subtopic title should be at most {{ MAX_CHARS_IN_SUBTOPIC_TITLE }} characters.
                 </em>
               </span>
             </form>
-            <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
-              <em><[$ctrl.errorMsg]></em>
+            <span class="form-text error-msg" *ngIf="errorMsg">
+              <em>{{ errorMsg }}</em>
             </span>
-            <span class="form-text error-message" ng-if="$ctrl.editableTitle.length === 80">
+            <span class="form-text error-message" *ngIf="editableTitle?.length === 80">
               <em>The maximum length of subtopic title is 80 characters.</em>
             </span>
           </div>
@@ -52,28 +57,30 @@
             </p>
             <form class="form-horizontal" role="form">
               <input class="form-control e2e-test-subtopic-url-fragment-field"
-                     ng-class="{'is-invalid': $ctrl.subtopicUrlFragmentExists || !$ctrl.subtopicUrlFragmentIsValid}"
+                     [ngClass]="{'is-invalid': subtopicUrlFragmentExists || !subtopicUrlFragmentIsValid}"
                      type="text"
-                     ng-blur="$ctrl.updateSubtopicUrlFragment($ctrl.editableUrlFragment)"
-                     ng-model="$ctrl.editableUrlFragment"
-                     maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
+                     (blur)="updateSubtopicUrlFragment(editableUrlFragment)"
+                     [(ngModel)]="editableUrlFragment"
+                     [ngModelOptions]="{standalone: true}"
+                     maxlength="MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT">
               <span class="oppia-input-box-subtitle">
                 <em>
-                  The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                  The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT }} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
                   This subtopic can be accessed at the following URL:<br>
-                  <[$ctrl.hostname]>/learn/<[$ctrl.classroomUrlFragment]>/<[$ctrl.topic.getUrlFragment()]>/revision/<[$ctrl.editableUrlFragment]>
+                  {{ hostname }}/learn/{{ classroomUrlFragment }}/{{ topic?.getUrlFragment() }}/revision/{{ editableUrlFragment }}
                 </em>
               </span>
             </form>
-            <div class="oppia-input-box-subtitle text-danger" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
+            <div class="oppia-input-box-subtitle text-danger"
+                 *ngIf="editableUrlFragment && subtopicUrlFragmentExists">
               <em>The subtopic url fragment is not unique.</em>
             </div>
           </div>
           <div class="subtopic-html">
-            <div  ng-click="$ctrl.showSchemaEditor()" class="e2e-test-edit-html-content">
+            <div  (click)="showSchemaEditor()" class="e2e-test-edit-html-content">
               <p>
                 <strong>Explanation of the subtopic*</strong>
-                <i class="fa fa-pen edit-icon" ng-if="!$ctrl.schemaEditorIsShown"></i>
+                <i class="fa fa-pen edit-icon" *ngIf="!schemaEditorIsShown"></i>
               </p>
             </div>
             <span class="oppia-input-box-subtitle">
@@ -81,188 +88,205 @@
                 Gives learner an overview of how to perform a skill. Go to the preview tab to preview.
               </em>
             </span>
-            <div ng-if="$ctrl.schemaEditorIsShown">
-              <schema-based-editor [schema]="$ctrl.SUBTOPIC_PAGE_SCHEMA"
+            <div *ngIf="schemaEditorIsShown">
+              <schema-based-editor [schema]="SUBTOPIC_PAGE_SCHEMA"
                                    class="e2e-test-edit-subtopic-page-contents"
-                                   [(local-value)]="$ctrl.htmlData">
+                                   [(localValue)]="htmlData">
               </schema-based-editor>
               <div class="text-right pt-3">
-                <button class="btn btn-outline-dark" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
-                <button class="btn btn-success e2e-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
+                <button class="btn btn-outline-dark"
+                        (click)="cancelHtmlDataChange()">
+                  Cancel
+                </button>
+                <button class="btn btn-success e2e-test-save-subtopic-content-button"
+                        (click)="updateHtmlData()">
+                  Save
+                </button>
               </div>
             </div>
-            <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="subtopic-html-content e2e-test-edit-html-content">
-              <angular-html-bind html-data="$ctrl.htmlData" class="e2e-test-subtopic-html-content">
-              </angular-html-bind>
+            <div *ngIf="!schemaEditorIsShown"
+                 (click)="showSchemaEditor()"
+                 class="subtopic-html-content e2e-test-edit-html-content">
+              <oppia-rte-output-display class="e2e-test-subtopic-html-content"
+                                        [rteString]="htmlData">
+              </oppia-rte-output-display>
             </div>
           </div>
           <div class="subtopic-thumbnail e2e-test-subtopic-thumbnail">
             <p>
               <strong>Thumbnail Image*</strong>
             </p>
-            <oppia-thumbnail-uploader [filename]="$ctrl.subtopic.getThumbnailFilename()"
+            <oppia-thumbnail-uploader [filename]="subtopic?.getThumbnailFilename()"
                                       [useLocalStorage]="false"
-                                      (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
-                                      [bg-color]="$ctrl.subtopic.getThumbnailBgColor()"
-                                      (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"
-                                      [allowed-bg-colors]="$ctrl.allowedBgColors"
-                                      [aspect-ratio]="'4:3'"
-                                      [preview-title]="$ctrl.editableTitle"
-                                      preview-description-bg-color="#BE563C">
+                                      (updateFilename)="updateSubtopicThumbnailFilename($event)"
+                                      [bgColor]="subtopic?.getThumbnailBgColor()"
+                                      (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
+                                      [allowedBgColors]="allowedBgColors"
+                                      [aspectRatio]="'4:3'"
+                                      [previewTitle]="editableTitle"
+                                      previewDescriptionBgColor="#BE563C">
             </oppia-thumbnail-uploader>
           </div>
         </div>
-        <div ng-if="$ctrl.editableThumbnailFilename && $ctrl.subtopicEditorCardIsShown">
-          <div ng-if="!$ctrl.subtopicPreviewCardIsShown">
-            <button class="btn btn-default show-subtopic-preview-button" ng-click="$ctrl.toggleSubtopicPreview()">
+        <div *ngIf="editableThumbnailFilename && subtopicEditorCardIsShown">
+          <div *ngIf="!subtopicPreviewCardIsShown">
+            <button class="btn btn-default show-subtopic-preview-button"
+                    (click)="toggleSubtopicPreview()">
               Expand Preview
               <i class="fa fa-angle-down"></i>
             </button>
           </div>
-          <div ng-if="$ctrl.subtopicPreviewCardIsShown">
-            <button class="btn btn-default show-subtopic-preview-button" ng-click="$ctrl.toggleSubtopicPreview()">
+          <div *ngIf="subtopicPreviewCardIsShown">
+            <button class="btn btn-default show-subtopic-preview-button"
+                    (click)="toggleSubtopicPreview()">
               Collapse Preview
               <i class="fa fa-angle-up"></i>
             </button>
           </div>
-          <div ng-if="$ctrl.subtopicPreviewCardIsShown">
-            <oppia-preview-thumbnail [name]="$ctrl.editableTitle"
-                                     [aspect-ratio]="'4:3'"
-                                     [filename]="$ctrl.editableThumbnailFilename"
-                                     [thumbnail-bg-color]="$ctrl.editableThumbnailBgColor"
-                                     [bg-color]="'#2F6687'">
+          <div *ngIf="subtopicPreviewCardIsShown">
+            <oppia-preview-thumbnail [name]="editableTitle"
+                                     [aspectRatio]="'4:3'"
+                                     [filename]="editableThumbnailFilename"
+                                     [thumbnailBgColor]="editableThumbnailBgColor"
+                                     [bgColor]="'#2F6687'">
             </oppia-preview-thumbnail>
           </div>
         </div>
-      </md-card>
-      <md-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container oppia-mobile-collapsible-card">
-        <div class="skill-card-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.togglePreviewSkillCard()">
+      </mat-card>
+      <mat-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container oppia-mobile-collapsible-card">
+        <div class="skill-card-header oppia-mobile-collapsible-card-header"
+             (click)="togglePreviewSkillCard()">
           <h3>Skills</h3>
           <i class="fa fa-caret-down"
-             ng-if="!$ctrl.skillsListIsShown"
+             *ngIf="!skillsListIsShown"
              aria-hidden="true">
           </i>
           <i class="fa fa-caret-up"
-             ng-if="$ctrl.skillsListIsShown"
+             *ngIf="skillsListIsShown"
              aria-hidden="true">
           </i>
         </div>
-        <div ng-if="$ctrl.skillsListIsShown" class="oppia-mobile-collapsible-card-content">
-          <div ng-if="!$ctrl.subtopic.getSkillSummaries().length">
+        <div *ngIf="skillsListIsShown" class="oppia-mobile-collapsible-card-content">
+          <div *ngIf="!subtopic?.getSkillSummaries()?.length">
             <span>There are no skills assigned to this subtopic.</span>
           </div>
-          <div ng-if="$ctrl.subtopic.getSkillSummaries().length">
+          <div *ngIf="subtopic?.getSkillSummaries()?.length">
             <div class="list-header">
               <span>Name</span>
               <span class="number-skills-header"># of Questions</span>
             </div>
-            <div ng-repeat="skillSummary in $ctrl.subtopic.getSkillSummaries() track by $index"
-                 dnd-list="$ctrl.subtopic.getSkillSummaries()"
-                 dnd-dragstart="$ctrl.onRearrangeMoveSkillStart($index)"
-                 dnd-drop="$ctrl.onRearrangeMoveSkillFinish($index)"
-                 dnd-draggable="skillSummary"
-                 class="skill-list-item">
-              <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
-              <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
-                 ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                <[skillSummary.getDescription()]>
-              </a>
-              <div class="skill-options-box">
-                <span><[$ctrl.skillQuestionCountDict[skillSummary.getId()] ]></span>
-                <i class="fa fa-ellipsis-v" ng-click="$ctrl.showSkillEditOptions($index)"></i>
-              </div>
-              <div class="skill-option-box" ng-if="$ctrl.selectedSkillEditOptionsIndex === $index" ng-mouseleave="$ctrl.showSkillEditOptions(null)" ng-click="$ctrl.showSkillEditOptions(null)">
-                <div class="skill-edit-option" ng-click="$ctrl.removeSkillFromSubtopic(skillSummary)">
-                  <i class="fa fa-trash"></i>
-                  <span>Remove from subtopic</span>
+            <div class="skills-list" cdkDropList (cdkDropListDropped)="drop($event)">
+              <div *ngFor="let skillSummary of subtopic?.getSkillSummaries();index as idx"
+                   class="skill-list-item"
+                   cdkDrag>
+                <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
+                <a *ngIf="!isSkillDeleted(skillSummary)"
+                   [href]="getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
+                  {{ skillSummary.getDescription() }}
+                </a>
+                <div class="skill-options-box">
+                  <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
+                  <i class="fa fa-ellipsis-v" (click)="showSkillEditOptions(idx)"></i>
                 </div>
-                <div class="skill-edit-option remove-from-topic-option" ng-click="$ctrl.removeSkillFromTopic(skillSummary)">
-                  <i class="fa fa-trash"></i>
-                  <span>Remove from topic</span>
+                <div class="skill-option-box"
+                     *ngIf="selectedSkillEditOptionsIndex === idx"
+                     (mouseleave)="showSkillEditOptions(null)"
+                     (click)="showSkillEditOptions(null)">
+                  <div class="skill-edit-option"
+                       (click)="removeSkillFromSubtopic(skillSummary)">
+                    <i class="fa fa-trash"></i>
+                    <span>Remove from subtopic</span>
+                  </div>
+                  <div class="skill-edit-option remove-from-topic-option"
+                       (click)="removeSkillFromTopic(skillSummary)">
+                    <i class="fa fa-trash"></i>
+                    <span>Remove from topic</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </md-card>
+      </mat-card>
     </div>
-
     <div class="subtopic-right-box">
-      <md-card>
-        <div class="entity-count">
-          <div class="skill-count">
-            <span class="skill-count-value"><[$ctrl.skillIds.length]></span>
-            <span class="skill-count-text">Skills</span>
-          </div>
-          <div class="question-count">
-            <span class="question-count-value"><[$ctrl.questionCount]></span>
-            <span class="question-count-text">Questions</span>
-          </div>
+      <div class="entity-count">
+        <div class="skill-count">
+          <span class="skill-count-value">{{ skillIds?.length }}</span>
+          <span class="skill-count-text">Skills</span>
         </div>
-      </md-card>
+        <div class="question-count">
+          <span class="question-count-value">{{ questionCount }}</span>
+          <span class="question-count-text">Questions</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <style>
-  .subtopic-content .oppia-subtopics-list-card,
-  .subtopic-content .skills-card,
-  .subtopic-content .uncategorized-skill-ids {
+  .oppia-subtopics-list-card,
+  .skills-card,
+  .uncategorized-skill-ids {
     font-family: Roboto, Arial, sans-serif;
     padding: 30px 55px 30px 45px;
   }
-  .subtopic-content .subtopic-content-box {
+  .subtopic-content-box {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 0 auto;
     width: 85%;
   }
-  .subtopic-content .show-subtopic-preview-button {
+  .show-subtopic-preview-button {
     border-top: 1px solid #c1c1c1;
     color: #419889;
     font-size: 15px;
     padding: 10px 0;
     width: 100%;
   }
-  .subtopic-content .error-message {
+  .error-message {
     color: #f00;
     font-size: smaller;
   }
-  .subtopic-content .list-header {
+  .list-header {
     border-bottom: 2px solid #000;
     display: flex;
     justify-content: space-between;
     margin: 20px 0 0;
   }
-  .subtopic-content .list-header span {
+  .list-header span {
     font-weight: bold;
   }
-  .subtopic-content .number-skills-header {
+  .number-skills-header {
     margin-right: 30px;
   }
-  .subtopic-content .skill-list-item {
+  .skill-list-item {
+    background: white;
     border-bottom: 1px solid #dbdbdb;
+    box-sizing: border-box;
+    cursor: move;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 10px 0;
     position: relative;
   }
-  .subtopic-content .skill-list-item a {
+  .skill-list-item a {
     color: inherit;
     flex: 1;
     overflow: hidden;
+    padding-left: 5px;
     padding-right: 10px;
     text-decoration: none;
     word-wrap: break-word;
   }
-  .subtopic-content .skill-options-box {
+  .skill-options-box {
     margin-right: 14px;
   }
-  .subtopic-content .skill-options-box span {
+  .skill-options-box span {
     margin-right: 42px;
   }
-  .subtopic-content .skill-option-box {
+  .skill-option-box {
     background-color: #e1dcdc;
     border: 1px solid #000;
     padding: 0;
@@ -271,53 +295,53 @@
     width: 210px;
     z-index: 1;
   }
-  .subtopic-content .skill-edit-option {
+  .skill-edit-option {
     border-bottom: 1px solid #000;
     cursor: pointer;
     font-size: 15px;
     padding: 5px;
   }
-  .subtopic-content .remove-from-topic-option {
+  .remove-from-topic-option {
     border-bottom: none;
   }
-  .subtopic-content .subtopic-left-box {
+  .subtopic-left-box {
     margin-right: 3%;
     width: 50%;
   }
-  .subtopic-content .subtopic-thumbnail,
+  .subtopic-thumbnail,
   .subtopic-content, .subtopic-url-fragment {
     margin: 20px 0;
   }
-  .subtopic-content .subtopic-html {
+  .subtopic-html {
     margin: 30px 0;
   }
-  .subtopic-content .add-skill-btn {
+  .add-skill-btn {
     background-color: #008098;
     color: #fff;
     font-weight: bold;
     margin: 15px 0;
   }
-  .subtopic-content .subtopic-right-box {
+  .subtopic-right-box {
     width: 35%;
   }
-  .subtopic-content .subtopics-list-item {
+  .subtopics-list-item {
     display: flex;
     justify-content: space-between;
     margin: 7px 0;
   }
-  .subtopic-content .skill-card-header i {
+  .skill-card-header i {
     display: none;
   }
-  .subtopic-content .subtopic-header-text {
+  .subtopic-header-text {
     font-size: 15px;
     margin-bottom: 35px;
     margin-left: 4%;
   }
-  .subtopic-content .topic-name {
+  .topic-name {
     color: #707070;
     cursor: pointer;
   }
-  .subtopic-content .entity-count {
+  .entity-count {
     align-items: center;
     background-color: #fff;
     border: 1px solid #aaaac1;
@@ -329,116 +353,136 @@
     position: fixed;
     width: 24%;
   }
-  .subtopic-content .skill-count,
-  .subtopic-content .question-count {
+  .skill-count,
+  .question-count {
     border-right: 2px solid #aaaac1;
     display: inline-block;
     text-align: center;
     width: 50%;
   }
-  .subtopic-content .edit-icon {
+  .edit-icon {
     color: #595959;
   }
-  .subtopic-content .question-count {
+  .question-count {
     border-right: none;
   }
-  .subtopic-content .skill-count-value,
-  .subtopic-content .question-count-value,
-  .subtopic-content .story-count-value {
+  .skill-count-value,
+  .question-count-value,
+  .story-count-value {
     display: block;
     font-size: 26px;
     font-weight: bold;
     height: 40px;
   }
-  .subtopic-content .create-skill-container i {
+  .create-skill-container i {
     color: #419889;
     font-size: 30px;
     width: 100%;
   }
-  .subtopic-content .create-skill-text {
+  .create-skill-text {
     color: #419889;
   }
-  .subtopic-content .subtopic-title p {
+  .subtopic-title p {
     margin-bottom: 10px;
   }
-  .subtopic-content .subtopic-item-container {
+  .subtopic-item-container {
       border-radius: 4px;
       margin: 0;
       padding-top: 45px;
   }
-  .subtopic-content .subtopic-html-content {
+  .subtopic-html-content {
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
     padding: 6px 12px;
   }
-  .subtopic-content .subtopic-skill-card {
+  .subtopic-skill-card {
     margin-bottom: 30px;
     margin-top: 64px;
   }
-  .subtopic-content .subtopic-card-heading {
+  .subtopic-card-heading {
     margin-bottom: 0;
     margin-left: 20px;
     margin-top: 0;
     padding-bottom: 4px;
   }
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+  }
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .skill-list-item:last-child {
+    border: none;
+  }
+  .skills-list.cdk-drop-list-dragging .skill-list-item:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
   @media screen and (max-width: 1100px) {
-    .subtopic-content .subtopic-left-box {
+    .subtopic-left-box {
       width: 55%;
     }
-    .subtopic-content .subtopic-right-box {
+    .subtopic-right-box {
       width: 40%;
     }
   }
   @media screen and (max-width: 768px) {
-    .subtopic-content .subtopic-content-box {
+    .subtopic-content-box {
       width: 100%;
     }
-    .subtopic-content .subtopic-left-box {
+    .subtopic-left-box {
       margin-right: 0;
     }
-    .subtopic-content .entity-count,
-    .subtopic-content .subtopic-header-text {
+    .entity-count,
+    .subtopic-header-text {
       display: none;
     }
-    .subtopic-content .subtopic-content {
+    .subtopic-content {
       margin-top: 25px;
     }
-    .subtopic-content .draggable-icon-indicator {
+    .draggable-icon-indicator {
       display: none;
     }
-    .subtopic-content .subtopic-left-box,
-    .subtopic-content .subtopic-right-box {
+    .subtopic-left-box,
+    .subtopic-right-box {
       width: 100%;
     }
-    .subtopic-content .subtopic-item-container {
+    .subtopic-item-container {
       padding: 0;
     }
-    .subtopic-content .oppia-subtopics-list-card {
+    .oppia-subtopics-list-card {
       padding: 20px 10px 15px;
     }
-    .subtopic-content .subtopic-card-heading {
+    .subtopic-card-heading {
       margin: 0;
       padding: 0;
     }
-    .subtopic-content .subtopic-skill-card {
+    .subtopic-skill-card {
       display: block;
       margin-bottom: 0;
       margin-top: 40px;
       padding: 0;
     }
-    .subtopic-content .skill-card-header i {
+    .skill-card-header i {
       color: #000;
       display: block;
     }
-    .subtopic-content .skill-card-header {
+    .skill-card-header {
       align-items: center;
       display: flex;
       justify-content: space-between;
     }
-    .subtopic-content .skill-card-header h3 {
+    .skill-card-header h3 {
       margin: 0;
     }
-    .subtopic-content .skill-option-box {
+    .skill-option-box {
       right: 30px;
     }
   }
