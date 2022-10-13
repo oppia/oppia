@@ -3,37 +3,37 @@
   <li class="oppia-navbar-dropdown-menu">
     <div ngbDropdown>
       <button class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-left"
-              [ngClass]="{'btn-success': topicIsSaveable}"
+              [ngClass]="{'btn-success': isTopicSaveable()}"
               (click)="saveChanges()"
-              [disabled]="!topicIsSaveable">
-        <span *ngIf="!saveInProgress">
+              [disabled]="!isTopicSaveable()">
+        <span *ngIf="!isSaveInProgress()">
           <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon oppia-topic-editor-save-icon"
              alt="Save Topic">
           </i>
           <span class="oppia-save-publish-button-label float-left">Save Changes</span>
           <span class="d-none d-md-block float-left oppia-change-count"
-                *ngIf="changeListLength > 0">
-            ({{ changeListLength }})
+                *ngIf="getChangeListLength() > 0">
+            ({{ getChangeListLength() }})
           </span>
         </span>
 
-        <span *ngIf="saveInProgress">
+        <span *ngIf="isSaveInProgress()">
           <span class="oppia-save-publish-button-label">Saving</span>
           <loading-dots></loading-dots>
         </span>
       </button>
       <button type="button"
               class="btn btn-light dropdown-toggle dropdown-toggle oppia-dropdown-toggle-button"
-              [disabled]="!changeListLength"
+              [disabled]="!getChangeListLength()"
               aria-label="Dropdown toggle"
               ngbDropdownToggle>
       </button>
       <ul ngbDropdownMenu role="menu"
           class="oppia-dropdown-menu"
-          [ngStyle]="{ width: changeListLength && topicRights.isPublished() ? '150px' : '120px' }">
+          [ngStyle]="{ width: getChangeListLength() && topicRights.isPublished() ? '150px' : '120px' }">
         <li title="Discard all pending changes">
           <a (click)="discardChanges()"
-             [ngClass]="{'oppia-disabled-link': !changeListLength}"
+             [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
              class="dropdown-item">
             Discard Draft
           </a>
@@ -46,8 +46,8 @@
             *ngIf="!topicRights.isPublished()"
             class="btn btn-light oppia-editor-publish-button e2e-test-publish-topic-button"
             (click)="publishTopic()"
-            [ngClass]="{'btn-success': !topicIsSaveable && warningsCount === 0 && prepublishValidationIssues.length === 0}"
-            [disabled]="topicIsSaveable || warningsCount > 0 || prepublishValidationIssues.length > 0">
+            [ngClass]="{'btn-success': !isTopicSaveable() && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
+            [disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
       <i class="fas fa-cloud-upload-alt md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
       </i>
@@ -59,7 +59,7 @@
             (click)="unpublishTopic()"
             *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
             class="btn btn-light"
-            [disabled]="topicIsSaveable">
+            [disabled]="isTopicSaveable()">
       Unpublish Topic
     </button>
   </li>
@@ -94,10 +94,10 @@
       </div>
       <div class="oppia-topic-nav-dropdown-content">
         <div class="oppia-topic-nav-dropdown-text" (click)="toggleWarningText()">
-          <i *ngIf="!totalWarningsCount" class="oppia-material-icons">&#xE254;</i>
+          <i *ngIf="!getTotalWarningsCount()" class="oppia-material-icons">&#xE254;</i>
           <span>{{ activeTab }}</span>
-          <span *ngIf="totalWarningsCount">
-            ({{ totalWarningsCount }} <i class="fa fa-exclamation-triangle oppia-error-icon"></i>)
+          <span *ngIf="getTotalWarningsCount()">
+            ({{ getTotalWarningsCount() }} <i class="fa fa-exclamation-triangle oppia-error-icon"></i>)
           </span>
         </div>
         <div class="oppia-topic-nav-dropdown-icon"
@@ -115,13 +115,13 @@
         <div class="oppia-topic-nav-dropdown-option">
           <div *ngIf="!topicRights.isPublished()"
                (click)="publishTopic()"
-               [attr.disabled]="topicIsSaveable || warningsCount > 0 || prepublishValidationIssues.length > 0">
+               [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="oppia-material-icons">&#xE254;</i>
             <span>Publish Topic</span>
           </div>
           <div (click)="unpublishTopic()"
                *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
-               [attr.disabled]="topicIsSaveable">
+               [attr.disabled]="isTopicSaveable()">
             <i class="oppia-material-icons">&#xE254;</i>
             <span>Unpublish Topic</span>
           </div>
@@ -130,14 +130,14 @@
       <div class="oppia-topic-nav-dropdown-content oppia-right-container">
         <div class="oppia-topic-nav-dropdown-text"
              (click)="saveChanges()">
-          <span *ngIf="saveInProgress">
+          <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
           </span>
-          <span *ngIf="!saveInProgress">
+          <span *ngIf="!isSaveInProgress()">
             Save Changes
           </span>
-          <span *ngIf="changeListLength > 0">
-            ({{ changeListLength }})
+          <span *ngIf="getChangeListLength() > 0">
+            ({{ getChangeListLength() }})
           </span>
         </div>
         <div class="oppia-topic-nav-dropdown-icon"

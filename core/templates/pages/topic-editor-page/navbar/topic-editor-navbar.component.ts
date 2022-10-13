@@ -52,11 +52,6 @@ export class TopicEditorNavbarComponent {
   warningsAreShown: boolean;
   navigationChoices: string[];
   activeTab: string;
-  totalWarningsCount: number;
-  changeListLength: number;
-  topicIsSaveable: boolean;
-  warningsCount: number;
-  saveInProgress: boolean;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
@@ -282,11 +277,6 @@ export class TopicEditorNavbarComponent {
         () => this._validateTopic()
       )
     );
-    this.totalWarningsCount = this.getTotalWarningsCount();
-    this.changeListLength = this.getChangeListLength();
-    this.topicIsSaveable = this.isTopicSaveable();
-    this.warningsCount = this.getWarningsCount();
-    this.saveInProgress = this.isSaveInProgress();
   }
 
   ngOnDestroy(): void {
