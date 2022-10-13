@@ -21,7 +21,7 @@ import commonConstants from 'assets/constants';
 export const AppConstants = {
   ...commonConstants,
 
-  EndExploration: 'End Exploration',
+  END_EXPLORATION: 'End Exploration',
 
   DEFAULT_TRANSLATIONS: {
     I18N_LIBRARY_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Library',
