@@ -783,10 +783,6 @@ class StateCompleteEventHandler(base.BaseHandler):
         time_spent_in_state_secs = self.normalized_payload.get(
             'time_spent_in_state_secs')
         exp_version = self.normalized_payload.get('exp_version')
-
-        if exp_version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: State Complete')
         event_services.StateCompleteEventHandler.record(
             exploration_id,
             exp_version,
