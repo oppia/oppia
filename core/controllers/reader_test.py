@@ -2199,6 +2199,31 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_cannot_complete_state_with_no_exploration_version(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+
+        all_models = (
+            stats_models.StateCompleteEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        response = self.post_json(
+            '/explorehandler/state_complete_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'time_spent_in_state_secs': 2.0,
+                'session_id': 'session_id'
+            }, expected_status_int=400
+        )
+
+        error_msg = 'Missing key in handler args: exp_version.'
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
 
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
