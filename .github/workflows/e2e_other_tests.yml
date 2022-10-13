@@ -48,22 +48,22 @@ jobs:
         run: python -m scripts.build --prod_env
       - name: Run e2e Classroom Page Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..10}; do doxvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env; done
+        run: for run in {1..10}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env; done
         env: 
           VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e Classroom Page Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..10}; do doxvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env; done
+        run: for run in {1..10}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env; done
         env: 
           VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e Classroom Page Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..10}; do doxvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env; done
+        run: for run in {1..10}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env; done
         env: 
           VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e Classroom Page Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: for run in {1..10}; do doxvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env; done
+        run: for run in {1..10}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env; done
         env: 
           VIDEO_RECORDING_IS_ENABLED: 1
       - name: Uploading webdriverio-video as Artifacts
