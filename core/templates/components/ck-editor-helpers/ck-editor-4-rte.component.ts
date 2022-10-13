@@ -540,9 +540,12 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   // Returns true if a rte component should not be shown in blog post editor
   // RTE to remove it from rte configuration for the blog post editor RTE.
   isInvalidForBlogPostEditorRTE(compDefn: RteComponentSpecs): boolean {
+    var invalidComponents = (
+      AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR);
     return (
       this.contextService.isInBlogPostEditorPage() && (
-        compDefn.id in AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR
+        invalidComponents.some(
+          (invalidComponents) => invalidComponents === compDefn.id)
       )
     );
   }
