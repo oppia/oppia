@@ -198,10 +198,10 @@ def get_invited_learner_groups_of_learner(
     ]
 
 
-def get_learner_groups_of_learner(
+def get_learner_groups_joined_by_learner(
     user_id: str
 ) -> List[learner_group_domain.LearnerGroup]:
-    """Returns a list of learner groups that the given learner is part of.
+    """Returns a list of learner groups that the given learner has joined.
 
     Args:
         user_id: str. The id of the learner.
