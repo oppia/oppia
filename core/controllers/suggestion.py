@@ -496,7 +496,7 @@ class SuggestionListHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id', 'is_valid_user_id'
+                        'id': 'is_valid_user_id'
                     }]
                 },
                 'default_value': None
