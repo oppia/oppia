@@ -1770,7 +1770,7 @@ class Topic:
         cls, story_dict: StoryReferenceDict
     ) -> StoryReferenceDict:
         """This currently does nothing but return what it was passed.
-        It is here to get full test coverage on the already written 
+        It is here to get full test coverage on the already written
         update_story_references_from_model which isn't being used yet.
 
         Args:
