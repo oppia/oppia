@@ -142,7 +142,10 @@ def download_and_install_node() -> None:
         if common.is_x64_architecture():
             if common.is_mac_os():
                 node_file_name = 'node-v%s-darwin-x64' % (common.NODE_VERSION)
-            elif common.is_linux_os():
+            # Oppia only suppports windows, mac and linux operating systems.
+            # Hence we use the 'no branch' flag since the else condition will
+            # never occur.
+            elif common.is_linux_os(): # pragma: no branch
                 node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
         else:
             node_file_name = 'node-v%s' % common.NODE_VERSION
