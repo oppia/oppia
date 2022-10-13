@@ -81,9 +81,8 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   waveSurfer: WaveSurfer;
   recordingTimeLimit: number;
   audioIsLoading: boolean;
-  recordingTimeLimitInDateFormat: Date;
-  recordingDate: Date;
-  startingDuration: Date;
+  recordingDate: number;
+  startingDuration: number;
 
   constructor(
     private alertsService: AlertsService,
@@ -154,13 +153,13 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
       this.selectedRecording = true;
       this.checkingMicrophonePermission = false;
 
-      this.recordingDate = new Date(0, 0, 0, 0, 0, 0);
+      this.recordingDate = 0;
       this.elapsedTime = 0;
       OppiaAngularRootComponent.ngZone.runOutsideAngular(() => {
         this.timerInterval = setInterval(() => {
           OppiaAngularRootComponent.ngZone.run(() => {
             this.elapsedTime++;
-            this.recordingDate = new Date(0, 0, 0, 0, 0, this.elapsedTime);
+            this.recordingDate = this.elapsedTime;
 
             // This.recordingTimeLimit is decremented to
             // compensate for the audio recording timing inconsistency,
@@ -464,11 +463,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.recordingTimeLimit = (
       ExplorationEditorPageConstants.RECORDING_TIME_LIMIT);
-    this.recordingTimeLimitInDateFormat = new Date(
-      0, 0, 0, 0, 0, this.recordingTimeLimit - 1);
-
-    this.startingDuration = new Date(0, 0, 0, 0, 0, 0);
-
+    this.startingDuration = 0;
     this.unsupportedBrowser = false;
     this.selectedRecording = false;
     this.isAudioAvailable = false;
