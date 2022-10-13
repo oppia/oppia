@@ -2070,7 +2070,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            'Expected tagged skill misconception id to be a str, received 1')
+            'Expected tagged skill misconception id to be None, received 1')
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected tagged skill misconception id to be None, received 1'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -2094,9 +2102,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            'Expected the format of tagged skill misconception id '
-            'to be <skill_id>-<misconception_id>, received '
+            'Expected tagged skill misconception id to be None, received '
             'invalid_tagged_skill_misconception_id')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected tagged skill misconception id to be None, received '
+            'invalid_tagged_skill_misconception_id'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
@@ -2110,8 +2127,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         first_answer_group.rule_specs = []
         self._assert_validation_error(
             exploration,
-            'There must be at least one rule or training data for each'
-            ' answer group.')
+            'There must be at least one rule for each answer group.')
+        with self.assertRaisesRegex(
+            Exception,
+            'There must be at least one rule for each answer group.'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
 
         exploration.states = {
             exploration.init_state_name: (
@@ -2200,6 +2224,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.tags = ['abc', 'abc']
         self._assert_validation_error(
             exploration, 'Some tags duplicate each other')
+
+        exploration.tags = ['randomtextwhichisprobablygreaterthanthirty']
+        self._assert_validation_error(
+            exploration, 'Tag text length should not be more than 30.')
+
+        exploration.tags = [
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+        self._assert_validation_error(
+            exploration, 'Total number of tags should be less than 10.')
 
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()
