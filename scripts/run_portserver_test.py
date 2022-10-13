@@ -331,7 +331,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
             response = request_handler.handle_port_request(b'1010')
             request_handler.dump_stats()
 
-        self.assertEqual(response, b'')
+        self.assertEqual(response, '')
         self.assertIn('denied-allocations 1', self.terminal_logs)
 
     def test_port_server_request_handler_allocates_port_to_client(
@@ -356,7 +356,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
             def bind(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
-        def dummy_handler(data: int) -> str:
+        def dummy_handler(data: bytes) -> str:
             return str(data)
 
         swap_socket = self.swap(
