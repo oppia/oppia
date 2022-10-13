@@ -199,7 +199,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         interaction: base.BaseInteraction,
-        exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
+        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        *,
+        tagged_skill_misconception_id_required: bool = False,
     ) -> None:
         """Verifies that all rule classes are valid, and that the AnswerGroup
         only has one classifier rule.
@@ -209,23 +211,38 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
 
         Raises:
             ValidationError. One or more attributes of the AnswerGroup are
                 invalid.
             ValidationError. The AnswerGroup contains more than one classifier
                 rule.
+            ValidationError. The tagged_skill_misconception_id is not valid.
         """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
 
-        if self.tagged_skill_misconception_id is not None:
+        if (
+            self.tagged_skill_misconception_id is not None and
+            not tagged_skill_misconception_id_required
+        ):
+            raise utils.ValidationError(
+                'Expected tagged skill misconception id to be None, '
+                'received %s' % self.tagged_skill_misconception_id)
+
+        if (
+            self.tagged_skill_misconception_id is not None and
+            tagged_skill_misconception_id_required
+        ):
             if not isinstance(self.tagged_skill_misconception_id, str):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
                     'received %s' % self.tagged_skill_misconception_id)
+
             if not re.match(
                     constants.VALID_SKILL_MISCONCEPTION_ID_REGEX,
                     self.tagged_skill_misconception_id):
@@ -234,10 +251,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                     'to be <skill_id>-<misconception_id>, received %s'
                     % self.tagged_skill_misconception_id)
 
-        if len(self.rule_specs) == 0 and len(self.training_data) == 0:
+        if len(self.rule_specs) == 0:
             raise utils.ValidationError(
-                'There must be at least one rule or training data for each'
-                ' answer group.')
+                'There must be at least one rule for each answer group.')
 
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type not in interaction.rules_dict:
@@ -1801,7 +1817,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     def validate(
         self,
-        exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
+        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        *,
+        tagged_skill_misconception_id_required: bool = False,
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -1810,6 +1828,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 the exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property(obj_type).
                 Is used to validate AnswerGroup objects.
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
 
         Raises:
             ValidationError. One or more attributes of the InteractionInstance
@@ -1846,7 +1866,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 'Linear interactions must not have any answer groups.')
 
         for answer_group in self.answer_groups:
-            answer_group.validate(interaction, exp_param_specs_dict)
+            answer_group.validate(
+                interaction, exp_param_specs_dict,
+                tagged_skill_misconception_id_required=(
+                    tagged_skill_misconception_id_required))
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -2972,6 +2995,15 @@ class WrittenTranslation:
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
 
+        # Validate translations.
+        if self.data_format == 'html':
+            # Ruling out the possibility of different types for mypy
+            # type checking.
+            assert isinstance(self.translation, str)
+            html_cleaner.validate_rte_tags(self.translation)
+            html_cleaner.validate_tabs_and_collapsible_rte_tags(
+                self.translation)
+
 
 class WrittenTranslationsDict(TypedDict):
     """Dictionary representing the WrittenTranslations object."""
@@ -3839,6 +3871,9 @@ class SubtitledHtml:
 
         self.html = html_cleaner.clean(self.html)
 
+        html_cleaner.validate_rte_tags(self.html)
+        html_cleaner.validate_tabs_and_collapsible_rte_tags(self.html)
+
     @classmethod
     def create_default_subtitled_html(cls, content_id: str) -> SubtitledHtml:
         """Create a default SubtitledHtml domain object.
@@ -4130,7 +4165,9 @@ class State(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        allow_null_interaction: bool
+        allow_null_interaction: bool,
+        *,
+        tagged_skill_misconception_id_required: bool = False,
     ) -> None:
         """Validates various properties of the State.
 
@@ -4142,6 +4179,8 @@ class State(translation_domain.BaseTranslatableObject):
                 question.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.
@@ -4159,7 +4198,10 @@ class State(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
-            self.interaction.validate(exp_param_specs_dict)
+            self.interaction.validate(
+                exp_param_specs_dict,
+                tagged_skill_misconception_id_required=(
+                    tagged_skill_misconception_id_required))
 
         content_id_list = []
         content_id_list.append(self.content.content_id)
@@ -4947,9 +4989,11 @@ class State(translation_domain.BaseTranslatableObject):
             subtitled_htmls = ca_dict.get_subtitled_html()
             for subtitled_html in subtitled_htmls:
                 html_string = subtitled_html.html
-                # Make sure we don't include content that only consists of
-                # numbers. See issue #13055.
-                if html_string != '' and not html_string.isnumeric():
+                stripped_html_string = html_cleaner.strip_html_tags(html_string)
+                if (
+                    stripped_html_string != '' and
+                    not stripped_html_string.isnumeric()
+                ):
                     content_id_to_translatable_item[
                         subtitled_html.content_id
                     ] = TranslatableItem(

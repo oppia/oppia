@@ -1501,8 +1501,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_question_state_from_v33_to_latest(self) -> None:
         feedback_html_content = (
-            '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-value="'
-            '&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;" svg_filename-with-value="&a'
+            'mp;quot;abc.svg&amp;quot;"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -1575,10 +1576,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }
         expected_feeedback_html_content = (
-            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val'
-            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;,'
-            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi'
-            'a-noninteractive-math>')
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>')
         question_model = (
             question_models.QuestionModel(
                 id='question_id',
