@@ -1139,6 +1139,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             current_schema + 1
         )
 
+    def test_subtopic_schema_v3_to_v4(self) -> None:
+        current_schema = 3
+        self.topic.thumbnail_size_in_bytes = '12345'
+        vers_subtopic_dict = TopicDomainUnitTests._schema_update_vers_dict(
+            current_schema,
+            self.topic
+        )
+        self.assertEqual(
+            vers_subtopic_dict['subtopics'][0]['thumbnail_size_in_bytes'],
+            None
+        )
+
     def test_story_schema_update(self) -> None:
         story_id = 'story_id'
         story_published = True
@@ -1167,6 +1179,32 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                     schema_version
                 )
 
+    def test_valid_topic_id(self) -> None:
+        """This test is needed for complete branch coverage.
+        We need to go from the if statement and directly exit
+        the method.
+        """
+        topic_id = 'abcdefghijkl'
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except utils.ValidationError:
+            self.fail('This test should pass and not raise an exception')
+
+    def test_publish_story_not_exist(self) -> None:
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
+        with self.assertRaisesRegex(
+            Exception,
+            'Story with given id doesn\'t exist in the topic'
+        ):
+            self.topic.publish_story('story_id_3')
+
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
         Topic during export and import.
@@ -1179,6 +1217,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         """Checks that serializing and then deserializing a default topic
         works as intended by leaving the topic unchanged.
         """
+        self.assertEqual(
+            self.topic.to_dict(),
+            topic_domain.Topic.deserialize(
+                self.topic.serialize()).to_dict())
+
+    def test_serialize_with_created_on_last_updated_set(self) -> None:
+        """Checks that serializing and then deserializing a default topic
+        works as intended by leaving the topic unchanged. Added values
+        for self.topic.created_on and last_updated.
+        """
+        self.topic.created_on = datetime.datetime.now()
+        self.topic.last_updated = datetime.datetime.now()
         self.assertEqual(
             self.topic.to_dict(),
             topic_domain.Topic.deserialize(
