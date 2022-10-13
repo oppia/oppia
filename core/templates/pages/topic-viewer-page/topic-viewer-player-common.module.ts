@@ -24,11 +24,13 @@ import { NgModule } from '@angular/core';
 import { SubtopicsListComponent } from './subtopics-list/subtopics-list.component';
 import { StoriesListComponent } from './stories-list/topic-viewer-stories-list.component';
 import { MatCardModule } from '@angular/material/card';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
 @NgModule({
   imports: [
     CommonModule,
-    MatCardModule
+    MatCardModule,
+    SharedComponentsModule
   ],
   declarations: [
     StoriesListComponent,
