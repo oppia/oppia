@@ -173,18 +173,17 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """
 
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
-
     re_param_line = re.compile(
         r"""
-        \s*  \*{0,2}(\w+)             # identifier potentially with asterisks
+        \s*  \*{0,2}(\w+)              # identifier potentially with asterisks
         \s*  ([:])
-        \s*  ([A-Z0-9](.*)[.\]}\)]+$)              # beginning of description
+        \s*  ([A-Z0-9](.*)[.\]}\)]+$)  # beginning of description
     """, flags=re.X | re.S | re.M)
 
     re_returns_line = re.compile(
         r"""
-        \s* (({type}|\S*).)?              # identifier
-        \s* (.*)                          # beginning of description
+        \s* (({type}|\S*).)?  # identifier
+        \s* (.*)              # beginning of description
     """.format(
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
@@ -193,12 +192,15 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
 
     re_raise_line = re.compile(
         r"""
-        \s* ({type}|\S*)?[.:]                    # identifier
-        \s* (.*)                         # beginning of description
+        \s* ({type}|\S*)?[.:]  # identifier
+        \s* (.*)               # beginning of description
     """.format(
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
 
+    # The method 'match_param_docs' is taken from the pylint codebase and is
+    # modified according to our needs. Reference:
+    # https://github.com/PyCQA/pylint/blob/e89c361668aeead9fd192d5289c186611ef779ca/pylint/extensions/_check_docs_utils.py#L585
     def match_param_docs(self):
         """Returns the set of parameter names which are properly documented.
 
@@ -207,7 +209,6 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
             in docstring.
         """
         params_with_doc = set()
-
         entries = self._parse_section(self.re_param_section)
         entries.extend(self._parse_section(self.re_keyword_param_section))
         for entry in entries:

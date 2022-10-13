@@ -639,27 +639,26 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 a node's docstring.
         """
         # The regular expressions are taken from the pylint codebase and are
-        # modified according to our needs. Link: https://github.com/PyCQA/pylint
-        # /blob/e89c361668aeead9fd192d5289c186611ef779ca/pylint/extensions/
-        # _check_docs_utils.py#L428.
+        # modified according to our needs. Reference:
+        # https://github.com/PyCQA/pylint/blob/e89c361668aeead9fd192d5289c186611ef779ca/pylint/extensions/_check_docs_utils.py#L428.
         re_param_line = re.compile(
             r"""
-            \s*  \*{0,2}(\w+)           # identifier potentially with asterisks
-            \s*  ([:])               # separator for identifier and description
-            \s*  [A-Z0-9](.*)[.\]}\)]+$              # beginning of description
+            \s*  \*{0,2}(\w+)         # identifier potentially with asterisks
+            \s*  ([:])                # separator for identifier and description
+            \s*  [A-Z0-9](.*)[.\]}\)]+$  # beginning of description
         """, flags=re.X | re.S | re.M)
 
         re_returns_line = re.compile(
             r"""
-            \s* [A-Z0-9](.*)[.\]}\)]+$               # beginning of description
+            \s* [A-Z0-9](.*)[.\]}\)]+$  # beginning of description
         """, flags=re.X | re.S | re.M)
 
         re_yields_line = re_returns_line
 
         re_raise_line = re.compile(
             r"""
-            \s* ({type}[.])+                    # identifier
-            \s* [A-Z0-9](.*)[.\]}}\)]+$         # beginning of description
+            \s* ({type}[.])+             # identifier
+            \s* [A-Z0-9](.*)[.\]}}\)]+$  # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -675,6 +674,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 if entry.lstrip().startswith('*args: list(*)'):
                     self.add_message('malformed-args-argument', node=node)
                     continue
+
                 match = re_param_line.match(entry)
                 if not match:
                     self.add_message('malformed-args-section', node=node)
@@ -1205,7 +1205,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         params_with_doc = doc.match_param_docs()
 
         # Tolerate no parameter documentation at all.
-        if (not params_with_doc and accept_no_param_doc):
+        if not params_with_doc and accept_no_param_doc:
             tolerate_missing_params = True
 
         def _compare_missing_args(
