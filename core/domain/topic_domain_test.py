@@ -1190,8 +1190,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         except utils.ValidationError:
             self.fail('This test should pass and not raise an exception')
 
-    def test_publish_story_not_exist(self) -> None:
-        self.topic.canonical_story_references = [
+    def test_invalid_topic_id(self) -> None:
+        topic_id='a'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic id %s is invalid' % topic_id
+        ):
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+
+    def _setup_stories(self, topic: topic_domain.Topic) -> None:
+        topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id'),
             topic_domain.StoryReference.create_default_story_reference(
@@ -1199,11 +1207,93 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_2')
         ]
+        topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_10'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_11'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_12')
+        ]
+
+    def test_publish_story(self) -> None:
+        topic = self.topic
+        self._setup_stories(topic)
+        topic.publish_story('story_id')
+        self.assertEqual(
+            topic.canonical_story_references[0].story_is_published,
+            True
+        )
+        topic.publish_story('story_id_10')
+        self.assertEqual(
+            topic.additional_story_references[0].story_is_published,
+            True
+        )
+
+    def test_publish_story_not_exist(self) -> None:
+        topic = self.topic
+        self._setup_stories(topic)
         with self.assertRaisesRegex(
             Exception,
             'Story with given id doesn\'t exist in the topic'
         ):
-            self.topic.publish_story('story_id_3')
+            topic.publish_story('story_id_110')
+
+    def test_unpublish_story(self) -> None:
+        topic = self.topic
+        self._setup_stories(topic)
+        topic.publish_story('story_id_11')
+        topic.unpublish_story('story_id_11')
+        topic.publish_story('story_id')
+        topic.unpublish_story('story_id')
+        self.assertEqual(
+            topic.additional_story_references[0].story_is_published,
+            False
+        )
+        self.assertEqual(
+            topic.canonical_story_references[1].story_is_published,
+            False
+        )
+
+    def test_validate_same_subtopic_url(self) -> None:
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'),
+            topic_domain.Subtopic(
+                1, 'Another title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two')]
+        self.topic.subtopics[0].url_fragment = 'abc'
+        self.topic.subtopics[1].url_fragment = 'abc'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Subtopic url fragments are not unique across '
+            'subtopics in the topic'
+        ):
+            self.topic.validate()
+
+    def test_validate_no_story_references(self) -> None:
+        """
+        This is needed for branch coverage when there are no
+        story references and validate is run on a topic.
+        """
+        self.topic.canonical_story_references = []
+        self.topic.additional_story_references = []
+        try:
+            self.topic.validate()
+        except Exception:
+            self.fail('There are no story references for topic')
+     
+    def test_unpublish_story_not_exist(self) -> None:
+        topic = self.topic
+        self._setup_stories(topic)
+        with self.assertRaisesRegex(
+            Exception,
+            'Story with given id doesn\'t exist in the topic'
+        ):
+            topic.unpublish_story('story_id_110')
 
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
