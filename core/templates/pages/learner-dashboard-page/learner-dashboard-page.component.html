@@ -222,10 +222,9 @@
             <tr>
               <td>
                 <button (click)="showAllThreads()"
-                        class="btn btn-secondary oppia-btn-secondary">
-                  <i class="material-icons oppia-vcenter"
+                        class="btn btn-secondary oppia-btn-secondary oppia-box-size">
+                  <i class="fas fa-chevron-left"
                      title="{{ 'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
-                     &#xE5CB;
                   </i>
                 </button>
                 <span class="oppia-exploration-title">{{ explorationTitle }}</span>
@@ -255,7 +254,7 @@
 
                         <span *ngIf="!message.authorPictureDataUrl"
                               class="d-inline-block">
-                          <i class="material-icons md-40 oppia-profile-picture">&#xE853;</i>
+                          <i class="oppia-profile-alignment fas fa-user-circle fa-2x"></i>
                         </span>
                       </span>
 
@@ -333,7 +332,7 @@
           </table>
           <div class="feedback-thread-warning"
                *ngIf="feedbackThreadActive">
-            <i class="material-icons">&#xE88F;</i>
+            <i class="fas fa-exclamation-circle"></i>
             <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
           </div>
           <div class="oppia-learnerdashboard-pagination-container" *ngIf="paginatedThreadsList.length > 0">
@@ -356,3 +355,12 @@
     </div>
   </div>
 </div>
+
+<style>
+  .oppia-profile-alignment {
+    vertical-align: middle;
+  }
+  .oppia-box-size {
+    padding: 2px 10px;
+  }
+</style>
