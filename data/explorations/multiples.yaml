@@ -170,7 +170,7 @@ states:
     content:
       content_id: content
       html: "<p>The aim of this exercise is to explain how to solve Problem #1 on\
-        \ Project Euler (<oppia-noninteractive-link text-with-value=\"&amp;quot;&amp;quot;\"\
+        \ Project Euler (<oppia-noninteractive-link text-with-value=\"&amp;quot;problems&amp;quot;\"\
         \ url-with-value=\"&amp;quot;http://projecteuler.net/problems&amp;quot;\"\
         ></oppia-noninteractive-link>). Here is the problem:</p><p>\_</p><p><em>\_\
         \ \_ \_Find the sum of all multiples of 3 or 5 below 1000.</em></p><p>\_</p><p>We\

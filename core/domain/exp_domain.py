@@ -1613,8 +1613,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
                     'received \'%s\'' % tag)
+
+            if len(tag) > 30:
+                raise utils.ValidationError(
+                    'Tag text length should not be more than 30.')
         if len(set(self.tags)) != len(self.tags):
             raise utils.ValidationError('Some tags duplicate each other')
+        if len(self.tags) > 10:
+            raise utils.ValidationError(
+                'Total number of tags should be less than 10.')
 
         if not isinstance(self.blurb, str):
             raise utils.ValidationError(
@@ -1634,7 +1641,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self._validate_state_name(state_name)
             state.validate(
                 self.param_specs,
-                allow_null_interaction=not strict)
+                allow_null_interaction=not strict,
+                tagged_skill_misconception_id_required=False)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in
