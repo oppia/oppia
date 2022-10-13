@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Audio Translation Bar component.
  */
 
-import { EventEmitter, NgZone, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NgZone, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -42,7 +42,14 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 import { UserInfo } from 'domain/user/user-info.model';
 import { Voiceover } from 'domain/exploration/voiceover.model';
+import { FormatTimePipe } from 'filters/format-timer.pipe';
 
+@Pipe({ name: 'formatTime' })
+class MockFormatTimePipe {
+  transform(value: number): string {
+    return String(value);
+  }
+}
 describe('Audio translation bar Component', () => {
   let component: AudioTranslationBarComponent;
   let fixture: ComponentFixture<AudioTranslationBarComponent>;
@@ -58,7 +65,7 @@ describe('Audio translation bar Component', () => {
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService:
-     TranslationTabActiveContentIdService;
+    TranslationTabActiveContentIdService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let userService: UserService;
   let voiceoverRecordingService: VoiceoverRecordingService;
@@ -70,7 +77,7 @@ describe('Audio translation bar Component', () => {
   let mockActiveContentIdChangedEventEmitter = new EventEmitter();
   let mockActiveLanguageChangedEventEmitter = new EventEmitter();
   let mockShowTranslationTabBusyModalEventEmitter = new EventEmitter();
-  let modalSpy;
+  let modalSpy = null;
   var mainBodyDivMock = null;
   var translationTabDivMock = null;
   var dropAreaMessageDivMock = null;
@@ -91,13 +98,18 @@ describe('Audio translation bar Component', () => {
      TestBed.configureTestingModule({
        imports: [HttpClientTestingModule],
        declarations: [
-         AudioTranslationBarComponent
+         AudioTranslationBarComponent,
+         MockFormatTimePipe
        ],
        providers: [
          ContextService,
          {
            provide: NgbModal,
            useClass: MockNgbModal
+         },
+         {
+           provide: FormatTimePipe,
+           useClass: MockFormatTimePipe
          },
          {
            provide: ExternalSaveService,
