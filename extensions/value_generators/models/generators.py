@@ -79,9 +79,11 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
     ) -> str:
         return copy.deepcopy(utils.get_random_choice(list_of_values))
 
+
 class TestValueGeneratorCodeBranch():
     """For complete branch testing coverage there
     needs to be a class in here that is not a subclass
     of BaseValueGenerator.
     """
+
     pass
