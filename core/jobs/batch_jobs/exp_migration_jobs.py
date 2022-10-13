@@ -988,9 +988,6 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
                 logging.exception(error_message)
                 return result.Err((exp_id, error_message))
 
-            if target_state_schema_version == current_state_schema_version:
-                return result.Ok((exp_id, 'SUCCESS'))
-
         exp_snapshot_model.content['states'] = (
             versioned_exploration_states['states']
         )
@@ -1000,6 +997,8 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
         with datastore_services.get_ndb_context():
             exp_snapshot_model.update_timestamps(update_last_updated_time=False)
             exp_snapshot_model.put()
+
+        return result.Ok((exp_id, 'SUCCESS'))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the audit of exploration
