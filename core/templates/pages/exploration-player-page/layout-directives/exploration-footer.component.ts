@@ -44,9 +44,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 import './exploration-footer.component.css';
-import { QuestionPlayerConceptCardModalComponent } from 'components/question-directives/question-player/question-player-concept-card-modal.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 
 @Component({
@@ -190,6 +190,13 @@ export class ExplorationFooterComponent {
           this.showInformationCard();
         })
     );
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onNewCardOpened.subscribe(
+        (newCard: StateCard) => {
+          this.conceptCardManagerService.reset();
+        }
+      )
+    );
   }
 
   isConceptCardButtonVisible(): boolean {
@@ -319,6 +326,7 @@ export class ExplorationFooterComponent {
       OppiaNoninteractiveSkillreviewConceptCardModalComponent,
       {backdrop: true}
     );
+    this.conceptCardManagerService.consumeConceptCard();
     modalRef.componentInstance.skillId = this.linkedSkillId;
     modalRef.result.then(() => {}, (res) => {
       this.contextService.removeCustomEntityContext();
@@ -362,11 +370,6 @@ export class ExplorationFooterComponent {
     this.linkedSkillId = state.linkedSkillId;
     console.log(this.linkedSkillId);
       this.openConceptCardModal();
-
-      // Update user has viewed lesson info modal once if
-      // lesson info modal button is clicked.
-
-    
   }
 
   getStaticImageUrl(imagePath: string): string {

@@ -158,6 +158,7 @@ export class ConversationSkinComponent {
   CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
+  isLearnerReallyStuck: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -271,6 +272,14 @@ export class ConversationSkinComponent {
             this.questionPlayerStateService.solutionViewed(
               this.questionPlayerEngineService.getCurrentQuestion()
             );
+          })
+      );
+      
+      this.directiveSubscriptions.add(
+        this.conceptCardManagerService.onLearnerGetsReallyStuck
+          .subscribe(() => {
+            this.isLearnerReallyStuck = true;
+            console.log("Receiving val of learnerIsStuck");
           })
       );
     }
@@ -1110,6 +1119,7 @@ export class ConversationSkinComponent {
           taggedSkillMisconceptionId, wasOldStateInitial,
           isFirstHit, isFinalQuestion, focusLabel) => {
         this.nextCard = nextCard;
+        console.log(this.conceptCardManagerService.isLearnerReallyStuck());
         if (!this._editorPreviewMode &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
           let oldStateName =
@@ -1162,6 +1172,7 @@ export class ConversationSkinComponent {
             // Stay on the same card.
             this.hintsAndSolutionManagerService.recordWrongAnswer();
             this.conceptCardManagerService.recordWrongAnswer();
+            console.log("Aage badh gya fn");
             this.playerTranscriptService.addNewResponse(feedbackHtml);
             let helpCardAvailable = false;
             if (feedbackHtml &&
