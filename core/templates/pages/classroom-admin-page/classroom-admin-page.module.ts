@@ -43,6 +43,9 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
 import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
 import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
+import { DeleteTopicFromClassroomModalComponent } from './modals/delete-topic-from-classroom-modal.component';
+import { TopicsDependencyGraphModalComponent } from './modals/topic-dependency-graph-viz-modal.component';
+
 
 declare var angular: ng.IAngularStatic;
 
@@ -68,6 +71,8 @@ declare var angular: ng.IAngularStatic;
     ClassroomEditorConfirmModalComponent,
     DeleteClassroomConfirmModalComponent,
     CreateNewClassroomModalComponent,
+    DeleteTopicFromClassroomModalComponent,
+    TopicsDependencyGraphModalComponent,
   ],
   entryComponents: [
     ClassroomAdminNavbarComponent,
@@ -75,6 +80,8 @@ declare var angular: ng.IAngularStatic;
     ClassroomEditorConfirmModalComponent,
     DeleteClassroomConfirmModalComponent,
     CreateNewClassroomModalComponent,
+    DeleteTopicFromClassroomModalComponent,
+    TopicsDependencyGraphModalComponent,
   ],
   providers: [
     {
