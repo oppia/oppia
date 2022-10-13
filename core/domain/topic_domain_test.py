@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import datetime
-import re
 
 from core import android_validation_constants
 from core import feconf
