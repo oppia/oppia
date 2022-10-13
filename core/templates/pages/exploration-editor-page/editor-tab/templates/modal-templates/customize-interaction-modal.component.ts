@@ -263,7 +263,8 @@ export class CustomizeInteractionModalComponent
       Save Interaction button should be disable for empty input
     */
     if (explorationTitle === AppConstants.END_EXPLORATION) {
-      let inputField = document.getElementsByClassName('oppia-exploration-id-input');
+      let inputField = document.
+        getElementsByClassName('oppia-exploration-id-input');
       if (inputField === undefined) {
         return true;
       }
