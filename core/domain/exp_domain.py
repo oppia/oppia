@@ -4470,7 +4470,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             str. Returns the updated html value.
         """
-        empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
         soup = bs4.BeautifulSoup(html, 'html.parser')
 
         for tag in soup.find_all('oppia-noninteractive-image'):
@@ -4497,13 +4496,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('start-with-value'):
                 tag['start-with-value'] = '0'
             else:
-                if tag['start-with-value'].strip() in empty_values:
+                if not tag['start-with-value'].isdigit():
                     tag['start-with-value'] = '0'
 
             if not tag.has_attr('end-with-value'):
                 tag['end-with-value'] = '0'
             else:
-                if tag['end-with-value'].strip() in empty_values:
+                if not tag['end-with-value'].isdigit():
                     tag['end-with-value'] = '0'
 
             if not tag.has_attr('autoplay-with-value'):
@@ -4549,7 +4548,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if 'raw_latex' not in math_content_list:
                 tag.decompose()
                 continue
-            if math_content_list['raw_latex'].strip() in empty_values:
+            if math_content_list['raw_latex'].strip() in cls.empty_values:
                 tag.decompose()
                 continue
 
