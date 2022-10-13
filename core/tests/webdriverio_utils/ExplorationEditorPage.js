@@ -404,8 +404,6 @@ var ExplorationEditorPage = function() {
 
   this.navigateToPreviewTab = async function() {
     await action.click('Preview tab button', navigateToPreviewTabButton);
-    await waitFor.visibilityOf(
-      previewTabLearnerViewCard, 'Preview Tab learner card is not visible');
     await waitFor.pageToFullyLoad();
   };
 
