@@ -851,6 +851,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
         expected_argument_names = set(
             None if (arg.name in self.not_needed_param_in_docstring)
             else (arg.name + ':') for arg in arguments_node.args)
+        if arguments_node.vararg is not None:
+            expected_argument_names.add(arguments_node.vararg + ':')
+        if arguments_node.kwarg is not None:
+            expected_argument_names.add(arguments_node.kwarg + ':')
         currently_in_args_section = False
         # When we are in the args section and a line ends in a colon,
         # we can ignore the indentation styling in the next section of
@@ -1193,15 +1197,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
             arg.name for arg in arguments_node.args)
         expected_argument_names.update(
             arg.name for arg in arguments_node.kwonlyargs)
-        not_needed_type_in_docstring = (
-            self.not_needed_param_in_docstring.copy())
 
         if arguments_node.vararg is not None:
-            expected_argument_names.add(arguments_node.vararg)
-            not_needed_type_in_docstring.add(arguments_node.vararg)
+            expected_argument_names.add('*' + arguments_node.vararg)
         if arguments_node.kwarg is not None:
-            expected_argument_names.add(arguments_node.kwarg)
-            not_needed_type_in_docstring.add(arguments_node.kwarg)
+            expected_argument_names.add('**' + arguments_node.kwarg)
         params_with_doc = doc.match_param_docs()
 
         # Tolerate no parameter documentation at all.
