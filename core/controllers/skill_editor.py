@@ -287,7 +287,8 @@ class SkillDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'comma_separated_skill_ids': {
             'schema': {
-                'type': 'basestring'
+                'type': 'custom',
+                'obj_type': 'JsonEncodedInString'
             }
         }
     }
