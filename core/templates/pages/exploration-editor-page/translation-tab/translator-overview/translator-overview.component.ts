@@ -141,6 +141,7 @@ export class TranslatorOverviewComponent implements OnInit {
     this.windowRef.nativeWindow.localStorage.setItem(
       this.LAST_SELECTED_TRANSLATION_LANGUAGE, this.languageCode);
 
+    this.routerService.onCenterGraph.emit();
     this.graphDataService.updateGraphData.emit();
   }
 

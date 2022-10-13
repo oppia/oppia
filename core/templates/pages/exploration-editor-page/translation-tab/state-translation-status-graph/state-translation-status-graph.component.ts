@@ -23,6 +23,7 @@ import { StateRecordedVoiceoversService } from 'components/state-editor/state-ed
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 import { TranslationStatusService } from '../services/translation-status.service';
 
 @Component({
@@ -36,6 +37,7 @@ export class StateTranslationStatusGraphComponent {
     private explorationStatesService: ExplorationStatesService,
     private graphDataService: GraphDataService,
     private stateEditorService: StateEditorService,
+    private routerService: RouterService,
     private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private stateWrittenTranslationsService: StateWrittenTranslationsService,
     private translationStatusService: TranslationStatusService
@@ -67,6 +69,7 @@ export class StateTranslationStatusGraphComponent {
         stateData.writtenTranslations);
       this.stateEditorService.onRefreshStateTranslation.emit();
     }
+    this.routerService.onCenterGraph.emit();
   }
 }
 
