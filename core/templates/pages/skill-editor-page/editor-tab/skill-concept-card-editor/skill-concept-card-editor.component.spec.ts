@@ -317,18 +317,62 @@ describe('Skill Concept Card Editor Component', () => {
     expect(result).toBe('Worked Example');
   });
 
-  it('should check if window is narrow when user resizes window', () => {
+  // it('should check if window is narrow when user resizes window', () => {
+  //   spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+  //   spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+  //     mockEventEmitter);
+
+  //   expect(component.workedExamplesListIsShown).toBeFalse();
+
+  //   component.windowIsNarrow = true;
+
+  //   component.ngOnInit();
+  //   mockEventEmitter.emit();
+
+  //   expect(component.windowIsNarrow).toBeFalse();
+  // });
+  it('should check if the worked examples list is shown when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockEventEmitter);
+          mockEventEmitter);
 
-    expect(component.workedExamplesListIsShown).toBeFalse();
+    component.windowIsNarrow = true;
+          
+    component.ngOnInit();
+    mockEventEmitter.emit();
+    
+    expect(component.workedExamplesListIsShown).toBe(true);
+
+    // expect(component.windowIsNarrow).toBe(false);
+  });
+
+  it('should check if the worked examples list is not shown when the window is narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+          mockEventEmitter);
+
+    expect(component.workedExamplesListIsShown).toBe(false);
+    
+    component.windowIsNarrow = true;
+          
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.windowIsNarrow).toBe(false);
+  });
+
+  it('should check if the worked examples list is shown when the window is not narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    // spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+    //       mockEventEmitter);
 
     component.windowIsNarrow = true;
 
     component.ngOnInit();
     mockEventEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.workedExamplesListIsShown).toBe(true);
+
+    expect(component.windowIsNarrow).toBe(false);
   });
 });
