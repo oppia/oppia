@@ -314,7 +314,7 @@ class LearnerGroupModel(base_models.BaseModel):
         cls, learner_user_id: str
     ) -> Sequence[LearnerGroupModel]:
         """Returns a list of all LearnerGroupModels that have the given
-        learner user id.
+        user id as a learner.
 
         Args:
             learner_user_id: str. The id of the learner.
@@ -335,8 +335,8 @@ class LearnerGroupModel(base_models.BaseModel):
     def get_by_invited_learner_user_id(
         cls, invited_learner_user_id: str
     ) -> Sequence[LearnerGroupModel]:
-        """Returns a list of all LearnerGroupModels that have the given
-        learner user id.
+        """Returns a list of all LearnerGroupModels that to which the given
+        user has been invited to join.
 
         Args:
             invited_learner_user_id: str. The id of the learner invited to
