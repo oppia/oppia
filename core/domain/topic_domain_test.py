@@ -1141,7 +1141,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_subtopic_schema_v3_to_v4(self) -> None:
         current_schema = 3
-        self.topic.thumbnail_size_in_bytes = '12345'
+        self.topic.thumbnail_size_in_bytes = 12345
         vers_subtopic_dict = TopicDomainUnitTests._schema_update_vers_dict(
             current_schema,
             self.topic
