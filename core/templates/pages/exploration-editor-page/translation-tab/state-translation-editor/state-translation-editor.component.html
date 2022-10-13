@@ -1,38 +1,38 @@
 <div class="oppia-translated-content-header">Translated content</div>
 <div class="oppia-state-translation-editor-section oppia-editor-card-section">
-  <div ng-if="!translationEditorIsOpen" class="clearfix">
-    <button class="btn oppia-translation-needs-update-button" ng-if="activeWrittenTranslation.needsUpdate">
+  <div *ngIf="!translationEditorIsOpen" class="clearfix">
+    <button class="btn oppia-translation-needs-update-button" *ngIf="activeWrittenTranslation && activeWrittenTranslation.needsUpdate">
       <i class="material-icons md-18"
-         uib-tooltip="Translation needs update"
-         tooltip-placement="top">warning
+         [ngbTooltip]="'Translation needs update'"
+         placement="top">warning
       </i>
     </button>
     <div class="e2e-test-edit-translation"
-         ng-class="{'oppia-editable-section': isEditable()}"
-         ng-click="openTranslationEditor()">
-      <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon"
+         [ngClass]="{'oppia-editable-section': isEditable()}"
+         (click)="openTranslationEditor()">
+      <i *ngIf="isEditable()" class="material-icons oppia-editor-edit-icon"
          title="Edit translation">&#xE254;
       </i>
       <div class="oppia-translated-content-display oppia-transition-200"
-           ng-class="{'oppia-prevent-selection': isEditable()}"
+           [ngClass]="{'oppia-prevent-selection': isEditable()}"
            title="Translated Content">
-        <span class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.translation === ''">
-          This section has not been translated yet. <span ng-if="isEditable()">Click to add a translation!</span>
+        <span class="oppia-placeholder" *ngIf="!activeWrittenTranslation || activeWrittenTranslation.translation === ''">
+          This section has not been translated yet. <span *ngIf="isEditable()">Click to add a translation!</span>
         </span>
-        <span ng-if="activeWrittenTranslation">
-          <angular-html-bind ng-if="activeWrittenTranslation.isHtml()"
-                             html-data="activeWrittenTranslation.getTranslation()"
-                             class="oppia-rte-editor e2e-test-translation-display">
-          </angular-html-bind>
-          <p ng-if="activeWrittenTranslation.isUnicode()">
+        <span *ngIf="activeWrittenTranslation">
+          <oppia-rte-output-display *ngIf="activeWrittenTranslation.isHtml()"
+                                    [rteString]="activeWrittenTranslation.getTranslation()"
+                                    class="oppia-rte-editor e2e-test-translation-display">
+          </oppia-rte-output-display>
+          <p *ngIf="activeWrittenTranslation.isUnicode()">
             {{activeWrittenTranslation.getTranslation()}}
           </p>
-          <ul ng-if="activeWrittenTranslation.isSetOfStrings()">
-            <li ng-repeat="item in activeWrittenTranslation.translation track by $index">
+          <ul *ngIf="activeWrittenTranslation.isSetOfStrings()">
+            <li *ngFor="let item of activeWrittenTranslation.translation; index as index">
               {{item}}
             </li>
           </ul>
-          <p ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
+          <p *ngIf="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
             <strong>ERROR:</strong> Unsupported translation data format.
           </p>
         </span>
@@ -41,49 +41,47 @@
       <div class="oppia-translation-editable-mask oppia-editable-section-mask">
       </div>
     </div>
-    <button ng-if="activeWrittenTranslation.needsUpdate === false"
+    <button *ngIf="activeWrittenTranslation && (activeWrittenTranslation.needsUpdate === false)"
             type="button"
             class="btn btn-secondary mt-4 float-right"
-            ng-click="markAsNeedingUpdate()">
+            (click)="markAsNeedingUpdate()">
       Mark translation as needing update
     </button>
   </div>
 
-  <div ng-if="translationEditorIsOpen" class="e2e-test-state-translation-editor">
-    <div ng-if="activeWrittenTranslation.isHtml()">
+  <div *ngIf="translationEditorIsOpen" class="e2e-test-state-translation-editor">
+    <div *ngIf="activeWrittenTranslation.isHtml()">
       <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
       <schema-based-editor [schema]="HTML_SCHEMA"
-                           ng-model="activeWrittenTranslation.translation"
-                           ng-model-change="$applyAsync()">
+                           [(ngModel)]="activeWrittenTranslation.translation">
       </schema-based-editor>
     </div>
-    <div ng-if="activeWrittenTranslation.isUnicode()">
+    <div *ngIf="activeWrittenTranslation.isUnicode()">
       <schema-based-editor [schema]="UNICODE_SCHEMA"
-                           ng-model="activeWrittenTranslation.translation"
-                           ng-model-change="$applyAsync()">
+                           [(ngModel)]="activeWrittenTranslation.translation">
       </schema-based-editor>
     </div>
-    <div ng-if="activeWrittenTranslation.isSetOfStrings()">
+    <div *ngIf="activeWrittenTranslation.isSetOfStrings()">
       <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
-                           ng-model="activeWrittenTranslation.translation"
-                           ng-model-change="$applyAsync()">
+                           [(ngModel)]="activeWrittenTranslation.translation">
       </schema-based-editor>
     </div>
-    <div ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
+    <div *ngIf="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
       <strong>ERROR:</strong> Unsupported translation data format.
     </div>
 
     <div class="oppia-save-item-button-container">
       <button type="button"
               class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-translation"
-              ng-click="onSaveTranslationButtonClicked()">
+              (click)="onSaveTranslationButtonClicked()">
         Save
       </button>
-      <button type="button" class="btn btn-secondary float-right" ng-click="cancelEdit()">Cancel</button>
+      <button type="button" class="btn btn-secondary float-right" (click)="cancelEdit()">Cancel</button>
       <div class="oppia-clear"></div>
     </div>
   </div>
 </div>
+
 <style>
   .oppia-translated-content-header {
     background: #ccc;
