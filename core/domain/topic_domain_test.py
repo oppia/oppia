@@ -1179,7 +1179,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                     schema_version
                 )
 
-    def test_valid_topic_id(self) -> None:
+    def test_is_valid_topic_id(self) -> None:
         """This test is needed for complete branch coverage.
         We need to go from the if statement and directly exit
         the method.
@@ -1191,7 +1191,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.fail('This test should pass and not raise an exception')
 
     def test_invalid_topic_id(self) -> None:
-        topic_id='a'
+        topic_id = 'a'
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Topic id %s is invalid' % topic_id
@@ -1199,6 +1199,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
     def _setup_stories(self, topic: topic_domain.Topic) -> None:
+        """This setups up stories for various story tests."""
         topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id'),
@@ -1275,8 +1276,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.validate()
 
     def test_validate_no_story_references(self) -> None:
-        """
-        This is needed for branch coverage when there are no
+        """This is needed for branch coverage when there are no
         story references and validate is run on a topic.
         """
         self.topic.canonical_story_references = []
@@ -1285,7 +1285,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.validate()
         except Exception:
             self.fail('There are no story references for topic')
-     
+
     def test_unpublish_story_not_exist(self) -> None:
         topic = self.topic
         self._setup_stories(topic)
