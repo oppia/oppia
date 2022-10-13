@@ -159,3 +159,17 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
     });
   };
 }
+
+// Object.entries() polyfill for Chrome 53 and below.
+if (!Object.entries) {
+  Object.entries = (obj: Object) => {
+    let objectProperties = Object.keys(obj);
+    let i = objectProperties.length;
+    let objectEntriesArray = new Array(i); // Preallocate the array.
+
+    while (i--) {
+      objectEntriesArray[i] = [objectProperties[i], obj[objectProperties[i]]];
+      return objectEntriesArray;
+    }
+  };
+}
