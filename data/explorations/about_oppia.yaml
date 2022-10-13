@@ -16,7 +16,7 @@ states:
     content:
       content_id: content
       html: "<p>Oppia.org is a hosted version of the Oppia codebase:\xC2\_</p><p><oppia-noninteractive-link\
-        \ text-with-value=\"&amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia/&amp;quot;\"\
+        \ text-with-value=\"&amp;quot;codebase&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia/&amp;quot;\"\
         ></oppia-noninteractive-link></p><p>\_</p><p>This site is maintained by a\
         \ group of volunteers in their spare time. If you want to help, let us know!\
         \ You can email the site admins at admin@oppia.org.</p><p>\_</p><p>Much of\
@@ -127,16 +127,16 @@ states:
       content_id: content
       html: "<p>If you have a question relating to this site, you can get in touch\
         \ by posting to our forum:</p><p><oppia-noninteractive-link text-with-value=\"\
-        &amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/forum&amp;quot;\"\
+        &amp;quot;forum link&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/forum&amp;quot;\"\
         ></oppia-noninteractive-link><br></p><p>\_</p><p>You can also follow our blog\
         \ to get the latest updates:</p><p><oppia-noninteractive-link text-with-value=\"\
-        &amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://medium.com/oppia-org&amp;quot;\"\
+        &amp;quot;updates&amp;quot;\" url-with-value=\"&amp;quot;https://medium.com/oppia-org&amp;quot;\"\
         ></oppia-noninteractive-link><br></p><p>\_</p><p>If you find a bug or have\
         \ a feature request, please create an issue on the Oppia bug tracker:</p><p><oppia-noninteractive-link\
-        \ text-with-value=\"&amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia/issues/new&amp;quot;\"\
+        \ text-with-value=\"&amp;quot;bug tracker&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia/issues/new&amp;quot;\"\
         ></oppia-noninteractive-link><br></p><p>\_</p><p>You can also get in touch\
         \ with the developers of the open-source Oppia codebase via the developers'\
-        \ forum:</p><p><oppia-noninteractive-link text-with-value=\"&amp;quot;&amp;quot;\"\
+        \ forum:</p><p><oppia-noninteractive-link text-with-value=\"&amp;quot;developers forum&amp;quot;\"\
         \ url-with-value=\"&amp;quot;https://groups.google.com/forum/#!forum/oppia-dev&amp;quot;\"\
         ></oppia-noninteractive-link><br></p><p>\_</p><p>If you need to contact the\
         \ admins privately, you can email them at admin@oppia.org.</p>"
@@ -243,18 +243,18 @@ states:
         \ contribute by being an active member of the Oppia community. This includes\
         \ posting on our forum, giving feedback to the site, and giving feedback to\
         \ exploration authors. You can take a look at our Community Guidelines here:</p><p><oppia-noninteractive-link\
-        \ text-with-value=\"&amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#community&amp;quot;\"\
+        \ text-with-value=\"&amp;quot;guidelines&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#community&amp;quot;\"\
         ></oppia-noninteractive-link><br></p><p>\_</p><p>Second, you can contribute\
         \ by creating content. This includes creating and publishing explorations.\
         \ Making explorations is fun and easy, you can try it for yourself by going\
         \ back to my home page and clicking 'Create Exploration'. You can take a look\
         \ at the Publishing Criteria here:</p><p><oppia-noninteractive-link text-with-value=\"\
-        &amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#publish-criteria&amp;quot;\"\
+        &amp;quot;publishing criteria&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#publish-criteria&amp;quot;\"\
         ></oppia-noninteractive-link><br></p><p>\_</p><p>Finally, you can contribute\
         \ directly to the open source platform. We are always in need of designers,\
         \ programmers, marketers, and everyone in-between. Visit the code site to\
         \ find out more about how you can contribute:</p><p><oppia-noninteractive-link\
-        \ text-with-value=\"&amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia&amp;quot;\"\
+        \ text-with-value=\"&amp;quot;How to contribute?&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia&amp;quot;\"\
         ></oppia-noninteractive-link><br></p>"
     interaction:
       answer_groups: []
@@ -295,7 +295,7 @@ states:
       content_id: content
       html: "<p>The open-source codebase has been contributed to by many people. You\
         \ can see a full list of contributors on our Credits page:</p><p><oppia-noninteractive-link\
-        \ text-with-value=\"&amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#credits&amp;quot;\"\
+        \ text-with-value=\"&amp;quot;Lst of contributors&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#credits&amp;quot;\"\
         ></oppia-noninteractive-link><br></p><p>\xC2\_</p><p>We have lots of plans\
         \ for the future! If you'd like to help, you'd be very welcome, and we'd be\
         \ delighted to help you get started. Feel free to reach out to us at the oppia-dev\
@@ -656,7 +656,7 @@ states:
       content_id: content
       html: <p>Yes, all the content on this website can be used freely under the Creative
         Commons 2.0 License. You can learn more about the License here:</p><p><oppia-noninteractive-link
-        text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;"></oppia-noninteractive-link><br></p>
+        text-with-value="&amp;quot;License&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;"></oppia-noninteractive-link><br></p>
     interaction:
       answer_groups:
       - outcome:

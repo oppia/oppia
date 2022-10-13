@@ -283,12 +283,13 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+            'mp;quot;+,-,-,+&amp;quot;" svg_filename-with-value="&a'
+            'mp;quot;abc.svg&amp;quot;"></oppia-noninteractive-math>')
         expected_html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>')
         written_translations_dict = {
             'translations_mapping': {
                 'content1': {

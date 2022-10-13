@@ -195,7 +195,7 @@ states:
         choices:
           value:
           - content_id: ca_choices_2
-            html: "<oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
+            html: "<oppia-noninteractive-image alt-with-value=\"&amp;quot;image&amp;quot;\"\
               \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
               &amp;quot;A_height_24_width_24.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
               </p>"

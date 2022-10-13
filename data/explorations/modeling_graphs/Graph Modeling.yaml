@@ -590,7 +590,7 @@ states:
         \ it isn't: in simple terms, graphs are just dots joined by lines! The dots\
         \ are called \"vertices\" and the lines are called \"edges\". An example of\
         \ a graph is shown below:</p><p>\_</p><oppia-noninteractive-image alt-with-value=\"\
-        &amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
+        &amp;quot;image&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
         &amp;quot;Asimplegraph_height_100_width_112.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
         </p><p>\_</p><p>Despite this simplicity, graphs are useful for modeling all\
         \ kinds of real world behavior. Not convinced? Let's take a look at some things\
