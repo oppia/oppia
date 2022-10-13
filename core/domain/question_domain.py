@@ -1859,7 +1859,13 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        self.question_state_data.validate({}, False)
+        # Here the variable `tagged_skill_misconception_id_required`
+        # represents that the tagged skill misconception id field is
+        # required for it.
+        self.question_state_data.validate(
+            {},
+            False,
+            tagged_skill_misconception_id_required=True)
         self.validate_translatable_contents(self.next_content_id_index)
 
     def validate(self) -> None:

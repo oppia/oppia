@@ -1595,15 +1595,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_CREATE_NEW
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
-        html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
-        expected_html_content = (
+        html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;image.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>')
 
         written_translations_dict: (
             translation_domain.WrittenTranslationsDict
@@ -1612,7 +1609,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 'content1': {
                     'en': {
                         'data_format': 'html',
-                        'translation': '',
+                        'translation': html_content,
                         'needs_update': True
                     },
                     'hi': {
@@ -1623,47 +1620,21 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 }
             }
         }
-        written_translations_dict_math = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': expected_html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-        worked_example_dict: skill_domain.WorkedExampleDict = {
+        worked_example_dict_math: skill_domain.WorkedExampleDict = {
             'question': {
                 'content_id': 'question1',
-                'html': ''
+                'html': html_content
             },
             'explanation': {
                 'content_id': 'explanation1',
-                'html': ''
-            }
-        }
-        worked_example_dict_math = {
-            'question': {
-                'content_id': 'question1',
-                'html': expected_html_content
-            },
-            'explanation': {
-                'content_id': 'explanation1',
-                'html': expected_html_content
+                'html': html_content
             }
         }
 
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, ''),
-            [skill_domain.WorkedExample.from_dict(worked_example_dict)],
+            [skill_domain.WorkedExample.from_dict(worked_example_dict_math)],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
@@ -1706,8 +1677,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(skill.skill_contents_schema_version, 4)
 
         self.assertEqual(
-            skill.skill_contents.explanation.html,
-            expected_html_content)
+            skill.skill_contents.explanation.html, html_content)
         self.assertEqual(
             skill.skill_contents.written_translations.to_dict(),
             written_translations_dict_math)
@@ -1720,15 +1690,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_CREATE_NEW
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
-        html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
-        expected_html_content = (
+        html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;image.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>')
 
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
@@ -1773,9 +1740,9 @@ class SkillMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(skill.misconceptions_schema_version, 5)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
-        self.assertEqual(skill.misconceptions[0].notes, expected_html_content)
+        self.assertEqual(skill.misconceptions[0].notes, html_content)
         self.assertEqual(
-            skill.misconceptions[0].feedback, expected_html_content)
+            skill.misconceptions[0].feedback, html_content)
 
     def test_migrate_rubrics_to_latest_schema(self) -> None:
         commit_cmd = skill_domain.SkillChange({
@@ -1783,13 +1750,10 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
-        expected_html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;image.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>')
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
@@ -1844,4 +1808,4 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(skill.rubrics[2].difficulty, 'Hard')
         self.assertEqual(
             skill.rubrics[2].explanations,
-            ['Hard explanation', expected_html_content])
+            ['Hard explanation', html_content])
