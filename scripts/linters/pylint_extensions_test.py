@@ -1787,7 +1787,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='missing-param-doc',
                 node=missing_param_func_node,
-                args=('args, kwargs',),
+                args=('**kwargs, *args',),
             ),
         ):
             self.checker_test_object.checker.visit_functiondef(
