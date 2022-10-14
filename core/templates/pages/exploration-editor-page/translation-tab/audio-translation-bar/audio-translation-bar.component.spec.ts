@@ -65,7 +65,7 @@ describe('Audio translation bar Component', () => {
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService:
-    TranslationTabActiveContentIdService;
+     TranslationTabActiveContentIdService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let userService: UserService;
   let voiceoverRecordingService: VoiceoverRecordingService;
@@ -77,7 +77,7 @@ describe('Audio translation bar Component', () => {
   let mockActiveContentIdChangedEventEmitter = new EventEmitter();
   let mockActiveLanguageChangedEventEmitter = new EventEmitter();
   let mockShowTranslationTabBusyModalEventEmitter = new EventEmitter();
-  let modalSpy = null;
+  let modalSpy;
   var mainBodyDivMock = null;
   var translationTabDivMock = null;
   var dropAreaMessageDivMock = null;

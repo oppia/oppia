@@ -172,7 +172,7 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
     StateTranslationComponent,
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
-    TranslationTabComponent
+    TranslationTabComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -231,7 +231,7 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
     StateTranslationComponent,
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
-    TranslationTabComponent
+    TranslationTabComponent,
   ],
   providers: [
     {
