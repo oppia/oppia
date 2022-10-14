@@ -119,14 +119,14 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(SystemExit, '1'):
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.STRICT_TSCONFIG_FILEPATH)
-    
+
     def test_error_is_raised_for_invalid_compilation_of_temp_strict_tsconfig(
             self) -> None:
         """Test that error is produced if stdout is not empty."""
         class MockOuput:
             def __init__(self, call_counter: int = 0) -> None:
                 self.call_counter = call_counter
-            def readline(self) -> str:
+            def readline(self) -> str: # pylint: disable=missing-docstring
                 self.call_counter = self.call_counter + 1
                 if self.call_counter == 1:
                     return 'core/templates/App.ts'
@@ -134,12 +134,12 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     return 'core/new_directory/new_file.ts'
                 else:
                     return ''
-        
+
         class MockProcess:
             stdout = MockOuput()
         def mock_popen_for_errors(
             unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
+        ) -> MockProcess:  # pylint: disable=unsubscriptable-object
             return MockProcess()
 
         swap_path_exists = self.swap(os.path, 'exists', lambda _: False)
