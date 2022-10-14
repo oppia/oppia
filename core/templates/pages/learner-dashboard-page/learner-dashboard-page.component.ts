@@ -49,6 +49,7 @@ import { PageTitleService } from 'services/page-title.service';
 
 import './learner-dashboard-page.component.css';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
 
 
 @Component({
@@ -153,6 +154,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
+  learnerGroupsImageUrl: string = '';
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
@@ -173,7 +175,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private translateService: TranslateService,
     private pageTitleService: PageTitleService,
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
@@ -196,6 +199,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       '/learner_dashboard/todolist.svg');
     this.progressImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/progress.svg');
+    this.learnerGroupsImageUrl = this.getStaticImageUrl(
+      '/learner_dashboard/learner-groups.svg');
 
     let dashboardTopicAndStoriesDataPromise = (
       this.learnerDashboardBackendApiService
@@ -223,6 +228,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           LearnerDashboardPageConstants
             .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY
         );
+        if (this.urlService.getUrlParams().active_tab === 'learner-groups') {
+          this.activeSection = LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS;
+        }
       }, errorResponseStatus => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {

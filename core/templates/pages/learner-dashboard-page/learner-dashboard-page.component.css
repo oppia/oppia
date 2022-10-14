@@ -41,7 +41,7 @@
 }
 
 oppia-learner-dashboard-page .home-button,
-oppia-learner-dashboard-page.goals-button {
+oppia-learner-dashboard-page .goals-button {
   left: 10px;
   position: relative;
 }
@@ -81,6 +81,7 @@ oppia-learner-dashboard-page .oppia-buttons {
 oppia-learner-dashboard-page .oppia-svg-image {
   display: block;
   height: 48px;
+  margin: auto;
   width: 64px;
 }
 
@@ -341,6 +342,23 @@ oppia-learner-dashboard-page .oppia-feedback-message-spacing {
 
   .oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
     margin-left: 15px;
+  }
+
+  oppia-learner-dashboard-page .oppia-svg-image {
+    height: 35px;
+    width: 44px;
+  }
+
+  oppia-learner-dashboard-page .home-button,
+  oppia-learner-dashboard-page .goals-button {
+    left: 3px;
+  }
+
+  oppia-learner-dashboard-page .home-button,
+  oppia-learner-dashboard-page .goals-button,
+  oppia-learner-dashboard-page .progress-button,
+  oppia-learner-dashboard-page .learner-groups-button {
+    font-size: 14px;
   }
 }
 

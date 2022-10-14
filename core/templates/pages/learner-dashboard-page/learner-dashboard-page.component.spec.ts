@@ -55,6 +55,7 @@ import { NonExistentExplorations } from 'domain/learner_dashboard/non-existent-e
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -119,6 +120,7 @@ describe('Learner dashboard page', () => {
   let translateService: TranslateService = null;
   let pageTitleService: PageTitleService = null;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
+  let urlService: UrlService;
 
   let profilePictureDataUrl = 'profile-picture-url';
 
@@ -387,6 +389,7 @@ describe('Learner dashboard page', () => {
       userService = TestBed.inject(UserService);
       translateService = TestBed.inject(TranslateService);
       pageTitleService = TestBed.inject(PageTitleService);
+      urlService = TestBed.inject(UrlService);
       learnerGroupBackendApiService = TestBed.inject(
         LearnerGroupBackendApiService);
 
@@ -514,6 +517,10 @@ describe('Learner dashboard page', () => {
 
       spyOn(learnerGroupBackendApiService, 'isLearnerGroupFeatureEnabledAsync')
         .and.returnValue(Promise.resolve(true));
+
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        active_tab: 'learner_groups',
+      });
 
       component.ngOnInit();
       flush();

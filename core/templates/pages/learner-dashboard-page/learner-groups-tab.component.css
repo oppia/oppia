@@ -135,16 +135,6 @@
   justify-content: center;
 }
 
-.learner-groups-tab .oppia-learner-groups-feature-info-desc {
-  color: #00645c;
-  display: grid;
-  flex-basis: 33%;
-  font-size: 14px;
-  grid-gap: 20px;
-  justify-items: center;
-  margin: 0;
-}
-
 .learner-groups-tab .learner-group-decline-invitation-button {
   background: #a53417;
   color: #fff;

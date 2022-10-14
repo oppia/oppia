@@ -19,7 +19,7 @@
 }
 
 .oppia-view-learner-group .learner-group-card-container {
-  background: rgba(174, 210, 233, 0.4);
+  background: #e5eef4;
 }
 
 .oppia-view-learner-group .group-info-container {
@@ -34,7 +34,7 @@
 
 .oppia-view-learner-group .group-cta-buttons-container {
   display: grid;
-  grid-gap: 5px;
+  grid-gap: 15px;
 }
 
 .oppia-view-learner-group .group-cta-buttons-container .btn-primary {
@@ -47,9 +47,9 @@
 
 .oppia-view-learner-group .group-cta-buttons-container .btn-danger {
   background: transparent;
-  border: 1px solid #be563c;
+  border: 1px solid #c30000;
   border-radius: 4px;
-  color: #be563c;
+  color: #c30000;
   padding: 8px 20px;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .oppia-view-learner-group .group-info-title {
-  color: #00645c;
+  color: #27635c;
   font-size: 24px;
 }
 
@@ -79,8 +79,8 @@
 }
 
 .oppia-view-learner-group .oppia-dashboard-view-tabs-item.active {
-  border-bottom: 3px solid #33978f;
-  color: #015952;
+  border-bottom: 3px solid #27635c;
+  color: #27635c;
 }
 
 .oppia-view-learner-group .learner-group-overview-summary-card {
@@ -92,7 +92,7 @@
 }
 
 .oppia-view-learner-group .learner-group-overview-summary-card-title {
-  color: #00645c;
+  color: #27635c;
   font-size: 18px;
 }
 
@@ -103,12 +103,12 @@
 
 .oppia-view-learner-group .learner-group-overview-summary-card-content .stories-count,
 .oppia-view-learner-group .learner-group-overview-summary-card-content .skills-count {
-  color: #00645c;
+  color: #27635c;
 }
 
 .oppia-view-learner-group .learner-group-overview-summary-card .assigned-stories-info,
 .oppia-view-learner-group .learner-group-overview-summary-card .assigned-skills-info {
-  border: solid 1px #00645c;
+  border: solid 1px #27635c;
   border-radius: 4px;
   font-size: 16px;
   padding: 10px 30px;

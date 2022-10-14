@@ -271,7 +271,8 @@ describe('ViewLearnerGroupPageComponent', () => {
     component.exitLearnerGroup();
     tick(100);
 
-    expect(windowRef.nativeWindow.location.href).toBe('/learner-dashboard');
+    expect(windowRef.nativeWindow.location.href).toBe(
+      '/learner-dashboard?active_tab=learner-groups');
     expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
       'Exiting Group');
   }));

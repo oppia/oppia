@@ -167,7 +167,8 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
         this.learnerGroupBackendApiService.exitLearnerGroupAsync(
           this.learnerGroup.id, this.username
         ).then(() => {
-          this.windowRef.nativeWindow.location.href = '/learner-dashboard';
+          this.windowRef.nativeWindow.location.href = (
+            '/learner-dashboard?active_tab=learner-groups');
         });
       }
     }, () => {
