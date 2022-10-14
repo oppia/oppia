@@ -18,12 +18,16 @@
 
 from __future__ import annotations
 
+import re
+
 from core import feconf
 from core import utils
 from core.domain import translation_domain
 from core.tests import test_utils
 
 from typing import Optional
+
+from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 
 class DummyTranslatableObjectWithTwoParams(
@@ -404,3 +408,301 @@ class MachineTranslationTests(test_utils.GenericTestBase):
                 'translated_text': 'hola mundo'
             }
         )
+
+
+class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
+    """Test methods operating on written transcripts."""
+
+    def test_data_formats_are_correct_and_complete(self) -> None:
+        translatable_class_names_in_data_formats = sorted(
+            translation_domain.WrittenTranslation.
+            DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values())
+        self.assertEqual(
+            translatable_class_names_in_data_formats,
+            translatable_object_registry.Registry.get_all_class_names())
+
+    def test_from_and_to_dict_works_correctly(self) -> None:
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Hey!',
+                        'needs_update': False
+                    },
+                    'fr': {
+                        'data_format': 'set_of_normalized_string',
+                        'translation': ['test1', 'test2'],
+                        'needs_update': False
+                    },
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    },
+                    'fr': {
+                        'data_format': 'set_of_normalized_string',
+                        'translation': ['test1', 'test2'],
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        self.assertEqual(
+            written_translations.to_dict(), written_translations_dict)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
+        self
+    ) -> None:
+        written_translations = (
+            translation_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {}
+        }))
+        invalid_content_id = 123
+        with self.assertRaisesRegex(
+            Exception, 'Expected content_id to be a string, received 123'):
+            written_translations.add_content_id_for_translation(
+                invalid_content_id)  # type: ignore[arg-type]
+
+    def test_add_content_id_for_translation_with_existing_content_id_raise_error( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
+            'translations_mapping': {
+                'feedback_1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        existing_content_id = 'feedback_1'
+        with self.assertRaisesRegex(
+            Exception, 'The content_id feedback_1 already exist.'):
+            written_translations.add_content_id_for_translation(
+                existing_content_id)
+
+    def test_delete_content_id_for_translations_deletes_content_id(
+        self
+    ) -> None:
+        old_written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            old_written_translations_dict)
+        self.assertEqual(
+            len(written_translations.translations_mapping.keys()), 1)
+
+        written_translations.delete_content_id_for_translation('content')
+
+        self.assertEqual(
+            len(written_translations.translations_mapping.keys()), 0)
+
+    def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
+            'translations_mapping': {
+                'content': {}
+            }
+        }
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        nonexisting_content_id_to_delete = 'feedback_1'
+        with self.assertRaisesRegex(
+            Exception, 'The content_id feedback_1 does not exist.'):
+            written_translations.delete_content_id_for_translation(
+                nonexisting_content_id_to_delete)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        written_translations = (
+            translation_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {}
+        }))
+        invalid_content_id_to_delete = 123
+        with self.assertRaisesRegex(
+            Exception, 'Expected content_id to be a string, '):
+            written_translations.delete_content_id_for_translation(
+                invalid_content_id_to_delete)  # type: ignore[arg-type]
+
+    def test_validation_with_invalid_content_id_raise_error(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
+            'translations_mapping': {
+                123: {}  # type: ignore[dict-item]
+            }
+        }
+
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            Exception, 'Expected content_id to be a string, '):
+            written_translations.validate([123])  # type: ignore[list-item]
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_dict_language_code_to_written_translation(
+        self
+    ) -> None:
+        written_translations = translation_domain.WrittenTranslations({
+            'en': []  # type: ignore[dict-item]
+        })
+
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape('Expected content_id value to be a dict, received []')):
+            written_translations.validate(None)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validation_with_invalid_type_language_code_raise_error(
+        self
+    ) -> None:
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
+            'translations_mapping': {
+                'content': {
+                    123: {  # type: ignore[dict-item]
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        with self.assertRaisesRegex(
+            Exception, 'Expected language_code to be a string, '):
+            written_translations.validate(['content'])
+
+    def test_validation_with_unknown_language_code_raise_error(self) -> None:
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
+            'translations_mapping': {
+                'content': {
+                    'ed': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        with self.assertRaisesRegex(Exception, 'Invalid language_code: ed'):
+            written_translations.validate(['content'])
+
+    def test_validation_with_invalid_content_id_list(self) -> None:
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
+                'Expected state written_translations to match the listed '
+                'content ids [\'invalid_content\']')):
+            written_translations.validate(['invalid_content'])
+
+    def test_written_translation_validation(self) -> None:
+        """Test validation of translation script."""
+        written_translation = translation_domain.WrittenTranslation(
+            'html', 'Test.', True)
+        written_translation.validate()
+
+        with self.assertRaisesRegex(
+            AssertionError, 'Expected unicode HTML string, received 30'):
+            with self.swap(written_translation, 'translation', 30):
+                written_translation.validate()
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected needs_update to be a bool'
+        ):
+            with self.swap(written_translation, 'needs_update', 20):
+                written_translation.validate()
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid data_format'
+        ):
+            with self.swap(written_translation, 'data_format', 'int'):
+                written_translation.validate()
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid data_format'
+        ):
+            with self.swap(written_translation, 'data_format', 2):
+                written_translation.validate()

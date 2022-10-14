@@ -24,9 +24,10 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import Callable, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 from typing_extensions import Final, TypedDict
 
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 
@@ -346,9 +347,13 @@ class BaseTranslatableObject:
         content_id_to_translatable_content = {}
 
         for translatable_content in translatable_content_list:
-            # TODO(#6178): Remove empty html checks once we add a validation
-            # check that ensures each content should be non-empty html.
-            if translatable_content.content_value == '':
+            content_value = translatable_content.content_value
+            if translatable_content.content_format == (
+                TranslatableContentFormat.HTML
+            ):
+                content_value = html_cleaner.strip_html_tags(content_value)
+
+            if content_value == '' or content_value.isnumeric():
                 continue
 
             if (
@@ -960,76 +965,6 @@ class WrittenTranslations:
 
         return cls(translations_mapping)
 
-    def get_content_ids_that_are_correctly_translated(
-        self, language_code: str
-    ) -> List[str]:
-        """Returns a list of content ids in which a correct translation is
-        available in the given language.
-
-        Args:
-            language_code: str. The abbreviated code of the language.
-
-        Returns:
-            list(str). A list of content ids in which the translations are
-            available in the given language.
-        """
-        correctly_translated_content_ids = []
-        for content_id, translations in self.translations_mapping.items():
-            if (
-                language_code in translations and
-                not translations[language_code].needs_update
-            ):
-                correctly_translated_content_ids.append(content_id)
-
-        return correctly_translated_content_ids
-
-    def add_translation(
-        self,
-        content_id: str,
-        language_code: str,
-        html: str
-    ) -> None:
-        """Adds a translation for the given content id in a given language.
-
-        Args:
-            content_id: str. The id of the content.
-            language_code: str. The language code of the translated html.
-            html: str. The translated html.
-        """
-        written_translation = WrittenTranslation(
-            WrittenTranslation.DATA_FORMAT_HTML, html, False)
-        self.translations_mapping[content_id][language_code] = (
-            written_translation)
-
-    def mark_written_translation_as_needing_update(
-        self, content_id: str, language_code: str
-    ) -> None:
-        """Marks translation as needing update for the given content id and
-        language code.
-
-        Args:
-            content_id: str. The id of the content.
-            language_code: str. The language code.
-        """
-        self.translations_mapping[content_id][language_code].needs_update = (
-            True
-        )
-
-    def mark_written_translations_as_needing_update(
-        self, content_id: str
-    ) -> None:
-        """Marks translation as needing update for the given content id in all
-        languages.
-
-        Args:
-            content_id: str. The id of the content.
-        """
-        for (language_code, written_translation) in (
-                self.translations_mapping[content_id].items()):
-            written_translation.needs_update = True
-            self.translations_mapping[content_id][language_code] = (
-                written_translation)
-
     def validate(self, expected_content_id_list: Optional[List[str]]) -> None:
         """Validates properties of the WrittenTranslations.
 
@@ -1078,46 +1013,6 @@ class WrittenTranslations:
 
                 written_translation.validate()
 
-    def get_content_ids_for_text_translation(self) -> List[str]:
-        """Returns a list of content_id available for text translation.
-
-        Returns:
-            list(str). A list of content id available for text translation.
-        """
-        return list(sorted(self.translations_mapping.keys()))
-
-    def get_translated_content(
-        self, content_id: str, language_code: str
-    ) -> str:
-        """Returns the translated content for the given content_id in the given
-        language.
-
-        Args:
-            content_id: str. The ID of the content.
-            language_code: str. The language code for the translated content.
-
-        Returns:
-            str. The translated content for a given content id in a language.
-
-        Raises:
-            Exception. Translation doesn't exist in the given language.
-            Exception. The given content id doesn't exist.
-        """
-        if content_id in self.translations_mapping:
-            if language_code in self.translations_mapping[content_id]:
-                translation = self.translations_mapping[
-                    content_id][language_code].translation
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
-                assert isinstance(translation, str)
-                return translation
-            else:
-                raise Exception(
-                    'Translation for the given content_id %s does not exist in '
-                    '%s language code' % (content_id, language_code))
-        else:
-            raise Exception('Invalid content_id: %s' % content_id)
-
     def add_content_id_for_translation(self, content_id: str) -> None:
         """Adds a content id as a key for the translation into the
         content_translation dict.
@@ -1154,82 +1049,6 @@ class WrittenTranslations:
                 'The content_id %s does not exist.' % content_id)
 
         self.translations_mapping.pop(content_id, None)
-
-    def get_all_html_content_strings(self) -> List[str]:
-        """Gets all html content strings used in the WrittenTranslations.
-
-        Returns:
-            list(str). The list of html content strings.
-        """
-        html_string_list = []
-        for translations in self.translations_mapping.values():
-            for written_translation in translations.values():
-                if (written_translation.data_format ==
-                        WrittenTranslation.DATA_FORMAT_HTML):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(written_translation.translation, str)
-                    html_string_list.append(written_translation.translation)
-        return html_string_list
-
-    @staticmethod
-    def convert_html_in_written_translations(
-        written_translations_dict: WrittenTranslationsDict,
-        conversion_fn: Callable[[str], str]
-    ) -> WrittenTranslationsDict:
-        """Checks for HTML fields in the written translations and converts it
-        according to the conversion function.
-
-        Args:
-            written_translations_dict: dict. The written translations dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-
-        Returns:
-            dict. The converted written translations dict.
-        """
-        for content_id, language_code_to_written_translation in (
-                written_translations_dict['translations_mapping'].items()):
-            for language_code in (
-                    language_code_to_written_translation.keys()):
-                translation_dict = written_translations_dict[
-                    'translations_mapping'][content_id][language_code]
-                if 'data_format' in translation_dict:
-                    if (translation_dict['data_format'] ==
-                            WrittenTranslation.DATA_FORMAT_HTML):
-                        translation = written_translations_dict[
-                                'translations_mapping'
-                            ][content_id][language_code]['translation']
-                        # Ruling out the possibility of any other type for mypy
-                        # type checking.
-                        assert isinstance(translation, str)
-                        written_translations_dict['translations_mapping'][
-                            content_id][language_code]['translation'] = (
-                                conversion_fn(translation)
-                            )
-                elif 'html' in translation_dict:
-                    # TODO(#11950): Delete this once old schema migration
-                    # functions are deleted.
-                    # This "elif" branch is needed because, in states schema
-                    # v33, this function is called but the dict is still in the
-                    # old format (that doesn't have a "data_format" key).
-                    # Here we use MyPy ignore because in convert functions,
-                    # we allow less strict typing because here we are working
-                    # with previous versions of the domain object and in
-                    # previous versions of the domain object there are some
-                    # fields that are discontinued in the latest domain object
-                    # (eg. html). So, while accessing these discontinued fields
-                    # MyPy throws an error. Thus to avoid the error, we used
-                    # ignore here.
-                    written_translations_dict['translations_mapping'][
-                        content_id][language_code]['html'] = (  # type: ignore[misc]
-                            # Here we use MyPy ignore because we want to avoid
-                            # the error that was generated by accessing a 'html'
-                            # key, because this 'html' key was deprecated from
-                            # the latest domain object.
-                            conversion_fn(translation_dict['html']))  # type: ignore[misc]
-
-        return written_translations_dict
 
 
 class ContentIdGenerator:

@@ -1338,10 +1338,6 @@ class Skill:
         """
         skill_contents_dict['explanation']['html'] = conversion_fn(
             skill_contents_dict['explanation']['html'])
-        skill_contents_dict['written_translations'] = (
-            translation_domain.WrittenTranslations.
-            convert_html_in_written_translations(
-                skill_contents_dict['written_translations'], conversion_fn))
 
         for value_index, value in enumerate(
                 skill_contents_dict['worked_examples']):

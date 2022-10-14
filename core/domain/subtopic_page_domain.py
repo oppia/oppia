@@ -357,11 +357,6 @@ class SubtopicPage:
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        subtopic_page_contents_dict['written_translations'] = (
-            translation_domain.WrittenTranslations.
-            convert_html_in_written_translations(
-                subtopic_page_contents_dict['written_translations'],
-                conversion_fn))
         subtopic_page_contents_dict['subtitled_html']['html'] = (
             conversion_fn(
                 subtopic_page_contents_dict['subtitled_html']['html']))
