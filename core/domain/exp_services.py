@@ -1882,6 +1882,19 @@ def validate_exploration_for_story(
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
 
+        if state.interaction.id == 'MultipleChoiceInput':
+            choices = (
+                state.interaction.customization_args['choices'].value)
+            error_string = (
+                'Exploration in a story having MultipleChoiceInput '
+                'interaction should have at least 4 choices present. '
+                'Exploration with ID %s and state name %s have fewer than '
+                '4 choices.' % (exp.id, state_name)
+            )
+            if len(choices) < 4 and strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
         if state.classifier_model_id is not None:
             error_string = (
                 'Explorations in a story are not expected to contain '

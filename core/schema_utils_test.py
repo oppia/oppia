@@ -127,7 +127,7 @@ UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
         'placeholder': {
             'type': SCHEMA_TYPE_UNICODE,
         },
-    },
+    }
 }
 
 # Schemas for validators for the various types.
@@ -183,7 +183,8 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
                 }],
             }
         },
-        'is_uniquified': {}
+        'is_uniquified': {},
+        'has_unique_subtitled_contents': {}
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {
@@ -219,6 +220,14 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
             }
         }
     },
+    SCHEMA_TYPE_CUSTOM: {
+        'has_subtitled_html_non_empty': {},
+        'has_expected_subtitled_content_length': {
+            'max_value': {
+                'type': SCHEMA_TYPE_INT
+            }
+        }
+    }
 }
 
 
@@ -360,7 +369,7 @@ def validate_schema(schema: Dict[str, Any]) -> None:
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [SCHEMA_KEY_REPLACEMENT_UI_CONFIG])
+            [SCHEMA_KEY_REPLACEMENT_UI_CONFIG, SCHEMA_KEY_VALIDATORS])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(
@@ -945,6 +954,52 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_username_string('admin'))
         self.assertFalse(is_valid_username_string('oppia'))
         self.assertFalse(is_valid_username_string(''))
+
+    def test_has_expected_subtitled_content_length(self) -> None:
+        """Checks whether the given subtitled content does not exceed the
+        given length.
+
+        Returns:
+            bool. A boolean value representing whether the content matches
+            the given max length.
+        """
+        has_expected_subtitled_content_length = (
+            schema_utils.get_validator('has_expected_subtitled_content_length'))
+
+        obj = {
+            'content_id': 'id',
+            'unicode_str': 'Continueeeeeeeeeeeeeeee'
+        }
+        self.assertFalse(has_expected_subtitled_content_length(obj, 20))
+
+        obj['unicode_str'] = 'Continue'
+        self.assertTrue(has_expected_subtitled_content_length(obj, 20))
+
+    def test_has_unique_subtitled_contents(self) -> None:
+        """Checks whether the subtitled html content has unique value or not.
+
+        Returns:
+            bool. A boolean value representing whether the content has unique
+            value.
+        """
+        has_unique_subtitled_contents = (
+            schema_utils.get_validator('has_unique_subtitled_contents')
+        )
+
+        obj_list = [
+            {
+                'content_id': 'id_1',
+                'html': '<p>1</p>'
+            },
+            {
+                'content_id': 'id_2',
+                'html': '<p>1</p>'
+            }
+        ]
+        self.assertFalse(has_unique_subtitled_contents(obj_list))
+
+        obj_list[1]['html'] = '<p>2</p>'
+        self.assertTrue(has_unique_subtitled_contents(obj_list))
 
     def test_has_length(self) -> None:
         """Tests if static method has_length returns true iff
