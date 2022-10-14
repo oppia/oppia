@@ -1224,7 +1224,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids()
         )
-        if interaction_id not in all_interaction_ids:
+        interaction_id_is_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_valid or interaction_id is None:
             return {}
 
         ca_specs_dict = (
@@ -4250,7 +4251,11 @@ class State(translation_domain.BaseTranslatableObject):
                 Hint.convert_html_in_hint(hint, conversion_fn))
 
         interaction_id = state_dict['interaction']['id']
-        if interaction_id is None:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        interaction_id_is_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_valid or interaction_id is None:
             return state_dict
 
         # TODO(#11950): Drop the following 'if' clause once all snapshots have
