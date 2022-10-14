@@ -70,9 +70,15 @@ class ItemSelectionInput(base.BaseInteraction):
         'description': 'Items for selection',
         'schema': {
             'type': 'list',
+            'validators': [{
+                'id': 'has_unique_subtitled_contents'
+            }],
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
+                'validators': [{
+                    'id': 'has_subtitled_html_non_empty'
+                }],
                 'replacement_ui_config': {
                     'html': {
                         'hide_complex_extensions': True,
