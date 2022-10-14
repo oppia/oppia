@@ -198,9 +198,7 @@ var SkillEditorPage = function() {
 
   this.clickCreateQuestionButton = async function() {
     await action.click('Create Question Button', createQuestionButton);
-    await browser.pause(2000);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
-    await browser.pause(2000);
   };
 
   this.confirmSkillDifficulty = async function() {
@@ -234,6 +232,7 @@ var SkillEditorPage = function() {
       skillChangeCount, 'Skill change count takes too long to update.');
     await waitFor.visibilityOfSuccessToast('Changes Saved.');
     expect(await saveOrPublishSkillButton.isEnabled()).toEqual(false);
+    await waitFor.invisibilityOfSuccessToast('Changes Saved.');
   };
 
   this.editConceptCard = async function(explanation) {
