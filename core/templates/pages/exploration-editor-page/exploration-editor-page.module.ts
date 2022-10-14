@@ -91,6 +91,9 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
 import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
 import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
 import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
+import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
+import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
+import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component';
 
 @NgModule({
   imports: [
@@ -165,6 +168,9 @@ import { ExplorationSavePromptModalComponent } from './modal-templates/explorati
     PieChartComponent,
     StateStatsModalComponent,
     StatisticsTabComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -220,6 +226,9 @@ import { ExplorationSavePromptModalComponent } from './modal-templates/explorati
     PieChartComponent,
     StateStatsModalComponent,
     StatisticsTabComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent
   ],
   providers: [
     {

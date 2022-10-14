@@ -41,7 +41,7 @@ export class VoiceoverRecordingService {
   defer: EventEmitter<string> = new EventEmitter();
 
   constructor(
-    private loggerService: LoggerService
+      private loggerService: LoggerService
   ) { }
 
   _stopRecord(): void {
@@ -70,9 +70,9 @@ export class VoiceoverRecordingService {
   }
 
   status(): {
-      isAvailable: boolean;
-      isRecording: boolean;
-      } {
+       isAvailable: boolean;
+       isRecording: boolean;
+       } {
     return {
       isAvailable: this.isAvailable,
       isRecording: this.isRecording
@@ -123,7 +123,7 @@ export class VoiceoverRecordingService {
     }
     if (this.mp3Worker === null) {
       let lameWorkerFileUrl = '/third_party/static/lamejs-1.2.0/' +
-          'worker-example/worker-realtime.js';
+           'worker-example/worker-realtime.js';
       // Config the mp3 encoding worker.
       let config = {sampleRate: 44100, bitRate: 128};
       this.mp3Worker = new Worker(lameWorkerFileUrl);
@@ -140,10 +140,10 @@ export class VoiceoverRecordingService {
   // Convert directly from mic input to mp3.
   _onAudioProcess(
       event: {
-        inputBuffer: {
-          getChannelData: (value) => Transferable[];
-        };
-      }): void {
+         inputBuffer: {
+           getChannelData: (value) => Transferable[];
+         };
+       }): void {
     let array = event.inputBuffer.getChannelData(0);
     this._postMessage(array);
   }
@@ -170,7 +170,7 @@ export class VoiceoverRecordingService {
   _initRecorder(): void {
     // Browser agnostic AudioContext API check.
     this.audioContextAvailable = window.AudioContext ||
-       window.webkitAudioContext;
+        window.webkitAudioContext;
 
     if (this.audioContextAvailable) {
       // Promise required because angular is async with worker.
