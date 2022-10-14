@@ -809,10 +809,21 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                     )
                 )
                 raise e
-            math_content_dict = {
-                'raw_latex': normalized_raw_latex,
-                'svg_filename': ''
-            }
+            if math_tag.has_attr('svg_filename-with-value'):
+                svg_filename = json.loads(utils.unescape_html(
+                        math_tag['svg_filename-with-value']))
+                normalized_svg_filename = (
+                    objects.UnicodeString.normalize(svg_filename))
+                math_content_dict = {
+                    'raw_latex': normalized_raw_latex,
+                    'svg_filename': normalized_svg_filename
+                }
+                del math_tag['svg_filename-with-value']
+            else:
+                math_content_dict = {
+                    'raw_latex': normalized_raw_latex,
+                    'svg_filename': ''
+                }
             # Normalize and validate the value before adding to the math
             # tag.
             normalized_math_content_dict = (
@@ -853,7 +864,8 @@ def validate_math_tags_in_html(html_string: str) -> List[str]:
                 # double quotes(&amp;quot;) and should be a valid unicode
                 # string.
                 raw_latex = (
-                    json.loads(utils.unescape_html(math_tag['raw_latex-with-value'])))
+                    json.loads(utils.unescape_html(
+                        math_tag['raw_latex-with-value'])))
                 objects.UnicodeString.normalize(raw_latex)
             except Exception:
                 error_list.append(math_tag)

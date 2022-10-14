@@ -304,8 +304,6 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'human_readable_contributors_summary': {},
             'status': 'public',
             'ratings': {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
-            'community_owned': True,
-            'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'thumbnail_bg_color': '#cd672b',
             'num_views': 0
