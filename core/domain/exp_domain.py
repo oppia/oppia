@@ -3346,6 +3346,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for translation in choice_translations.values():
                 translation['needs_update'] = True
 
+        # Fix RTE content present inside the choices.
+        for choice in choices:
+            choice_html = choice['html']
+            choice['html'] = cls._fix_content(choice_html)
+
     @classmethod
     def _set_lower_and_upper_bounds(
         cls,
@@ -3773,6 +3778,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         if value_a > value_b:
                             rule_spec['inputs']['a'] = value_b
                             rule_spec['inputs']['b'] = value_a
+                        elif value_a == value_b:
+                            invalid_rules.append(rule_spec)
+                            continue
                         rule_value_a = float(value_a)
                         rule_value_b = float(value_b)
                         cls._set_lower_and_upper_bounds(
@@ -3833,6 +3841,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         ranges: List[RangeVariableDict] = []
         invalid_rules = []
         matched_denominator_list: List[MatchedDenominatorDict] = []
+        inputs_without_fractions = [
+            'HasDenominatorEqualTo',
+            'HasNumeratorEqualTo',
+            'HasIntegerPartEqualTo',
+            'HasNoFractionalPart'
+        ]
+        allow_imp_frac = state_dict['interaction']['customization_args'][
+            'allowImproperFraction']['value']
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -3853,6 +3869,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'rule_spec_index': int(rule_spec_index),
                     'denominator': 0
                 }
+
+                if rule_spec['rule_type'] not in inputs_without_fractions:
+                    inputs = rule_spec['inputs']
+                    assert isinstance(inputs, dict)
+                    value_f = inputs['f']
+                    assert isinstance(value_f, dict)
+                    num = value_f['numerator']
+                    assert isinstance(num, int)
+                    deno = value_f['denominator']
+                    assert isinstance(deno, int)
+                    whole = value_f['wholeNumber']
+                    assert isinstance(whole, int)
+                    if not allow_imp_frac and (whole != 0 or deno <= num):
+                        state_dict['interaction']['customization_args'][
+                            'allowImproperFraction']['value'] = True
 
                 if rule_spec['rule_type'] in (
                     'IsEquivalentTo', 'IsExactlyEqualTo',
@@ -4717,6 +4748,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # Fix tags for state content.
             html = state['content']['html']
             state['content']['html'] = cls._fix_content(html)
+
             # Fix tags for written translations.
             written_translations = (
                 state['written_translations']['translations_mapping'])
@@ -4731,6 +4763,38 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     else:
                         html = translation['translation']
                         translation['translation'] = cls._fix_content(html)
+
+            # Fix RTE content present inside the answer group's feedback.
+            for answer_group in state['interaction']['answer_groups']:
+                feedback = answer_group['outcome']['feedback']['html']
+                if feedback in cls.empty_values:
+                    continue
+
+                answer_group['outcome']['feedback']['html'] = cls._fix_content(
+                    feedback)
+
+            # Fix RTE content present inside the default outcome.
+            if state['interaction']['default_outcome'] is not None:
+                default_feedback = state['interaction']['default_outcome'][
+                    'feedback']['html']
+                if default_feedback in cls.empty_values:
+                    continue
+
+                state['interaction']['default_outcome']['feedback']['html'] = (
+                    cls._fix_content(default_feedback))
+
+            # Fix RTE content present inside the Hint.
+            for hint in state['interaction']['hints']:
+                hint_content = hint['hint_content']['html']
+                hint['hint_content']['html'] = cls._fix_content(hint_content)
+
+            # Fix RTE content present inside the Solution.
+            if state['interaction']['solution'] is not None:
+                solution = state['interaction']['solution']['explanation'][
+                    'html']
+                state['interaction']['solution']['explanation']['html'] = (
+                    cls._fix_content(solution))
+
         return states_dict
 
     @classmethod

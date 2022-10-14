@@ -6039,7 +6039,13 @@ states:
         <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-image filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
         <oppia-noninteractive-tabs></oppia-noninteractive-tabs>
         <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-collapsible&amp;gt;&amp;lt;/oppia-noninteractive-collapsible&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
-        <oppia-noninteractive-tabs tab_contents-with-value=\"[]\"></oppia-noninteractive-tabs>'
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+        &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+        {&amp;quot;content&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+        &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+        #2&amp;quot;}]"></oppia-noninteractive-tabs>'
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6179,7 +6185,7 @@ states:
         &amp;quot;&amp;lt;p&amp;gt;Content2&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image
         alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
         caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
-        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>    '
+        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>     '
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6273,6 +6279,8 @@ title: ''
         from version less than 58.
         """
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
         sample_yaml_content_for_cont_and_end_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -6306,7 +6314,14 @@ states:
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
-          html: ''
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+            {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+            place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+            is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+            #2&amp;quot;}]"></oppia-noninteractive-tabs>'
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -6368,6 +6383,8 @@ tags:
 title: ''
 """)
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
         latest_sample_yaml_content_for_cont_and_end_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -6401,7 +6418,12 @@ states:
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
-          html: ''
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+            can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+            &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+            of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -6659,6 +6681,8 @@ title: ''
         data from version less than 58.
         """
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
         sample_yaml_content_for_numeric_interac: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -6705,7 +6729,14 @@ states:
           dest_if_really_stuck: null
           feedback:
             content_id: feedback_2
-            html: ''
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+            {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+            place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+            is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+            #2&amp;quot;}]"></oppia-noninteractive-tabs>'
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -6725,6 +6756,10 @@ states:
         - inputs:
             a: 17.0
             b: 15.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            a: 18.0
+            b: 18.0
           rule_type: IsInclusivelyBetween
         tagged_skill_misconception_id: null
         training_data: []
@@ -6867,7 +6902,17 @@ states:
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-      hints: []
+      hints:
+        - hint_content:
+            content_id: hint
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+              {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+              place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+              &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+              is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+              #2&amp;quot;}]"></oppia-noninteractive-tabs>'
       id: NumericInput
       solution: null
     linked_skill_id: null
@@ -6877,6 +6922,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+        hint: {}
         feedback_1: {}
         feedback_2: {}
         feedback_3: {}
@@ -6889,6 +6935,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
+        hint: {}
         feedback_1: {}
         feedback_2: {}
         feedback_3: {}
@@ -6938,6 +6985,8 @@ tags:
 title: ''
 """)
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
         latest_sample_yaml_content_for_numeric_interac: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -6965,7 +7014,12 @@ states:
           dest_if_really_stuck: null
           feedback:
             content_id: feedback_2
-            html: ''
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+              can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+              &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+              of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+              &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -7034,7 +7088,15 @@ states:
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-      hints: []
+      hints:
+      - hint_content:
+          content_id: hint
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+            can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+            &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+            of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
       id: NumericInput
       solution: null
     linked_skill_id: null
@@ -7047,6 +7109,7 @@ states:
         feedback_2: {}
         feedback_3: {}
         feedback_5: {}
+        hint: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7055,6 +7118,7 @@ states:
         feedback_2: {}
         feedback_3: {}
         feedback_5: {}
+        hint: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -7542,6 +7606,246 @@ title: ''
             exploration.to_yaml(),
             latest_sample_yaml_content_for_fraction_interac)
 
+        sample_yaml_content_for_fraction_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: false
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_fraction_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_8: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_8: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_fraction_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_fraction_interac_2)
+
     def test_fixing_invalid_multiple_choice_exp_data_by_migrating_to_v58(
         self
     ) -> None:
@@ -7862,6 +8166,8 @@ title: ''
         data from version less than 58.
         """
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
         sample_yaml_content_for_item_selection_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -7939,9 +8245,9 @@ states:
         choices:
           value:
           - content_id: ca_choices_20
-            html: <p>1</p>
+            html: <p>1<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>
           - content_id: ca_choices_21
-            html: <p>2</p>
+            html: <p>2<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
           - content_id: ca_choices_22
             html: <p>3</p>
           - content_id: ca_choices_23
@@ -8024,6 +8330,8 @@ tags: []
 title: ''
 """)
 
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
         latest_sample_yaml_content_for_item_selection_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -8099,7 +8407,8 @@ states:
           - content_id: ca_choices_20
             html: <p>1</p>
           - content_id: ca_choices_21
-            html: <p>2</p>
+            html: <p>2<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
           - content_id: ca_choices_22
             html: <p>3</p>
           - content_id: ca_choices_23
