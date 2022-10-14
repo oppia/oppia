@@ -20,12 +20,12 @@ from __future__ import annotations
 
 import importlib
 import inspect
-import re
 import os
+import re
 
+from core import feconf
 from core.domain import value_generators_domain
 from core.tests import test_utils
-from core import feconf
 
 
 class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
@@ -94,7 +94,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
     def test_branch_code_refresh_registry_not_subclass(self) -> None:
         """We need to have a class in
         core.extensions.value_generators.models.generators
-        that isn't a subclass of BaseValueGenerator to test all code branches.
+        that isn't a subclass of BaseValueGenerator to test.
         """
         module_path_parts = feconf.VALUE_GENERATORS_DIR.split(os.sep)
         module_path_parts.extend(['models', 'generators'])
