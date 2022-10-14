@@ -71,9 +71,11 @@ describe('Learner Group Preferences Modal Component', function() {
     expect(component).toBeDefined();
   });
 
-  it('should confirm', () => {
+  it('should confirm to save learner group preferences', () => {
     spyOn(ngbActiveModal, 'close');
+
     component.confirm();
+
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       progressSharingPermission: component.progressSharingPermission
     });

@@ -73,9 +73,11 @@ describe('View Learner Group Invitation Modal Component', function() {
     expect(component).toBeDefined();
   });
 
-  it('should confirm', () => {
+  it('should confirm to join learner group', () => {
     spyOn(ngbActiveModal, 'close');
+
     component.confirm();
+
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       progressSharingPermission: component.progressSharingPermission
     });
