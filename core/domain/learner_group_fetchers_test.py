@@ -117,9 +117,9 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(learner_groups), 1)
         self.assertEqual(learner_groups[0].group_id, self.LEARNER_GROUP_ID)
 
-    def test_get_learner_groups_of_learner(self) -> None:
+    def test_get_learner_groups_joined_by_learner(self) -> None:
         learner_groups = (
-            learner_group_fetchers.get_learner_groups_of_learner(
+            learner_group_fetchers.get_learner_groups_joined_by_learner(
                 self.LEARNER_ID_1
             )
         )
@@ -128,7 +128,7 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
         learner_groups = (
-            learner_group_fetchers.get_learner_groups_of_learner(
+            learner_group_fetchers.get_learner_groups_joined_by_learner(
                 self.LEARNER_ID_1
             )
         )

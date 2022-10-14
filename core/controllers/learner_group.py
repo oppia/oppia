@@ -992,7 +992,7 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
             })
 
         learner_groups_joined = (
-            learner_group_fetchers.get_learner_groups_of_learner(
+            learner_group_fetchers.get_learner_groups_joined_by_learner(
                 self.user_id)
         )
         learner_of_learner_groups_data = []
