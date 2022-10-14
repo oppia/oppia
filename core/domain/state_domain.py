@@ -1221,7 +1221,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             dict. A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
-        if interaction_id is None:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        if interaction_id not in all_interaction_ids:
             return {}
 
         ca_specs_dict = (
