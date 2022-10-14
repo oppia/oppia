@@ -135,6 +135,7 @@ export class ConceptCardManagerService {
 
   reset(): void {
     if (this.hintsForStateCardExist()) {
+      console.log("NON");
       return;
     }
     console.log("Subscription works fine");
@@ -165,6 +166,7 @@ export class ConceptCardManagerService {
 
   hintsForStateCardExist(): boolean {
   let numHints = this.hintsAndSolutionManagerService.getNumHints();
+  console.log("Hints calculated" + numHints);
   return numHints > 0;
 }
 

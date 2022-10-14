@@ -24,7 +24,7 @@ export const ExplorationPlayerConstants = {
   CONTINUE_BUTTON_FOCUS_LABEL: 'continueButton',
 
   // The enforced waiting period before the first hint request.
-  WAIT_FOR_FIRST_HINT_MSEC: 60000,
+  WAIT_FOR_FIRST_HINT_MSEC: 5000,
   // The enforced waiting period before each of the subsequent hint requests.
   WAIT_FOR_SUBSEQUENT_HINTS_MSEC: 30000,
 
