@@ -1,0 +1,67 @@
+<div class="modal-header">
+  <h3>Statistics for "<a (click)="navigateToStateEditor()">{{ stateName }}</a>"</h3>
+</div>
+
+<div class="modal-body oppia-state-stats-modal-body">
+  <div class="section">
+    <div class="d-inline-block">
+      <strong>Card entered</strong>: {{ numEnters }}
+      <strong>times.</strong>
+    </div>
+    <div class="d-inline-block oppia-quit-card-text">
+      <strong>Quit at this card</strong>: {{ numQuits }}
+      <strong>times.</strong>
+    </div>
+  </div>
+
+  <div class="section" *ngIf="hasExplorationBeenAnswered">
+    <div class="d-inline-block">
+      <oppia-pie-chart *ngIf="answerFeedbackPieChartData && answerFeedbackPieChartOptions"
+                       [data]="answerFeedbackPieChartData"
+                       [options]="answerFeedbackPieChartOptions">
+      </oppia-pie-chart>
+    </div>
+    <div class="d-inline-block oppia-pie-chart">
+      <oppia-pie-chart *ngIf="solutionUsagePieChartData && solutionUsagePieChartOptions"
+                       [data]="solutionUsagePieChartData"
+                       [options]="solutionUsagePieChartOptions">
+      </oppia-pie-chart>
+    </div>
+  </div>
+
+  <div *ngFor="let vizInfo of visualizationsInfo; index as index">
+    <div [ngSwitch]="vizInfo.id">
+      <oppia-visualization-click-hexbins *ngSwitchCase="'ClickHexbins'"
+                                         [data]="vizInfo.data"
+                                         [interactionArgs]="interactionArgs">
+      </oppia-visualization-click-hexbins>
+      <oppia-visualization-enumerated-frequency-table *ngSwitchCase="'EnumeratedFrequencyTable'"
+                                                      [data]="vizInfo.data"
+                                                      [options]="vizInfo.options"
+                                                      [addressedInfoIsSupported]="vizInfo.addressedInfoIsSupported">
+      </oppia-visualization-enumerated-frequency-table>
+      <oppia-visualization-frequency-table *ngSwitchCase="'FrequencyTable'"
+                                           [data]="vizInfo.data"
+                                           [options]="vizInfo.options"
+                                           [addressedInfoIsSupported]="vizInfo.addressedInfoIsSupported">
+      </oppia-visualization-frequency-table>
+      <oppia-visualization-sorted-tiles *ngSwitchCase="'SortedTiles'"
+                                        [data]="vizInfo.data"
+                                        [options]="vizInfo.options">
+      </oppia-visualization-sorted-tiles>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Close</button>
+</div>
+
+<style>
+  .oppia-state-stats-modal-body .oppia-quit-card-text {
+    padding-left: 170px;
+  }
+  .oppia-state-stats-modal-body .oppia-pie-chart {
+    padding-left: 76px;
+  }
+</style>
