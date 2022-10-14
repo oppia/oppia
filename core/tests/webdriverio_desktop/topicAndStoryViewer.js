@@ -134,7 +134,7 @@ describe('Topic and Story viewer functionality', function() {
       await skillEditorPage.moveToQuestionsTab();
       await skillEditorPage.clickCreateQuestionButton();
       await explorationEditorMainTab.setContent(
-        await forms.toRichText('Question 1'), true);
+        await forms.toRichText('Question 1'));
       await explorationEditorMainTab.setInteraction(
         'TextInput', 'Placeholder', 5);
       await explorationEditorMainTab.addResponse(
