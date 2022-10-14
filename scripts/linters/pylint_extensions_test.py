@@ -1495,6 +1495,29 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 valid_indentation_node)
 
+        valid_indentation_with_kw_args_node = astroid.extract_node(
+        """
+        def func( #@
+            test_var_one: int,
+            *,
+            test_var_two: int
+        ) -> int:
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: First test variable.
+                test_var_two: Second test variable.
+
+            Returns:
+                The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                valid_indentation_with_kw_args_node)
+
     def test_finds_docstring_parameter(self):
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
