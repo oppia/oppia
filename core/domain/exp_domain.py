@@ -3841,11 +3841,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         ranges: List[RangeVariableDict] = []
         invalid_rules = []
         matched_denominator_list: List[MatchedDenominatorDict] = []
-        inputs_without_fractions = [
-            'HasDenominatorEqualTo',
-            'HasNumeratorEqualTo',
-            'HasIntegerPartEqualTo',
-            'HasNoFractionalPart'
+        rules_that_can_have_improper_fractions = [
+            'IsExactlyEqualTo',
+            'HasFractionalPartExactlyEqualTo'
         ]
         allow_imp_frac = state_dict['interaction']['customization_args'][
             'allowImproperFraction']['value']
@@ -3870,7 +3868,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'denominator': 0
                 }
 
-                if rule_spec['rule_type'] not in inputs_without_fractions:
+                if (
+                    rule_spec['rule_type'] in
+                    rules_that_can_have_improper_fractions
+                ):
                     inputs = rule_spec['inputs']
                     assert isinstance(inputs, dict)
                     value_f = inputs['f']
@@ -3879,11 +3880,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     assert isinstance(num, int)
                     deno = value_f['denominator']
                     assert isinstance(deno, int)
-                    whole = value_f['wholeNumber']
-                    assert isinstance(whole, int)
-                    if not allow_imp_frac and (whole != 0 or deno <= num):
-                        state_dict['interaction']['customization_args'][
-                            'allowImproperFraction']['value'] = True
+                    if not allow_imp_frac and deno <= num:
+                        invalid_rules.append(rule_spec)
+                        continue
 
                 if rule_spec['rule_type'] in (
                     'IsEquivalentTo', 'IsExactlyEqualTo',
@@ -4569,13 +4568,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 tag['start-with-value'] = '0'
 
         for tag in soup.find_all('oppia-noninteractive-link'):
-            if not tag.has_attr('text-with-value'):
-                tag.decompose()
-                continue
-
             if cls._is_tag_removed_with_invalid_attributes(
                 tag, 'url-with-value'):
                 continue
+
+            if not tag.has_attr('text-with-value'):
+                tag['text-with-value'] = tag['url-with-value']
+            else:
+                if tag['text-with-value'].strip() in cls.empty_values:
+                    tag['text-with-value'] = tag['url-with-value']
 
         for tag in soup.find_all('oppia-noninteractive-math'):
             if cls._is_tag_removed_with_invalid_attributes(

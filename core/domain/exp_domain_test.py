@@ -6011,6 +6011,8 @@ states:
         <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-link url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-link text-with-value="&amp;quot;Link value&amp;quot;" url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-math></oppia-noninteractive-math>
         <oppia-noninteractive-math math_content-with-value=""></oppia-noninteractive-math>
         <oppia-noninteractive-math math_content-with-value="{&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
@@ -6159,6 +6161,10 @@ states:
         <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
         filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
         <oppia-noninteractive-link text-with-value="&amp;quot;Link value&amp;quot;"
+        url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;https://www.example.com&amp;quot;"
+        url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;https://www.example.com&amp;quot;"
         url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
         <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;skill id&amp;quot;"
@@ -7646,6 +7652,13 @@ states:
               numerator: 17
               wholeNumber: 0
           rule_type: IsExactlyEqualTo
+        - inputs:
+            f:
+              denominator: 17
+              isNegative: false
+              numerator: 3
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7761,9 +7774,9 @@ states:
         rule_specs:
         - inputs:
             f:
-              denominator: 3
+              denominator: 17
               isNegative: false
-              numerator: 17
+              numerator: 3
               wholeNumber: 0
           rule_type: IsExactlyEqualTo
         tagged_skill_misconception_id: null
@@ -7771,7 +7784,7 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         allowImproperFraction:
-          value: true
+          value: false
         allowNonzeroIntegerPart:
           value: true
         customPlaceholder:
