@@ -21,9 +21,11 @@ from __future__ import annotations
 import importlib
 import inspect
 import re
+import os
 
 from core.domain import value_generators_domain
 from core.tests import test_utils
+from core import feconf
 
 
 class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
@@ -88,6 +90,38 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
                 'Copier'
             ).get_html_template()
         )
+
+    def test_branch_code_refresh_registry_not_subclass(self) -> None:
+        """We need to have a class in
+        core.extensions.value_generators.models.generators
+        that isn't a subclass of BaseValueGenerator to test all code branches.
+        """
+        module_path_parts = feconf.VALUE_GENERATORS_DIR.split(os.sep)
+        module_path_parts.extend(['models', 'generators'])
+        module = importlib.import_module('.'.join(module_path_parts))
+        vg_class_names = list(
+            value_generators_domain.Registry.get_all_generator_classes().keys()
+        )
+        if len(vg_class_names) > 0:
+            swap_class = vg_class_names[0]
+            with self.swap(module, swap_class, NotBvgSubclass):
+                new_value_generators = (
+                    value_generators_domain.Registry.get_all_generator_classes()
+                )
+            self.assertNotIn(swap_class, new_value_generators.keys())
+        else:
+            self.fail(
+            'There were no Base Value Generator sub classes in %s' %
+            '.'.join(module_path_parts)
+        )
+
+
+class NotBvgSubclass():
+
+    """This is a dummy class for self.swap to test all code branches.
+    """
+
+    pass
 
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
