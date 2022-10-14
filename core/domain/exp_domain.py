@@ -4148,9 +4148,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         )
 
         # Fix RTE content present inside the choices.
-        for choice in choices_drag_drop:
-            choice_html = choice['html']
-            choice['html'] = cls._fix_content(choice_html)
+        for choice_drag in choices_drag_drop:
+            choice_html = choice_drag['html']
+            choice_drag['html'] = cls._fix_content(choice_html)
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
