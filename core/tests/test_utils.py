@@ -237,7 +237,7 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
     return matches[0] if matches else None
 
 
-def mock_load_template(filename: str) -> str:
+def mock_load_template(filename: str, template_is_aot_compiled: bool) -> str:
     """Mock for load_template function. This mock is required for backend tests
     since we do not have webpack compilation before backend tests. The folder to
     search templates is webpack_bundles which is generated after webpack
@@ -257,6 +257,9 @@ def mock_load_template(filename: str) -> str:
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
+    if template_is_aot_compiled:
+        filepath = get_filepath_from_filename(
+            filename, os.path.join('src'))
     if filepath is None:
         raise Exception(
             'No file exists for the given file name.'
