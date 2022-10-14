@@ -217,7 +217,6 @@ class BlogPostModel(base_models.BaseModel):
         user_data: Dict[str, BlogPostModelDataDict] = {}
         blog_post_models: Sequence[BlogPostModel] = cls.get_all().filter(
             cls.author_id == user_id).fetch()
-
         for blog_post_model in blog_post_models:
             user_data[blog_post_model.id] = {
                 'title': blog_post_model.title,
@@ -563,22 +562,17 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from BlogAuthorDetailModel.
-
-        Raises:
-            Exception. BlogAuthorDetailsModel with the given author id not
-                found.
+            Dict. Dictionary of the data from BlogAuthorDetailModel.
         """
 
         author_model = cls.query(cls.author_id == user_id).get()
-        if not author_model:
-            raise Exception(
-            'Entity for class BlogAuthorDetailsModel with author id %s not'
-            ' found' % user_id)
-        return {
-            'author_name': author_model.author_name,
-            'author_bio': author_model.author_bio
-        }
+        if author_model:
+            return {
+                'author_name': author_model.author_name,
+                'author_bio': author_model.author_bio
+            }
+        else:
+            return {}
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:

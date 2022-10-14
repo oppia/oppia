@@ -553,17 +553,16 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
         """Test if export_data returns None when user's author detail model is
         not in datastore.
         """
-        with self.assertRaisesRegex(
-            Exception,
-            'Entity for class BlogAuthorDetailsModel with author id %s not'
-            ' found' % self.NONEXISTENT_USER_ID):
+        self.assertEqual(
             blog_models.BlogAuthorDetailsModel.export_data(
-                self.NONEXISTENT_USER_ID)
+                self.NONEXISTENT_USER_ID
+            ), {}
+        )
 
     def test_export_data_on_existent_author(self) -> None:
         """Test if export_data works as intended on a user's author detail model
          in datastore.
-         """
+        """
         user_data = (
             blog_models.BlogAuthorDetailsModel.export_data(self.USER_1_ID))
         expected_data = {
