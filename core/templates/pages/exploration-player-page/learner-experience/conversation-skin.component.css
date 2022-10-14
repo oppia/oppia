@@ -129,6 +129,10 @@ oppia-conversation-skin .oppia-button-icon {
   color: #fff;
 }
 
+.oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
+  cursor: default;
+}
+
 @media screen and (max-width: 959px) {
   .conversation-skin-cards-container {
     display: block;

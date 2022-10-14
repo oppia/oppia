@@ -5,7 +5,7 @@
             <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
                 <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileDropdown()">
                   {{selectedContributionType}}
-                  <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+                  <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
                     arrow_drop_down
                   </span>
                 </div>
@@ -15,7 +15,7 @@
                        *ngFor="let option of options"
                        (click)="selectOption(option.contributionType)"
                        [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
-                    {{option.displayName}}
+                      {{option.displayName}}
                   </div>
                 </div>
             </div>
@@ -30,10 +30,10 @@
             <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector">
                 <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()">
                   {{selectedContributionType}}
-                  <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow">
+                  <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
                   </span>
                 </div>
-              
+
                 <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
                   <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
                         *ngFor="let option of options"
@@ -46,55 +46,60 @@
         </div>
     </div>
     <div *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-cards-container">
-        <mat-card *ngFor="let block of statsData[type]" layout="row" class="list-view-item">
-            <div>
-                {{selectedContributionType}} - {{block.language}}
-            </div>
-            <table class="dashboard-table e2e-test-topics-table">
-              <tr>
-                <th *ngFor="let column of COLUMNS[type]"
-                    class="{{column.styles}}">
-                    <div class="stats-column-name-container">
-                        {{column.name}}
-                    </div>
-                </th>
-              </tr>
-              <tr *ngFor="let row of block.pagedStats[block.currentPage - 1].stats" class="stats-row">
-                <td class="stats-data">
-                    {{row.firstContributionDate}} - {{row.lastContributionDate}}
-                </td>
-                <td class="stats-data">
-                    {{row.topicName}}
-                </td>
-                <td *ngIf="type == 'translationReview'" class="stats-data">
-                    {{row.reviewedCards}}
-                </td>
-                <td *ngIf="type == 'translationReview'" class="stats-data">
-                    {{row.reviewedWordCount}}
-                </td>
-                <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
-                    {{row.acceptedCards}}
-                </td>
-                <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
-                    {{row.acceptedWordCount}}
-                </td>
-              </tr>
-            </table>
-            <div class="oppia-pagination-container">
-              <button type="button"
-                      class="oppia-pagination-button"
-                      (click)="previousPage(block)"
-                      [disabled]="block.currentPage === 1">
-                <span class="material-icons">navigate_before</span>Previous
-              </button>
-              <button type="button"
-                      class="oppia-pagination-button"
-                      (click)="nextPage(block)"
-                      [disabled]="block.currentPage === block.totalPages">
-                Next<span class="material-icons">navigate_next</span>
-              </button>
-            </div>
-        </mat-card>
+      <mat-card *ngFor="let block of statsData[type]" layout="row" class="list-view-item">
+          <div>
+              {{selectedContributionType}} - {{block.language}}
+          </div>
+          <table class="dashboard-table e2e-test-topics-table">
+            <tr>
+              <th *ngFor="let column of COLUMNS[type]"
+                  class="{{column.styles}}">
+                  <div class="stats-column-name-container">
+                      {{column.name}}
+                  </div>
+              </th>
+            </tr>
+            <tr *ngFor="let row of block.pagedStats[block.currentPage - 1].stats" class="stats-row">
+              <td class="stats-data">
+                  {{row.firstContributionDate}} - {{row.lastContributionDate}}
+              </td>
+              <td class="stats-data">
+                  {{row.topicName}}
+              </td>
+              <td *ngIf="type == 'translationReview'" class="stats-data">
+                  {{row.reviewedCards}}
+              </td>
+              <td *ngIf="type == 'translationReview'" class="stats-data">
+                  {{row.reviewedWordCount}}
+              </td>
+              <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
+                  {{row.acceptedCards}}
+              </td>
+              <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
+                  {{row.acceptedWordCount}}
+              </td>
+            </tr>
+          </table>
+          <div class="oppia-pagination-container">
+            <button type="button"
+                    class="oppia-pagination-button"
+                    (click)="previousPage(block)"
+                    [disabled]="block.currentPage === 1">
+              <span class="material-icons">navigate_before</span>Previous
+            </button>
+            <button type="button"
+                    class="oppia-pagination-button"
+                    (click)="nextPage(block)"
+                    [disabled]="block.currentPage === block.totalPages">
+              Next<span class="material-icons">navigate_next</span>
+            </button>
+          </div>
+      </mat-card>
+      <mat-card *ngIf="statsData[type].length === 0" layout="row" class="list-view-item oppia-contributions-required-message-container">
+        <div class="oppia-contributions-required-message">
+          Start contributing to see your stats!
+        </div>
+      </mat-card>
     </div>
     <div *ngIf="type == 'questionContribution' || type == 'questionReview'" class="stats-cards-container">
         <mat-card *ngFor="let block of statsData[type]" layout="row" class="list-view-item">
@@ -143,10 +148,28 @@
               </button>
             </div>
         </mat-card>
+        <mat-card *ngIf="statsData[type].length === 0" layout="row" class="list-view-item oppia-contributions-required-message-container">
+          <div class="oppia-contributions-required-message">
+            Start contributing to see your stats!
+          </div>
+        </mat-card>
     </div>
 </div>
 
 <style>
+  .oppia-contributions-required-message-container {
+    height: 300px;
+  }
+  .oppia-contributions-required-message {
+    color: #4a4a4a;
+    font-size: 28px;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   .oppia-pagination-container {
     display: flex;
     justify-content: space-between;

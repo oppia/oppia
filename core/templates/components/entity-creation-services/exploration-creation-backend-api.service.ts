@@ -42,7 +42,8 @@ export class ExplorationCreationBackendApiService {
   private _createExploration(
       newExplorationData: NewExplorationData | {},
       successCallback: (value: ExplorationCreationResponse) => void,
-      errorCallback: (reason: string) => void): void {
+      errorCallback: (reason: string) => void
+  ): void {
     this.http.post<ExplorationCreationBackendDict>(
       '/contributehandler/create_new', newExplorationData).toPromise()
       .then(response => {
@@ -56,6 +57,20 @@ export class ExplorationCreationBackendApiService {
           errorCallback(errorResponse.error.error);
         }
       });
+  }
+
+  uploadExploration(yamlFile: string): Promise<ExplorationCreationResponse> {
+    let form = new FormData();
+    form.append('yaml_file', yamlFile);
+    form.append('payload', JSON.stringify({}));
+    return this.http.post<ExplorationCreationBackendDict>(
+      'contributehandler/upload', form
+    ).toPromise().then(
+      (data) => Promise.resolve({
+        explorationId: data.exploration_id
+      }),
+      (response) => Promise.reject(response)
+    );
   }
 
   async registerNewExplorationAsync(

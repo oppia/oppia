@@ -90,25 +90,27 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   }
 
   ngAfterViewInit(): void {
-    let angularJsFormController: angular.IFormController = angular.element(
-      this.elementRef.nativeElement).controller('form');
-    // This throws "Object is possibly undefined." The type undefined
-    // comes here from NgForm dependency. We need to suppress this
-    // error because of strict type checking.
-    // @ts-ignore
-    this.form.statusChanges.subscribe((validationStatus) => {
-      if (angularJsFormController === null ||
-        angularJsFormController === undefined) {
-        return;
-      }
-      if (validationStatus === VALIDATION_STATUS_INVALID) {
-        angularJsFormController.$setValidity(
-          'schema', false, angularJsFormController);
-      } else {
-        angularJsFormController.$setValidity(
-          'schema', true, angularJsFormController);
-      }
-    });
+    if (angular.element) {
+      let angularJsFormController: angular.IFormController = angular.element(
+        this.elementRef.nativeElement).controller('form');
+      // This throws "Object is possibly undefined." The type undefined
+      // comes here from NgForm dependency. We need to suppress this
+      // error because of strict type checking.
+      // @ts-ignore
+      this.form.statusChanges.subscribe((validationStatus) => {
+        if (angularJsFormController === null ||
+          angularJsFormController === undefined) {
+          return;
+        }
+        if (validationStatus === VALIDATION_STATUS_INVALID) {
+          angularJsFormController.$setValidity(
+            'schema', false, angularJsFormController);
+        } else {
+          angularJsFormController.$setValidity(
+            'schema', true, angularJsFormController);
+        }
+      });
+    }
   }
 }
 
