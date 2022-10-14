@@ -308,14 +308,6 @@ def validate_rte_tags(
                 'Image tag does not have \'alt-with-value\' attribute.'
             )
 
-        alt_value = utils.unescape_html(
-            tag['alt-with-value'])[1:-1].replace('\\"', '')
-        if len(alt_value.strip()) < 5:
-            raise utils.ValidationError(
-                'The length of the image tag \'alt-with-value\' '
-                'attribute value should be at least 5 characters.'
-            )
-
         if not tag.has_attr('caption-with-value'):
             raise utils.ValidationError(
                 'Image tag does not have \'caption-with-value\' attribute.'

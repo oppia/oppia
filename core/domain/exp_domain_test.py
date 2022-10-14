@@ -1153,20 +1153,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'attribute.')
 
         self.state.content.html = (
-            '<oppia-noninteractive-image alt-with-value="&quot;&quot;">'
-            '</oppia-noninteractive-image>')
-        self._assert_validation_error(
-            self.new_exploration, 'The length of the image tag \'alt-with'
-            '-value\' attribute value should be at least 5 characters.')
-
-        self.state.content.html = (
-            '<oppia-noninteractive-image alt-with-value="">'
-            '</oppia-noninteractive-image>')
-        self._assert_validation_error(
-            self.new_exploration, 'The length of the image tag \'alt-with'
-            '-value\' attribute value should be at least 5 characters.')
-
-        self.state.content.html = (
             '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
             'caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'

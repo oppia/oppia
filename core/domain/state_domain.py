@@ -1244,6 +1244,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'HasIntegerPartEqualTo',
             'HasNoFractionalPart'
         ]
+        rules_that_can_have_improper_fractions = [
+            'IsExactlyEqualTo',
+            'HasFractionalPartExactlyEqualTo'
+        ]
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
         allow_non_zero_integ_part = (
@@ -1284,15 +1288,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                 f'in FractionInput interaction.'
                             )
 
-                    if not allow_imp_frac and whole != 0:
-                        raise utils.ValidationError(
-                            f'The rule \'{rule_spec_index}\' of '
-                            f'answer group \'{ans_group_index}\' do '
-                            f'not have value in proper fraction '
-                            f'in FractionInput interaction.'
-                        )
-
-                    if not allow_imp_frac and den <= num:
+                    if (
+                        not allow_imp_frac and den <= num and
+                        rule_spec.rule_type in
+                        rules_that_can_have_improper_fractions
+                    ):
                         raise utils.ValidationError(
                             f'The rule \'{rule_spec_index}\' of '
                             f'answer group \'{ans_group_index}\' do '
