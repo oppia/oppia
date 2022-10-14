@@ -86,7 +86,7 @@ class ChangedBranch:
     def __init__(self, new_branch: str) -> None:
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
         self.old_branch = subprocess.check_output(
-            get_branch_cmd, text=True
+            get_branch_cmd, encoding='utf-8'
         ).strip()
         self.new_branch = new_branch
         self.is_same_branch = self.old_branch == self.new_branch
@@ -95,7 +95,8 @@ class ChangedBranch:
         if not self.is_same_branch:
             try:
                 subprocess.check_output(
-                    ['git', 'checkout', self.new_branch, '--'])
+                    ['git', 'checkout', self.new_branch, '--'], encoding='utf-8'
+                )
             except subprocess.CalledProcessError:
                 print(
                     '\nCould not change branch to %s. This is most probably '
@@ -111,7 +112,9 @@ class ChangedBranch:
         exc_tb: Optional[TracebackType]
     ) -> None:
         if not self.is_same_branch:
-            subprocess.check_output(['git', 'checkout', self.old_branch, '--'])
+            subprocess.check_output(
+                ['git', 'checkout', self.old_branch, '--'], encoding='utf-8'
+            )
 
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
@@ -389,7 +392,9 @@ def has_uncommitted_files() -> bool:
     """Returns true if the repo contains modified files that are uncommitted.
     Ignores untracked files.
     """
-    uncommitted_files = subprocess.check_output(GIT_IS_DIRTY_CMD.split(' '))
+    uncommitted_files = subprocess.check_output(
+        GIT_IS_DIRTY_CMD.split(' '), encoding='utf-8'
+    )
     return bool(len(uncommitted_files))
 
 

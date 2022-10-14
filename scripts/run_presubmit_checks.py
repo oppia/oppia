@@ -66,7 +66,7 @@ def main(args: Optional[List[str]] = None) -> None:
     print('')
 
     current_branch = subprocess.check_output(
-        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], text=True
+        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], encoding='utf-8'
     )
 
     # If the current branch exists on remote origin, matched_branch_num=1
@@ -76,7 +76,7 @@ def main(args: Optional[List[str]] = None) -> None:
             'git', 'ls-remote', '--heads', 'origin', current_branch, '|',
             'wc', '-l'
         ],
-        text=True
+        encoding='utf-8'
     )
 
     # Set the origin branch to develop if it's not specified.
@@ -94,7 +94,7 @@ def main(args: Optional[List[str]] = None) -> None:
             'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
             branch
         ],
-        text=True
+        encoding='utf-8'
     )
 
     if common.FRONTEND_DIR in all_changed_files:

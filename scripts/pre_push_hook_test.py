@@ -65,7 +65,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         def mock_check_output(
-            unused_cmd_tokens: List[str], text: bool = True  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'Output'
         self.linter_code = 0
@@ -470,7 +470,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 pre_push_hook.run_script_and_get_returncode(['script']), 0)
 
     def test_has_uncommitted_files(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> str:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
             return 'file1'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -678,7 +680,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
             ' working.\nStash your changes or commit them.\n' in self.print_arr)
 
     def test_error_while_branch_change(self) -> None:
-        def mock_check_output(cmd_tokens: List[str], text: bool = True) -> str:  # pylint: disable=unused-argument
+        def mock_check_output(
+            cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
             if 'symbolic-ref' in cmd_tokens:
                 return 'old-branch'
             raise subprocess.CalledProcessError(1, 'cmd', output='Output')
