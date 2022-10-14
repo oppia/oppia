@@ -110,7 +110,7 @@ def make_graph() -> Tuple[Dict[str, List[str]], Set[str]]:
                         # with 'require' keyword. This is made sure by the code
                         # section above. Hence, a branch where the below if
                         # condition is false will never arise and hence, we add
-                        # the no branch flag.
+                        # the 'no branch' flag.
                         if ( # pragma: no branch
                             parsed_node.type == 'ExpressionStatement' and
                             parsed_node.expression.callee.name == 'require'
