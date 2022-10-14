@@ -38,16 +38,20 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   mapImgPath = '';
   art!: {
-    images: string[]; caption: {
-      content: string; name:
-        string; type: string;
+    images: string[];
+    caption: {
+      content: string;
+      name: string;
+      type: string;
     }[];
   };
 
   development!: {
-    images: string[]; caption: {
+    images: string[];
+    caption: {
       content: string;
-      name: string; type: string;
+      name: string;
+      type: string;
     }[];
   };
 

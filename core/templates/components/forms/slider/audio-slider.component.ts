@@ -32,7 +32,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
     [step]="1"
     aria-label="audio-slider">
   </mat-slider>`,
-  styles: []
+  styles: [`
+  .mat-accent /deep/ .mat-slider-track-fill,
+  .mat-accent /deep/ .mat-slider-thumb,
+  .mat-accent /deep/ .mat-slider-thumb-label {
+    background: #ff4081;
+  }`]
 })
 export class AudioSliderComponent {
   // These properties are initialized using component interactions

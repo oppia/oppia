@@ -185,10 +185,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onMenuKeypress(...args: unknown[]): void {
-    return;
-  }
-
   searchDropdownCategories(): SearchDropDownItems[] {
     return constants.SEARCH_DROPDOWN_CLASSROOMS.map((classroomName) => {
       return {

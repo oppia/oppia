@@ -211,7 +211,7 @@ def main(args: Optional[List[str]] = None) -> None:
         build.main(args=['--prod_env'])
     else:
         build.main(args=[])
-        run_ng_compilation
+        run_ng_compilation()
         run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:

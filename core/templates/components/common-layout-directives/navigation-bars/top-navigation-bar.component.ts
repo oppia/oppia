@@ -42,6 +42,7 @@ import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/acce
 import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './top-navigation-bar.component.css';
+
 interface LanguageInfo {
   id: string;
   text: string;

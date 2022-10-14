@@ -17,11 +17,8 @@
  */
 
 import { NgModule } from '@angular/core';
-import { BrowserModule } from
-  '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';
 import { SharedComponentsModule } from 'components/shared-component.module';
-
-
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { AddSyllabusItemsComponent } from './create-group/add-syllabus-items.component';

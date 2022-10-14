@@ -177,7 +177,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
                 watch_mode=True))
 
-
         app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
         dev_appserver = stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,

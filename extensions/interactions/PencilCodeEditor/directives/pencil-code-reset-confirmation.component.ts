@@ -28,7 +28,7 @@ export class PencilCodeResetConfirmation {
     private ngbActiveModal: NgbActiveModal
   ) {}
 
-  confirm(value: string): void {
+  confirm(value?: string): void {
     this.ngbActiveModal.close(value);
   }
 
