@@ -21,7 +21,10 @@ import os
 from core import feconf
 from core import utils
 from core.domain import blog_services
+from core.platform import models
 from core.tests import test_utils
+
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class BlogDashboardPageTests(test_utils.GenericTestBase):
@@ -315,6 +318,40 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             expected_status_int=404)
 
+        self.logout()
+
+    def test_get_blog_post_data_with_author_account_deleted_by_blog_admin(self):
+        blog_services.create_blog_author_details_model(self.blog_editor_id)
+        blog_services.update_blog_author_details(
+            self.blog_editor_id, 'new author name', 'general user bio')
+        # Deleting user setting model.
+        blog_editor_model = (
+            user_models.UserSettingsModel.get_by_id(self.blog_editor_id))
+        blog_editor_model.deleted = True
+        blog_editor_model.update_timestamps()
+        blog_editor_model.put()
+
+        self.login(self.BLOG_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            )
+        self.assertEqual('new author name', json_response['author_name'])
+        self.assertIsNone(json_response['profile_picture_data_url'])
+        expected_blog_post_dict = {
+            'id': u'%s' % self.blog_post.id,
+            'author_name': 'new author name',
+            'title': '',
+            'content': '',
+            'tags': [],
+            'thumbnail_filename': None,
+            'url_fragment': '',
+            'published_on': None,
+            'last_updated': u'%s' % utils.convert_naive_datetime_to_string(
+                self.blog_post.last_updated)
+        }
+        self.assertEqual(
+            expected_blog_post_dict, json_response['blog_post_dict'])
+        self.assertEqual(10, json_response['max_no_of_tags'])
         self.logout()
 
     def test_put_blog_post_data(self):
