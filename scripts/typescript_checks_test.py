@@ -98,7 +98,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             typescript_checks.compile_and_check_typescript(
                 typescript_checks.STRICT_TSCONFIG_FILEPATH)
 
-    def test_no_error_for_invalid_compilation_of_tsconfig(self) -> None:
+    def test_error_is_raised_for_invalid_compilation_of_tsconfig(self) -> None:
         """Test that error is produced if stdout is not empty."""
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
@@ -112,12 +112,43 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.TSCONFIG_FILEPATH)
 
-    def test_no_error_for_invalid_compilation_of_strict_tsconfig(self) -> None:
+    def test_error_is_raised_for_invalid_compilation_of_strict_tsconfig(
+            self) -> None:
         """Test that error is produced if stdout is not empty."""
-        typescript_checks.TS_STRICT_EXCLUDE_PATHS = []
-        with self.assertRaisesRegex(SystemExit, '1'):
-            typescript_checks.compile_and_check_typescript(
-                typescript_checks.STRICT_TSCONFIG_FILEPATH)
+        with self.swap(typescript_checks, 'TS_STRICT_EXCLUDE_PATHS', []):
+            with self.assertRaisesRegex(SystemExit, '1'):
+                typescript_checks.compile_and_check_typescript(
+                    typescript_checks.STRICT_TSCONFIG_FILEPATH)
+    
+    def test_error_is_raised_for_invalid_compilation_of_temp_strict_tsconfig(
+            self) -> None:
+        """Test that error is produced if stdout is not empty."""
+        class MockOuput:
+            def __init__(self, call_counter: int = 0) -> None:
+                self.call_counter = call_counter
+            def readline(self) -> str:
+                self.call_counter = self.call_counter + 1
+                if self.call_counter == 1:
+                    return 'core/templates/App.ts'
+                elif self.call_counter == 2:
+                    return 'core/new_directory/new_file.ts'
+                else:
+                    return ''
+        
+        class MockProcess:
+            stdout = MockOuput()
+        def mock_popen_for_errors(
+            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
+            return MockProcess()
+
+        swap_path_exists = self.swap(os.path, 'exists', lambda _: False)
+        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
+            with self.assertRaisesRegex(SystemExit, '1'), swap_path_exists:
+                typescript_checks.compile_temp_strict_tsconfig(
+                    typescript_checks.STRICT_TSCONFIG_FILEPATH,
+                    ['core/templates/App.ts', 'core/new_directory/new_file.ts']
+                )
 
     def test_config_path_when_no_arg_is_used(self) -> None:
         """Test if the config path is correct when no arg is used."""
