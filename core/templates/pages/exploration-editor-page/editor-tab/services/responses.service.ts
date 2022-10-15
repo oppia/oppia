@@ -171,9 +171,6 @@ export class ResponsesService {
       if (updates.hasOwnProperty('dest')) {
         answerGroup.outcome.dest = updates.dest;
       }
-      if (updates.hasOwnProperty('destIfReallyStuck')) {
-        answerGroup.outcome.destIfReallyStuck = updates.destIfReallyStuck;
-      }
       if (updates.hasOwnProperty('refresherExplorationId')) {
         answerGroup.outcome.refresherExplorationId = (
           updates.refresherExplorationId);

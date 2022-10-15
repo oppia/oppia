@@ -1241,8 +1241,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             translation_dict)
         self.new_exploration = (
             exp_domain.Exploration.create_default_exploration('test_id'))
+        content_id_generator = translation_domain.ContentIdGenerator(
+            self.new_exploration.next_content_id_index
+        )
         self.state = self.new_exploration.states['Introduction']
-        self.set_interaction_for_state(self.state, 'Continue')
+        self.set_interaction_for_state(
+            self.state, 'Continue', content_id_generator)
 
     def test_image_rte_tag(self) -> None:
         """Validate image tag."""

@@ -155,7 +155,8 @@ describe('Exploration object factory', () => {
       language_code: 'en',
       states: {
         'first state': firstState,
-        'second state': secondState},
+        'second state': secondState
+      },
       param_specs: {},
       param_changes: [],
       draft_changes: [],
@@ -292,10 +293,14 @@ describe('Exploration object factory', () => {
       exploration.getAuthorRecommendedExpIds('first state');
     }).toThrowError(
       'Tried to get recommendations for a non-terminal state: ' +
-      'first state');
+        'first state');
 
     expect(exploration.isStateTerminal('second state')).toBe(true);
     expect(exploration.getAuthorRecommendedExpIds('second state'))
       .toEqual([]);
+  });
+
+  it('should return correct list of translatable objects', () => {
+    expect(exploration.getTranslatableObjects().length).toEqual(2);
   });
 });

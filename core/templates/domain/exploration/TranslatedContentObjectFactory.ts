@@ -51,48 +51,6 @@ export class TranslatedContent {
     this.needsUpdate = true;
   }
 
-  toggleNeedsUpdateAttribute(): void {
-    this.needsUpdate = !this.needsUpdate;
-  }
-
-  isHtml(): boolean {
-    return this.dataFormat === TRANSLATION_DATA_FORMAT_HTML;
-  }
-
-  isUnicode(): boolean {
-    return this.dataFormat === TRANSLATION_DATA_FORMAT_UNICODE;
-  }
-
-  isSetOfStrings(): boolean {
-    return [
-      TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-      TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING
-    ].indexOf(this.dataFormat) !== -1;
-  }
-
-  getTranslation(): string|string[] {
-    return this.translation;
-  }
-
-  setTranslation(translation: string|string[]): void {
-    if (typeof translation !==
-        typeof DATA_FORMAT_TO_DEFAULT_VALUES[
-          this.dataFormat as DataFormatToDefaultValuesKey]) {
-      throw new Error(
-        'This translation is not of the correct type for data format ' +
-        this.dataFormat);
-    }
-    this.translation = translation;
-  }
-
-  toBackendDict(): TranslatedContentBackendDict {
-    return {
-      content_format: this.dataFormat,
-      content_value: this.translation,
-      needs_update: this.needsUpdate
-    };
-  }
-
   static createFromBackendDict(
       translationBackendDict: TranslatedContentBackendDict): TranslatedContent {
     return new TranslatedContent(

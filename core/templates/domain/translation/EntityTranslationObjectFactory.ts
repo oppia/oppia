@@ -47,10 +47,6 @@ export class EntityTranslation {
     public translationMapping: TranslationMapping
   ) {}
 
-  getAllContentIds(): string[] {
-    return Object.keys(this.translationMapping);
-  }
-
   getWrittenTranslation(contentId: string): TranslatedContent | null {
     if (!this.hasWrittenTranslation(contentId)) {
       return null;
@@ -62,19 +58,8 @@ export class EntityTranslation {
     this.translationMapping[contentId].markAsNeedingUpdate();
   }
 
-  getLanguageCode(): string {
-    return this.languageCode;
-  }
-
   hasWrittenTranslation(contentId: string): boolean {
     return this.translationMapping.hasOwnProperty(contentId);
-  }
-
-  hasUnflaggedWrittenTranslations(contentId: string): boolean {
-    if (!this.translationMapping[contentId].needsUpdate) {
-      return true;
-    }
-    return false;
   }
 
   static createTranslationMappingFromBackendDict(

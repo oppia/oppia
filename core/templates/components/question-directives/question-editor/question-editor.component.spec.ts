@@ -391,6 +391,23 @@ describe('Question Editor Component', () => {
     expect(component.nextContentIdIndexMemento).toBe(2);
   });
 
+  it('should restore next content ID index if needed', () => {
+    component.ngOnInit();
+
+    expect(component.nextContentIdIndexDisplayedValue).toBe(1);
+    expect(component.nextContentIdIndexMemento).toBe(1);
+
+    generateContentIdService.getNextStateId('interaction');
+
+    expect(component.nextContentIdIndexDisplayedValue).toBe(2);
+    expect(component.nextContentIdIndexMemento).toBe(1);
+
+    generateContentIdService.revertUnusedContentIdIndex();
+
+    expect(component.nextContentIdIndexDisplayedValue).toBe(1);
+    expect(component.nextContentIdIndexMemento).toBe(1);
+  });
+
   it('should show mark all audio needing update modal and mark all unflagged' +
     ' voiceovers and translations as needing update', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({

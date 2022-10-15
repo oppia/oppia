@@ -906,11 +906,11 @@ class GenerateExplorationOpportunitySummariesJobTests(
         story_model.update_timestamps()
 
         init_state = state_domain.State.create_default_state(
-            'state1', is_initial_state=True)
+            'state1', 'content_0', 'default_outcome_1', is_initial_state=True)
         # Set the content.
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>This is content</p>'
             })
         )

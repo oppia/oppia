@@ -64,7 +64,7 @@ const CONTENT_REPLACERS: ContentReplacers = {
 };
 
 export class BaseTranslatableObject {
-  static getContentValue(content: TranslatableField): string | string[] | null {
+  static getContentValue(content: TranslatableField): string | string[] {
     if (content instanceof SubtitledHtml) {
       return content.html;
     }
@@ -82,8 +82,6 @@ export class BaseTranslatableObject {
       content = content as TranslatableSetOfUnicodeString;
       return content.unicodeStrSet;
     }
-
-    return null;
   }
 
   getTranslatableFields(): TranslatableField[] {

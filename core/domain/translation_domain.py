@@ -353,7 +353,13 @@ class BaseTranslatableObject:
             ):
                 content_value = html_cleaner.strip_html_tags(content_value)
 
-            if content_value == '' or content_value.isnumeric():
+            if content_value == '':
+                continue
+
+            if (
+                not translatable_content.is_data_format_list() and
+                content_value.isnumeric()
+            ):
                 continue
 
             if (

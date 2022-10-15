@@ -1680,7 +1680,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             skill.skill_contents.explanation.html, html_content)
         self.assertEqual(
             skill.skill_contents.written_translations.to_dict(),
-            written_translations_dict_math)
+            written_translations_dict)
         self.assertEqual(
             skill.skill_contents.worked_examples[0].to_dict(),
             worked_example_dict_math)

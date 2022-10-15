@@ -59,6 +59,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationDataService } from '../services/exploration-data.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -71,6 +72,7 @@ describe('Exploration editor tab component', function() {
   var editabilityService = null;
   var explorationFeaturesService = null;
   var explorationInitStateNameService = null;
+  var explorationNextContentIdIndexService = null;
   var explorationStatesService = null;
   var explorationWarningsService = null;
   var hintObjectFactory = null;
@@ -84,6 +86,7 @@ describe('Exploration editor tab component', function() {
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
+  var generateContentIdService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
@@ -118,6 +121,7 @@ describe('Exploration editor tab component', function() {
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.get(SolutionObjectFactory);
     focusManagerService = TestBed.get(FocusManagerService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -167,6 +171,8 @@ describe('Exploration editor tab component', function() {
     focusManagerService = $injector.get('FocusManagerService');
     explorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
+    explorationNextContentIdIndexService = $injector.get(
+      'ExplorationNextContentIdIndexService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     routerService = $injector.get('RouterService');
@@ -345,6 +351,32 @@ describe('Exploration editor tab component', function() {
   it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.interactionIsShown).toBe(false);
+    });
+
+  it('should correctly initialize generateContentIdService',
+    function() {
+      explorationNextContentIdIndexService.init(5);
+
+      generateContentIdService.getNextStateId('content');
+      expect(explorationNextContentIdIndexService.displayed).toBe(6);
+      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+
+      generateContentIdService.revertUnusedContentIdIndex();
+      expect(explorationNextContentIdIndexService.displayed).toBe(5);
+      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+    });
+
+  it('should correctly save next contentId index',
+    function() {
+      explorationNextContentIdIndexService.init(5);
+      generateContentIdService.getNextStateId('content');
+      expect(explorationNextContentIdIndexService.displayed).toBe(6);
+      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+
+      ctrl.saveNextContentIdIndex();
+
+      expect(explorationNextContentIdIndexService.displayed).toBe(6);
+      expect(explorationNextContentIdIndexService.savedMemento).toBe(6);
     });
 
   it('should get state content placeholder text when init state name is equal' +
