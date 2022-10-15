@@ -3091,9 +3091,10 @@ def regenerate_missing_stats_for_exploration(
                 for commit_cmd in snapshot['commit_cmds']
             ])
         except utils.ValidationError as e:
-            raise Exception(
+            logging.error(
                 'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
-                % (exp_id, snapshot['commit_cmds'])) from e
+                % (exp_id, snapshot['commit_cmds']))
+            continue
 
     missing_exp_stats = []
     missing_state_stats = []
