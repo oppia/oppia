@@ -201,5 +201,10 @@ export const AppConstants = {
   IMAGE_SAVE_DESTINATION_SERVER: 'imageSaveDestinationServer',
   IMAGE_SAVE_DESTINATION_LOCAL_STORAGE:
     'imageSaveDestinationLocalStorage',
-  SVG_MIME_TYPE: 'data:image/svg+xml'
+  SVG_MIME_TYPE: 'data:image/svg+xml',
+
+  CONTRIBUTION_STATS_TYPE_TRANSLATION: 'translation',
+  CONTRIBUTION_STATS_TYPE_QUESTION: 'question',
+  CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
+  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review'
 } as const;
