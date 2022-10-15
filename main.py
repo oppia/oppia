@@ -121,9 +121,7 @@ class InternetConnectivityHandler(base.BaseHandler):
     # from core.controllers.base.BaseModel.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True})
@@ -134,9 +132,7 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "post" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
@@ -146,9 +142,7 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET warmup requests."""
         pass
@@ -157,9 +151,7 @@ class WarmupPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access  # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         self.redirect('/')
 

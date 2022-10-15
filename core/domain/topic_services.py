@@ -1339,7 +1339,7 @@ def check_can_edit_topic(
         return True
     if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
         return False
-    if topic_rights.is_manager(user.user_id):
+    if user.user_id and topic_rights.is_manager(user.user_id):
         return True
 
     return False
@@ -1357,8 +1357,14 @@ def deassign_user_from_all_topics(
 
     Raises:
         Exception. The committer does not have rights to modify a role.
+        Exception. Guest users are not allowed to deassing users from
+            all topics.
     """
     topic_rights_list = topic_fetchers.get_topic_rights_with_user(user_id)
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassing users from all topics.'
+        )
     for topic_rights in topic_rights_list:
         topic_rights.manager_ids.remove(user_id)
         commit_cmds = [topic_domain.TopicRightsChange({
@@ -1389,7 +1395,13 @@ def deassign_manager_role_from_topic(
 
     Raises:
         Exception. The committer does not have rights to modify a role.
+        Exception. Guest users are not allowed to deassing manager role
+            from topic.
     """
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassing manager role from topic.'
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if user_id not in topic_rights.manager_ids:
         raise Exception('User does not have manager rights in topic.')
@@ -1442,6 +1454,11 @@ def assign_role(
                 committer_id, assignee.user_id, new_role, topic_id))
         raise Exception(
             'UnauthorizedUserException: Could not assign new role.')
+
+    assert committer_id is not None
+
+    if assignee.user_id is None:
+        raise Exception
 
     assignee_username = user_services.get_username(assignee.user_id)
     if role_services.ACTION_EDIT_OWNED_TOPIC not in assignee.actions:

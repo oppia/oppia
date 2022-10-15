@@ -45,11 +45,17 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 
-from typing import Any, Callable # isort: skip
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
+
+SELF_BASE_HANDLER_TYPE = Type[base.BaseHandler]
+GENERIC_RETURN_TYPE = TypeVar('GENERIC_RETURN_TYPE')
 
 
 def _redirect_based_on_return_type(
-        handler, redirection_url, expected_return_type):
+    handler: SELF_BASE_HANDLER_TYPE,
+    redirection_url: str,
+    expected_return_type: str
+) -> None:
     """Redirects to the provided URL if the handler type is not JSON.
 
     Args:
@@ -67,7 +73,9 @@ def _redirect_based_on_return_type(
     handler.redirect(redirection_url)
 
 
-def open_access(handler):
+def open_access(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to give access to everyone.
 
     Args:
@@ -78,7 +86,12 @@ def open_access(handler):
         everyone.
     """
 
-    def test_can_access(self, *args, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access(
+        self: SELF_BASE_HANDLER_TYPE,
+        *args: Any,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Gives access to everyone.
 
         Args:
@@ -89,12 +102,13 @@ def open_access(handler):
             *. The return value of the decorated function.
         """
         return handler(self, *args, **kwargs)
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def is_source_mailchimp(handler):
+def is_source_mailchimp(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the request was generated from Mailchimp.
 
     Args:
@@ -104,7 +118,10 @@ def is_source_mailchimp(handler):
         function. The newly decorated function.
     """
 
-    def test_is_source_mailchimp(self, secret, **kwargs):
+    @functools.wraps(handler)
+    def test_is_source_mailchimp(
+        self: SELF_BASE_HANDLER_TYPE, secret: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the request was generated from Mailchimp.
 
         Args:
@@ -125,12 +142,13 @@ def is_source_mailchimp(handler):
             raise self.PageNotFoundException
 
         return handler(self, secret, **kwargs)
-    test_is_source_mailchimp.__wrapped__ = True
 
     return test_is_source_mailchimp
 
 
-def does_classroom_exist(handler):
+def does_classroom_exist(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether classroom exists.
 
     Args:
@@ -140,7 +158,12 @@ def does_classroom_exist(handler):
         function. The newly decorated function.
     """
 
-    def test_does_classroom_exist(self, classroom_url_fragment, **kwargs):
+    @functools.wraps(handler)
+    def test_does_classroom_exist(
+        self: SELF_BASE_HANDLER_TYPE,
+        classroom_url_fragment: str,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if classroom url fragment provided is valid. If so, return
         handler or else redirect to the correct classroom.
 
@@ -173,12 +196,13 @@ def does_classroom_exist(handler):
                 'be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
-    test_does_classroom_exist.__wrapped__ = True
 
     return test_does_classroom_exist
 
 
-def can_play_exploration(handler):
+def can_play_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can play given exploration.
 
     Args:
@@ -189,7 +213,10 @@ def can_play_exploration(handler):
         play a given exploration.
     """
 
-    def test_can_play(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_play(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can play the exploration.
 
         Args:
@@ -216,12 +243,13 @@ def can_play_exploration(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
-    test_can_play.__wrapped__ = True
 
     return test_can_play
 
 
-def can_view_skills(handler):
+def can_view_skills(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can view multiple given skills.
 
     Args:
@@ -232,7 +260,10 @@ def can_view_skills(handler):
         can view multiple given skills.
     """
 
-    def test_can_view(self, selected_skill_ids, **kwargs):
+    @functools.wraps(handler)
+    def test_can_view(
+        self: SELF_BASE_HANDLER_TYPE, selected_skill_ids: List[str], **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can view the skills.
 
         Args:
@@ -261,12 +292,13 @@ def can_view_skills(handler):
             raise self.PageNotFoundException(e)
 
         return handler(self, selected_skill_ids, **kwargs)
-    test_can_view.__wrapped__ = True
 
     return test_can_view
 
 
-def can_play_collection(handler):
+def can_play_collection(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can play given collection.
 
     Args:
@@ -277,7 +309,10 @@ def can_play_collection(handler):
         play a given collection.
     """
 
-    def test_can_play(self, collection_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_play(
+        self: SELF_BASE_HANDLER_TYPE, collection_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can play the collection.
 
         Args:
@@ -301,12 +336,13 @@ def can_play_collection(handler):
             return handler(self, collection_id, **kwargs)
         else:
             raise self.PageNotFoundException
-    test_can_play.__wrapped__ = True
 
     return test_can_play
 
 
-def can_download_exploration(handler):
+def can_download_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can download given exploration.
     If a user is authorized to play given exploration, they can download it.
 
@@ -318,7 +354,10 @@ def can_download_exploration(handler):
         has permission to download a given exploration.
     """
 
-    def test_can_download(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_download(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can download the exploration.
 
         Args:
@@ -345,12 +384,13 @@ def can_download_exploration(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
-    test_can_download.__wrapped__ = True
 
     return test_can_download
 
 
-def can_view_exploration_stats(handler):
+def can_view_exploration_stats(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can view exploration stats.
     If a user is authorized to play given exploration, they can view its stats.
 
@@ -362,7 +402,10 @@ def can_view_exploration_stats(handler):
         has permission to view exploration stats.
     """
 
-    def test_can_view_stats(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_view_stats(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can view the exploration stats.
 
         Args:
@@ -389,12 +432,13 @@ def can_view_exploration_stats(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.PageNotFoundException
-    test_can_view_stats.__wrapped__ = True
 
     return test_can_view_stats
 
 
-def can_edit_collection(handler):
+def can_edit_collection(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can edit collection.
 
     Args:
@@ -405,7 +449,10 @@ def can_edit_collection(handler):
         permission to edit a given collection.
     """
 
-    def test_can_edit(self, collection_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_edit(
+        self: SELF_BASE_HANDLER_TYPE, collection_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can edit the collection.
 
         Args:
@@ -434,12 +481,13 @@ def can_edit_collection(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this collection.')
-    test_can_edit.__wrapped__ = True
 
     return test_can_edit
 
 
-def can_manage_email_dashboard(handler):
+def can_manage_email_dashboard(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can access email dashboard.
 
     Args:
@@ -450,7 +498,10 @@ def can_manage_email_dashboard(handler):
         permission to access the email dashboard.
     """
 
-    def test_can_manage_emails(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_manage_emails(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can access email dashboard.
 
         Args:
@@ -472,12 +523,13 @@ def can_manage_email_dashboard(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to access email dashboard.')
-    test_can_manage_emails.__wrapped__ = True
 
     return test_can_manage_emails
 
 
-def can_access_blog_admin_page(handler):
+def can_access_blog_admin_page(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can access blog admin page.
 
     Args:
@@ -488,7 +540,10 @@ def can_access_blog_admin_page(handler):
         permission to access the blog admin page.
     """
 
-    def test_can_access_blog_admin_page(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access_blog_admin_page(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can access blog admin page.
 
         Args:
@@ -510,12 +565,13 @@ def can_access_blog_admin_page(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to access blog admin page.')
-    test_can_access_blog_admin_page.__wrapped__ = True
 
     return test_can_access_blog_admin_page
 
 
-def can_manage_blog_post_editors(handler):
+def can_manage_blog_post_editors(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can add and remove users as blog
     post editors.
 
@@ -527,7 +583,10 @@ def can_manage_blog_post_editors(handler):
         permission to manage blog post editors.
     """
 
-    def test_can_manage_blog_post_editors(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_manage_blog_post_editors(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can add and remove users as blog
         post editors.
 
@@ -550,12 +609,13 @@ def can_manage_blog_post_editors(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to add or remove blog post editors.')
-    test_can_manage_blog_post_editors.__wrapped__ = True
 
     return test_can_manage_blog_post_editors
 
 
-def can_access_blog_dashboard(handler):
+def can_access_blog_dashboard(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can access blog dashboard.
 
     Args:
@@ -565,7 +625,11 @@ def can_access_blog_dashboard(handler):
         function. The newly decorated function that now checks if the user has
         permission to access the blog dashboard.
     """
-    def test_can_access_blog_dashboard(self, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_access_blog_dashboard(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can access blog dashboard.
 
         Args:
@@ -587,12 +651,13 @@ def can_access_blog_dashboard(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to access blog dashboard page.')
-    test_can_access_blog_dashboard.__wrapped__ = True
 
     return test_can_access_blog_dashboard
 
 
-def can_delete_blog_post(handler):
+def can_delete_blog_post(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can delete blog post.
 
     Args:
@@ -602,7 +667,11 @@ def can_delete_blog_post(handler):
         function. The newly decorated function that checks if a user has
         permission to delete a given blog post.
     """
-    def test_can_delete(self, blog_post_id, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_delete(
+        self: SELF_BASE_HANDLER_TYPE, blog_post_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can delete the blog post.
 
         Args:
@@ -635,12 +704,13 @@ def can_delete_blog_post(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'User %s does not have permissions to delete blog post %s' %
                 (self.user_id, blog_post_id))
-    test_can_delete.__wrapped__ = True
 
     return test_can_delete
 
 
-def can_edit_blog_post(handler):
+def can_edit_blog_post(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can edit blog post.
 
     Args:
@@ -650,7 +720,11 @@ def can_edit_blog_post(handler):
         function. The newly decorated function that checks if a user has
         permission to edit a given blog post.
     """
-    def test_can_edit(self, blog_post_id, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_edit(
+        self: SELF_BASE_HANDLER_TYPE, blog_post_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can edit the blog post.
 
         Args:
@@ -683,12 +757,13 @@ def can_edit_blog_post(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'User %s does not have permissions to edit blog post %s' %
                 (self.user_id, blog_post_id))
-    test_can_edit.__wrapped__ = True
 
     return test_can_edit
 
 
-def can_access_moderator_page(handler):
+def can_access_moderator_page(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can access moderator page.
 
     Args:
@@ -699,7 +774,10 @@ def can_access_moderator_page(handler):
         permission to access the moderator page.
     """
 
-    def test_can_access_moderator_page(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access_moderator_page(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can access moderator page.
 
         Args:
@@ -721,12 +799,13 @@ def can_access_moderator_page(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to access moderator page.')
-    test_can_access_moderator_page.__wrapped__ = True
 
     return test_can_access_moderator_page
 
 
-def can_access_release_coordinator_page(handler):
+def can_access_release_coordinator_page(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can access release coordinator page.
 
     Args:
@@ -737,7 +816,10 @@ def can_access_release_coordinator_page(handler):
         permission to access the release coordinator page.
     """
 
-    def test_can_access_release_coordinator_page(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access_release_coordinator_page(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can access release coordinator
         page.
 
@@ -761,12 +843,13 @@ def can_access_release_coordinator_page(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to access release coordinator page.')
-    test_can_access_release_coordinator_page.__wrapped__ = True
 
     return test_can_access_release_coordinator_page
 
 
-def can_manage_memcache(handler):
+def can_manage_memcache(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can can manage memcache.
 
     Args:
@@ -777,7 +860,10 @@ def can_manage_memcache(handler):
         permission to manage memcache.
     """
 
-    def test_can_manage_memcache(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_manage_memcache(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can manage memcache.
 
         Args:
@@ -799,12 +885,13 @@ def can_manage_memcache(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to manage memcache.')
-    test_can_manage_memcache.__wrapped__ = True
 
     return test_can_manage_memcache
 
 
-def can_run_any_job(handler: Callable[..., None]) -> Callable[..., None]:
+def can_run_any_job(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can can run any job.
 
     Args:
@@ -815,9 +902,10 @@ def can_run_any_job(handler: Callable[..., None]) -> Callable[..., None]:
         permission to run any job.
     """
 
+    @functools.wraps(handler)
     def test_can_run_any_job(
-        self: base.BaseHandler, *args: Any, **kwargs: Any
-    ) -> None:
+        self: SELF_BASE_HANDLER_TYPE, *args: Any, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can run any job.
 
         Args:
@@ -840,12 +928,13 @@ def can_run_any_job(handler: Callable[..., None]) -> Callable[..., None]:
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to run jobs.')
-    setattr(test_can_run_any_job, '__wrapped__', True)
 
     return test_can_run_any_job
 
 
-def can_send_moderator_emails(handler):
+def can_send_moderator_emails(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can send moderator emails.
 
     Args:
@@ -856,7 +945,10 @@ def can_send_moderator_emails(handler):
         has permission to send moderator emails.
     """
 
-    def test_can_send_moderator_emails(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_send_moderator_emails(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can send moderator emails.
 
         Args:
@@ -878,12 +970,13 @@ def can_send_moderator_emails(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to send moderator emails.')
-    test_can_send_moderator_emails.__wrapped__ = True
 
     return test_can_send_moderator_emails
 
 
-def can_manage_own_account(handler):
+def can_manage_own_account(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can manage their account.
 
     Args:
@@ -894,7 +987,10 @@ def can_manage_own_account(handler):
         has permission to manage their account.
     """
 
-    def test_can_manage_account(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_manage_account(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and can manage their account.
 
         Args:
@@ -916,12 +1012,13 @@ def can_manage_own_account(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to manage account or preferences.')
-    test_can_manage_account.__wrapped__ = True
 
     return test_can_manage_account
 
 
-def can_access_admin_page(handler):
+def can_access_admin_page(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator that checks if the current user is a super admin.
 
     Args:
@@ -932,7 +1029,10 @@ def can_access_admin_page(handler):
         is a super admin.
     """
 
-    def test_super_admin(self, **kwargs):
+    @functools.wraps(handler)
+    def test_super_admin(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and is a super admin.
 
         Args:
@@ -953,12 +1053,13 @@ def can_access_admin_page(handler):
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application' % self.user_id)
         return handler(self, **kwargs)
-    test_super_admin.__wrapped__ = True
 
     return test_super_admin
 
 
-def can_access_contributor_dashboard_admin_page(handler):
+def can_access_contributor_dashboard_admin_page(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator that checks if the user can access the contributor dashboard
     admin page.
 
@@ -970,7 +1071,10 @@ def can_access_contributor_dashboard_admin_page(handler):
         access the contributor dashboard admin page.
     """
 
-    def test_can_access_contributor_dashboard_admin_page(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access_contributor_dashboard_admin_page(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can access the contributor dashboard admin page.
 
         Args:
@@ -995,12 +1099,13 @@ def can_access_contributor_dashboard_admin_page(handler):
             'You do not have credentials to access contributor dashboard '
             'admin page.')
 
-    test_can_access_contributor_dashboard_admin_page.__wrapped__ = True
 
     return test_can_access_contributor_dashboard_admin_page
 
 
-def can_manage_contributors_role(handler):
+def can_manage_contributors_role(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator that checks if the current user can modify contributor's role
     for the contributor dashboard page.
 
@@ -1012,7 +1117,10 @@ def can_manage_contributors_role(handler):
         can modify contributor's role for the contributor dashboard page.
     """
 
-    def test_can_manage_contributors_role(self, category, **kwargs):
+    @functools.wraps(handler)
+    def test_can_manage_contributors_role(
+        self: SELF_BASE_HANDLER_TYPE, category: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can modify contributor's role for the contributor
         dashboard page.
 
@@ -1048,12 +1156,13 @@ def can_manage_contributors_role(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to modify contributor\'s role.')
-    test_can_manage_contributors_role.__wrapped__ = True
 
     return test_can_manage_contributors_role
 
 
-def can_delete_any_user(handler):
+def can_delete_any_user(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator that checks if the current user can delete any user.
 
     Args:
@@ -1064,7 +1173,10 @@ def can_delete_any_user(handler):
         can delete any user.
     """
 
-    def test_primary_admin(self, **kwargs):
+    @functools.wraps(handler)
+    def test_primary_admin(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user is logged in and is a primary admin e.g. user with
         email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
 
@@ -1088,12 +1200,13 @@ def can_delete_any_user(handler):
                 '%s cannot delete any user.' % self.user_id)
 
         return handler(self, **kwargs)
-    test_primary_admin.__wrapped__ = True
 
     return test_primary_admin
 
 
-def can_upload_exploration(handler):
+def can_upload_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator that checks if the current user can upload exploration.
 
     Args:
@@ -1104,7 +1217,10 @@ def can_upload_exploration(handler):
         has permission to upload an exploration.
     """
 
-    def test_can_upload(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_upload(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can upload exploration.
 
         Args:
@@ -1125,12 +1241,13 @@ def can_upload_exploration(handler):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to upload explorations.')
         return handler(self, **kwargs)
-    test_can_upload.__wrapped__ = True
 
     return test_can_upload
 
 
-def can_create_exploration(handler):
+def can_create_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can create an exploration.
 
     Args:
@@ -1141,7 +1258,10 @@ def can_create_exploration(handler):
         has permission to create an exploration.
     """
 
-    def test_can_create(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_create(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can create an exploration.
 
         Args:
@@ -1163,12 +1283,13 @@ def can_create_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to create an exploration.')
-    test_can_create.__wrapped__ = True
 
     return test_can_create
 
 
-def can_create_collection(handler):
+def can_create_collection(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can create a collection.
 
     Args:
@@ -1179,7 +1300,10 @@ def can_create_collection(handler):
         has permission to create a collection.
     """
 
-    def test_can_create(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_create(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can create a collection.
 
         Args:
@@ -1201,12 +1325,13 @@ def can_create_collection(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to create a collection.')
-    test_can_create.__wrapped__ = True
 
     return test_can_create
 
 
-def can_access_creator_dashboard(handler):
+def can_access_creator_dashboard(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can access creator dashboard page.
 
     Args:
@@ -1217,7 +1342,10 @@ def can_access_creator_dashboard(handler):
         user has permission to access the creator dashboard page.
     """
 
-    def test_can_access(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can access the creator dashboard page.
 
         Args:
@@ -1239,12 +1367,13 @@ def can_access_creator_dashboard(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to access creator dashboard.')
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_create_feedback_thread(handler):
+def can_create_feedback_thread(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can create a feedback thread.
 
     Args:
@@ -1255,7 +1384,10 @@ def can_create_feedback_thread(handler):
         has permission to create a feedback thread.
     """
 
-    def test_can_access(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can create a feedback thread.
 
         Args:
@@ -1282,12 +1414,13 @@ def can_create_feedback_thread(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to create exploration feedback.')
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_view_feedback_thread(handler):
+def can_view_feedback_thread(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can view a feedback thread.
 
     Args:
@@ -1298,7 +1431,10 @@ def can_view_feedback_thread(handler):
         has permission to view a feedback thread.
     """
 
-    def test_can_access(self, thread_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access(
+        self: SELF_BASE_HANDLER_TYPE, thread_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can view a feedback thread.
 
         Args:
@@ -1340,12 +1476,13 @@ def can_view_feedback_thread(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to view exploration feedback.')
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_comment_on_feedback_thread(handler):
+def can_comment_on_feedback_thread(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can comment on feedback thread.
 
     Args:
@@ -1356,7 +1493,10 @@ def can_comment_on_feedback_thread(handler):
         has permission to comment on a given feedback thread.
     """
 
-    def test_can_access(self, thread_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access(
+        self: SELF_BASE_HANDLER_TYPE, thread_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can comment on the feedback thread.
 
         Args:
@@ -1398,12 +1538,13 @@ def can_comment_on_feedback_thread(handler):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to comment on exploration'
                 ' feedback.')
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_rate_exploration(handler):
+def can_rate_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can give rating to given
     exploration.
 
@@ -1415,7 +1556,10 @@ def can_rate_exploration(handler):
         has permission to rate a given exploration.
     """
 
-    def test_can_rate(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_rate(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can rate the exploration.
 
         Args:
@@ -1435,12 +1579,13 @@ def can_rate_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to give ratings to explorations.')
-    test_can_rate.__wrapped__ = True
 
     return test_can_rate
 
 
-def can_flag_exploration(handler):
+def can_flag_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can flag given exploration.
 
     Args:
@@ -1451,7 +1596,10 @@ def can_flag_exploration(handler):
         a user can flag a given exploration.
     """
 
-    def test_can_flag(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_flag(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can flag the exploration.
 
         Args:
@@ -1470,12 +1618,13 @@ def can_flag_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to flag explorations.')
-    test_can_flag.__wrapped__ = True
 
     return test_can_flag
 
 
-def can_subscribe_to_users(handler):
+def can_subscribe_to_users(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can subscribe/unsubscribe a creator.
 
     Args:
@@ -1486,7 +1635,10 @@ def can_subscribe_to_users(handler):
         has permission to subscribe/unsubscribe a creator.
     """
 
-    def test_can_subscribe(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_subscribe(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can subscribe/unsubscribe a creator.
 
         Args:
@@ -1504,12 +1656,13 @@ def can_subscribe_to_users(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to manage subscriptions.')
-    test_can_subscribe.__wrapped__ = True
 
     return test_can_subscribe
 
 
-def can_edit_exploration(handler):
+def can_edit_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can edit given exploration.
 
     Args:
@@ -1520,7 +1673,10 @@ def can_edit_exploration(handler):
         a user has permission to edit a given exploration.
     """
 
-    def test_can_edit(self, exploration_id, *args, **kwargs):
+    @functools.wraps(handler)
+    def test_can_edit(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, *args: Any, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can edit the exploration.
 
         Args:
@@ -1552,12 +1708,13 @@ def can_edit_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this exploration.')
-    test_can_edit.__wrapped__ = True
 
     return test_can_edit
 
 
-def can_voiceover_exploration(handler):
+def can_voiceover_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can voiceover given exploration.
 
     Args:
@@ -1568,7 +1725,10 @@ def can_voiceover_exploration(handler):
         has permission to voiceover a given exploration.
     """
 
-    def test_can_voiceover(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_voiceover(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can voiceover the exploration.
 
         Args:
@@ -1598,12 +1758,13 @@ def can_voiceover_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to voiceover this exploration.')
-    test_can_voiceover.__wrapped__ = True
 
     return test_can_voiceover
 
 
-def can_add_voice_artist(handler):
+def can_add_voice_artist(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can add voice artist to
     the given activity.
 
@@ -1615,7 +1776,10 @@ def can_add_voice_artist(handler):
         has permission to add voice artist.
     """
 
-    def test_can_add_voice_artist(self, entity_type, entity_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_add_voice_artist(
+        self: SELF_BASE_HANDLER_TYPE, entity_type: str, entity_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can add a voice artist for the given entity.
 
         Args:
@@ -1655,12 +1819,13 @@ def can_add_voice_artist(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to manage voice artists.')
-    test_can_add_voice_artist.__wrapped__ = True
 
     return test_can_add_voice_artist
 
 
-def can_remove_voice_artist(handler):
+def can_remove_voice_artist(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can remove voice artist
     from the given activity.
 
@@ -1672,7 +1837,13 @@ def can_remove_voice_artist(handler):
         has permission to remove voice artist.
     """
 
-    def test_can_remove_voice_artist(self, entity_type, entity_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_remove_voice_artist(
+        self: SELF_BASE_HANDLER_TYPE,
+        entity_type: str,
+        entity_id: str,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can remove a voice artist for the given entity.
 
         Args:
@@ -1708,12 +1879,13 @@ def can_remove_voice_artist(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to manage voice artists.')
-    test_can_remove_voice_artist.__wrapped__ = True
 
     return test_can_remove_voice_artist
 
 
-def can_save_exploration(handler):
+def can_save_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can save exploration.
 
     Args:
@@ -1724,7 +1896,12 @@ def can_save_exploration(handler):
         a user has permission to save a given exploration.
     """
 
-    def test_can_save(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_save(
+        self: SELF_BASE_HANDLER_TYPE,
+        exploration_id: str,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can save the exploration.
 
         Args:
@@ -1756,12 +1933,12 @@ def can_save_exploration(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have permissions to save this exploration.')
 
-    test_can_save.__wrapped__ = True
-
     return test_can_save
 
 
-def can_delete_exploration(handler):
+def can_delete_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can delete exploration.
 
     Args:
@@ -1772,7 +1949,10 @@ def can_delete_exploration(handler):
         permission to delete a given exploration.
     """
 
-    def test_can_delete(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_delete(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can delete the exploration.
 
         Args:
@@ -1800,12 +1980,13 @@ def can_delete_exploration(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'User %s does not have permissions to delete exploration %s' %
                 (self.user_id, exploration_id))
-    test_can_delete.__wrapped__ = True
 
     return test_can_delete
 
 
-def can_suggest_changes_to_exploration(handler):
+def can_suggest_changes_to_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether a user can make suggestions to an
     exploration.
 
@@ -1817,7 +1998,10 @@ def can_suggest_changes_to_exploration(handler):
         has permission to make suggestions to an exploration.
     """
 
-    def test_can_suggest(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_suggest(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can make suggestions to an exploration.
 
         Args:
@@ -1837,12 +2021,13 @@ def can_suggest_changes_to_exploration(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to give suggestions to this '
                 'exploration.')
-    test_can_suggest.__wrapped__ = True
 
     return test_can_suggest
 
 
-def can_suggest_changes(handler):
+def can_suggest_changes(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether a user can make suggestions.
 
     Args:
@@ -1853,7 +2038,10 @@ def can_suggest_changes(handler):
         has permission to make suggestions.
     """
 
-    def test_can_suggest(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_suggest(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can make suggestions to an exploration.
 
         Args:
@@ -1871,15 +2059,19 @@ def can_suggest_changes(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to make suggestions.')
-    test_can_suggest.__wrapped__ = True
 
     return test_can_suggest
 
 
-def can_resubmit_suggestion(handler):
+def can_resubmit_suggestion(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether a user can resubmit a suggestion."""
 
-    def test_can_resubmit_suggestion(self, suggestion_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_resubmit_suggestion(
+        self: SELF_BASE_HANDLER_TYPE, suggestion_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can edit the given suggestion.
 
         Args:
@@ -1900,18 +2092,19 @@ def can_resubmit_suggestion(handler):
             raise self.InvalidInputException(
                 'No suggestion found with given suggestion id')
 
-        if suggestion_services.check_can_resubmit_suggestion(
+        if self.user_id and suggestion_services.check_can_resubmit_suggestion(
                 suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to resubmit this suggestion.')
-    test_can_resubmit_suggestion.__wrapped__ = True
 
     return test_can_resubmit_suggestion
 
 
-def can_publish_exploration(handler):
+def can_publish_exploration(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can publish exploration.
 
     Args:
@@ -1922,7 +2115,10 @@ def can_publish_exploration(handler):
         has permission to publish an exploration.
     """
 
-    def test_can_publish(self, exploration_id, *args, **kwargs):
+    @functools.wraps(handler)
+    def test_can_publish(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, *args: Any, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can publish the exploration.
 
         Args:
@@ -1950,12 +2146,13 @@ def can_publish_exploration(handler):
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to publish this exploration.')
-    test_can_publish.__wrapped__ = True
 
     return test_can_publish
 
 
-def can_publish_collection(handler):
+def can_publish_collection(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can publish collection.
 
     Args:
@@ -1966,7 +2163,10 @@ def can_publish_collection(handler):
         has permission to publish a collection.
     """
 
-    def test_can_publish_collection(self, collection_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_publish_collection(
+        self: SELF_BASE_HANDLER_TYPE, collection_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can publish the collection.
 
         Args:
@@ -1992,12 +2192,13 @@ def can_publish_collection(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to publish this collection.')
-    test_can_publish_collection.__wrapped__ = True
 
     return test_can_publish_collection
 
 
-def can_unpublish_collection(handler):
+def can_unpublish_collection(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can unpublish a given
     collection.
 
@@ -2009,7 +2210,10 @@ def can_unpublish_collection(handler):
         the user has permission to unpublish a collection.
     """
 
-    def test_can_unpublish_collection(self, collection_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_unpublish_collection(
+        self: SELF_BASE_HANDLER_TYPE, collection_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can unpublish the collection.
 
         Args:
@@ -2035,12 +2239,13 @@ def can_unpublish_collection(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to unpublish this collection.')
-    test_can_unpublish_collection.__wrapped__ = True
 
     return test_can_unpublish_collection
 
 
-def can_modify_exploration_roles(handler):
+def can_modify_exploration_roles(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorators to check whether user can manage rights related to an
     exploration.
 
@@ -2053,7 +2258,10 @@ def can_modify_exploration_roles(handler):
         exploration.
     """
 
-    def test_can_modify(self, exploration_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_modify(
+        self: SELF_BASE_HANDLER_TYPE, exploration_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can modify the rights related to an exploration.
 
         Args:
@@ -2077,12 +2285,13 @@ def can_modify_exploration_roles(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to change rights for this '
                 'exploration.')
-    test_can_modify.__wrapped__ = True
 
     return test_can_modify
 
 
-def can_perform_tasks_in_taskqueue(handler):
+def can_perform_tasks_in_taskqueue(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to ensure that the handler is being called by task scheduler or
     by a superadmin of the application.
 
@@ -2095,7 +2304,10 @@ def can_perform_tasks_in_taskqueue(handler):
         a superadmin of the application.
     """
 
-    def test_can_perform(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_perform(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the handler is called by task scheduler or by a superadmin
         of the application.
 
@@ -2119,12 +2331,13 @@ def can_perform_tasks_in_taskqueue(handler):
                 'You do not have the credentials to access this page.')
 
         return handler(self, **kwargs)
-    test_can_perform.__wrapped__ = True
 
     return test_can_perform
 
 
-def can_perform_cron_tasks(handler):
+def can_perform_cron_tasks(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to ensure that the handler is being called by cron or by a
     superadmin of the application.
 
@@ -2137,7 +2350,10 @@ def can_perform_cron_tasks(handler):
         a superadmin of the application.
     """
 
-    def test_can_perform(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_perform(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the handler is called by cron or by a superadmin of the
         application.
 
@@ -2160,12 +2376,13 @@ def can_perform_cron_tasks(handler):
                 'You do not have the credentials to access this page.')
 
         return handler(self, **kwargs)
-    test_can_perform.__wrapped__ = True
 
     return test_can_perform
 
 
-def can_access_learner_dashboard(handler):
+def can_access_learner_dashboard(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check access to learner dashboard.
 
     Args:
@@ -2176,7 +2393,10 @@ def can_access_learner_dashboard(handler):
         one can access the learner dashboard.
     """
 
-    def test_can_access(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can access the learner dashboard.
 
         Args:
@@ -2198,12 +2418,13 @@ def can_access_learner_dashboard(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_access_learner_groups(handler):
+def can_access_learner_groups(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check access to learner groups.
 
     Args:
@@ -2214,7 +2435,10 @@ def can_access_learner_groups(handler):
         one can access the learner groups.
     """
 
-    def test_can_access(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can access the learner groups.
 
         Args:
@@ -2236,12 +2460,13 @@ def can_access_learner_groups(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_manage_question_skill_status(handler):
+def can_manage_question_skill_status(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can publish a question and link it
     to a skill.
 
@@ -2254,7 +2479,10 @@ def can_manage_question_skill_status(handler):
         to a skill.
     """
 
-    def test_can_manage_question_skill_status(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_manage_question_skill_status(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can publish a question directly.
 
         Args:
@@ -2278,12 +2506,13 @@ def can_manage_question_skill_status(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to publish a question.')
-    test_can_manage_question_skill_status.__wrapped__ = True
 
     return test_can_manage_question_skill_status
 
 
-def require_user_id_else_redirect_to_homepage(handler):
+def require_user_id_else_redirect_to_homepage(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., Optional[GENERIC_RETURN_TYPE]]:
     """Decorator that checks if a user_id is associated with the current
     session. If not, the user is redirected to the main page.
     Note that the user may not yet have registered.
@@ -2297,7 +2526,10 @@ def require_user_id_else_redirect_to_homepage(handler):
         session.
     """
 
-    def test_login(self, **kwargs):
+    @functools.wraps(handler)
+    def test_login(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> Optional[GENERIC_RETURN_TYPE]:
         """Checks if the user for the current session is logged in.
         If not, redirects the user to the home page.
 
@@ -2309,17 +2541,21 @@ def require_user_id_else_redirect_to_homepage(handler):
         """
         if not self.user_id:
             self.redirect('/')
-            return
+            return None
         return handler(self, **kwargs)
-    test_login.__wrapped__ = True
 
     return test_login
 
 
-def can_edit_topic(handler):
+def can_edit_topic(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can edit given topic."""
 
-    def test_can_edit(self, topic_id, *args, **kwargs):
+    @functools.wraps(handler)
+    def test_can_edit(
+        self: SELF_BASE_HANDLER_TYPE, topic_id: str, *args: Any, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can edit a given topic.
 
         Args:
@@ -2354,12 +2590,13 @@ def can_edit_topic(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this topic.')
-    test_can_edit.__wrapped__ = True
 
     return test_can_edit
 
 
-def can_edit_question(handler):
+def can_edit_question(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can edit given question.
 
     Args:
@@ -2370,7 +2607,10 @@ def can_edit_question(handler):
         whether the user has permission to edit a given question.
     """
 
-    def test_can_edit(self, question_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_edit(
+        self: SELF_BASE_HANDLER_TYPE, question_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can edit the given question.
 
         Args:
@@ -2398,12 +2638,13 @@ def can_edit_question(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this question.')
-    test_can_edit.__wrapped__ = True
 
     return test_can_edit
 
 
-def can_play_question(handler):
+def can_play_question(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can play given question.
 
     Args:
@@ -2413,7 +2654,11 @@ def can_play_question(handler):
         function. The newly decorated function that now also checks
         whether the user can play a given question.
     """
-    def test_can_play_question(self, question_id, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_play_question(
+        self: SELF_BASE_HANDLER_TYPE, question_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can play the given question.
 
         Args:
@@ -2431,11 +2676,13 @@ def can_play_question(handler):
         if question is None:
             raise self.PageNotFoundException
         return handler(self, question_id, **kwargs)
-    test_can_play_question.__wrapped__ = True
+
     return test_can_play_question
 
 
-def can_view_question_editor(handler):
+def can_view_question_editor(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can view any question editor.
 
     Args:
@@ -2446,7 +2693,10 @@ def can_view_question_editor(handler):
         if the user has permission to view any question editor.
     """
 
-    def test_can_view_question_editor(self, question_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_view_question_editor(
+        self: SELF_BASE_HANDLER_TYPE, question_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can view the question editor.
 
         Args:
@@ -2476,12 +2726,13 @@ def can_view_question_editor(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to access the questions editor'
                 % self.user_id)
-    test_can_view_question_editor.__wrapped__ = True
 
     return test_can_view_question_editor
 
 
-def can_delete_question(handler):
+def can_delete_question(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can delete a question.
 
     Args:
@@ -2492,7 +2743,10 @@ def can_delete_question(handler):
         if the user has permission to delete a question.
     """
 
-    def test_can_delete_question(self, question_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_delete_question(
+        self: SELF_BASE_HANDLER_TYPE, question_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can delete a given question.
 
         Args:
@@ -2519,12 +2773,13 @@ def can_delete_question(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to delete the'
                 ' question.' % self.user_id)
-    test_can_delete_question.__wrapped__ = True
 
     return test_can_delete_question
 
 
-def can_add_new_story_to_topic(handler):
+def can_add_new_story_to_topic(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can add a story to a given topic.
 
     Args:
@@ -2535,7 +2790,10 @@ def can_add_new_story_to_topic(handler):
         if the user has permission to add a story to a given topic.
     """
 
-    def test_can_add_story(self, topic_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_add_story(
+        self: SELF_BASE_HANDLER_TYPE, topic_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can add a story to
         a given topic.
 
@@ -2570,12 +2828,13 @@ def can_add_new_story_to_topic(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to add a story to this topic.')
-    test_can_add_story.__wrapped__ = True
 
     return test_can_add_story
 
 
-def can_edit_story(handler):
+def can_edit_story(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can edit a story belonging to a given
     topic.
 
@@ -2587,7 +2846,10 @@ def can_edit_story(handler):
         a user has permission to edit a story for a given topic.
     """
 
-    def test_can_edit_story(self, story_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_edit_story(
+        self: SELF_BASE_HANDLER_TYPE, story_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can edit a story belonging to
         a given topic.
 
@@ -2627,12 +2889,13 @@ def can_edit_story(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this story.')
-    test_can_edit_story.__wrapped__ = True
 
     return test_can_edit_story
 
 
-def can_edit_skill(handler):
+def can_edit_skill(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can edit a skill, which can be
     independent or belong to a topic.
 
@@ -2643,7 +2906,11 @@ def can_edit_skill(handler):
         function. The newly decorated function that now also checks if
         the user has permission to edit a skill.
     """
-    def test_can_edit_skill(self, skill_id, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_edit_skill(
+        self: SELF_BASE_HANDLER_TYPE, skill_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
 
@@ -2669,11 +2936,12 @@ def can_edit_skill(handler):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
 
-    test_can_edit_skill.__wrapped__ = True
     return test_can_edit_skill
 
 
-def can_submit_images_to_questions(handler):
+def can_submit_images_to_questions(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can submit images to questions.
 
     Args:
@@ -2683,7 +2951,11 @@ def can_submit_images_to_questions(handler):
         function. The newly decorated function that now also checks if
         the user has permission to submit a question.
     """
-    def test_can_submit_images_to_questions(self, skill_id, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_submit_images_to_questions(
+        self: SELF_BASE_HANDLER_TYPE, skill_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Test to see if user can submit images to questions.
 
         Args:
@@ -2708,11 +2980,12 @@ def can_submit_images_to_questions(handler):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to submit images to questions.')
 
-    test_can_submit_images_to_questions.__wrapped__ = True
     return test_can_submit_images_to_questions
 
 
-def can_delete_skill(handler):
+def can_delete_skill(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can delete a skill.
 
     Args:
@@ -2723,7 +2996,10 @@ def can_delete_skill(handler):
         if the user can delete a skill.
     """
 
-    def test_can_delete_skill(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_delete_skill(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can delete a skill.
 
         Args:
@@ -2747,11 +3023,12 @@ def can_delete_skill(handler):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to delete the skill.')
 
-    test_can_delete_skill.__wrapped__ = True
     return test_can_delete_skill
 
 
-def can_create_skill(handler):
+def can_create_skill(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can create a skill, which can be
     independent or added to a topic.
 
@@ -2762,7 +3039,11 @@ def can_create_skill(handler):
         function. The newly decorated function that now also checks if
         the user has permission to create a skill.
     """
-    def test_can_create_skill(self, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_create_skill(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can create a skill, which can be
         independent or belong to a topic.
 
@@ -2787,11 +3068,12 @@ def can_create_skill(handler):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to create a skill.')
 
-    test_can_create_skill.__wrapped__ = True
     return test_can_create_skill
 
 
-def can_delete_story(handler):
+def can_delete_story(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can delete a story in a given
     topic.
 
@@ -2804,7 +3086,10 @@ def can_delete_story(handler):
         given topic.
     """
 
-    def test_can_delete_story(self, story_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_delete_story(
+        self: SELF_BASE_HANDLER_TYPE, story_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can delete a story in
         a given topic.
 
@@ -2838,12 +3123,13 @@ def can_delete_story(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to delete this story.')
-    test_can_delete_story.__wrapped__ = True
 
     return test_can_delete_story
 
 
-def can_delete_topic(handler):
+def can_delete_topic(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can delete a topic.
 
     Args:
@@ -2854,7 +3140,10 @@ def can_delete_topic(handler):
         checks if the user can delete a given topic.
     """
 
-    def test_can_delete_topic(self, topic_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_delete_topic(
+        self: SELF_BASE_HANDLER_TYPE, topic_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can delete a given topic.
 
         Args:
@@ -2885,12 +3174,13 @@ def can_delete_topic(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to delete the'
                 ' topic.' % self.user_id)
-    test_can_delete_topic.__wrapped__ = True
 
     return test_can_delete_topic
 
 
-def can_create_topic(handler):
+def can_create_topic(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can create a topic.
 
     Args:
@@ -2901,7 +3191,10 @@ def can_create_topic(handler):
         if the user can create a topic.
     """
 
-    def test_can_create_topic(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_create_topic(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can create a topic.
 
         Args:
@@ -2926,12 +3219,13 @@ def can_create_topic(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to create a'
                 ' topic.' % self.user_id)
-    test_can_create_topic.__wrapped__ = True
 
     return test_can_create_topic
 
 
-def can_access_topics_and_skills_dashboard(handler):
+def can_access_topics_and_skills_dashboard(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can access the topics and skills
     dashboard.
 
@@ -2943,7 +3237,10 @@ def can_access_topics_and_skills_dashboard(handler):
         the user can access the topics and skills dashboard.
     """
 
-    def test_can_access_topics_and_skills_dashboard(self, **kwargs):
+    @functools.wraps(handler)
+    def test_can_access_topics_and_skills_dashboard(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can access the topics and skills
         dashboard.
 
@@ -2972,12 +3269,13 @@ def can_access_topics_and_skills_dashboard(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to access the topics and skills'
                 ' dashboard.' % self.user_id)
-    test_can_access_topics_and_skills_dashboard.__wrapped__ = True
 
     return test_can_access_topics_and_skills_dashboard
 
 
-def can_view_any_topic_editor(handler):
+def can_view_any_topic_editor(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can view any topic editor.
 
     Args:
@@ -2988,7 +3286,10 @@ def can_view_any_topic_editor(handler):
         if the user can view any topic editor.
     """
 
-    def test_can_view_any_topic_editor(self, topic_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_view_any_topic_editor(
+        self: SELF_BASE_HANDLER_TYPE, topic_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can view any topic editor.
 
         Args:
@@ -3020,12 +3321,13 @@ def can_view_any_topic_editor(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to view any topic editor.'
                 % self.user_id)
-    test_can_view_any_topic_editor.__wrapped__ = True
 
     return test_can_view_any_topic_editor
 
 
-def can_manage_rights_for_topic(handler):
+def can_manage_rights_for_topic(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can manage a topic's rights.
 
     Args:
@@ -3036,7 +3338,10 @@ def can_manage_rights_for_topic(handler):
         if the user can manage a given topic's rights.
     """
 
-    def test_can_manage_topic_rights(self, topic_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_manage_topic_rights(
+        self: SELF_BASE_HANDLER_TYPE, topic_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can manage a topic's rights.
 
         Args:
@@ -3064,12 +3369,13 @@ def can_manage_rights_for_topic(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to assign roles for the '
                 'topic.' % self.user_id)
-    test_can_manage_topic_rights.__wrapped__ = True
 
     return test_can_manage_topic_rights
 
 
-def can_change_topic_publication_status(handler):
+def can_change_topic_publication_status(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the user can publish or unpublish a topic.
 
     Args:
@@ -3080,7 +3386,10 @@ def can_change_topic_publication_status(handler):
         if the user can publish or unpublish a topic.
     """
 
-    def test_can_change_topic_publication_status(self, topic_id, **kwargs):
+    @functools.wraps(handler)
+    def test_can_change_topic_publication_status(
+        self: SELF_BASE_HANDLER_TYPE, topic_id: str, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the user can can publish or unpublish a topic.
 
         Args:
@@ -3113,12 +3422,13 @@ def can_change_topic_publication_status(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to publish or unpublish the '
                 'topic.' % self.user_id)
-    test_can_change_topic_publication_status.__wrapped__ = True
 
     return test_can_change_topic_publication_status
 
 
-def can_access_topic_viewer_page(handler):
+def can_access_topic_viewer_page(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., Optional[GENERIC_RETURN_TYPE]]:
     """Decorator to check whether user can access topic viewer page.
 
     Args:
@@ -3129,8 +3439,13 @@ def can_access_topic_viewer_page(handler):
         if the user can access the given topic viewer page.
     """
 
+    @functools.wraps(handler)
     def test_can_access(
-            self, classroom_url_fragment, topic_url_fragment, **kwargs):
+        self: SELF_BASE_HANDLER_TYPE,
+        classroom_url_fragment: str,
+        topic_url_fragment: str,
+        **kwargs: Any
+    ) -> Optional[GENERIC_RETURN_TYPE]:
         """Checks if the user can access topic viewer page.
 
         Args:
@@ -3150,7 +3465,7 @@ def can_access_topic_viewer_page(handler):
                     classroom_url_fragment,
                     topic_url_fragment.lower()),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         topic = topic_fetchers.get_topic_by_url_fragment(
             topic_url_fragment)
@@ -3159,7 +3474,7 @@ def can_access_topic_viewer_page(handler):
             _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         verified_classroom_url_fragment = (
             classroom_services.get_classroom_url_fragment_for_topic_id(
@@ -3171,11 +3486,11 @@ def can_access_topic_viewer_page(handler):
                     verified_classroom_url_fragment,
                     url_substring),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         topic_id = topic.id
         topic_rights = topic_fetchers.get_topic_rights(
-            topic_id, strict=False)
+            topic_id, strict=True)
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
@@ -3185,12 +3500,13 @@ def can_access_topic_viewer_page(handler):
             return handler(self, topic.name, **kwargs)
         else:
             raise self.PageNotFoundException
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_access_story_viewer_page(handler):
+def can_access_story_viewer_page(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., Optional[GENERIC_RETURN_TYPE]]:
     """Decorator to check whether user can access story viewer page.
 
     Args:
@@ -3201,9 +3517,15 @@ def can_access_story_viewer_page(handler):
         if the user can access the given story viewer page.
     """
 
+    @functools.wraps(handler)
     def test_can_access(
-            self, classroom_url_fragment, topic_url_fragment,
-            story_url_fragment, *args, **kwargs):
+        self: SELF_BASE_HANDLER_TYPE,
+        classroom_url_fragment: str,
+        topic_url_fragment: str,
+        story_url_fragment: str,
+        *args: Any,
+        **kwargs: Any
+    ) -> Optional[GENERIC_RETURN_TYPE]:
         """Checks if the user can access story viewer page.
 
         Args:
@@ -3227,7 +3549,7 @@ def can_access_story_viewer_page(handler):
                     topic_url_fragment,
                     story_url_fragment.lower()),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
 
@@ -3237,7 +3559,7 @@ def can_access_story_viewer_page(handler):
                 '/learn/%s/%s/story' %
                 (classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         story_is_published = False
         topic_is_published = False
@@ -3254,7 +3576,7 @@ def can_access_story_viewer_page(handler):
                         topic.url_fragment,
                         story_url_fragment),
                     self.GET_HANDLER_ERROR_RETURN_TYPE)
-                return
+                return None
 
             verified_classroom_url_fragment = (
                 classroom_services.get_classroom_url_fragment_for_topic_id(
@@ -3267,7 +3589,7 @@ def can_access_story_viewer_page(handler):
                         verified_classroom_url_fragment,
                         url_substring),
                     self.GET_HANDLER_ERROR_RETURN_TYPE)
-                return
+                return None
             topic_rights = topic_fetchers.get_topic_rights(topic_id)
             topic_is_published = topic_rights.topic_is_published
             all_story_references = topic.get_all_story_references()
@@ -3282,12 +3604,13 @@ def can_access_story_viewer_page(handler):
             return handler(self, story_id, *args, **kwargs)
         else:
             raise self.PageNotFoundException
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_access_subtopic_viewer_page(handler):
+def can_access_subtopic_viewer_page(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., Optional[GENERIC_RETURN_TYPE]]:
     """Decorator to check whether user can access subtopic page viewer.
 
     Args:
@@ -3298,9 +3621,14 @@ def can_access_subtopic_viewer_page(handler):
         if the user can access the given subtopic viewer page.
     """
 
+    @functools.wraps(handler)
     def test_can_access(
-            self, classroom_url_fragment, topic_url_fragment,
-            subtopic_url_fragment, **kwargs):
+        self: SELF_BASE_HANDLER_TYPE,
+        classroom_url_fragment: str,
+        topic_url_fragment: str,
+        subtopic_url_fragment: str,
+        **kwargs: Any
+    ) -> Optional[GENERIC_RETURN_TYPE]:
         """Checks if the user can access subtopic viewer page.
 
         Args:
@@ -3323,7 +3651,7 @@ def can_access_subtopic_viewer_page(handler):
                     topic_url_fragment,
                     subtopic_url_fragment.lower()),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
         subtopic_id = None
@@ -3332,7 +3660,7 @@ def can_access_subtopic_viewer_page(handler):
             _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
         topic_rights = topic_fetchers.get_topic_rights(topic.id)
@@ -3344,7 +3672,7 @@ def can_access_subtopic_viewer_page(handler):
             _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         for subtopic in topic.subtopics:
             if subtopic.url_fragment == subtopic_url_fragment:
@@ -3356,7 +3684,7 @@ def can_access_subtopic_viewer_page(handler):
                 '/learn/%s/%s/revision' %
                 (classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         verified_classroom_url_fragment = (
             classroom_services.get_classroom_url_fragment_for_topic_id(
@@ -3369,7 +3697,7 @@ def can_access_subtopic_viewer_page(handler):
                     verified_classroom_url_fragment,
                     url_substring),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            return None
 
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic.id, subtopic_id, strict=False)
@@ -3379,14 +3707,16 @@ def can_access_subtopic_viewer_page(handler):
                 '/learn/%s/%s/revision' % (
                     classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return None
         else:
             return handler(self, topic.name, subtopic_id, **kwargs)
-    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def get_decorator_for_accepting_suggestion(decorator):
+def get_decorator_for_accepting_suggestion(
+    decorator: Callable[..., Callable[..., GENERIC_RETURN_TYPE]]
+) -> Callable[..., Callable[..., GENERIC_RETURN_TYPE]]:
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
     decorator.
@@ -3404,7 +3734,9 @@ def get_decorator_for_accepting_suggestion(decorator):
             - Any user with edit permissions to the target entity can
             accept/reject suggestions for that entity.
     """
-    def generate_decorator_for_handler(handler):
+    def generate_decorator_for_handler(
+        handler: Callable[..., GENERIC_RETURN_TYPE]
+    ) -> Callable[..., GENERIC_RETURN_TYPE]:
         """Function that generates a decorator for a given handler.
 
         Args:
@@ -3417,8 +3749,14 @@ def get_decorator_for_accepting_suggestion(decorator):
         Raises:
             NotLoggedInException. The user is not logged in.
         """
+
+        @functools.wraps(handler)
         def test_can_accept_suggestion(
-                self, target_id, suggestion_id, **kwargs):
+            self: SELF_BASE_HANDLER_TYPE,
+            target_id: str,
+            suggestion_id: str,
+            **kwargs: Any
+        ) -> GENERIC_RETURN_TYPE:
             """Returns a (possibly-decorated) handler to test whether a
             suggestion can be accepted based on the user actions and roles.
 
@@ -3474,13 +3812,14 @@ def get_decorator_for_accepting_suggestion(decorator):
 
             return decorator(handler)(self, target_id, suggestion_id, **kwargs)
 
-        test_can_accept_suggestion.__wrapped__ = True
         return test_can_accept_suggestion
 
     return generate_decorator_for_handler
 
 
-def can_view_reviewable_suggestions(handler):
+def can_view_reviewable_suggestions(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., Optional[GENERIC_RETURN_TYPE]]:
     """Decorator to check whether user can view the list of suggestions that
     they are allowed to review.
 
@@ -3491,8 +3830,14 @@ def can_view_reviewable_suggestions(handler):
         function. The newly decorated function that now checks
         if the user can view reviewable suggestions.
     """
+
+    @functools.wraps(handler)
     def test_can_view_reviewable_suggestions(
-            self, target_type, suggestion_type, **kwargs):
+        self: SELF_BASE_HANDLER_TYPE,
+        target_type: str,
+        suggestion_type: str,
+        **kwargs: Any
+    ) -> Optional[GENERIC_RETURN_TYPE]:
         """Checks whether the user can view reviewable suggestions.
 
         Args:
@@ -3512,19 +3857,21 @@ def can_view_reviewable_suggestions(handler):
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
+            return None
         elif suggestion_type == (
                 feconf.SUGGESTION_TYPE_ADD_QUESTION):
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
+            return None
         else:
             raise self.PageNotFoundException
-
-    test_can_view_reviewable_suggestions.__wrapped__ = True
 
     return test_can_view_reviewable_suggestions
 
 
-def can_edit_entity(handler):
+def can_edit_entity(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can edit entity.
 
     Args:
@@ -3534,7 +3881,14 @@ def can_edit_entity(handler):
         function. The newly decorated function that now checks
         if the user can edit the entity.
     """
-    def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_edit_entity(
+        self: SELF_BASE_HANDLER_TYPE,
+        entity_type: str,
+        entity_id: str,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can edit entity.
 
         Args:
@@ -3555,7 +3909,7 @@ def can_edit_entity(handler):
         # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
-        functions = {
+        functions: Dict[str, Callable[[str], GENERIC_RETURN_TYPE]] = {
             feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (
                 can_edit_exploration(reduced_handler)(
                     self, entity_id, **kwargs)),
@@ -3582,12 +3936,12 @@ def can_edit_entity(handler):
             raise self.PageNotFoundException
         return functions[entity_type](entity_id)
 
-    test_can_edit_entity.__wrapped__ = True
-
     return test_can_edit_entity
 
 
-def can_play_entity(handler):
+def can_play_entity(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether user can play entity.
 
     Args:
@@ -3597,7 +3951,14 @@ def can_play_entity(handler):
         function. The newly decorated function that now checks
         if the user can play the entity.
     """
-    def test_can_play_entity(self, entity_type, entity_id, **kwargs):
+
+    @functools.wraps(handler)
+    def test_can_play_entity(
+        self: SELF_BASE_HANDLER_TYPE,
+        entity_type: str,
+        entity_id: str,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the user can play entity.
 
         Args:
@@ -3630,12 +3991,12 @@ def can_play_entity(handler):
         else:
             raise self.PageNotFoundException
 
-    test_can_play_entity.__wrapped__ = True
-
     return test_can_play_entity
 
 
-def is_from_oppia_ml(handler):
+def is_from_oppia_ml(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the incoming request is from a valid Oppia-ML
     VM instance.
 
@@ -3646,7 +4007,12 @@ def is_from_oppia_ml(handler):
         function. The newly decorated function that now can check if incoming
         request is from a valid VM instance.
     """
-    def test_request_originates_from_valid_oppia_ml_instance(self, **kwargs):
+
+    @functools.wraps(handler)
+    def test_request_originates_from_valid_oppia_ml_instance(
+        self: SELF_BASE_HANDLER_TYPE,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks if the incoming request is from a valid Oppia-ML VM
         instance.
 
@@ -3670,12 +4036,12 @@ def is_from_oppia_ml(handler):
 
         return handler(self, **kwargs)
 
-    test_request_originates_from_valid_oppia_ml_instance.__wrapped__ = True
-
     return test_request_originates_from_valid_oppia_ml_instance
 
 
-def can_update_suggestion(handler):
+def can_update_suggestion(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the current user can update suggestions.
 
     Args:
@@ -3693,8 +4059,13 @@ def can_update_suggestion(handler):
         PageNotFoundException. A suggestion is not found with the given
             suggestion id.
     """
+
+    @functools.wraps(handler)
     def test_can_update_suggestion(
-            self, suggestion_id, **kwargs):
+        self: SELF_BASE_HANDLER_TYPE,
+        suggestion_id: str,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Returns a handler to test whether a suggestion can be updated based
         on the user's roles.
 
@@ -3755,11 +4126,12 @@ def can_update_suggestion(handler):
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You are not allowed to update the suggestion.')
 
-    test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion
 
 
-def can_fetch_contributor_dashboard_stats(handler):
+def can_fetch_contributor_dashboard_stats(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the current user can fetch contributor
     dashboard stats.
 
@@ -3775,8 +4147,15 @@ def can_fetch_contributor_dashboard_stats(handler):
         UnauthorizedUserException. The user does not have credentials to
             fetch stats for the given username.
     """
+
+    @functools.wraps(handler)
     def test_can_fetch_contributor_dashboard_stats(
-            self, contribution_type, contribution_subtype, username, **kwargs):
+        self: SELF_BASE_HANDLER_TYPE,
+        contribution_type: str,
+        contribution_subtype: str,
+        username: str,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Returns a handler to test whether stats can be fetched based
         on the logged in user.
 
@@ -3807,11 +4186,12 @@ def can_fetch_contributor_dashboard_stats(handler):
         return handler(
             self, contribution_type, contribution_subtype, username, **kwargs)
 
-    test_can_fetch_contributor_dashboard_stats.__wrapped__ = True
     return test_can_fetch_contributor_dashboard_stats
 
 
-def can_fetch_all_contributor_dashboard_stats(handler):
+def can_fetch_all_contributor_dashboard_stats(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the current user can fetch contributor
     dashboard stats.
 
@@ -3827,8 +4207,13 @@ def can_fetch_all_contributor_dashboard_stats(handler):
         UnauthorizedUserException. The user does not have credentials to
             fetch stats for the given username.
     """
+
+    @functools.wraps(handler)
     def test_can_fetch_all_contributor_dashboard_stats(
-            self, username, **kwargs):
+        self: SELF_BASE_HANDLER_TYPE,
+        username: str,
+        **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Returns a handler to test whether stats can be fetched based
         on the logged in user.
 
@@ -3854,11 +4239,12 @@ def can_fetch_all_contributor_dashboard_stats(handler):
 
         return handler(self, username, **kwargs)
 
-    test_can_fetch_all_contributor_dashboard_stats.__wrapped__ = True
     return test_can_fetch_all_contributor_dashboard_stats
 
 
-def is_from_oppia_android(handler):
+def is_from_oppia_android(
+    handler: Callable[..., GENERIC_RETURN_TYPE]
+) -> Callable[..., GENERIC_RETURN_TYPE]:
     """Decorator to check whether the request was sent from Oppia Android.
 
     Args:
@@ -3868,7 +4254,10 @@ def is_from_oppia_android(handler):
         function. The newly decorated function.
     """
 
-    def test_is_from_oppia_android(self, **kwargs):
+    @functools.wraps(handler)
+    def test_is_from_oppia_android(
+        self: SELF_BASE_HANDLER_TYPE, **kwargs: Any
+    ) -> GENERIC_RETURN_TYPE:
         """Checks whether the request was sent from Oppia Android.
 
         Args:
@@ -3901,7 +4290,5 @@ def is_from_oppia_android(handler):
             raise self.UnauthorizedUserException(
                 'The incoming request is not a valid Oppia Android request.')
         return handler(self, **kwargs)
-
-    test_is_from_oppia_android.__wrapped__ = True
 
     return test_is_from_oppia_android

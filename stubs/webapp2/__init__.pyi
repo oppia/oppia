@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Pattern
 
 
 class Request:
@@ -45,7 +45,7 @@ class Response:
 class WSGIApplication:
     def __init__(
             self,
-            routes: List[Tuple[str, str]] = ...,
+            routes: List[Route] = ...,
             debug: bool = ...,
             config: Dict[str, Any] = ...
     ) -> None: ...
@@ -55,3 +55,10 @@ class WSGIApplication:
             environ: Dict[str, str],
             start_response: Response
     ) -> Response: ...
+
+class Route:
+    def __init__(
+            self,
+            template: Union[str, Pattern[Any]],
+            handler: Callable[..., object]
+    ) -> None: ...

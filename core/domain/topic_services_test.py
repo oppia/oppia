@@ -114,6 +114,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
 
+    def test_raises_error_if_guest_user_trying_to_deassign_roles_from_topic(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest users are not allowed to deassing users from all topics.'
+        ):
+            topic_services.deassign_user_from_all_topics(guest_user, 'user_id')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest users are not allowed to deassing manager role from topic.'
+        ):
+            topic_services.deassign_manager_role_from_topic(
+                guest_user, 'user_id', 'topic_id'
+            )
+
     def test_get_story_titles_in_topic(self) -> None:
         story_titles = topic_services.get_story_titles_in_topic(
             self.topic)

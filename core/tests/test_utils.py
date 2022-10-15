@@ -2793,16 +2793,16 @@ title: Title
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    # Here we use type Any because this method can return JSON response Dict
-    # whose values can contain any type of values, like int, bool, str and
-    # other types too.
+    # Here we use type Any because this method can return a JSON response
+    # whose value can be of any type, like int, bool, str, and other
+    # types too.
     def get_json(
         self,
         url: str,
         params: Optional[Dict[str, str]] = None,
         expected_status_int: int = 200,
         headers: Optional[Dict[str, str]] = None
-    ) -> Dict[str, Any]:
+    ) -> Any:
         """Get a JSON response, transformed to a Python object."""
         if params is not None:
             self.assertIsInstance(params, dict)
@@ -2823,14 +2823,10 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
-        # Here we use type Any because response is a JSON response dict
-        # which can contain different types of values. So, to allow every
-        # type of value we used Any here.
-        response: Dict[str, Any] = self._parse_json_response(
+        return self._parse_json_response(
             json_response,
             expect_errors
         )
-        return response
 
     # Here we use type Any because this method can return JSON response Dict
     # whose values can contain different types of values, like int, bool,
@@ -2908,7 +2904,7 @@ title: Title
     def delete_json(
         self,
         url: str,
-        params: str = '',
+        params: Dict[str, Any] = {},
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
         """Delete object on the server using a JSON call."""

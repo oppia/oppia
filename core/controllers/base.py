@@ -39,7 +39,7 @@ from core.domain import user_services
 
 import webapp2
 
-from typing import Any, Dict, Optional # isort: skip
+from typing import Any, Dict, Optional, Union # isort: skip
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -531,11 +531,11 @@ class BaseHandler(webapp2.RequestHandler):
         """
         return self.get(*args, **kwargs)
 
-    def render_json(self, values: Dict[Any, Any]) -> None:
+    def render_json(self, values: Union[str, Dict[Any, Any]]) -> None:
         """Prepares JSON response to be sent to the client.
 
         Args:
-            values: dict. The key-value pairs to encode in the JSON response.
+            values: str|dict. The key-value pairs to encode in the JSON response.
         """
         self.response.content_type = 'application/json; charset=utf-8'
         self.response.headers['Content-Disposition'] = (

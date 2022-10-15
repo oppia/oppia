@@ -47,8 +47,6 @@ EXCLUDED_DIRECTORIES: Final = [
 NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/access_validators.py',
     'core/controllers/access_validators_test.py',
-    'core/controllers/acl_decorators.py',
-    'core/controllers/acl_decorators_test.py',
     'core/controllers/admin.py',
     'core/controllers/admin_test.py',
     'core/controllers/android_e2e_config.py',
