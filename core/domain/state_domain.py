@@ -1883,6 +1883,23 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if self.solution:
             self.solution.validate(self.id)
 
+        # TODO(#16236): Find a way to encode these checks more declaratively.
+        # Conceptually the validation code should go in each interaction
+        # and as inside the interaction the code is very declarative we need
+        # to figure out a way to put these validations following the
+        # same format.
+        interaction_id_to_validation_func = {
+            'NumericInput': self._validate_numeric_input,
+            'FractionInput': self._validate_fraction_input,
+            'NumberWithUnits': self._validate_number_with_units_input,
+            'MultipleChoiceInput': self._validate_multi_choice_input,
+            'ItemSelectionInput': self._validate_item_selec_input,
+            'DragAndDropSortInput': self._validate_drag_and_drop_input,
+            'TextInput': self._validate_text_input
+        }
+        if self.id in interaction_id_to_validation_func:
+            interaction_id_to_validation_func[self.id]()
+
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
         customization_args_util.validate_customization_args_and_values().
