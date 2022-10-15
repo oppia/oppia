@@ -433,8 +433,11 @@ import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-edito
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
+import { ContributionAndReviewStatsBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats-backend-api.service';
+import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
+import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -503,6 +506,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContributionAndReviewService', ContributionAndReviewService],
   ['ContributionAndReviewBackendApiService',
     ContributionAndReviewBackendApiService],
+  ['ContributionAndReviewStatsService', ContributionAndReviewStatsService],
+  ['ContributionAndReviewStatsBackendApiService',
+    ContributionAndReviewStatsBackendApiService],
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
@@ -903,5 +909,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationNextContentIdIndexService',
     ExplorationNextContentIdIndexService],
   ['EntityCreationService', EntityCreationService],
-  ['ClassroomAdminDataService', ClassroomAdminDataService]
+  ['ClassroomAdminDataService', ClassroomAdminDataService],
+  ['VoiceoverRecordingService', VoiceoverRecordingService]
 ];

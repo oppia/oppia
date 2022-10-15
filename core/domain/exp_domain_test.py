@@ -2113,6 +2113,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             'Terminal interactions must not have any answer groups.')
 
+        init_state.interaction.answer_groups = []
+        self.set_interaction_for_state(init_state, 'Continue')
+        init_state.interaction.answer_groups = answer_groups
+        init_state.update_interaction_default_outcome(default_outcome)
+        self._assert_validation_error(
+            exploration,
+            'Linear interactions must not have any answer groups.')
+
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
         init_state.interaction.answer_groups = []

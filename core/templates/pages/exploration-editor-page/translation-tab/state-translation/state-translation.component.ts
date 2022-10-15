@@ -20,7 +20,15 @@ require(
   'components/state-directives/response-header/response-header.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
+<<<<<<< HEAD
   'audio-translation-bar.directive.ts');
+=======
+  'audio-translation-bar.component.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/state-translation-editor/' +
+  'state-translation-editor.component.ts'
+);
+>>>>>>> 1dc3086262e4aa93a1788a08876c784191325324
 
 require('components/ck-editor-helpers/ck-editor-copy-content.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
