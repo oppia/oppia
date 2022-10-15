@@ -24,8 +24,9 @@ from scripts import flake_checker
 
 import requests
 
-from typing import List, Dict, Optional, Union
+from typing import Dict, Optional, Union
 from typing_extensions import TypedDict
+
 
 class FlakeReportDictWithoutLog(TypedDict):
     """Dictionary representation of flake's report without log."""
@@ -34,8 +35,10 @@ class FlakeReportDictWithoutLog(TypedDict):
     flake: Dict[str, str]
     rerun: str
 
+
 AllowedMockJsonTypes = Union[
-    flake_checker.FlakeReportDict, FlakeReportDictWithoutLog, Dict[str, str], str, None
+    flake_checker.FlakeReportDict,
+    FlakeReportDictWithoutLog, Dict[str, str], str, None
 ]
 
 
