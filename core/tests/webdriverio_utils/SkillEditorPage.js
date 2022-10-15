@@ -194,7 +194,6 @@ var SkillEditorPage = function() {
 
   this.moveToQuestionsTab = async function() {
     await action.click('Questions tab button', questionsTab);
-    await browser.pause(5000);
   };
 
   this.clickCreateQuestionButton = async function() {

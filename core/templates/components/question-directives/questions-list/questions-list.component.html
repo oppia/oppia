@@ -39,12 +39,14 @@
       </mat-card>
       <button class="btn btn-success btn-sm" (click)="addSkill()">Link Another Skill</button>
     </div>
-    <oppia-question-editor [questionId]="questionId"
-                           [misconceptionsBySkill]="misconceptionsBySkill"
-                           [questionStateData]="questionStateData"
-                           [question]="question"
-                           [userCanEditQuestion]="canEditQuestion">
-    </oppia-question-editor>
+    <div *ngIf="question">
+      <oppia-question-editor [questionId]="questionId"
+                             [misconceptionsBySkill]="misconceptionsBySkill"
+                             [questionStateData]="questionStateData"
+                             [question]="question"
+                             [userCanEditQuestion]="canEditQuestion">
+      </oppia-question-editor>
+    </div>
     <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && question.getValidationErrorMessage()">
       {{question.getValidationErrorMessage()}}
     </div>
