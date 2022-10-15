@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Audio Translation Bar component.
  */
 
-import { EventEmitter, NgZone, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { ElementRef, EventEmitter, NgZone, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -228,6 +228,12 @@ describe('Audio translation bar Component', () => {
 
      fixture.detectChanges();
      component.showRecorderWarning = true;
+     component.visualized = {
+       nativeElement: {
+         innerHTML: ''
+       }
+     } as ElementRef<Element>;
+
      component.ngOnInit();
    });
 

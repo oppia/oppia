@@ -16,7 +16,7 @@
  * @fileoverview Component for the audio translation bar.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 import WaveSurfer from 'wavesurfer.js';
@@ -52,6 +52,7 @@ import { VoiceoverRecordingService } from '../services/voiceover-recording.servi
 })
 export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   @Input() isTranslationTabBusy: boolean;
+  @ViewChild('visualized') visualized!: ElementRef<Element>;
 
   directiveSubscriptions = new Subscription();
 
@@ -226,9 +227,11 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
       // Create audio play and pause for unsaved recording.
       let url = URL.createObjectURL(this.audioBlob);
       // Create visualizer for playing unsaved audio.
-      if (this.waveSurfer) {
-        this.waveSurfer.destroy();
-      }
+
+      // When new WaveSurfer is created old waveSurfer should be deleted so
+      // to do that innerHTML is turend to empty string.
+      // eslint-disable-next-line oppia/no-inner-html
+      this.visualized.nativeElement.innerHTML = '';
       this.waveSurfer = WaveSurfer.create({
         container: '#visualized',
         waveColor: '#009688',
