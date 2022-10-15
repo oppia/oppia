@@ -33,7 +33,7 @@ from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 
 from typing import (
-        Dict, Final, List, Literal, Optional, Sequence, Tuple, Union, overload)
+    Dict, Final, List, Literal, Optional, Sequence, Tuple, Union, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover

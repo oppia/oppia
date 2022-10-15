@@ -28,8 +28,8 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
-        Dict, Final, List, Literal, Optional, Sequence, Tuple, TypedDict, Union,
-        overload)
+    Dict, Final, List, Literal, Optional, Sequence, Tuple, TypedDict, Union,
+    overload)
 
 MYPY = False
 if MYPY: # pragma: no cover

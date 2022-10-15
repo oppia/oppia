@@ -37,7 +37,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
-        Callable, Dict, Final, List, Optional, Sequence, Set, Type, Union)
+    Callable, Dict, Final, List, Optional, Sequence, Set, Type, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover

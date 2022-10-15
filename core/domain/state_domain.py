@@ -36,8 +36,8 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-        Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Tuple,
-        Type, TypedDict, Union, cast, overload)
+    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Tuple,
+    Type, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip

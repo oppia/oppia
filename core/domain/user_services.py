@@ -40,7 +40,7 @@ from core.platform import models
 import requests
 
 from typing import (
-        Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload)
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover

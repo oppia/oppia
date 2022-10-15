@@ -32,7 +32,7 @@ from core.domain import user_domain
 from core.platform import models
 
 from typing import (
-        Callable, List, Literal, Optional, Sequence, Tuple, TypedDict, overload)
+    Callable, List, Literal, Optional, Sequence, Tuple, TypedDict, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -31,8 +31,8 @@ from core.domain import topic_domain
 from core.platform import models
 
 from typing import (
-        Callable, Dict, Final, List, Literal, Mapping, Optional, TypedDict,
-        Union, overload)
+    Callable, Dict, Final, List, Literal, Mapping, Optional, TypedDict,
+    Union, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -28,7 +28,7 @@ from core.constants import constants
 from core.domain import change_domain
 
 from typing import (
-        Callable, Dict, Final, List, Optional, Pattern, TypedDict, Union)
+    Callable, Dict, Final, List, Optional, Pattern, TypedDict, Union)
 
 
 class ServerMode(enum.Enum):
