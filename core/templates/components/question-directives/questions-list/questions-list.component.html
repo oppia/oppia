@@ -41,10 +41,10 @@
     </div>
     <div *ngIf="question">
       <oppia-question-editor [questionId]="questionId"
-                           [misconceptionsBySkill]="misconceptionsBySkill"
-                           [questionStateData]="questionStateData"
-                           [question]="question"
-                           [userCanEditQuestion]="canEditQuestion">
+                             [misconceptionsBySkill]="misconceptionsBySkill"
+                             [questionStateData]="questionStateData"
+                             [question]="question"
+                             [userCanEditQuestion]="canEditQuestion">
       </oppia-question-editor>
     </div>
     <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && question.getValidationErrorMessage()">
