@@ -769,7 +769,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         'Expected trainable interaction to have more '
                         'classifier: %s' % interaction_id))
 
-    def test_get_dependency_ids(self) -> None:
+    def test_get_interaction_dependency_ids_correctly(self) -> None:
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 

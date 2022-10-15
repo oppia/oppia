@@ -58,13 +58,13 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_merged_skills(self) -> None:
+    def test_get_all_merged_skills_correctly(self) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
-        model = skill_models.SkillModel(
-            id='skill_id',
-            description='description',
+        model1 = skill_models.SkillModel(
+            id='skill_id_a',
+            description='description1',
             language_code='en',
             misconceptions=[],
             rubrics=[],
@@ -72,15 +72,30 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             misconceptions_schema_version=1,
             rubric_schema_version=1,
             skill_contents_schema_version=0,
-            superseding_skill_id='skill_id1',
+            superseding_skill_id=None,
+            all_questions_merged=False
+        )
+        model2 = skill_models.SkillModel(
+            id='skill_id_b',
+            description='description2',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=0,
+            superseding_skill_id='skill_id_x',
             all_questions_merged=True
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
-        model.commit(
+        model1.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
-        self.assertEqual(skill_models.SkillModel.get_merged_skills(), [model])
+        model2.commit(
+            self.user_id_admin, 'skill model created', commit_cmd_dicts)
+        self.assertEqual(skill_models.SkillModel.get_merged_skills(), [model2])
 
-    def test_get_by_description(self) -> None:
+    def test_get_skills_by_description_correctly(self) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })

@@ -980,9 +980,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 })], 'Changes.')
 
     def test_handler_with_invalid_language_code_raise_exception(self):
-        user_services.allow_user_to_review_translation_in_language(
-            self.owner_id, 'hi')
-        self.login(self.OWNER_EMAIL)
         self.get_json('/gettranslatabletexthandler', params={
             'language_code': 'hi',
             'exp_id': '0'

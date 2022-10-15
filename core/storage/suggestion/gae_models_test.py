@@ -97,7 +97,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_5', None)
 
-    def test_get_in_review_translation_suggestions_by_exp_ids(self) -> None:
+    def test_get_all_in_review_translation_suggestions_by_exp_ids(
+            self) -> None:
         model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
             model.get_in_review_translation_suggestions_by_exp_ids(
@@ -120,7 +121,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             [created_suggestion_model]
         )
 
-    def test_get_user_created_suggestions_of_suggestion_type(self) -> None:
+    def test_get_all_user_created_suggestions_of_given_suggestion_type(
+            self) -> None:
         model = suggestion_models.GeneralSuggestionModel
         expected_suggestion_model = model.get_by_id(
             'exploration.exp1.thread_1')
@@ -1845,7 +1847,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         datetime.date.fromtimestamp(1616173837)
     ]
 
-    def test_get_all_by_user_id(self) -> None:
+    def test_get_all_models_instances_matching_the_given_user_id(self) -> None:
         model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
             model.get_all_by_user_id(self.CONTRIBUTOR_USER_ID), [])

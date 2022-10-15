@@ -113,8 +113,9 @@ class ContributionRightsHandler(base.BaseHandler):
             user_services.allow_user_to_review_question(user_id)
         # The handler schema defines the possible values of 'category'.
         # If 'category' has a value other than those defined in the schema,
-        # a Bad Request error will be thrown and the else branch of the below
-        # condition will never execute. Hence, we use the no branch flag.
+        # a Bad Request error will be thrown. This means that the else
+        # branch of this if/elif/else chain will never execute.
+        # Hence, we use the 'no branch' flag.
         elif category == ( # pragma: no branch
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
             if user_services.can_submit_question_suggestions(user_id):
@@ -160,8 +161,9 @@ class ContributionRightsHandler(base.BaseHandler):
             user_services.remove_question_review_rights(user_id)
         # The handler schema defines the possible values of 'category'.
         # If 'category' has a value other than those defined in the schema,
-        # a Bad Request error will be thrown and the else branch of the below
-        # condition will never execute. Hence, we use the no branch flag.
+        # a Bad Request error will be thrown. This means that the else
+        # branch of this if/elif/else chain will never execute.
+        # Hence, we use the 'no branch' flag.
         elif category == ( # pragma: no branch
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
             if not user_services.can_submit_question_suggestions(user_id):

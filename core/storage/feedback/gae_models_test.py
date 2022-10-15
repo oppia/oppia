@@ -351,7 +351,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(test_data, user_data)
 
-    def test_get_messages(self) -> None:
+    def test_get_all_messages_in_a_thread_correctly(self) -> None:
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             id='thread_id',
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
@@ -585,7 +585,8 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             self.USER_ID_B)
         self.assertEqual({}, user_data)
 
-    def test_apply_deletion_policy(self) -> None:
+    def test_delete_model_instance_of_user_by_applying_deletion_policy(
+            self) -> None:
         feedback_models.GeneralFeedbackThreadUserModel.create(
             'user_id', 'exploration.exp_id.thread_id')
         self.assertIsNotNone(

@@ -22,6 +22,7 @@ import datetime
 import types
 
 from core import feconf
+from core import utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -208,7 +209,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
-    def test_check_dupliacte_message(self) -> None:
+    def test_check_duplicate_message(self) -> None:
         email_models.SentEmailModel.create(
             'recipient_id', 'recipient@email.com', self.SENDER_ID,
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
@@ -228,6 +229,21 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             email_models.SentEmailModel.check_duplicate_message(
                 'recipient_id2', 'Email Subject', 'Email Body'))
+
+    def test_check_duplicate_messages_with_same_hash(self) -> None:
+        def mock_convert_to_hash(input_string: str, max_length: int) -> str:
+            return 'some_poor_hash'
+        swap_generate_hash = self.swap(
+            utils, 'convert_to_hash', mock_convert_to_hash)
+        with swap_generate_hash:
+            email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', self.SENDER_ID,
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+            self.assertFalse(
+            email_models.SentEmailModel.check_duplicate_message(
+                'recipient_id2', 'Email Subject2', 'Email Body2'))
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         # Test Exception for SentEmailModel.

@@ -290,9 +290,9 @@ class AdminHandler(base.BaseHandler):
                 }
             # The handler schema defines the possible values of 'action'.
             # If 'action' has a value other than those defined in the schema,
-            # a Bad Request error will be thrown and the else branch of the
-            # below condition will never execute. Hence, we use the no branch
-            # flag.
+            # a Bad Request error will be thrown. This means that the else
+            # branch of this if/elif/else chain will never execute.
+            # Hence, we use the 'no branch' flag.
             elif action == 'update_feature_flag_rules': # pragma: no branch
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rules = self.normalized_payload.get('new_rules')
@@ -884,9 +884,9 @@ class AdminRoleHandler(base.BaseHandler):
             })
         # The handler schema defines the possible values of 'filter_criterion'.
         # If 'filter_criterion' has a value other than those defined in the
-        # schema, a Bad Request error will be thrown and the else branch of the
-        # below condition will never execute. Hence, we use the no branch
-        # flag.
+        # schema, a Bad Request error will be thrown. This means that the else
+        # branch of this if/elif/else chain will never execute.
+        # Hence, we use the 'no branch' flag.
         elif filter_criterion == ( # pragma: no branch
                 feconf.USER_FILTER_CRITERION_USERNAME):
             username = self.normalized_request.get(
@@ -1001,16 +1001,17 @@ class TopicManagerRoleHandler(base.BaseHandler):
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
         # The handler schema defines the possible values of 'action'.
         # If 'action' has a value other than those defined in the schema,
-        # a Bad Request error will be thrown and the else branch of the below
-        # condition will never execute. Hence, we use the no branch flag.
+        # a Bad Request error will be thrown. This means that the else branch
+        # of this if/elif/else chain will never execute.
+        # Hence, we use the 'no branch' flag.
         elif action == 'deassign': # pragma: no branch
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 
-            # We add no branch coverage flag here because if the case where
+            # We add 'no branch' coverage flag here because if the case where
             # user does not have manager rights in topic happens, it will be
             # caught before in topic_services.deassign_manager_role_from_topic
-            # method and the else part of the if condition given below will
+            # method. This means that the else part this if/else chain will
             # never execute.
             if not topic_fetchers.get_topic_rights_with_user(user_id): # pragma: no branch pylint: disable=line-too-long
                 user_services.remove_user_role(

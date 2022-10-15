@@ -118,8 +118,9 @@ class BlogAdminHandler(base.BaseHandler):
                 (self.user_id, new_config_property_values))
         # The handler schema defines the possible values of 'action'.
         # If 'action' has a value other than those defined in the schema,
-        # a Bad Request error will be thrown and the else branch of the below
-        # condition will never execute. Hence, we use the no branch flag.
+        # a Bad Request error will be thrown. This means that the else
+        # branch of this if/elif/else chain will never execute.
+        # Hence, we use the 'no branch' flag.
         elif self.normalized_payload.get( # pragma: no branch
                 'action') == 'revert_config_property':
             config_property_id = (
