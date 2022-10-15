@@ -3502,5 +3502,5 @@ class EntityTranslationHandlerTest(test_utils.GenericTestBase):
         entity_translation_dict = self.get_json(url)
 
         self.assertEqual(
-            entity_translation_dict['translation'], translations_mapping)
+            entity_translation_dict['translations'], translations_mapping)
         self.logout()
