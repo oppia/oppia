@@ -64,6 +64,7 @@ def load_template(filename, template_is_aot_compiled):
 
     Args:
         filename: str. Name of the requested HTML file.
+        template_is_aot_compiled: bool. Used to determine which bundle to use.
 
     Returns:
         str. The HTML file content.
@@ -569,7 +570,11 @@ class BaseHandler(webapp2.RequestHandler):
         # bytes.
         super(webapp2.Response, self.response).write(file.getvalue())  # pylint: disable=bad-super-call
 
-    def render_template(self, filepath, iframe_restriction='DENY', template_is_aot_compiled=False):
+    def render_template(
+        self,
+        filepath,
+        iframe_restriction='DENY', template_is_aot_compiled=False
+    ):
         """Prepares an HTML response to be sent to the client.
 
         Args:
@@ -580,6 +585,8 @@ class BaseHandler(webapp2.RequestHandler):
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
+            template_is_aot_compiled: bool or None. False by default. Use
+                True when the template is compiled by angular AoT compiler.
 
         Raises:
             Exception. Invalid X-Frame-Options.

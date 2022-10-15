@@ -28,7 +28,6 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss",
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css"
             ],
@@ -100,7 +99,6 @@
               "assets"
             ],
             "styles": [
-              "src/styles.scss"
             ],
             "scripts": []
           }

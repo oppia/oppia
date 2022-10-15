@@ -127,6 +127,7 @@ def is_oppia_server_already_running() -> bool:
             return True
     return False
 
+
 def run_ng_compilation() -> None:
     """Runs webpack compilation.
 

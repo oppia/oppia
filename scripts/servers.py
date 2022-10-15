@@ -395,6 +395,7 @@ def create_managed_web_browser(
     else:
         return None
 
+
 @contextlib.contextmanager
 def managed_ng_build(
     use_prod_env: bool = False,
@@ -450,6 +451,7 @@ def managed_ng_build(
         printer_thread.start()
         exit_stack.callback(printer_thread.join)
         yield proc
+
 
 @contextlib.contextmanager
 def managed_webpack_compiler(

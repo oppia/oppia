@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for paramChangesEditor.
  */
 
-import { EventEmitter, destroyPlatform } from '@angular/core';
-import { async, TestBed } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -42,9 +42,8 @@ import { AngularNameService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
-import { importAllAngularServices, setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils.ajs';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ExplorationDataService } from '../services/exploration-data.service';
-import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
@@ -421,17 +420,3 @@ describe('Param Changes Editor Component', function() {
     }]);
   });
 });
-
-// describe('Upgraded component', () => {
-//   beforeEach(() => destroyPlatform());
-//   afterEach(() => destroyPlatform());
-//   it('should create the upgraded component', async(() => {
-//     setupAndGetUpgradedComponentAsync(
-//       'param-changes-editor',
-//       'paramChangesEditor',
-//       [ParamChangesEditorDirective]
-//     ).then(
-//       async(textContext) => expect(textContext).toBe('Hello Oppia!')
-//     );
-//   }));
-// });

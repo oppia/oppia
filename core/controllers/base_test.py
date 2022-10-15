@@ -66,7 +66,7 @@ class HelperFunctionTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
                 '"Loading | Oppia"',
-                base.load_template('oppia-root.mainpage.html'))
+                base.load_template('oppia-root.mainpage.html', False))
 
 
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):

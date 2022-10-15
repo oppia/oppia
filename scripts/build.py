@@ -675,6 +675,7 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
         _generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], webfonts_dir))
 
+
 def build_using_ng() -> None:
     print('Building using angular cli')
     managed_ng_build_process = servers.managed_ng_build(True, False)

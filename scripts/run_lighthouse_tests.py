@@ -118,6 +118,7 @@ def run_ng_compilation() -> None:
         print('Failed to complete webpack compilation, exiting...')
         sys.exit(1)
 
+
 def run_webpack_compilation() -> None:
     """Runs webpack compilation."""
     max_tries = 5
