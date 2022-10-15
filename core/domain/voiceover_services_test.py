@@ -18,8 +18,6 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import question_services
 from core.domain import rights_manager
@@ -416,57 +414,3 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             voiceover_services.reject_voiceover_application(
                 user_voiceover_applications[0].voiceover_application_id,
                 self.applicant_id, 'Testing rejection')
-
-    def test_get_text_to_create_voiceover_application(self) -> None:
-        exp_services.update_exploration(
-            self.owner_id, '0', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_CONTENT),
-                    'state_name': 'Introduction',
-                    'new_value': {
-                        'content_id': 'content',
-                        'html': '<p>The new content to voiceover</p>'
-                    }
-                })], 'Adds new content to init state')
-
-        content = voiceover_services.get_text_to_create_voiceover_application(
-            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en')
-        self.assertEqual(content, '<p>The new content to voiceover</p>')
-
-    def test_get_text_to_create_voiceover_application_in_diff_language(
-        self
-    ) -> None:
-        exp_services.update_exploration(
-            self.owner_id, '0', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_CONTENT),
-                    'state_name': 'Introduction',
-                    'new_value': {
-                        'content_id': 'content',
-                        'html': '<p>The new content to voiceover</p>'
-                    }
-                }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                    'state_name': 'Introduction',
-                    'content_id': 'content',
-                    'language_code': 'hi',
-                    'content_html': '<p>The new content to voiceover</p>',
-                    'translation_html': '<p>Translation in Hindi</p>',
-                    'data_format': 'html'
-                })], 'Adds new content to init state and its translation')
-
-        content = voiceover_services.get_text_to_create_voiceover_application(
-            feconf.ENTITY_TYPE_EXPLORATION, '0', 'hi')
-        self.assertEqual(content, '<p>Translation in Hindi</p>')
-
-    def test_get_text_to_create_voiceover_application_for_invalid_type(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'Invalid target type: invalid_type'):
-            voiceover_services.get_text_to_create_voiceover_application(
-                'invalid_type', '0', 'hi')

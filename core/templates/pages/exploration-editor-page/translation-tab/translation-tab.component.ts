@@ -62,16 +62,14 @@ angular.module('oppia').component('translationTab', {
     'ContextService', 'EditabilityService', 'ExplorationStatesService',
     'LoaderService', 'NgbModal', 'RouterService', 'SiteAnalyticsService',
     'StateEditorService', 'StateRecordedVoiceoversService',
-    'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
-    'TranslationTabActiveModeService',
+    'StateTutorialFirstTimeService', 'TranslationTabActiveModeService',
     'UserExplorationPermissionsService',
     function(
         $rootScope, $scope, $templateCache,
         ContextService, EditabilityService, ExplorationStatesService,
         LoaderService, NgbModal, RouterService, SiteAnalyticsService,
         StateEditorService, StateRecordedVoiceoversService,
-        StateTutorialFirstTimeService, StateWrittenTranslationsService,
-        TranslationTabActiveModeService,
+        StateTutorialFirstTimeService, TranslationTabActiveModeService,
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -93,9 +91,6 @@ angular.module('oppia').component('translationTab', {
         var stateName = StateEditorService.getActiveStateName();
         StateRecordedVoiceoversService.init(
           stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
-            stateName));
-        StateWrittenTranslationsService.init(
-          stateName, ExplorationStatesService.getWrittenTranslationsMemento(
             stateName));
         $scope.showTranslationTabSubDirectives = true;
         TranslationTabActiveModeService.activateVoiceoverMode();

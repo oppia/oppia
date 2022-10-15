@@ -46,6 +46,7 @@ from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.tests import test_utils
 
@@ -3418,8 +3419,6 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     AUTHOR_USERNAME = 'author'
     AUTHOR_EMAIL = 'author@example.com'
-    VIEWER_USERNAME = 'user'
-    VIEWER_EMAIL = 'user@example.com'
     TARGET_TYPE = feconf.ENTITY_TYPE_EXPLORATION
     SUGGESTION_TYPE_1 = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
     SUGGESTION_TYPE_2 = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
@@ -3437,7 +3436,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         'cmd': 'add_translation',
         'state_name': 'Introduction',
         'language_code': constants.DEFAULT_LANGUAGE_CODE,
-        'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+        'content_id': 'content_0',
         'content_html': '',
         'translation_html': ''
     }
@@ -3449,7 +3448,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_1'],
-            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+            'next_content_id_index': 0
         },
         'skill_id': SKILL_ID,
         'skill_difficulty': 0.3
@@ -3500,8 +3500,12 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(self.EXPLORATION_ID, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.EXPLORATION_ID)
         self.save_new_skill(self.SKILL_ID, self.author_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.CHANGE_DICT_3['question_dict']['question_state_data'] = (
-            self._create_valid_question_data('default_state').to_dict())
+            self._create_valid_question_data(
+                'default_state', content_id_generator).to_dict())
+        self.CHANGE_DICT_3['question_dict']['next_content_id_index'] = (
+            content_id_generator.next_content_id_index)
         self.suggestion_1 = suggestion_services.create_suggestion(
             self.SUGGESTION_TYPE_1, self.TARGET_TYPE,
             self.EXPLORATION_ID, self.TARGET_VERSION_ID,
@@ -5311,9 +5315,12 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id, self.admin_id,
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.skill_id],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.admin_id, self.question_id, self.skill_id, 0.5)
 
@@ -5799,9 +5806,12 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(self.topic_id, self.admin_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.set_topic_managers([self.user_a], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -5890,9 +5900,12 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(self.topic_id, self.admin_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.set_topic_managers([self.user_a], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -6066,9 +6079,12 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_play_question/<question_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
 
     def test_can_play_question_with_valid_question_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -6121,9 +6137,12 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -6230,9 +6249,12 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -6638,7 +6660,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     target_version_id = 1
     change_dict = {
         'cmd': 'add_written_translation',
-        'content_id': 'content',
+        'content_id': 'content_0',
         'language_code': 'hi',
         'content_html': '<p>old content html</p>',
         'state_name': 'State 1',
@@ -6696,7 +6718,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
+            'content_0', '<p>old content html</p>').to_dict()
         exploration.states['State 1'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 2'].update_content(
@@ -6713,17 +6735,19 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             'content', '<p>resubmit change content html</p>').to_dict()
 
         self.save_new_skill('skill_123', self.admin_id)
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         add_question_change_dict = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_123',
             'skill_difficulty': 0.3

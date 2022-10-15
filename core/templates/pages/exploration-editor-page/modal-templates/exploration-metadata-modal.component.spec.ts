@@ -114,7 +114,7 @@ describe('Exploration Metadata Modal Component', () => {
       explorationTitleService.init('');
       explorationCategoryService.init('');
       explorationLanguageCodeService.init('en');
-      explorationStatesService.init(null);
+      explorationStatesService.init(null, false);
       explorationTagsService.init('');
 
       fixture.detectChanges();
@@ -192,7 +192,7 @@ describe('Exploration Metadata Modal Component', () => {
       explorationTitleService.init('');
       explorationCategoryService.init('Generic category');
       explorationLanguageCodeService.init('en');
-      explorationStatesService.init(null);
+      explorationStatesService.init(null, false);
       explorationTagsService.init('');
 
       fixture.detectChanges();

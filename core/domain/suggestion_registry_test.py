@@ -21,10 +21,10 @@ import os
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import change_domain
 from core.domain import config_services
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_validation_service
@@ -34,6 +34,8 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import translation_domain
+from core.domain import translation_fetchers
 from core.platform import models
 from core.tests import test_utils
 
@@ -42,9 +44,14 @@ from typing_extensions import Final, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+(
+    suggestion_models, opportunity_models
+) = models.Registry.import_models([
+    models.Names.SUGGESTION, models.Names.OPPORTUNITY
+])
 
 ChangeType = Dict[
     str, Union[str, float, Dict[str, Union[str, int, state_domain.StateDict]]]
@@ -600,14 +607,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        exp_services.update_exploration(
-            self.author_id, 'exp1', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                })
-            ], 'Added state')
-        suggestion.change.state_name = 'State A'
+        suggestion.change.state_name = 'Introduction'
 
         suggestion.pre_accept_validate()
 
@@ -928,6 +928,22 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'edited_by_reviewer': False
         }
 
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp1',
+            topic_id='Topic1',
+            topic_name='New Topic',
+            story_id='Story1',
+            story_title='New Story',
+            chapter_title='New chapter',
+            content_count=10,
+            translation_counts={},
+            incomplete_translation_language_codes=[
+                language['id']
+                for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            ],
+            language_codes_needing_voice_artists=['en']
+        ).put()
+
     def test_pre_update_validate_fails_for_invalid_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -941,7 +957,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date)
 
         change = {
-            'cmd': exp_domain.CMD_ADD_STATE,
+            'cmd': exp_domain.CMD_DELETE_STATE,
             'state_name': 'Introduction'
         }
         with self.assertRaisesRegex(
@@ -1482,20 +1498,17 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             self.author_id, 'exp1', [
                 exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                }),
-                exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'new_value': {
                         'content_id': 'content',
                         'html': '<p>This is a content.</p>'
                     },
-                    'state_name': 'State A',
+                    'state_name': 'Introduction',
                 })
             ], 'Added state')
-        suggestion.change.state_name = 'State A'
+
+        suggestion.change.state_name = 'Introduction'
 
         suggestion.pre_accept_validate()
 
@@ -1507,9 +1520,12 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             suggestion.pre_accept_validate()
 
     def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
-        self.save_new_default_exploration('exp1', self.author_id)
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exp.id, exp.version))
+        self.assertEqual(len(translations), 0)
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1522,17 +1538,23 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1
-        })
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exp.id, exp.version))
+        self.assertEqual(len(translations), 1)
+        self.assertEqual(translations[0].language_code, 'hi')
+        self.assertEqual(translations[0].get_translation_count(), 1)
 
     def test_accept_suggestion_with_set_of_string_adds_translation(
         self
     ) -> None:
-        self.save_new_default_exploration('exp1', self.author_id)
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exp.id, exp.version))
+        self.assertEqual(len(translations), 0)
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1554,18 +1576,24 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1
-        })
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version
+            )
+        )
+        self.assertEqual(len(translations), 1)
+        self.assertEqual(translations[0].language_code, 'hi')
+        self.assertEqual(translations[0].get_translation_count(), 1)
 
     def test_accept_suggestion_with_psedonymous_author_adds_translation(
         self
     ) -> None:
-        self.save_new_default_exploration('exp1', self.author_id)
-
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version)
+        )
+        self.assertEqual(len(translations), 0)
 
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1580,11 +1608,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
-        exploration = exp_fetchers.get_exploration_by_id('exp1')
-
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1
-        })
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version
+            )
+        )
+        self.assertEqual(len(translations), 1)
+        self.assertEqual(translations[0].language_code, 'hi')
+        self.assertEqual(translations[0].get_translation_count(), 1)
 
     def test_get_all_html_content_strings(self) -> None:
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1696,6 +1727,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
@@ -1713,12 +1745,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
                 'question_dict': {
                     'question_state_data': self._create_valid_question_data(
-                        'default_state').to_dict(),
+                        'default_state', content_id_generator).to_dict(),
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                    'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                    'next_content_id_index': (
+                        content_id_generator.next_content_id_index)
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -2093,14 +2127,17 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
+        content_id_generator = translation_domain.ContentIdGenerator()
         change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_2'
         }
@@ -2116,14 +2153,17 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             )
 
     def test_pre_update_validate_complains_if_nothing_changed(self) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.3
@@ -2135,14 +2175,17 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, change,
             'question.topic_1', 'en', False, self.fake_date)
 
+        content_id_generator = translation_domain.ContentIdGenerator()
         new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.3
@@ -2161,14 +2204,17 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     def test_pre_update_validate_accepts_a_change_in_skill_difficulty_only(
         self
     ) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.3
@@ -2180,14 +2226,17 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, change,
             'question.topic_1', 'en', False, self.fake_date)
 
+        content_id_generator = translation_domain.ContentIdGenerator()
         new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.6
@@ -2209,14 +2258,17 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     def test_pre_update_validate_accepts_a_change_in_state_data_only(
         self
     ) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.3
@@ -2228,14 +2280,17 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, change,
             'question.topic_1', 'en', False, self.fake_date)
 
+        content_id_generator = translation_domain.ContentIdGenerator()
         new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'hi',
                 'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'next_content_id_index': (
+                        content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.3
@@ -2392,7 +2447,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'Expected language_code to be en, received None'):
             suggestion.validate()
 
-    def test_get_all_html_conztent_strings(self) -> None:
+    def test_get_all_html_content_strings(self) -> None:
         suggestion = suggestion_registry.SuggestionAddQuestion(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -2404,7 +2459,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [
-            u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>', u'']
+            u'', u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self) -> None:
@@ -2446,15 +2501,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'solution': {}
-                }
-            },
-            'written_translations': {
-                'translations_mapping': {
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -2559,8 +2605,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;img.svg&amp;quot;}">'
             '</oppia-noninteractive-math>')
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_state_dict = self._create_valid_question_data(
-            'default_state').to_dict()
+            'default_state', content_id_generator).to_dict()
         question_state_dict['content']['html'] = html_content
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
@@ -2589,7 +2636,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_skill_misconception_ids': []
+                    'inapplicable_skill_misconception_ids': [],
+                    'next_content_id_index': (
+                        content_id_generator.next_content_id_index)
                 },
                 'skill_id': 'skill1',
                 'skill_difficulty': 0.3,
@@ -2623,7 +2672,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         question_state_dict: state_domain.StateDict = {
             'content': {
                 'html': '<p>Text</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'classifier_model_id': None,
             'linked_skill_id': None,
@@ -2641,7 +2690,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                             'dest_if_really_stuck': None,
                             'feedback': {
                                 'html': '<p>assas</p>',
-                                'content_id': 'feedback_0'
+                                'content_id': 'feedback_2'
                             },
                             'labelled_as_correct': True,
                             'param_changes': [],
@@ -2686,7 +2735,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'dest_if_really_stuck': None,
                     'feedback': {
                         'html': '<p>wer</p>',
-                        'content_id': 'default_outcome'
+                        'content_id': 'default_outcome_1'
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
@@ -2697,7 +2746,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'html': '<p>assaas</p>',
-                            'content_id': 'hint_1'
+                            'content_id': 'hint_3'
                         }
                     }
                 ],
@@ -2706,23 +2755,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'feedback_0': {},
-                    'hint_1': {}
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'feedback_2': {},
+                    'hint_3': {}
                 }
             },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'feedback_0': {},
-                    'hint_1': {}
-                }
-            },
-            'next_content_id_index': 2
         }
         suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'skill1.thread1',
@@ -2741,6 +2781,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill1'],
+                    'next_content_id_index': 4,
                     'inapplicable_skill_misconception_ids': []
                 },
                 'skill_id': 'skill1',

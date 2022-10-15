@@ -59,7 +59,6 @@ describe('StateTopAnswersStatsService', () => {
   const stateBackendDict: StateBackendDict = {
     content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
     linked_skill_id: null,
-    next_content_id_index: 0,
     param_changes: [],
     interaction: {
       answer_groups: [{
@@ -115,13 +114,6 @@ describe('StateTopAnswersStatsService', () => {
     },
     solicit_answer_details: false,
     card_is_checkpoint: false,
-    written_translations: {
-      translations_mapping: {
-        content: {},
-        default_outcome: {},
-        feedback_1: {},
-      },
-    },
   };
 
   const makeStates = (statesBackendDict = {Hola: stateBackendDict}): States => {

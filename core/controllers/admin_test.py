@@ -443,12 +443,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         exp_services.update_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'content 1'
             },
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -457,12 +457,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         exp_services.update_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'content 1'
             },
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -471,12 +471,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         exp_services.update_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'content 1'
             },
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -485,12 +485,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         exp_services.update_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'content 1'
             },
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',

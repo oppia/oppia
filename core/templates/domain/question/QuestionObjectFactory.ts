@@ -35,6 +35,7 @@ export interface QuestionBackendDict {
   'version': number;
   'linked_skill_ids': string[];
   'inapplicable_skill_misconception_ids': string[];
+  'next_content_id_index': number;
 }
 
 export class Question {
@@ -46,11 +47,12 @@ export class Question {
   _version: number;
   _linkedSkillIds: string[];
   _inapplicableSkillMisconceptionIds: string[];
+  _nextContentIdIndex: number;
 
   constructor(
       id: string | null, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
-      inapplicableSkillMisconceptionIds: string[]) {
+      inapplicableSkillMisconceptionIds: string[], nextContentIdIndex: number) {
     this._id = id;
     this._stateData = stateData;
     this._languageCode = languageCode;
@@ -58,6 +60,7 @@ export class Question {
     this._linkedSkillIds = linkedSkillIds;
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
+    this._nextContentIdIndex = nextContentIdIndex;
   }
 
   // Some methods have either string or null return value,
@@ -102,6 +105,14 @@ export class Question {
       inapplicableSkillMisconceptionIds: string[]): void {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
+  }
+
+  getNextContentIdIndex(): number {
+    return this._nextContentIdIndex;
+  }
+
+  setNextContentIdIndex(nextContentIdIndex: number): void {
+    this._nextContentIdIndex = nextContentIdIndex;
   }
 
   // Returns 'null' when the message is valid.
@@ -197,6 +208,7 @@ export class Question {
       linked_skill_ids: this._linkedSkillIds,
       inapplicable_skill_misconception_ids: (
         this._inapplicableSkillMisconceptionIds),
+      next_content_id_index: this._nextContentIdIndex,
       version: 0,
     };
     if (!isNewQuestion) {
@@ -219,8 +231,9 @@ export class QuestionObjectFactory {
   // Create a default question until the actual question is saved.
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
-      null, this.stateObject.createDefaultState(null),
-      constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
+      null, this.stateObject.createDefaultState(
+        null, 'content_0', 'default_outcome_1'),
+      constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, [], 2);
   }
 
   createFromBackendDict(questionBackendDict: QuestionBackendDict): Question {
@@ -230,7 +243,8 @@ export class QuestionObjectFactory {
         'question', questionBackendDict.question_state_data),
       questionBackendDict.language_code, questionBackendDict.version,
       questionBackendDict.linked_skill_ids,
-      questionBackendDict.inapplicable_skill_misconception_ids
+      questionBackendDict.inapplicable_skill_misconception_ids,
+      questionBackendDict.next_content_id_index
     );
   }
 }

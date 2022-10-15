@@ -109,7 +109,7 @@ class QuestionCreationHandler(base.BaseHandler):
             question.id,
             skill_ids,
             skill_difficulties)
-        html_list = question.question_state_data.get_all_html_content_strings()
+        html_list = question.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
         image_validation_error_message_suffix = (

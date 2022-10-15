@@ -30,6 +30,7 @@ from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -75,7 +76,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}
                 }
@@ -184,7 +185,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}
                 }
@@ -215,7 +216,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({
+                translation_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }
@@ -233,7 +234,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({
+                translation_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }
@@ -268,7 +269,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({
+                translation_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }
@@ -286,7 +287,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({
+                translation_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }
@@ -924,18 +925,21 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.SKILL_ID, strict=False), None)
 
     def test_delete_skill_model_with_linked_suggestion(self) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change: SuggestionChangeDictType = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': self.SKILL_ID,
             'skill_difficulty': 0.3
@@ -1598,7 +1602,9 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;image.svg&amp;quot;}">'
             '</oppia-noninteractive-math>')
 
-        written_translations_dict_math: state_domain.WrittenTranslationsDict = {
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content1': {
                     'en': {
@@ -1634,8 +1640,8 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                     explanation_content_id: {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict(
-                written_translations_dict_math))
+            translation_domain.WrittenTranslations.from_dict(
+                written_translations_dict))
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_dict['explanation']['html'] = html_content
         skill_contents_dict['written_translations']['translations_mapping'][
@@ -1674,7 +1680,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             skill.skill_contents.explanation.html, html_content)
         self.assertEqual(
             skill.skill_contents.written_translations.to_dict(),
-            written_translations_dict_math)
+            written_translations_dict)
         self.assertEqual(
             skill.skill_contents.worked_examples[0].to_dict(),
             worked_example_dict_math)
@@ -1699,7 +1705,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                     explanation_content_id: {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     explanation_content_id: {}
                 }
@@ -1756,7 +1762,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                     explanation_content_id: {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     explanation_content_id: {}
                 }

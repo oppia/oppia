@@ -41,6 +41,7 @@ describe('Exploration data service', function() {
     version: 1,
     draft_changes: [],
     is_version_of_draft_valid: true,
+    next_content_id_index: 1,
     init_state_name: 'init',
     param_changes: [],
     param_specs: {randomProp: {obj_type: 'randomVal'}},
@@ -186,6 +187,7 @@ describe('Exploration data service', function() {
         states: {},
         title: 'Test Exploration',
         language_code: 'en',
+        next_content_id_index: 5,
         correctness_feedback_enabled: false
       };
       eds.data = dataResults;

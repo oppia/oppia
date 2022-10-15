@@ -79,9 +79,10 @@ angular.module('oppia').component('explorationEditorTab', {
   controller: [
     '$rootScope', '$scope', '$templateCache', '$timeout', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
-    'ExplorationInitStateNameService', 'ExplorationStatesService',
-    'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
-    'LoaderService', 'NgbModal',
+    'ExplorationInitStateNameService',
+    'ExplorationNextContentIdIndexService', 'ExplorationStatesService',
+    'ExplorationWarningsService', 'FocusManagerService',
+    'GenerateContentIdService', 'GraphDataService', 'LoaderService', 'NgbModal',
     'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
@@ -89,9 +90,10 @@ angular.module('oppia').component('explorationEditorTab', {
     function(
         $rootScope, $scope, $templateCache, $timeout, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
-        ExplorationInitStateNameService, ExplorationStatesService,
-        ExplorationWarningsService, FocusManagerService, GraphDataService,
-        LoaderService, NgbModal,
+        ExplorationInitStateNameService,
+        ExplorationNextContentIdIndexService, ExplorationStatesService,
+        ExplorationWarningsService, FocusManagerService,
+        GenerateContentIdService, GraphDataService, LoaderService, NgbModal,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -254,10 +256,8 @@ angular.module('oppia').component('explorationEditorTab', {
           angular.copy(displayedValue));
       };
 
-      ctrl.saveNextContentIdIndex = function(displayedValue) {
-        ExplorationStatesService.saveNextContentIdIndex(
-          StateEditorService.getActiveStateName(),
-          angular.copy(displayedValue));
+      ctrl.saveNextContentIdIndex = function() {
+        ExplorationNextContentIdIndexService.saveDisplayedValue();
       };
 
       ctrl.saveSolution = function(displayedValue) {
@@ -267,6 +267,7 @@ angular.module('oppia').component('explorationEditorTab', {
 
         StateEditorService.setInteractionSolution(
           angular.copy(displayedValue));
+        ExplorationNextContentIdIndexService.saveDisplayedValue();
       };
 
       ctrl.saveHints = function(displayedValue) {
@@ -293,11 +294,8 @@ angular.module('oppia').component('explorationEditorTab', {
         var stateName = StateEditorService.getActiveStateName();
         var state = ExplorationStatesService.getState(stateName);
         var recordedVoiceovers = state.recordedVoiceovers;
-        var writtenTranslations = state.writtenTranslations;
         const shouldPrompt = contentIds.some(contentId => {
-          return (
-            recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
-            writtenTranslations.hasUnflaggedWrittenTranslations(contentId));
+          return recordedVoiceovers.hasUnflaggedVoiceovers(contentId);
         });
         if (shouldPrompt) {
           NgbModal.open(
@@ -310,13 +308,6 @@ angular.module('oppia').component('explorationEditorTab', {
                   contentId);
                 ExplorationStatesService.saveRecordedVoiceovers(
                   stateName, recordedVoiceovers);
-              }
-              if (writtenTranslations.hasUnflaggedWrittenTranslations(
-                contentId)) {
-                writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                  contentId);
-                ExplorationStatesService.markWrittenTranslationsAsNeedingUpdate(
-                  contentId, stateName);
               }
             });
           }, function() {
@@ -357,6 +348,14 @@ angular.module('oppia').component('explorationEditorTab', {
           }
         });
         ctrl.interactionIsShown = false;
+
+        GenerateContentIdService.init(() => {
+          let indexToUse = ExplorationNextContentIdIndexService.displayed;
+          ExplorationNextContentIdIndexService.displayed += 1;
+          return indexToUse;
+        }, () => {
+          ExplorationNextContentIdIndexService.restoreFromMemento();
+        });
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

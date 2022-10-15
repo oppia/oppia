@@ -104,7 +104,7 @@ describe('Tutor card component', () => {
 
   let mockDisplayedCard = new StateCard(
     '', '', '', new Interaction([], [], null, null, [], null, null)
-    , [], null, null, '', null);
+    , [], null, '', null);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

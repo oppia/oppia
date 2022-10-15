@@ -59,6 +59,7 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
+from core.domain import translation_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -114,6 +115,7 @@ class UserExplorationDataDict(TypedDict):
     is_version_of_draft_valid: Optional[bool]
     draft_changes: Dict[str, str]
     email_preferences: user_domain.UserExplorationPrefsDict
+    next_content_id_index: int
 
 
 class SnapshotsMetadataDict(TypedDict):
@@ -467,7 +469,11 @@ def apply_change_list(
                     exp_domain.AddExplorationStateCmd,
                     change
                 )
-                exploration.add_states([add_state_cmd.state_name])
+                exploration.add_state(
+                    add_state_cmd.state_name,
+                    add_state_cmd.content_id_for_state_content,
+                    add_state_cmd.content_id_for_default_outcome
+                )
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
                 # Here we use cast because we are narrowing down the type from
                 # ExplorationChange to a specific change command.
@@ -518,20 +524,6 @@ def apply_change_list(
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExpStatePropertyNextContentIdIndexCmd.
-                    edit_next_content_id_index_cmd = cast(
-                        exp_domain.EditExpStatePropertyNextContentIdIndexCmd,
-                        change
-                    )
-                    next_content_id_index = max(
-                        edit_next_content_id_index_cmd.new_value,
-                        state.next_content_id_index
-                    )
-                    state.update_next_content_id_index(next_content_id_index)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
                     # Here we use cast because this 'elif'
@@ -712,78 +704,6 @@ def apply_change_list(
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                    if not isinstance(change.new_value, dict):
-                        raise Exception(
-                            'Expected written_translations to be a dict, '
-                            'received %s' % change.new_value)
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExpStatePropertyWrittenTranslationsCmd.
-                    edit_written_translations_cmd = cast(
-                        exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
-                        change
-                    )
-                    cleaned_written_translations_dict = (
-                        state_domain.WrittenTranslations
-                        .convert_html_in_written_translations(
-                            edit_written_translations_cmd.new_value,
-                            html_cleaner.clean
-                        )
-                    )
-                    written_translations = (
-                        state_domain.WrittenTranslations.from_dict(
-                            cleaned_written_translations_dict))
-                    state.update_written_translations(written_translations)
-            elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
-                # DEPRECATED: This command is deprecated. Please do not use.
-                # The command remains here to support old suggestions.
-                exploration.states[change.state_name].add_translation(
-                    change.content_id, change.language_code,
-                    change.translation_html)
-            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                # Here we use cast because we are narrowing down the type from
-                # ExplorationChange to a specific change command.
-                add_written_translation_cmd = cast(
-                    exp_domain.AddWrittenTranslationCmd,
-                    change
-                )
-                exploration.states[
-                    add_written_translation_cmd.state_name
-                ].add_written_translation(
-                    add_written_translation_cmd.content_id,
-                    add_written_translation_cmd.language_code,
-                    add_written_translation_cmd.translation_html,
-                    add_written_translation_cmd.data_format
-                )
-            elif (change.cmd ==
-                  exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
-                # Here we use cast because we are narrowing down the type from
-                # ExplorationChange to a specific change command.
-                written_translation_as_needing_update_cmd = cast(
-                    exp_domain.MarkWrittenTranslationAsNeedingUpdateCmd,
-                    change
-                )
-                exploration.states[
-                    written_translation_as_needing_update_cmd.state_name
-                ].mark_written_translation_as_needing_update(
-                    written_translation_as_needing_update_cmd.content_id,
-                    written_translation_as_needing_update_cmd.language_code
-                )
-            elif (change.cmd ==
-                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
-                # Here we use cast because we are narrowing down the type from
-                # ExplorationChange to a specific change command.
-                written_translations_as_needing_update_cmd = cast(
-                    exp_domain.MarkWrittenTranslationsAsNeedingUpdateCmd,
-                    change
-                )
-                exploration.states[
-                    written_translations_as_needing_update_cmd.state_name
-                ].mark_written_translations_as_needing_update(
-                    written_translations_as_needing_update_cmd.content_id
-                )
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     # Here we use cast because this 'if' condition forces
@@ -903,8 +823,19 @@ def apply_change_list(
                         change
                     )
                     exploration.update_correctness_feedback_enabled(
-                        edit_correctness_feedback_enabled_cmd.new_value
+                        edit_correctness_feedback_enabled_cmd.new_value)
+                elif change.property_name == 'next_content_id_index':
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyNextContentIdIndexCmd.
+                    cmd = cast(
+                        exp_domain.EditExplorationPropertyNextContentIdIndexCmd,
+                        change
                     )
+                    next_content_id_index = max(
+                        cmd.new_value, exploration.next_content_id_index)
+                    exploration.update_next_content_id_index(
+                        next_content_id_index)
             elif (change.cmd ==
                   exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
@@ -972,6 +903,7 @@ def populate_exp_model_fields(
     exp_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
     exp_model.edits_allowed = exploration.edits_allowed
+    exp_model.next_content_id_index = exploration.next_content_id_index
 
     return exp_model
 
@@ -1101,11 +1033,10 @@ def update_states_version_history(
         for state_name in states_which_were_not_renamed
     }
     # The following ignore list contains those state properties which are
-    # related to translations. Hence, they are ignored in order to avoid
-    # updating the version history in case of translation-only commits.
+    # related to voiceovers. Hence, they are ignored in order to avoid
+    # updating the version history in case of voiceover-only commits.
     state_property_ignore_list = [
-        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS,
-        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
+        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
     ]
     for change in change_list:
         if (
@@ -1437,7 +1368,8 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
+        next_content_id_index=exploration.next_content_id_index
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)
@@ -1940,7 +1872,6 @@ def update_exploration(
     exploration_id: str,
     change_list: Optional[List[exp_domain.ExplorationChange]],
     commit_message: Optional[str],
-    is_suggestion: bool = False,
     is_by_voice_artist: bool = False
 ) -> None:
     """Update an exploration. Commits changes.
@@ -1957,8 +1888,6 @@ def update_exploration(
             explorations, it should be equal to None. For suggestions that are
             being accepted, and only for such commits, it should start with
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
-        is_suggestion: bool. Whether the update is due to a suggestion being
-            accepted.
         is_by_voice_artist: bool. Whether the changes are made by a
             voice artist.
 
@@ -1984,24 +1913,39 @@ def update_exploration(
             'Exploration is public so expected a commit message but '
             'received none.')
 
-    if (is_suggestion and (
-            not commit_message or
-            not commit_message.startswith(
-                feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX))):
-        raise ValueError('Invalid commit message for suggestion.')
-    if (not is_suggestion and commit_message and commit_message.startswith(
-            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)):
-        raise ValueError(
-            'Commit messages for non-suggestions may not start with \'%s\'' %
-            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
-
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
-    _save_exploration(
-        committer_id, updated_exploration, commit_message, change_list)
+
+    content_ids_corresponding_translations_to_remove = []
+    content_ids_corresponding_translations_to_mark_needs_update = []
+
+    for change in change_list:
+        if change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
+            content_ids_corresponding_translations_to_mark_needs_update.append(
+                change.content_id)
+            continue
+
+        if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
+            content_ids_corresponding_translations_to_remove.append(
+                change.content_id)
 
     discard_draft(exploration_id, committer_id)
+
+    # Update translations related changes in the datastore.
+    # Running this function in task queue is avoided as failure updating
+    # translation models can lead to missing translations to all the future
+    # versions of exploration.
+    translation_services.update_translation_related_change(
+        exploration_id,
+        updated_exploration.version - 1,
+        content_ids_corresponding_translations_to_remove,
+        content_ids_corresponding_translations_to_mark_needs_update,
+        updated_exploration.get_content_count()
+    )
+
+    _save_exploration(
+        committer_id, updated_exploration, commit_message, change_list)
 
     # Update summary of changed exploration in a deferred task.
     taskqueue_services.defer(
@@ -2015,11 +1959,6 @@ def update_exploration(
         if not rights_manager.is_exploration_private(exploration_id):
             user_services.update_first_contribution_msec_if_not_set(
                 committer_id, utils.get_current_time_in_millisecs())
-
-    if opportunity_services.is_exploration_available_for_contribution(
-            exploration_id):
-        opportunity_services.update_opportunity_with_updated_exploration(
-            exploration_id)
 
 
 def regenerate_exploration_summary_with_new_contributor(
@@ -2780,7 +2719,6 @@ def are_changes_mergeable(
         return True
     if current_exploration.version < change_list_version:
         return False
-
     # A complete list of changes from one version to another
     # is composite_change_list.
     composite_change_list = get_composite_change_list(
@@ -2883,6 +2821,7 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
+        'next_content_id_index': exploration.next_content_id_index,
         'edits_allowed': exploration.edits_allowed
     }
 

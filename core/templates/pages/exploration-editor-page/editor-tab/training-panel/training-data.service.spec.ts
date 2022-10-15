@@ -207,7 +207,7 @@ describe('Training Data Service', () => {
           null,
           null,
         ), [], 'id', null),
-        null, null, true, true, null, 7)
+        null, null, true, null)
     )).toEqual([null, null, new Outcome(
       'Hola',
       null,

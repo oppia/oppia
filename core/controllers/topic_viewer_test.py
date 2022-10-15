@@ -24,6 +24,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.tests import test_utils
 
@@ -318,9 +319,12 @@ class TopicPageDataHandlerTests(
             self.skill_id_1, self.admin_id, description='Skill Description 1')
         for index in range(number_of_questions):
             question_id = question_services.get_new_question_id()
+            content_id_generator = translation_domain.ContentIdGenerator()
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data(index), [self.skill_id_1])
+                self._create_valid_question_data(index, content_id_generator),
+                [self.skill_id_1],
+                content_id_generator.next_content_id_index)
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         json_response = self.get_json(
@@ -370,9 +374,12 @@ class TopicPageDataHandlerTests(
             self.skill_id_1, self.admin_id, description='Skill Description 1')
         for index in range(number_of_questions):
             question_id = question_services.get_new_question_id()
+            content_id_generator = translation_domain.ContentIdGenerator()
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data(index), [self.skill_id_1])
+                self._create_valid_question_data(index, content_id_generator),
+                [self.skill_id_1],
+                content_id_generator.next_content_id_index)
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         json_response = self.get_json(
@@ -427,9 +434,12 @@ class TopicPageDataHandlerTests(
         for i in range(number_of_skills):
             for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
+                content_id_generator = translation_domain.ContentIdGenerator()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [skill_ids[i]])
+                    self._create_valid_question_data(j, content_id_generator),
+                    [skill_ids[i]],
+                    content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 
@@ -477,9 +487,12 @@ class TopicPageDataHandlerTests(
         for i in range(number_of_skills):
             for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
+                content_id_generator = translation_domain.ContentIdGenerator()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [skill_ids[i]])
+                    self._create_valid_question_data(j, content_id_generator),
+                    [skill_ids[i]],
+                    content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 
@@ -529,9 +542,12 @@ class TopicPageDataHandlerTests(
         for i in range(number_of_skills):
             for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
+                content_id_generator = translation_domain.ContentIdGenerator()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [skill_ids[i]])
+                    self._create_valid_question_data(j, content_id_generator),
+                    [skill_ids[i]],
+                    content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 

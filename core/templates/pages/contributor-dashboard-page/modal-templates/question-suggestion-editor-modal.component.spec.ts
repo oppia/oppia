@@ -255,10 +255,7 @@ describe('Question Suggestion Editor Modal Component', () => {
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {}
-        },
-        written_translations: {
-          translations_mapping: {}
-        },
+        }
       },
       inapplicable_skill_misconception_ids: ['1-2']
     });
@@ -299,8 +296,9 @@ describe('Question Suggestion Editor Modal Component', () => {
   it('should update the question', () => {
     spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
       .and.callFake((
-          suggestionId, skillDifficulty, questionStateData, imagesData,
-          successCallback, errorCallback) => {
+          suggestionId, skillDifficulty, questionStateData, nextContentIdIndex,
+          imagesData, successCallback, errorCallback
+      ) => {
         successCallback(null);
         return null;
       });
@@ -319,8 +317,9 @@ describe('Question Suggestion Editor Modal Component', () => {
     () => {
       spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
         .and.callFake((
-            suggestionId, skillDifficulty, questionStateData, imagesData,
-            successCallback, errorCallback) => {
+            suggestionId, skillDifficulty, questionStateData,
+            nextContentIdIndex, imagesData, successCallback, errorCallback
+        ) => {
           successCallback(null);
           return null;
         });

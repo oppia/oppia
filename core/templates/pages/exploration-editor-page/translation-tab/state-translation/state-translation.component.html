@@ -267,7 +267,30 @@
     <oppia-audio-translation-bar [is-translation-tab-busy]="$ctrl.isTranslationTabBusy"></oppia-audio-translation-bar>
   </div>
   <div ng-if="!isVoiceoverModeActive()">
-    <oppia-state-translation-editor></oppia-state-translation-editor>
+    <div ng-if="!isVoiceoverModeActive()" class="oppia-state-content-header">Translated content</div>
+    <div class="translated-state-contents">
+      <div class="oppia-translated-content-display oppia-transition-200"
+           ng-class="{'oppia-prevent-selection': isEditable()}"
+           title="Translated Content">
+        <span class="oppia-placeholder" ng-if="!activeTranslatedContent || activeTranslatedContent.translation === ''">
+          This section has not been translated yet.
+        </span>
+        <span ng-if="activeTranslatedContent">
+          <angular-html-bind ng-if="activeTranslatedContent.isHtml()"
+                             html-data="activeTranslatedContent.getTranslation()"
+                             class="oppia-rte-editor protractor-test-translation-display">
+          </angular-html-bind>
+          <p ng-if="activeTranslatedContent.isUnicode()">
+            {{activeTranslatedContent.getTranslation()}}
+          </p>
+          <ul ng-if="activeTranslatedContent.isSetOfStrings()">
+            <li ng-repeat="item in activeTranslatedContent.translation track by $index">
+              {{item}}
+            </li>
+          </ul>
+        </span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -339,6 +362,11 @@
   .translation-state-contents {
     border-bottom: 2px solid #eee;
     min-height: 400px;
+    word-wrap: break-word;
+  }
+  .translated-state-contents {
+    border-bottom: 2px solid #eee;
+    min-height: 100px;
     word-wrap: break-word;
   }
   .translation-state-content {

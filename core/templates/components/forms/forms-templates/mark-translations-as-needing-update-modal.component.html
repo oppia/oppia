@@ -1,0 +1,44 @@
+<div class="modal-header e2e-test-update-translations-modal">
+  <h3>Update Translations</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    It looks like you are updating content for a published curated lesson that can contain translations in different
+    languages.
+  </p>
+  <br>
+  <br>
+  <p>
+    Please select an appropriate change for the translations:
+  </p>
+  <ul>
+    <li>
+      <p>
+        <strong>Remove existing translations:</strong>
+        Remove all the translations in different languages for the given content.
+        Select this in case you have made some significant changes and the existing translations won't be appropriate for
+        the updated content.
+      </p>
+    </li>
+    <li>
+      <p>
+        <strong>Mark translations need update:</strong>
+        Mark all the translations in different languages for the given content as needs update.
+        Select this in case you have made some changes that will need some minor changes in the translations.
+      </p>
+    </li>
+    <li>
+      <p>
+        <strong>Leave as is:</strong>
+        Leave all the translations as is. Select this in case you have made a very minor change e.g. fixed a minor typo.
+      </p>
+    </li>
+  </ul>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="removeTranslations()">Remove existing translations</button>
+  <button class="btn btn-secondary" (click)="markNeedsUpdate()">Mark translations needs update</button>
+  <button class="btn btn-secondary e2e-test-leave-translations-as-is" (click)="cancel()">Leave as is</button>
+</div>

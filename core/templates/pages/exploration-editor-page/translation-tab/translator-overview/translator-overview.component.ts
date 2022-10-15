@@ -38,13 +38,13 @@ angular.module('oppia').component('translatorOverview', {
   },
   template: require('./translator-overview.component.html'),
   controller: [
-    '$scope', '$window', 'ExplorationLanguageCodeService',
+    '$scope', '$window', 'ContextService', 'ExplorationLanguageCodeService',
     'FocusManagerService', 'GraphDataService', 'LanguageUtilService',
     'RouterService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
     'DEFAULT_AUDIO_LANGUAGE',
     function(
-        $scope, $window, ExplorationLanguageCodeService,
+        $scope, $window, ContextService, ExplorationLanguageCodeService,
         FocusManagerService, GraphDataService, LanguageUtilService,
         RouterService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
@@ -58,8 +58,8 @@ angular.module('oppia').component('translatorOverview', {
         .getAllVoiceoverLanguageCodes();
 
       $scope.canShowTabModeSwitcher = function() {
-        return ($scope.languageCode !== (
-          ExplorationLanguageCodeService.displayed));
+        return ContextService.isExplorationLinkedToStory() && (
+          $scope.languageCode !== ExplorationLanguageCodeService.displayed);
       };
 
       var refreshDirectiveScope = function() {

@@ -33,6 +33,7 @@ from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
+from core.domain import translation_domain
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -112,13 +113,9 @@ class SuggestionHandler(base.BaseHandler):
 
         suggestion_change = suggestion.change
         if (
-                suggestion_change.cmd == 'add_written_translation' and
-                suggestion_change.data_format in
-                (
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                suggestion_change.cmd == 'add_written_translation' and (
+                    translation_domain.TranslatableContentFormat
+                    .is_data_format_list(suggestion_change.data_format)
                 )
         ):
             self.render_json(self.values)
@@ -582,6 +579,11 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 'The parameter \'question_state_data\' is missing.'
             )
 
+        if self.payload.get('next_content_id_index') is None:
+            raise self.InvalidInputException(
+                'The parameter \'next_content_id_index\' is missing.'
+            )
+
         question_state_data_obj = state_domain.State.from_dict(
             self.payload.get('question_state_data'))
         question_state_data_obj.validate(None, False)
@@ -589,7 +591,9 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
         suggestion_services.update_question_suggestion(
             suggestion_id,
             self.payload.get('skill_difficulty'),
-            self.payload.get('question_state_data'))
+            self.payload.get('question_state_data'),
+            self.payload.get('next_content_id_index')
+        )
 
         self.render_json(self.values)
 

@@ -50,7 +50,7 @@ describe('Progress nav component', () => {
   let schemaFormSubmittedService: SchemaFormSubmittedService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let mockDisplayedCard = new StateCard(
-    '', '', '', null, [], null, null, '', null);
+    '', '', '', null, [], null, '', null);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

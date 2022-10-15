@@ -37,7 +37,7 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, List, Optional, Set, Union, cast, overload
+from typing import Dict, List, Optional, Set, Tuple, Union, cast, overload
 from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -54,6 +54,7 @@ QUESTION_PROPERTY_QUESTION_STATE_DATA: Final = 'question_state_data'
 QUESTION_PROPERTY_LINKED_SKILL_IDS: Final = 'linked_skill_ids'
 QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS: Final = (
     'inapplicable_skill_misconception_ids')
+QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -90,8 +91,8 @@ class QuestionChange(change_domain.BaseChange):
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE,
         QUESTION_PROPERTY_LINKED_SKILL_IDS,
-        QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
-    ]
+        QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+        QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
@@ -152,6 +153,17 @@ class UpdateQuestionPropertyLanguageCodeCmd(QuestionChange):
     property_name: Literal['language_code']
     new_value: str
     old_value: str
+
+
+class UpdateQuestionPropertyNextContentIdIndexCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX as allowed value.
+    """
+
+    property_name: Literal['next_content_id_index']
+    new_value: int
+    old_value: int
 
 
 class UpdateQuestionPropertyLinkedSkillIdsCmd(QuestionChange):
@@ -237,6 +249,7 @@ class QuestionDict(TypedDict):
     version: int
     linked_skill_ids: List[str]
     inapplicable_skill_misconception_ids: List[str]
+    next_content_id_index: int
 
 
 class VersionedQuestionStateDict(TypedDict):
@@ -258,6 +271,7 @@ class Question(translation_domain.BaseTranslatableObject):
         version: int,
         linked_skill_ids: List[str],
         inapplicable_skill_misconception_ids: List[str],
+        next_content_id_index: int,
         created_on: Optional[datetime.datetime] = None,
         last_updated: Optional[datetime.datetime] = None
     ) -> None:
@@ -278,6 +292,8 @@ class Question(translation_domain.BaseTranslatableObject):
             inapplicable_skill_misconception_ids: list(str). Optional
                 misconception ids that are marked as not relevant to the
                 question.
+            next_content_id_index: int. The next content_id index to use for
+                generation of new content_ids.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -292,13 +308,15 @@ class Question(translation_domain.BaseTranslatableObject):
         self.linked_skill_ids = linked_skill_ids
         self.inapplicable_skill_misconception_ids = (
             inapplicable_skill_misconception_ids)
+        self.next_content_id_index = next_content_id_index
         self.created_on = created_on
         self.last_updated = last_updated
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
-        """Registers all of translatable fields/objects in the question.
+        """Get all translatable fields in the question.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -326,11 +344,14 @@ class Question(translation_domain.BaseTranslatableObject):
             'version': self.version,
             'linked_skill_ids': self.linked_skill_ids,
             'inapplicable_skill_misconception_ids': (
-                self.inapplicable_skill_misconception_ids)
+                self.inapplicable_skill_misconception_ids),
+            'next_content_id_index': self.next_content_id_index,
         }
 
     @classmethod
-    def create_default_question_state(cls) -> state_domain.State:
+    def create_default_question_state(
+        cls, content_id_generator: translation_domain.ContentIdGenerator
+    ) -> state_domain.State:
         """Return a State domain object with default value for being used as
         question state data.
 
@@ -338,7 +359,12 @@ class Question(translation_domain.BaseTranslatableObject):
             State. The corresponding State domain object.
         """
         return state_domain.State.create_default_state(
-            None, is_initial_state=True)
+            None,
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
 
     @classmethod
     def _convert_state_v27_dict_to_v28_dict(
@@ -634,8 +660,16 @@ class Question(translation_domain.BaseTranslatableObject):
                         del question_state_dict['recorded_voiceovers'][
                             'voiceovers_mapping'][content_id]
                     if content_id in question_state_dict[
-                            'written_translations']['translations_mapping']:
-                        del question_state_dict['written_translations'][
+                            # Here we use MyPy ignore because this is a
+                            # conversion function for old schema and the
+                            # StateDict doesn't have the writtent translation
+                            # property in the latest schema.
+                            'written_translations']['translations_mapping']: # type: ignore[misc]
+                            # Here we use MyPy ignore because this is a
+                            # conversion function for old schema and the
+                            # StateDict doesn't have the writtent translation
+                            # property in the latest schema.
+                        del question_state_dict['written_translations'][ # type: ignore[misc]
                             'translations_mapping'][content_id]
 
                 question_state_dict['interaction']['id'] = new_interaction_id
@@ -682,8 +716,10 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
         max_existing_content_id_index = -1
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains written_translations property.
         translations_mapping = question_state_dict[
-            'written_translations']['translations_mapping']
+            'written_translations']['translations_mapping'] # type: ignore[misc]
         for content_id in translations_mapping:
             # Find maximum existing content_id index.
             content_id_suffix = content_id.split('_')[-1]
@@ -702,23 +738,16 @@ class Question(translation_domain.BaseTranslatableObject):
             for lang_code in translations_mapping[content_id]:
                 translations_mapping[
                     content_id][lang_code]['data_format'] = 'html'
-                # Here we use MyPy ignore because in _convert_* functions, we
-                # allow less strict typing because here we are working with
-                # previous versions of the domain object and in previous
-                # versions of the domain object there are some fields (eg. html)
-                # that are discontinued in the latest domain object. So, while
-                # accessing these discontinued fields MyPy throws an error. Thus
-                # to avoid the error, we used ignore here.
                 translations_mapping[
                     content_id][lang_code]['translation'] = (
-                        translations_mapping[content_id][lang_code]['html'])  # type: ignore[misc]
+                        translations_mapping[content_id][lang_code]['html'])
                 # Here we use MyPy ignore because MyPy doesn't allow key
                 # deletion from TypedDict.
-                del translations_mapping[content_id][lang_code]['html']  # type: ignore[misc]
+                del translations_mapping[content_id][lang_code]['html']
 
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id is None:
-            question_state_dict['next_content_id_index'] = (
+            question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
                 max_existing_content_id_index + 1)
             return question_state_dict
 
@@ -864,13 +893,15 @@ class Question(translation_domain.BaseTranslatableObject):
                 ca_dict,
                 ca_specs)
         )
-
-        question_state_dict['next_content_id_index'] = (
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains next_content_id_index property.
+        question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
             content_id_counter.next_content_id_index)
         for new_content_id in content_id_counter.new_content_ids:
-            question_state_dict[
-                'written_translations'][
-                    'translations_mapping'][new_content_id] = {}
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
+            question_state_dict['written_translations'][ # type: ignore[misc]
+                'translations_mapping'][new_content_id] = {}
             question_state_dict[
                 'recorded_voiceovers'][
                     'voiceovers_mapping'][new_content_id] = {}
@@ -975,7 +1006,9 @@ class Question(translation_domain.BaseTranslatableObject):
                     }
                 }
             })
-            question_state_dict['written_translations']['translations_mapping'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
+            question_state_dict['written_translations']['translations_mapping'][ # type: ignore[misc]
                 'ca_placeholder_0'] = {}
             question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
                 'ca_placeholder_0'] = {}
@@ -1076,7 +1109,9 @@ class Question(translation_domain.BaseTranslatableObject):
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id in ['TextInput', 'SetInput']:
             content_id_counter = ContentIdCounter(
-                question_state_dict['next_content_id_index'])
+                # Here we use MyPy ignore because the latest schema of state
+                # dict doesn't contains next_content_id_index property.
+                question_state_dict['next_content_id_index']) # type: ignore[misc]
             answer_group_dicts = question_state_dict[
                 'interaction']['answer_groups']
             for answer_group_dict in answer_group_dicts:
@@ -1107,11 +1142,15 @@ class Question(translation_domain.BaseTranslatableObject):
                             'contentId': content_id,
                             'unicodeStrSet': rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
-            question_state_dict['next_content_id_index'] = (
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains next_content_id_index property.
+            question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
                 content_id_counter.next_content_id_index)
             for new_content_id in content_id_counter.new_content_ids:
+                # Here we use MyPy ignore because the latest schema of state
+                # dict doesn't contains written_translations property.
                 question_state_dict[
-                    'written_translations'][
+                    'written_translations'][ # type: ignore[misc]
                         'translations_mapping'][new_content_id] = {}
                 question_state_dict[
                     'recorded_voiceovers'][
@@ -1635,11 +1674,42 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v53_dict_to_v54_dict(
+        cls,
+        question_state_dict: state_domain.StateDict
+    ) -> Tuple[state_domain.StateDict, int]:
+        """Converts from v52 to v53. Version 53 removes next_content_id_index
+        and WrittenTranslation from State. This version also updates the
+        content-ids for each translatable field in the state with its new
+        content-id.
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains next_content_id_index property.
+        del question_state_dict['next_content_id_index'] # type: ignore[misc]
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains written_translations property.
+        del question_state_dict['written_translations'] # type: ignore[misc]
+        states_dict, next_content_id_index = (
+            state_domain.State
+            .update_old_content_id_to_new_content_id_in_v52_states({
+                'question_state': question_state_dict
+            })
+        )
+
+        return states_dict['question_state'], next_content_id_index
+
+    @classmethod
     def update_state_from_model(
         cls,
         versioned_question_state: VersionedQuestionStateDict,
         current_state_schema_version: int
-    ) -> None:
+    ) -> Optional[int]:
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -1654,6 +1724,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     state data.
             current_state_schema_version: int. The current state
                 schema version.
+
+        Returns:
+            int|None. The next content id index if the current state schema
+            version is 52 else None.
         """
         versioned_question_state['state_schema_version'] = (
             current_state_schema_version + 1)
@@ -1661,8 +1735,17 @@ class Question(translation_domain.BaseTranslatableObject):
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
 
+        if current_state_schema_version == 52:
+            versioned_question_state['state'], next_content_id_index = (
+                conversion_fn(versioned_question_state['state'])
+            )
+            assert isinstance(next_content_id_index, int)
+            return next_content_id_index
+
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
+
+        return None
 
     def partial_validate(self) -> None:
         """Validates the Question domain object, but doesn't require the
@@ -1801,6 +1884,7 @@ class Question(translation_domain.BaseTranslatableObject):
             {},
             False,
             tagged_skill_misconception_id_required=True)
+        self.validate_translatable_contents(self.next_content_id_index)
 
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""
@@ -1829,7 +1913,8 @@ class Question(translation_domain.BaseTranslatableObject):
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
             question_dict['linked_skill_ids'],
-            question_dict['inapplicable_skill_misconception_ids'])
+            question_dict['inapplicable_skill_misconception_ids'],
+            question_dict['next_content_id_index'])
 
         return question
 
@@ -1846,12 +1931,15 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             Question. A Question domain object with default values.
         """
-        default_question_state_data = cls.create_default_question_state()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        default_question_state_data = cls.create_default_question_state(
+            content_id_generator)
 
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [])
+            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [],
+            content_id_generator.next_content_id_index)
 
     def update_language_code(self, language_code: str) -> None:
         """Updates the language code of the question.
@@ -1883,6 +1971,12 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))
+
+    def update_next_content_id_index(
+        self, next_content_id_index: int
+    ) -> None:
+        """Updates the next content id index for the question."""
+        self.next_content_id_index = next_content_id_index
 
     def update_question_state_data(
         self, question_state_data: state_domain.State

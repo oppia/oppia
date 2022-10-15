@@ -28,8 +28,8 @@ import { InteractionCustomizationArgsBackendDict } from 'interactions/customizat
 export type ExplorationChange = (
   ExplorationChangeAddState |
   ExplorationChangeAddWrittenTranslation |
-  ExplorationChangeMarkWrittenTranslationAsNeedingUpdate |
-  ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate |
+  ExplorationChangeMarkTranslationsNeedsUpdate |
+  ExplorationChangeRemoveTranslations |
   ExplorationChangeRenameState |
   ExplorationChangeDeleteState |
   ExplorationChangeEditStateProperty |
@@ -41,6 +41,8 @@ export type ExplorationChange = (
 export interface ExplorationChangeAddState {
   'cmd': 'add_state';
   'state_name': string;
+  'content_id_for_state_content': string;
+  'content_id_for_default_outcome': string;
 }
 
 export interface ExplorationChangeRenameState {
@@ -112,17 +114,14 @@ export interface ExplorationChangeAddWrittenTranslation {
   'translation_html': string;
 }
 
-export interface ExplorationChangeMarkWrittenTranslationAsNeedingUpdate {
-  'cmd': 'mark_written_translation_as_needing_update';
+export interface ExplorationChangeMarkTranslationsNeedsUpdate {
+  'cmd': 'mark_translations_needs_update';
   'content_id': string;
-  'language_code': string;
-  'state_name': string;
 }
 
-export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
-  'cmd': 'mark_written_translations_as_needing_update';
+export interface ExplorationChangeRemoveTranslations {
+  'cmd': 'remove_translations';
   'content_id': string;
-  'state_name': string;
 }
 
 export interface ExplorationDraftDict {

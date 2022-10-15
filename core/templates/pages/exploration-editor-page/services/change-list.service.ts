@@ -68,7 +68,6 @@ export type StatePropertyNames = (
   'default_outcome' |
   'hints' |
   'linked_skill_id' |
-  'next_content_id_index' |
   'param_changes' |
   'param_specs' |
   'recorded_voiceovers' |
@@ -76,8 +75,7 @@ export type StatePropertyNames = (
   'solution' |
   'state_name' |
   'widget_customization_args' |
-  'widget_id' |
-  'written_translations'
+  'widget_id'
 );
 
 @Injectable({
@@ -107,7 +105,8 @@ export class ChangeListService {
     tags: true,
     title: true,
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true
+    correctness_feedback_enabled: true,
+    next_content_id_index: true,
   };
 
   ALLOWED_STATE_BACKEND_NAMES: Record<StatePropertyNames, boolean> = {
@@ -118,7 +117,6 @@ export class ChangeListService {
     default_outcome: true,
     hints: true,
     linked_skill_id: true,
-    next_content_id_index: true,
     param_changes: true,
     param_specs: true,
     solicit_answer_details: true,
@@ -126,8 +124,7 @@ export class ChangeListService {
     solution: true,
     state_name: true,
     widget_customization_args: true,
-    widget_id: true,
-    written_translations: true
+    widget_id: true
   };
 
   changeListAddedTimeoutId = null;
@@ -220,10 +217,15 @@ export class ChangeListService {
    *
    * @param {string} stateName - The name of the newly-added state
    */
-  addState(stateName: string): void {
+  addState(
+      stateName: string,
+      contentIdForContent: string,
+      contentIdForDefaultOutcome: string): void {
     this.addChange({
       cmd: 'add_state',
-      state_name: stateName
+      state_name: stateName,
+      content_id_for_state_content: contentIdForContent,
+      content_id_for_default_outcome: contentIdForDefaultOutcome
     });
   }
 
@@ -361,34 +363,27 @@ export class ChangeListService {
 
   /**
    * Saves a change dict that represents marking a translation as needing
-   * update in a particular language.
+   * update in all languages.
    *
    * @param {string} contentId - The content id of the translated content.
-   * @param {string} languageCode - The language code.
-   * @param {string} stateName - The current state name.
    */
-  markTranslationAsNeedingUpdate(
-      contentId: string, languageCode: string, stateName: string): void {
+  markTranslationsAsNeedingUpdate(contentId: string): void {
     this.addChange({
-      cmd: 'mark_written_translation_as_needing_update',
-      content_id: contentId,
-      language_code: languageCode,
-      state_name: stateName
+      cmd: 'mark_translations_needs_update',
+      content_id: contentId
     });
   }
 
   /**
-   * Saves a change dict that represents marking a translation as needing
-   * update in all languages.
+   * Saves a change dict that represents removing translations in all languages
+   * for the given content id.
    *
    * @param {string} contentId - The content id of the translated content.
-   * @param {string} stateName - The current state name.
    */
-  markTranslationsAsNeedingUpdate(contentId: string, stateName: string): void {
+  removeTranslations(contentId: string): void {
     this.addChange({
-      cmd: 'mark_written_translations_as_needing_update',
-      content_id: contentId,
-      state_name: stateName
+      cmd: 'remove_translations',
+      content_id: contentId
     });
   }
 

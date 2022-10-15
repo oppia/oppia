@@ -28,7 +28,6 @@ import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/serv
 import { ContextService } from 'services/context.service';
 import { Schema } from 'services/schema-default-value.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { ConfirmLeaveModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
 import { InteractionDetailsCacheService } from '../../services/interaction-details-cache.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
@@ -58,6 +57,7 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ImageWithRegions } from 'interactions/customization-args-defs';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 interface DefaultValueHtml {
   content_id: string;
@@ -162,7 +162,7 @@ export class CustomizeInteractionModalComponent
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private generateContentIdService: GenerateContentIdService,
     private urlInterpolationService: UrlInterpolationService,
   ) {
     super(ngbActiveModal);
@@ -319,10 +319,7 @@ export class CustomizeInteractionModalComponent
       if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
         if ((value as SubtitledHtml|SubtitledUnicode).contentId === null) {
           (value as SubtitledHtml|SubtitledUnicode).contentId = (
-            `${contentIdPrefix}_${
-              this.stateNextContentIdIndexService.displayed}`
-          );
-          this.stateNextContentIdIndexService.displayed += 1;
+            this.generateContentIdService.getNextStateId(contentIdPrefix));
         }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (

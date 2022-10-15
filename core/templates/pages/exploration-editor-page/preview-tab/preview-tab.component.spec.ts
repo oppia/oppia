@@ -117,7 +117,8 @@ describe('Preview Tab Component', () => {
                 paramChangeObjectFactory
                   .createEmpty(changeObjectName).toBackendDict()
               ],
-              states: [stateObjectFactory.createDefaultState(stateName)],
+              states: [stateObjectFactory.createDefaultState(
+                stateName, 'content_0', 'default_outcome_1')],
               init_state_name: stateName
             })
           }
@@ -297,7 +298,7 @@ describe('Preview Tab Component', () => {
     explorationInitStateNameService.savedMemento = 'state';
     spyOn(numberAttemptsService, 'reset').and.stub();
     spyOn(explorationEngineService, 'init').and.callFake(
-      (value, value1, value2, value3, value4, callback) => {
+      (value, value1, value2, value3, value4, value5, callback) => {
         callback(null, null);
       });
 

@@ -168,6 +168,37 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v53_dict_to_v54_dict(self) -> None:
+        new_value: Dict[str, str] = {}
+        draft_change_list_1_v52 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': new_value
+            })
+        ]
+
+        # Migrate exploration to state schema version 53.
+        self.create_and_migrate_new_exploration('53', '54')
+        migrated_draft_change_list_1_v53 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v52, 1, 2, self.EXP_ID))
+        # Verify that changes are not upgraded to v52.
+        self.assertIsNone(migrated_draft_change_list_1_v53)
+
     def test_convert_states_v52_dict_to_v53_dict(self) -> None:
         ans_group_1 = state_domain.AnswerGroup(
             state_domain.Outcome(

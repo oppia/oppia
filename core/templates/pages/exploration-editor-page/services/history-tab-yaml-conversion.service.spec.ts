@@ -38,7 +38,8 @@ describe('History tab yaml conversion service', () => {
     yamlService = TestBed.inject(YamlService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
 
-    testState = stateObjectFactory.createDefaultState('state_1');
+    testState = stateObjectFactory.createDefaultState(
+      'state_1', 'content_0', 'default_outcome_1');
     testStateYamlString = yamlService.stringify(testState.toBackendDict());
   });
 

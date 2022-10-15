@@ -137,6 +137,7 @@ export class QuestionSuggestionEditorModalComponent
         this.suggestionId,
         this.skillDifficulty,
         questionDict.question_state_data,
+        questionDict.next_content_id_index,
         imagesData,
         () => {
           this.alertsService.addSuccessMessage('Updated question.');

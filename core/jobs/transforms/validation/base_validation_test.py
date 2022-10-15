@@ -476,10 +476,13 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
                     state_domain.State.create_default_state(
-                        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
+                        feconf.DEFAULT_INIT_STATE_NAME,
+                        'content_0', 'default_outcome_1',
+                        is_initial_state=True
                     ).to_dict()),
             },
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            next_content_id_index=2,
             created_on=self.YEAR_AGO,
             last_updated=self.NOW
         )
@@ -493,10 +496,12 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
                     state_domain.State.create_default_state(
-                        'end', is_initial_state=True
+                        'end', 'content_0', 'default_outcome_1',
+                        is_initial_state=True
                     ).to_dict()),
             },
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            next_content_id_index=2,
             created_on=self.YEAR_AGO,
             last_updated=self.NOW
         )

@@ -17,7 +17,7 @@
  * playing an exploration.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -35,6 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -43,8 +44,10 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
@@ -76,7 +79,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
     }
   }
 
-  onSelectLanguage(newLanguageCode: string): string {
+  onSelectLanguage(newLanguageCode: string): void {
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(
         SwitchContentLanguageRefreshRequiredModalComponent);
@@ -92,8 +95,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
       this.imagePreloaderService.restartImagePreloader(
         this.playerTranscriptService.getCard(0).getStateName());
     }
-
-    return this.selectedLanguageCode;
+    this.changeDetectorRef.detectChanges();
   }
 
   shouldDisplaySelector(): boolean {

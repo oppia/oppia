@@ -65,15 +65,11 @@ describe('Statistics Tab Component', () => {
       customization_args: null
     } as InteractionBackendDict,
     linked_skill_id: null,
-    next_content_id_index: 0,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {}
     },
-    solicit_answer_details: true,
-    written_translations: {
-      translations_mapping: {}
-    }
+    solicit_answer_details: true
   };
 
   beforeEach(() => {
@@ -134,6 +130,7 @@ describe('Statistics Tab Component', () => {
           language_code: null,
           objective: null,
           correctness_feedback_enabled: null,
+          next_content_id_index: 5
         } as ReadOnlyExplorationBackendDict,
         can_edit: null,
         exploration_metadata: null,

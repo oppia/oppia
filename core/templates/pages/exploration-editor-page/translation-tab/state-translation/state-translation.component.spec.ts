@@ -40,9 +40,6 @@ import { StateEditorService } from
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
@@ -91,6 +88,8 @@ describe('State translation component', function() {
   var stateRecordedVoiceoversService = null;
   var subtitledUnicodeObjectFactory = null;
   var translationLanguageService = null;
+  var entityTranslationsService = null;
+  var contextService = null;
   var translationTabActiveContentIdService = null;
   var translationTabActiveModeService = null;
   var explorationHtmlFormatterService = null;
@@ -180,25 +179,10 @@ describe('State translation component', function() {
         }]
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       recorded_voiceovers: {
         voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {
-          content_1: {
-            en: {
-              data_format: 'html',
-              translation: 'Translation',
-              needs_update: false
-            }
-          },
-          ca_placeholder: {},
-          rule_input_4: {},
-          rule_input_5: {}
-        }
       }
     }
   };
@@ -251,22 +235,10 @@ describe('State translation component', function() {
         }]
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       recorded_voiceovers: {
         voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {
-          content_1: {
-            en: {
-              data_format: 'html',
-              translation: 'Translation',
-              needs_update: false
-            }
-          }
-        }
       }
     }
   };
@@ -316,22 +288,10 @@ describe('State translation component', function() {
         }]
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       recorded_voiceovers: {
         voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {
-          content_1: {
-            en: {
-              data_format: 'html',
-              translation: 'Translation',
-              needs_update: false
-            }
-          }
-        }
       }
     }
   };
@@ -358,22 +318,10 @@ describe('State translation component', function() {
         hints: []
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       recorded_voiceovers: {
         voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {
-          content_1: {
-            en: {
-              data_format: 'html',
-              translation: 'Translation',
-              needs_update: false
-            }
-          }
-        }
       }
     }
   };
@@ -445,9 +393,6 @@ describe('State translation component', function() {
       'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value(
-      'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
-    $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
@@ -463,6 +408,13 @@ describe('State translation component', function() {
       StateRecordedVoiceoversService);
     subtitledUnicodeObjectFactory = TestBed.get(SubtitledUnicodeObjectFactory);
   });
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    entityTranslationsService = $injector.get('EntityTranslationsService');
+    entityTranslationsService.entityTranslation = {
+      getWrittenTranslation: () => { }
+    };
+  }));
 
   afterEach(function() {
     ctrl.$onDestroy();
@@ -490,7 +442,7 @@ describe('State translation component', function() {
         .returnValue(true);
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
-      explorationStatesService.init(explorationState1);
+      explorationStatesService.init(explorationState1, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -753,7 +705,8 @@ describe('State translation component', function() {
         content_id: 'content_1',
         html: 'This is the html'
       });
-      expect($scope.getRequiredHtml(subtitledObject)).toBe('Translation');
+      expect($scope.getRequiredHtml(subtitledObject)).toBe(
+        'This is the html');
       expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
         'This is the html');
     });
@@ -824,7 +777,7 @@ describe('State translation component', function() {
         'Introduction');
       spyOnProperty(stateEditorService, 'onShowTranslationTabBusyModal').and
         .returnValue(showTranslationTabBusyModalEmitter);
-      explorationStatesService.init(explorationState1);
+      explorationStatesService.init(explorationState1, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -1043,25 +996,13 @@ describe('State translation component', function() {
             }]
           },
           linked_skill_id: null,
-          next_content_id_index: 0,
           param_changes: [],
           solicit_answer_details: false,
           recorded_voiceovers: {
             voiceovers_mapping: {}
-          },
-          written_translations: {
-            translations_mapping: {
-              content_1: {
-                en: {
-                  data_format: 'html',
-                  translation: 'Translation',
-                  needs_update: false
-                }
-              }
-            }
           }
         }
-      });
+      }, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -1101,7 +1042,7 @@ describe('State translation component', function() {
 
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
-      explorationStatesService.init(explorationState2);
+      explorationStatesService.init(explorationState2, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -1144,7 +1085,7 @@ describe('State translation component', function() {
 
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
-      explorationStatesService.init(explorationState3);
+      explorationStatesService.init(explorationState3, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -1214,7 +1155,7 @@ describe('State translation component', function() {
           }
         }
       });
-      explorationStatesService.init(explorationState4);
+      explorationStatesService.init(explorationState4, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           {
@@ -1275,15 +1216,22 @@ describe('State translation component', function() {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
       routerService = $injector.get('RouterService');
+      entityTranslationsService = $injector.get('EntityTranslationsService');
       translationLanguageService = $injector.get('TranslationLanguageService');
+      contextService = $injector.get('ContextService');
       translationTabActiveContentIdService = $injector.get(
         'TranslationTabActiveContentIdService');
       translationTabActiveModeService = $injector.get(
         'TranslationTabActiveModeService');
 
+      contextService.explorationId = 'expId';
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
-      explorationStatesService.init(explorationState2);
+
+      entityTranslationsService.entityTranslation = {
+        getWrittenTranslation: () => {}
+      };
+      explorationStatesService.init(explorationState2, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));

@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.domain import skill_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.tests import test_utils
 
 from typing import List
@@ -49,7 +50,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}
                 }
@@ -793,7 +794,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}
                 }

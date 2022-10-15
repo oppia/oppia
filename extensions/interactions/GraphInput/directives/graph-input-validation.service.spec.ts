@@ -26,7 +26,7 @@ import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
@@ -250,17 +250,7 @@ describe('GraphInputValidationService', () => {
 
   it('should throw error when rule is invalid', () => {
     var answerGroup = agof.createNew(
-      [{
-        type: new Error('Error') as unknown as string,
-        inputs: {},
-        inputTypes: {},
-        toBackendDict: () => {
-          return {
-            rule_type: 'type',
-            inputs: {}
-          };
-        }
-      }],
+      [new Rule(new Error('Error') as unknown as string, {}, {})],
       goodDefaultOutcome,
       [],
       null);

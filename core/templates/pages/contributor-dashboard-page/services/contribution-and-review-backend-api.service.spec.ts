@@ -286,16 +286,9 @@ describe('Contribution and review backend API service', () => {
         id: 'TextInput'
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
     };
     const payload = {
       skill_difficulty: 'easy',

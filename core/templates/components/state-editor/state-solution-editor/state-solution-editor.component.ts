@@ -38,6 +38,7 @@ import { AppConstants } from 'app.constants';
 import { StateEditorConstants } from '../state-editor.constants';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface DeleteValue {
@@ -76,6 +77,7 @@ export class StateSolutionEditorComponent implements OnInit {
     private editabilityService: EditabilityService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private externalSaveService: ExternalSaveService,
+    private generateContentIdService: GenerateContentIdService,
     private ngbModal: NgbModal,
     private solutionValidityService: SolutionValidityService,
     private solutionVerificationService: SolutionVerificationService,
@@ -197,6 +199,7 @@ export class StateSolutionEditorComponent implements OnInit {
         }
       }
     }, () => {
+      this.generateContentIdService.revertUnusedContentIdIndex();
       this.alertsService.clearWarnings();
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

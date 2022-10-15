@@ -216,13 +216,7 @@ describe('State Editor Component', () => {
         hints: []
       },
       param_changes: [],
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
+      solicit_answer_details: false
     };
     spyOnProperty(stateEditorService, 'onStateEditorInitialized')
       .and.returnValue(onStateEditorInitializedEmitter);

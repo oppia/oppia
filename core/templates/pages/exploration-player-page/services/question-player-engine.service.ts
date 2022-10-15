@@ -115,8 +115,7 @@ export class QuestionPlayerEngineService {
     const initialCard =
       StateCard.createNewCard(
         null, questionHtml, interactionHtml, interaction,
-        initialState.recordedVoiceovers,
-        initialState.writtenTranslations, initialState.content.contentId,
+        initialState.recordedVoiceovers, initialState.content.contentId,
         this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
   }
@@ -313,7 +312,6 @@ export class QuestionPlayerEngineService {
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
-        this.getNextStateData().writtenTranslations,
         this.getNextStateData().content.contentId,
         this.audioTranslationLanguageService
       );

@@ -59,6 +59,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationDataService } from '../services/exploration-data.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -71,6 +72,7 @@ describe('Exploration editor tab component', function() {
   var editabilityService = null;
   var explorationFeaturesService = null;
   var explorationInitStateNameService = null;
+  var explorationNextContentIdIndexService = null;
   var explorationStatesService = null;
   var explorationWarningsService = null;
   var hintObjectFactory = null;
@@ -84,6 +86,7 @@ describe('Exploration editor tab component', function() {
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
+  var generateContentIdService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
@@ -118,6 +121,7 @@ describe('Exploration editor tab component', function() {
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.get(SolutionObjectFactory);
     focusManagerService = TestBed.get(FocusManagerService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -167,6 +171,8 @@ describe('Exploration editor tab component', function() {
     focusManagerService = $injector.get('FocusManagerService');
     explorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
+    explorationNextContentIdIndexService = $injector.get(
+      'ExplorationNextContentIdIndexService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     routerService = $injector.get('RouterService');
@@ -232,7 +238,6 @@ describe('Exploration editor tab component', function() {
           hints: []
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         recorded_voiceovers: {
@@ -245,18 +250,6 @@ describe('Exploration editor tab component', function() {
                 file_size_bytes: 120000,
                 needs_update: false,
                 duration_secs: 1.2
-              }
-            }
-          }
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {
-              en: {
-                html: 'This is a html',
-                needs_update: false
               }
             }
           }
@@ -312,18 +305,10 @@ describe('Exploration editor tab component', function() {
           hints: []
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        }
+        solicit_answer_details: false
       }
-    });
+    }, false);
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorTab', {
@@ -366,6 +351,32 @@ describe('Exploration editor tab component', function() {
   it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.interactionIsShown).toBe(false);
+    });
+
+  it('should correctly initialize generateContentIdService',
+    function() {
+      explorationNextContentIdIndexService.init(5);
+
+      generateContentIdService.getNextStateId('content');
+      expect(explorationNextContentIdIndexService.displayed).toBe(6);
+      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+
+      generateContentIdService.revertUnusedContentIdIndex();
+      expect(explorationNextContentIdIndexService.displayed).toBe(5);
+      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+    });
+
+  it('should correctly save next contentId index',
+    function() {
+      explorationNextContentIdIndexService.init(5);
+      generateContentIdService.getNextStateId('content');
+      expect(explorationNextContentIdIndexService.displayed).toBe(6);
+      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+
+      ctrl.saveNextContentIdIndex();
+
+      expect(explorationNextContentIdIndexService.displayed).toBe(6);
+      expect(explorationNextContentIdIndexService.savedMemento).toBe(6);
     });
 
   it('should get state content placeholder text when init state name is equal' +
@@ -439,18 +450,6 @@ describe('Exploration editor tab component', function() {
     ctrl.saveInteractionId(newInteractionId);
 
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
-  });
-
-  it('should save state next content id index', function() {
-    stateEditorService.setActiveStateName('First State');
-    expect(
-      explorationStatesService.getState('First State').nextContentIdIndex
-    ).toEqual(0);
-
-    ctrl.saveNextContentIdIndex(2);
-    expect(
-      explorationStatesService.getState('First State').nextContentIdIndex
-    ).toBe(2);
   });
 
   it('should save linked skill id', function() {
@@ -650,10 +649,6 @@ describe('Exploration editor tab component', function() {
         explorationStatesService.getState('First State')
           .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       tick();
@@ -663,10 +658,6 @@ describe('Exploration editor tab component', function() {
         explorationStatesService.getState('First State')
           .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         true);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(true);
 
       flush();
     }));
@@ -682,10 +673,6 @@ describe('Exploration editor tab component', function() {
         explorationStatesService.getState('First State')
           .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       $scope.$apply();
@@ -694,10 +681,6 @@ describe('Exploration editor tab component', function() {
         explorationStatesService.getState('First State')
           .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
     });
 
   it('should navigate to main tab in specific state name', function() {

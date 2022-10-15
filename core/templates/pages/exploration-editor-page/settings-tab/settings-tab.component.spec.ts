@@ -316,9 +316,7 @@ describe('Settings Tab Component', () => {
     () => {
       explorationInitStateNameService.init('Introduction');
       spyOn(explorationStatesService, 'getState').and.returnValue(
-        new State(
-          null, null, null, null, null,
-          null, null, null, null, null, null));
+        new State(null, null, null, null, null, null, null, null, null));
       spyOn(explorationInitStateNameService, 'saveDisplayedValue');
 
       component.saveExplorationInitStateName();

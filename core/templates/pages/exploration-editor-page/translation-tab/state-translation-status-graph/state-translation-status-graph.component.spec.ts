@@ -55,7 +55,6 @@ describe('State Translation Status Graph Component', function() {
   var stateName = 'State1';
   var state = {
     recorded_voiceovers: {},
-    written_translations: {}
   };
 
   beforeEach(angular.mock.module('oppia', function($provide) {

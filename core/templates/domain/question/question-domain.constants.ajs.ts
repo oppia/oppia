@@ -56,5 +56,9 @@ angular.module('oppia').constant(
   QuestionDomainConstants.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS);
 
 angular.module('oppia').constant(
+  'QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX',
+  QuestionDomainConstants.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX);
+
+angular.module('oppia').constant(
   'CMD_UPDATE_QUESTION_PROPERTY',
   QuestionDomainConstants.CMD_UPDATE_QUESTION_PROPERTY);
