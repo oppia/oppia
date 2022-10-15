@@ -16,155 +16,187 @@
  * @fileoverview Service for handling microphone data and mp3 audio processing.
  */
 
-angular.module('oppia').factory('VoiceoverRecordingService', [
-  '$log', '$q', '$window', function($log, $q, $window) {
-    var audioContextAvailable = null,
-      defer = null,
-      definedAudioContext = null, // Will be defined audio context.
-      isAvailable = null,
-      isRecording = false,
-      microphone = null,
-      microphoneStream = null,
-      mp3Worker = null,
-      processor = null;
+import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { LoggerService } from 'services/contextual/logger.service';
 
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
 
-    var _initWorker = function() {
-      if (!$window.Worker) {
-        $log.warn('Worker API not supported in this browser.');
-        return;
-      }
-      if (mp3Worker === null) {
-        var lameWorkerFileUrl = '/third_party/static/lamejs-1.2.0/' +
-          'worker-example/worker-realtime.js';
-        // Config the mp3 encoding worker.
-        var config = {sampleRate: 44100, bitRate: 128};
-        mp3Worker = new Worker(lameWorkerFileUrl);
-        mp3Worker.onmessage = function(e) {
-          // Async data flow.
-          defer.resolve(e.data.buf);
-        };
-        mp3Worker.postMessage({cmd: 'init', config: config});
-      }
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class VoiceoverRecordingService {
+  audioContextAvailable: typeof AudioContext;
+  definedAudioContext: AudioContext; // Will be defined audio context.
+  isAvailable: boolean;
+  isRecording: boolean = false;
+  microphone: MediaStreamAudioSourceNode;
+  microphoneStream: MediaStream;
+  mp3Worker: Worker = null;
+  processor: ScriptProcessorNode;
+  defer: EventEmitter<string> = new EventEmitter();
 
-    var _postMessage = function(buffer) {
-      // Ensure the mp3Worker is available when this is run.
-      if (mp3Worker) {
-        mp3Worker.postMessage({cmd: 'encode', buf: buffer});
-      }
-    };
+  constructor(
+      private loggerService: LoggerService
+  ) { }
 
-    var _stopWorker = function() {
-      if (mp3Worker) {
-        mp3Worker.terminate();
-        $log.log('Ending mp3 worker');
-        mp3Worker = null;
-      }
-    };
+  _stopRecord(): void {
+    if (this.microphone && this.processor && this.mp3Worker) {
+      // Disconnect mic and processor and stop processing.
+      this.microphone.disconnect();
+      this.processor.disconnect();
+      this.processor.onaudioprocess = null;
+      // Issue command to retrieve converted audio.
+      this.mp3Worker.postMessage({cmd: 'finish'});
+      // Stop microphone stream.
+      this.microphoneStream.getTracks().forEach(function(track) {
+        track.stop();
+      });
 
-    var _initRecorder = function() {
-      // Browser agnostic AudioContext API check.
-      audioContextAvailable = $window.AudioContext ||
-        $window.webkitAudioContext;
-      if (audioContextAvailable) {
-        // Promise required because angular is async with worker.
-        defer = $q.defer();
-        isAvailable = true;
-        _initWorker();
-      } else {
-        isAvailable = false;
-      }
-    };
+      this.isRecording = false;
+    }
+  }
 
+  _closeRecorder(): void {
+    this._stopWorker();
+  }
 
-    // Setup microphone inputs for mp3 audio processing.
-    var _processMicAudio = function(stream) {
-      definedAudioContext = new audioContextAvailable();
-      // Settings a bufferSize of 0 instructs the browser
-      // to choose the best bufferSize.
-      processor = definedAudioContext.createScriptProcessor(0, 1, 1);
-      // Process microphone to mp3 encoding.
-      processor.onaudioprocess = _onAudioProcess;
+  initRecorder(): void {
+    this._initRecorder();
+  }
 
-      microphone = definedAudioContext.createMediaStreamSource(stream);
-      // Connect custom processor to microphone.
-      microphone.connect(processor);
-      // Connect to speakers as destination.
-      processor.connect(definedAudioContext.destination);
-    };
-
-    // Convert directly from mic input to mp3.
-    var _onAudioProcess = function(event) {
-      var array = event.inputBuffer.getChannelData(0);
-      _postMessage(array);
-    };
-
-    var _startMicrophoneAsync = async function() {
-      return navigator.mediaDevices.getUserMedia({audio: true, video: false});
-    };
-
-    var _stopRecord = function() {
-      if (microphone && processor && mp3Worker) {
-        // Disconnect mic and processor and stop processing.
-        microphone.disconnect();
-        processor.disconnect();
-        processor.onaudioprocess = null;
-        // Issue command to retrieve converted audio.
-        mp3Worker.postMessage({cmd: 'finish'});
-        // Stop microphone stream.
-        microphoneStream.getTracks().forEach(function(track) {
-          track.stop();
-        });
-        isRecording = false;
-      }
-    };
-
-    var _closeRecorder = function() {
-      _stopWorker();
-    };
-
+  status(): {
+       isAvailable: boolean;
+       isRecording: boolean;
+       } {
     return {
-      initRecorder: function() {
-        _initRecorder();
-      },
-      status: function() {
-        return {
-          isAvailable: isAvailable,
-          isRecording: isRecording
-        };
-      },
-      startRecordingAsync: async function() {
-        // If worker is not available then do not start recording.
-        if (mp3Worker === null) {
-          return null;
-        }
-        var navigator = _startMicrophoneAsync();
-        navigator.then(function(stream) {
-          isRecording = true;
-          // Set microphone stream will be used for stopping track
-          // stream in another function.
-          microphoneStream = stream;
-          _processMicAudio(stream);
-        }, function() {
-          $log.warn(
-            'Microphone was not started because ofuser denied permission.');
-          isRecording = false;
-        });
-
-        return navigator;
-      },
-      stopRecord: function() {
-        if (mp3Worker !== null) {
-          _stopRecord();
-        }
-      },
-      getMp3Data: function() {
-        return defer.promise;
-      },
-      closeRecorder: function() {
-        _closeRecorder();
-      }
+      isAvailable: this.isAvailable,
+      isRecording: this.isRecording
     };
   }
-]);
+
+  async startRecordingAsync(): Promise<MediaStream> {
+    // If worker is not available then do not start recording.
+    if (this.mp3Worker === null) {
+      return null;
+    }
+
+    let navigator = this._startMicrophoneAsync();
+
+    navigator.then((stream) => {
+      this.isRecording = true;
+      // Set microphone stream will be used for stopping track
+      // stream in another function.
+      this.microphoneStream = stream;
+      this._processMicAudio(stream);
+    }, () => {
+      this.loggerService.warn(
+        'Microphone was not started because ofuser denied permission.');
+      this.isRecording = false;
+    });
+
+    return navigator;
+  }
+
+  stopRecord(): void {
+    if (this.mp3Worker !== null) {
+      this._stopRecord();
+    }
+  }
+
+  getMp3Data(): EventEmitter<string> {
+    return this.defer;
+  }
+
+  closeRecorder(): void {
+    this._closeRecorder();
+  }
+
+  _initWorker(): void {
+    if (!Worker) {
+      this.loggerService.warn('Worker API not supported in this browser.');
+      return;
+    }
+    if (this.mp3Worker === null) {
+      let lameWorkerFileUrl = '/third_party/static/lamejs-1.2.0/' +
+           'worker-example/worker-realtime.js';
+      // Config the mp3 encoding worker.
+      let config = {sampleRate: 44100, bitRate: 128};
+      this.mp3Worker = new Worker(lameWorkerFileUrl);
+      this.mp3Worker.onmessage = (e) => {
+        // Async data flow.
+        this.defer.emit(e.data.buf);
+        return;
+      };
+
+      this.mp3Worker.postMessage({cmd: 'init', config: config});
+    }
+  }
+
+  // Convert directly from mic input to mp3.
+  _onAudioProcess(
+      event: {
+         inputBuffer: {
+           getChannelData: (value) => Transferable[];
+         };
+       }): void {
+    let array = event.inputBuffer.getChannelData(0);
+    this._postMessage(array);
+  }
+
+  async _startMicrophoneAsync(): Promise<MediaStream> {
+    return navigator.mediaDevices.getUserMedia({audio: true, video: false});
+  }
+
+  _postMessage(buffer: Transferable[]): void {
+    // Ensure the mp3Worker is available when this is run.
+    if (this.mp3Worker) {
+      this.mp3Worker.postMessage({cmd: 'encode', buf: buffer});
+    }
+  }
+
+  _stopWorker(): void {
+    if (this.mp3Worker) {
+      this.mp3Worker.terminate();
+      this.loggerService.log('Ending mp3 worker');
+      this.mp3Worker = null;
+    }
+  }
+
+  _initRecorder(): void {
+    // Browser agnostic AudioContext API check.
+    this.audioContextAvailable = window.AudioContext ||
+        window.webkitAudioContext;
+
+    if (this.audioContextAvailable) {
+      // Promise required because angular is async with worker.
+      this.isAvailable = true;
+      this._initWorker();
+    } else {
+      this.isAvailable = false;
+    }
+  }
+
+  // Setup microphone inputs for mp3 audio processing.
+  _processMicAudio(stream: MediaStream): void {
+    this.definedAudioContext = new this.audioContextAvailable();
+    // Settings a bufferSize of 0 instructs the browser
+    // to choose the best bufferSize.
+    this.processor = this.definedAudioContext.createScriptProcessor(0, 1, 1);
+    // Process microphone to mp3 encoding.
+    this.processor.onaudioprocess = this._onAudioProcess.bind(this);
+
+    this.microphone = this.definedAudioContext.createMediaStreamSource(stream);
+    // Connect custom processor to microphone.
+    this.microphone.connect(this.processor);
+    // Connect to speakers as destination.
+    this.processor.connect(this.definedAudioContext.destination);
+  }
+}
+
+angular.module('oppia').factory(
+  'VoiceoverRecordingService', downgradeInjectable(VoiceoverRecordingService));

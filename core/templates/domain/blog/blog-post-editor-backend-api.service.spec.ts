@@ -36,7 +36,7 @@ describe('Blog Post Editor backend api service', () => {
   let blogPostEditorBackendResponse = {
     blog_post_dict: {
       id: 'sampleBlogId',
-      author_name: 'test_user',
+      author_username: 'test_user',
       title: 'sample_title',
       content: '<p>hello</p>',
       thumbnail_filename: 'image',
