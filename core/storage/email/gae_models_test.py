@@ -231,7 +231,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'recipient_id2', 'Email Subject', 'Email Body'))
 
     def test_check_duplicate_messages_with_same_hash(self) -> None:
-        def mock_convert_to_hash(input_string: str, max_length: int) -> str:
+        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
             return 'some_poor_hash'
         swap_generate_hash = self.swap(
             utils, 'convert_to_hash', mock_convert_to_hash)
