@@ -434,7 +434,7 @@ describe('Skill editor main tab Component', () => {
   it('should show Prerequisites list when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-          mockEventEmitter);
+      mockEventEmitter);
     component.windowIsNarrow = false;
 
     expect(component.prerequisiteSkillsAreShown).toBe(false);
@@ -461,21 +461,21 @@ describe('Skill editor main tab Component', () => {
 
   it('should not toggle Prerequisites list when window is wide', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    
+
     component.prerequisiteSkillsAreShown = true;
-  
+
     component.togglePrerequisiteSkills();
-  
+
     expect(component.prerequisiteSkillsAreShown).toBe(true);
   });
 
   it('should not toggle skill card editor when window is wide', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    
+
     component.skillEditorCardIsShown = true;
-  
+
     component.togglePrerequisiteSkills();
-  
+
     expect(component.skillEditorCardIsShown).toBe(true);
   });
 });

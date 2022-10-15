@@ -237,7 +237,7 @@ describe('Skill Misconceptions Editor Component', () => {
   it('should show Misconceptions list when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-          mockEventEmitter);
+      mockEventEmitter);
     component.windowIsNarrow = false;
 
     expect(component.misconceptionsListIsShown).toBe(false);
@@ -264,21 +264,21 @@ describe('Skill Misconceptions Editor Component', () => {
 
   it('should not toggle Misconceptions list when window is wide', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    
+
     component.misconceptionsListIsShown = true;
-  
+
     component.toggleMisconceptionLists();
-  
+
     expect(component.misconceptionsListIsShown).toBe(true);
   });
 
   it('should not toggle skill card editor when window is wide', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    
+
     component.skillEditorCardIsShown = true;
-  
+
     component.toggleMisconceptionLists();
-  
+
     expect(component.skillEditorCardIsShown).toBe(true);
   });
 });

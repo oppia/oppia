@@ -320,7 +320,7 @@ describe('Skill Concept Card Editor Component', () => {
   it('should show worked examples list when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-          mockEventEmitter);
+      mockEventEmitter);
     component.windowIsNarrow = false;
 
     expect(component.workedExamplesListIsShown).toBe(false);
@@ -347,21 +347,21 @@ describe('Skill Concept Card Editor Component', () => {
 
   it('should not toggle Worked Example list when window is wide', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    
+
     component.workedExamplesListIsShown = true;
-  
+
     component.toggleWorkedExampleList();
-  
+
     expect(component.workedExamplesListIsShown).toBe(true);
   });
 
   it('should not toggle skill card editor when window is wide', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    
+
     component.skillEditorCardIsShown = true;
-  
+
     component.toggleWorkedExampleList();
-  
+
     expect(component.skillEditorCardIsShown).toBe(true);
   });
 });

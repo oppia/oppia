@@ -190,7 +190,7 @@ describe('Skill Rubrics Editor Component', () => {
   it('should show Rubrics list when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-          mockEventEmitter);
+      mockEventEmitter);
     component.windowIsNarrow = false;
 
     expect(component.rubricsListIsShown).toBe(false);
@@ -217,21 +217,21 @@ describe('Skill Rubrics Editor Component', () => {
 
   it('should not toggle Rubrics list when window is wide', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    
+
     component.rubricsListIsShown = true;
-  
+
     component.toggleRubricsList();
-  
+
     expect(component.rubricsListIsShown).toBe(true);
   });
 
   it('should not toggle skill card editor when window is wide', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    
+
     component.skillEditorCardIsShown = true;
-  
+
     component.toggleRubricsList();
-  
+
     expect(component.skillEditorCardIsShown).toBe(true);
   });
 });
