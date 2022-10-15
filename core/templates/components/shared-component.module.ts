@@ -173,6 +173,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateModule } from '@ngx-translate/core';
+import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 
 @NgModule({
   imports: [
@@ -202,7 +204,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
     MatProgressSpinnerModule,
-    NgbModalModule
+    NgbModalModule,
+    TranslateModule,
   ],
 
   providers: [
@@ -336,6 +339,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
+    ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
   ],
 
@@ -462,6 +466,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
+    ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
   ],
 
@@ -599,6 +604,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
+    ComponentOverviewComponent,
+    TranslateModule,
     VisualizationSortedTilesComponent,
   ],
 })
