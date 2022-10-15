@@ -47,6 +47,7 @@ implements OnInit {
   skillIdToSummaryMap!: Record<string, string>;
   skill!: Skill;
   prerequisiteSkillsAreShown: boolean = false;
+  skillEditorCardIsShown: boolean = false;
   allAvailableSkills: SkillSummary[] = [];
   directiveSubscriptions = new Subscription();
   windowIsNarrow!: boolean;
@@ -127,6 +128,12 @@ implements OnInit {
     }
   }
 
+  toggleSkillEditorCard(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.skillEditorCardIsShown = !this.skillEditorCardIsShown;
+    }
+  }
+
   // Return null if the skill is not found.
   getSkillDescription(skillIdUpdate: string): string | null {
     for (let skill of this.allAvailableSkills) {
@@ -138,6 +145,7 @@ implements OnInit {
   }
 
   ngOnInit(): void {
+    this.skillEditorCardIsShown = true;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionsService.getResizeEvent().subscribe(

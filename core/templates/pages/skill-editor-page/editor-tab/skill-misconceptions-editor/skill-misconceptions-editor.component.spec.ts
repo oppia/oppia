@@ -234,18 +234,51 @@ describe('Skill Misconceptions Editor Component', () => {
     expect(component.activeMisconceptionIndex).toBe(null);
   });
 
-  it('should check if window is narrow when user resizes window', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+  it('should show Misconceptions list when the window is narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockEventEmitter);
+          mockEventEmitter);
+    component.windowIsNarrow = false;
 
-    expect(component.misconceptionsListIsShown).toBeFalse();
-
-    component.windowIsNarrow = true;
+    expect(component.misconceptionsListIsShown).toBe(false);
 
     component.ngOnInit();
     mockEventEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.misconceptionsListIsShown).toBe(false);
+    expect(component.windowIsNarrow).toBe(true);
+  });
+
+  it('should show Misconceptions list when the window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    component.windowIsNarrow = true;
+
+    expect(component.misconceptionsListIsShown).toBe(false);
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.misconceptionsListIsShown).toBe(true);
+    expect(component.windowIsNarrow).toBe(false);
+  });
+
+  it('should not toggle Misconceptions list when window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    
+    component.misconceptionsListIsShown = true;
+  
+    component.toggleMisconceptionLists();
+  
+    expect(component.misconceptionsListIsShown).toBe(true);
+  });
+
+  it('should not toggle skill card editor when window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    
+    component.skillEditorCardIsShown = true;
+  
+    component.toggleMisconceptionLists();
+  
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 });
