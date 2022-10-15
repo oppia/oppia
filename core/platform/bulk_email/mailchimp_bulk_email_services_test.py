@@ -53,7 +53,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         self.tag_names: List[str] = []
 
                     def update(
-                            self, _id: str, _hash: str,
+                            self, _id: str,
+                            _hash: str,
                             tag_data: Dict[str, List[Dict[str, str]]]) -> None:
                         """Mocks the tag update function in mailchimp api.
 
@@ -64,9 +65,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                             tag_data: dict. A dict with the 'tags' key
                                 containing the tags to be updated for the user.
                         """
-                        for tag in tag_data['tags']:
-                            if tag['status'] == 'active':
-                                self.tag_names.append(tag['name'])
+                        self.tag_names = [
+                            tag['name'] for tag in tag_data['tags']
+                            if tag['status'] == 'active'
+                        ]
 
                 def __init__(self) -> None:
                     self.users_data = [{
@@ -196,14 +198,15 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             swapped_mailchimp)
         with swap_mailchimp_context:
             with self.assertRaisesRegex(
-                Exception, 'Invalid Merge Field: INVALID'):
+                Exception, 'Invalid Merge Fields'
+            ):
                 mailchimp_bulk_email_services.add_or_update_user_status(
-                    'valid@example.com', True, {'INVALID': 'value'}, 'Android')
+                    'valid@example.com', {'INVALID': 'value'}, 'Android', True)
 
             with self.assertRaisesRegex(
                 Exception, 'Invalid tag: Invalid'):
                 mailchimp_bulk_email_services.add_or_update_user_status(
-                    'valid@example.com', True, {}, 'Invalid')
+                    'valid@example.com', {}, 'Invalid', True)
 
     def test_get_mailchimp_class_error(self) -> None:
         observed_log_messages = []
@@ -239,7 +242,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     'sample_email'))
             self.assertFalse(
                 mailchimp_bulk_email_services.add_or_update_user_status(
-                    'sample_email', True, {}, 'Web'))
+                    'sample_email', {}, 'Web', True))
 
     def test_add_or_update_mailchimp_user_status(self) -> None:
         mailchimp = self.MockMailchimpClass()
@@ -256,7 +259,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 mailchimp.lists.members.users_data[0]['status'], 'unsubscribed')
             mailchimp_bulk_email_services.add_or_update_user_status(
-                self.user_email_1, True, {}, 'Web')
+                self.user_email_1, {}, 'Web', True)
             self.assertEqual(
                 mailchimp.lists.members.users_data[0]['status'], 'subscribed')
             self.assertEqual(mailchimp.lists.members.tags.tag_names, ['Web'])
@@ -267,7 +270,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 mailchimp.lists.members.users_data[1]['status'],
                 'subscribed')
             mailchimp_bulk_email_services.add_or_update_user_status(
-                self.user_email_2, False, {}, 'Web')
+                self.user_email_2, {}, 'Web', False)
             self.assertEqual(
                 mailchimp.lists.members.users_data[1]['status'],
                 'unsubscribed')
@@ -276,7 +279,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(mailchimp.lists.members.users_data), 2)
             return_status = (
                 mailchimp_bulk_email_services.add_or_update_user_status(
-                    self.user_email_3, True, {}, 'Web'))
+                    self.user_email_3, {}, 'Web', True))
             self.assertTrue(return_status)
             self.assertEqual(
                 mailchimp.lists.members.users_data[2]['status'], 'subscribed')
@@ -289,7 +292,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 Exception, 'Server Error'):
                 mailchimp_bulk_email_services.add_or_update_user_status(
-                    self.user_email_1, True, {}, 'Web')
+                    self.user_email_1, {}, 'Web', True)
 
     def test_android_merge_fields(self) -> None:
         mailchimp = self.MockMailchimpClass()
@@ -306,7 +309,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 mailchimp.lists.members.users_data[0]['status'], 'unsubscribed')
             mailchimp_bulk_email_services.add_or_update_user_status(
-                self.user_email_1, True, {'NAME': 'name'}, 'Android')
+                self.user_email_1, {'NAME': 'name'}, 'Android', True)
             self.assertEqual(
                 mailchimp.lists.members.users_data[0]['status'], 'subscribed')
             self.assertEqual(
@@ -326,7 +329,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(mailchimp.lists.members.users_data), 2)
             return_status = (
                 mailchimp_bulk_email_services.add_or_update_user_status(
-                    'test4@example.com', True, {}, 'Web'))
+                    'test4@example.com', {}, 'Web', True))
             self.assertFalse(return_status)
             self.assertEqual(len(mailchimp.lists.members.users_data), 2)
 
@@ -334,7 +337,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 Exception, 'Server Issue'):
                 mailchimp_bulk_email_services.add_or_update_user_status(
-                    'test5@example.com', True, {}, 'Web')
+                    'test5@example.com', {}, 'Web', True)
 
     def test_permanently_delete_user(self) -> None:
         mailchimp = self.MockMailchimpClass()

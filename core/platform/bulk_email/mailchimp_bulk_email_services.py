@@ -86,7 +86,9 @@ def _create_user_in_mailchimp_db(
     Args:
         client: mailchimp3.MailChimp. A mailchimp instance with the API key and
             username initialized.
-        subscribed_mailchimp_data: dict. Post body with required fields.
+        subscribed_mailchimp_data: dict. Post body with required fields for a
+            new user. The required fields are email_address, status and tags
+            with any relevant merge_fields as optional.
 
     Returns:
         bool. Whether the user was successfully added to the db. (This will be
@@ -98,11 +100,8 @@ def _create_user_in_mailchimp_db(
             mailchimp API.
     """
     try:
-        # Here we use MyPy ignore because the following is a function in the
-        # mailchimp api but mypy is throwing an error that the arg type
-        # for subscriber data is not correct.
         client.lists.members.create(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data) # type: ignore[arg-type]
+            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data)
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the
@@ -159,8 +158,10 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
 
 def add_or_update_user_status(
-        user_email: str, can_receive_email_updates: bool,
-        merge_fields: Dict[str, str], tag: str
+        user_email: str,
+        merge_fields: Dict[str, str],
+        tag: str,
+        can_receive_email_updates: bool
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
@@ -173,8 +174,12 @@ def add_or_update_user_status(
             identify the user in the mailchimp DB.
         can_receive_email_updates: bool. Whether they want to be subscribed to
             the bulk email list or not.
-        merge_fields: dict. Additional 'merge fields' used for Android signups
-            currently, which can be expanded in the future.
+        merge_fields: dict. Additional 'merge fields' used by mailchimp for
+            adding extra information for each user. The format is
+            { 'KEY': value } where the key is defined in the mailchimp
+            dashboard .
+            (reference:
+            https://mailchimp.com/developer/marketing/docs/merge-fields/).
         tag: str. Tag to add to user in mailchimp.
 
     Returns:
@@ -194,9 +199,12 @@ def add_or_update_user_status(
     if tag not in feconf.VALID_MAILCHIMP_TAGS:
         raise Exception('Invalid tag: %s' % tag)
 
-    for key, _ in merge_fields.items():
-        if key not in feconf.VALID_MAILCHIMP_FIELD_KEYS:
-            raise Exception('Invalid Merge Field: %s' % key)
+    invalid_keys = [
+        key for key in merge_fields
+        if key not in feconf.VALID_MAILCHIMP_FIELD_KEYS
+    ]
+    if invalid_keys:
+        raise Exception('Invalid Merge Fields: %s' % invalid_keys)
 
     new_user_mailchimp_data = {
         'email_address': user_email,
@@ -236,17 +244,14 @@ def add_or_update_user_status(
         }
 
     try:
-        _ = client.lists.members.get(
+        client.lists.members.get(
             feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
 
         # If member is already added to mailchimp list, we cannot permanently
         # delete a list member, since they cannot be programmatically added
         # back, so we change their status based on preference.
         if can_receive_email_updates:
-            # Here we use MyPy ignore because the following is a function in the
-            # mailchimp api but mypy is throwing an error that the 'tags'
-            # atrribute is not defined.
-            client.lists.members.tags.update( # type: ignore[attr-defined]
+            client.lists.members.tags.update(
                 feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash, tag_data)
             client.lists.members.update(
                 feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,

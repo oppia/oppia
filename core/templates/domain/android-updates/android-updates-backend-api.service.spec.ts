@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AndroidUpdatesBackendApiService.
+ * @fileoverview Unit tests for android updates backend API service.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -45,7 +45,8 @@ describe('Android updates backend api service', () => {
       aubas.subscribeUserToAndroidList('email@example.com', 'name').then(
         successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/subscribetoandroidlist');
+      let req = httpTestingController.expectOne(
+        '/androidlistsubscriptionhandler');
       expect(req.request.method).toEqual('PUT');
 
       req.flush({
@@ -71,7 +72,8 @@ describe('Android updates backend api service', () => {
     aubas.subscribeUserToAndroidList(email, name)
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/subscribetoandroidlist');
+    let req = httpTestingController.expectOne(
+      '/androidlistsubscriptionhandler');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 

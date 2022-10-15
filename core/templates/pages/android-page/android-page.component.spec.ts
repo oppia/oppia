@@ -159,25 +159,6 @@ describe('Android page', () => {
     expect(component.validateEmailAddress()).toBeTrue();
   });
 
-  it('should catch error when adding user to android mailing list',
-    fakeAsync(() => {
-      spyOn(alertsService, 'addInfoMessage');
-      component.ngOnInit();
-      tick();
-      component.emailAddress = 'validEmail@example.com';
-      component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
-        .and.returnValue(Promise.reject({
-          error: { error: 'Internal Server Error.'}
-        }));
-
-      component.subscribeToAndroidList();
-
-      flushMicrotasks();
-
-      expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
-    }));
-
   it('should add user to android mailing list and return status',
     fakeAsync(() => {
       spyOn(alertsService, 'addInfoMessage');
@@ -186,7 +167,7 @@ describe('Android page', () => {
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
       spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
-        .and.returnValue(Promise.resolve());
+        .and.returnValue(Promise.resolve(true));
 
       component.subscribeToAndroidList();
 
@@ -194,6 +175,44 @@ describe('Android page', () => {
 
       expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
         'Done!', 1000);
+    }));
+
+  it('should fail to add user to android mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      component.ngOnInit();
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+        .and.returnValue(Promise.resolve(false));
+
+      component.subscribeToAndroidList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Sorry, some unexpected occurred. Please email admin@oppia.org to ' +
+        'add you to the mailing list.', 10000);
+    }));
+
+  it('should reject request to the android mailing list correctly',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      component.ngOnInit();
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+        .and.returnValue(Promise.reject(false));
+
+      component.subscribeToAndroidList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Sorry, some unexpected occurred. Please email admin@oppia.org to ' +
+        'add you to the mailing list.', 10000);
     }));
 
   it('should attach intersection observers', () => {

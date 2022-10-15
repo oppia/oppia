@@ -35,8 +35,10 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
 
 def add_or_update_user_status(
-    user_email: str, can_receive_email_updates: bool,
-    _merge_fields: Dict[str, str], _tag: str
+    user_email: str,
+    _merge_fields: Dict[str, str],
+    _tag: str,
+    can_receive_email_updates: bool
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
@@ -45,8 +47,10 @@ def add_or_update_user_status(
         user_email: str. Email id of the user.
         can_receive_email_updates: bool. Whether they want to be subscribed to
             list or not.
-        _merge_fields: dict. Additional 'merge fields' used for Android signups
-            currently, which can be expanded in the future.
+        _merge_fields: dict. Additional 'merge fields' used by mailchimp for
+            adding extra information for each user. The format is
+            { 'KEY': value } where the key is defined in the mailchimp
+            dashboard.
         _tag: str. Tag to add to user in mailchimp.
 
     Returns:

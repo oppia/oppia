@@ -964,11 +964,9 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
-class SubscribeToAndroidListTests(test_utils.GenericTestBase):
+class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
     def test_put_function(self):
-        # The GET function should not throw any error and should return status
-        # 200. No other check required here.
         swap_add_fn = self.swap(
             user_services, 'add_user_to_android_list', lambda *args: True)
 
@@ -978,11 +976,53 @@ class SubscribeToAndroidListTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             json_response = self.put_json(
-                '/subscribetoandroidlist', {
+                '/androidlistsubscriptionhandler', {
                     'email': 'email@example.com',
                     'name': 'Name'
                 }, csrf_token=csrf_token)
             self.assertEqual(json_response, {'status': True})
+
+        self.logout()
+
+    def test_email_provider_error(self):
+        def raise_exception():
+            raise Exception('Backend error')
+        swap_add_fn = self.swap(
+            user_services, 'add_user_to_android_list', raise_exception)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        with swap_add_fn:
+            self.put_json(
+                '/androidlistsubscriptionhandler', {
+                    'email': 'email@example.com',
+                    'name': 'Name'
+                }, csrf_token=csrf_token, expected_status_int=500)
+
+        self.logout()
+
+    def test_invalid_inputs(self):
+        swap_add_fn = self.swap(
+            user_services, 'add_user_to_android_list', lambda *args: True)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        with swap_add_fn:
+            self.put_json(
+                '/androidlistsubscriptionhandler', {
+                    'email': 'invalidemail.com',
+                    'name': 'Name'
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+            self.put_json(
+                '/androidlistsubscriptionhandler', {
+                    'email': 'email@example.com',
+                    'name': ''
+                }, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
 

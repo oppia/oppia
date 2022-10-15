@@ -1,6 +1,6 @@
 from .mailchimpclient import MailChimpClient as MailChimpClient
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 from typing_extensions import TypedDict
 
 
@@ -23,10 +23,11 @@ class Lists:
 
 
 class ListMembers:
+    tags: MemberTags = ...
     def create(
             self,
             list_id: Optional[str],
-            data: Dict[str, str]
+            data: Dict[str, Sequence[str]]
     ) -> Dict[str, Any]: ...
 
     def get(
@@ -48,3 +49,11 @@ class ListMembers:
             list_id: Optional[str],
             subscriber_hash: str,
     ) -> Dict[str, Any]: ...
+
+class MemberTags:
+    def update(
+        self,
+        list_id: Optional[str],
+        subscriber_hash: str,
+        data: Dict[str, Any]
+) -> Dict[str, Any]: ...

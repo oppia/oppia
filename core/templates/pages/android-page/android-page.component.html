@@ -146,14 +146,20 @@
                    required="true">
           </div>
           <div class="oppia-android-updates-input-padding">
-            <input class="oppia-android-updates-checkbox" [(ngModel)]="userCanSubscribe" type="checkbox">
+            <input class="oppia-android-updates-checkbox"
+                   [(ngModel)]="userCanSubscribe"
+                   type="checkbox">
             <span class="oppia-android-updates-checkbox-label">
               {{ 'I18N_ANDROID_PAGE_CONSENT_CHECKBOX_LABEL' | translate }}
               <span class="oppia-android-updates-asterisk-color">*</span>
             </span>
           </div>
           <div class="oppia-android-updates-input-padding text-center">
-            <button [disabled]="!userCanSubscribe || !validateEmailAddress()" (click)="subscribeToAndroidList()" class="btn oppia-android-updates-button">{{ 'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate }}</button>
+            <button [disabled]="!userCanSubscribe || !validateEmailAddress()"
+                    (click)="subscribeToAndroidList()"
+                    class="btn oppia-android-updates-button">
+              {{ 'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate }}
+            </button>
           </div>
         </div>
       </div>

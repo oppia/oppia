@@ -26,9 +26,9 @@ import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { AppConstants } from 'app.constants';
 
-import { AndroidUpdatesBackendApiService }
-  from 'domain/android-updates/android-updates-backend-api.service';
+import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
 
 import './android-page.component.css';
 
@@ -77,8 +77,8 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   featuresShown = 0;
   androidUpdatesSectionIsSeen = false;
   featuresMainTextIsSeen = false;
-  emailAddress = null;
-  name = null;
+  emailAddress: string = null;
+  name: string = null;
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
@@ -145,17 +145,25 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
 
   validateEmailAddress(): boolean {
     // A simple check for basic email validation.
-    let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let regex = new RegExp(AppConstants.EMAIL_REGEX);
     return regex.test(this.emailAddress);
   }
 
   subscribeToAndroidList(): void {
     this.androidUpdatesBackendApiService.subscribeUserToAndroidList(
       this.emailAddress, this.name
-    ).then(() => {
-      this.alertsService.addInfoMessage('Done!', 1000);
+    ).then((status) => {
+      if (status) {
+        this.alertsService.addInfoMessage('Done!', 1000);
+      } else {
+        this.alertsService.addInfoMessage(
+          'Sorry, some unexpected occurred. Please email admin@oppia.org to ' +
+          'add you to the mailing list.', 10000);
+      }
     }).catch(errorResponse => {
-      // This is placed here in order to satisfy Unit tests.
+      this.alertsService.addInfoMessage(
+        'Sorry, some unexpected occurred. Please email admin@oppia.org to ' +
+        'add you to the mailing list.', 10000);
     });
   }
 

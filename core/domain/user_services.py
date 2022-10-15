@@ -1705,7 +1705,7 @@ def add_user_to_android_list(email: str, name: str) -> bool:
         'NAME': name
     }
     return bulk_email_services.add_or_update_user_status(
-        email, True, merge_fields, 'Android')
+        email, merge_fields, 'Android', True)
 
 
 def update_email_preferences(
@@ -1758,7 +1758,7 @@ def update_email_preferences(
     if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
-                email, can_receive_email_updates, {}, 'Web'))
+                email, {}, 'Web', can_receive_email_updates))
         if not user_creation_successful:
             email_preferences_model.site_updates = False
             email_preferences_model.update_timestamps()

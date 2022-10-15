@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,27 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Backend api service for android email updates
+ * @fileoverview Backend api service for android email updates.
  */
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface ReturnStatusData {
+  status: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-
 export class AndroidUpdatesBackendApiService {
   constructor(private http: HttpClient) {}
 
   private async _putRequestAsync(
-      handlerUrl: string, payload: Object): Promise<void> {
+      handlerUrl: string, payload: Object): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
+      this.http.put<ReturnStatusData>(
         handlerUrl, payload).toPromise()
         .then(response => {
-          resolve(response);
+          resolve(response.status);
         }, errorResponse => {
           reject(errorResponse.error.error);
         });
@@ -41,13 +44,13 @@ export class AndroidUpdatesBackendApiService {
   }
 
   async subscribeUserToAndroidList(
-      email: string, name: string): Promise<void> {
+      email: string, name: string): Promise<boolean> {
     let payload = {
       email: email,
       name: name,
     };
     return this._putRequestAsync(
-      '/subscribetoandroidlist', payload);
+      '/androidlistsubscriptionhandler', payload);
   }
 }
 
