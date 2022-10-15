@@ -6699,6 +6699,7 @@ states_schema_version: 53
 tags: []
 title: Title
 """)
+
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
@@ -9897,9 +9898,9 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
-        solution: {}
         feedback_24: {}
         feedback_25: {}
+        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -9909,9 +9910,9 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
-        solution: {}
         feedback_24: {}
         feedback_25: {}
+        solution: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
