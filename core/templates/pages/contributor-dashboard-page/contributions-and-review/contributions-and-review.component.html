@@ -4,8 +4,7 @@
     <div class="oppia-contributions-dropdown-container">
       <div class="oppia-contributions-selection-container" (click)="toggleDropdown()">
         {{ activeDropdownTabChoice }}
-        <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
-          arrow_drop_down
+        <span class="fas fa-sort-down oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
         </span>
       </div>
 
@@ -74,7 +73,7 @@
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
                   class="oppia-contributions-back-button mat-raised-button">
-            <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
+            <i class="fa fa-arrow-left oppia-vcenter arrow-left" aria-hidden="true"></i>
           </button>
           <div class="oppia-contributions-back-button-label">Back to lessons</div>
         </div>
@@ -208,9 +207,13 @@
   }
 
   .oppia-contributions-back-button {
+    align-items: center;
     background: none;
     border: none;
+    display: flex;
+    font-size: 17px;
     height: 36px;
+    justify-content: center;
     margin-left: 12px;
     min-width: 36px;
     padding: 6px;
@@ -272,6 +275,7 @@
     height: 100%;
     width: 100%;
   }
+
 
   @media only screen and (max-width: 1500px) {
     contributions-and-review .oppia-contributions-navbar-button {
