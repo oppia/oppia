@@ -13,7 +13,7 @@
 // limitations under the License.
 import { ElementRef } from '@angular/core';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -21,7 +21,6 @@ import { MaterialModule } from 'modules/material.module';
 import { TagFilterComponent } from './tag-filter.component';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { BlogPostSearchService } from 'services/blog-search.service';
-import { Observable } from 'rxjs';
 /**
  * @fileoverview Unit tests for Tag Filter Component.
  */
@@ -63,40 +62,36 @@ describe('Tag Filter component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should initialize tag filter and select a tag and exec search', () => {
-    spyOn(component.selectionsChange, 'emit');
-    fixture.detectChanges();
-    component.selectedTags = ['tag1', 'tag2'];
-    component.listOfDefaultTags = ['tag1', 'tag2', 'tag3', 'tag4'];
-    component.filteredTags = {
-      pipe: (param1: string[], parm2: string[]) => {
-        return {
-          subscribe(callb: () => void) {
-            callb();
-          }
-        };
-      }
-    } as Observable<string[]>;
-    component.ngOnInit();
+  it('should initialize tag filter and select a tag and exec search', fakeAsync(
+    () => {
+      spyOn(component.selectionsChange, 'emit');
+      component.selectedTags = ['tag1', 'tag2'];
+      component.listOfDefaultTags = ['tag1', 'tag2', 'tag3', 'tag4'];
 
-    expect(component.filteredTags).toBeDefined();
-    expect(component.tagFilter).toBeDefined();
-    expect(component.searchDropDownTags).toEqual(['tag3', 'tag4']);
+      fixture.detectChanges();
+      component.ngOnInit();
 
-    component.tagFilterInput = {
-      nativeElement: {
-        value: ''
-      }
-    } as ElementRef;
-    component.selectTag(({ option: { viewValue: 'tag3'}}));
+      expect(component.filteredTags).toBeDefined();
+      expect(component.tagFilter).toBeDefined();
+      expect(component.searchDropDownTags).toEqual(['tag3', 'tag4']);
 
-    expect(component.selectedTags).toEqual(['tag1', 'tag2', 'tag3']);
-    expect(component.searchDropDownTags).toEqual(['tag4']);
+      component.tagFilterInput = {
+        nativeElement: {
+          value: ''
+        }
+      } as ElementRef;
+      component.selectTag(({ option: { viewValue: 'tag3'}}));
+      tick(1600);
 
-    component.selectTag(({ option: { viewValue: 'noTag'}}));
+      expect(component.selectedTags).toEqual(['tag1', 'tag2', 'tag3']);
+      expect(component.searchDropDownTags).toEqual(['tag4']);
 
-    expect(component.selectionsChange.emit).toHaveBeenCalled();
-  });
+      component.selectTag(({ option: { viewValue: 'noTag'}}));
+      tick(1600);
+
+      expect(component.selectionsChange.emit).toHaveBeenCalled();
+    })
+  );
 
   it('should filter tags', () => {
     component.searchDropDownTags = ['math'];
