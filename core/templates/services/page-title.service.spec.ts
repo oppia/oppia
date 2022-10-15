@@ -84,16 +84,4 @@ describe('Page title service', () => {
       content: 'description_text'
     });
   });
-
-  it('should correctly add meta tag', () => {
-    let metaTagContent = {
-      name: 'keywords',
-      content: 'blog, oppia, maths',
-    };
-    spyOn(metaTagService, 'addTag').and.callThrough();
-
-    pts.addMetaTag(metaTagContent);
-
-    expect(metaTagService.addTag).toHaveBeenCalledWith(metaTagContent);
-  });
 });
