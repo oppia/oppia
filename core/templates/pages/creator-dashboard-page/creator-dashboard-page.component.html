@@ -114,12 +114,6 @@
                 class="oppia-page-card oppia-dashboard-intro-card">
         <div>
           <p [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE' | translate"></p>
-          <button type="button"
-                  class="btn oppia-dashboard-intro-button oppia-transition-200 e2e-test-create-new-exploration-button"
-                  (click)="showCreateQuestionModal()"
-                  *ngIf="topicSummaries?.length > 0">
-                  CREATE QUESTION
-          </button>
         </div>
         <div class="oppia-dashboard-intro-picture">
           <img [src]="emptyDashboardImgUrl" alt="emptyDashboardImageUrl">
