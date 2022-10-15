@@ -32,6 +32,7 @@ import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { CdkDragSortEvent } from '@angular/cdk/drag-drop';
 import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
+import { of } from 'rxjs';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -55,6 +56,7 @@ describe('Skill Concept Card Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
   let sampleSkill: Skill;
+  let resizeEvent = new Event('resize');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -65,7 +67,13 @@ describe('Skill Concept Card Editor Component', () => {
       providers: [
         SkillEditorStateService,
         SkillUpdateService,
-        WindowDimensionsService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
+          }
+        },
         UrlInterpolationService
       ],
       schemas: [NO_ERRORS_SCHEMA]
