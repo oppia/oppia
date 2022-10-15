@@ -42,8 +42,6 @@ import { HintAndSolutionModalService } from './services/hint-and-solution-modal.
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -55,8 +53,6 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     MaterialModule,
     NgbPopoverModule,
     SharedComponentsModule,
-    ToastrModule,
-    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
