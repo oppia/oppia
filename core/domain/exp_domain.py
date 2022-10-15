@@ -4224,42 +4224,6 @@ class ExplorationChangeMergeVerifier:
         for change in composite_change_list:
             self._parse_exp_change(change)
 
-    def _get_property_name_from_content_id(self, content_id: str) -> str:
-        """Returns property name from content id.
-
-        Args:
-            content_id: string. Id of the content.
-
-        Returns:
-            string. Name of the property of which the
-            content is part of.
-        """
-        property_name_to_content_id_identifier: Dict[
-            str, Callable[[str], bool]
-        ] = {
-            STATE_PROPERTY_CONTENT: (
-                lambda content_id: content_id == 'content'),
-            STATE_PROPERTY_INTERACTION_CUST_ARGS: (
-                lambda content_id: content_id[:3] == 'ca_'),
-            STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME: (
-                lambda content_id: content_id == 'default_outcome'),
-            STATE_PROPERTY_INTERACTION_SOLUTION: (
-                lambda content_id: content_id == 'solution'),
-            STATE_PROPERTY_INTERACTION_HINTS: (
-                lambda content_id: content_id[:4] == 'hint'),
-            STATE_PROPERTY_INTERACTION_ANSWER_GROUPS: (
-                lambda content_id: (
-                    content_id[:8] == 'feedback' or
-                    content_id[:10] == 'rule_input')),
-        }
-
-        for prop_name, identifier_function in (
-                property_name_to_content_id_identifier.items()):
-            if identifier_function(content_id):
-                property_name = prop_name
-                break
-        return property_name
-
     def _parse_exp_change(self, change: ExplorationChange) -> None:
         """This function take the change and according to the cmd
         add the property name in the lists defined above.

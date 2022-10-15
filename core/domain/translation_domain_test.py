@@ -751,6 +751,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
         written_translations = translation_domain.WrittenTranslations.from_dict(
             written_translations_dict)
+        written_translations.validate(['content1', 'feedback_1'])
         self.assertEqual(
             written_translations.to_dict(), written_translations_dict)
 
