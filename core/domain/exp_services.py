@@ -3098,7 +3098,7 @@ def regenerate_missing_stats_for_exploration(
                     % (exp_id, commit_cmd)
                 )
                 continue
-        change_lists.append([change_list_for_snapshot])
+        change_lists.append(change_list_for_snapshot)
 
     missing_exp_stats = []
     missing_state_stats = []
