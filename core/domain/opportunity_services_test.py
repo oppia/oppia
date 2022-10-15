@@ -1069,7 +1069,7 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
                 story_id='story_id',
                 story_title='story_title',
                 chapter_title='chapter_title',
-                content_count=1,
+                content_count=2,
                 incomplete_translation_language_codes=(
                     self.new_incomplete_translation_language_codes),
                 translation_counts={},
@@ -1077,3 +1077,61 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
                 language_codes_with_assigned_voice_artists=[]
             ))
         self.opportunity_model.put()
+
+    def test_update_translation_opportunity_with_accepted_suggestion(
+        self
+    ) -> None:
+        (
+            opportunity_services
+            .update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+        )
+
+        opportunity = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['exp_1']
+            )
+        )
+        assert opportunity['exp_1'] is not None
+
+        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 1})
+
+    def test_fully_translated_content_in_language_updated_in_opportunity(
+        self
+    ) -> None:
+        (
+            opportunity_services
+            .update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+        )
+
+        opportunity = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['exp_1']
+            )
+        )
+        assert opportunity['exp_1'] is not None
+
+        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 1})
+        self.assertTrue(
+            'hi' in opportunity['exp_1'].incomplete_translation_language_codes)
+
+        (
+            opportunity_services
+            .update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+        )
+
+        opportunity = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['exp_1']
+            )
+        )
+        assert opportunity['exp_1'] is not None
+
+        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 2})
+        self.assertFalse(
+            'hi' in opportunity['exp_1'].incomplete_translation_language_codes)

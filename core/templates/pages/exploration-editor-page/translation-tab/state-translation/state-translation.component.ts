@@ -21,10 +21,7 @@ require(
 require(
   'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.component.ts');
-require(
-  'pages/exploration-editor-page/translation-tab/state-translation-editor/' +
-  'state-translation-editor.component.ts'
-);
+
 
 require('components/ck-editor-helpers/ck-editor-copy-content.service.ts');
 require('domain/utilities/url-interpolation.service.ts');

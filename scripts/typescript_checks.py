@@ -320,8 +320,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-status.service.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-topic.service.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.component.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.spec.ts',

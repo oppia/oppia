@@ -46,8 +46,16 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(classifier_models, exp_models, stats_models) = models.Registry.import_models([
-    models.Names.CLASSIFIER, models.Names.EXPLORATION, models.Names.STATISTICS
+(
+    classifier_models,
+    exp_models,
+    stats_models,
+    translation_models
+) = models.Registry.import_models([
+    models.Names.CLASSIFIER,
+    models.Names.EXPLORATION,
+    models.Names.STATISTICS,
+    models.Names.TRANSLATION
 ])
 
 
@@ -176,6 +184,10 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
+        exp_models.ExplorationContextModel(
+            id='0',
+            story_id='story1'
+        ).put()
 
         # Viewer opens exploration.
         self.login(self.VIEWER_EMAIL)
@@ -3463,3 +3475,32 @@ class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
             response, {
                 'checkpoints_feature_is_enabled': True,
             })
+
+
+class EntityTranslationHandlerTest(test_utils.GenericTestBase):
+    """Unit test for the EntityTranslationHandler."""
+
+    def test_fetching_entity_translations(self):
+        """Test giving feedback handler."""
+        translations_mapping = {
+            'content_0': {
+                'content_value': 'Translated content',
+                'content_format': 'html',
+                'needs_update': False
+            }
+        }
+        language_codes = ['hi', 'bn']
+        for language_code in language_codes:
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', 'exp1', 5, language_code, translations_mapping
+            ).put()
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.login(self.VIEWER_EMAIL)
+        url = '/entity_translations_handler/exploration/exp1/5/hi'
+        entity_translation_dict = self.get_json(url)
+
+        self.assertEqual(
+            entity_translation_dict['translation'], translations_mapping)
+        self.logout()

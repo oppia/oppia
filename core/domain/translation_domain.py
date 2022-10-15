@@ -587,38 +587,27 @@ class EntityTranslation:
         """Validates the EntityTranslation object."""
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
-                'entity_type must be a string, but got %r' % self.entity_type)
+                'entity_type must be a string, recieved %r' % self.entity_type)
         if not isinstance(self.entity_id, str):
             raise utils.ValidationError(
-                'entity_id must be a string, but got %r' % self.entity_id)
+                'entity_id must be a string, recieved %r' % self.entity_id)
         if not isinstance(self.entity_version, int):
             raise utils.ValidationError(
-                'entity_version must be a string, but got %r' %
+                'entity_version must be an int, recieved %r' %
                 self.entity_version)
         if not isinstance(self.language_code, str):
             raise utils.ValidationError(
-                'language_code must be a string, but got %r' %
+                'language_code must be a string, recieved %r' %
                 self.language_code)
 
         for content_id, translated_content in self.translations.items():
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
-                    'content_id must be a string, but got %r' % content_id)
+                    'content_id must be a string, recieved %r' % content_id)
             if not isinstance(translated_content.needs_update, bool):
                 raise utils.ValidationError(
-                    'needs_update must be a bool, but got %r' %
+                    'needs_update must be a bool, recieved %r' %
                     translated_content.needs_update)
-            if isinstance(translated_content.content_value, list):
-                for content_value in translated_content.content_value:
-                    if not isinstance(content_value, str):
-                        raise utils.ValidationError(
-                            'content_value must be a string, but got %r' %
-                            content_value)
-            else:
-                if not isinstance(translated_content.content_value, str):
-                    raise utils.ValidationError(
-                        'content_value must be a string, but got %r' %
-                        content_value)
 
     def add_translation(
         self,
@@ -809,22 +798,6 @@ class WrittenTranslation:
             'TranslatableSetOfNormalizedString'),
         DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
     }
-
-    @classmethod
-    def is_data_format_list(cls, data_format: str) -> bool:
-        """Checks whether the content of translation with given format is of
-        a list type.
-
-        Args:
-            data_format: str. The format of the translation.
-
-        Returns:
-            bool. Whether the content of translation is a list.
-        """
-        return data_format in (
-            cls.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
-            cls.DATA_FORMAT_SET_OF_UNICODE_STRING
-        )
 
     def __init__(
         self,

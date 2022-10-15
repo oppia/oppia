@@ -29,10 +29,9 @@ describe('Entity Translation Backend Api Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [EntityTranslationBackendApiService]
+      imports: [HttpClientTestingModule]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
     translationApiService = TestBed.inject(EntityTranslationBackendApiService);
   });
 
@@ -91,7 +90,6 @@ describe('Entity Translation Backend Api Service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
   }));
 });

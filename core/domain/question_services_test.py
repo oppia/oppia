@@ -869,7 +869,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': rule_content_ids[0],
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Test0']
                         }
                     },
                     'rule_type': 'Contains'
@@ -894,7 +894,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': rule_content_ids[1],
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Test1']
                         }
                     },
                     'rule_type': 'Contains'
@@ -919,7 +919,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': rule_content_ids[2],
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Test2']
                         }
                     },
                     'rule_type': 'Contains'
@@ -1028,7 +1028,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': rule_content_ids[0],
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Test0']
                         }
                     },
                     'rule_type': 'Contains'
@@ -1053,7 +1053,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': rule_content_ids[1],
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Test1']
                         }
                     },
                     'rule_type': 'Contains'
@@ -1078,7 +1078,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': rule_content_ids[2],
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Test2']
                         }
                     },
                     'rule_type': 'Contains'

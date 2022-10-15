@@ -113,13 +113,9 @@ class SuggestionHandler(base.BaseHandler):
 
         suggestion_change = suggestion.change
         if (
-                suggestion_change.cmd == 'add_written_translation' and
-                suggestion_change.data_format in
-                (
+                suggestion_change.cmd == 'add_written_translation' and (
                     translation_domain.TranslatableContentFormat
-                    .SET_OF_NORMALIZED_STRING,
-                    translation_domain.TranslatableContentFormat
-                    .SET_OF_UNICODE_STRING
+                    .is_data_format_list(suggestion_change.data_format)
                 )
         ):
             self.render_json(self.values)

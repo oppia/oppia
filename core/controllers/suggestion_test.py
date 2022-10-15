@@ -1240,6 +1240,67 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             response['error'], 'The parameter \'skill_difficulty\' is missing.')
         self.logout()
 
+    def test_cannot_update_question_without_next_content_id_index(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
+        suggestion_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state', content_id_generator).to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        new_solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is the updated solution.</p>',
+            },
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        question_state_data = suggestion.change.question_dict[
+            'question_state_data']
+        question_state_data['content']['html'] = '<p>Updated question</p>'
+        question_state_data['interaction']['solution'] = new_solution_dict
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),
+            {
+                'question_state_data': question_state_data,
+                'skill_difficulty': 0.6
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            response['error'],
+            'The parameter \'next_content_id_index\' is missing.'
+        )
+        self.logout()
+
     def test_cannot_update_already_handled_question(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(

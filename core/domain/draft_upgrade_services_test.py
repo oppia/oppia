@@ -168,12 +168,51 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v52_dict_to_v53_dict(self) -> None:
+        new_value: Dict[str, str] = {}
+        draft_change_list_1_v52 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': new_value
+            })
+        ]
+
+        # Migrate exploration to state schema version 53.
+        self.create_and_migrate_new_exploration('52', '53')
+        migrated_draft_change_list_1_v53 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v52, 1, 2, self.EXP_ID))
+        # Verify that changes are not upgraded to v52.
+        self.assertIsNone(migrated_draft_change_list_1_v53)
+
     def test_convert_states_v51_dict_to_v52_dict(self) -> None:
         draft_change_list_v51_1 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        draft_change_list_v51_2 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'next_content_id_index',
                 'new_value': 'new value'
             })
         ]
@@ -199,6 +238,12 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             [change.to_dict() for change in draft_change_list_v51_1],
             [change.to_dict() for change in migrated_draft_change_list_v52_1]
         )
+
+        migrated_draft_change_list_v52_2 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v51_2, 1, 2, self.EXP_ID)
+        )
+        self.assertIsNone(migrated_draft_change_list_v52_2)
 
         migrated_draft_change_list_v52_3 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
@@ -1156,8 +1201,58 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': {
-                    'content_id': 'content_0',
+                    'content_id': 'content',
                     'html': html_content
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'written_translations',
+                'new_value': {
+                    'translations_mapping': {
+                        # Here we use MyPy ignore because we are testing convert
+                        # function and in convert function we are working with
+                        # previous versions of the domain object and in previous
+                        # versions of the domain object there are some fields
+                        # (eg: html) that are discontinued in the latest domain
+                        # object. So, while defining these old keys MyPy throw
+                        # an error. To avoid the error, we used ignore here.
+                        'content1': {
+                            'en': {  # type: ignore[typeddict-item]
+                                'html': html_content,
+                                'needs_update': True
+                            },
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
+                                'html': 'Hey!',
+                                'needs_update': False
+                            }
+                        },
+                        'feedback_1': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
+                                'html': html_content,
+                                'needs_update': False
+                            },
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'en': {  # type: ignore[typeddict-item]
+                                'html': 'hello!',
+                                'needs_update': False
+                            }
+                        }
+                    }
                 }
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1328,12 +1423,65 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': {
-                    'content_id': 'content_0',
+                    'content_id': 'content',
                     'html': expected_html_content
                 }
             }).to_dict())
         self.assertEqual(
             migrated_draft_change_list[3].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'written_translations',
+                'new_value': {
+                    'translations_mapping': {
+                        # Here we use MyPy ignore because we are testing convert
+                        # function and in convert function we are working with
+                        # previous versions of the domain object and in previous
+                        # versions of the domain object there are some fields
+                        # (eg: html) that are discontinued in the latest domain
+                        # object. So, while defining these old keys MyPy throw
+                        # an error. To avoid the error, we used ignore here.
+                        'content1': {
+                            'en': {  # type: ignore[typeddict-item]
+                                'html': expected_html_content,
+                                'needs_update': True
+                            },
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
+                                'html': 'Hey!',
+                                'needs_update': False
+                            }
+                        },
+                        'feedback_1': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'hi': {  # type: ignore[typeddict-item]
+                                'html': expected_html_content,
+                                'needs_update': False
+                            },
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
+                            'en': {  # type: ignore[typeddict-item]
+                                'html': 'hello!',
+                                'needs_update': False
+                            }
+                        }
+                    }
+                }
+            }).to_dict())
+        self.assertEqual(
+            migrated_draft_change_list[4].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -1348,7 +1496,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             }).to_dict())
         self.assertEqual(
-            migrated_draft_change_list[4].to_dict(),
+            migrated_draft_change_list[5].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -1369,7 +1517,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
         self.assertEqual(
-            migrated_draft_change_list[5].to_dict(),
+            migrated_draft_change_list[6].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -1388,7 +1536,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
         self.assertEqual(
-            migrated_draft_change_list[6].to_dict(),
+            migrated_draft_change_list[7].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',

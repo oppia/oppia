@@ -86,6 +86,8 @@ STATE_PROPERTY_INTERACTION_SOLUTION: Final = 'solution'
 STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED: Final = (
     # Deprecated in state schema v27.
     'content_ids_to_audio_translations')
+STATE_PROPERTY_WRITTEN_TRANSLATIONS_DEPRECATED: Final = 'written_translations'
+STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED: Final = 'next_content_id_index'
 
 # These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS: Final = 'widget_handlers'
@@ -309,7 +311,9 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
         # Deprecated state properties.
-        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED
+        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED,
+        STATE_PROPERTY_WRITTEN_TRANSLATIONS_DEPRECATED,
+        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED
     ]
 
     # The allowed list of exploration properties which can be used in
@@ -4296,18 +4300,6 @@ class ExplorationChangeMergeVerifier:
                 state_name = self.new_to_old_state_names[change.state_name]
             self.changed_properties[state_name].add(
                 change.property_name)
-        elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
-            changed_property = self._get_property_name_from_content_id(
-                change.content_id)
-            # A condition to store the name of the properties changed
-            # in changed_properties dict.
-            state_name = change.state_name
-            if state_name in self.new_to_old_state_names:
-                state_name = self.new_to_old_state_names[change.state_name]
-            self.changed_translations[state_name].add(
-                changed_property)
-            self.changed_properties[state_name].add(
-                DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS)
 
     def is_change_list_mergeable(
         self,

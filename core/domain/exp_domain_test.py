@@ -2114,13 +2114,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Terminal interactions must not have any answer groups.')
 
         init_state.interaction.answer_groups = []
-        self.set_interaction_for_state(init_state, 'Continue')
+        self.set_interaction_for_state(
+            init_state, 'Continue', content_id_generator)
         init_state.interaction.answer_groups = answer_groups
         init_state.update_interaction_default_outcome(default_outcome)
         self._assert_validation_error(
             exploration,
             'Linear interactions must not have any answer groups.')
-
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
         init_state.interaction.answer_groups = []
@@ -2825,6 +2827,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception,
             'Expected correctness_feedback_enabled to be a bool, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_next_content_id_index(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.next_content_id_index = '5'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected next_content_id_index to be an int, received 5'):
             exploration.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type

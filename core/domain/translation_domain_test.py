@@ -432,6 +432,144 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
             entity_translations.translations['content_id_1'].needs_update,
             False)
 
+    def test_validate_entity_type(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                False)
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict
+        )
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'entity_type must be a string'
+        ):
+            entity_translations.entity_type = 123  # type: ignore[assignment]
+            entity_translations.validate()
+
+    def test_validate_entity_id(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                False)
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict
+        )
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'entity_id must be a string'
+        ):
+            entity_translations.entity_id = 123  # type: ignore[assignment]
+            entity_translations.validate()
+
+    def test_validate_language_code(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                False)
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict
+        )
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'language_code must be a string'
+        ):
+            entity_translations.language_code = 123  # type: ignore[assignment]
+            entity_translations.validate()
+
+    def test_validate_entity_version(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                False)
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict
+        )
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'entity_version must be an int'
+        ):
+            entity_translations.entity_version = '123'  # type: ignore[assignment]
+            entity_translations.validate()
+
+    def test_validate_content_id(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                False)
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict
+        )
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'content_id must be a string'
+        ):
+            entity_translations.translations[1] = (   # type: ignore[index]
+                translation_domain.TranslatedContent(
+                    'My name is Nikhil.',
+                    translation_domain.TranslatableContentFormat.HTML,
+                    False
+                )
+            )
+            entity_translations.validate()
+
+    def test_validate_needs_update(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                False)
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict
+        )
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'needs_update must be a bool'
+        ):
+            entity_translations.translations['content_id_1'].needs_update = 5  # type: ignore[assignment]
+            entity_translations.validate()
+
 
 class TranslatableContentUnitTests(test_utils.GenericTestBase):
     """Test class for TranslatableContent."""
