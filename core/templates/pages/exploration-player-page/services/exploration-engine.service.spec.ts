@@ -42,12 +42,16 @@ import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateModule } from 'tests/unit-test-utils';
 
 
-class MockTranslateService {
-  onLangChange: EventEmitter<string> = new EventEmitter();
-  instant(key: string, interpolateParams: Object | undefined): string {
-    return key;
+export class MockTranslateService {
+  instant(val: string): string {
+    return val;
+  }
+
+  get(val: string): string {
+    return val;
   }
 }
 
@@ -382,7 +386,10 @@ describe('Exploration engine service ', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MockTranslateModule
+      ],
       providers: [
         {
           provide: TranslateService,
