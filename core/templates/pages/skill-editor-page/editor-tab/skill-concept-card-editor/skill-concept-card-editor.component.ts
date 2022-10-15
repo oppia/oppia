@@ -213,6 +213,14 @@ export class SkillConceptCardEditorComponent implements OnInit {
         }
       )
     );
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.workedExamplesListIsShown = (
+            !this.windowDimensionsService.isWindowNarrow());
+        }
+      )
+    );
   }
 
   ngOnDestroy(): void {
