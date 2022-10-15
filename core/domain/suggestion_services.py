@@ -2844,10 +2844,7 @@ def increment_translation_contribution_stats_at_review(
         translation_contribution_stat.rejected_translation_word_count += (
             content_word_count)
     if suggestion_is_accepted and not edited_by_reviewer:
-        (
-            translation_contribution_stat
-            .accepted_translations_without_reviewer_edits_count
-        ) += 1
+        translation_contribution_stat.accepted_translations_without_reviewer_edits_count += 1 # pylint: disable=line-too-long
 
 
 def increment_translation_review_stats(
