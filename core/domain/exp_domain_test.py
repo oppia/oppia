@@ -9734,6 +9734,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
     solicit_answer_details: false
@@ -9745,6 +9746,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
   end:
@@ -9895,6 +9897,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
     solicit_answer_details: false
@@ -9906,6 +9909,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
   end:
@@ -10093,6 +10097,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
         feedback_26: {}
@@ -10106,6 +10111,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
         feedback_26: {}
