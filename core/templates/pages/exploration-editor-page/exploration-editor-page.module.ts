@@ -23,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { JoyrideModule } from 'ngx-joyride';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -35,7 +36,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
-import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
@@ -99,6 +99,8 @@ import { TranslatorOverviewComponent } from './translation-tab/translator-overvi
 import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component';
 import { TranslationTabComponent } from './translation-tab/translation-tab.component';
 import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
+import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
+import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
 
 @NgModule({
   imports: [
@@ -106,6 +108,7 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    MatMenuModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
@@ -121,7 +124,6 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
   declarations: [
     CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
-    ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
@@ -181,6 +183,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
     ExplorationEditorPageComponent,
+    ValueGeneratorEditorComponent,
+    ParamChangesEditorComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -244,6 +248,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
     ExplorationEditorPageComponent,
+    ValueGeneratorEditorComponent,
+    ParamChangesEditorComponent,
   ],
   providers: [
     {
