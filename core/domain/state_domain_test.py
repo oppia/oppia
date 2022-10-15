@@ -90,7 +90,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ]
             },
             'allowMultipleItemsInSamePosition': {
-                'value': False
+                'value': True
             }
         }
         state_answer_group = state_domain.AnswerGroup(
@@ -1645,6 +1645,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'content_id': 'ca_choices_2',
                         'html': '100'
+                    },
+                    {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>1,000</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_4',
+                        'html': '<p>100</p>'
                     }
                 ]
             }
@@ -1665,14 +1673,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {},
                 'ca_choices_0': {},
                 'ca_choices_1': {},
-                'ca_choices_2': {}
+                'ca_choices_2': {},
+                'ca_choices_3': {},
+                'ca_choices_4': {}
             }
         }
         written_translations = state_domain.WrittenTranslations.from_dict(
             written_translations_dict)
         init_state.update_written_translations(written_translations)
 
-        # Choice 2 should not be returned as its value is numeric.
+        # Choice 2 and 4 should not be returned as its value is numeric.
         content_id_mapping_needing_translations = (
             init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
@@ -1693,6 +1703,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ].content, '1,000')
         self.assertFalse(
             'ca_choices_2' in content_id_mapping_needing_translations)
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_3'
+            ].content, '<p>1,000</p>')
+        self.assertFalse(
+            'ca_choices_4' in content_id_mapping_needing_translations)
 
     def test_content_id_existance_checks_work_correctly(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -4189,7 +4205,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'x': {
                             'contentId': 'rule_input_Contains',
-                            'normalizedStrSet': ['Test1']
+                            'normalizedStrSet': ['Temp']
                             }
                     })
             ],
