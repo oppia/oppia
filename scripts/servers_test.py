@@ -934,9 +934,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
         program_args = popen_calls[0].program_args
         self.assertIn(
-            '%s --unhandled-rejections=strict %s %s' % (
+            '%s --unhandled-rejections=strict %s %s --suite full %s' % (
                 common.NPX_BIN_PATH, common.NODEMODULES_WDIO_BIN_PATH,
-                common.WEBDRIVERIO_CONFIG_FILE_PATH),
+                common.WEBDRIVERIO_CONFIG_FILE_PATH, '104.0.5112.79'),
             program_args)
         self.assertNotIn('DEBUG=true', program_args)
         self.assertIn('--suite full', program_args)

@@ -24,7 +24,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import repo_specific_changes_fetcher
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 from typing_extensions import Final
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
@@ -106,7 +106,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
     def test_get_changes(self) -> None:
         def mock_get_changed_schema_version_constant_names(
             unused_release_tag_to_diff_against: str
-        ) -> List[str] | None:
+        ) -> Optional[List[str]]:
             if self.call_counter:
                 return ['version_change']
             return None

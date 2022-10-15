@@ -105,28 +105,18 @@ def make_graph() -> Tuple[Dict[str, List[str]], Set[str]]:
                     parsed_script = esprima.parseScript(dep_lines, comment=True)
                     parsed_nodes = parsed_script.body
                     for parsed_node in parsed_nodes:
-                        # For require statements.
-                        # The dep_lines contains only the expressions beginning
-                        # with 'require' keyword. This is made sure by the code
-                        # section above. Hence, a branch where the below if
-                        # condition is false will never arise and hence, we add
-                        # the 'no branch' flag.
-                        if ( # pragma: no branch
-                            parsed_node.type == 'ExpressionStatement' and
-                            parsed_node.expression.callee.name == 'require'
-                        ):
-                            arguments = parsed_node.expression.arguments
-                            for argument in arguments:
-                                dep_path = argument.value
-                                if argument.operator == '+':
-                                    dep_path = (
-                                        argument.left.value +
-                                        argument.right.value)
-                                if not dep_path.endswith('.ts'):
-                                    dep_path = dep_path + '.ts'
-                                if dep_path.endswith(SERVICE_FILES_SUFFICES):
-                                    dep_name = os.path.basename(dep_path)
-                                    adj_list[dep_name].append(filename)
+                        arguments = parsed_node.expression.arguments
+                        for argument in arguments:
+                            dep_path = argument.value
+                            if argument.operator == '+':
+                                dep_path = (
+                                    argument.left.value +
+                                    argument.right.value)
+                            if not dep_path.endswith('.ts'):
+                                dep_path = dep_path + '.ts'
+                            if dep_path.endswith(SERVICE_FILES_SUFFICES):
+                                dep_name = os.path.basename(dep_path)
+                                adj_list[dep_name].append(filename)
 
     return (adj_list, nodes_set)
 
