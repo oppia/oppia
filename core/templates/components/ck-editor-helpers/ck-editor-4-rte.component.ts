@@ -537,10 +537,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     });
   }
 
-  // Returns true if a rte component should not be shown in blog post editor
-  // RTE to remove it from rte configuration for the blog post editor RTE.
+  // Returns whether the component should be shown in the 'Blog Post Editor
+  // RTE'. Return true if component should be hidden in the RTE.
   isInvalidForBlogPostEditorRTE(compDefn: RteComponentSpecs): boolean {
-    var invalidComponents = (
+    let invalidComponents = (
       AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR);
     return (
       this.contextService.isInBlogPostEditorPage() && (
