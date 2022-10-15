@@ -41,6 +41,7 @@ import {
   BaseContentComponent,
   BaseContentNavBarBreadCrumbDirective,
   BaseContentNavBarPreLogoActionDirective,
+  BaseContentNavOptionsDirective,
   BaseContentPageFooterDirective
 } from './base-content.component';
 
@@ -65,6 +66,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
     BaseContentNavBarPreLogoActionDirective,
+    BaseContentNavOptionsDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
@@ -103,6 +105,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
     BaseContentNavBarPreLogoActionDirective,
+    BaseContentNavOptionsDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,

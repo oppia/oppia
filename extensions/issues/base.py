@@ -20,6 +20,8 @@ from __future__ import annotations
 
 from extensions import domain
 
+from typing import Dict, List
+
 
 class BaseExplorationIssueSpec:
     """Base issue definition class.
@@ -30,16 +32,16 @@ class BaseExplorationIssueSpec:
 
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
-    _customization_arg_specs = []
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = []
 
     @property
-    def customization_arg_specs(self):
+    def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         """The customization arg specs for the components."""
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, List[domain.CustomizationArgSpecsDict]]:
         """Gets a dict representing this issue. Only default values are
         provided.
         """

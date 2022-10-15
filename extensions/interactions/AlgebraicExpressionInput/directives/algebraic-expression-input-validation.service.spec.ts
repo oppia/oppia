@@ -238,4 +238,31 @@ describe('AlgebraicExpressionInputValidationService', () => {
       message: 'The number of custom letters cannot be more than 10.'
     }]);
   });
+
+  it('should warn if there are inputs with unsupported functions', function() {
+    answerGroups[0].rules = [
+      rof.createFromBackendDict({
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: 'x+log(y)'
+        }
+      }, 'AlgebraicExpressionInput')
+    ];
+    customizationArgs = {
+      useFractionForDivision: false,
+      allowedVariables: {
+        value: ['y', 'x']
+      }
+    };
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Input for rule 1 from answer group 1 uses these function(s) that ' +
+        'aren\'t supported: [log] The supported functions are: [sqrt,abs]')
+    }]);
+  });
 });

@@ -38,6 +38,15 @@ import { CookieService } from 'ngx-cookie';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    AndroidBetaLandingPage: {
+      isEnabled: false
+    }
+  };
+}
 
 class MockWindowRef {
   nativeWindow = {
@@ -50,6 +59,10 @@ class MockWindowRef {
       }
     },
     localStorage: {
+      last_uploaded_audio_lang: 'en',
+      removeItem: (name: string) => {}
+    },
+    sessionStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
     },
@@ -83,6 +96,7 @@ describe('TopNavigationBarComponent', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -116,6 +130,10 @@ describe('TopNavigationBarComponent', () => {
             getResizeEvent: () => mockResizeEmitter,
             isWindowNarrow: () => false
           }
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -576,5 +594,16 @@ describe('TopNavigationBarComponent', () => {
     hackyStoryTitleTranslationIsDisplayed =
       component.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
+
+  it('should show android button if the feature is enabled', () => {
+    // The androidPageIsEnabled property is set when the component is
+    // constructed and the value is not modified after that so there is no
+    // pre-check for this test.
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
+
+    const component = TestBed.createComponent(TopNavigationBarComponent);
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

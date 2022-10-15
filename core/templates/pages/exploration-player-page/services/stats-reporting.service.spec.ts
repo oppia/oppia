@@ -119,6 +119,10 @@ describe('Stats reporting service ', () => {
     let recordExplorationStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExpStartedAsync')
       .and.returnValue(Promise.resolve({}));
+    spyOn(statsReportingBackendApiService, 'recordStateHitAsync')
+      .and.returnValue(Promise.resolve({}));
+    spyOn(statsReportingBackendApiService, 'postsStatsAsync')
+      .and.returnValue(Promise.resolve({}));
 
     let sampleStats = {
       total_answers_count: 1,
@@ -132,10 +136,12 @@ describe('Stats reporting service ', () => {
       sampleStats);
 
     expect(statsReportingService.explorationStarted).toBe(false);
+
     statsReportingService.recordExplorationStarted('firstState', {});
 
     expect(statsReportingService.explorationStarted).toBe(true);
     expect(recordExplorationStartedSpy).toHaveBeenCalled();
+    expect(statsReportingBackendApiService.postsStatsAsync).toHaveBeenCalled();
   });
 
   it('should not again record exploration\'s stats when ' +
@@ -144,6 +150,7 @@ describe('Stats reporting service ', () => {
       statsReportingBackendApiService, 'recordExpStartedAsync')
       .and.returnValue(Promise.resolve({}));
     statsReportingService.explorationStarted = true;
+
     statsReportingService.recordExplorationStarted('firstState', {});
 
     expect(recordExplorationStartedSpy).not.toHaveBeenCalled();
@@ -153,10 +160,19 @@ describe('Stats reporting service ', () => {
     'it is about to start and already recorded', () => {
     let postStatsSpy = spyOn(statsReportingBackendApiService, 'postsStatsAsync')
       .and.returnValue(Promise.resolve({}));
+    spyOn(statsReportingBackendApiService, 'recordExpStartedAsync')
+      .and.returnValue(Promise.resolve({}));
+    spyOn(statsReportingBackendApiService, 'recordStateHitAsync')
+      .and.returnValue(Promise.resolve({}));
     statsReportingService.explorationIsComplete = true;
+
     statsReportingService.recordExplorationStarted('firstState', {});
 
     expect(postStatsSpy).not.toHaveBeenCalled();
+    expect(statsReportingBackendApiService.recordExpStartedAsync)
+      .toHaveBeenCalled();
+    expect(statsReportingBackendApiService.recordStateHitAsync)
+      .toHaveBeenCalled();
   });
 
   it('should record exploration\'s stats when it is actually started', () => {
@@ -241,20 +257,28 @@ describe('Stats reporting service ', () => {
     let recordExplorationCompletedSpy = spyOn(
       statsReportingBackendApiService, 'recordExplorationCompletedAsync')
       .and.returnValue(Promise.resolve({}));
+    spyOn(statsReportingBackendApiService, 'postsStatsAsync')
+      .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.explorationIsComplete).toBe(false);
+
     statsReportingService.recordExplorationCompleted('firstState', {});
 
     expect(recordExplorationCompletedSpy).toHaveBeenCalled();
     expect(statsReportingService.explorationIsComplete).toBe(true);
+    expect(statsReportingBackendApiService.postsStatsAsync).toHaveBeenCalled();
   });
 
   it('should record stats when a leave event is triggered', () => {
     let recordMaybeLeaveEventSpy = spyOn(
       statsReportingBackendApiService, 'recordMaybeLeaveEventAsync')
       .and.returnValue(Promise.resolve({}));
+    spyOn(statsReportingBackendApiService, 'postsStatsAsync')
+      .and.returnValue(Promise.resolve({}));
+
     statsReportingService.recordMaybeLeaveEvent('firstState', {});
 
     expect(recordMaybeLeaveEventSpy).toHaveBeenCalled();
+    expect(statsReportingBackendApiService.postsStatsAsync).toHaveBeenCalled();
   });
 
   it('should record stats when an answer submit button is clicked', () => {

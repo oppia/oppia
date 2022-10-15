@@ -17,42 +17,48 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class DragAndDropSortInput(base.BaseInteraction):
     """Interaction for Drag and Drop Sorting."""
 
-    name = 'Drag And Drop Sort'
-    description = 'Allows learners to drag and drop items for sorting.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = False
-    _dependency_ids = []
-    answer_type = 'ListOfSetsOfTranslatableHtmlContentIds'
-    instructions = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
-    narrow_instructions = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
-    needs_summary = True
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Drag And Drop Sort'
+    description: str = 'Allows learners to drag and drop items for sorting.'
+    display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable: bool = False
+    _dependency_ids: List[str] = []
+    answer_type: str = 'ListOfSetsOfTranslatableHtmlContentIds'
+    instructions: str = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
+    narrow_instructions: str = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
+    needs_summary: bool = True
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'choices',
         'description': 'Items for drag and drop',
         'schema': {
             'type': 'list',
-            'validators': [{
-                'id': 'has_length_at_least',
-                # NOTE: There is slightly stricter validation of the number of
-                # minimum choices in frontend. It should be at least 2 from the
-                # frontend perspective but we can't impose it here as min_value
-                # in the customization schema determines the number of RTEs that
-                # appear in the customization modal initially that needs to be
-                # 1. Here min_value: 2 and default_value: [''] aren't allowed as
-                # default_value needs to be at least of same length as min_value
-                # else schema tests for customization args will fail.
-                'min_value': 1
-            }],
+            'validators': [
+                {
+                    'id': 'has_length_at_least',
+                    'min_value': 2
+                },
+                {
+                    'id': 'has_unique_subtitled_contents'
+                }
+            ],
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
+                'validators': [{
+                    'id': 'has_subtitled_html_non_empty'
+                }],
                 'replacement_ui_config': {
                     'html': {
                         'hide_complex_extensions': True,
@@ -78,4 +84,4 @@ class DragAndDropSortInput(base.BaseInteraction):
         'default_value': False
     }]
 
-    _answer_visualization_specs = []
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = []
