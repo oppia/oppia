@@ -8624,6 +8624,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
     solicit_answer_details: false
@@ -8635,6 +8636,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
   end:
@@ -8785,6 +8787,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
     solicit_answer_details: false
@@ -8796,6 +8799,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
   end:
@@ -8983,6 +8987,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
         feedback_26: {}
@@ -8996,6 +9001,7 @@ states:
         ca_choices_23: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_24: {}
         feedback_25: {}
         feedback_26: {}
@@ -9115,6 +9121,7 @@ states:
         ca_choices_22: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_25: {}
     solicit_answer_details: false
     written_translations:
@@ -9124,6 +9131,7 @@ states:
         ca_choices_22: {}
         content: {}
         default_outcome: {}
+        solution: {}
         feedback_25: {}
   end:
     card_is_checkpoint: false

@@ -5315,6 +5315,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 exploration_dict)
             exploration_schema_version = 58
 
+        if exploration_schema_version == 58:
+            exploration_dict = cls._convert_v58_dict_to_v59_dict(
+                exploration_dict)
+            exploration_schema_version = 59
+
         return exploration_dict
 
     @classmethod
