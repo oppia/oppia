@@ -35,7 +35,7 @@
       <mat-card-subtitle class="blog-dashboard-tile-subtitle">
         {{ lastUpdatedDateString }}
       </mat-card-subtitle>
-      <oppia-rte-output-display [rteString]="this.summaryContent"
+      <oppia-rte-output-display [rteString]="this.blogPostSummary.summary"
                                 class="blog-post-summary d-block">
       </oppia-rte-output-display>
     </mat-card-content>
@@ -48,7 +48,7 @@
   <span class="blog-dashboard-tile-title e2e-test-blog-post-title px-0 py-0 col-sm-5" *ngIf="blogPostSummary.title === ''">
     {{ 'I18N_BLOG_POST_UNTITLED_HEADING' | translate }}
   </span>
-  <oppia-rte-output-display [rteString]="this.summaryContent"
+  <oppia-rte-output-display [rteString]="this.blogPostSummary.summary"
                             class="blog-post-summary truncated-text col-sm-6">
   </oppia-rte-output-display>
   <span class="blog-dashboard-tile-subtitle d-contents col-sm-2 px-0 py-0">
