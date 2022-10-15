@@ -204,7 +204,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     'valid@example.com', {'INVALID': 'value'}, 'Android', True)
 
             with self.assertRaisesRegex(
-                Exception, 'Invalid tag: Invalid'):
+                Exception, 'Invalid tag: Invalid'
+            ):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     'valid@example.com', {}, 'Invalid', True)
 
