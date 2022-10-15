@@ -351,15 +351,13 @@ class BaseTranslatableObject:
             if translatable_content.content_format == (
                 TranslatableContentFormat.HTML
             ):
+                assert isinstance(content_value, str)
                 content_value = html_cleaner.strip_html_tags(content_value)
 
             if content_value == '':
                 continue
 
-            if (
-                not translatable_content.is_data_format_list() and
-                content_value.isnumeric()
-            ):
+            if isinstance(content_value, str) and content_value.isnumeric():
                 continue
 
             if (

@@ -76,9 +76,7 @@ export class BaseTranslatableObject {
     if (content.hasOwnProperty('normalizedStrSet')) {
       content = content as TranslatableSetOfNormalizedString;
       return content.normalizedStrSet;
-    }
-
-    if (content.hasOwnProperty('unicodeStrSet')) {
+    } else {
       content = content as TranslatableSetOfUnicodeString;
       return content.unicodeStrSet;
     }

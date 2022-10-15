@@ -1638,37 +1638,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'inside another Tabs or Collapsible tag.')
         self.state.content.html = 'Valid content'
 
-    def test_written_translations(self) -> None:
-        """Validate WrittenTranslations."""
-        cust_args = (
-            self.state.interaction.customization_args['buttonText'].value)
-        # Ruling out the possibility of different types for mypy type checking.
-        assert isinstance(cust_args, state_domain.SubtitledUnicode)
-        content_id_of_continue_button_text = cust_args.content_id
-
-        self.state.written_translations.add_translation(
-            content_id_of_continue_button_text,
-            'en',
-            '<oppia-noninteractive-image></oppia-noninteractive-image>'
-        )
-        self._assert_validation_error(
-            self.new_exploration, 'Image tag does not have \'alt-with-value\' '
-            'attribute.')
-
-        self.state.written_translations.translations_mapping[
-            content_id_of_continue_button_text]['en'].translation = (
-            '<oppia-noninteractive-collapsible '
-            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
-            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
-        )
-        self._assert_validation_error(
-            self.new_exploration, 'No collapsible content is present '
-            'inside the tag.')
-
-        self.state.written_translations.translations_mapping[
-            content_id_of_continue_button_text]['en'].translation = (
-            'valid value')
-
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
     def test_validation(self) -> None:
