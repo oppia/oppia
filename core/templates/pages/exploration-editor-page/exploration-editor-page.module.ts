@@ -81,6 +81,15 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
+import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
+import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
+import { NeedsGuidingResponsesTaskComponent } from './improvements-tab/needs-guiding-responses-task.component';
+import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
+import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
+import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
+import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
+import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
+import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component';
 
 @NgModule({
   imports: [
@@ -144,7 +153,16 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    PieChartComponent,
+    StateStatsModalComponent,
+    StatisticsTabComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -190,7 +208,16 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    PieChartComponent,
+    StateStatsModalComponent,
+    StatisticsTabComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent
   ],
   providers: [
     {
