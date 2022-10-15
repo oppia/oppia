@@ -87,7 +87,7 @@ describe('Entity Translation Backend Api Service', () => {
     }, {
       status: 500, statusText: 'Internal Server Error'
     });
-    tick();
+
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();

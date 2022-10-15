@@ -292,58 +292,14 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-math>')
         written_translations_dict = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         written_translations_dict_math = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': expected_html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         recorded_voiceovers = {
@@ -407,58 +363,14 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-image>')
         written_translations_dict = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         written_translations_dict_math = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': expected_html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         recorded_voiceovers = {
@@ -517,58 +429,14 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         written_translations_dict = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         written_translations_dict_math = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': expected_html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         recorded_voiceovers = {
