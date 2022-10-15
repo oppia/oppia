@@ -3085,16 +3085,20 @@ def regenerate_missing_stats_for_exploration(
         exp_id, exp_versions)
     change_lists = []
     for snapshot in snapshots:
-        try:
-            change_lists.append([
-                exp_domain.ExplorationChange(commit_cmd)
-                for commit_cmd in snapshot['commit_cmds']
-            ])
-        except utils.ValidationError as e:
-            logging.error(
-                'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
-                % (exp_id, snapshot['commit_cmds']))
-            continue
+        change_list_for_snapshot = []
+        for commit_cmd in snapshot['commit_cmds']:
+            try:
+                change_list_for_snapshot.append(
+                    exp_domain.ExplorationChange(commit_cmd)
+                )
+            except utils.ValidationError as e:
+                logging.error(
+                    'Exploration(id=%r) snapshots contains invalid '
+                    'commit_cmd: %r'
+                    % (exp_id, commit_cmd)
+                )
+                continue
+        change_lists.append([change_list_for_snapshot])
 
     missing_exp_stats = []
     missing_state_stats = []
