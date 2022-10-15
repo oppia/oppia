@@ -60,7 +60,7 @@
                     class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
                     (click)="deleteInteraction()"
                     *ngIf="editabilityService.isEditable()">
-              <i class="material-icons mat-18">&#xE5CD;</i>
+              <i class="fas fa-times oppia-delete-interaction-icon"></i>
             </button>
           </div>
         </div>
@@ -113,6 +113,10 @@
   .oppia-editor-card-section {
     display: flex;
     min-height: 80px;
+  }
+
+  .oppia-delete-interaction-icon {
+      font-size: 21px;
   }
 
   @media screen and (max-width: 768px) {
