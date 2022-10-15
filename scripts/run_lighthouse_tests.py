@@ -107,7 +107,7 @@ def run_ng_compilation() -> None:
     ng_bundles_dir_name = 'dist/oppia-angular'
     for _ in range(max_tries):
         try:
-            with servers.managed_ng_compiler() as proc:
+            with servers.managed_ng_build() as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
             print(error.output)
