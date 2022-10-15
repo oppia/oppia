@@ -63,6 +63,7 @@ export class ExplorationFooterComponent {
   windowIsNarrow!: boolean;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
+  isVisible: boolean = true;
 
   // Stores the number of checkpoints in an exploration.
   checkpointCount: number = 0;

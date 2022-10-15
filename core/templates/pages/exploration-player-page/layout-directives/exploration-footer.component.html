@@ -31,20 +31,14 @@
       <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
         <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
-      </div>
-    </div>
-    <div [ngClass]="{'col-sm-7': isLanguageRTL(), 'col-sm-12': !isLanguageRTL()}">
-      <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
-        <div *ngIf="!windowIsNarrow">
-          <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
+        <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
               (click)="showConceptCard()">
             <mat-icon>description</mat-icon>
-          </button>
-        </div>
+        </button>
       </div>
     </div>
-    <div class="hint-container" *ngIf="isVisible && isTooltipVisible()">
-      <div class="hint-box hint-box-add-ons">
+    <div class="hint-container">
+      <div class="hint-box hint-box-add-ons" *ngIf="isVisible">
         <span [innerHTML]="'I18N_HINT_NEED_HELP' | translate"></span>
         <button type="button"
                 class="btn close"
@@ -116,7 +110,7 @@
   background-color: #f0ffff;
   border: 1px solid #2d4a9d;
   border-radius: 5px;
-  bottom: 135px;
+  bottom: 75px;
   box-shadow: 0 0 6px #2d4a9d;
   color: #2d4a9d;
   display: flex;
@@ -150,5 +144,40 @@
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   border-top: 32px solid #2d4a9d;
+}
+.close {
+  bottom: 10px;
+  font-size: 22px;
+  margin-left: 10px;
+  position: relative;
+}
+@keyframes bounce {
+  0% {
+    -webkit-transform: translateY(0);
+  }
+  8% {
+    -webkit-transform: translateY(-75px);
+  }
+  10% {
+    -webkit-transform: translateY(0);
+  }
+  15% {
+    -webkit-transform: translateY(-13px);
+  }
+  20% {
+    -webkit-transform: translateY(0);
+  }
+  25% {
+    -webkit-transform: translateY(-5px);
+  }
+  30% {
+    -webkit-transform: translateY(0);
+  }
+  35% {
+    -webkit-transform: translateY(-2px);
+  }
+  40% {
+    -webkit-transform: translateY(0);
+  }
 }
 </style>
