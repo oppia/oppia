@@ -21,13 +21,12 @@ export interface BlogPostSummaryBackendDict {
   'id': string;
   'title': string;
   'summary': string;
-  'author_name': string;
+  'author_username': string;
   'tags': string[];
   'url_fragment': string;
   'thumbnail_filename': string | null;
   'published_on'?: string;
   'last_updated': string;
-  'profile_pic_url'?: string;
 }
 
 export class BlogPostSummary {
@@ -40,7 +39,6 @@ export class BlogPostSummary {
   _urlFragment: string;
   _lastUpdated?: string;
   _publishedOn?: string;
-  _authorProfilePicUrl?: string;
   constructor(
       id: string,
       authorUsername: string,
@@ -50,8 +48,7 @@ export class BlogPostSummary {
       thumbnailFilename: string | null,
       urlFragment: string,
       lastUpdated?: string,
-      publishedOn?: string,
-      authorProfilePicUrl?: string) {
+      publishedOn?: string) {
     this._id = id;
     this._authorUsername = authorUsername;
     this._title = title;
@@ -61,7 +58,6 @@ export class BlogPostSummary {
     this._urlFragment = urlFragment;
     this._lastUpdated = lastUpdated;
     this._publishedOn = publishedOn;
-    this._authorProfilePicUrl = authorProfilePicUrl;
   }
 
   get id(): string {
@@ -78,10 +74,6 @@ export class BlogPostSummary {
 
   get publishedOn(): string | undefined {
     return this._publishedOn;
-  }
-
-  get authorProfilePicUrl(): string | undefined {
-    return this._authorProfilePicUrl;
   }
 
   get title(): string {
@@ -109,15 +101,14 @@ export class BlogPostSummary {
   ): BlogPostSummary {
     return new BlogPostSummary (
       blogPostSummaryBackendDict.id,
-      blogPostSummaryBackendDict.author_name,
+      blogPostSummaryBackendDict.author_username,
       blogPostSummaryBackendDict.title,
       blogPostSummaryBackendDict.summary,
       blogPostSummaryBackendDict.tags,
       blogPostSummaryBackendDict.thumbnail_filename,
       blogPostSummaryBackendDict.url_fragment,
       blogPostSummaryBackendDict.last_updated,
-      blogPostSummaryBackendDict.published_on,
-      blogPostSummaryBackendDict.profile_pic_url
+      blogPostSummaryBackendDict.published_on
     );
   }
 }
