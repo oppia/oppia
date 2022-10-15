@@ -165,7 +165,7 @@ class DummyTranslatableObjectWithFourParams(
         translatable_contents_collection.add_translatable_field(
             'content_id_1',
             translation_domain.ContentType.HINT,
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.TranslatableContentFormat.HTML,
             self.param1)
         translatable_contents_collection.add_translatable_field(
             'content_id_2',
@@ -174,7 +174,7 @@ class DummyTranslatableObjectWithFourParams(
             self.param2)
         translatable_contents_collection.add_translatable_field(
             'content_id_3',
-            translation_domain.ContentType.CONTENT,
+            translation_domain.ContentType.RULE,
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param3)
         translatable_contents_collection.add_translatable_field(
@@ -257,6 +257,154 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             expected_list_of_contents_which_need_translataion,
             list_of_contents_which_need_translataion)
+
+    def test_get_translatable_content_ids(self) -> None:
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'My name is jack.', 'My name is jhon.', 'My name is Nikhil.', '')
+        content_ids = (
+            translatable_object.get_translatable_content_ids())
+
+        self.assertItemsEqual(
+            content_ids,
+            ['content_id_1', 'content_id_2', 'content_id_3', 'content_id_4']
+        )
+
+    def test_get_all_contents_which_need_translations_with_digits(
+        self
+    ) -> None:
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True)
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
+
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            '<p>10000</p>', 'My name is jhon.', 'My name is Nikhil.', '')
+        contents_which_need_translation = (
+            translatable_object.get_all_contents_which_need_translations(
+                entity_translations).values())
+
+        expected_list_of_contents_which_need_translataion = [
+            'My name is jhon.',
+            'My name is Nikhil.'
+        ]
+        list_of_contents_which_need_translataion = [
+            translatable_content.content_value
+            for translatable_content in contents_which_need_translation
+        ]
+        self.assertItemsEqual(
+            expected_list_of_contents_which_need_translataion,
+            list_of_contents_which_need_translataion)
+
+    def test_are_translations_displayable_with_all_translations(self) -> None:
+        translation_dict = {
+            'content_id_2': translation_domain.TranslatedContent(
+                'Translation.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+            'content_id_3': translation_domain.TranslatedContent(
+                'Translation.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+            'content_id_4': translation_domain.TranslatedContent(
+                'Translation.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
+
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'Content', 'My name is jhon.', 'My name is Nikhil.', '')
+        self.assertTrue(
+            translatable_object.are_translations_displayable(
+                entity_translations))
+
+    def test_are_translations_displayable_without_rule_translation(
+        self
+    ) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'Translation.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+            'content_id_2': translation_domain.TranslatedContent(
+                'Translation.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+            'content_id_4': translation_domain.TranslatedContent(
+                'Translation.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
+
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'Content', 'My name is jhon.', 'My name is Nikhil.', 'Content')
+        self.assertFalse(
+            translatable_object.are_translations_displayable(
+                entity_translations))
+
+    def test_are_translations_displayable_without_min_translation(
+        self
+    ) -> None:
+        translation_dict = {
+            'content_id_2': translation_domain.TranslatedContent(
+                'Translation.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+            'content_id_4': translation_domain.TranslatedContent(
+                'Translation.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+        }
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
+        min_value_swap = self.swap(
+            feconf,
+            'MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS',
+            1)
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'Content', 'My name is jhon.', 'My name is Nikhil.', 'Content')
+        with min_value_swap:
+            self.assertFalse(
+                translatable_object.are_translations_displayable(
+                    entity_translations))
+
+    def test_get_content_count(self) -> None:
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'My name is jack.',
+            'My name is jhon.',
+            'My name is Nikhil.',
+            'Content'
+        )
+
+        self.assertEqual(translatable_object.get_content_count(), 4)
+
+    def test_get_all_html_content_strings(self) -> None:
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            '<p>HTML content</p>', 'My name is jhon.', 'My name is Nikhil.', '')
+        html_contents = translatable_object.get_all_html_content_strings()
+
+        self.assertItemsEqual(html_contents, ['<p>HTML content</p>'])
+
+    def test_validate_translatable_contents_raise_error(self) -> None:
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            '<p>HTML content</p>', 'My name is jhon.', 'My name is Nikhil.', '')
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected all content id indexes to be less than'
+        ):
+            translatable_object.validate_translatable_contents(2)
 
 
 class EntityTranslationsUnitTests(test_utils.GenericTestBase):

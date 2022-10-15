@@ -55,6 +55,5 @@ describe('EntityTranslation', () => {
     let contentTranslation = entityTranslation.getWrittenTranslation(
       'content_1');
     expect(contentTranslation).not.toBeNull();
-    expect(contentTranslation!.translation).toEqual('Translation');
   });
 });

@@ -22,7 +22,7 @@ import re
 
 from core import feconf
 from core.constants import constants
-from core.domain import skill_services
+from core.domain import skill_services, translation_domain
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -290,13 +290,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}">'
             '</oppia-noninteractive-math>')
-        written_translations_dict = {
-            'translations_mapping': {
-                'content1': {},
-                'feedback_1': {}
-            }
-        }
-        written_translations_dict_math = {
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content1': {},
                 'feedback_1': {}
@@ -326,7 +322,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content_0', 'html': expected_html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict_math
+            'written_translations': written_translations_dict
         }
 
         subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
@@ -361,13 +357,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             ' caption-with-value="&amp;quot;&amp;quot;" '
             'filepath-with-value=\'\"img1.svg\"\'>'
             '</oppia-noninteractive-image>')
-        written_translations_dict = {
-            'translations_mapping': {
-                'content1': {},
-                'feedback_1': {}
-            }
-        }
-        written_translations_dict_math = {
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content1': {},
                 'feedback_1': {}
@@ -397,7 +389,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content_0', 'html': expected_html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict_math
+            'written_translations': written_translations_dict
         }
 
         subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
@@ -427,13 +419,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         html_content = (
             '<p>1 Ã— 3 ðŸ˜• ðŸ˜Š</p>'
         )
-        written_translations_dict = {
-            'translations_mapping': {
-                'content1': {},
-                'feedback_1': {}
-            }
-        }
-        written_translations_dict_math = {
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
                 'content1': {},
                 'feedback_1': {}
@@ -463,7 +451,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content_0', 'html': expected_html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict_math
+            'written_translations': written_translations_dict
         }
 
         subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')

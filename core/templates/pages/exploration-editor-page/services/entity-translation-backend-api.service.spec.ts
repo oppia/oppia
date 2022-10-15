@@ -35,6 +35,7 @@ describe('Entity Translation Backend Api Service', () => {
     httpTestingController = TestBed.get(HttpTestingController);
     translationApiService = TestBed.inject(EntityTranslationBackendApiService);
   });
+
   afterEach(() => {
     httpTestingController.verify();
   });
