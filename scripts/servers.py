@@ -31,11 +31,23 @@ from scripts import common
 
 import psutil
 
+from typing import (
+    Any, Callable, ContextManager, Dict, Iterator, List, Optional, Sequence,
+    Union
+)
 
+
+# Here we use type Any because the argument 'popen_kwargs' can accept an
+# arbitrary number of keyword arguments with different types of values.
 @contextlib.contextmanager
 def managed_process(
-        command_args, human_readable_name='Process', shell=False,
-        timeout_secs=60, raise_on_nonzero_exit=True, **popen_kwargs):
+    command_args: Sequence[Union[int, str]],
+    human_readable_name: str = 'Process',
+    shell: bool = False,
+    timeout_secs: int = 60,
+    raise_on_nonzero_exit: bool = True,
+    **popen_kwargs: Any
+) -> Iterator[psutil.Process]:
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -66,7 +78,7 @@ def managed_process(
         Exception. The process exited unexpectedly (only raised if
             raise_on_nonzero_exit is True).
     """
-    get_proc_info = lambda p: (
+    get_proc_info: Callable[[psutil.Process], str] = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
         if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid))
 
@@ -130,10 +142,17 @@ def managed_process(
 
 @contextlib.contextmanager
 def managed_dev_appserver(
-        app_yaml_path, env=None, log_level='info',
-        host='0.0.0.0', port=8080, admin_host='0.0.0.0', admin_port=8000,
-        enable_host_checking=True, automatic_restart=False,
-        skip_sdk_update_check=False):
+    app_yaml_path: str,
+    env: Optional[Dict[str, str]] = None,
+    log_level: str = 'info',
+    host: str = '0.0.0.0',
+    port: int = 8080,
+    admin_host: str = '0.0.0.0',
+    admin_port: int = 8000,
+    enable_host_checking: bool = True,
+    automatic_restart: bool = False,
+    skip_sdk_update_check: bool = False
+) -> Iterator[psutil.Process]:
     """Returns a context manager to start up and shut down a GAE dev appserver.
 
     Args:
@@ -160,7 +179,7 @@ def managed_dev_appserver(
     Yields:
         psutil.Process. The dev_appserver process.
     """
-    dev_appserver_args = [
+    dev_appserver_args: List[Union[str, int]] = [
         common.CURRENT_PYTHON_BIN,
         common.DEV_APPSERVER_PATH,
         '--host', host,
@@ -189,7 +208,9 @@ def managed_dev_appserver(
 
 
 @contextlib.contextmanager
-def managed_firebase_auth_emulator(recover_users=False):
+def managed_firebase_auth_emulator(
+    recover_users: bool = False
+) -> Iterator[psutil.Process]:
     """Returns a context manager to manage the Firebase auth emulator.
 
     Args:
@@ -220,7 +241,7 @@ def managed_firebase_auth_emulator(recover_users=False):
 
 
 @contextlib.contextmanager
-def managed_elasticsearch_dev_server():
+def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
     """Returns a context manager for ElasticSearch server for running tests
     in development mode and running a local dev server. This is only required
     in a development environment.
@@ -254,7 +275,9 @@ def managed_elasticsearch_dev_server():
 
 
 @contextlib.contextmanager
-def managed_cloud_datastore_emulator(clear_datastore=False):
+def managed_cloud_datastore_emulator(
+    clear_datastore: bool = False
+) -> Iterator[psutil.Process]:
     """Returns a context manager for the Cloud Datastore emulator.
 
     Args:
@@ -317,7 +340,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
 
 
 @contextlib.contextmanager
-def managed_redis_server():
+def managed_redis_server() -> Iterator[psutil.Process]:
     """Run the redis server within a context manager that ends it gracefully."""
     if common.is_windows_os():
         raise Exception(
@@ -344,7 +367,9 @@ def managed_redis_server():
             subprocess.check_call([common.REDIS_CLI_PATH, 'shutdown', 'nosave'])
 
 
-def create_managed_web_browser(port):
+def create_managed_web_browser(
+    port: int
+) -> Optional[ContextManager[psutil.Process]]:
     """Returns a context manager for a web browser targeting the given port on
     localhost. If a web browser cannot be opened on the current system by Oppia,
     then returns None instead.
@@ -373,8 +398,12 @@ def create_managed_web_browser(port):
 
 @contextlib.contextmanager
 def managed_webpack_compiler(
-        config_path=None, use_prod_env=False, use_source_maps=False,
-        watch_mode=False, max_old_space_size=None):
+    config_path: Optional[str] = None,
+    use_prod_env: bool = False,
+    use_source_maps: bool = False,
+    watch_mode: bool = False,
+    max_old_space_size: Optional[int] = None
+) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the webpack compiler gracefully.
 
     Args:
@@ -426,8 +455,11 @@ def managed_webpack_compiler(
             # Capture compiler's output to detect when builds have completed.
             stdout=subprocess.PIPE))
 
+        read_line_func: Callable[[], Optional[bytes]] = (
+            lambda: proc.stdout.readline() or None
+        )
         if watch_mode:
-            for line in iter(lambda: proc.stdout.readline() or None, None):
+            for line in iter(read_line_func, None):
                 common.write_stdout_safe(line)
                 # Message printed when a compilation has succeeded. We break
                 # after the first one to ensure the site is ready to be visited.
@@ -438,9 +470,9 @@ def managed_webpack_compiler(
                 # raise an error because a build hasn't finished successfully.
                 raise IOError('First build never completed')
 
-        def print_proc_output():
+        def print_proc_output() -> None:
             """Prints the proc's output until it is exhausted."""
-            for line in iter(lambda: proc.stdout.readline() or None, None):
+            for line in iter(read_line_func, None):
                 common.write_stdout_safe(line)
 
         # Start a thread to print the rest of the compiler's output to stdout.
@@ -451,7 +483,7 @@ def managed_webpack_compiler(
         yield proc
 
 
-def get_chrome_verison():
+def get_chrome_verison() -> str:
     """Returns the version of Chrome installed on the system."""
 
     # Although there are spaces between Google and Chrome in the path, we
@@ -484,13 +516,13 @@ def get_chrome_verison():
     response = utils.url_open(
         'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
             installed_version))
-    chrome_version = response.read().decode('utf-8')
+    chrome_version: str = response.read().decode('utf-8')
 
     return chrome_version
 
 
 @contextlib.contextmanager
-def managed_portserver():
+def managed_portserver() -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the portserver gracefully.
 
     The portserver listens at PORTSERVER_SOCKET_FILEPATH and allocates free
@@ -548,8 +580,14 @@ def managed_portserver():
 
 @contextlib.contextmanager
 def managed_webdriverio_server(
-        suite_name='full', dev_mode=True, debug_mode=False,
-        sharding_instances=1, chrome_version=None, mobile=False, **kwargs):
+    suite_name: str = 'full',
+    dev_mode: bool = True,
+    debug_mode: bool = False,
+    sharding_instances: int = 1,
+    chrome_version: Optional[str] = None,
+    mobile: bool = False,
+    **kwargs: Any
+) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
     Args:
