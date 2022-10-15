@@ -77,8 +77,8 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   featuresShown = 0;
   androidUpdatesSectionIsSeen = false;
   featuresMainTextIsSeen = false;
-  emailAddress: string = null;
-  name: string = null;
+  emailAddress: string = '';
+  name: string = '';
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
