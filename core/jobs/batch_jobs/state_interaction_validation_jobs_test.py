@@ -28,7 +28,7 @@ from core.jobs.batch_jobs import state_interaction_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-(exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, ) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class ExpStateInteractionValidationJobTests(

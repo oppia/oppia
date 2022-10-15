@@ -43,7 +43,7 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 (exp_models, opportunity_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.opportunity])
+    [models.Names.EXPLORATION, models.Names.OPPORTUNITY])
 
 
 class ExpStateValidationJob(base_jobs.JobBase):
