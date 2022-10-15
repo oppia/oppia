@@ -31,7 +31,6 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree) [];
 export class RteOutputDisplayComponent implements AfterViewInit {
   // Native HTML elements.
   @ViewChild('p') pTagPortal: TemplateRef<unknown>;
-  @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
   @ViewChild('span') spanTagPortal: TemplateRef<unknown>;
   @ViewChild('ol') olTagPortal: TemplateRef<unknown>;
   @ViewChild('li') liTagPortal: TemplateRef<unknown>;
