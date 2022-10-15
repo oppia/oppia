@@ -77,10 +77,6 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return True
         def mock_is_windows() -> bool:
             return True
-        def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
-        ) -> Tuple[str, None]:
-            return ('Output', None)
 
         islink_swap = self.swap_with_checks(
             os.path, 'islink', mock_islink,
