@@ -27,7 +27,8 @@ import { Subscription } from 'rxjs';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-
+import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'oppia-blog-dashboard-page',
   templateUrl: './blog-dashboard-page.component.html'
@@ -43,8 +44,6 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   blogDashboardData!: BlogDashboardData;
   windowIsNarrow: boolean = false;
   activeView: string = 'gridView';
-  authorNameEditorIsOpen: boolean = false;
-  authorBioEditorIsOpen: boolean = false;
   directiveSubscriptions = new Subscription();
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   constructor(
@@ -53,6 +52,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     private blogDashboardPageService: BlogDashboardPageService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
+    private ngbModal: NgbModal,
     private windowDimensionService: WindowDimensionsService,
   ) {}
 
@@ -95,9 +95,6 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
         this.authorProfilePictureUrl = decodeURIComponent((
           // eslint-disable-next-line max-len
           dashboardData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
-        if (!this.authorBio.length) {
-          this.authorBioEditorIsOpen = true;
-        }
         this.loaderService.hideLoadingScreen();
       }, (errorResponse) => {
         if (
@@ -149,37 +146,34 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateAuthorName(): void {
-    this.blogDashboardBackendService.updateAuthorDetailsAsync(
-      this.authorName, this.authorBio).then(() => {
-      this.authorNameEditorIsOpen = false;
-      this.alertsService.addSuccessMessage('Author name saved successfully.');
-    }, (error) => {
-      this.authorNameEditorIsOpen = true;
-      this.alertsService.addWarning(
-        `Unable to update author name. Error: ${error}`);
+  showAuthorDetailsEditor(): void {
+    let modelRef = this.ngbModal.open(BlogAuthorDetailsEditorComponent, {
+      backdrop: 'static',
+      keyboard: false,
+    });
+    modelRef.componentInstance.authorName = this.authorName;
+    modelRef.componentInstance.authorBio = this.authorBio;
+    modelRef.result.then((authorDetails) => {
+      this.authorName = authorDetails.authorName;
+      this.authorBio = authorDetails.authorBio;
+      this.updateAuthorDetails();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     });
   }
 
-  updateAuthorBio(): void {
+  updateAuthorDetails(): void {
     this.blogDashboardBackendService.updateAuthorDetailsAsync(
       this.authorName, this.authorBio).then(() => {
-      this.alertsService.addSuccessMessage('Author bio saved successfully.');
-      if (this.authorBio.length) {
-        this.authorBioEditorIsOpen = false;
-      }
+      this.alertsService.addSuccessMessage(
+        'Author Details saved successfully.'
+      );
     }, (error) => {
       this.alertsService.addWarning(
-        `Unable to update author bio. Error: ${error}`);
+        `Unable to update author details. Error: ${error}`);
     });
-  }
-
-  openAuthorNameEditor(): void {
-    this.authorNameEditorIsOpen = true;
-  }
-
-  openAuthorBioEditor(): void {
-    this.authorBioEditorIsOpen = true;
   }
 }
 

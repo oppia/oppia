@@ -527,6 +527,39 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
         author_model_one.update_timestamps()
         author_model_one.put()
 
+    def test_raise_exception_by_mocking_collision(self) -> None:
+        """Tests create and generate_new_instance_id methods for raising
+        exception.
+        """
+        blog_author_details_model_cls = blog_models.BlogAuthorDetailsModel
+
+        # Test create method.
+        with self.assertRaisesRegex(
+            Exception, 'A blog author details model for given user already'
+            ' exists.'):
+
+            # Swap dependent method get_by_author to simulate collision every
+            # time.
+            with self.swap(
+                blog_author_details_model_cls, 'get_by_author',
+                types.MethodType(
+                    lambda x, y: True,
+                    blog_author_details_model_cls)):
+                blog_author_details_model_cls.create(
+                    self.USER_1_ID, 'author_name', '')
+
+        # Test generate_new_blog_post_id method.
+        with self.assertRaisesRegex(
+            Exception,
+            'New instance id generator is producing too many collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                blog_author_details_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    blog_author_details_model_cls)):
+                blog_author_details_model_cls.generate_new_instance_id()
+
     def test_get_deletion_policy_is_delete(self) -> None:
         self.assertEqual(
             blog_models.BlogAuthorDetailsModel.get_deletion_policy(),

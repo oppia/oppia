@@ -22,6 +22,8 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { MatTabsModule } from '@angular/material/tabs';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
 import { AlertsService } from 'services/alerts.service';
@@ -44,6 +46,7 @@ describe('Blog Dashboard Page Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
+  let ngbModal: NgbModal;
 
   class MockWindowRef {
     nativeWindow = {
@@ -64,10 +67,12 @@ describe('Blog Dashboard Page Component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MatTabsModule
+        MatTabsModule,
+        NgbModalModule,
       ],
       declarations: [
         BlogDashboardPageComponent,
+        BlogAuthorDetailsEditorComponent,
         MockTranslatePipe
       ],
       providers: [
@@ -99,6 +104,7 @@ describe('Blog Dashboard Page Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BlogDashboardPageComponent);
     component = fixture.componentInstance;
+    ngbModal = TestBed.inject(NgbModal);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
@@ -187,7 +193,6 @@ describe('Blog Dashboard Page Component', () => {
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
       .and.returnValue(Promise.resolve(blogDashboardData));
-    expect(component.authorBioEditorIsOpen).toBeFalse();
 
     component.initMainTab();
     // As loading screen should be shown irrespective of the response
@@ -201,7 +206,6 @@ describe('Blog Dashboard Page Component', () => {
     expect(blogDashboardBackendApiService.fetchBlogDashboardDataAsync)
       .toHaveBeenCalled();
     expect(component.authorProfilePictureUrl).toEqual('sample_url');
-    expect(component.authorBioEditorIsOpen).toBeTrue();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.windowIsNarrow).toBe(true);
@@ -360,30 +364,29 @@ describe('Blog Dashboard Page Component', () => {
       []);
   });
 
-  it('should display alert when unable to update author name', fakeAsync(() => {
+  it('should display alert when unable to update author details', fakeAsync(
+    () => {
+      component.authorName = 'new username';
+      component.authorBio = 'Oppia Blog Author';
+      spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+        .and.returnValue(Promise.reject(
+          'Server responded with backend error.'));
+      spyOn(alertsService, 'addWarning');
+
+      component.updateAuthorDetails();
+      tick();
+
+      expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+        .toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Unable to update author details. Error: Server responded with' +
+        ' backend error.');
+    })
+  );
+
+  it('should successfully update author details', fakeAsync(() => {
     component.authorName = 'new username';
     component.authorBio = 'Oppia Blog Author';
-    component.authorNameEditorIsOpen = true;
-    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
-      .and.returnValue(Promise.reject(
-        'Server responded with backend error.'));
-    spyOn(alertsService, 'addWarning');
-
-    component.updateAuthorName();
-    tick();
-
-    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
-      .toHaveBeenCalled();
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Unable to update author name. Error: Server responded with backend ' +
-      'error.');
-    expect(component.authorNameEditorIsOpen).toBeTrue();
-  }));
-
-  it('should successfully update author name', fakeAsync(() => {
-    component.authorName = 'new username';
-    component.authorBio = 'Oppia Blog Author';
-    component.authorNameEditorIsOpen = true;
     let BlogAuthorDetails = {
       authorName: 'new username',
       authorBio: 'Oppia Blog Author'
@@ -392,71 +395,56 @@ describe('Blog Dashboard Page Component', () => {
       .and.returnValue(Promise.resolve(BlogAuthorDetails));
     spyOn(alertsService, 'addSuccessMessage');
 
-    component.updateAuthorName();
+    component.updateAuthorDetails();
     tick();
 
     expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
       .toHaveBeenCalled();
-    expect(component.authorNameEditorIsOpen).toBeFalse();
     expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-      'Author name saved successfully.');
+      'Author Details saved successfully.');
   }));
 
-  it('should display alert when unable to update author bio', fakeAsync(() => {
-    component.authorName = 'sername';
-    component.authorBio = 'Fresh Oppia Blog Author';
-    component.authorBioEditorIsOpen = true;
-    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
-      .and.returnValue(Promise.reject(
-        'Server responded with backend error.'));
-    spyOn(alertsService, 'addWarning');
+  it('should cancel updating author details', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        authorName: '',
+        authorBio: ''
+      },
+      result: Promise.reject()
+    } as NgbModalRef);
+    spyOn(component, 'updateAuthorDetails');
+    component.authorBio = '';
+    component.authorName = 'test username';
 
-    component.updateAuthorBio();
+    component.showAuthorDetailsEditor();
     tick();
 
-    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
-      .toHaveBeenCalled();
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Unable to update author bio. Error: Server responded with backend ' +
-      'error.');
-    expect(component.authorBioEditorIsOpen).toBeTrue();
+    expect(component.updateAuthorDetails).not.toHaveBeenCalled();
   }));
 
-  it('should successfully update author bio', fakeAsync(() => {
-    component.authorName = 'username';
-    component.authorBio = 'Fresh Oppia Blog Author';
-    component.authorBioEditorIsOpen = true;
-    let BlogAuthorDetails = {
-      authorName: 'username',
-      authorBio: 'Fresh Oppia Blog Author'
-    };
-    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
-      .and.returnValue(Promise.resolve(BlogAuthorDetails));
-    spyOn(alertsService, 'addSuccessMessage');
+  it('should successfully place call to update author details', fakeAsync(
+    () => {
+      component.authorBio = '';
+      component.authorName = 'test username';
+      let updatedAuthorDetails = {
+        authorName: 'username',
+        authorBio: 'general bio'
+      };
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          authorName: '',
+          authorBio: ''
+        },
+        result: Promise.resolve(updatedAuthorDetails)
+      } as NgbModalRef);
+      spyOn(component, 'updateAuthorDetails');
 
-    component.updateAuthorBio();
-    tick();
+      component.showAuthorDetailsEditor();
+      tick();
 
-    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
-      .toHaveBeenCalled();
-    expect(component.authorBioEditorIsOpen).toBeFalse();
-    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-      'Author bio saved successfully.');
-  }));
-
-  it('should open author name editor', () => {
-    component.authorNameEditorIsOpen = false;
-
-    component.openAuthorNameEditor();
-
-    expect(component.authorNameEditorIsOpen).toBeTrue();
-  });
-
-  it('should open author bio editor', () => {
-    component.authorBioEditorIsOpen = false;
-
-    component.openAuthorBioEditor();
-
-    expect(component.authorBioEditorIsOpen).toBeTrue();
-  });
+      expect(component.updateAuthorDetails).toHaveBeenCalled();
+      expect(component.authorBio).toBe('general bio');
+      expect(component.authorName).toBe('username');
+    })
+  );
 });

@@ -625,7 +625,7 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
             Exception. A blog author details model with the given ID exists
                 already.
         """
-        if cls.query(cls.author_id == author_id).get():
+        if cls.get_by_author(author_id):
             raise Exception(
                 'A blog author details model for given user already exists.')
         model_id = cls.generate_new_instance_id()

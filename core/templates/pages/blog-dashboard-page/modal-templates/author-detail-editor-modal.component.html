@@ -1,0 +1,48 @@
+<div class="mt-5 mb-1 mx-3">
+  <h3>{{ 'I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_HEADING' | translate }}: </h3>
+</div>
+<span class="my-2 ml-2 d-flex">
+  <h4 class="my-auto mr-1">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_NAME_HEADING' | translate }} :</h4>
+  <input class="w-auto form-control required general-text-format oppia-autofocus blog-author-editor"
+         [(ngModel)]="authorName"
+         maxlength="MAX_AUTHOR_NAME_LENGTH"
+         aria-label="Author Name of the user">
+</span>
+<div class="my-4 ml-2">
+  <span class="d-flex blog-author-editor">
+    <span class="blog-author-bio">
+      <h4 class="mr-1">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING' | translate }}: </h4>
+    </span>
+    <textarea class="oppia-bio-border oppia-autofocus w-100 mr-1"
+              [(ngModel)]="authorBio"
+              [attr.value]="authorBio"
+              rows="5"
+              [maxlength]="250"
+              placeholder="{{ 'I18N_PREFERENCES_BIO_EXPLAIN_TEXT' | translate }}">
+    </textarea>
+  </span>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary"
+          (click)="cancel()">
+          {{ 'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate }}
+  </button>
+  <button class="btn btn-success"
+          (click)="save()"
+          [disabled]="!(authorName.length)">
+          {{ 'I18N_BLOG_DASHBOARD_PAGE_SAVE_BUTTON' | translate }}
+  </button>
+</div>
+<style>
+  oppia-blog-author-details-editor {
+    padding: 3.5rem;
+  }
+
+  .blog-author-editor {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    line-height: 20px;
+    text-align: left;
+  }
+</style>
