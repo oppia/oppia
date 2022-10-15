@@ -16,74 +16,108 @@
  * @fileoverview Unit tests for "enumerated frequency table" visualization.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { OppiaVisualizationEnumeratedFrequencyTableComponent } from './oppia-visualization-enumerated-frequency-table.directive';
 
 describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
-  let $compile = null, $rootScope = null;
-  let el = null;
-  let scope = null;
+  let component: OppiaVisualizationEnumeratedFrequencyTableComponent;
+  let fixture: ComponentFixture<
+  OppiaVisualizationEnumeratedFrequencyTableComponent>;
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function(_$compile_, _$rootScope_) {
-    $compile = _$compile_;
-    $rootScope = _$rootScope_;
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        RichTextComponentsModule
+      ],
+      declarations: [
+        OppiaVisualizationEnumeratedFrequencyTableComponent,
+      ],
+      providers: [
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    const elementTemplate = angular.element(
-      '<oppia-visualization-enumerated-frequency-table ' + (
-        'data="data" options="options" ' +
-        'addressed-info-is-supported="addressedInfoIsSupported">') +
-      '</oppia-visualization-enumerated-frequency-table>');
-    scope = $rootScope.$new();
+    fixture = TestBed.createComponent(
+      OppiaVisualizationEnumeratedFrequencyTableComponent);
+    component = fixture.componentInstance;
+    component.answerVisible = [true, false];
     let data = [
       {answer: ['foo'], frequency: 3},
       {answer: ['bar'], frequency: 1}];
-    scope.data = (data.map(d => AnswerStats.createFromBackendDict(d)));
-    el = $compile(elementTemplate)(scope);
-    $rootScope.$digest();
+    component.options = {
+      title: 'title',
+      column_headers: 'column_headers',
+    };
+    component.addressedInfoIsSupported = ['addressedInfoIsSupported'];
+    component.data = (data.map(d => AnswerStats.createFromBackendDict(d)));
+    fixture.detectChanges();
   });
 
-  it('should display first answer and hide the second answer', () => {
-    expect(el.find(
-      'a.answer-rank'
-    ).map((_, el) => el.textContent.trim()).toArray())
-      .toEqual(['Answer Set #1', 'Answer Set #2']);
-    let values = el.find('td')
-      .map((_, el) => el.textContent.trim()).toArray();
-    expect(values[1]).toBe('foo');
-    expect(values[2]).toBe('3');
-    expect(values[4]).toBe('bar');
-    expect(values[5]).toBe('1');
-    expect(el.find(
-      'table.item.table.ng-hide angular-html-bind'
-    ).map((_, el) => el.textContent.trim()).toArray()).toEqual(['bar']);
-    expect(el.find(
-      'table.item.table:not(.ng-hide) angular-html-bind'
-    ).map((_, el) => el.textContent.trim()).toArray()).toEqual(['foo']);
-  });
+  it('should display first answer and hide the second answer', fakeAsync(() => {
+    const bannerDe = fixture.debugElement;
+    const bannerEl = bannerDe.nativeElement;
+    const answersList = [];
+    bannerEl.querySelectorAll('.answer-rank').forEach(
+      (el) => {
+        answersList.push(el.textContent);
+      }
+    );
 
-  it('should display second answer and hide the first answer', () => {
-    let list = el.find('.answer-rank');
-    list.trigger('click');
+    tick();
+    expect(answersList).toEqual(['Answer Set #1', 'Answer Set #2']);
 
-    expect(el.find(
-      'table.item.table.ng-hide angular-html-bind'
-    ).map((_, el) => el.textContent.trim()).toArray()).toEqual(['foo']);
-    expect(el.find(
-      'table.item.table:not(.ng-hide) angular-html-bind'
-    ).map((_, el) => el.textContent.trim()).toArray()).toEqual(['bar']);
-    expect(el.find(
-      'a.answer-rank'
-    ).map((_, el) => el.textContent.trim()).toArray())
-      .toEqual(['Answer Set #1', 'Answer Set #2']);
-    let values = el.find('td')
-      .map((_, el) => el.textContent.trim()).toArray();
-    expect(values[1]).toBe('foo');
-    expect(values[2]).toBe('3');
-    expect(values[4]).toBe('bar');
-    expect(values[5]).toBe('1');
-  });
+    let values = bannerEl.querySelectorAll('.answers');
+
+    expect(values[0].textContent).toBe('foo');
+    expect(values[1].textContent).toBe('3');
+    expect(values[2].textContent).toBe('bar');
+    expect(values[3].textContent).toBe('1');
+
+    component.toggleAnswerVisibility(2);
+
+    const hiddenRows = [];
+    bannerEl.querySelectorAll(
+      '.item-table'
+    ).forEach(
+      (el) => hiddenRows.push(el.hidden)
+    );
+    tick();
+
+    expect(hiddenRows).toEqual([false, true]);
+  }));
+
+  it('should display second answer and hide the first answer', fakeAsync(() => {
+    const bannerDe = fixture.debugElement;
+    const bannerEl = bannerDe.nativeElement;
+
+    component.toggleAnswerVisibility(1);
+    fixture.detectChanges();
+    tick();
+
+    const hiddenRows = [];
+    bannerEl.querySelectorAll(
+      '.item-table'
+    ).forEach(
+      (el) => hiddenRows.push(el.hidden)
+    );
+    tick();
+
+    expect(hiddenRows).toEqual([false, false]);
+  }));
+
+  it('should intialize component properly', fakeAsync(() => {
+    tick();
+    component.ngOnInit();
+
+    component.toggleAnswerVisibility(0);
+
+    expect(component.answerVisible[0]).toEqual(false);
+  }));
 });

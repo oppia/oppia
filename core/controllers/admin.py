@@ -28,6 +28,8 @@ from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
 from core.domain import blog_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -88,6 +90,7 @@ class AdminHandler(base.BaseHandler):
                         'generate_dummy_explorations', 'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
+                        'generate_dummy_classroom',
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
@@ -248,6 +251,8 @@ class AdminHandler(base.BaseHandler):
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
+            elif action == 'generate_dummy_classroom':
+                self._generate_dummy_classroom()
             elif action == 'save_config_properties':
                 new_config_property_values = self.normalized_payload.get(
                     'new_config_property_values')
@@ -673,6 +678,132 @@ class AdminHandler(base.BaseHandler):
                 exploration_ids_to_publish)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
+
+    def _generate_dummy_classroom(self):
+        """Generate and loads the database with a classroom.
+
+        Raises:
+            Exception. Cannot generate dummy classroom in production.
+            Exception. User does not have enough rights to generate data.
+        """
+        if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
+            logging.info(
+                '[ADMIN] %s generated dummy classroom.' % self.user_id)
+
+            topic_id_1 = topic_fetchers.get_new_topic_id()
+            topic_id_2 = topic_fetchers.get_new_topic_id()
+            topic_id_3 = topic_fetchers.get_new_topic_id()
+            topic_id_4 = topic_fetchers.get_new_topic_id()
+            topic_id_5 = topic_fetchers.get_new_topic_id()
+            topic_id_6 = topic_fetchers.get_new_topic_id()
+
+            skill_id_1 = skill_services.get_new_skill_id()
+            skill_id_2 = skill_services.get_new_skill_id()
+            skill_id_3 = skill_services.get_new_skill_id()
+            skill_id_4 = skill_services.get_new_skill_id()
+            skill_id_5 = skill_services.get_new_skill_id()
+            skill_id_6 = skill_services.get_new_skill_id()
+
+            topic_1 = topic_domain.Topic.create_default_topic(
+                topic_id_1, 'Topic1', 'topic-one', 'description', 'fragm')
+            topic_2 = topic_domain.Topic.create_default_topic(
+                topic_id_2, 'Topic2', 'topic-two', 'description', 'fragm')
+            topic_3 = topic_domain.Topic.create_default_topic(
+                topic_id_3, 'Topic3', 'topic-three', 'description', 'fragm')
+            topic_4 = topic_domain.Topic.create_default_topic(
+                topic_id_4, 'Topic4', 'topic-four', 'description', 'fragm')
+            topic_5 = topic_domain.Topic.create_default_topic(
+                topic_id_5, 'Topic5', 'topic-five', 'description', 'fragm')
+            topic_6 = topic_domain.Topic.create_default_topic(
+                topic_id_6, 'Topic6', 'topic-six', 'description', 'fragm')
+
+            skill_1 = self._create_dummy_skill(
+                skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
+            skill_2 = self._create_dummy_skill(
+                skill_id_2, 'Skill2', '<p>Dummy Explanation 2</p>')
+            skill_3 = self._create_dummy_skill(
+                skill_id_3, 'Skill3', '<p>Dummy Explanation 3</p>')
+            skill_4 = self._create_dummy_skill(
+                skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>')
+            skill_5 = self._create_dummy_skill(
+                skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
+            skill_6 = self._create_dummy_skill(
+                skill_id_6, 'Skill6', '<p>Dummy Explanation 6</p>')
+
+            skill_services.save_new_skill(self.user_id, skill_1)
+            skill_services.save_new_skill(self.user_id, skill_2)
+            skill_services.save_new_skill(self.user_id, skill_3)
+            skill_services.save_new_skill(self.user_id, skill_4)
+            skill_services.save_new_skill(self.user_id, skill_5)
+            skill_services.save_new_skill(self.user_id, skill_6)
+
+            topic_1.add_uncategorized_skill_id(skill_id_1)
+            topic_2.add_uncategorized_skill_id(skill_id_2)
+            topic_3.add_uncategorized_skill_id(skill_id_3)
+            topic_4.add_uncategorized_skill_id(skill_id_4)
+            topic_5.add_uncategorized_skill_id(skill_id_5)
+            topic_6.add_uncategorized_skill_id(skill_id_6)
+
+            topic_services.save_new_topic(self.user_id, topic_1)
+            topic_services.save_new_topic(self.user_id, topic_2)
+            topic_services.save_new_topic(self.user_id, topic_3)
+            topic_services.save_new_topic(self.user_id, topic_4)
+            topic_services.save_new_topic(self.user_id, topic_5)
+            topic_services.save_new_topic(self.user_id, topic_6)
+
+            classroom_id_1 = classroom_config_services.get_new_classroom_id()
+            classroom_id_2 = classroom_config_services.get_new_classroom_id()
+
+            classroom_name_1 = 'Dummy Classroom with 5 topics'
+            classroom_name_2 = 'Dummy Classroom with 1 topic'
+
+            classroom_url_fragment_1 = 'first-classroom'
+            classroom_url_fragment_2 = 'second-classroom'
+
+            topic_dependency_for_classroom_1 = {
+                topic_id_1: [],
+                topic_id_2: [topic_id_1],
+                topic_id_3: [topic_id_1],
+                topic_id_4: [topic_id_2],
+                topic_id_5: [topic_id_3]
+            }
+            topic_dependency_for_classroom_2 = {
+                topic_id_6: []
+            }
+
+            classroom_dict_1 = {
+                'classroom_id': classroom_id_1,
+                'name': classroom_name_1,
+                'url_fragment': classroom_url_fragment_1,
+                'course_details': '',
+                'topic_list_intro': '',
+                'topic_id_to_prerequisite_topic_ids': (
+                    topic_dependency_for_classroom_1)
+            }
+            classroom_dict_2 = {
+                'classroom_id': classroom_id_2,
+                'name': classroom_name_2,
+                'url_fragment': classroom_url_fragment_2,
+                'course_details': '',
+                'topic_list_intro': '',
+                'topic_id_to_prerequisite_topic_ids': (
+                    topic_dependency_for_classroom_2)
+            }
+
+            classroom_1 = classroom_config_domain.Classroom.from_dict(
+                classroom_dict_1)
+            classroom_2 = classroom_config_domain.Classroom.from_dict(
+                classroom_dict_2)
+
+            classroom_config_services.update_or_create_classroom_model(
+                classroom_1)
+            classroom_config_services.update_or_create_classroom_model(
+                classroom_2)
+        else:
+            raise Exception('Cannot generate dummy classroom in production.')
 
 
 class AdminRoleHandler(base.BaseHandler):

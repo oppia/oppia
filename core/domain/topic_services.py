@@ -1590,3 +1590,40 @@ def get_topic_id_to_diagnostic_test_skill_ids(
         )
         raise Exception(error_msg)
     return topic_id_to_diagnostic_test_skill_ids
+
+
+def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:
+    """Returns a dict with topic ID as key and topic name as value, for all
+    given topic IDs.
+
+    Args:
+        topic_ids: List(str). A list of topic IDs.
+
+    Raises:
+        Exception. The topic models for some of the given topic IDs do not
+            exist.
+
+    Returns:
+        dict(str, str). A dict with topic ID as key and topic name as value.
+    """
+    topic_id_to_topic_name = {}
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+
+    for topic in topics:
+        if topic is None:
+            continue
+        topic_id_to_topic_name[topic.id] = topic.name
+
+    correct_topic_ids = list(topic_id_to_topic_name.keys())
+    # The topic IDs for which topic models do not exist are referred to as
+    # incorrect topic IDs.
+    incorrect_topic_ids = [
+        topic_id for topic_id in topic_ids if topic_id not in correct_topic_ids
+    ]
+    if incorrect_topic_ids:
+        error_msg = (
+            'No corresponding topic models exist for these topic IDs: %s.'
+            % (', '.join(incorrect_topic_ids))
+        )
+        raise Exception(error_msg)
+    return topic_id_to_topic_name

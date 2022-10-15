@@ -183,7 +183,10 @@ var ExplorationEditorTranslationTab = function() {
     await action.click(
       'Confirm delete record button',
       confirmDeleteRecordButton);
-    await waitFor.pageToFullyLoad();
+    // We need to explicitly wait till the audio is deleted, in order
+    // to make sure there is no unsaved changes left in the exploration.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.uploadAudioRecord = async function(audioPath) {
@@ -231,7 +234,7 @@ var ExplorationEditorTranslationTab = function() {
   this.setTranslation = async function(richTextInstructions) {
     await action.click('Edit translation button', editTranslationButtton);
     // eslint-disable-next-line oppia/e2e-practices
-    var stateTranslationEditorTag = $('<state-translation-editor>');
+    var stateTranslationEditorTag = $('<oppia-state-translation-editor>');
     var stateTranslationEditor = stateTranslationEditorTag.$(
       '.e2e-test-state-translation-editor');
     await waitFor.visibilityOf(

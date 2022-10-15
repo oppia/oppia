@@ -17,7 +17,6 @@
  */
 
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { MaterialModule } from 'modules/material.module';
 import { PencilCodeEditor } from './directives/oppia-interactive-pencil-code-editor.component';
@@ -26,11 +25,12 @@ import { ResponePencilCodeEditor } from './directives/oppia-response-pencil-code
 import { ShortResponePencilCodeEditor } from './directives/oppia-short-response-pencil-code-editor.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   imports: [
     SharedPipesModule,
-    BrowserModule,
+    CommonModule,
     MaterialModule,
     TranslateModule
   ],
