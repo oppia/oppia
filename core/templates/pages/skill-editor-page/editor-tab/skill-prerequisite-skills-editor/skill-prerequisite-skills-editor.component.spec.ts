@@ -431,6 +431,20 @@ describe('Skill editor main tab Component', () => {
     expect(component.windowIsNarrow).toBeFalse();
   });
 
+  it('should toggle skill editor card on clicking', () => {
+    component.skillEditorCardIsShown = true;
+    spyOn(windowDimensionsService, 'isWindowNarrow')
+      .and.returnValue(true);
+
+    component.toggleSkillEditorCard();
+
+    expect(component.skillEditorCardIsShown).toBeFalse();
+
+    component.toggleSkillEditorCard();
+
+    expect(component.skillEditorCardIsShown).toBeTrue();
+  });
+
   it('should show Prerequisites list when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
