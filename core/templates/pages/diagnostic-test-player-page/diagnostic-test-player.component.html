@@ -5,7 +5,7 @@
   </button>
 </div>
 <div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
-<mat-card class="introductory-card">
+<mat-card class="introductory-card" *ngIf="!diagnosticTestStarted">
   <div class="oppia-introductory-container">
     <div class="oppia-image">
       <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
@@ -21,10 +21,13 @@
     </div>
   </div>
   <button class="btn oppia-diagnostic-test-button start-test-button"
-          disabled="true">
+          (click)="startDiagnosticTest()">
     START THE TEST
   </button>
 </mat-card>
+<div *ngIf="diagnosticTestStarted">
+  <oppia-question-player [questionPlayerConfig]="questionPlayerConfig"></oppia-question-player>
+</div>
 
 <style>
   .oppia-image {

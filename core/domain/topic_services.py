@@ -1570,6 +1570,8 @@ def get_topic_id_to_diagnostic_test_skill_ids(
     """
     topic_id_to_diagnostic_test_skill_ids = {}
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    print('\n'*5)
+    print(topic_ids)
 
     for topic in topics:
         if topic is None:

@@ -20,8 +20,10 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { DiagnosticTestModel } from './diagnostic-test.model';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 
 @Component({
@@ -30,12 +32,18 @@ import { PreventPageUnloadEventService } from 'services/prevent-page-unload-even
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL!: string;
+  diagnosticTestData;
+  classroomId!: string;
+  diagnosticTestStarted: boolean = false;
+  questionPlayerConfig;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private loaderService: LoaderService,
-    private preventPageUnloadEventService: PreventPageUnloadEventService
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService:
+    TopicsAndSkillsDashboardBackendApiService,
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +55,44 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   returnBackToClassroom(): void {
     this.windowRef.nativeWindow.location.href = '/learn/math';
+  }
+
+  startDiagnosticTest(): void {
+    // fetch the math topic ID.
+    const classroomId = 'v3kVwNM3GC3x';
+
+    this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
+      response => {
+        this.diagnosticTestData = new DiagnosticTestModel(
+          response.classroomDict.topicIdToPrerequisiteTopicIds);
+        this.diagnosticTestData.setCurrentTopicId();
+        let currentTopicId = this.diagnosticTestData.getCurrentTopicId();
+
+        // 1. fetch topic
+        // 2. get diagnostic test skill IDs
+        // 3. Make question config
+
+      this.topicsAndSkillsDashboardBackendApiService
+        .fetchTopicIdToDiagnosticTestSkillIdsAsync([currentTopicId]).then(
+          (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
+            let diagnosticTestSkillIds = (
+              responseDict.topicIdToDiagnosticTestSkillIds[currentTopicId]);
+
+            this.questionPlayerConfig = {
+              resultActionButtons: [],
+              skillList: diagnosticTestSkillIds,
+              skillDescriptions: 'Nikhil',
+              questionCount: 2,
+              questionsSortedByDifficulty: true
+            };
+
+            console.log(this.questionPlayerConfig);
+            console.log('hello niki')
+
+            this.diagnosticTestStarted = true;
+          });
+      }
+    );
   }
 }
 
