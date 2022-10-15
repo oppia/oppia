@@ -62,10 +62,6 @@ export class PageTitleService {
     });
   }
 
-  addMetaTag(metaTag: {name: string; content: string}): void {
-    this.metaTagService.addTag(metaTag);
-  }
-
   setNavbarTitleForMobileView(title: string): void {
     this.pageTitleForMobile = title;
   }

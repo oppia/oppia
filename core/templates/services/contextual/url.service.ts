@@ -274,21 +274,6 @@ export class UrlService {
   }
 
   /**
- * This function is used to find the blog post url fragment from the url.
- * @return {string} the blog post url fragment.
- * @throws Will throw an error if the blog post url is invalid.
- */
-  getBlogPostUrlFromUrl(): string {
-    let pathname = this.getPathname();
-    let argumentsArray = pathname.split('/');
-    if (pathname.startsWith('/blog') && argumentsArray.length === 3) {
-      return decodeURIComponent(pathname.split('/')[2]);
-    } else {
-      throw new Error('Invalid Blog Post Url.');
-    }
-  }
-
-  /**
    * This function is used to find the query values as a list.
    * @param {string} fieldName - the name of the field.
    * @return {string[]} the list of query field values.

@@ -194,16 +194,6 @@ describe('Site Analytics Service', () => {
       });
     });
 
-    it('should register share blog post event', () => {
-      const network = 'ShareBlogPostNetwork';
-      sas.registerShareBlogPostEvent(network);
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'share', {
-        event_category: network,
-        event_label: pathname
-      });
-    });
-
     it('should register open embed info event', () => {
       const explorationId = 'abc1';
       sas.registerOpenEmbedInfoEvent(explorationId);

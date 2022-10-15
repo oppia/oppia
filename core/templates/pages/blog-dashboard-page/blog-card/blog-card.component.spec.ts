@@ -24,23 +24,12 @@ import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
 import { BlogCardComponent } from './blog-card.component';
 import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Blog Dashboard Tile Component', () => {
   let component: BlogCardComponent;
   let fixture: ComponentFixture<BlogCardComponent>;
   let urlInterpolationService: UrlInterpolationService;
   let sampleBlogPostSummary: BlogPostSummaryBackendDict;
-  class MockWindowRef {
-    nativeWindow = {
-      location: {
-        href: '',
-        hash: '/'
-      },
-      open: (url: string) => {}
-    };
-  }
-  let mockWindowRef: MockWindowRef;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -56,10 +45,6 @@ describe('Blog Dashboard Tile Component', () => {
           provide: CapitalizePipe,
           useClass: MockCapitalizePipe
         },
-        {
-          provide: WindowRef,
-          useClass: MockWindowRef
-        },
         UrlInterpolationService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -70,10 +55,10 @@ describe('Blog Dashboard Tile Component', () => {
     fixture = TestBed.createComponent(BlogCardComponent);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     component = fixture.componentInstance;
-    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+
     sampleBlogPostSummary = {
       id: 'sampleId',
-      author_name: 'test_user',
+      author_username: 'test_user',
       title: 'Title',
       summary: 'Hello World',
       tags: ['news'],
@@ -124,7 +109,7 @@ describe('Blog Dashboard Tile Component', () => {
   it('should throw error if published date is not defined', () => {
     const invalidBlogPostSummary: BlogPostSummaryBackendDict = {
       id: 'sampleId',
-      author_name: 'test_user',
+      author_username: 'test_user',
       title: 'Title',
       summary: 'Hello World',
       tags: ['news'],
@@ -150,18 +135,5 @@ describe('Blog Dashboard Tile Component', () => {
     component.ngOnInit();
 
     expect(component.thumbnailUrl).toBe('');
-  });
-
-  it('should navigate to the blog post page', () => {
-    component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
-    spyOn(mockWindowRef.nativeWindow, 'open');
-    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
-      '/blog/sample-blog-post-url');
-
-    component.navigateToBlogPostPage();
-
-    expect(mockWindowRef.nativeWindow.open).toHaveBeenCalledWith(
-      '/blog/sample-blog-post-url');
   });
 });

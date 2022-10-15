@@ -61,7 +61,7 @@ describe('Blog Post Editor Component', () => {
 
   let sampleBlogPostBackendDict = {
     id: 'sampleBlogId',
-    author_name: 'test_user',
+    author_username: 'test_user',
     title: 'sample_title',
     content: '<p>hello</p>',
     thumbnail_filename: 'image.png',

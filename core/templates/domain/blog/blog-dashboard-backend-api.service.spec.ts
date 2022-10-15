@@ -37,7 +37,7 @@ describe('Blog Dashboard backend api service', () => {
   };
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
-    author_name: 'test_user',
+    author_username: 'test_user',
     title: 'sample_title',
     summary: 'hello',
     thumbnail_filename: 'image',

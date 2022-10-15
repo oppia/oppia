@@ -19,7 +19,6 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import blog_services
 from core.domain import classroom_services
 from core.domain import user_services
 
@@ -144,62 +143,3 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
     def get(self) -> None:
         """Handles GET requests."""
         pass
-
-
-class BlogHomePageAccessValidationHandler(base.BaseHandler):
-    """Validates access to blog home page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
-        'GET': {}
-    }
-
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
-    def get(self) -> None:
-        """Validates access to blog home page."""
-        pass
-
-
-class BlogPostPageAccessValidationHandler(base.BaseHandler):
-    """Validates whether request made to correct blog post route."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
-        'GET': {
-            'blog_post_url_fragment': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
-    }
-
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
-    def get(self) -> None:
-        # Please use type casting here instead of type ignore[union-attr] once
-        # this attribute `normalized_request` has been type annotated in the
-        # parent class BaseHandler.
-        blog_post_url_fragment = self.normalized_request.get( # type: ignore[union-attr]
-            'blog_post_url_fragment')
-        blog_post = blog_services.get_blog_post_by_url_fragment( # type: ignore[no-untyped-call]
-            blog_post_url_fragment)
-
-        if not blog_post:
-            raise self.PageNotFoundException

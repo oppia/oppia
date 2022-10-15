@@ -20,7 +20,7 @@
 import { AppConstants } from 'app.constants';
 export interface BlogPostBackendDict {
   'id': string ;
-  'author_name': string;
+  'author_username': string;
   'title': string;
   'content': string;
   'thumbnail_filename': string | null;
@@ -35,7 +35,7 @@ export class BlogPostData {
   // blog post that is displayed in the editor until the actual
   // is fetched from the backend.
   _id: string | null;
-  _authorName: string;
+  _authorUsername: string;
   _title: string;
   _content: string;
   _tags: string[];
@@ -54,7 +54,7 @@ export class BlogPostData {
       lastUpdated?: string,
       publishedOn?: string) {
     this._id = id;
-    this._authorName = authorUsername;
+    this._authorUsername = authorUsername;
     this._title = title;
     this._content = content;
     this._tags = tags;
@@ -69,7 +69,7 @@ export class BlogPostData {
   }
 
   get authorUsername(): string {
-    return this._authorName;
+    return this._authorUsername;
   }
 
   get lastUpdated(): string | undefined {
@@ -182,7 +182,7 @@ export class BlogPostData {
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
-      blogPostBackendDict.author_name,
+      blogPostBackendDict.author_username,
       blogPostBackendDict.title,
       blogPostBackendDict.content,
       blogPostBackendDict.tags,
