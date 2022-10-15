@@ -69,7 +69,7 @@ describe('Copy Exploration URL component', function() {
 
     component.copyUrlButton();
     tick(1000);
-    
+
     expect(clipboard.copy).toHaveBeenCalledWith(
       explorationURL);
   }));
