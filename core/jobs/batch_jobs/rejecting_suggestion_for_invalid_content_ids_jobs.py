@@ -52,10 +52,52 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
-    """Job that rejects the suggestions for missing content ids."""
+    """Job that rejects the suggestions for missing content ids and
+    updates the RTE content.
+    """
+
+    @staticmethod
+    def _update_suggestion_model(
+        suggestions: List[suggestion_models.GeneralSuggestionModel],
+        exp_model: exp_models.ExplorationModel
+    ) -> List[suggestion_models.GeneralSuggestionModel]:
+        """Updates the translation suggestion. The translation whose
+        content_id no longer exists, the suggestion status will be marked
+        as `rejected`. The RTE content of the suggestion will be updated
+        in case invalid data is present.
+
+        Args:
+            suggestions: list(GeneralSuggestionModel). A list of translation
+                suggestion models corresponding to the given exploration.
+            exp_model: ExplorationModel. The exploration model.
+
+        Returns:
+            List[GeneralSuggestionModel]. Result containing the list of
+            updated suggestion models.
+        """
+        exp_domain = exp_fetchers.get_exploration_from_model(exp_model)
+        exp_translatable_contents = (
+            exp_domain.get_translatable_contents_collection())
+
+        translatable_content_ids = []
+        for content_id in (
+            exp_translatable_contents.content_id_to_translatable_content.keys()
+        ):
+            translatable_content_ids.append(content_id)
+
+        for suggestion in suggestions:
+            suggestion_change = suggestion.change_cmd
+            if not suggestion_change['content_id'] in translatable_content_ids:
+                suggestion.status = 'rejected'
+
+        return suggestions
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """
+        """Returns a PCollection of results from the suggestion updation.
+
+        Returns:
+            PCollection. A PCollection of results from the suggestion
+            migration.
         """
         target_id_to_suggestion_models = (
             self.pipeline
@@ -85,7 +127,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                 lambda model: model.id)
         )
 
-        combine_exp_with_suggestion = (
+        updated_suggestion_results = (
             {
                 'suggestions': target_id_to_suggestion_models,
                 'exploration': exploration_models
@@ -101,54 +143,26 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                         objects['exploration'][0]
                     )
                 ))
+            | 'Flatten suggestion models' >> beam.FlatMap(lambda x: x)
         )
 
-        updated_exp_models = (
-            combine_exp_with_suggestion
-            | 'Extracting only exp models' >> beam.Map(
-                lambda exp_with_suggestions: exp_with_suggestions['exploration']
-            )
-            | 'Job run result for exps' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+        updated_suggestions_count_job_run_results = (
+            updated_suggestion_results
+            | 'Transform suggestion objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SUGGESTION UPDATED'))
         )
 
-        updated_suggestion_models = (
-            combine_exp_with_suggestion
-            | 'Extracting only suggestion models' >> beam.Map(
-                lambda exp_with_suggestions: exp_with_suggestions['suggestion']
-            )
-            | 'Job run result for suggestions' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+        unused_put_results = (
+            updated_suggestion_results
+            | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return (
-            (
-                updated_exp_models,
-                updated_suggestion_models
-            )
-            | 'Merge job run results' >> beam.Flatten()
-        )
-
-    @staticmethod
-    def _update_suggestion_model(
-        suggestions: List[suggestion_models.GeneralSuggestionModel],
-        exp_model: exp_models.ExplorationModel
-    ) -> List[suggestion_models.GeneralSuggestionModel]:
-        """
-        """
-        exp_domain = exp_fetchers.get_exploration_from_model(exp_model)
-        exp_translatable_contents = (
-            exp_domain.get_translatable_contents_collection())
-
-        translatable_content_ids = []
-        for content_id in (
-            exp_translatable_contents.content_id_to_translatable_content.keys()
-        ):
-            translatable_content_ids.append(content_id)
-
-        for suggestion in suggestions:
-            suggestion_change = suggestion.change_cmd
-            if not suggestion_change['content_id'] in translatable_content_ids:
-                suggestion.status = 'rejected'
-
-        return suggestions
+        # return (
+        #     (
+        #         updated_suggestion_job_run_results,
+        #         updated_suggestions_count_job_run_results
+        #     )
+        #     | beam.Flatten()
+        # )
+        return updated_suggestions_count_job_run_results
