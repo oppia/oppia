@@ -34,7 +34,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
-import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
@@ -90,6 +89,8 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
 import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
 import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
 import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component';
+import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
+import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
 
 @NgModule({
   imports: [
@@ -111,7 +112,6 @@ import { StateTranslationEditorComponent } from './translation-tab/state-transla
   declarations: [
     CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
-    ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
@@ -162,7 +162,9 @@ import { StateTranslationEditorComponent } from './translation-tab/state-transla
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
-    StateTranslationEditorComponent
+    StateTranslationEditorComponent,
+    ValueGeneratorEditorComponent,
+    ParamChangesEditorComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -217,7 +219,9 @@ import { StateTranslationEditorComponent } from './translation-tab/state-transla
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
-    StateTranslationEditorComponent
+    StateTranslationEditorComponent,
+    ValueGeneratorEditorComponent,
+    ParamChangesEditorComponent,
   ],
   providers: [
     {

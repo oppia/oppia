@@ -44,7 +44,6 @@ import { StateEditorRefreshService } from
 import { AlertsService } from 'services/alerts.service';
 import { importAllAngularServices, setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils.ajs';
 import { ExplorationDataService } from '../services/exploration-data.service';
-import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
@@ -429,7 +428,7 @@ describe('Upgraded component', () => {
     setupAndGetUpgradedComponentAsync(
       'param-changes-editor',
       'paramChangesEditor',
-      [ParamChangesEditorDirective]
+      []
     ).then(
       async(textContext) => expect(textContext).toBe('Hello Oppia!')
     );

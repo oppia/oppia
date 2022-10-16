@@ -680,8 +680,8 @@
 
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 e2e-test-exploration-edit-param-changes">
-        <param-changes-editor [paramChangesService]="explorationParamChangesService"
-                              [postSaveHook]="postSaveParamChangesHook"
+        <param-changes-editor [paramChangesServiceName]="'explorationParamChangesService'"
+                              [postSaveHook]="postSaveParamChangesHook.bind(this)"
                               [currentlyInSettingsTab]="true">
         </param-changes-editor>
       </div>

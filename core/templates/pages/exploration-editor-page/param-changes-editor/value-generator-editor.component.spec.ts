@@ -35,9 +35,9 @@ describe('Value Generator Editor directive', function() {
     $scope.objType = 'UnicodeString';
 
     elem = angular.element(
-      '<value-generator-editor generator-id="generatorId" ' +
-      'customization-args="customizationArgs" obj-type="objType" ' +
-      'init-args="initArgs"></value-generator-editor>');
+      '<oppia-value-generator-editor [generator-id]="generatorId" ' +
+      '[customization-args]="customizationArgs" [obj-type]="objType" ' +
+      '[init-args]="initArgs"></oppia-value-generator-editor>');
 
     compiledElement = $compile(elem)($scope);
     $rootScope.$digest();

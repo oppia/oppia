@@ -173,6 +173,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { MatMenuModule} from '@angular/material/menu';
+import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 
 @NgModule({
   imports: [
@@ -180,6 +182,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     BaseModule,
     CommonModule,
     DragDropModule,
+    MatMenuModule,
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
@@ -202,7 +205,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
     MatProgressSpinnerModule,
-    NgbModalModule
+    NgbModalModule,
+    DynamicComponentModule
   ],
 
   providers: [
