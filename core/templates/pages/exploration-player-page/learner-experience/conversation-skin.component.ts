@@ -93,6 +93,7 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
+  @Input() isDiagnosticTestPlayer;
   directiveSubscriptions = new Subscription();
   // The minimum width, in pixels, needed to be able to show two cards
   // side-by-side.
@@ -157,6 +158,13 @@ export class ConversationSkinComponent {
   CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
+
+  // The fields are used to customize the component for the diagnostic player,
+  // question player, and exploration player page.
+  enableFeedback!: boolean;
+  allowOnlySingleAttemptForAnswering!: boolean;
+  showOnlyLastInputPairResponse!: boolean;
+  enableNavigationThroughCardHistory!: boolean;
 
   constructor(
     private windowRef: WindowRef,
@@ -413,6 +421,18 @@ export class ConversationSkinComponent {
         this.visitedStateNames.push(firstStateName);
       }
     });
+
+    if (this.isDiagnosticTestPlayer) {
+      this.enableFeedback = false;
+      this.allowOnlySingleAttemptForAnswering = true;
+      this.showOnlyLastInputPairResponse = true;
+      this.enableNavigationThroughCardHistory = false;
+    } else {
+      this.enableFeedback = true;
+      this.allowOnlySingleAttemptForAnswering = false;
+      this.showOnlyLastInputPairResponse = false;
+      this.enableNavigationThroughCardHistory = true;
+    }
   }
 
   doesCollectionAllowsGuestProgress(collectionId: string): boolean {
@@ -496,7 +516,8 @@ export class ConversationSkinComponent {
   isCorrectnessFooterEnabled(): boolean {
     return (
       this.answerIsCorrect && this.isCorrectnessFeedbackEnabled() &&
-      this.playerPositionService.hasLearnerJustSubmittedAnAnswer());
+      this.playerPositionService.hasLearnerJustSubmittedAnAnswer() &&
+      this.enableFeedback);
   }
 
   isLearnAgainButton(): boolean {
