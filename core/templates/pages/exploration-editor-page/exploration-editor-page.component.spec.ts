@@ -31,7 +31,7 @@ import { AlertsService } from 'services/alerts.service';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
-import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
+import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
@@ -321,7 +321,9 @@ describe('Exploration editor page component', () => {
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve({
+          isExplorationWhitelisted: null,
+        } as ExplorationFeatures));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -364,6 +366,8 @@ describe('Exploration editor page component', () => {
       spyOn(component, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
 
+      component.ngOnInit();
+      tick();
       rs.navigateToMainTab(null);
       component.isWarningsAreShown(true);
       tick();
@@ -623,7 +627,9 @@ describe('Exploration editor page component', () => {
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve({
+          isExplorationWhitelisted: null,
+        } as ExplorationFeatures));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -650,7 +656,7 @@ describe('Exploration editor page component', () => {
         autosaveIsInProgress);
       spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
         mockInitExplorationPageEmitter);
-      explorationData.is_version_of_draft_valid = true;
+      explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = ['data1', 'data2'];
 
       component.ngOnInit();
@@ -822,7 +828,7 @@ describe('Exploration editor page component', () => {
       spyOnProperty(sts, 'onEnterEditorForTheFirstTime').and.returnValue(
         mockEnterEditorForTheFirstTime);
 
-      explorationData.is_version_of_draft_valid = true;
+      explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = ['data1', 'data2'];
     });
 
