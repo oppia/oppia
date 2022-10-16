@@ -4870,8 +4870,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
         elif current_states_schema_version == 52:
+            versioned_exploration_states['states'] = conversion_fn(
+                versioned_exploration_states['states'], language_code)
+        elif current_states_schema_version == 53:
             versioned_exploration_states['states'], next_content_id_index = (
-                conversion_fn(versioned_exploration_states['states'], language_code))
+                conversion_fn(versioned_exploration_states['states']))
             assert isinstance(next_content_id_index, int)
             return next_content_id_index
         else:
