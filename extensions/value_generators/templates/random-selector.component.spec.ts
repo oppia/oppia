@@ -16,37 +16,43 @@
  * @fileoverview Unit tests for random selector value generator.
  */
 
-describe('randomSelector', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { RandomSelectorComponent } from './random-selector.component';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function(
-      $injector, $componentController, $compile) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('randomSelector', {}, {
-      getGeneratorId: () => {
-        return 'generatorId';
-      }
-    });
+describe('RandomSelector component', function() {
+  let component: RandomSelectorComponent;
+  let fixture: ComponentFixture<RandomSelectorComponent>;
 
-    let elem = angular.element(
-      '<random-selector generator-id="$ctrl.generatorId" ' +
-      'customization-args="customizationArgs"></random-selector>');
-    $compile(elem)($scope);
-    $rootScope.$digest();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        RandomSelectorComponent
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(RandomSelectorComponent);
+    component = fixture.componentInstance;
+
+    component.generatorId = 'generatorId';
+    component.initArgs = 'generatorId';
+    component.objType = 'objType';
+
+    fixture.detectChanges();
+  });
+
   it('should initialise component', () => {
-    ctrl.customizationArgs = {
-      list_of_values: ['test']
+    component.customizationArgs = {
+      list_of_values: ['test'],
+      value: null,
     };
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(ctrl.SCHEMA).toEqual({
+    expect(component.SCHEMA).toEqual({
       type: 'list',
       items: {
         type: 'unicode'
@@ -55,18 +61,19 @@ describe('randomSelector', () => {
         add_element_text: 'Add New Choice'
       }
     });
-    expect(ctrl.generatorId).toBe('generatorId');
-    expect(ctrl.customizationArgs.list_of_values).toEqual(['test']);
+    expect(component.generatorId).toBe('generatorId');
+    expect(component.customizationArgs.list_of_values).toEqual(['test']);
   });
 
   it('should initialise list_of_values as an empty array when list_of_values' +
   ' is not defined', () => {
-    ctrl.customizationArgs = {
-      list_of_values: undefined
+    component.customizationArgs = {
+      list_of_values: undefined,
+      value: null,
     };
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(ctrl.customizationArgs.list_of_values).toEqual([]);
+    expect(component.customizationArgs.list_of_values).toEqual([]);
   });
 });
