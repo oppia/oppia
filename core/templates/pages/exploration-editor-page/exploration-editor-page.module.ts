@@ -162,7 +162,9 @@ import { StateTranslationEditorComponent } from './translation-tab/state-transla
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
-    StateTranslationEditorComponent
+    StateTranslationEditorComponent,
+    StateVersionHistoryModalComponent,
+    MetadataVersionHistoryModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -217,7 +219,9 @@ import { StateTranslationEditorComponent } from './translation-tab/state-transla
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
-    StateTranslationEditorComponent
+    StateTranslationEditorComponent,
+    StateVersionHistoryModalComponent,
+    MetadataVersionHistoryModalComponent
   ],
   providers: [
     {
@@ -252,6 +256,8 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { StateVersionHistoryModalComponent } from './modal-templates/state-version-history-modal.component';
+import { MetadataVersionHistoryModalComponent } from './modal-templates/metadata-version-history-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -148,8 +148,9 @@ require('services/internet-connectivity.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 require('services/ngb-modal.service.ts');
-
 require('components/on-screen-keyboard/on-screen-keyboard.component');
+require('pages/exploration-editor-page/services/version-history.service.ts');
+
 import { Subscription } from 'rxjs';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 import { HelpModalComponent } from './modal-templates/help-modal.component';
@@ -180,7 +181,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'UserService', 'WindowDimensionsService',
+    'UserService', 'VersionHistoryService', 'WindowDimensionsService',
     function(
         $location, $q, $rootScope, $scope, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
@@ -204,7 +205,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateTutorialFirstTimeService,
         ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
-        UserService, WindowDimensionsService) {
+        UserService, VersionHistoryService, WindowDimensionsService) {
       var ctrl = this;
       var reconnectedMessageTimeoutMilliseconds = 4000;
       var disconnectedMessageTimeoutMilliseconds = 5000;
@@ -295,6 +296,7 @@ angular.module('oppia').component('explorationEditorPage', {
             EditabilityService.lockExploration(false);
           }
 
+          VersionHistoryService.init(explorationData.version);
 
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;

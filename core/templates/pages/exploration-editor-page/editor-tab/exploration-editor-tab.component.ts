@@ -67,9 +67,18 @@ require('services/editability.service.ts');
 require('services/exploration-features.service.ts');
 require('services/site-analytics.service.ts');
 require('services/ngb-modal.service.ts');
+require('pages/exploration-editor-page/services/version-history.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'version-history-backend-api.service.ts');
+require('services/context.service.ts');
 
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
+import { StateVersionHistoryResponse } from '../services/version-history-backend-api.service';
+import { StateVersionHistoryModalComponent } from '../modal-templates/state-version-history-modal.component';
+import { StateDiffData } from '../services/version-history.service';
 
 angular.module('oppia').component('explorationEditorTab', {
   bindings: {
@@ -77,7 +86,8 @@ angular.module('oppia').component('explorationEditorTab', {
   },
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$rootScope', '$scope', '$templateCache', '$timeout', 'EditabilityService',
+    '$rootScope', '$scope', '$templateCache', '$timeout',
+    'ContextService', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
@@ -86,8 +96,11 @@ angular.module('oppia').component('explorationEditorTab', {
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
     'UserExplorationPermissionsService',
+    'VersionHistoryBackendApiService',
+    'VersionHistoryService',
     function(
-        $rootScope, $scope, $templateCache, $timeout, EditabilityService,
+        $rootScope, $scope, $templateCache, $timeout,
+        ContextService, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService, GraphDataService,
@@ -95,7 +108,9 @@ angular.module('oppia').component('explorationEditorTab', {
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
-        UserExplorationPermissionsService) {
+        UserExplorationPermissionsService,
+        VersionHistoryBackendApiService,
+        VersionHistoryService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.stateCardIsCheckpointService = StateCardIsCheckpointService;
@@ -137,6 +152,45 @@ angular.module('oppia').component('explorationEditorTab', {
         ExplorationWarningsService.updateWarnings();
       };
 
+      ctrl.getLastEditedVersionNumber = function() {
+        return (
+          VersionHistoryService.getBackwardStateDiffData().oldVersionNumber);
+      };
+
+      ctrl.getLastEditedCommitterUsername = function() {
+        return (
+          VersionHistoryService.getBackwardStateDiffData().committerUsername);
+      };
+
+      ctrl.canShowExploreVersionHistoryButton = function() {
+        return VersionHistoryService.canShowBackwardStateDiffData();
+      };
+
+      ctrl.onClickExploreVersionHistoryButton = function() {
+        const modalRef: NgbModalRef = NgbModal.open(
+          StateVersionHistoryModalComponent, {
+            backdrop: true,
+            windowClass: 'metadata-diff-modal',
+            size: 'xl'
+          });
+
+        const stateDiffData: StateDiffData = (
+          VersionHistoryService.getBackwardStateDiffData());
+        modalRef.componentInstance.newState = stateDiffData.newState;
+        modalRef.componentInstance.oldState = stateDiffData.oldState;
+        modalRef.componentInstance.newStateName = stateDiffData.newState.name;
+        modalRef.componentInstance.oldStateName = stateDiffData.oldState.name;
+        modalRef.componentInstance.committerUsername = (
+          stateDiffData.committerUsername);
+        modalRef.componentInstance.oldVersion = stateDiffData.oldVersionNumber;
+
+        modalRef.result.then(function() {
+          VersionHistoryService.setCurrentPositionInVersionHistoryList(0);
+        }, function() {
+          VersionHistoryService.setCurrentPositionInVersionHistoryList(0);
+        });
+      };
+
       ctrl.initStateEditor = function() {
         ctrl.stateName = StateEditorService.getActiveStateName();
         StateEditorService.setStateNames(
@@ -171,6 +225,23 @@ angular.module('oppia').component('explorationEditorTab', {
             ctrl.stateName);
           if (content.html || stateData.interaction.id) {
             ctrl.interactionIsShown = true;
+          }
+
+          VersionHistoryService.reset();
+          VersionHistoryService.insertStateVersionHistoryData(
+            VersionHistoryService.getLatestVersionOfExploration(), stateData);
+
+          if (VersionHistoryService.getLatestVersionOfExploration() !== null) {
+            VersionHistoryBackendApiService.fetchStateVersionHistoryAsync(
+              ContextService.getExplorationId(), stateData.name,
+              VersionHistoryService.getLatestVersionOfExploration()
+            ).then((response: StateVersionHistoryResponse) => {
+              VersionHistoryService.insertStateVersionHistoryData(
+                response.lastEditedVersionNumber,
+                response.stateInPreviousVersion,
+                response.lastEditedCommitterUsername
+              );
+            });
           }
 
           LoaderService.hideLoadingScreen();
