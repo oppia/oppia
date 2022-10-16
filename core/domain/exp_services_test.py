@@ -7728,28 +7728,6 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                 'exp_id', self.USER_ID)
         self.assertIsNone(updated_exploration)
 
-    def test_get_exp_with_draft_applied_when_draft_has_exp_property_changes(
-        self
-    ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.USER_ID, exploration)
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'New title'
-        }).to_dict()]
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.USER_ID, 'exp_id'), user_id=self.USER_ID,
-            exploration_id='exp_id',
-            draft_change_list=change_list,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=2).put()
-        updated_exploration = exp_services.get_exp_with_draft_applied(
-            'exp_id', self.USER_ID)
-        self.assertFalse(updated_exploration is None)
-
 
 class ApplyDraftUnitTests(test_utils.GenericTestBase):
     """Test apply draft functions in exp_services."""
@@ -7776,7 +7754,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 51,
+            'from_version': 52,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
@@ -7812,6 +7790,25 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         new_content_dict = updated_exp.init_state.content.to_dict()
         self.assertEqual(new_content_dict['html'], '<p>New html value</p>')
         self.assertEqual(new_content_dict['content_id'], 'content_0')
+
+    def test_get_exp_with_draft_applied_when_draft_has_exp_property_changes(
+        self
+    ) -> None:
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'New title'
+        }).to_dict()]
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID1), user_id=self.USER_ID,
+            exploration_id=self.EXP_ID1,
+            draft_change_list=change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=2,
+            draft_change_list_id=2).put()
+        updated_exploration = exp_services.get_exp_with_draft_applied(
+            self.EXP_ID1, self.USER_ID)
+        self.assertFalse(updated_exploration is None)
 
 
 class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):

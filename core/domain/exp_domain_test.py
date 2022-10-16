@@ -11029,12 +11029,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             ]
         }), exp_domain.ExplorationChange({
-            'property_name': 'next_content_id_index',
-            'old_value': 1,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': 2
-        }), exp_domain.ExplorationChange({
             'property_name': 'solution',
             'old_value': None,
             'state_name': 'Introduction',
@@ -11142,6 +11136,9 @@ class ExplorationChangesMergeabilityUnitTests(
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_4,
+            'Resname state.')
 
         # Adding translations to the second state to check
         # that they can be merged even in the same property.
@@ -11151,7 +11148,7 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         changes_are_mergeable_1 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 3, change_list_5)
+            self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_1, False)
 
         # Add changes to the different content of first state to
