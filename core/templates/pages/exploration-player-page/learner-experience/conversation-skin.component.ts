@@ -121,11 +121,14 @@ export class ConversationSkinComponent {
   recommendedExplorationSummaries = [];
   answerIsCorrect = false;
   nextCard;
+  nextCardIfStuck: StateCard | null;
   alertMessage = {};
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
+  timeout: NodeJS.Timeout | null = null;
+  responseTimeout: NodeJS.Timeout | null = null;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
@@ -272,6 +275,14 @@ export class ConversationSkinComponent {
           })
       );
     }
+
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onNewCardOpened.subscribe(
+        (newCard: StateCard) => {
+          this.triggerRedirectionIfLearnerStuck();
+        }
+      )
+    );
 
     this.directiveSubscriptions.add(
       this.explorationPlayerStateService.onPlayerStateChange.subscribe(
@@ -982,6 +993,26 @@ export class ConversationSkinComponent {
     }
   }
 
+  triggerRedirectionIfLearnerStuck(): void {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+    if (this.responseTimeout) {
+      clearTimeout(this.responseTimeout);
+      this.responseTimeout = null;
+    }
+    // this.responseTimeout = setTimeout(() => {
+    //   this.playerTranscriptService.addNewResponse("Response");
+    // }, 5000);
+    this.timeout = setTimeout(() => {
+      if (this.nextCardIfStuck) {
+        this.nextCard = this.nextCardIfStuck;
+        this.showPendingCard();
+      }
+    }, 7000);
+  }
+
   showQuestionAreNotAvailable(): void {
     this.loaderService.hideLoadingScreen();
   }
@@ -1108,6 +1139,7 @@ export class ConversationSkinComponent {
           taggedSkillMisconceptionId, wasOldStateInitial,
           isFirstHit, isFinalQuestion, nextCardIfReallyStuck, focusLabel,) => {
         this.nextCard = nextCard;
+        this.nextCardIfStuck = nextCardIfReallyStuck;
         if (!this._editorPreviewMode &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
           let oldStateName =
@@ -1159,21 +1191,14 @@ export class ConversationSkinComponent {
           if (remainOnCurrentCard) {
             // Stay on the same card.
             this.hintsAndSolutionManagerService.recordWrongAnswer();
-
-
-            // If learner is really stuck detected.
-            // Might as well change feedbackHtml too.
-            // Change next card
-
-
             if (feedbackHtml) {
               this.playerTranscriptService.addNewResponse(feedbackHtml);
-              // if (!this.displayedCard.isInteractionInline()) {
-              //   this.playerPositionService.onHelpCardAvailable.emit({
-              //     helpCardHtml: null,
-              //     hasContinueButton: true
-              //   });
-              // }
+              if (!this.displayedCard.isInteractionInline()) {
+                this.playerPositionService.onHelpCardAvailable.emit({
+                  helpCardHtml: null,
+                  hasContinueButton: true
+                });
+              }
               this.playerPositionService.onNewCardAvailable.emit();
               this._nextFocusLabel = (
                 ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
