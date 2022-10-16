@@ -23,7 +23,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import { ParamChange, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
-import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
+import { ParamSpecs, ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
@@ -40,8 +40,7 @@ class MockNgbModal {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Param Changes Editor Component', () => {
+describe('Param Changes Editor Component', () => {
   let component: ParamChangesEditorComponent;
   let fixture: ComponentFixture<ParamChangesEditorComponent>;
   let alertsService: AlertsService;
@@ -106,7 +105,7 @@ fdescribe('Param Changes Editor Component', () => {
         a: {
           obj_type: 'UnicodeString'
         }
-      }));
+      }) as ParamSpecs);
 
     stateParamChangesService.init('', []);
 
@@ -156,6 +155,10 @@ fdescribe('Param Changes Editor Component', () => {
 
   it('should save param changes when externalSave is broadcasted',
     fakeAsync(() => {
+      component.paramChangesService.displayed = [];
+      spyOn(component, 'generateParamNameChoices').and.stub();
+      spyOn(component.paramChangesService, 'saveDisplayedValue').and.stub();
+      spyOn(explorationParamSpecsService, 'saveDisplayedValue').and.stub();
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
       let saveParamChangesSpy = spyOn(
         explorationStatesService, 'saveStateParamChanges')
@@ -207,23 +210,28 @@ fdescribe('Param Changes Editor Component', () => {
       ).length).toBe(0);
     });
 
-  it('should open param changes editor and cancel edit', () => {
+  it('should open param changes editor and cancel edit', fakeAsync(() => {
+    component.paramChangesService.displayed = [];
+    spyOn(component, 'generateParamNameChoices').and.returnValue([]);
+    spyOn(component.paramChangesService, 'restoreFromMemento').and.stub();
+    spyOn(component.paramChangesService, 'saveDisplayedValue').and.stub();
+    spyOn(explorationParamSpecsService, 'saveDisplayedValue').and.stub();
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
-    expect((
-      component.paramChangesService.displayed as ParamChange[]).length).toBe(0);
 
     component.openParamChangesEditor();
+    tick();
 
     expect(component.isParamChangesEditorOpen).toBe(true);
     expect((
       component.paramChangesService.displayed as ParamChange[]).length).toBe(1);
 
     component.cancelEdit();
+    tick();
 
     expect(component.isParamChangesEditorOpen).toBe(false);
     expect((
-      component.paramChangesService.displayed as ParamChange[]).length).toBe(0);
-  });
+      component.paramChangesService.displayed as ParamChange[]).length).toBe(1);
+  }));
 
   it('should open param changes editor and add a param change', () => {
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
@@ -329,16 +337,22 @@ fdescribe('Param Changes Editor Component', () => {
       'Invalid parameter changes.');
   }));
 
-  it('should save param changes when it is valid', () => {
+  it('should save param changes when it is valid', fakeAsync(() => {
     spyOn(component, 'generateParamNameChoices').and.stub();
+    spyOn(component.paramChangesService, 'saveDisplayedValue').and.stub();
+    spyOn(explorationParamSpecsService, 'saveDisplayedValue').and.stub();
+
     let saveParamChangesSpy = spyOn(
       explorationStatesService, 'saveStateParamChanges').and.callFake(() => {});
+
+    component.currentlyInSettingsTab = false;
     component.addParamChange();
     component.saveParamChanges();
+    tick();
 
     expect(saveParamChangesSpy).toHaveBeenCalled();
     expect(postSaveHookSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should not delete a param change when index is less than 0', () => {
     component.addParamChange();
