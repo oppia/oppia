@@ -57,40 +57,50 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """
         """
-        suggestions_grouped_by_target = (
+        target_id_to_suggestion_models = (
             self.pipeline
-            | 'Get all non-deleted suggestion models' >> ndb_io.GetModels(
+            | 'Get translation suggestion models in review' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False))
-            | 'Filter translate suggestions' >> beam.Filter(
-                lambda m: (
-                    m.suggestion_type ==
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                ))
-            | 'Transform to suggestion domain object' >> beam.Map(
-                suggestion_services.get_suggestion_from_model)
-            | 'Group by target' >> beam.GroupBy(lambda m: m.target_id)
+                    include_deleted=False).filter(
+                        (
+                            suggestion_models
+                            .GeneralSuggestionModel.suggestion_type
+                        ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                    ).filter(
+                        suggestion_models.GeneralSuggestionModel.status == (
+                            suggestion_models.STATUS_IN_REVIEW
+                        )
+                    )
+            )
+            | 'Add target id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.target_id)
+            | 'Group exploration suggestions' >> beam.GroupByKey()
         )
 
         exploration_models = (
             self.pipeline
-            | 'Get all non-deleted exploration models' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False))
-            | 'Transform to exploration domain object' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
-            | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
+            | 'Get all exploration models' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all())
+            | 'Add exploration id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.id)
         )
 
         combine_exp_with_suggestion = (
             {
-                'suggestion': suggestions_grouped_by_target,
+                'suggestions': target_id_to_suggestion_models,
                 'exploration': exploration_models
             }
             | 'Merge models' >> beam.CoGroupByKey()
             | 'Remove keys' >> beam.Values()
-            | 'Update suggestion status for missing content ids' >> beam.Map(
-                self._update_suggestion_status
-            )
+            | 'Filter unwanted exploration' >> beam.Filter(
+                lambda objects: len(objects['suggestions']) != 0)
+            | 'Transform and migrate model' >> beam.Map(
+                lambda objects: (
+                    self._update_suggestion_model(
+                        objects['suggestions'][0],
+                        objects['exploration'][0]
+                    )
+                ))
         )
 
         updated_exp_models = (
@@ -120,18 +130,16 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
         )
 
     @staticmethod
-    def _update_suggestion_status(exp_with_suggestion):
+    def _update_suggestion_model(
+        suggestions: List[suggestion_models.GeneralSuggestionModel],
+        exp_model: exp_models.ExplorationModel
+    ) -> List[suggestion_models.GeneralSuggestionModel]:
         """
         """
-        if not len(exp_with_suggestion['suggestion']):
-            return exp_with_suggestion
-        suggestions: Iterable[suggestion_registry.SuggestionTranslateContent] = (
-            exp_with_suggestion['suggestion'][0])
-        exploration: exp_domain.Exploration = list(exp_with_suggestion[
-            'exploration'][0])[0]
-
+        exp_domain = exp_fetchers.get_exploration_from_model(exp_model)
         exp_translatable_contents = (
-            exploration.get_translatable_contents_collection())
+            exp_domain.get_translatable_contents_collection())
+
         translatable_content_ids = []
         for content_id in (
             exp_translatable_contents.content_id_to_translatable_content.keys()
@@ -139,7 +147,8 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
             translatable_content_ids.append(content_id)
 
         for suggestion in suggestions:
-            suggestion_change = suggestion.change
-            if not suggestion_change.content_id in translatable_content_ids:
+            suggestion_change = suggestion.change_cmd
+            if not suggestion_change['content_id'] in translatable_content_ids:
                 suggestion.status = 'rejected'
-        return exp_with_suggestion
+
+        return suggestions
