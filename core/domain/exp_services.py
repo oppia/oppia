@@ -1938,7 +1938,7 @@ def update_exploration(
     # versions of exploration.
     translation_services.update_translation_related_change(
         exploration_id,
-        updated_exploration.version - 1,
+        updated_exploration.version,
         content_ids_corresponding_translations_to_remove,
         content_ids_corresponding_translations_to_mark_needs_update,
         updated_exploration.get_content_count()

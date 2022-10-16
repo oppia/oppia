@@ -47,6 +47,8 @@ from core.domain import subscription_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import translation_domain
+from core.domain import translation_fetchers
+from core.domain import translation_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -67,12 +69,14 @@ if MYPY:  # pragma: no cover
     exp_models,
     opportunity_models,
     recommendations_models,
+    translation_models,
     user_models
 ) = models.Registry.import_models([
     models.Names.FEEDBACK,
     models.Names.EXPLORATION,
     models.Names.OPPORTUNITY,
     models.Names.RECOMMENDATIONS,
+    models.Names.TRANSLATION,
     models.Names.USER
 ])
 
@@ -6861,6 +6865,97 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
         self.assertEqual(exploration.correctness_feedback_enabled, False)
+
+
+    def test_update_exploration_with_mark_translation_needs_update_changes(
+        self
+    ) -> None:
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+            exploration.version, 'hi', 'content_0',
+            translation_domain.TranslatedContent(
+                'Translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertFalse(
+            entity_translations[0].translations['content_0'].needs_update)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+                'content_id': 'content_0'
+            })], 'Marked translation need update.')
+
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version + 1
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertTrue(
+            entity_translations[0].translations['content_0'].needs_update)
+
+
+    def test_update_exploration_with_remove_translation_changes(self) -> None:
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+            exploration.version, 'hi', 'content_0',
+            translation_domain.TranslatedContent(
+                'Translation 1',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+            exploration.version, 'hi', 'default_outcome_1',
+            translation_domain.TranslatedContent(
+                'Translation 2',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertTrue('content_0' in entity_translations[0].translations)
+        self.assertTrue(
+            'default_outcome_1' in entity_translations[0].translations)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_REMOVE_TRANSLATIONS,
+                'content_id': 'content_0'
+            })], 'Marked translation need update.')
+
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version + 1
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertFalse('content_0' in entity_translations[0].translations)
+        self.assertTrue(
+            'default_outcome_1' in entity_translations[0].translations)
 
     def test_update_unclassified_answers(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
