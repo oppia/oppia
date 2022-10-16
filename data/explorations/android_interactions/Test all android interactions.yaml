@@ -112,7 +112,7 @@ states:
     content:
       content_id: content
       html: <p>Test exploration with all android specific interactions</p><oppia-noninteractive-image
-        alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        alt-with-value="&amp;quot;tests&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
         filepath-with-value="&amp;quot;img_20210622_123005_efcgi87dk2_height_130_width_289.png&amp;quot;"></oppia-noninteractive-image>
     interaction:
       answer_groups: []
@@ -725,6 +725,8 @@ states:
             html: <p>Chicken</p>
           - content_id: ca_choices_2
             html: <p>Eagle</p>
+          - content_id: ca_choices_3
+            html: <p>Tiger</p>
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -747,6 +749,7 @@ states:
         ca_choices_0: {}
         ca_choices_1: {}
         ca_choices_2: {}
+        ca_choices_3: {}
         content: {}
         default_outcome: {}
         feedback_3: {}
@@ -756,6 +759,7 @@ states:
         ca_choices_0: {}
         ca_choices_1: {}
         ca_choices_2: {}
+        ca_choices_3: {}
         content: {}
         default_outcome: {}
         feedback_3: {}

@@ -378,9 +378,3 @@ indexes:
   - name: is_root_pipeline
   - name: start_time
     direction: desc
-
-- kind: BlogPostRightsModel
-  properties:
-  - name: blog_post_is_published
-  - name: last_updated
-    direction: desc
