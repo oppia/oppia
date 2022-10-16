@@ -35,6 +35,7 @@ import { StateHintsService } from '../state-editor-properties-services/state-hin
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
 import { StateSolutionEditorComponent } from './state-solution-editor.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('State Solution Editor Component', () => {
   let component: StateSolutionEditorComponent;
@@ -59,7 +60,8 @@ describe('State Solution Editor Component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        StateSolutionEditorComponent
+        StateSolutionEditorComponent,
+        MockTranslatePipe
       ],
       providers: [
         AlertsService,
