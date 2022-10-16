@@ -99,6 +99,7 @@ import { StateTranslationComponent } from './translation-tab/state-translation/s
 import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component';
 import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component';
 import { TranslationTabComponent } from './translation-tab/translation-tab.component';
+import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
 
 @NgModule({
   imports: [
@@ -181,6 +182,7 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
+    ExplorationEditorPageComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -243,6 +245,7 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
+    ExplorationEditorPageComponent
   ],
   providers: [
     {
