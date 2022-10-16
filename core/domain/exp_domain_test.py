@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import copy
 import os
-import re
 
 from core import feconf
 from core import utils
