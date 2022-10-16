@@ -60,7 +60,7 @@ import { ExplorationEditorPageConstants } from '../exploration-editor-page.const
 import { AppConstants } from 'app.constants';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { MetadataDiffData, VersionHistoryService } from '../services/version-history.service';
-import { MetadataVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { MetadataVersionHistoryModalComponent } from '../modal-templates/metadata-version-history-modal.component';
 
 @Component({
@@ -229,58 +229,32 @@ export class SettingsTabComponent
     // settings tab directly (by entering a URL that ends with
     // /settings) results in a console error.
 
-    this.versionHistoryService.reset();
-
     this.hasPageLoaded = false;
-    this.explorationDataService.getDataAsync(() => {}).then(
-      (explorationData) => {
-        if (this.explorationStatesService.isInitialized()) {
-          var categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
-            (categoryItem) => {
-              return (
-                categoryItem.id ===
-                    this.explorationCategoryService.savedMemento);
-            }
-          );
-          // If the current category is not in the dropdown, add it
-          // as the first option.
-          if (!categoryIsInSelect2 &&
-              this.explorationCategoryService.savedMemento) {
-            this.CATEGORY_LIST_FOR_SELECT2.unshift({
-              id: this.explorationCategoryService.savedMemento as string,
-              text: this.explorationCategoryService.savedMemento as string
-            });
+    this.explorationDataService.getDataAsync(() => {}).then(() => {
+      if (this.explorationStatesService.isInitialized()) {
+        var categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
+          (categoryItem) => {
+            return (
+              categoryItem.id ===
+                  this.explorationCategoryService.savedMemento);
           }
-
-          this.stateNames = this.explorationStatesService.getStateNames();
-          this.explorationIsLinkedToStory = (
-            this.contextService.isExplorationLinkedToStory());
-        }
-        const explorationMetadata = this
-          .explorationMetadataObjectFactory
-          .createFromBackendDict(explorationData.exploration_metadata);
-        this.versionHistoryService.insertMetadataVersionHistoryData(
-          this.versionHistoryService.getLatestVersionOfExploration(),
-          explorationMetadata, '');
-
-        if (
-          this.versionHistoryService.getLatestVersionOfExploration() !== null
-        ) {
-          this.versionHistoryBackendApiService
-            .fetchMetadataVersionHistoryAsync(
-              this.contextService.getExplorationId(),
-              this.versionHistoryService.getLatestVersionOfExploration()
-            ).then((response: MetadataVersionHistoryResponse) => {
-              this.versionHistoryService.insertMetadataVersionHistoryData(
-                response.lastEditedVersionNumber,
-                response.metadataInPreviousVersion,
-                response.lastEditedCommitterUsername
-              );
-            });
+        );
+        // If the current category is not in the dropdown, add it
+        // as the first option.
+        if (!categoryIsInSelect2 &&
+            this.explorationCategoryService.savedMemento) {
+          this.CATEGORY_LIST_FOR_SELECT2.unshift({
+            id: this.explorationCategoryService.savedMemento as string,
+            text: this.explorationCategoryService.savedMemento as string
+          });
         }
 
-        this.hasPageLoaded = true;
-      });
+        this.stateNames = this.explorationStatesService.getStateNames();
+        this.explorationIsLinkedToStory = (
+          this.contextService.isExplorationLinkedToStory());
+      }
+      this.hasPageLoaded = true;
+    });
   }
 
   getLastEditedVersionNumber(): number {
@@ -323,11 +297,44 @@ export class SettingsTabComponent
       metadataDiffData.committerUsername);
     modalRef.componentInstance.oldVersion = metadataDiffData.oldVersionNumber;
 
-    modalRef.result.then(function() {
-      this.versionHistoryService.setCurrentPositionInVersionHistoryList(0);
-    }, function() {
-      this.versionHistoryService.setCurrentPositionInVersionHistoryList(0);
+    modalRef.result.then(() => {
+      this.versionHistoryService
+        .setCurrentPositionInMetadataVersionHistoryList(0);
+    }, () => {
+      this.versionHistoryService
+        .setCurrentPositionInMetadataVersionHistoryList(0);
     });
+  }
+
+  async updateMetadataVersionHistory(): Promise<void> {
+    this.versionHistoryService.resetMetadataVersionHistory();
+
+    const explorationData = (
+      await this.explorationDataService.getDataAsync(() => {}));
+
+    const explorationMetadata = this
+      .explorationMetadataObjectFactory
+      .createFromBackendDict(explorationData.exploration_metadata);
+
+    this.versionHistoryService.insertMetadataVersionHistoryData(
+      this.versionHistoryService.getLatestVersionOfExploration(),
+      explorationMetadata, '');
+
+    if (
+      this.versionHistoryService.getLatestVersionOfExploration() !== null
+    ) {
+      const metadataVersionHistory = await this
+        .versionHistoryBackendApiService
+        .fetchMetadataVersionHistoryAsync(
+          this.contextService.getExplorationId(),
+          this.versionHistoryService.getLatestVersionOfExploration()
+        );
+      this.versionHistoryService.insertMetadataVersionHistoryData(
+        metadataVersionHistory.lastEditedVersionNumber,
+        metadataVersionHistory.metadataInPreviousVersion,
+        metadataVersionHistory.lastEditedCommitterUsername
+      );
+    }
   }
 
   saveExplorationTitle(): void {
@@ -719,6 +726,7 @@ export class SettingsTabComponent
           () => {
             this.explorationTags = (
               this.explorationTagsService.displayed as string[]);
+            this.updateMetadataVersionHistory();
           }
         )
     );

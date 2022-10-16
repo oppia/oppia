@@ -185,9 +185,9 @@ angular.module('oppia').component('explorationEditorTab', {
         modalRef.componentInstance.oldVersion = stateDiffData.oldVersionNumber;
 
         modalRef.result.then(function() {
-          VersionHistoryService.setCurrentPositionInVersionHistoryList(0);
+          VersionHistoryService.setCurrentPositionInStateVersionHistoryList(0);
         }, function() {
-          VersionHistoryService.setCurrentPositionInVersionHistoryList(0);
+          VersionHistoryService.setCurrentPositionInStateVersionHistoryList(0);
         });
       };
 
@@ -227,7 +227,7 @@ angular.module('oppia').component('explorationEditorTab', {
             ctrl.interactionIsShown = true;
           }
 
-          VersionHistoryService.reset();
+          VersionHistoryService.resetStateVersionHistory();
           VersionHistoryService.insertStateVersionHistoryData(
             VersionHistoryService.getLatestVersionOfExploration(), stateData);
 

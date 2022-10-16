@@ -129,7 +129,8 @@ export class MetadataVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
-    this.versionHistoryService.decrementCurrentPositionInVersionHistoryList();
+    this.versionHistoryService
+      .decrementCurrentPositionInMetadataVersionHistoryList();
   }
 
   onClickExploreBackwardVersionHistory(): void {
@@ -150,8 +151,9 @@ export class MetadataVersionHistoryModalComponent
   }
 
   fetchPreviousVersionHistory(): void {
-    if (!this.versionHistoryService.shouldFetchNewData()) {
-      this.versionHistoryService.incrementCurrentPositionInVersionHistoryList();
+    if (!this.versionHistoryService.shouldFetchNewMetadataVersionHistory()) {
+      this.versionHistoryService
+        .incrementCurrentPositionInMetadataVersionHistoryList();
       return;
     }
     const diffData = this.versionHistoryService.getBackwardMetadataDiffData();
@@ -165,7 +167,7 @@ export class MetadataVersionHistoryModalComponent
           response.lastEditedCommitterUsername
         );
         this.versionHistoryService
-          .incrementCurrentPositionInVersionHistoryList();
+          .incrementCurrentPositionInMetadataVersionHistoryList();
       });
     }
   }

@@ -117,7 +117,9 @@ export class StateVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
-    this.versionHistoryService.decrementCurrentPositionInVersionHistoryList();
+    this
+      .versionHistoryService
+      .decrementCurrentPositionInStateVersionHistoryList();
   }
 
   onClickExploreBackwardVersionHistory(): void {
@@ -140,8 +142,9 @@ export class StateVersionHistoryModalComponent
   }
 
   fetchPreviousVersionHistory(): void {
-    if (!this.versionHistoryService.shouldFetchNewData()) {
-      this.versionHistoryService.incrementCurrentPositionInVersionHistoryList();
+    if (!this.versionHistoryService.shouldFetchNewStateVersionHistory()) {
+      this.versionHistoryService
+        .incrementCurrentPositionInStateVersionHistoryList();
       return;
     }
     const diffData = this.versionHistoryService.getBackwardStateDiffData();
@@ -156,7 +159,7 @@ export class StateVersionHistoryModalComponent
           response.lastEditedCommitterUsername
         );
         this.versionHistoryService
-          .incrementCurrentPositionInVersionHistoryList();
+          .incrementCurrentPositionInStateVersionHistoryList();
       });
     }
   }
