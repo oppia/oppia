@@ -40,8 +40,10 @@ describe('RandomSelector component', function() {
     component.generatorId = 'generatorId';
     component.initArgs = 'generatorId';
     component.objType = 'objType';
-
-    fixture.detectChanges();
+    component.customizationArgs = {
+      list_of_values: null,
+      value: null,
+    };
   });
 
   it('should initialise component', () => {
@@ -61,17 +63,14 @@ describe('RandomSelector component', function() {
         add_element_text: 'Add New Choice'
       }
     });
+    expect(component.getTemplateUrl()).toBe(
+      '/value_generator_handler/generatorId');
     expect(component.generatorId).toBe('generatorId');
     expect(component.customizationArgs.list_of_values).toEqual(['test']);
   });
 
   it('should initialise list_of_values as an empty array when list_of_values' +
   ' is not defined', () => {
-    component.customizationArgs = {
-      list_of_values: undefined,
-      value: null,
-    };
-
     component.ngOnInit();
 
     expect(component.customizationArgs.list_of_values).toEqual([]);
