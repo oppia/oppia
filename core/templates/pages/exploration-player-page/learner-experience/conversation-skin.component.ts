@@ -1438,10 +1438,6 @@ export class ConversationSkinComponent {
         this.displayedCard.getStateName()) !== -1
       )
     );
-    console.log(k);
-    console.log(this.displayedCard);
-    console.log(this.prevSessionStatesProgress);
-    console.log('nikihl')
     return k;
   }
 

@@ -248,7 +248,6 @@ angular.module('oppia').component('explorationEditorPage', {
       // Called on page load.
       ctrl.initExplorationPage = () => {
         EditabilityService.lockExploration(true);
-        console.log('editor page');
         return $q.all([
           ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {

@@ -45,7 +45,6 @@ export class ExplorationFeaturesBackendApiService {
 
   async fetchExplorationFeaturesAsync(
       explorationId: string): Promise<ExplorationFeatures> {
-    console.log('before failing')
     return this.http.get<ExplorationFeaturesBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ServicesConstants.EXPLORATION_FEATURES_URL,

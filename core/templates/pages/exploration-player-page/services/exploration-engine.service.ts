@@ -287,7 +287,6 @@ export class ExplorationEngineService {
   }
 
   checkAlwaysAskLearnersForAnswerDetails(): void {
-    console.log('Engine services')
     this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
       this._explorationId
     ).then((featuresData) => {

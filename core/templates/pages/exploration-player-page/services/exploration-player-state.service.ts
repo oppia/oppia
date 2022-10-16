@@ -219,7 +219,6 @@ export class ExplorationPlayerStateService {
 
   initExplorationPreviewPlayer(
       callback: (sateCard: StateCard, str: string) => void): void {
-    console.log('Player state')
     this.setExplorationMode();
     Promise.all([
       this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
