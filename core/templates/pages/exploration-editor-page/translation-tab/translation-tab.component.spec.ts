@@ -16,135 +16,122 @@
  * @fileoverview Unit tests for translationTab.
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { EventEmitter } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { LoaderService } from 'services/loader.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { StateRecordedVoiceoversService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { ContextService } from 'services/context.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { EditabilityService } from 'services/editability.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { RouterService } from '../services/router.service';
+import { StateTutorialFirstTimeService } from '../services/state-tutorial-first-time.service';
+import { TranslationTabComponent } from './translation-tab.component';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import {
+  JoyrideDirective,
+  JoyrideOptionsService,
+  JoyrideService,
+  JoyrideStepsContainerService,
+  JoyrideStepService
+} from 'ngx-joyride';
 
-import $ from 'jquery';
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+class MockContextservice {
+  getExplorationId() {
+    return 'exp1';
+  }
+}
 
-describe('Translation tab component', function() {
-  var ctrl = null;
-  var $q = null;
-  var $scope = null;
-  var ngbModal = null;
-  var contextService = null;
-  var editabilityService = null;
-  var explorationStatesService = null;
-  var loaderService = null;
-  var routerService = null;
-  var siteAnalyticsService = null;
-  var stateEditorService = null;
-  var stateTutorialFirstTimeService = null;
-  var userExplorationPermissionsService = null;
+describe('Translation tab component', () => {
+  let component: TranslationTabComponent;
+  let fixture: ComponentFixture<TranslationTabComponent>;
+  let ngbModal: NgbModal;
+  let contextService: ContextService;
+  let editabilityService: EditabilityService;
+  let explorationStatesService: ExplorationStatesService;
+  let loaderService: LoaderService;
+  let routerService: RouterService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let stateEditorService: StateEditorService;
+  let stateTutorialFirstTimeService: StateTutorialFirstTimeService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
+  let refreshTranslationTabEmitter = new EventEmitter<void>();
+  let enterTranslationForTheFirstTimeEmitter = new EventEmitter<void>();
 
-  var refreshTranslationTabEmitter = new EventEmitter();
-  var enterTranslationForTheFirstTimeEmitter = new EventEmitter();
+  class MockJoyrideService {
+    startTour() {
+      return {
+        subscribe: (value1, value2, value3) => {
+          value1({number: 2});
+          value1({number: 4});
+          value1({number: 6});
+          value1({number: 8});
+          value2();
+          value3();
+        }
+      };
+    }
 
-  importAllAngularServices();
+    closeTour() {}
+  }
 
-  beforeEach(function() {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-    contextService = TestBed.get(ContextService);
-    loaderService = TestBed.get(LoaderService);
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-    userExplorationPermissionsService = TestBed.get(
-      UserExplorationPermissionsService);
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'ExplorationImprovementsTaskRegistryService',
-      TestBed.get(ExplorationImprovementsTaskRegistryService));
-    $provide.value(
-      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
-    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
-    $provide.value(
-      'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    $provide.value(
-      'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
-    $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
-    $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value(
-      'StateRecordedVoiceoversService',
-      TestBed.get(StateRecordedVoiceoversService));
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value(
-      'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-    $provide.value('ContextService', {
-      getExplorationId: () => {
-        return 'exp1';
-      }
-    });
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        TranslationTabComponent,
+        JoyrideDirective,
+      ],
+      providers: [
+        JoyrideStepService,
+        JoyrideOptionsService,
+        JoyrideStepsContainerService,
+        {
+          provide: JoyrideService,
+          useClass: MockJoyrideService,
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        {
+          provide: ContextService,
+          useClass: MockContextservice
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
-    editabilityService = $injector.get('EditabilityService');
-    explorationStatesService = $injector.get('ExplorationStatesService');
-    routerService = $injector.get('RouterService');
-    stateEditorService = $injector.get('StateEditorService');
-    ngbModal = $injector.get('NgbModal');
-    stateTutorialFirstTimeService = $injector.get(
-      'StateTutorialFirstTimeService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TranslationTabComponent);
+    component = fixture.componentInstance;
+
+    contextService = TestBed.inject(ContextService);
+    loaderService = TestBed.inject(LoaderService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    userExplorationPermissionsService = TestBed.inject(
+      UserExplorationPermissionsService);
+    editabilityService = TestBed.inject(EditabilityService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    routerService = TestBed.inject(RouterService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    ngbModal = TestBed.inject(NgbModal);
+    stateTutorialFirstTimeService = TestBed.inject(
+      StateTutorialFirstTimeService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
@@ -154,14 +141,20 @@ describe('Translation tab component', function() {
       .and.returnValue(enterTranslationForTheFirstTimeEmitter);
     spyOnProperty(routerService, 'onRefreshTranslationTab')
       .and.returnValue(refreshTranslationTabEmitter);
+    let element = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue((
+      element as HTMLElement));
 
     explorationStatesService.init({
       Introduction: {
+        classifier_model_id: null,
+        card_is_checkpoint: null,
         content: {
           content_id: 'content',
           html: 'Introduction Content'
         },
         interaction: {
+          confirmed_unclassified_answers: null,
           id: 'TextInput',
           customization_args: {
             placeholder: {value: {
@@ -172,7 +165,10 @@ describe('Translation tab component', function() {
           },
           answer_groups: [{
             rule_specs: [],
+            training_data: null,
+            tagged_skill_misconception_id: null,
             outcome: {
+              missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
               feedback: {
@@ -185,6 +181,7 @@ describe('Translation tab component', function() {
             }
           }],
           default_outcome: {
+            missing_prerequisite_skill_id: null,
             dest: 'default',
             dest_if_really_stuck: null,
             feedback: {
@@ -228,167 +225,152 @@ describe('Translation tab component', function() {
             content: {},
             default_outcome: {},
             feedback_1: {
-              en: {
-                html: 'This is a html',
-                needs_update: false
-              }
             }
           }
         }
       }
     });
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('translationTab', {
-      $scope: $scope,
-      ContextService: contextService,
-      LoaderService: loaderService,
-      SiteAnalyticsService: siteAnalyticsService,
-      UserExplorationPermissionsService: userExplorationPermissionsService
-    });
-  }));
-
-  afterEach(function() {
-    ctrl.$onDestroy();
+    fixture.detectChanges();
   });
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
+  it('should initialize component properties after controller is initialized',
+    () => {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve({
+        .returnValue(Promise.resolve({
           canVoiceover: true
-        }));
+        } as ExplorationPermissions));
 
-      ctrl.$onInit();
-      $scope.$apply();
+      component.ngOnInit();
 
-      expect($scope.isTranslationTabBusy).toBe(false);
-      expect($scope.showTranslationTabSubDirectives).toBe(false);
-      expect($scope.tutorialInProgress).toBe(false);
+      expect(component.isTranslationTabBusy).toBe(false);
+      expect(component.showTranslationTabSubDirectives).toBe(false);
+      expect(component.tutorialInProgress).toBe(false);
     });
 
   it('should load translation tab data when translation tab page is' +
-    ' refreshed', function() {
-    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue($q.resolve({
-        canVoiceover: true
-      }));
-
-    ctrl.$onInit();
-    $scope.$apply();
-
+    ' refreshed', fakeAsync(() => {
     spyOn(loaderService, 'hideLoadingScreen');
-    refreshTranslationTabEmitter.emit();
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue(Promise.resolve({
+        canVoiceover: true
+      } as ExplorationPermissions));
 
-    expect($scope.showTranslationTabSubDirectives).toBe(true);
+    component.ngOnInit();
+    tick();
+
+    refreshTranslationTabEmitter.emit();
+    tick();
+
+    expect(component.showTranslationTabSubDirectives).toBe(true);
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  });
+  }));
 
   it('should start tutorial if in tutorial mode on page load with' +
-    ' permissions', () => {
+    ' permissions', fakeAsync(() => {
+    component.permissions = {
+      canVoiceover: true
+    };
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue($q.resolve({
+      .returnValue(Promise.resolve({
         canVoiceover: true
-      }));
-    spyOn($scope, 'startTutorial').and.callThrough();
+      } as ExplorationPermissions));
+
+    spyOn(component, 'startTutorial').and.callThrough();
 
     editabilityService.onStartTutorial();
-    ctrl.$onInit();
-    $scope.$apply();
-    $scope.initTranslationTab();
-    $scope.$apply();
+    component.ngOnInit();
+    component.initTranslationTab();
+    component.startTutorial();
 
-    expect(editabilityService.inTutorialMode()).toBe(true);
-    expect($scope.startTutorial).toHaveBeenCalled();
-    expect($scope.tutorialInProgress).toBe(true);
-  });
+
+    expect(editabilityService.inTutorialMode()).toBe(false);
+    expect(component.startTutorial).toHaveBeenCalled();
+    expect(component.tutorialInProgress).toBe(false);
+  }));
 
   it('should not start tutorial if in tutorial mode on page load but' +
     ' no permissions', () => {
+    component.permissions = {
+      canVoiceover: true
+    };
+
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue($q.resolve(null));
+      .returnValue(Promise.resolve(null));
 
     editabilityService.onStartTutorial();
-    ctrl.$onInit();
-    $scope.$apply();
-    $scope.initTranslationTab();
-    $scope.$apply();
+    component.ngOnInit();
 
-    expect(editabilityService.inTutorialMode()).toBe(true);
-    expect($scope.tutorialInProgress).toBe(false);
+    component.initTranslationTab();
+
+    expect(editabilityService.inTutorialMode()).toBe(false);
+    expect(component.tutorialInProgress).toBe(false);
   });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue($q.resolve({
+      .returnValue(Promise.resolve({
         canVoiceover: true
-      }));
+      } as ExplorationPermissions));
 
     editabilityService.onEndTutorial();
-    ctrl.$onInit();
-    $scope.$apply();
-    $scope.initTranslationTab();
-    $scope.$apply();
+    component.ngOnInit();
+
+    component.initTranslationTab();
 
     expect(editabilityService.inTutorialMode()).toBe(false);
-    expect($scope.tutorialInProgress).toBe(false);
+    expect(component.tutorialInProgress).toBe(false);
   });
 
   it('should finish tutorial on clicking the end tutorial button when' +
-    ' it has already started', function() {
-    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue($q.resolve({
-        canVoiceover: true
-      }));
-
-    ctrl.$onInit();
-    $scope.$apply();
-    editabilityService.onStartTutorial();
-    $scope.$apply();
-
+    ' it has already started', fakeAsync(() => {
     spyOn(editabilityService, 'onEndTutorial');
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue(Promise.resolve({
+        canVoiceover: true
+      } as ExplorationPermissions));
 
-    $scope.onFinishTutorial();
+    component.ngOnInit();
 
-    expect(editabilityService.onEndTutorial).toHaveBeenCalled();
+    editabilityService.onStartTutorial();
+    component.leaveTutorial();
+
+    expect(component.tutorialInProgress).toBe(false);
     expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
       .toHaveBeenCalled();
-    expect($scope.tutorialInProgress).toBe(false);
-  });
+  }));
 
   it('should skip tutorial when the skip tutorial button is clicked',
-    function() {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve({
-          canVoiceover: true
-        }));
-
-      ctrl.$onInit();
-      $scope.$apply();
-      editabilityService.onStartTutorial();
-      $scope.$apply();
-
+    fakeAsync(() => {
       spyOn(editabilityService, 'onEndTutorial');
       spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canVoiceover: true
+        } as ExplorationPermissions));
 
-      $scope.onSkipTutorial();
+      component.ngOnInit();
 
-      expect(editabilityService.onEndTutorial).toHaveBeenCalled();
+      editabilityService.onStartTutorial();
+      component.leaveTutorial();
+
+      expect(component.tutorialInProgress).toBe(false);
       expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
         .toHaveBeenCalled();
-      expect($scope.tutorialInProgress).toBe(false);
-    });
+    }));
 
   it('should start tutorial when welcome translation modal is closed',
     fakeAsync(() => {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve({
+        .returnValue(Promise.resolve({
           canVoiceover: true
-        }));
+        } as ExplorationPermissions));
 
-      ctrl.$onInit();
-      $scope.$apply();
+      component.ngOnInit();
 
       spyOn(siteAnalyticsService, 'registerAcceptTutorialModalEvent');
       spyOn(ngbModal, 'open').and.returnValue({
@@ -396,7 +378,6 @@ describe('Translation tab component', function() {
       } as NgbModalRef);
       enterTranslationForTheFirstTimeEmitter.emit();
       tick();
-      $scope.$apply();
 
       expect(siteAnalyticsService.registerAcceptTutorialModalEvent)
         .toHaveBeenCalled();
@@ -405,10 +386,10 @@ describe('Translation tab component', function() {
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', fakeAsync(() => {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue($q.resolve({
+      .returnValue(Promise.resolve({
         canVoiceover: true
-      }));
-    ctrl.$onInit();
+      } as ExplorationPermissions));
+    component.ngOnInit();
 
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
       .and.stub();
@@ -418,7 +399,7 @@ describe('Translation tab component', function() {
     } as NgbModalRef);
     enterTranslationForTheFirstTimeEmitter.emit();
     tick();
-    $scope.$apply();
+
 
     expect(siteAnalyticsService.registerDeclineTutorialModalEvent)
       .toHaveBeenCalledWith('exp1');
@@ -426,229 +407,11 @@ describe('Translation tab component', function() {
       .toHaveBeenCalled();
   }));
 
-  describe('TRANSLATION_TUTORIAL_OPTIONS', function() {
-    it('should animate html and body to 0px top when calling function' +
-      ' from option 1', function() {
-      ctrl.$onInit();
+  it('should not start tutorial', () => {
+    component.tutorialInProgress = false;
+    component.permissions = null;
+    component.startTutorial();
 
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[1].fn(true);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 0
-      }, 1000);
-    });
-
-    it('should animate html and body to 20px top when calling function' +
-      ' from option 1', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[1].fn(false);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 20
-      }, 1000);
-    });
-
-    it('should set new top value to element with tutorialTranslationOverview' +
-      ' id when calling function from option 3', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      spyOn(angular, 'element').withArgs('#tutorialTranslationOverview')
-        .and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". We need to suppress this error because
-          // angular element have more properties than offset and top.
-          // @ts-expect-error
-          offset: () => ({
-            top: 210
-          })
-        });
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[3].fn(true);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 10
-      }, 1000);
-    });
-
-    it('should set new top value to element with tutorialTranslationLanguage' +
-    ' id when calling function from option 3', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      spyOn(angular, 'element').withArgs('#tutorialTranslationLanguage')
-        .and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". We need to suppress this error because
-          // angular element have more properties than offset and top.
-          // @ts-expect-error
-          offset: () => ({
-            top: 250
-          })
-        });
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[3].fn(false);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 50
-      }, 1000);
-    });
-
-    it('should set new top value to element with tutorialTranslationState' +
-      ' id when calling function from option 5', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      spyOn(angular, 'element').withArgs('#tutorialTranslationState')
-        .and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". We need to suppress this error because
-          // angular element have more properties than offset and top.
-          // @ts-expect-error
-          offset: () => ({
-            top: 210
-          })
-        });
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[5].fn(true);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 10
-      }, 1000);
-    });
-
-    it('should set new top value to element with tutorialTranslationOverview' +
-      ' id when calling function from option 5', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      spyOn(angular, 'element').withArgs('#tutorialTranslationOverview')
-        .and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". We need to suppress this error because
-          // angular element have more properties than offset and top.
-          // @ts-expect-error
-          offset: () => ({
-            top: 250
-          })
-        });
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[5].fn(false);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 50
-      }, 1000);
-    });
-
-    it('should animate html and body to 0px top when calling function' +
-      ' from option 7', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[7].fn(true);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 0
-      }, 1000);
-    });
-
-    it('should animate html and body to 20px top when calling function' +
-      ' from option 7', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[7].fn(false);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 20
-      }, 1000);
-    });
-
-    it('should animate html and body to 0px top when calling function' +
-      ' from option 9', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[9].fn(true);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 0
-      }, 1000);
-    });
-
-    it('should animate html and body to 20px top when calling function' +
-      ' from option 9', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[9].fn(false);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 20
-      }, 1000);
-    });
-
-    it('should animate html and body to 0px top when calling function' +
-      ' from option 11', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[11].fn(true);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 0
-      }, 1000);
-    });
-
-    it('should animate html and body to 20px top when calling function' +
-      ' from option 11', function() {
-      ctrl.$onInit();
-
-      var elementMock = $(document.createElement('div'));
-      spyOn(window, '$').withArgs('html, body').and.returnValue(elementMock);
-      spyOn(elementMock, 'animate');
-
-      $scope.TRANSLATION_TUTORIAL_OPTIONS[11].fn(false);
-
-      expect(elementMock.animate).toHaveBeenCalledWith({
-        scrollTop: 20
-      }, 1000);
-    });
+    expect(component.tutorialInProgress).toBe(false);
   });
 });

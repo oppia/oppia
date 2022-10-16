@@ -29,12 +29,13 @@ import { ConvertToPlainTextPipe } from './string-utility-filters/convert-to-plai
 import { ReplaceInputsWithEllipsesPipe } from './string-utility-filters/replace-inputs-with-ellipses.pipe';
 import { TruncatePipe } from './string-utility-filters/truncate.pipe';
 import { WrapTextWithEllipsisPipe } from './string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { FormatTimePipe } from './format-timer.pipe';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    StringUtilityPipesModule
+    StringUtilityPipesModule,
   ],
   providers: [
     ReplaceInputsWithEllipsesPipe,
@@ -44,11 +45,13 @@ import { WrapTextWithEllipsisPipe } from './string-utility-filters/wrap-text-wit
     WrapTextWithEllipsisPipe,
   ],
   declarations: [
-    LimitToPipe
+    LimitToPipe,
+    FormatTimePipe
   ],
   exports: [
     LimitToPipe,
-    StringUtilityPipesModule
+    StringUtilityPipesModule,
+    FormatTimePipe
   ],
 })
 

@@ -179,9 +179,15 @@ describe('State Translation Editor Component', () => {
         content_1: {
           en: {
             needs_update: false,
+            duration_secs: null,
+            filename: null,
+            file_size_bytes: null,
           },
           es: {
             needs_update: true,
+            duration_secs: null,
+            filename: null,
+            file_size_bytes: null,
           }
         }
       }
@@ -192,7 +198,7 @@ describe('State Translation Editor Component', () => {
     },
     card_is_checkpoint: null,
     next_content_id_index: null,
-  } as unknown as StateBackendDict;
+  } as StateBackendDict;
   let stateObj = null;
 
   beforeEach(waitForAsync(() => {
@@ -268,9 +274,20 @@ describe('State Translation Editor Component', () => {
           translation: 'This is a html',
           needs_update: true
         })
-      ),
-      updateWrittenTranslation: () => {}
-    } as unknown as WrittenTranslations);
+      ) as WrittenTranslation,
+      updateWrittenTranslation: () => {},
+      translationsMapping: null,
+      _writtenTranslationObjectFactory: null,
+      getAllContentIds: null,
+      markAllTranslationsAsNeedingUpdate: null,
+      getLanguageCodes: null,
+      hasUnflaggedWrittenTranslations: null,
+      addContentId: null,
+      deleteContentId: null,
+      addWrittenTranslation: null,
+      toggleNeedsUpdateAttribute: null,
+      toBackendDict: null
+    } as WrittenTranslations);
 
     component.ngOnInit();
     fixture.detectChanges();
@@ -305,8 +322,20 @@ describe('State Translation Editor Component', () => {
             translation: 'This is a second html',
             needs_update: true
           })
-        )
-      } as unknown as WrittenTranslations;
+        ),
+        updateWrittenTranslation: () => {},
+        translationsMapping: null,
+        _writtenTranslationObjectFactory: null,
+        getAllContentIds: null,
+        markAllTranslationsAsNeedingUpdate: null,
+        getLanguageCodes: null,
+        hasUnflaggedWrittenTranslations: null,
+        addContentId: null,
+        deleteContentId: null,
+        addWrittenTranslation: null,
+        toggleNeedsUpdateAttribute: null,
+        toBackendDict: null
+      } as WrittenTranslations;
       spyOn(translationTabActiveContentIdService, 'getActiveContentId').and
         .returnValue('content_1');
       spyOn(ngbModal, 'open').and.returnValue({
@@ -334,8 +363,20 @@ describe('State Translation Editor Component', () => {
             translation: 'This is a second html',
             needs_update: true
           })
-        )
-      } as unknown as WrittenTranslations;
+        ),
+        updateWrittenTranslation: () => {},
+        translationsMapping: null,
+        _writtenTranslationObjectFactory: null,
+        getAllContentIds: null,
+        markAllTranslationsAsNeedingUpdate: null,
+        getLanguageCodes: null,
+        hasUnflaggedWrittenTranslations: null,
+        addContentId: null,
+        deleteContentId: null,
+        addWrittenTranslation: null,
+        toggleNeedsUpdateAttribute: null,
+        toBackendDict: null
+      } as WrittenTranslations;
       spyOn(translationTabActiveContentIdService, 'getActiveContentId').and
         .returnValue('content_1');
       spyOn(ngbModal, 'open').and.returnValue({
@@ -365,8 +406,20 @@ describe('State Translation Editor Component', () => {
             translation: 'This is a second html',
             needs_update: true
           })
-        )
-      } as unknown as WrittenTranslations;
+        ),
+        updateWrittenTranslation: () => {},
+        translationsMapping: null,
+        _writtenTranslationObjectFactory: null,
+        getAllContentIds: null,
+        markAllTranslationsAsNeedingUpdate: null,
+        getLanguageCodes: null,
+        hasUnflaggedWrittenTranslations: null,
+        addContentId: null,
+        deleteContentId: null,
+        addWrittenTranslation: null,
+        toggleNeedsUpdateAttribute: null,
+        toBackendDict: null
+      } as WrittenTranslations;
       spyOn(translationTabActiveContentIdService, 'getActiveContentId').and
         .returnValue('content_1');
       spyOn(ngbModal, 'open').and.returnValue({
@@ -405,8 +458,20 @@ describe('State Translation Editor Component', () => {
             translation: 'This is a second html',
             needs_update: true
           })
-        )
-      } as unknown as WrittenTranslations;
+        ),
+        updateWrittenTranslation: () => {},
+        translationsMapping: null,
+        _writtenTranslationObjectFactory: null,
+        getAllContentIds: null,
+        markAllTranslationsAsNeedingUpdate: null,
+        getLanguageCodes: null,
+        hasUnflaggedWrittenTranslations: null,
+        addContentId: null,
+        deleteContentId: null,
+        addWrittenTranslation: null,
+        toggleNeedsUpdateAttribute: null,
+        toBackendDict: null
+      } as WrittenTranslations;
       component.cancelEdit();
 
       expect(

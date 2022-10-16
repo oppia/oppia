@@ -204,7 +204,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       // same position.
       // For example, if the list of items in the same position is [1, 2, 3],
       // then the list of lists will be [[], [1, 2, 3], []].
-      if (savedSolution.length) {
+      if (savedSolution && savedSolution.length) {
         // Pre populate with the saved solution, if present.
         for (let i = 0; i < savedSolution.length; i++) {
           let items = [];
@@ -226,7 +226,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       }
     } else {
       // Use Array to store the single item in same position.
-      if (savedSolution.length) {
+      if (savedSolution && savedSolution.length) {
         // Pre populate with the saved solution, if present.
         for (let i = 0; i < savedSolution.length; i++) {
           let htmlContent = this.getHtmlOfContentId(savedSolution[i][0]);

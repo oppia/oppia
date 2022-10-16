@@ -3,38 +3,45 @@
     <div id="tutorialTranslationLanguage">
       <span class="e2e-test-language-selector-label oppia-language-selector-label">
         <strong>
-          <span ng-if="inVoiceoverMode">Voiceovers</span>
-          <span ng-if="inTranslationMode">Translations</span> for language:
+          <span *ngIf="inVoiceoverMode">Voiceovers</span>
+          <span *ngIf="inTranslationMode">Translations</span> for language:
         </strong>
       </span>
-      <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector e2e-test-translation-language-selector oppia-autofocus" ng-change="changeTranslationLanguage()" ng-model="languageCode"
-              ng-options="language.id as language.description for language in languageCodesAndDescriptions" focus-on="audioTranslationLanguageCodeField">
+      <select id="audioTranslationLanguageCodeField"
+              class="oppia-translation-language-selector e2e-test-translation-language-selector oppia-autofocus"
+              (change)="changeTranslationLanguage()"
+              [(ngModel)]="languageCode">
+        <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id" (focus)="audioTranslationLanguageCodeField">
+          {{ language.description }}
+        </option>
       </select>
     </div>
-    <div ng-if="canShowTabModeSwitcher()" class="oppia-mode-change-section">
+    <div *ngIf="canShowTabModeSwitcher()" class="oppia-mode-change-section">
       <label class="oppia-mode-change-label">Mode: </label>
       <button class="oppia-translation-tab-mode-changer oppia-translation-mode e2e-test-translation-mode"
-              uib-tooltip="Translation mode" tooltip-placement="bottom"
-              ng-class="{'oppia-active-mode' : inTranslationMode}"
-              ng-click="changeActiveMode(TRANSLATION_MODE)">
+              [ngbTooltip]="'Translation mode'"
+              placement="bottom"
+              [ngClass]="{'oppia-active-mode' : inTranslationMode}"
+              (click)="changeActiveMode(TRANSLATION_MODE)">
         <i class="fas fa-language"></i>
       </button>
       <button class="oppia-translation-tab-mode-changer oppia-voiceover-mode e2e-test-voiceover-mode"
-              uib-tooltip="Voiceover mode" tooltip-placement="bottom"
-              ng-class="{'oppia-active-mode' : inVoiceoverMode}"
-              ng-click="changeActiveMode(VOICEOVER_MODE)">
+              [ngbTooltip]="'Voiceover mode'"
+              placement="bottom"
+              [ngClass]="{'oppia-active-mode' : inVoiceoverMode}"
+              (click)="changeActiveMode(VOICEOVER_MODE)">
         <i class="fas fa-microphone"></i>
       </button>
     </div>
   </div>
   <div class="oppia-translation-progress">
     <div class="e2e-test-progress-info">
-      <strong>Exploration <[inVoiceoverMode ? 'voiceover' : 'translation']> progress:</strong>
+      <strong>Exploration {{ inVoiceoverMode ? 'voiceover' : 'translation' }} progress:</strong>
     </div>
     <div class="progress oppia-translation-progress-bar">
-      <div class="progress-bar bg-success" role="progressbar" ng-style="getTranslationProgressStyle()"></div>
+      <div class="progress-bar bg-success" role="progressbar" [ngStyle]="getTranslationProgressStyle()"></div>
     </div>
-    <span aria-label="<[getTranslationProgressAriaLabel()]>" role="status" class="oppia-numerical-progress-status e2e-test-translation-numerical-status">(<[numberOfRequiredAudio - numberOfAudioNotAvailable]>/<[numberOfRequiredAudio]>)</span>
+    <span [attr.aria-label]="getTranslationProgressAriaLabel()" role="status" class="oppia-numerical-progress-status e2e-test-translation-numerical-status">({{ numberOfRequiredAudio - numberOfAudioNotAvailable }}/{{ numberOfRequiredAudio }})</span>
   </div>
 </div>
 
