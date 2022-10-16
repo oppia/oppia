@@ -602,7 +602,7 @@ def managed_webdriverio_server(
         chrome_version: str|None. The version of Google Chrome to run the tests
             on. If None, then the currently-installed version of Google Chrome
             is used instead.
-        stdout: int. This parameter specify the executed program's standard
+        stdout: int. This parameter specifies the executed program's standard
             output file handle.
         mobile: bool. Whether to run the webdriverio tests in mobile mode.
 
