@@ -1,5 +1,5 @@
 <div class="question-editor-container">
-  <div *ngIf="editorIsOpen" class="question-editor-parent">
+  <div *ngIf="editorIsOpen && question" class="question-editor-parent">
     <mat-card class="oppia-page-card oppia-mobile-collapsible-card">
       <div class="difficulty-card-header oppia-mobile-collapsible-card-header" (click)="toggleDifficultyCard()">
         <h3>Difficulty</h3>
@@ -39,14 +39,12 @@
       </mat-card>
       <button class="btn btn-success btn-sm" (click)="addSkill()">Link Another Skill</button>
     </div>
-    <div *ngIf="question">
-      <oppia-question-editor [questionId]="questionId"
-                             [misconceptionsBySkill]="misconceptionsBySkill"
-                             [questionStateData]="questionStateData"
-                             [question]="question"
-                             [userCanEditQuestion]="canEditQuestion">
-      </oppia-question-editor>
-    </div>
+    <oppia-question-editor [questionId]="questionId"
+                           [misconceptionsBySkill]="misconceptionsBySkill"
+                           [questionStateData]="questionStateData"
+                           [question]="question"
+                           [userCanEditQuestion]="canEditQuestion">
+    </oppia-question-editor>
     <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && question.getValidationErrorMessage()">
       {{question.getValidationErrorMessage()}}
     </div>
