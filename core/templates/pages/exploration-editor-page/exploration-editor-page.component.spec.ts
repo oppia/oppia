@@ -868,4 +868,3 @@ describe('Exploration editor page component', () => {
     }));
   });
 });
-

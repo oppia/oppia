@@ -630,4 +630,3 @@ angular.module('oppia').directive('explorationEditorPage',
     downgradeComponent({
       component: ExplorationEditorPageComponent
     }) as angular.IDirectiveFactory);
-
