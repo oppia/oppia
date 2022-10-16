@@ -306,11 +306,18 @@ class DraftUpgradeUtil:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
 
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
         Raises:
             InvalidDraftConversionException. The conversion cannot be
                 completed.
         """
-        raise InvalidDraftConversionException('Conversion cannot be completed.')
+        for exp_change in draft_change_list:
+            if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+        return draft_change_list
 
     @classmethod
     def _convert_states_v51_dict_to_v52_dict(

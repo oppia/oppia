@@ -6866,7 +6866,6 @@ title: Old Title
         self.assertEqual(exploration.title, 'new title')
         self.assertEqual(exploration.correctness_feedback_enabled, False)
 
-
     def test_update_exploration_with_mark_translation_needs_update_changes(
         self
     ) -> None:
@@ -6880,7 +6879,6 @@ title: Old Title
                 False
             )
         )
-
         entity_translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
                 feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
@@ -6896,7 +6894,6 @@ title: Old Title
                 'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
                 'content_id': 'content_0'
             })], 'Marked translation need update.')
-
         entity_translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
                 feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
@@ -6906,7 +6903,6 @@ title: Old Title
         self.assertEqual(len(entity_translations), 1)
         self.assertTrue(
             entity_translations[0].translations['content_0'].needs_update)
-
 
     def test_update_exploration_with_remove_translation_changes(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -7731,6 +7727,28 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             updated_exploration = exp_services.get_exp_with_draft_applied(
                 'exp_id', self.USER_ID)
         self.assertIsNone(updated_exploration)
+
+    def test_get_exp_with_draft_applied_when_draft_has_exp_property_changes(
+        self
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exp_services.save_new_exploration(self.USER_ID, exploration)
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'New title'
+        }).to_dict()]
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, 'exp_id'), user_id=self.USER_ID,
+            exploration_id='exp_id',
+            draft_change_list=change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=2).put()
+        updated_exploration = exp_services.get_exp_with_draft_applied(
+            'exp_id', self.USER_ID)
+        self.assertFalse(updated_exploration is None)
 
 
 class ApplyDraftUnitTests(test_utils.GenericTestBase):

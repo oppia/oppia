@@ -10937,6 +10937,293 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
+    def test_changes_are_mergeable_when_translations_changes_do_not_conflict(
+        self
+    ) -> None:
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        # Adding content, feedbacks, solutions so that
+        # translations can be added later on.
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>First State Content.</p>'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'widget_customization_args',
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': '',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                }
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': ''
+                },
+                'param_changes': [],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>Feedback 1.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'hints',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': '<p>Hint 1.</p>'
+                    }
+                }
+            ]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'next_content_id_index',
+            'old_value': 1,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': 2
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                },
+                'correct_answer': 'Solution'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Second State Content.</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list,
+            'Added various contents.')
+
+        change_list_2 = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola'
+                            ]
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None
+                },
+                'training_data': []
+            }]
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_2,
+            'Added answer group.')
+
+        # Adding some translations to the first state.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'cmd': 'mark_translations_needs_update',
+            'content_id': 'content',
+        }), exp_domain.ExplorationChange({
+            'cmd': 'mark_translations_needs_update',
+            'content_id': 'default_outcome'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'remove_translations',
+            'content_id': 'default_outcome'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_3,
+            'Added some translations.')
+
+        # Adding translations again to the different contents
+        # of same state to check that they can be merged.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'new_state_name': 'Intro-Rename',
+            'cmd': 'rename_state',
+            'old_state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'content_id': 'ca_placeholder_0',
+            'cmd': 'remove_translations'
+        }), exp_domain.ExplorationChange({
+            'content_id': 'hint_1',
+            'cmd': 'remove_translations'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'Introduction',
+            'cmd': 'rename_state',
+            'old_state_name': 'Intro-Rename'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_4)
+        self.assertEqual(changes_are_mergeable, False)
+
+        # Adding translations to the second state to check
+        # that they can be merged even in the same property.
+        change_list_5 = [exp_domain.ExplorationChange({
+            'content_id': 'content',
+            'cmd': 'mark_translations_needs_update'
+        })]
+
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_5)
+        self.assertEqual(changes_are_mergeable_1, False)
+
+        # Add changes to the different content of first state to
+        # check that translation changes to some properties doesn't
+        # affects the changes of content of other properties.
+        change_list_6 = [exp_domain.ExplorationChange({
+            'old_value': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                }
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder Changed.',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': 'Feedback 1.'
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>Feedback 2.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            }
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_6,
+            'Changing Customization Args Placeholder in First State.')
+        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 4, change_list_5)
+        self.assertEqual(changes_are_mergeable_3, False)
+
     def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(
         self
     ) -> None:

@@ -61,7 +61,34 @@ class EntityTranslationsModelGenerationOneOffJobTests(
             'param_changes': [],
             'interaction': {
                 'solution': None,
-                'answer_groups': [],
+                'answer_groups': [{
+                    'outcome': {
+                        'feedback': {
+                            'content_id': 'feedback_1',
+                            'html': '<p>Feedback</p>'
+                        },
+                        'missing_prerequisite_skill_id': None,
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None
+                    },
+                    'training_data': [],
+                    'rule_specs': [{
+                        'inputs': {
+                            'x': {
+                                'normalizedStrSet': [
+                                    'Hello',
+                                    'Hola',
+                                    'Hi'],
+                                'contentId': 'rule_input_2'
+                            }
+                        },
+                        'rule_type': 'StartsWith'
+                    }],
+                    'tagged_skill_misconception_id': None
+                }],
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
@@ -94,7 +121,9 @@ class EntityTranslationsModelGenerationOneOffJobTests(
                 'voiceovers_mapping': {
                     'content': {},
                     'default_outcome': {},
-                    'ca_placeholder_1': {}
+                    'ca_placeholder_1': {},
+                    'feedback_1': {},
+                    'rule_input_2': {}
                 }
             },
             'written_translations': {
@@ -132,6 +161,30 @@ class EntityTranslationsModelGenerationOneOffJobTests(
                         'bn': {
                             'data_format': 'unicode',
                             'translation': 'Translated placeholder in Bangla',
+                            'needs_update': False
+                        }
+                    },
+                    'feedback_1': {
+                        'hi': {
+                            'data_format': 'html',
+                            'translation': 'Translated feedback in Hindi',
+                            'needs_update': False
+                        },
+                        'bn': {
+                            'data_format': 'html',
+                            'translation': 'Translated feedback in Bangla',
+                            'needs_update': False
+                        }
+                    },
+                    'rule_input_2': {
+                        'hi': {
+                            'data_format': 'set_of_normalized_string',
+                            'translation': ['test1', 'test2', 'test3'],
+                            'needs_update': False
+                        },
+                        'bn': {
+                            'data_format': 'set_of_normalized_string',
+                            'translation': ['test1', 'test2', 'test3'],
                             'needs_update': False
                         }
                     }

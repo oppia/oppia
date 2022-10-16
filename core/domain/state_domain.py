@@ -2252,20 +2252,6 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             lambda x: x.content_id
         )
 
-    def get_html(self) -> List[str]:
-        """Get all html from SubtitledHtml in the customization argument.
-
-        Returns:
-            list(str). All html strings in the customization argument.
-        """
-
-        return InteractionCustomizationArg.traverse_by_schema_and_get(
-            self.schema,
-            self.value,
-            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-            lambda x: x.html
-        )
-
     def validate_subtitled_html(self) -> None:
         """Calls the validate method on all SubtitledHtml domain objects in
         the customization arguments.
@@ -4334,9 +4320,6 @@ class State(translation_domain.BaseTranslatableObject):
             ca_specs_dict = interaction_specs[interaction_id][
                 'customization_arg_specs']
             for spec in ca_specs_dict:
-                if not spec['name'] in customisation_args:
-                    continue
-
                 customisation_arg = customisation_args[spec['name']]
                 contents = (
                     InteractionCustomizationArg.traverse_by_schema_and_get(

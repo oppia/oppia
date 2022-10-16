@@ -56,6 +56,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.dummy_entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
             translation_dict)
+
     def test_get_all_html_in_exploration_with_drag_and_drop_interaction(
         self
     ) -> None:
@@ -209,10 +210,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry, 'get_interaction_by_id',
             classmethod(mock_get_interaction_by_id))
 
+        html_list: List[str] = []
+
+        def _append_to_list(html_str: str) -> str:
+            html_list.append(html_str)
+            return html_str
         with rules_registry_swap, interaction_registry_swap:
-            html_list = []
             state_domain.State.convert_html_fields_in_state(
-            state.to_dict(), lambda x: html_list.append(x))
+            state.to_dict(), _append_to_list)
 
         self.assertItemsEqual(
             html_list,
@@ -318,9 +323,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_solution(solution)
 
         exp_services.save_new_exploration('owner_id', exploration)
-        html_list = []
+        html_list: List[str] = []
+
+        def _append_to_list(html_str: str) -> str:
+            html_list.append(html_str)
+            return html_str
+
         state_domain.State.convert_html_fields_in_state(
-            state.to_dict(), lambda x: html_list.append(x))
+            state.to_dict(), _append_to_list)
 
         self.assertItemsEqual(
             html_list,
@@ -468,11 +478,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry, 'get_interaction_by_id',
             classmethod(mock_get_interaction_by_id))
 
-        with rules_registry_swap, interaction_registry_swap:
-            html_list = []
-            state_domain.State.convert_html_fields_in_state(
-                state.to_dict(), lambda x: html_list.append(x))
+        html_list: List[str] = []
 
+        def _append_to_list(html_str: str) -> str:
+            html_list.append(html_str)
+            return html_str
+        with rules_registry_swap, interaction_registry_swap:
+            state_domain.State.convert_html_fields_in_state(
+                state.to_dict(), _append_to_list)
 
         self.assertItemsEqual(
             html_list,
@@ -556,7 +569,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'The rule spec does not belong to a valid format.'):
                 state_domain.State.convert_html_fields_in_state(
                     state.to_dict(), lambda x: x)
-
 
     def test_update_customization_args_with_invalid_content_id(self) -> None:
         """Test the method for updating interaction customization arguments

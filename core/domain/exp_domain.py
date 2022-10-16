@@ -41,7 +41,7 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-    Callable, Dict, List, Mapping, Optional, Sequence,
+    Dict, List, Mapping, Optional, Sequence,
     Set, Tuple, Union, cast, overload
 )
 from typing_extensions import Final, Literal, TypedDict
