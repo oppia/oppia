@@ -26,6 +26,7 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { JoyrideModule } from 'ngx-joyride';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatMenuModule } from '@angular/material/menu';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -110,6 +111,7 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
     SmartRouterModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
+    MatMenuModule,
     FormsModule,
     MatPaginatorModule,
     RouterModule.forRoot([]),
