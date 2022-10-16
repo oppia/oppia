@@ -24,7 +24,6 @@ core.controllers.suggestion_test
 core.controllers.topic_editor_test
 core.controllers.topics_and_skills_dashboard_test
 core.controllers.voice_artist_test
-core.domain.action_registry_test
 core.domain.app_feedback_report_domain_test
 core.domain.app_feedback_report_services_test
 core.domain.auth_services_test
