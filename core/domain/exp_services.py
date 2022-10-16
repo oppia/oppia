@@ -114,6 +114,7 @@ class UserExplorationDataDict(TypedDict):
     is_version_of_draft_valid: Optional[bool]
     draft_changes: Dict[str, str]
     email_preferences: user_domain.UserExplorationPrefsDict
+    exploration_metadata: exp_domain.ExplorationMetadata
 
 
 class SnapshotsMetadataDict(TypedDict):
@@ -2883,7 +2884,8 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
-        'edits_allowed': exploration.edits_allowed
+        'edits_allowed': exploration.edits_allowed,
+        'exploration_metadata': exploration.get_metadata().to_dict()
     }
 
     return editor_dict

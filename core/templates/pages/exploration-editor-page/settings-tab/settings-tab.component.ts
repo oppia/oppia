@@ -58,6 +58,10 @@ import { UserEmailPreferencesService } from '../services/user-email-preferences.
 import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
 import { ExplorationEditorPageConstants } from '../exploration-editor-page.constants';
 import { AppConstants } from 'app.constants';
+import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { MetadataDiffData, VersionHistoryService } from '../services/version-history.service';
+import { MetadataVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { MetadataVersionHistoryModalComponent } from '../modal-templates/metadata-version-history-modal.component';
 
 @Component({
   selector: 'oppia-settings-tab',
@@ -136,6 +140,7 @@ export class SettingsTabComponent
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
+    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private explorationObjectiveService: ExplorationObjectiveService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationParamSpecsService: ExplorationParamSpecsService,
@@ -151,6 +156,8 @@ export class SettingsTabComponent
     private userExplorationPermissionsService:
       UserExplorationPermissionsService,
     private userService: UserService,
+    private versionHistoryBackendApiService: VersionHistoryBackendApiService,
+    private versionHistoryService: VersionHistoryService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
   ) {}
@@ -222,31 +229,104 @@ export class SettingsTabComponent
     // settings tab directly (by entering a URL that ends with
     // /settings) results in a console error.
 
+    this.versionHistoryService.reset();
+
     this.hasPageLoaded = false;
-    this.explorationDataService.getDataAsync(() => {}).then(() => {
-      if (this.explorationStatesService.isInitialized()) {
-        var categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
-          (categoryItem) => {
-            return (
-              categoryItem.id ===
-                  this.explorationCategoryService.savedMemento);
+    this.explorationDataService.getDataAsync(() => {}).then(
+      (explorationData) => {
+        if (this.explorationStatesService.isInitialized()) {
+          var categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
+            (categoryItem) => {
+              return (
+                categoryItem.id ===
+                    this.explorationCategoryService.savedMemento);
+            }
+          );
+          // If the current category is not in the dropdown, add it
+          // as the first option.
+          if (!categoryIsInSelect2 &&
+              this.explorationCategoryService.savedMemento) {
+            this.CATEGORY_LIST_FOR_SELECT2.unshift({
+              id: this.explorationCategoryService.savedMemento as string,
+              text: this.explorationCategoryService.savedMemento as string
+            });
           }
-        );
-        // If the current category is not in the dropdown, add it
-        // as the first option.
-        if (!categoryIsInSelect2 &&
-            this.explorationCategoryService.savedMemento) {
-          this.CATEGORY_LIST_FOR_SELECT2.unshift({
-            id: this.explorationCategoryService.savedMemento as string,
-            text: this.explorationCategoryService.savedMemento as string
-          });
+
+          this.stateNames = this.explorationStatesService.getStateNames();
+          this.explorationIsLinkedToStory = (
+            this.contextService.isExplorationLinkedToStory());
+        }
+        const explorationMetadata = this
+          .explorationMetadataObjectFactory
+          .createFromBackendDict(explorationData.exploration_metadata);
+        this.versionHistoryService.insertMetadataVersionHistoryData(
+          this.versionHistoryService.getLatestVersionOfExploration(),
+          explorationMetadata, '');
+
+        if (
+          this.versionHistoryService.getLatestVersionOfExploration() !== null
+        ) {
+          this.versionHistoryBackendApiService
+            .fetchMetadataVersionHistoryAsync(
+              this.contextService.getExplorationId(),
+              this.versionHistoryService.getLatestVersionOfExploration()
+            ).then((response: MetadataVersionHistoryResponse) => {
+              this.versionHistoryService.insertMetadataVersionHistoryData(
+                response.lastEditedVersionNumber,
+                response.metadataInPreviousVersion,
+                response.lastEditedCommitterUsername
+              );
+            });
         }
 
-        this.stateNames = this.explorationStatesService.getStateNames();
-        this.explorationIsLinkedToStory = (
-          this.contextService.isExplorationLinkedToStory());
-      }
-      this.hasPageLoaded = true;
+        this.hasPageLoaded = true;
+      });
+  }
+
+  getLastEditedVersionNumber(): number {
+    return (
+      this
+        .versionHistoryService
+        .getBackwardMetadataDiffData()
+        .oldVersionNumber
+    );
+  }
+
+  getLastEditedCommitterUsername(): string {
+    return (
+      this
+        .versionHistoryService
+        .getBackwardMetadataDiffData()
+        .committerUsername
+    );
+  }
+
+  canShowExploreVersionHistoryButton(): boolean {
+    return this.versionHistoryService.canShowBackwardMetadataDiffData();
+  }
+
+  onClickExploreVersionHistoryButton(): void {
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      MetadataVersionHistoryModalComponent, {
+        backdrop: true,
+        windowClass: 'metadata-diff-modal',
+        size: 'xl'
+      });
+
+    const metadataDiffData: MetadataDiffData = this
+      .versionHistoryService
+      .getBackwardMetadataDiffData();
+
+    modalRef.componentInstance.newMetadata = metadataDiffData.newMetadata;
+    modalRef.componentInstance.oldMetadata = metadataDiffData.oldMetadata;
+    modalRef.componentInstance.committerUsername = (
+      metadataDiffData.committerUsername);
+    modalRef.componentInstance.oldVersion = metadataDiffData.oldVersionNumber;
+
+    modalRef.result.then(function() {
+      this.versionHistoryService.setCurrentPositionInVersionHistoryList(0);
+    }, function() {
+      this.versionHistoryService.setCurrentPositionInVersionHistoryList(0);
     });
   }
 
