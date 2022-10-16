@@ -492,7 +492,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             self.assertTrue(self.USER_ID_NEW not in model.editor_ids)
 
     def test_deassign_user_from_blog_post_handles_invalid_user_id(self) -> None:
-        # If the BlogPostRightsModel has not been created for a User, the
+        # If the user is not in the editor list of any blog post, the
         # method 'BlogPostRightsModel.deassign_user_from_all_blog_posts()'
         # should do nothing and exit.
         blog_models.BlogPostRightsModel.deassign_user_from_all_blog_posts(

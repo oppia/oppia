@@ -206,6 +206,9 @@ class LearnerGroupModel(base_models.BaseModel):
                     'story_ids': []
                 }
             else:
+                # To get to this branch, the user_id would need to be in
+                # facilitator_user_ids.
+                assert user_id in learner_group_model.facilitator_user_ids
                 learner_group_data = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
@@ -280,6 +283,9 @@ class LearnerGroupModel(base_models.BaseModel):
             # If the user has been invited to join the group, delete the
             # user from the invited_learner_user_ids list.
             else:
+                # To get to this branch, the user_id would need to be in
+                # invited_learner_user_ids.
+                assert user_id in learner_group_model.invited_learner_user_ids
                 learner_group_model.invited_learner_user_ids.remove(user_id)
 
             learner_group_models_to_put.append(learner_group_model)

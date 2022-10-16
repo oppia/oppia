@@ -1847,7 +1847,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         datetime.date.fromtimestamp(1616173837)
     ]
 
-    def test_get_all_models_instances_matching_the_given_user_id(self) -> None:
+    def test_get_all_model_instances_matching_the_given_user_id(self) -> None:
         model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
             model.get_all_by_user_id(self.CONTRIBUTOR_USER_ID), [])
