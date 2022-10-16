@@ -331,7 +331,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
             response = request_handler.handle_port_request(b'1010')
             request_handler.dump_stats()
 
-        self.assertEqual(response, '')
+        self.assertEqual(response, b'')
         self.assertIn('denied-allocations 1', self.terminal_logs)
 
     def test_port_server_request_handler_allocates_port_to_client(
@@ -356,8 +356,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
             def bind(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
-        def dummy_handler(data: bytes) -> str:
-            return str(data)
+        def dummy_handler(data: bytes) -> bytes:
+            return data
 
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: FailingMockSocket())
@@ -371,8 +371,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
         mock_socket = MockSocket()
         mock_socket.port = 8181
 
-        def dummy_handler(data: bytes) -> str:
-            return str(data)
+        def dummy_handler(data: bytes) -> bytes:
+            return data
         swap_hasattr = self.swap_with_checks(
             builtins, 'hasattr', lambda *unused_args: False,
             expected_args=((socket, 'AF_UNIX'),))
@@ -390,8 +390,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_server_on_close_removes_the_socket_file(self) -> None:
         path = '8181'
-        def dummy_handler(data: bytes) -> str:
-            return str(data)
+        def dummy_handler(data: bytes) -> bytes:
+            return data
         swap_hasattr = self.swap_with_checks(
             builtins, 'hasattr', lambda *unused_args: False,
             expected_args=((socket, 'AF_UNIX'),))

@@ -57,7 +57,7 @@ import socket
 import sys
 import threading
 
-from typing import Callable, Deque, List, Optional, Sequence, Union
+from typing import Callable, Deque, List, Optional, Sequence
 from typing_extensions import Final
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
@@ -314,14 +314,14 @@ class PortServerRequestHandler:
 
     def handle_port_request(
         self, client_data: bytes
-    ) -> Optional[Union[bytes, str]]:
+    ) -> Optional[bytes]:
         """Given a port request body, parse it and respond appropriately.
 
         Args:
             client_data: bytes. The request bytes from the client.
 
         Returns:
-            Optional[Union[bytes, str]]. The response to return to the client.
+            Optional[bytes]. The response to return to the client.
         """
         try:
             pid = int(client_data)
@@ -345,7 +345,7 @@ class PortServerRequestHandler:
         else:
             self._denied_allocations += 1
             logging.info('Denied allocation to pid %d', pid)
-            return ''
+            return b''
 
     def dump_stats(self) -> None:
         """Logs statistics of our operation."""
@@ -424,7 +424,7 @@ class Server:
 
     def __init__(
         self,
-        handler: Callable[[bytes], Optional[Union[str, bytes]]],
+        handler: Callable[[bytes], Optional[bytes]],
         socket_path: str
     ) -> None:
         """Runs the portserver
