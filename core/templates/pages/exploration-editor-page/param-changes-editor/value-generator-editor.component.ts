@@ -79,8 +79,9 @@ export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
   }
 
   ngOnChanges(changes: { generatorId: SimpleChange }): void {
-    if (changes.generatorId.currentValue !== changes.generatorId.currentValue &&
-       this.viewContainerRef) {
+    if ((changes.generatorId.currentValue !==
+        changes.generatorId.previousValue) &&
+        this.viewContainerRef) {
       this.viewContainerRef.clear();
       this.ngAfterViewInit();
     }

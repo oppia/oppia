@@ -16,40 +16,67 @@
  * @fileoverview Unit tests for valueGeneratorEditor.
  */
 
-describe('Value Generator Editor directive', function() {
-  var $scope = null;
-  var elem = null;
+import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { CopierComponent } from 'value_generators/templates/copier.component';
+import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
+import { ValueGeneratorEditorComponent } from './value-generator-editor.component';
 
-  var compiledElement = null;
+describe('Value Generator Editor Component', function() {
+  let component: ValueGeneratorEditorComponent;
+  let fixture: ComponentFixture<ValueGeneratorEditorComponent>;
 
-  beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($compile, $injector) {
-    var $rootScope = $injector.get('$rootScope');
-
-    $scope = $rootScope.$new();
-    $scope.generatorId = 'Copier';
-    $scope.customizationArgs = [];
-    $scope.initArgs = [];
-    $scope.objType = 'UnicodeString';
-
-    elem = angular.element(
-      '<oppia-value-generator-editor [generator-id]="generatorId" ' +
-      '[customization-args]="customizationArgs" [obj-type]="objType" ' +
-      '[init-args]="initArgs"></oppia-value-generator-editor>');
-
-    compiledElement = $compile(elem)($scope);
-    $rootScope.$digest();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        ValueGeneratorEditorComponent,
+        RandomSelectorComponent,
+        CopierComponent
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [
+          CopierComponent,
+          RandomSelectorComponent],
+      }
+    }).compileComponents();
   }));
 
-  it('should add new attributes in the compiled one', function() {
-    expect(compiledElement.html()).toContain(
-      'get-generator-id="getGeneratorId()"');
-    expect(compiledElement.html()).toContain(
-      'get-init-args="getInitArgs()"');
-    expect(compiledElement.html()).toContain(
-      'get-generator-id="getGeneratorId()"');
-    expect(compiledElement.html()).toContain('get-obj-type="getObjType()"');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ValueGeneratorEditorComponent);
+    component = fixture.componentInstance;
+
+    component.generatorId = 'copier';
+    component.initArgs = 'initArgs';
+    component.objType = 'objType';
+    component.customizationArgs = {
+      value: 'value',
+      list_of_values: ['list_of_values']
+    };
+
+    fixture.detectChanges();
+    component.ngAfterViewInit();
+  });
+
+  it('should initialize the component', () => {
+    component.generatorId = 'random-selector';
+    component.ngOnChanges({
+      generatorId: {
+        currentValue: 'currentValue',
+        previousValue: 'previousValue'
+      }
+    } as { generatorId: SimpleChange});
+
+    expect(component).toBeDefined();
+  });
+
+  it('should render RandomSelectorComponent', () => {
+    component.generatorId = 'random-selector';
+    component.ngAfterViewInit();
+
+    const bannerElement: HTMLElement = fixture.nativeElement;
+    expect(bannerElement.querySelector('random-selector')).toBeDefined();
   });
 });
