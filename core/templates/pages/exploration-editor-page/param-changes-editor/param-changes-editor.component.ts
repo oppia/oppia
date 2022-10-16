@@ -52,7 +52,11 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   isParamChangesEditorOpen: boolean;
   paramNameChoices: { id: string; text: string }[];
   warningText: string;
-  HUMAN_READABLE_ARGS_RENDERERS: object;
+  HUMAN_READABLE_ARGS_RENDERERS: {
+    Copier: (value) => void;
+    RandomSelector: (value) => void;
+  };
+
   PREAMBLE_TEXT = {
     Copier: 'to',
     RandomSelector: 'to one of'
@@ -86,14 +90,14 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     this.isParamChangesEditorOpen = true;
     this.paramNameChoices = this.generateParamNameChoices();
 
-    if ((this.paramChangesService.displayed as ParamChange[])?.length === 0) {
+    if ((this.paramChangesService.displayed as ParamChange[]).length === 0) {
       this.addParamChange();
     }
   }
 
   addParamChange(): void {
     let newParamName = (
-       this.paramNameChoices?.length > 0 ?
+       this.paramNameChoices.length > 0 ?
          this.paramNameChoices[0].id : 'x');
     let newParamChange = this.paramChangeObjectFactory.createDefault(
       newParamName);
@@ -126,8 +130,8 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   areDisplayedParamChangesValid(): boolean {
     let paramChanges = this.paramChangesService.displayed;
 
-    if (paramChanges && (paramChanges as ParamChange[])?.length) {
-      for (let i = 0; i < (paramChanges as ParamChange[])?.length; i++) {
+    if (paramChanges && (paramChanges as ParamChange[]).length) {
+      for (let i = 0; i < (paramChanges as ParamChange[]).length; i++) {
         let paramName = paramChanges[i].name;
         if (paramName === '') {
           this.warningText = 'Please pick a non-empty parameter name.';
@@ -157,7 +161,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
         }
 
         if (generatorId === 'RandomSelector' &&
-             customizationArgs.list_of_values?.length === 0) {
+             customizationArgs.list_of_values.length === 0) {
           this.warningText = (
             'Each parameter should have at least one possible value.');
           return false;
@@ -201,7 +205,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
   deleteParamChange(index: number): void {
     if (index < 0 ||
-         index >= (this.paramChangesService.displayed as [])?.length) {
+         index >= (this.paramChangesService.displayed as []).length) {
       this.alertsService.addWarning(
         'Cannot delete parameter change at position ' + index +
          ': index out of range');
@@ -258,7 +262,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
       RandomSelector: (customizationArgs) => {
         let result = 'to one of [';
         for (
-          let i = 0; i < customizationArgs.list_of_values?.length; i++) {
+          let i = 0; i < customizationArgs.list_of_values.length; i++) {
           if (i !== 0) {
             result += ', ';
           }
