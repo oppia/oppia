@@ -1470,6 +1470,59 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.validate_exploration_for_story(
                 updated_exploration, True)
 
+    def test_validation_fail_for_multiple_choice_exploration(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
+        error_string = (
+            'Exploration in a story having MultipleChoiceInput '
+            'interaction should have at least 4 choices present. '
+            'Exploration with ID %s and state name %s have fewer than '
+            '4 choices.' % (exploration.id, exploration.init_state_name))
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            {
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>1</p>'
+                            },
+                            {
+                                'content_id': 'ca_choices_1',
+                                'html': '<p>2</p>'
+                            }
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': True
+                    }
+                }
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            change_list, 'Changed to MultipleChoiceInput')
+        updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        errors = exp_services.validate_exploration_for_story(
+            updated_exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(
+                updated_exploration, True)
+
     def test_validation_fail_for_android_rte_content(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
@@ -2201,8 +2254,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 '<blockquote>Hello, this is state1</blockquote>'
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
-                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
-                '</oppia-noninteractive-image>')
+                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;image>'
+                '&amp;quot;"</oppia-noninteractive-image>')
         }
         content2_dict: state_domain.SubtitledHtmlDict = {
             'content_id': 'content',
@@ -2250,8 +2303,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
+                    '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;'
+                    'image&amp;quot;"></oppia-noninteractive-image></p>'
                 )
             }, {
                 'content_id': 'ca_choices_1',
@@ -2260,7 +2313,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p></p>')
             }]},
             'showChoicesInShuffledOrder': {'value': True}
@@ -2275,7 +2328,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }, {
                 'content_id': 'ca_choices_1',
@@ -2284,7 +2337,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }, {
                 'content_id': 'ca_choices_2',
@@ -2293,7 +2346,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }]},
             'minAllowableSelectionCount': {'value': 1},
@@ -2318,8 +2371,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '<p>Hello, this is html1 for state2</p>'
                         '<oppia-noninteractive-image filepath-with-value="'
                         '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                        '"&amp;quot;&amp;quot;" alt-with-value='
-                        '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                        '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;'
+                        'image&amp;quot;"></oppia-noninteractive-image>'
                     )
                 )
             ),
@@ -2338,7 +2391,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
-                        ' alt-with-value="&amp;quot;&amp;quot;">'
+                        ' alt-with-value="&amp;quot;image&amp;quot;">'
                         '</oppia-noninteractive-image>')
                     ), False, [], None, None), [
                         state_domain.RuleSpec('Equals', {'x': 0}),
@@ -2370,7 +2423,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                             'value='
                             '"&amp;quot;s3Choice1.png&amp;quot;"'
                             ' caption-with-value="&amp;quot;&amp;quot;" '
-                            'alt-with-value="&amp;quot;&amp;quot;">'
+                            'alt-with-value="&amp;quot;image&amp;quot;">'
                             '</oppia-noninteractive-image>')
                         ]}),
                 state_domain.RuleSpec(
@@ -2382,7 +2435,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                             'value='
                             '"&amp;quot;s3Choice3.png&amp;quot;"'
                             ' caption-with-value="&amp;quot;&amp;quot;" '
-                            'alt-with-value="&amp;quot;&amp;quot;">'
+                            'alt-with-value="&amp;quot;image&amp;quot;">'
                             '</oppia-noninteractive-image>')
                         ]})
             ],
@@ -7193,7 +7246,7 @@ title: Old Title
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }
         }]
@@ -7231,7 +7284,7 @@ title: Old Title
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }
         }, {
@@ -7242,7 +7295,7 @@ title: Old Title
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }
         }]
@@ -7290,7 +7343,7 @@ title: Old Title
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }
         }
@@ -7326,7 +7379,7 @@ title: Old Title
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }
         }
@@ -7368,7 +7421,7 @@ title: Old Title
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }
         }
@@ -7413,7 +7466,7 @@ title: Old Title
                     u'<oppia-noninteractive-image filepath-with-value="'
                     u'&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     u'"&amp;quot;&amp;quot;" alt-with-value='
-                    u'"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    u'"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     u'</p>')
             }
         }]
@@ -7908,8 +7961,9 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             draft_change_list_last_updated=self.DATETIME,
             draft_change_list_exp_version=1,
             draft_change_list_id=2).put()
-        updated_exploration = exp_services.get_exp_with_draft_applied(
-            'exp_id', self.USER_ID)
+        with self.swap(state_domain.SubtitledHtml, 'validate', lambda x: True):
+            updated_exploration = exp_services.get_exp_with_draft_applied(
+                'exp_id', self.USER_ID)
         self.assertIsNone(updated_exploration)
 
 

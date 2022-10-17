@@ -82,9 +82,9 @@
     <oppia-topic-questions-tab></oppia-topic-questions-tab>
   </div>
 
-  <!-- <div *ngIf="getActiveTabName() === 'subtopic_editor'">
-    <subtopic-editor-tab></subtopic-editor-tab>
-  </div> -->
+  <div *ngIf="getActiveTabName() === 'subtopic_editor'">
+    <oppia-subtopic-editor-tab></oppia-subtopic-editor-tab>
+  </div>
 
   <div *ngIf="getActiveTabName() === 'topic_preview'">
     <oppia-topic-preview-tab></oppia-topic-preview-tab>

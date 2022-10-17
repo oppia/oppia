@@ -53,6 +53,7 @@ import { CreateNewStoryModalComponent } from './modal-templates/create-new-story
 import { TopicEditorStoriesListComponent } from './editor-tab/topic-editor-stories-list.component';
 import { TopicEditorTabComponent } from './editor-tab/topic-editor-tab.directive';
 import { TopicEditorPageComponent } from './topic-editor-page.component';
+import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-tab.component';
 
 @NgModule({
   imports: [
@@ -83,7 +84,8 @@ import { TopicEditorPageComponent } from './topic-editor-page.component';
     TopicQuestionsTabComponent,
     TopicEditorStoriesListComponent,
     TopicEditorTabComponent,
-    TopicEditorPageComponent
+    TopicEditorPageComponent,
+    SubtopicEditorTabComponent
   ],
   entryComponents: [
     ChangeSubtopicAssignmentModalComponent,
@@ -101,7 +103,8 @@ import { TopicEditorPageComponent } from './topic-editor-page.component';
     TopicQuestionsTabComponent,
     TopicEditorStoriesListComponent,
     TopicEditorTabComponent,
-    TopicEditorPageComponent
+    TopicEditorPageComponent,
+    SubtopicEditorTabComponent
   ],
   providers: [
     {
