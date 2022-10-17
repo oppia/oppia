@@ -59,6 +59,7 @@ from core.jobs.batch_jobs import user_stats_computation_jobs         # pylint: d
 from core.jobs.batch_jobs import math_interactions_audit_jobs        # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import mailchimp_population_jobs           # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import exp_validation_jobs                 # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import state_interaction_validation_jobs   # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
       exp_version_history_computation_job)
 from core.jobs.batch_jobs import (
