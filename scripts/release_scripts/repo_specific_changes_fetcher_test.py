@@ -112,13 +112,13 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             return None
         def mock_get_setup_scripts_changes_status(
             unused_release_tag_to_diff_against: str
-        ) -> Dict[str, bool] | None:
+        ) -> Optional[List[str]]:
             if self.call_counter:
                 return {'setup_changes': True}
             return None
         def mock_get_changed_storage_models_filenames(
             unused_release_tag_to_diff_against: str
-        ) -> List[str] | None:
+        ) -> Optional[List[str]]:
             if self.call_counter:
                 return ['storage_changes']
             return None
