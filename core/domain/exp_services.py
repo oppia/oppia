@@ -3104,7 +3104,7 @@ def regenerate_missing_stats_for_exploration(
                 change_list_for_snapshot.append(
                     exp_domain.ExplorationChange(commit_cmd)
                 )
-            except utils.ValidationError as e:
+            except utils.ValidationError:
                 logging.error(
                     'Exploration(id=%r) snapshots contains invalid '
                     'commit_cmd: %r'
