@@ -116,8 +116,8 @@
     <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'" exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
     </exploration-editor-tab>
 
-    <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">
-    </translation-tab>
+    <oppia-translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">
+    </oppia-translation-tab>
     <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
     <oppia-preview-tab ng-if="$ctrl.getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
     </oppia-preview-tab>

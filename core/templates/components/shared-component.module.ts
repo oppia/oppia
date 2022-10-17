@@ -169,6 +169,7 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
+import { JoyrideModule } from 'ngx-joyride';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
@@ -200,6 +201,7 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    JoyrideModule.forRoot(),
     RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
