@@ -23,7 +23,7 @@ describe('Blog Post Object Factory', () => {
   beforeEach(() => {
     let sampleBlogPostBackendDict = {
       id: 'sampleId',
-      author_name: 'testUsername',
+      author_username: 'testUsername',
       title: 'sampleTitle',
       content: '<p>Hello</p>',
       thumbnail_filename: 'image',
