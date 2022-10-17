@@ -33,8 +33,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_changelog_and_credits
 
-from typing import List, Union
-from typing_extensions import Final
+from typing import Final, List, Union
 import github  # isort:skip pylint: disable=wrong-import-position
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')

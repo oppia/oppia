@@ -22,8 +22,7 @@ import subprocess
 import sys
 import tarfile
 
-from typing import List, Optional
-from typing_extensions import Final
+from typing import Final, List, Optional
 
 from . import clean
 from . import common

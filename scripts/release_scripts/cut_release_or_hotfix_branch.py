@@ -43,8 +43,7 @@ import json
 import re
 import subprocess
 
-from typing import List, Optional, Pattern, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Pattern, Tuple
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after

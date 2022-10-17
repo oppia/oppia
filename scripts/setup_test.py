@@ -27,8 +27,7 @@ import tarfile
 
 from core.tests import test_utils
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 from . import clean
 from . import common
