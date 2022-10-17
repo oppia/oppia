@@ -507,6 +507,7 @@ describe('Exploration editor page component', () => {
       spyOn(rs, 'navigateToMainTab').and.callThrough();
 
       component.selectMainTab();
+      component.initExplorationPage();
       tick();
 
       expect(rs.navigateToMainTab).toHaveBeenCalled();
