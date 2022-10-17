@@ -1,18 +1,35 @@
-<div class="oppia-translation-tab" ng-if="showTranslationTabSubDirectives"
-     ng-joy-ride="tutorialInProgress"
-     config="TRANSLATION_TUTORIAL_OPTIONS"
-     on-finish="onFinishTutorial()"
-     on-skip="onSkipTutorial()">
+<ng-template #TranslationTabTourContainer>
+  <h3 class="e2e-test-joyride-title">Translations In Oppia</h3>
+  <p>
+    Hello, welcome to the Translation Tab! This tour will walk you through the translation page. Hit the "Next" button to begin.
+  </p>
+</ng-template>
+
+<ng-template #TranslationTabOverview>
+  <h3 class="e2e-test-joyride-title">Choose Language</h3>
+  <p>
+    Start your translation by choosing the language that you want to translate to.
+  </p>
+</ng-template>
+
+<ng-template #TranslationTabStatusGraph>
+  <h3 class="e2e-test-joyride-title">Choose a Card to Translate</h3>
+  <p>
+    Then, choose a card from the exploration overview by clicking on the card. The selected card will have a bold border. Cards with missing translations are coloured yellow or red. These are good places to start.
+  </p>
+</ng-template>
+
+<div class="oppia-translation-tab" *ngIf="showTranslationTabSubDirectives">
   <div class="oppia-translator-overview">
-    <translator-overview is-translation-tab-busy="isTranslationTabBusy"></translator-overview>
+    <oppia-translator-overview [isTranslationTabBusy]="isTranslationTabBusy" joyrideStep="translationTabOverview" [stepContent]="TranslationTabOverview"></oppia-translator-overview>
   </div>
-  <div class="row">
+  <div class="row" joyrideStep="translationTabTourContainer" [stepContent]="TranslationTabTourContainer">
     <div class="col-lg-8 col-md-8 col-sm-8">
-      <state-translation is-translation-tab-busy="isTranslationTabBusy"></state-translation>
+      <oppia-state-translation [isTranslationTabBusy]="isTranslationTabBusy"></oppia-state-translation>
     </div>
     <div class="col-lg-4 col-md-4 col-sm-4">
       <div class="oppia-editor-sidebar d-none d-md-block">
-        <state-translation-status-graph is-translation-tab-busy="isTranslationTabBusy"></state-translation-status-graph>
+        <oppia-state-translation-status-graph joyrideStep="translationTabStatusGraph" [stepContent]="TranslationTabStatusGraph" [isTranslationTabBusy]="isTranslationTabBusy"></oppia-state-translation-status-graph>
       </div>
     </div>
     <attribution-guide></attribution-guide>
