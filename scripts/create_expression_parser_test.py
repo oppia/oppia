@@ -20,7 +20,6 @@ import os
 import subprocess
 
 from core.tests import test_utils
-from typing import Any
 
 from . import common
 from . import create_expression_parser
@@ -33,7 +32,8 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
     def test_expression_parser_is_produced_correctly(self) -> None:
         cmd_token_list = []
         def mock_check_call(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> None:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> None:  # pylint: disable=unused-argument
             cmd_token_list.append(cmd_tokens)
 
         setup_script_args = []
