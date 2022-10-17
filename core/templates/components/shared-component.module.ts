@@ -204,7 +204,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
     MatProgressSpinnerModule,
-    NgbModalModule
+    NgbModalModule,
   ],
 
   providers: [
