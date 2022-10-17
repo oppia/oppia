@@ -26,6 +26,7 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { JoyrideModule } from 'ngx-joyride';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatMenuModule } from '@angular/material/menu';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -87,6 +88,9 @@ import { NeedsGuidingResponsesTaskComponent } from './improvements-tab/needs-gui
 import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
 import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
 import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
+import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
+import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
+import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
 import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
 import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
 import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component';
@@ -96,6 +100,7 @@ import { StateTranslationStatusGraphComponent } from './translation-tab/state-tr
 import { TranslationTabComponent } from './translation-tab/translation-tab.component';
 import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
 import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
+import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
 
 @NgModule({
   imports: [
@@ -108,6 +113,7 @@ import { ParamChangesEditorComponent } from './param-changes-editor/param-change
     SmartRouterModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
+    MatMenuModule,
     FormsModule,
     MatPaginatorModule,
     RouterModule.forRoot([]),
@@ -160,6 +166,9 @@ import { ParamChangesEditorComponent } from './param-changes-editor/param-change
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
+    ExplorationEditorTabComponent,
+    ExplorationSaveAndPublishButtonsComponent,
+    ExplorationSavePromptModalComponent,
     FeedbackTabComponent,
     ImprovementsTabComponent,
     NeedsGuidingResponsesTaskComponent,
@@ -175,6 +184,7 @@ import { ParamChangesEditorComponent } from './param-changes-editor/param-change
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
+    ExplorationEditorPageComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -221,6 +231,9 @@ import { ParamChangesEditorComponent } from './param-changes-editor/param-change
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
+    ExplorationEditorTabComponent,
+    ExplorationSaveAndPublishButtonsComponent,
+    ExplorationSavePromptModalComponent,
     FeedbackTabComponent,
     ImprovementsTabComponent,
     NeedsGuidingResponsesTaskComponent,
@@ -236,6 +249,7 @@ import { ParamChangesEditorComponent } from './param-changes-editor/param-change
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
+    ExplorationEditorPageComponent
   ],
   providers: [
     {
