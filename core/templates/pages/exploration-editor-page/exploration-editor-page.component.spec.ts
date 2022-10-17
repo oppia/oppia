@@ -60,6 +60,7 @@ import { RouterService } from './services/router.service';
 import { StateTutorialFirstTimeService } from './services/state-tutorial-first-time.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
  class MockNgbModalRef {
    componentInstance = {};
@@ -196,6 +197,10 @@ describe('Exploration editor page component', () => {
     show_state_translation_tutorial_on_load: true
   };
 
+  class MockWindowRef {
+    location = { path: '/create/2234' };
+  }
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -242,6 +247,10 @@ describe('Exploration editor page component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
         },
         {
           provide: ExplorationDataService,
@@ -349,8 +358,6 @@ describe('Exploration editor page component', () => {
         mockOpenEditorTutorialEmitter);
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
         mockOpenTranslationTutorialEmitter);
-      spyOn(rs, 'isLocationSetToNonStateEditorTab')
-        .and.returnValue(false);
 
       explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = ['data1', 'data2'];
@@ -364,6 +371,8 @@ describe('Exploration editor page component', () => {
 
     it('should start editor tutorial when on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
+      spyOn(rs, 'isLocationSetToNonStateEditorTab')
+        .and.returnValue(false);
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
