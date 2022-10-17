@@ -50,6 +50,9 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { TopicEditorNavbarComponent } from './navbar/topic-editor-navbar.component';
 import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.component';
 import { CreateNewStoryModalComponent } from './modal-templates/create-new-story-modal.component';
+import { TopicEditorStoriesListComponent } from './editor-tab/topic-editor-stories-list.component';
+import { TopicEditorTabComponent } from './editor-tab/topic-editor-tab.directive';
+import { TopicEditorPageComponent } from './topic-editor-page.component';
 
 @NgModule({
   imports: [
@@ -77,7 +80,10 @@ import { CreateNewStoryModalComponent } from './modal-templates/create-new-story
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent,
     TopicEditorNavbarComponent,
-    TopicQuestionsTabComponent
+    TopicQuestionsTabComponent,
+    TopicEditorStoriesListComponent,
+    TopicEditorTabComponent,
+    TopicEditorPageComponent
   ],
   entryComponents: [
     ChangeSubtopicAssignmentModalComponent,
@@ -92,7 +98,10 @@ import { CreateNewStoryModalComponent } from './modal-templates/create-new-story
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent,
     TopicEditorNavbarComponent,
-    TopicQuestionsTabComponent
+    TopicQuestionsTabComponent,
+    TopicEditorStoriesListComponent,
+    TopicEditorTabComponent,
+    TopicEditorPageComponent
   ],
   providers: [
     {
