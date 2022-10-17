@@ -16,6 +16,15 @@
     <b>Description</b>
     <div>{{learnerGroup.description}}</div>
   </div>
+  <div class="group-facilitator">
+    <b [innerHTML]="'I18N_LEARNER_GROUP_FACILITATOR_MODAL_TEXT' | translate"></b>
+    <div>
+      <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames; let last = last">
+        <span *ngIf="last">{{facilitator}}</span>
+        <span *ngIf="!last">{{facilitator}}, </span>
+      </span>
+    </div>
+  </div>
   <div class="learner-groups-progress-sharing-info">
     <b [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TITLE' | translate"></b>
     <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT' | translate"></p>
@@ -77,7 +86,8 @@
 
   .group-title,
   .group-description,
-  .learner-groups-progress-sharing-info {
+  .learner-groups-progress-sharing-info,
+  .group-facilitator {
     margin-bottom: 15px;
   }
 </style>

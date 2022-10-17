@@ -115,8 +115,11 @@
   text-align: center;
 }
 
-.exit-learner-group-modal .modal-dialog,
 .learner-group-preferences-modal .modal-dialog {
+  margin: 100px auto;
+}
+
+.exit-learner-group-modal .modal-dialog {
   margin: 200px auto;
 }
 
@@ -158,8 +161,26 @@
     display: grid;
   }
 
+  .oppia-dashboard-view-tabs-container,
+  .oppia-dashboard-view-content-container {
+    width: 90%;
+  }
+
   .oppia-view-learner-group .group-info-container {
     display: grid;
     grid-gap: 20px;
+    justify-content: center;
+    text-align: center;
+    width: 90%;
+  }
+
+  .oppia-view-learner-group .group-cta-buttons-container {
+    display: flex;
+  }
+
+  .oppia-view-learner-group .group-cta-buttons-container .btn-primary,
+  .oppia-view-learner-group .group-cta-buttons-container .btn-danger {
+    font-size: 14px;
+    padding: 7px 12px;
   }
 }

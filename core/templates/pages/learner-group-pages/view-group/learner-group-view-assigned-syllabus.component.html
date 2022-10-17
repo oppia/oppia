@@ -35,14 +35,16 @@
             </div>
           </div>
           <div class="assigned-syllabus-card-title">
-            <span>{{storySummaries[getIndexToDisplay(displayedItem)].getTitle()}}</span>
+            <a [href]="getStoryLink(storySummaries[getIndexToDisplay(displayedItem)])">
+              {{storySummaries[getIndexToDisplay(displayedItem)].getTitle()}}
+            </a>
           </div>
           <div class="assigned-syllabus-card-description">
-            <a [href]="getStoryLink(storySummaries[getIndexToDisplay(displayedItem)])"
+            <a [href]="getStoryNodeLink(storySummaries[getIndexToDisplay(displayedItem)])"
                class="btn-primary" *ngIf="storySummaries[getIndexToDisplay(displayedItem)].getCompletedNodeTitles().length == 0">
               <span translate="I18N_GET_STARTED_PAGE_HEADING"></span>
             </a>
-            <a [href]="getStoryLink(storySummaries[getIndexToDisplay(displayedItem)])"
+            <a [href]="getStoryNodeLink(storySummaries[getIndexToDisplay(displayedItem)])"
                class="btn-primary" *ngIf="storySummaries[getIndexToDisplay(displayedItem)].getCompletedNodeTitles().length > 0">
               <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
             </a>

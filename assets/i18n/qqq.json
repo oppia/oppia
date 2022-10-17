@@ -693,6 +693,7 @@
 	"I18N_LEARNER_GROUP_DETAILS_GROUP_TITLE": "Label text shown for the group title input field on the learner group details section.",
 	"I18N_LEARNER_GROUP_DETAILS_MODAL_DESCRIPTION": "Label text shown for the group description on the learner group details modal.",
 	"I18N_LEARNER_GROUP_DETAILS_TITLE": "Title text shown on the learner group details modal.",
+	"I18N_LEARNER_GROUP_FACILITATOR_MODAL_TEXT": "Label text shown for facilitator name in learner group details modal.",
 	"I18N_LEARNER_GROUP_GROUP_DETAILS_SECTION": "Group Details section title in preferences tab on the edit learner group page.",
 	"I18N_LEARNER_GROUP_INVITATION_MODAL_HEADER": "Header text for the learner group invitation modal.",
 	"I18N_LEARNER_GROUP_INVITE_LEARNERS": "Text shown for the invite learners section on the learner group creation page.",

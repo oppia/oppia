@@ -17,6 +17,15 @@
     <b [innerHTML]="'I18N_LEARNER_GROUP_DETAILS_MODAL_DESCRIPTION' | translate"></b>
     <div>{{learnerGroup.description}}</div>
   </div>
+  <div class="group-facilitator">
+    <b [innerHTML]="'I18N_LEARNER_GROUP_FACILITATOR_MODAL_TEXT' | translate"></b>
+    <div>
+      <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames; let last = last">
+        <span *ngIf="last">{{facilitator}}</span>
+        <span *ngIf="!last">{{facilitator}}, </span>
+      </span>
+    </div>
+  </div>
 </div>
 <div class="modal-footer">
 </div>
@@ -41,7 +50,8 @@
     padding: 1rem 0;
   }
 
-  .modal-body .group-title {
+  .modal-body .group-title,
+  .modal-body .group-description {
     margin-bottom: 15px;
   }
 

@@ -24,6 +24,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AlertsService } from 'services/alerts.service';
 import { DeclineInvitationModalComponent } from './modal-templates/decline-invitaiton-modal.component';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { ViewLearnerGroupInvitationModalComponent } from './modal-templates/view-learner-group-invitation-modal.component';
@@ -46,6 +47,7 @@ export class LearnerGroupsTabComponent {
   directiveSubscriptions = new Subscription();
   invitedToLearnerGroups: ShortLearnerGroupSummary[] = [];
   learnerGroupsJoined: ShortLearnerGroupSummary[] = [];
+  alertTimeout = 6000;
 
   constructor(
     private windowDimensionService: WindowDimensionsService,
@@ -53,7 +55,8 @@ export class LearnerGroupsTabComponent {
     private learnerDashboardBackendApiService:
       LearnerDashboardBackendApiService,
     private ngbModal: NgbModal,
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
+    private alertsService: AlertsService
   ) {}
 
   ngOnInit(): void {
@@ -155,6 +158,12 @@ export class LearnerGroupsTabComponent {
         learnerGroupSummary.id, this.username, true,
         data.progressSharingPermission
       ).then((learnerGroup) => {
+        // Show a message to indicate that the learner has successfully joined
+        // the learner group.
+        this.alertsService.addSuccessMessage(
+          'You have successfully joined ' + learnerGroup.title +
+          ' learner group.', this.alertTimeout);
+
         let acceptedLearnerGroupSummary = new ShortLearnerGroupSummary(
           learnerGroup.id, learnerGroup.title, learnerGroup.description,
           learnerGroup.facilitatorUsernames,

@@ -19,6 +19,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { UrlService } from 'services/contextual/url.service';
 import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
@@ -46,6 +47,7 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService
   ) {}
@@ -165,6 +167,31 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
         topic_url_fragment: topicUrlFragment
       });
     return storyLink;
+  }
+
+  getStoryNodeLink(storySummary: StorySummary): string {
+    const classroomUrlFragment = storySummary.getClassroomUrlFragment();
+    const topicUrlFragment = storySummary.getTopicUrlFragment();
+    let storyNodeToDisplay = storySummary.getAllNodes()[0];
+    storyNodeToDisplay = storySummary.getAllNodes().find(node => {
+      return !storySummary.getCompletedNodeTitles().includes(node.getTitle());
+    });
+    const explorationId = storyNodeToDisplay.getExplorationId();
+    if (classroomUrlFragment === undefined || topicUrlFragment === undefined ||
+      explorationId === null) {
+      return '#';
+    }
+    let storyNodeLink = this.urlInterpolationService.interpolateUrl(
+      '/explore/<exp_id>', { exp_id: explorationId });
+    storyNodeLink = this.urlService.addField(
+      storyNodeLink, 'topic_url_fragment', topicUrlFragment);
+    storyNodeLink = this.urlService.addField(
+      storyNodeLink, 'classroom_url_fragment', classroomUrlFragment);
+    storyNodeLink = this.urlService.addField(
+      storyNodeLink, 'story_url_fragment', storySummary.getUrlFragment());
+    storyNodeLink = this.urlService.addField(
+      storyNodeLink, 'node_id', storyNodeToDisplay.getId());
+    return storyNodeLink;
   }
 
   getPracticeSessionLink(

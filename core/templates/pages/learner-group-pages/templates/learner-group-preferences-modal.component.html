@@ -13,12 +13,12 @@
     <b [innerHTML]="'I18N_LEARNER_GROUP_DETAILS_MODAL_DESCRIPTION' | translate"></b>
     <div>{{learnerGroup.description}}</div>
   </div>
-  <div class="group-learners">
-    <b [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS_MODAL_TEXT' | translate"></b>
+  <div class="group-facilitator">
+    <b [innerHTML]="'I18N_LEARNER_GROUP_FACILITATOR_MODAL_TEXT' | translate"></b>
     <div>
-      <span *ngFor="let learner of learnerGroup.learnerUsernames; let last = last">
-        <span *ngIf="last">{{learner}}</span>
-        <span *ngIf="!last">{{learner}}, </span>
+      <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames; let last = last">
+        <span *ngIf="last">{{facilitator}}</span>
+        <span *ngIf="!last">{{facilitator}}, </span>
       </span>
     </div>
   </div>
@@ -84,7 +84,7 @@
   .group-title,
   .group-description,
   .learner-groups-progress-sharing-info,
-  .group-learners {
+  .group-facilitator {
     margin-bottom: 15px;
   }
 </style>

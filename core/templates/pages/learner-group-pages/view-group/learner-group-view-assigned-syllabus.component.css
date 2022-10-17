@@ -68,6 +68,10 @@
   font-weight: 500;
 }
 
+.oppia-learner-group-view-assigned-syllabus .assigned-syllabus-card-title a {
+  color: unset;
+}
+
 .oppia-learner-group-view-assigned-syllabus .type-tag-pill {
   background: #eaf0ef;
   border: 1px solid #00645c;
