@@ -199,6 +199,44 @@ describe('Exploration editor page component', () => {
 
   class MockWindowRef {
     location = { path: '/create/2234' };
+    nativeWindow = {
+      scrollTo: (value1, value2) => {},
+      sessionStorage: {
+        promoIsDismissed: null,
+        setItem: (testKey1, testKey2) => {},
+        removeItem: (testKey) => {}
+      },
+      gtag: (value1, value2, value3) => {},
+      navigator: {
+        onLine: true,
+        userAgent: null
+      },
+      location: {
+        path: '/create/2234',
+        pathname: '/',
+        hostname: 'oppiaserver.appspot.com',
+        search: '',
+        protocol: '',
+        reload: () => {},
+        hash: '',
+        href: '',
+      },
+      document: {
+        documentElement: {
+          setAttribute: (value1, value2) => {},
+          clientWidth: null,
+          clientHeight: null,
+        },
+        body: {
+          clientWidth: null,
+          clientHeight: null,
+          style: {
+            overflowY: ''
+          }
+        }
+      },
+      addEventListener: (value1, value2) => {}
+    };
   }
 
   beforeEach(() => {
