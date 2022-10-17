@@ -8336,6 +8336,10 @@ states:
               &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
               is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
               #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+        - hint_content:
+            content_id: hint_2
+            html: '<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
       id: NumericInput
       solution: null
     linked_skill_id: null
@@ -8346,6 +8350,7 @@ states:
         content: {}
         default_outcome: {}
         hint: {}
+        hint_2: {}
         feedback_1: {}
         feedback_2: {}
         feedback_3: {}
@@ -8359,6 +8364,7 @@ states:
         content: {}
         default_outcome: {}
         hint: {}
+        hint_2: {}
         feedback_1: {}
         feedback_2: {}
         feedback_3: {}
