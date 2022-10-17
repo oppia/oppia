@@ -1638,14 +1638,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'Adjacent whitespace in tags should be collapsed, '
                     'received \'%s\'' % tag)
 
-            if len(tag) > 30:
-                raise utils.ValidationError(
-                    'Tag text length should not be more than 30.')
         if len(set(self.tags)) != len(self.tags):
             raise utils.ValidationError('Some tags duplicate each other')
-        if len(self.tags) > 10:
-            raise utils.ValidationError(
-                'Total number of tags should be less than 10.')
 
         if not isinstance(self.blurb, str):
             raise utils.ValidationError(
@@ -5161,11 +5155,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         exploration_dict['schema_version'] = 58
 
-        tags = exploration_dict['tags']
-        if len(tags) > 0:
-            exp_tags = sorted(list(set(tags)))
-            exp_tags = [tag for tag in exp_tags if tag and len(tag) <= 30]
-            exploration_dict['tags'] = exp_tags[:10]
         exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
             exploration_dict['states'], exploration_dict['language_code'])
         exploration_dict['states_schema_version'] = 53
