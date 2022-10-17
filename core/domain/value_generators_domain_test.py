@@ -20,12 +20,11 @@ from __future__ import annotations
 
 import importlib
 import inspect
-import os
 import re
 
-from core import feconf
 from core.domain import value_generators_domain
 from core.tests import test_utils
+from extensions.value_generators.models import generators
 
 
 class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
@@ -91,37 +90,33 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
             ).get_html_template()
         )
 
-    def test_branch_code_refresh_registry_not_subclass(self) -> None:
-        """We need to have a class in
-        core.extensions.value_generators.models.generators
-        that isn't a subclass of BaseValueGenerator to test.
+    def test_get_value_generator_classes_not_subclass(self) -> None:
+        """Test  that the value generator registry discovers all classes
+        correctly and excludes classes that are not subclasses of
+        BaseValueGenerator.
         """
-        module_path_parts = feconf.VALUE_GENERATORS_DIR.split(os.sep)
-        module_path_parts.extend(['models', 'generators'])
-        module = importlib.import_module('.'.join(module_path_parts))
-        vg_class_names = list(
-            value_generators_domain.Registry.get_all_generator_classes().keys()
+
+        class MockCopier():
+            """This is a dummy class for self.swap to test  that the value
+            generator registry discovers all classes correctly and excludes
+            classes that are not subclasses of BaseValueGenerator.
+            We need to have a class in the returned list of value generators
+            that isn't a subclass of BaseValueGenerator to test.
+            """
+
+            pass
+
+        module = importlib.import_module(
+            'extensions.value_generators.models.generators'
         )
-        if len(vg_class_names) > 0:
-            swap_class = vg_class_names[0]
-            with self.swap(module, swap_class, NotBvgSubclass):
-                new_value_generators = (
-                    value_generators_domain.Registry.get_all_generator_classes()
-                )
-            self.assertNotIn(swap_class, new_value_generators.keys())
-        else:
-            self.fail(
-            'There were no Base Value Generator sub classes in %s' %
-            '.'.join(module_path_parts)
-        )
-
-
-class NotBvgSubclass():
-
-    """This is a dummy class for self.swap to test all code branches.
-    """
-
-    pass
+        expected_generators = {
+            'RandomSelector': type(generators.RandomSelector())
+            }
+        with self.swap(module, 'Copier', MockCopier):
+            value_generators = (
+                value_generators_domain.Registry.get_all_generator_classes()
+            )
+        self.assertEqual(expected_generators, value_generators)
 
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
