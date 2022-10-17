@@ -6851,7 +6851,7 @@ export default {
 
   "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
 
-  "CAN_FETCH_VERSION_HISTORY_DATA": false,
+  "ALLOW_VERSION_HISTORY_EXPLORATION": false,
   "METADATA_PROPERTIES": [
     "title", "category", "objective", "language_code", "tags", "blurb",
     "author_notes", "states_schema_version", "init_state_name", "param_specs",
