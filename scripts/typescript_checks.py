@@ -145,6 +145,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/filters/string-utility-filters/capitalize.filter.spec.ts',
     'core/templates/filters/string-utility-filters/capitalize.filter.ts',
     'core/templates/filters/string-utility-filters/convert-to-plain-text.filter.ts',
+    'core/templates/filters/string-utility-filters/convert-to-plain-text.filter.spec.ts',
     'core/templates/filters/string-utility-filters/get-abbreviated-text.filter.spec.ts',
     'core/templates/filters/string-utility-filters/get-abbreviated-text.filter.ts',
     'core/templates/filters/string-utility-filters/normalize-whitespace-punctuation-and-case.filter.ts',

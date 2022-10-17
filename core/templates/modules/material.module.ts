@@ -38,8 +38,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   imports: [
@@ -65,9 +63,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatSlideToggleModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDividerModule,
-    MatTooltipModule,
-    MatMenuModule
+    MatDividerModule
   ],
   exports: [
     CommonModule,
@@ -90,9 +86,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatSlideToggleModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDividerModule,
-    MatTooltipModule,
-    MatMenuModule
+    MatDividerModule
   ]
 })
 export class MaterialModule {}

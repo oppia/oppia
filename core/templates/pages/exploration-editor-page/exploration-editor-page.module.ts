@@ -24,6 +24,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
+import { JoyrideModule } from 'ngx-joyride';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
@@ -89,6 +90,10 @@ import { StateStatsModalComponent } from './statistics-tab/templates/state-stats
 import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
 import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
 import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
+import { StateTranslationComponent } from './translation-tab/state-translation/state-translation.component';
+import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component';
+import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component';
+import { TranslationTabComponent } from './translation-tab/translation-tab.component';
 
 @NgModule({
   imports: [
@@ -104,6 +109,7 @@ import { AudioTranslationBarComponent } from './translation-tab/audio-translatio
     FormsModule,
     MatPaginatorModule,
     RouterModule.forRoot([]),
+    JoyrideModule.forRoot(),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -160,7 +166,11 @@ import { AudioTranslationBarComponent } from './translation-tab/audio-translatio
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent
+    AudioTranslationBarComponent,
+    StateTranslationComponent,
+    TranslatorOverviewComponent,
+    StateTranslationStatusGraphComponent,
+    TranslationTabComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -214,7 +224,11 @@ import { AudioTranslationBarComponent } from './translation-tab/audio-translatio
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent
+    AudioTranslationBarComponent,
+    StateTranslationComponent,
+    TranslatorOverviewComponent,
+    StateTranslationStatusGraphComponent,
+    TranslationTabComponent,
   ],
   providers: [
     {
