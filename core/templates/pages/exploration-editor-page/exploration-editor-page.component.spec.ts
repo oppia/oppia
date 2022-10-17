@@ -368,8 +368,8 @@ describe('Exploration editor page component', () => {
   });
 
   afterEach(() => {
-    fixture.destroy();
     component.ngOnDestroy();
+    fixture.destroy();
   });
 
   describe('when user permission is true and draft changes not valid', () => {
