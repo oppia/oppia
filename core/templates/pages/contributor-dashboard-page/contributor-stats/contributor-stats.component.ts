@@ -274,7 +274,7 @@ export class ContributorStatsComponent {
   async selectOption(contributionType: string): Promise<void> {
     this.type = contributionType;
     const currentOption = this.options.filter(
-      (option) => option.contributionType === this.type);
+      (option) => option.contributionType === contributionType);
     this.selectedContributionType = currentOption[0].displayName;
     this.dropdownShown = false;
     this.mobileDropdownShown = false;
