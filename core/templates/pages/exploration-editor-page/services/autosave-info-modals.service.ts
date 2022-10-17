@@ -56,7 +56,8 @@ export class AutosaveInfoModalsService {
     return this._isModalOpen;
   }
 
-  showVersionMismatchModal(lostChanges: LostChange[]): void {
+  showVersionMismatchModal(
+      lostChanges: LostChange[] | ExplorationChange[]): void {
     if (!this.isLostChangesModalOpen) {
       this.isLostChangesModalOpen = true;
 
