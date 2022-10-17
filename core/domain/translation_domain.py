@@ -348,7 +348,9 @@ class BaseTranslatableObject:
 
         for translatable_content in translatable_content_list:
             content_value = translatable_content.content_value
-            if translatable_content.content_format == (
+            if translatable_content.content_type == (
+                ContentType.CUSTOMIZATION_ARG
+            ) and translatable_content.content_format == (
                 TranslatableContentFormat.HTML
             ):
                 assert isinstance(content_value, str)

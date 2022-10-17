@@ -164,7 +164,7 @@ class DummyTranslatableObjectWithFourParams(
 
         translatable_contents_collection.add_translatable_field(
             'content_id_1',
-            translation_domain.ContentType.HINT,
+            translation_domain.ContentType.CUSTOMIZATION_ARG,
             translation_domain.TranslatableContentFormat.HTML,
             self.param1)
         translatable_contents_collection.add_translatable_field(
