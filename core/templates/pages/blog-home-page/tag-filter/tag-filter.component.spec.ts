@@ -81,7 +81,7 @@ describe('Tag Filter component', () => {
         }
       } as ElementRef;
       component.selectTag(({ option: { viewValue: 'tag3'}}));
-      tick(1600);
+      tick(1501);
 
       expect(component.selectedTags).toEqual(['tag1', 'tag2', 'tag3']);
       expect(component.searchDropDownTags).toEqual(['tag4']);
