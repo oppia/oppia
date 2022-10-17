@@ -4816,7 +4816,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             for empty_hint in empty_hints:
                 hints.remove(empty_hint)
-                break
             state['interaction']['hints'] = hints
 
             # Update translations and voiceovers.
