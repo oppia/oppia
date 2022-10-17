@@ -61,6 +61,7 @@ import { StateTutorialFirstTimeService } from './services/state-tutorial-first-t
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 
  class MockNgbModalRef {
    componentInstance = {};
@@ -103,6 +104,8 @@ describe('Exploration editor page component', () => {
   let registerAcceptTutorialModalEventSpy;
   let registerDeclineTutorialModalEventSpy;
   let focusManagerService: FocusManagerService;
+  let explorationPermissionsBackendApiService:
+    ExplorationPermissionsBackendApiService;
   let ngbModal: NgbModal;
   let refreshGraphEmitter = new EventEmitter<void>();
   let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
@@ -342,7 +345,14 @@ describe('Exploration editor page component', () => {
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     ueps = TestBed.inject(UserExplorationPermissionsService);
     focusManagerService = TestBed.inject(FocusManagerService);
+    explorationPermissionsBackendApiService = TestBed.inject(
+      ExplorationPermissionsBackendApiService);
 
+    spyOn(explorationPermissionsBackendApiService, 'getPermissionsAsync')
+      .and.returnValue(Promise.resolve(
+        new ExplorationPermissions(
+          null, null, null, null, null, null, true, null)
+      ));
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.callFake((value) => {});
     spyOn(autosaveInfoModalsService, 'showLostChangesModal').and.stub();
