@@ -1129,6 +1129,11 @@ export class ConversationSkinComponent {
           taggedSkillMisconceptionId, wasOldStateInitial,
           isFirstHit, isFinalQuestion, focusLabel) => {
         this.nextCard = nextCard;
+
+        if (this.isDiagnosticTestPlayer) {
+          remainOnCurrentCard = false;
+        }
+
         if (!this._editorPreviewMode &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
           let oldStateName =
