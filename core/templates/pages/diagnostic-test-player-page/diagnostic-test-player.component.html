@@ -1,30 +1,31 @@
-<div>
-  <button class="btn oppia-diagnostic-test-button oppia-back-button"
-          (click)="returnBackToClassroom()">
-    BACK
-  </button>
-</div>
-<div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
-<mat-card class="introductory-card">
-  <div class="oppia-introductory-container">
-    <div class="oppia-image">
-      <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
-    </div>
-    <div class="test-introduction-container">
-      <p class="test-introduction-text">
-        This test will help us recommend a topic for you.
-      </p>
-      <p class="test-introduction-text">
-        Please note that you will not be able to return to previous questions
-        after moving to the next question.
-      </p>
-    </div>
+<div class="diagnostic-test-container">
+  <div>
+    <button class="btn oppia-diagnostic-test-button oppia-back-button"
+            (click)="returnBackToClassroom()"
+            translate="I18N_DIAGNOSTIC_TEST_BACK_BUTTON">
+    </button>
   </div>
-  <button class="btn oppia-diagnostic-test-button start-test-button"
-          disabled="true">
-    START THE TEST
-  </button>
-</mat-card>
+  <div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
+  <mat-card class="introductory-card">
+    <div class="oppia-introductory-container">
+      <div class="oppia-image">
+        <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+      </div>
+      <div class="test-introduction-container">
+        <p class="test-introduction-text">
+          <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1"></span>
+        </p>
+        <p class="test-introduction-text">
+          <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2"></span>
+        </p>
+      </div>
+    </div>
+    <button class="btn oppia-diagnostic-test-button start-test-button"
+            disabled="true"
+            translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
+    </button>
+  </mat-card>
+</div>
 
 <style>
   .oppia-image {
@@ -46,6 +47,7 @@
   .oppia-back-button {
     margin: 10px;
     position: absolute;
+    text-transform: uppercase;
   }
   .test-introduction-text {
     font-family: 'Roboto', Arial, sans-serif;
@@ -66,5 +68,6 @@
     color: #fff;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 12px;
+    text-transform: uppercase;
   }
 </style>

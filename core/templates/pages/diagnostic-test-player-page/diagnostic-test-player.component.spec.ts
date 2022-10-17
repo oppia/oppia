@@ -82,8 +82,6 @@ describe('Diagnostic test player component', () => {
   it('should open classroom on clicking back button', () => {
     component.returnBackToClassroom();
 
-    expect(windowRef.nativeWindow.location.href).toBe(
-      '/learn/math'
-    );
+    expect(windowRef.nativeWindow.location.href).toBe('/learn/math');
   });
 });
