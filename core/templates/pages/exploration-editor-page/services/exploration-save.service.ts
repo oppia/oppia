@@ -62,7 +62,7 @@ export class ExplorationSaveService {
   modalIsOpen: boolean = false;
 
   diffData = null;
-  _initExplorationPageEventEmitter = new EventEmitter<void>();
+  _initExplorationPageEventEmitter = new EventEmitter();
 
   constructor(
     private alertsService: AlertsService,
@@ -280,7 +280,7 @@ export class ExplorationSaveService {
     });
   }
 
-  get onInitExplorationPage(): EventEmitter<void> {
+  get onInitExplorationPage(): unknown {
     return this._initExplorationPageEventEmitter;
   }
 

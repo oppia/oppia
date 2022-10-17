@@ -27,7 +27,6 @@ import { ChangeListService } from 'pages/exploration-editor-page/services/change
 import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
-import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -58,7 +57,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string | boolean | ParamChange[] | ParamSpecs): void {
+  init(value: string | boolean | ParamChange[]): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }

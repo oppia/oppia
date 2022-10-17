@@ -69,10 +69,8 @@ export class InternetConnectivityService {
             tap(val => {
               if (this._internetAccessible) {
                 this._internetAccessible = false;
-                this.ngZone.run(() => {
-                  this._connectionStateChangeEventEmitter.emit(
-                    this._internetAccessible);
-                });
+                this._connectionStateChangeEventEmitter.emit(
+                  this._internetAccessible);
               }
             }),
             delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
@@ -81,10 +79,8 @@ export class InternetConnectivityService {
         ).subscribe(result => {
           if (!this._internetAccessible) {
             this._internetAccessible = true;
-            this.ngZone.run(() => {
-              this._connectionStateChangeEventEmitter.emit(
-                this._internetAccessible);
-            });
+            this._connectionStateChangeEventEmitter.emit(
+              this._internetAccessible);
           }
         }));
     });
