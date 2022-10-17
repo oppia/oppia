@@ -25,34 +25,38 @@ import shutil
 import subprocess
 
 from core.tests import test_utils
+from scripts import concurrent_task_utils
 
 import esprima
+
+from typing import List, Tuple
+from typing_extensions import Final
 
 from . import js_ts_linter
 from . import pre_commit_linter
 
+NAME_SPACE: Final = multiprocessing.Manager().Namespace()
+NAME_SPACE.files = pre_commit_linter.FileCache()  # type: ignore[no-untyped-call]
+FILE_CACHE: Final = NAME_SPACE.files
 
-NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES = multiprocessing.Manager().dict()
-NAME_SPACE.files = pre_commit_linter.FileCache()
-FILE_CACHE = NAME_SPACE.files
-
-LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
-VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
-VALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
-VALID_BACKEND_API_SERVICE_FILEPATH = os.path.join(
+LINTER_TESTS_DIR: Final = os.path.join(
+    os.getcwd(), 'scripts', 'linters', 'test_files'
+)
+VALID_JS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.js')
+VALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
+VALID_BACKEND_API_SERVICE_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
-INVALID_SORTED_DEPENDENCIES_FILEPATH = os.path.join(
+INVALID_SORTED_DEPENDENCIES_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_sorted_dependencies.ts')
-INVALID_CONSTANT_IN_TS_FILEPATH = os.path.join(
+INVALID_CONSTANT_IN_TS_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
-INVALID_CONSTANT_FILEPATH = os.path.join(
+INVALID_CONSTANT_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid.constants.ts')
-INVALID_CONSTANT_AJS_FILEPATH = os.path.join(
+INVALID_CONSTANT_AJS_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid.constants.ajs.ts')
-VALID_IGNORED_SERVICE_PATH = os.path.join(
+VALID_IGNORED_SERVICE_PATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_ignored.service.ts')
-VALID_UNLISTED_SERVICE_PATH = os.path.join(
+VALID_UNLISTED_SERVICE_PATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_unlisted.service.ts')
 
 # Note: Almost all test functions have a subprocess call. This call is to mock
@@ -62,10 +66,26 @@ VALID_UNLISTED_SERVICE_PATH = os.path.join(
 # thereby making the tests run faster.
 
 
+class Ret:
+    """Return object with required attributes."""
+
+    def __init__(self) -> None:
+        self.returncode = 1
+
+    def communicate(self) -> Tuple[str, bytes]:
+        """Return some error."""
+        return '', 'Some error'.encode('utf-8')
+
+
 class JsTsLintTests(test_utils.LinterTestBase):
     """Tests for js_ts_linter file."""
 
-    def validate(self, lint_task_report, expected_messages, failed_count):
+    def validate(
+        self,
+        lint_task_report: List[concurrent_task_utils.TaskResult],
+        expected_messages: List[str],
+        failed_count: int
+    ) -> None:
         """Assert linter output messages with expected messages."""
         for stdout in lint_task_report:
             if stdout.failed:
@@ -77,16 +97,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
             else:
                 continue
 
-    def test_compile_all_ts_files_with_error(self):
-        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            class Ret:
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 1
-                def communicate(self):
-                    """Return some error."""
-                    return '', 'Some error'.encode('utf-8')
+    def test_compile_all_ts_files_with_error(self) -> None:
+        def mock_popen_error_call(
+            unused_cmd_tokens: List[str], *args: str, **kwargs: str  # pylint: disable=unused-argument
+        ) -> Ret:
             return Ret()
 
         popen_error_swap = self.swap(
@@ -95,8 +109,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
             with self.assertRaisesRegex(Exception, 'Some error'):
                 js_ts_linter.compile_all_ts_files()
 
-    def test_validate_and_parse_js_and_ts_files_with_exception(self):
-        def mock_parse_script(unused_file_content, comment):  # pylint: disable=unused-argument
+    def test_validate_and_parse_js_and_ts_files_with_exception(self) -> None:
+        def mock_parse_script(unused_file_content: str, comment: str) -> None:  # pylint: disable=unused-argument
             raise Exception('Exception raised from parse_script()')
 
         compile_all_ts_files_swap = self.swap(
@@ -109,8 +123,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE).perform_all_lint_checks()
 
-    def test_check_constants_declaration(self):
-        def mock_compile_all_ts_files():
+    def test_check_constants_declaration(self) -> None:
+        def mock_compile_all_ts_files() -> None:
             cmd = (
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
@@ -139,8 +153,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
             ]
         self.validate(lint_task_report, expected_messages, 1)
 
-    def test_check_duplicate_constant_declaration_in_separate_files(self):
-        def mock_compile_all_ts_files():
+    def test_check_duplicate_constant_declaration_in_separate_files(
+        self
+    ) -> None:
+        def mock_compile_all_ts_files() -> None:
             cmd = (
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
@@ -167,18 +183,20 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'or rename the constant.']
         self.validate(lint_task_report, expected_messages, 1)
 
-    def test_third_party_linter(self):
+    def test_third_party_linter(self) -> None:
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             [INVALID_SORTED_DEPENDENCIES_FILEPATH]
         ).perform_all_lint_checks()
         expected_messages = ['Unused injected value IMPORT_STATEMENT']
         self.validate(lint_task_report, expected_messages, 1)
 
-    def test_third_party_linter_with_stderr(self):
+    def test_third_party_linter_with_stderr(self) -> None:
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-        def mock_popen(unused_cmd, stdout, stderr):  # pylint: disable=unused-argument
+        def mock_popen(
+            unused_cmd: str, stdout: int, stderr: int  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
-        def mock_communicate(unused_self):
+        def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
             return (b'Output', b'Invalid')
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         communicate_swap = self.swap(
@@ -189,8 +207,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     [INVALID_SORTED_DEPENDENCIES_FILEPATH]
                 ).perform_all_lint_checks()
 
-    def test_third_party_linter_with_invalid_eslint_path(self):
-        def mock_exists(unused_path):
+    def test_third_party_linter_with_invalid_eslint_path(self) -> None:
+        def mock_exists(unused_path: str) -> bool:
             return False
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -203,14 +221,14 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH]
             ).perform_all_lint_checks()
 
-    def test_third_party_linter_with_success_message(self):
+    def test_third_party_linter_with_success_message(self) -> None:
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             [VALID_TS_FILEPATH]).perform_all_lint_checks()
         expected_messages = (
             ['SUCCESS  ESLint check passed'])
         self.validate(lint_task_report, expected_messages, 0)
 
-    def test_custom_linter_with_no_files(self):
+    def test_custom_linter_with_no_files(self) -> None:
         lint_task_report = js_ts_linter.JsTsLintChecksManager(
             [], [], FILE_CACHE).perform_all_lint_checks()
         self.assertEqual(
@@ -221,7 +239,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertEqual('JS TS lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
-    def test_third_party_linter_with_no_files(self):
+    def test_third_party_linter_with_no_files(self) -> None:
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             []).perform_all_lint_checks()
         self.assertEqual(
@@ -232,8 +250,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertEqual('JS TS lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
-    def test_angular_services_index_error(self):
-        def mock_compile_all_ts_files():
+    def test_angular_services_index_error(self) -> None:
+        def mock_compile_all_ts_files() -> None:
             cmd = (
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
@@ -271,8 +289,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
         ]
         self.validate(lint_task_report, expected_messages, 1)
 
-    def test_angular_services_index_success(self):
-        def mock_compile_all_ts_files():
+    def test_angular_services_index_success(self) -> None:
+        def mock_compile_all_ts_files() -> None:
             cmd = (
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
@@ -298,7 +316,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         ]
         self.validate(lint_task_report, expected_messages, 0)
 
-    def test_get_linters_with_success(self):
+    def test_get_linters_with_success(self) -> None:
         custom_linter, third_party = js_ts_linter.get_linters(
             [VALID_JS_FILEPATH], [VALID_TS_FILEPATH], FILE_CACHE)
         self.assertTrue(
