@@ -261,7 +261,7 @@ describe('Blog Dashboard Page Component', () => {
   ' add it to drafts list', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_name: 'test_user',
+        author_username: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -296,7 +296,7 @@ describe('Blog Dashboard Page Component', () => {
   'published blog post is deleted', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_name: 'test_user',
+        author_username: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -326,7 +326,7 @@ describe('Blog Dashboard Page Component', () => {
   'draft blog post is deleted', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_name: 'test_user',
+        author_username: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
