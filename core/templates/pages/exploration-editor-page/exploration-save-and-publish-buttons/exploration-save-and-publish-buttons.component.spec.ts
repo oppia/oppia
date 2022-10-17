@@ -37,13 +37,13 @@ import { ExplorationWarningsService } from '../services/exploration-warnings.ser
 import { ExternalSaveService } from 'services/external-save.service';
 import { ExplorationSavePromptModalComponent } from '../modal-templates/exploration-save-prompt-modal.component';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Exploration save and publish buttons component', () => {
   let component: ExplorationSaveAndPublishButtonsComponent;
   let fixture: ComponentFixture<ExplorationSaveAndPublishButtonsComponent>;
   let changeListService: ChangeListService;
   let ngbModal: NgbModal;
-  let contextService: ContextService;
   let ics: InternetConnectivityService;
   let explorationRightsService: ExplorationRightsService;
   let explorationSaveService: ExplorationSaveService;
@@ -66,6 +66,48 @@ describe('Exploration save and publish buttons component', () => {
      }
    }
 
+   class MockWindowRef {
+     location = { path: '/create/2234' };
+     nativeWindow = {
+       scrollTo: (value1, value2) => {},
+       sessionStorage: {
+         promoIsDismissed: null,
+         setItem: (testKey1, testKey2) => {},
+         removeItem: (testKey) => {}
+       },
+       gtag: (value1, value2, value3) => {},
+       navigator: {
+         onLine: true,
+         userAgent: null
+       },
+       location: {
+         path: '/create/2234',
+         pathname: '/',
+         hostname: 'oppiaserver.appspot.com',
+         search: '',
+         protocol: '',
+         reload: () => {},
+         hash: '',
+         href: '',
+       },
+       document: {
+         documentElement: {
+           setAttribute: (value1, value2) => {},
+           clientWidth: null,
+           clientHeight: null,
+         },
+         body: {
+           clientWidth: null,
+           clientHeight: null,
+           style: {
+             overflowY: ''
+           }
+         }
+       },
+       addEventListener: (value1, value2) => {}
+     };
+   }
+
    beforeEach(waitForAsync(() => {
      TestBed.configureTestingModule({
        imports: [
@@ -85,6 +127,19 @@ describe('Exploration save and publish buttons component', () => {
            useClass: MockExternalSaveService
          },
          {
+           provide: WindowRef,
+           useClass: MockWindowRef
+         },
+         {
+           provide: ContextService,
+           useValue: {
+             getExplorationId: () => {
+               return 'exp1';
+             },
+             setExplorationIsLinkedToStory: () => {}
+           }
+         },
+         {
            provide: NgbModal,
            useClass: MockNgbModal
          }
@@ -99,13 +154,11 @@ describe('Exploration save and publish buttons component', () => {
      component = fixture.componentInstance;
 
      changeListService = TestBed.inject(ChangeListService);
-     contextService = TestBed.inject(ContextService);
      ngbModal = TestBed.inject(NgbModal);
      ics = TestBed.inject(InternetConnectivityService);
      explorationRightsService = TestBed.inject(ExplorationRightsService);
      explorationSaveService = TestBed.inject(ExplorationSaveService);
      explorationWarningsService = TestBed.inject(ExplorationWarningsService);
-     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
      editabilityService = TestBed.inject(EditabilityService);
      userExplorationPermissionsService = TestBed.inject(
        UserExplorationPermissionsService);
