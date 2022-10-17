@@ -24,15 +24,22 @@ const {
     await write("testadmin@example.com", into(textBox("enter an email")));
     await click(button("Sign In", below("Emulator Mode Sign In")));
     await goto("http://localhost:8181/creator-dashboard");
-    // await click("CREATE EXPLORATION");
+  
     await click(button({class: "e2e-test-create-new-exploration-button" }));
     await click(listItem({ class: "e2e-test-translation-tab" }));
     await click(
-      button({ class: "e2e-test-accessibility-translation-start-record" })
+      button({ class: "e2e-test-accessibility-translation-upload-audio" })
     );
-    await setConfig({ observeTime: 3000 });
-    await press("R");
-    await click(button({ class: "e2e-test-confirm-record" }));
+    
+    await attach("./A4.mp3", 
+        fileField(above(button('Cancel'))));
+    await click(
+      button({ class: "e2e-test-save-uploaded-audio-button" })
+    );
+
+    await click(button({class: 'e2e-test-delete-record'}));
+    await click('Delete');
+
   } catch (error) {
     console.error(error);
   } finally {

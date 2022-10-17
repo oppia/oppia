@@ -1,8 +1,0 @@
-{
-  "files.autoSaveDelay": 500,
-  "files.autoSave": "afterDelay",
-  "files.associations": {
-    "*.spec": "gauge",
-    "*.cpt": "gauge"
-  }
-}
