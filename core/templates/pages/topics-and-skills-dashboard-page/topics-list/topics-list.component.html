@@ -84,12 +84,12 @@
       </td>
     </tr>
   </table>
-  <div class="topics-list-mobile">
+  <div class="topics-list-mobile e2e-test-mobile-topic-table">
     <div *ngFor="let topic of topicSummaries; index as idx">
       <div class="topic-item">
         <div class="topic-item-header">
           <div class="topic-item-name-box">
-            <div class="topic-item-name">
+            <div class="topic-item-name e2e-test-mobile-topic-name">
               <span>
                 {{getSerialNumberForTopic(idx)}}
               </span>

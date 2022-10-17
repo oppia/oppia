@@ -24,6 +24,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
+import { JoyrideModule } from 'ngx-joyride';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
@@ -81,6 +82,19 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
+import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
+import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
+import { NeedsGuidingResponsesTaskComponent } from './improvements-tab/needs-guiding-responses-task.component';
+import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
+import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
+import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
+import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
+import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
+import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component';
+import { StateTranslationComponent } from './translation-tab/state-translation/state-translation.component';
+import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component';
+import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component';
+import { TranslationTabComponent } from './translation-tab/translation-tab.component';
 
 @NgModule({
   imports: [
@@ -96,6 +110,7 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     FormsModule,
     MatPaginatorModule,
     RouterModule.forRoot([]),
+    JoyrideModule.forRoot(),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -144,7 +159,20 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    PieChartComponent,
+    StateStatsModalComponent,
+    StatisticsTabComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent,
+    StateTranslationComponent,
+    TranslatorOverviewComponent,
+    StateTranslationStatusGraphComponent,
+    TranslationTabComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -190,7 +218,20 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    PieChartComponent,
+    StateStatsModalComponent,
+    StatisticsTabComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent,
+    StateTranslationComponent,
+    TranslatorOverviewComponent,
+    StateTranslationStatusGraphComponent,
+    TranslationTabComponent,
   ],
   providers: [
     {

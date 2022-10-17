@@ -167,9 +167,9 @@ var TopicEditorPage = function() {
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
-    await waitFor.visibilityOf(
-      selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
-    await selectSkillDropdown.selectByVisibleText(skillDescription);
+    await action.click('Select Skill Dropdown', selectSkillDropdown);
+    var dropdownOption = await $(`.mat-option-text=${skillDescription}`);
+    await action.click(skillDescription, dropdownOption);
     await waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
     var questionItems = await questionItemsSelector();
@@ -184,9 +184,9 @@ var TopicEditorPage = function() {
   };
 
   this.createQuestionForSkillWithName = async function(skillDescription) {
-    await waitFor.visibilityOf(
-      selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
-    await selectSkillDropdown.selectByVisibleText(skillDescription);
+    await action.click('Select Skill Dropdown', selectSkillDropdown);
+    var dropdownOption = await $(`.mat-option-text=${skillDescription}`);
+    await action.click(skillDescription, dropdownOption);
     await action.click('Create question button', createQuestionButton);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
@@ -467,8 +467,15 @@ var TopicEditorPage = function() {
 
   this.createStory = async function(
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
-    await general.scrollToTop();
-    await action.click('Create Story Button', createStoryButton);
+    let width = (await browser.getWindowSize()).width;
+    if (width < 831) {
+      var storiesDropdown = $('.e2e-test-story-dropdown');
+      await action.click('Story dropdown', storiesDropdown);
+      await action.click('Create Story Button', createStoryButton);
+    } else {
+      await general.scrollToTop();
+      await action.click('Create Story Button', createStoryButton);
+    }
 
     await action.setValue(
       'Create new story title', newStoryTitleField, storyTitle);

@@ -205,11 +205,13 @@ export class CkEditorInitializerService {
                   const customEl = that.element.getChild(0).$;
                   customEl[capital.join('') + 'WithValue'] = (
                     htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] || ''));
+                      that.data[spec.name] !== undefined ?
+                      that.data[spec.name] : ''));
                   that.element.getChild(0).setAttribute(
                     spec.name + '-with-value',
                     htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] || ''));
+                      that.data[spec.name] !== undefined ?
+                      that.data[spec.name] : ''));
                 });
               },
               init: function() {

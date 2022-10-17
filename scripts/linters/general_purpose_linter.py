@@ -21,6 +21,9 @@ from __future__ import annotations
 import os
 import re
 
+from typing import Dict, List, Pattern, Tuple
+from typing_extensions import Final, TypedDict
+
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
 
@@ -28,7 +31,46 @@ from .. import build
 from .. import common
 from .. import concurrent_task_utils
 
-EXCLUDED_PATHS = (
+MYPY = False
+if MYPY:  # pragma: no cover
+    from scripts.linters import pre_commit_linter
+
+
+class BadPatternRegexpDict(TypedDict):
+    """Dictionary representation of bad pattern regular expressions."""
+
+    regexp: Pattern[str]
+    message: str
+    excluded_files: Tuple[str, ...]
+    excluded_dirs: Tuple[str, ...]
+
+
+class BadPatternsDict(TypedDict):
+    """Dictionary representation of bad patterns."""
+
+    message: str
+    excluded_files: Tuple[str, ...]
+    excluded_dirs: Tuple[str, ...]
+
+
+class MandatoryPatternsRegexpDict(TypedDict):
+    """Dictionary representation of mandatory pattern regular expressions."""
+
+    regexp: Pattern[str]
+    message: str
+    included_types: Tuple[str, ...]
+    excluded_files: Tuple[str, ...]
+    excluded_dirs: Tuple[str, ...]
+
+
+class BadStringsConstantsDict(TypedDict):
+    """Type for the dictionary representation of BAD_STRINGS_CONSTANTS dict."""
+
+    message: str
+    excluded_files: Tuple[str, ...]
+
+
+EXCLUDED_PATHS: Final = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif', '*.png',
     '*.webp', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
@@ -44,13 +86,12 @@ EXCLUDED_PATHS = (
     'extensions/classifiers/proto/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
-GENERATED_FILE_PATHS = (
+GENERATED_FILE_PATHS: Final = (
     'core/templates/expressions/parser.js',)
 
-CONFIG_FILE_PATHS = (
+CONFIG_FILE_PATHS: Final = (
     'core/tests/.browserstack.env.example',
     'core/tests/wdio.conf.js',
-    'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/mathjaxConfig.ts',
     'assets/constants.ts',
@@ -59,7 +100,7 @@ CONFIG_FILE_PATHS = (
     'webpack.dev.config.ts',
     'webpack.prod.config.ts')
 
-BAD_STRINGS_CONSTANTS = {
+BAD_STRINGS_CONSTANTS: Dict[str, BadStringsConstantsDict] = {
     '"DEV_MODE": false': {
         'message': 'Please set the DEV_MODE variable in constants.ts '
                    'to true before committing.',
@@ -72,7 +113,7 @@ BAD_STRINGS_CONSTANTS = {
     }
 }
 
-BAD_PATTERNS = {
+BAD_PATTERNS: Dict[str, BadPatternsDict] = {
     '\t': {
         'message': 'Please use spaces instead of tabs.',
         'excluded_files': (),
@@ -97,7 +138,7 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
-BAD_PATTERNS_REGEXP = [
+BAD_PATTERNS_REGEXP: List[BadPatternRegexpDict] = [
     {
         'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
         'message': 'Please link TODO comments to an issue '
@@ -107,7 +148,7 @@ BAD_PATTERNS_REGEXP = [
     }
 ]
 
-MANDATORY_PATTERNS_REGEXP = [
+MANDATORY_PATTERNS_REGEXP: List[MandatoryPatternsRegexpDict] = [
     {
         'regexp': re.compile(
             r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.'),
@@ -122,14 +163,14 @@ MANDATORY_PATTERNS_REGEXP = [
         'regexp': re.compile('from __future__ import annotations'),
         'message': 'Please ensure this file should contain annotations '
                    'future import.',
-        'included_types': ('.py'),
+        'included_types': ('.py',),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
             '__init__.py',),
         'excluded_dirs': EXCLUDED_PATHS
     }
 ]
 
-MANDATORY_PATTERNS_JS_REGEXP = [
+MANDATORY_PATTERNS_JS_REGEXP: List[MandatoryPatternsRegexpDict] = [
     {
         'regexp': re.compile(r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+'),
         'message': 'Please ensure this file should contain a file '
@@ -140,7 +181,7 @@ MANDATORY_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_LINE_PATTERNS_HTML_REGEXP = [
+BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexpDict] = [
     {
         'regexp': re.compile(r'text\/ng-template'),
         'message': 'The directives must be directly referenced.',
@@ -173,7 +214,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_PYTHON_REGEXP = [
+BAD_PATTERNS_PYTHON_REGEXP: List[BadPatternRegexpDict] = [
     {
         'regexp': re.compile(r'__author__'),
         'message': 'Please remove author tags from this file.',
@@ -225,13 +266,15 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
 ]
 
-BAD_PATTERNS_MAP = {
+BAD_PATTERNS_MAP: Dict[str, List[BadPatternRegexpDict]] = {
     '.html': BAD_LINE_PATTERNS_HTML_REGEXP,
     '.py': BAD_PATTERNS_PYTHON_REGEXP
 }
 
 
-def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
+def is_filepath_excluded_for_bad_patterns_check(
+    pattern: str, filepath: str
+) -> bool:
     """Checks if file is excluded from the bad patterns check.
 
     Args:
@@ -248,7 +291,9 @@ def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
             or filepath in BAD_PATTERNS[pattern]['excluded_files'])
 
 
-def check_bad_pattern_in_file(filepath, file_content, pattern):
+def check_bad_pattern_in_file(
+    filepath: str, file_content: str, pattern: BadPatternRegexpDict
+) -> Tuple[bool, List[str]]:
     """Detects whether the given pattern is present in the file.
 
     Args:
@@ -294,7 +339,9 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
     return failed, error_messages
 
 
-def check_file_type_specific_bad_pattern(filepath, content):
+def check_file_type_specific_bad_pattern(
+    filepath: str, content: str
+) -> Tuple[bool, int, List[str]]:
     """Check the file content based on the file's extension.
 
     Args:
@@ -303,7 +350,8 @@ def check_file_type_specific_bad_pattern(filepath, content):
 
     Returns:
         bool. True if there is bad pattern else false.
-        total_error_count: int. The number of errors.
+        int. The number of errors.
+        List[str]. All error messages.
     """
     error_messages = []
     failed = False
@@ -327,7 +375,9 @@ class GeneralPurposeLinter:
     is not intended to be used directly.
     """
 
-    def __init__(self, files_to_lint, file_cache):
+    def __init__(
+        self, files_to_lint: List[str], file_cache: pre_commit_linter.FileCache
+    ) -> None:
         """Constructs a GeneralPurposeLinter object.
 
         Args:
@@ -345,12 +395,16 @@ class GeneralPurposeLinter:
         self.file_cache = file_cache
 
     @property
-    def all_filepaths(self):
+    def all_filepaths(self) -> List[str]:
         """Returns all file paths."""
         return self.files_to_lint
 
     def _check_for_mandatory_pattern_in_file(
-            self, pattern_list, filepath, failed):
+        self,
+        pattern_list: List[MandatoryPatternsRegexpDict],
+        filepath: str,
+        failed: bool
+    ) -> Tuple[bool, List[str]]:
         """Checks for a given mandatory pattern in a file.
 
         Args:
@@ -360,7 +414,8 @@ class GeneralPurposeLinter:
             failed: bool. Status of failure of the check.
 
         Returns:
-            bool. The failure status of the check.
+            Tuple[bool, List[str]]. The failure status of the check
+            and error messages.
 
         Raises:
             Exception. Given file at filepath is not readable.
@@ -371,7 +426,7 @@ class GeneralPurposeLinter:
         error_messages = []
 
         try:
-            file_content = self.file_cache.readlines(filepath)
+            file_content = self.file_cache.readlines(filepath)  # type: ignore[no-untyped-call]
         except Exception as e:
             raise Exception('%s %s' % (filepath, e)) from e
         for index, regexp_to_check in enumerate(
@@ -399,7 +454,7 @@ class GeneralPurposeLinter:
 
         return failed, error_messages
 
-    def check_mandatory_patterns(self):
+    def check_mandatory_patterns(self) -> concurrent_task_utils.TaskResult:
         """This function checks that all files contain the mandatory
         patterns.
         """
@@ -417,7 +472,7 @@ class GeneralPurposeLinter:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_bad_patterns(self):
+    def check_bad_patterns(self) -> concurrent_task_utils.TaskResult:
         """This function is used for detecting bad patterns."""
         name = 'Bad pattern'
         total_files_checked = 0
@@ -429,7 +484,7 @@ class GeneralPurposeLinter:
                     filepath.endswith('general_purpose_linter_test.py')))]
         failed = False
         for filepath in all_filepaths:
-            file_content = self.file_cache.readlines(filepath)
+            file_content = self.file_cache.readlines(filepath)  # type: ignore[no-untyped-call]
             total_files_checked += 1
             for pattern, error in BAD_PATTERNS.items():
                 if is_filepath_excluded_for_bad_patterns_check(
@@ -476,7 +531,7 @@ class GeneralPurposeLinter:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_newline_at_eof(self):
+    def check_newline_at_eof(self) -> concurrent_task_utils.TaskResult:
         """This function is used to detect newline at the end of file."""
         name = 'Newline at EOF'
         error_messages = []
@@ -484,7 +539,7 @@ class GeneralPurposeLinter:
         failed = False
 
         for filepath in files_to_lint:
-            file_content = self.file_cache.readlines(filepath)
+            file_content = self.file_cache.readlines(filepath)  # type: ignore[no-untyped-call]
             file_length = len(file_content)
             if (
                     file_length >= 1 and
@@ -497,7 +552,7 @@ class GeneralPurposeLinter:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_disallowed_flags(self):
+    def check_disallowed_flags(self) -> concurrent_task_utils.TaskResult:
         """This function is used to disallow flags."""
         name = 'Disallow flags'
         disallow_flag = (
@@ -515,7 +570,7 @@ class GeneralPurposeLinter:
                     allowed_files = filepath
             if not filepath.endswith('.ts') or filepath == allowed_files:
                 continue
-            file_content = self.file_cache.read(filepath)
+            file_content = self.file_cache.read(filepath)  # type: ignore[no-untyped-call]
 
             if disallow_flag in file_content:
                 error_message = (
@@ -527,7 +582,7 @@ class GeneralPurposeLinter:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_extra_js_files(self):
+    def check_extra_js_files(self) -> concurrent_task_utils.TaskResult:
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
         build.JS_FILEPATHS_NOT_TO_BUILD.
@@ -546,8 +601,7 @@ class GeneralPurposeLinter:
                 ('.js')) and filepath.startswith(
                     ('core/templates', 'extensions')) and (
                         filepath not in build.JS_FILEPATHS_NOT_TO_BUILD
-                        ) and not filepath.endswith(
-                        ('protractor.js', 'webdriverio.js')):
+                        ) and not filepath.endswith('webdriverio.js'):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)
@@ -562,7 +616,7 @@ class GeneralPurposeLinter:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -582,7 +636,9 @@ class GeneralPurposeLinter:
         return task_results
 
 
-def get_linters(files_to_lint, file_cache):
+def get_linters(
+    files_to_lint: List[str], file_cache: pre_commit_linter.FileCache
+) -> Tuple[GeneralPurposeLinter, None]:
     """Creates GeneralPurposeLinter object and returns it.
 
     Args:

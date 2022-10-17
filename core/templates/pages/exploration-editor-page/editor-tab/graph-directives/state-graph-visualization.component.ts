@@ -329,6 +329,8 @@ export class StateGraphVisualization
       warning = (
         'Warning: there is no path from this state to the END state.'
       );
+    } else {
+      warning = this.getNodeErrorMessage(node.label);
     }
 
     let tooltip = node.label;
@@ -457,15 +459,16 @@ export class StateGraphVisualization
       this.nodeList.push(this.nodeData[nodeId]);
     }
 
-    this.overallTransformStr = 'translate(0,0)';
-    this.innerTransformStr = 'translate(0,0)';
-
     if (this.allowPanning) {
       this.makeGraphPannable();
     }
 
     if (this.centerAtCurrentState) {
-      this.centerGraph();
+      // SetTimeout is required to ensure code runs
+      // once all the current call stack has finished execution.
+      setTimeout(() => {
+        this.centerGraph();
+      });
     }
   }
 
@@ -486,10 +489,17 @@ export class StateGraphVisualization
   }
 
   ngOnInit(): void {
+    this.overallTransformStr = 'translate(0,0)';
+    this.innerTransformStr = 'translate(0,0)';
+
     this.directiveSubscriptions.add(
       this.routerService.onCenterGraph.subscribe(() => {
-        this.centerGraph();
-        this.redrawGraph();
+        // SetTimeout is required to ensure code runs
+        // once all the current call stack has finished execution.
+        setTimeout(() => {
+          this.centerGraph();
+          this.redrawGraph();
+        });
       })
     );
 

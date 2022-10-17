@@ -97,6 +97,7 @@ var ExplorationEditorPage = function() {
   var navigateToStatsTabButton = $('.e2e-test-stats-tab');
   var navigateToTranslationTabButton = $('.e2e-test-translation-tab');
   var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
+  var previewTabLearnerViewCard = $('.e2e-test-learner-view-card-content');
   var publishChangesButtonTextContainer = $(
     '.e2e-test-publish-changes-message');
   var publishExplorationButton = $('.e2e-test-publish-exploration');
@@ -105,9 +106,15 @@ var ExplorationEditorPage = function() {
   var saveChangesButton = $('.e2e-test-save-changes');
   var saveDiscardToggleButton = $('.e2e-test-save-discard-toggle');
   var saveDraftButtonTextContainer = $('.e2e-test-save-draft-message');
+  var saveButtonMobileSelector = function() {
+    return $$('.e2e-test-save-changes-for-small-screens');
+  };
+  var navigateToSettingsTabButtonMobile = $('.e2e-test-mobile-options');
+  var optionsDropdownMobile = $('.e2e-test-mobile-options-dropdown');
+  var settingsButtonMobile = $('.e2e-test-mobile-settings-button');
 
   /*
-   * Components
+        * Components
    */
   this.getImprovementsTab = function() {
     return (
@@ -246,20 +253,37 @@ var ExplorationEditorPage = function() {
     }
   };
 
+  // eslint-disable-next-line padded-blocks
   this.saveChanges = async function(commitMessage) {
     await action.waitForAutosave();
-    await action.click('Save changes button', saveChangesButton);
-    if (commitMessage) {
-      await action.setValue(
-        'Commit message input', commitMessageInput, commitMessage);
+    let width = (await browser.getWindowSize()).width;
+    if (width > 768) {
+      await action.click('Save changes button', saveChangesButton);
+      if (commitMessage) {
+        await action.setValue(
+          'Commit message input', commitMessageInput, commitMessage);
+      }
+
+      await action.click('Save draft button', commitChangesButton);
+      // TODO(#13096): Remove browser.pause from e2e files.
+      /* eslint-disable-next-line oppia/e2e-practices */
+      await browser.pause(2500);
+      await waitFor.textToBePresentInElement(
+        saveDraftButtonTextContainer, 'Save Draft',
+        'Changes could not be saved');
+    } else {
+      var saveButtonMobile = await saveButtonMobileSelector();
+      if (await saveButtonMobile.length === 0) {
+        await action.click(
+          'Settings tab button', navigateToSettingsTabButtonMobile);
+      }
+      await action.click('Save draft', saveButtonMobile[0]);
+      if (commitMessage) {
+        await action.sendValue(
+          'Commit message input', commitMessageInput, commitMessage);
+      }
+      await action.click('Save draft button', commitChangesButton);
     }
-    await action.click('Save draft button', commitChangesButton);
-    // TODO(#13096): Remove browser.pause from e2e files.
-    // eslint-disable-next-line oppia/e2e-practices
-    await browser.pause(2500);
-    await waitFor.textToBePresentInElement(
-      saveDraftButtonTextContainer, 'Save Draft',
-      'Changes could not be saved');
   };
 
   this.publishChanges = async function(commitMessage) {
@@ -383,8 +407,26 @@ var ExplorationEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.waitForPreviewTabToLoad = async function() {
+    await waitFor.visibilityOf(
+      previewTabLearnerViewCard, 'Preview Tab learner card is not visible');
+  };
+
   this.navigateToSettingsTab = async function() {
-    await action.click('Settings tab button', navigateToSettingsTabButton);
+    let width = (await browser.getWindowSize()).width;
+    if (width > 768) {
+      await action.click('Settings tab button', navigateToSettingsTabButton);
+    } else {
+      var saveButtonMobile = await saveButtonMobileSelector();
+      if (await saveButtonMobile.length === 0) {
+        await action.click(
+          'Settings tab button', navigateToSettingsTabButtonMobile);
+      }
+      await action.click(
+        'Options button dropdown', optionsDropdownMobile);
+      await action.click(
+        'Settings tab', settingsButtonMobile);
+    }
     await waitFor.pageToFullyLoad();
   };
 
