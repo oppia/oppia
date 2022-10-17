@@ -501,7 +501,7 @@ describe('Exploration editor page component', () => {
 
     it('should navigate to main tab', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
       spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
       spyOn(rs, 'navigateToMainTab').and.callThrough();
