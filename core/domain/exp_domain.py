@@ -4819,6 +4819,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state['interaction']['solution']['explanation']['html'] = (
                     cls._fix_content(solution))
 
+            # Update translations and voiceovers.
+            cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
+                state, state_schema=52)
+
         return states_dict
 
     @classmethod
