@@ -17,7 +17,6 @@
 """Unit tests for jobs.batch_jobs.exp_migration_jobs."""
 
 from __future__ import annotations
-from typing import Dict
 
 from core import feconf
 from core.constants import constants
@@ -39,6 +38,8 @@ from core.jobs.batch_jobs import exp_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
+
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -589,11 +590,6 @@ class ExpSnapshotsMigrationAuditJobTests(
     NEW_EXP_ID = 'exp_id1'
     EXP_TITLE = 'title'
 
-    def setUp(self) -> None:
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-
     def create_exploration_with_states_schema_version(
         self,
         states_schema_version: int,
@@ -670,7 +666,8 @@ class ExpSnapshotsMigrationAuditJobTests(
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration)
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -695,7 +692,8 @@ class ExpSnapshotsMigrationAuditJobTests(
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration)
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
@@ -703,7 +701,8 @@ class ExpSnapshotsMigrationAuditJobTests(
             self.VALID_EXP_ID)
 
         # Delete the exploration before migration occurs.
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+        exp_services.delete_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.VALID_EXP_ID)
 
         # Ensure the exploration is deleted.
         with self.assertRaisesRegex(Exception, 'Entity .* not found'):
@@ -735,7 +734,8 @@ class ExpSnapshotsMigrationAuditJobTests(
         with swap_states_schema_version, swap_exp_schema_version:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(self.albert_id, exploration)
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
         self.assertLess(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -753,8 +753,11 @@ class ExpSnapshotsMigrationAuditJobTests(
             })
         ]
         exp_services.update_exploration(
-            self.albert_id, self.VALID_EXP_ID, migration_change_list,
-            'Ran Exploration Migration job.')
+            feconf.SYSTEM_COMMITTER_ID,
+            self.VALID_EXP_ID,
+            migration_change_list,
+            'Ran Exploration Migration job.'
+        )
         exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
         self.assertEqual(
             exploration_model.states_schema_version,
@@ -786,7 +789,8 @@ class ExpSnapshotsMigrationAuditJobTests(
         with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(self.albert_id, exploration)
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
 
         # Bring the main exploration to the latest schema.
         caching_services.delete_multi(
@@ -801,8 +805,11 @@ class ExpSnapshotsMigrationAuditJobTests(
             })
         ]
         exp_services.update_exploration(
-            self.albert_id, self.VALID_EXP_ID, migration_change_list,
-            'Ran Exploration Migration job.')
+            feconf.SYSTEM_COMMITTER_ID,
+            self.VALID_EXP_ID,
+            migration_change_list,
+            'Ran Exploration Migration job.'
+        )
         exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
         self.assertEqual(
             exploration_model.states_schema_version,
@@ -838,12 +845,15 @@ class ExpSnapshotsMigrationAuditJobTests(
     def test_audit_job_detects_invalid_exploration(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID,
+            exploration
+        )
 
         exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
         exploration_model.language_code = 'invalid_language_code'
         exploration_model.commit(
-            self.albert_id, 'Changed language_code.', [])
+            feconf.SYSTEM_COMMITTER_ID, 'Changed language_code.', [])
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
             [self.VALID_EXP_ID])
@@ -867,7 +877,8 @@ class ExpSnapshotsMigrationAuditJobTests(
         with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(self.albert_id, exploration)
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
         self.assertLess(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -901,11 +912,6 @@ class ExpSnapshotsMigrationJobTests(
     NEW_EXP_ID = 'exp_id1'
     EXP_TITLE = 'title'
 
-    def setUp(self) -> None:
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-
     def test_migration_job_does_not_convert_up_to_date_exp(self) -> None:
         """Tests that the exploration migration job does not convert a
         snapshot that is already the latest states schema version.
@@ -917,7 +923,8 @@ class ExpSnapshotsMigrationJobTests(
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration)
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -941,7 +948,8 @@ class ExpSnapshotsMigrationJobTests(
         with swap_states_schema_version, swap_exp_schema_version:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(self.albert_id, exploration)
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
         self.assertLess(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -959,8 +967,11 @@ class ExpSnapshotsMigrationJobTests(
             })
         ]
         exp_services.update_exploration(
-            self.albert_id, self.VALID_EXP_ID, migration_change_list,
-            'Ran Exploration Migration job.')
+            feconf.SYSTEM_COMMITTER_ID,
+            self.VALID_EXP_ID,
+            migration_change_list,
+            'Ran Exploration Migration job.'
+        )
         exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
         self.assertEqual(
             exploration_model.states_schema_version,
@@ -990,7 +1001,8 @@ class ExpSnapshotsMigrationJobTests(
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration)
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
@@ -998,7 +1010,8 @@ class ExpSnapshotsMigrationJobTests(
             self.VALID_EXP_ID)
 
         # Delete the exploration before migration occurs.
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+        exp_services.delete_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.VALID_EXP_ID)
 
         # Ensure the exploration is deleted.
         with self.assertRaisesRegex(Exception, 'Entity .* not found'):
@@ -1022,12 +1035,13 @@ class ExpSnapshotsMigrationJobTests(
     def test_migration_job_detects_invalid_exploration(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration)
 
         exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
         exploration_model.language_code = 'invalid_language_code'
         exploration_model.commit(
-            self.albert_id, 'Changed language_code.', [])
+            feconf.SYSTEM_COMMITTER_ID, 'Changed language_code.', [])
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
             [self.VALID_EXP_ID])
@@ -1053,7 +1067,8 @@ class ExpSnapshotsMigrationJobTests(
         with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(self.albert_id, exploration)
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
         self.assertLess(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
