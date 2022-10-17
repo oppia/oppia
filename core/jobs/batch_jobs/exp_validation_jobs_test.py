@@ -29,8 +29,8 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 (exp_models, opportunity_models) = models.Registry.import_models([
-  models.NAMES.exploration,
-  models.NAMES.opportunity
+  models.Names.EXPLORATION,
+  models.Names.OPPORTUNITY
 ])
 
 
