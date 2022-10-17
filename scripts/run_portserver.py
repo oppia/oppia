@@ -57,6 +57,9 @@ import socket
 import sys
 import threading
 
+from typing import Callable, Deque, List, Optional, Sequence
+from typing_extensions import Final
+
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -64,11 +67,13 @@ from scripts import common  # isort:skip pylint: disable=wrong-import-position, 
 
 from core import utils   # isort:skip
 
-_PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
-              (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
+_PROTOCOLS: Final = [
+    (socket.SOCK_STREAM, socket.IPPROTO_TCP),
+    (socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+]
 
 
-def get_process_command_line(pid) -> str:
+def get_process_command_line(pid: int) -> str:
     """Get the command for a process.
 
     Args:
@@ -84,14 +89,14 @@ def get_process_command_line(pid) -> str:
         return ''
 
 
-def get_process_start_time(pid) -> str:
+def get_process_start_time(pid: int) -> int:
     """Get the start time for a process.
 
     Args:
         pid: int. The process ID.
 
     Returns:
-        str. The time when the process started.
+        int. The time when the process started.
     """
     try:
         with utils.open_file('/proc/{}/stat'.format(pid), 'r') as f:
@@ -100,7 +105,9 @@ def get_process_start_time(pid) -> str:
         return 0
 
 
-def sock_bind(port, socket_type, socket_protocol):
+def sock_bind(
+    port: int, socket_type: int, socket_protocol: int
+) -> Optional[int]:
     """Try to bind to a socket of the specified type, protocol, and port.
     For the port to be considered available, the kernel must support at least
     one of (IPv6, IPv4), and the port must be available on each supported
@@ -137,7 +144,7 @@ def sock_bind(port, socket_type, socket_protocol):
     return port if got_socket else None
 
 
-def is_port_free(port) -> bool:
+def is_port_free(port: int) -> bool:
     """Check if specified port is free.
 
     Args:
@@ -146,10 +153,13 @@ def is_port_free(port) -> bool:
     Returns:
         bool. Whether the port is free to use for both TCP and UDP.
     """
-    return sock_bind(port, *_PROTOCOLS[0]) and sock_bind(port, *_PROTOCOLS[1])
+    return bool(
+        sock_bind(port, *_PROTOCOLS[0]) and
+        sock_bind(port, *_PROTOCOLS[1])
+    )
 
 
-def should_allocate_port(pid) -> bool:
+def should_allocate_port(pid: int) -> bool:
     """Determine whether to allocate a port for a process id.
 
     Args:
@@ -186,7 +196,7 @@ class _PortInfo:
 
     __slots__ = ('port', 'pid', 'start_time')
 
-    def __init__(self, port):
+    def __init__(self, port: int) -> None:
         self.port = port
         self.pid = 0
         self.start_time = 0
@@ -210,8 +220,8 @@ class PortPool:
           low.
     """
 
-    def __init__(self):
-        self._port_queue = collections.deque()
+    def __init__(self) -> None:
+        self._port_queue: Deque[_PortInfo] = collections.deque()
         self.ports_checked_for_last_request = 0
 
     def num_ports(self) -> int:
@@ -222,7 +232,7 @@ class PortPool:
         """
         return len(self._port_queue)
 
-    def get_port_for_process(self, pid) -> int:
+    def get_port_for_process(self, pid: int) -> int:
         """Allocates a port for the given process.
 
         Args:
@@ -264,7 +274,7 @@ class PortPool:
         self.ports_checked_for_last_request = check_count
         return 0
 
-    def add_port_to_free_pool(self, port) -> None:
+    def add_port_to_free_pool(self, port: int) -> None:
         """Add a new port to the free pool for allocation.
 
         Args:
@@ -288,11 +298,11 @@ class PortServerRequestHandler:
     Statistics can be logged using the dump_stats method.
     """
 
-    def __init__(self, ports_to_serve):
+    def __init__(self, ports_to_serve: Sequence[int]) -> None:
         """Initialize a new port server.
 
         Args:
-            ports_to_serve: list(int). A sequence of unique port numbers
+            ports_to_serve: Sequence[int]. A sequence of unique port numbers
                 to test and offer up to clients.
         """
         self._port_pool = PortPool()
@@ -302,28 +312,30 @@ class PortServerRequestHandler:
         for port in ports_to_serve:
             self._port_pool.add_port_to_free_pool(port)
 
-    def handle_port_request(self, client_data) -> str:
+    def handle_port_request(
+        self, client_data: bytes
+    ) -> Optional[bytes]:
         """Given a port request body, parse it and respond appropriately.
 
         Args:
             client_data: bytes. The request bytes from the client.
 
         Returns:
-            str. The response to return to the client.
+            Optional[bytes]. The response to return to the client.
         """
         try:
             pid = int(client_data)
         except ValueError as error:
             self._client_request_errors += 1
             logging.warning('Could not parse request: %s', error)
-            return
+            return None
 
         logging.info('Request on behalf of pid %d.', pid)
         logging.info('cmdline: %s', get_process_command_line(pid))
 
         if not should_allocate_port(pid):
             self._denied_allocations += 1
-            return
+            return None
 
         port = self._port_pool.get_port_for_process(pid)
         if port > 0:
@@ -333,7 +345,7 @@ class PortServerRequestHandler:
         else:
             self._denied_allocations += 1
             logging.info('Denied allocation to pid %d', pid)
-            return ''
+            return b''
 
     def dump_stats(self) -> None:
         """Logs statistics of our operation."""
@@ -350,7 +362,7 @@ class PortServerRequestHandler:
             logging.info(stat)
 
 
-def _parse_command_line(args=None):
+def _parse_command_line(args: Optional[List[str]] = None) -> argparse.Namespace:
     """Configure and parse our command line flags.
 
     Returns:
@@ -373,14 +385,14 @@ def _parse_command_line(args=None):
     return parser.parse_args(args=args)
 
 
-def _parse_port_ranges(pool_str) -> set(int):
+def _parse_port_ranges(pool_str: str) -> List[int]:
     """Given a 'N-P,X-Y' description of port ranges, return a set of ints.
 
     Args:
         pool_str: str. The N-P,X-Y description of port ranges.
 
     Returns:
-        set(int). The port numbers in the port ranges.
+        List[int]. The port numbers in the port ranges.
     """
     ports = set()
     for range_str in pool_str.split(','):
@@ -394,7 +406,7 @@ def _parse_port_ranges(pool_str) -> set(int):
             logging.info('Ignoring out of bounds port range %r.', range_str)
             continue
         ports.update(set(range(start, end + 1)))
-    return ports
+    return list(ports)
 
 
 class Server:
@@ -410,7 +422,11 @@ class Server:
     max_backlog = 5
     message_size = 1024
 
-    def __init__(self, handler, socket_path):
+    def __init__(
+        self,
+        handler: Callable[[bytes], Optional[bytes]],
+        socket_path: str
+    ) -> None:
         """Runs the portserver
 
         Args:
@@ -459,7 +475,10 @@ class Server:
                     os.remove(self.socket_path)
 
     @staticmethod
-    def handle_connection(connection, handler) -> None:
+    def handle_connection(
+        connection: socket.SocketType,
+        handler: Callable[[bytes], socket.SocketType]
+    ) -> None:
         """Handle a socket connection.
 
         Reads the request from the socket connection and passes it to
@@ -477,7 +496,7 @@ class Server:
         connection.sendall(response)
         connection.close()
 
-    def _start_server(self, path):
+    def _start_server(self, path: str) -> socket.SocketType:
         """Start the server bound to a socket file.
 
         Args:
@@ -500,7 +519,7 @@ class Server:
         sock.listen(self.max_backlog)
         return sock
 
-    def _get_socket(self):
+    def _get_socket(self) -> socket.SocketType:
         """Get a new socket.
 
         Returns:
@@ -518,7 +537,7 @@ class Server:
         return sock
 
 
-def main(args=None) -> None:
+def main(args: Optional[List[str]] = None) -> None:
     """Runs the portserver until ctrl-C, then shuts it down."""
     config = _parse_command_line(args)
     ports_to_serve = _parse_port_ranges(config.portserver_static_pool)
