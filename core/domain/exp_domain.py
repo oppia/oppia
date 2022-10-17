@@ -4797,6 +4797,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state['interaction']['default_outcome']['feedback'][
                         'html'] = cls._fix_content(default_feedback)
 
+            # Fix RTE content present inside the Solution.
+            if state['interaction']['solution'] is not None:
+                solution = state['interaction']['solution']['explanation'][
+                    'html']
+                state['interaction']['solution']['explanation']['html'] = (
+                    cls._fix_content(solution))
+
             # Fix RTE content present inside the Hint.
             empty_hints = []
             hints = state['interaction']['hints']
@@ -4811,13 +4818,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 hints.remove(empty_hint)
                 break
             state['interaction']['hints'] = hints
-
-            # Fix RTE content present inside the Solution.
-            if state['interaction']['solution'] is not None:
-                solution = state['interaction']['solution']['explanation'][
-                    'html']
-                state['interaction']['solution']['explanation']['html'] = (
-                    cls._fix_content(solution))
 
             # Update translations and voiceovers.
             cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
