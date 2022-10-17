@@ -51,6 +51,7 @@ describe('Exploration save and publish buttons component', () => {
   let editabilityService: EditabilityService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let fetchPermissionsAsyncSpy;
+
   let mockExternalSaveEventEmitter = new EventEmitter<void>();
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
 
