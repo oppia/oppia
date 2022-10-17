@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.exp_migration_jobs."""
 
 from __future__ import annotations
+from typing import Dict
 
 from core import feconf
 from core.constants import constants
@@ -27,6 +28,7 @@ from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -587,13 +589,18 @@ class ExpSnapshotsMigrationAuditJobTests(
     NEW_EXP_ID = 'exp_id1'
     EXP_TITLE = 'title'
 
-    def setUp(self):
+    def setUp(self) -> None:
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
 
     def create_exploration_with_states_schema_version(
-            self, states_schema_version, exp_id, user_id, states_dict):
+        self,
+        states_schema_version: int,
+        exp_id: str,
+        user_id: str,
+        states_dict: Dict[str, state_domain.StateDict]
+    ) -> None:
         """Saves a new default exploration with the given states dictionary in
         the given state schema version. All passed state dictionaries in
         'states_dict' must have the states schema version indicated by
@@ -652,7 +659,7 @@ class ExpSnapshotsMigrationAuditJobTests(
         )
         exp_summary_model.put()
 
-    def test_migration_audit_job_does_not_convert_up_to_date_exp(self):
+    def test_migration_audit_job_does_not_convert_up_to_date_exp(self) -> None:
         """Tests that the snapshot migration audit job does not convert a
         snapshot that is already the latest states schema version.
         """
@@ -679,7 +686,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             )
         ])
 
-    def test_migration_audit_job_skips_deleted_explorations(self):
+    def test_migration_audit_job_skips_deleted_explorations(self) -> None:
         """Tests that the snapshot migration job skips deleted explorations
         and does not attempt to migrate any of the snapshots.
         """
@@ -717,7 +724,7 @@ class ExpSnapshotsMigrationAuditJobTests(
         with self.assertRaisesRegex(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-    def test_migration_job_audit_success(self):
+    def test_migration_job_audit_success(self) -> None:
         """Test that the audit job runs correctly on snapshots that use a
         previous state schema.
         """
@@ -768,7 +775,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             )
         ])
 
-    def test_migration_job_audit_failure(self):
+    def test_migration_job_audit_failure(self) -> None:
         """Test that the audit job catches any errors that would otherwise
         occur during the migration.
         """
@@ -828,7 +835,7 @@ class ExpSnapshotsMigrationAuditJobTests(
                 )
             ])
 
-    def test_audit_job_detects_invalid_exploration(self):
+    def test_audit_job_detects_invalid_exploration(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -852,7 +859,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             )
         ])
 
-    def test_audit_job_detects_exploration_that_is_not_up_to_date(self):
+    def test_audit_job_detects_exploration_that_is_not_up_to_date(self) -> None:
         swap_states_schema_41 = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
         swap_exp_schema_46 = self.swap(
@@ -894,12 +901,12 @@ class ExpSnapshotsMigrationJobTests(
     NEW_EXP_ID = 'exp_id1'
     EXP_TITLE = 'title'
 
-    def setUp(self):
+    def setUp(self) -> None:
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
 
-    def test_migration_job_does_not_convert_up_to_date_exp(self):
+    def test_migration_job_does_not_convert_up_to_date_exp(self) -> None:
         """Tests that the exploration migration job does not convert a
         snapshot that is already the latest states schema version.
         """
@@ -926,7 +933,7 @@ class ExpSnapshotsMigrationJobTests(
             )
         ])
 
-    def test_migration_job_succeeds_on_default_exploration(self):
+    def test_migration_job_succeeds_on_default_exploration(self) -> None:
         swap_states_schema_version = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
         swap_exp_schema_version = self.swap(
@@ -974,7 +981,7 @@ class ExpSnapshotsMigrationJobTests(
             )
         ])
 
-    def test_migration_job_skips_deleted_explorations(self):
+    def test_migration_job_skips_deleted_explorations(self) -> None:
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
@@ -1012,7 +1019,7 @@ class ExpSnapshotsMigrationJobTests(
         with self.assertRaisesRegex(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-    def test_migration_job_detects_invalid_exploration(self):
+    def test_migration_job_detects_invalid_exploration(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1036,7 +1043,9 @@ class ExpSnapshotsMigrationJobTests(
             )
         ])
 
-    def test_migration_job_detects_exploration_that_is_not_up_to_date(self):
+    def test_migration_job_detects_exploration_that_is_not_up_to_date(
+        self
+    ) -> None:
         swap_states_schema_41 = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
         swap_exp_schema_46 = self.swap(

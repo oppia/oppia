@@ -831,10 +831,12 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                     )
                 )
 
-            versioned_exploration_states = {
-                'states_schema_version': current_state_schema_version,
-                'states': exp_snapshot_model.content['states']
-            }
+            versioned_exploration_states = (
+                exp_domain.VersionedExplorationStatesDict(
+                    states_schema_version=current_state_schema_version,
+                    states=exp_snapshot_model.content['states']
+                )
+            )
             while current_state_schema_version < target_state_schema_version:
                 try:
                     with datastore_services.get_ndb_context():
@@ -971,10 +973,12 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
                 )
             )
 
-        versioned_exploration_states = {
-            'states_schema_version': current_state_schema_version,
-            'states': exp_snapshot_model.content['states']
-        }
+        versioned_exploration_states = (
+            exp_domain.VersionedExplorationStatesDict(
+                states_schema_version=current_state_schema_version,
+                states=exp_snapshot_model.content['states']
+            )
+        )
         while current_state_schema_version < target_state_schema_version:
             try:
                 with datastore_services.get_ndb_context():
