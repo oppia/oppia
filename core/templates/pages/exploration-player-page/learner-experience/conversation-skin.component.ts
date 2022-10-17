@@ -279,7 +279,17 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
-          this.triggerRedirectionIfLearnerStuck();
+          this.nextCardIfStuck = null;
+          this.triggerRedirectionOrSolutionIfLearnerStuck();
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.hintsAndSolutionManagerService.onHintsExhausted.subscribe(
+        () => {
+          console.log("Subscribed");
+          this.triggerRedirectionOrSolutionIfLearnerStuck();
         }
       )
     );
@@ -993,7 +1003,8 @@ export class ConversationSkinComponent {
     }
   }
 
-  triggerRedirectionIfLearnerStuck(): void {
+  triggerRedirectionOrSolutionIfLearnerStuck(): void {
+    console.log("func run");
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
@@ -1002,15 +1013,22 @@ export class ConversationSkinComponent {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
     }
-    // this.responseTimeout = setTimeout(() => {
-    //   this.playerTranscriptService.addNewResponse("Response");
-    // }, 5000);
+    this.responseTimeout = setTimeout(() => {
+      if (this.nextCardIfStuck) {
+        this.playerTranscriptService.addNewResponse("Response");
+      }
+      else {
+        // Release solution
+        this.hintsAndSolutionManagerService.releaseSolution();
+      }
+    }, 12000);
     this.timeout = setTimeout(() => {
       if (this.nextCardIfStuck) {
+        console.log("redirection started");
         this.nextCard = this.nextCardIfStuck;
         this.showPendingCard();
       }
-    }, 7000);
+    }, 15000);
   }
 
   showQuestionAreNotAvailable(): void {
@@ -1131,7 +1149,7 @@ export class ConversationSkinComponent {
     this.playerPositionService.recordAnswerSubmission();
     let currentEngineService =
       this.explorationPlayerStateService.getCurrentEngineService();
-    this.answerIsCorrect = currentEngineService.submitAnswer(
+    this.answerIsCorrect = this.explorationEngineService.submitAnswer(
       answer, interactionRulesService, (
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,

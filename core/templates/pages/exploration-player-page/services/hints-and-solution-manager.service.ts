@@ -54,6 +54,7 @@ export class HintsAndSolutionManagerService {
   correctAnswerSubmitted: boolean = false;
 
   _hintConsumedEventEmitter = new EventEmitter();
+  _hintsExhaustedEventEmitter = new EventEmitter();
 
   // Variable tooltipIsOpen is a flag which says that the tooltip is currently
   // visible to the learner.
@@ -131,6 +132,10 @@ export class HintsAndSolutionManagerService {
     let funcToEnqueue = null;
     if (!this.areAllHintsExhausted()) {
       funcToEnqueue = this.releaseHint;
+    }
+    else {
+      this._hintsExhaustedEventEmitter.emit();
+      console.log("Exhausted hints");
     }
     if (funcToEnqueue) {
       this.enqueueTimeout(
@@ -239,6 +244,10 @@ export class HintsAndSolutionManagerService {
 
   get onHintConsumed(): EventEmitter<unknown> {
     return this._hintConsumedEventEmitter;
+  }
+
+  get onHintsExhausted(): EventEmitter<unknown> {
+    return this._hintsExhaustedEventEmitter;
   }
 }
 
