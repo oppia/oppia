@@ -615,7 +615,7 @@ describe('Exploration editor page component', () => {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
       spyOn(tds, 'getFeedbackThreadsAsync')
         .and.returnValue(Promise.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
