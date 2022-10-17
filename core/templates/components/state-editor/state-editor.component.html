@@ -1,3 +1,28 @@
+<ng-template #ContentEditorTab>
+  <h3 class="e2e-test-joyride-title">Content</h3>
+  <p>An Oppia exploration is divided into several 'cards'. The first part of a card is the <b>content</b>. Use the content section to set the scene. Tell the learner a story,
+  give them some information, and then ask a relevant question.</p>
+</ng-template>
+
+<ng-template #StateInteractionEditorTab>
+  <h3 class="e2e-test-joyride-title">Interaction</h3>
+  <p>After you've written the content of your conversation, choose an <b>interaction type</b>. An interaction is how you want your learner to respond
+    to your question. Oppia has several built-in interactions, including:
+  </p>
+  <ul>
+    <li>Multiple Choice</li>
+    <li>Text/Number input</li>
+    <li>Code snippets</li>
+  </ul> and more.
+</ng-template>
+
+<ng-template #StateResponsesTab>
+  <h3 class="e2e-test-joyride-title">Responses</h3>
+  <p>
+    After the learner uses the interaction you created, it's your turn again to choose how your exploration will respond to their input. You can send a learner to a new card or have them repeat the same card, depending on how they answer.
+  </p>
+</ng-template>
+
 <mat-card class="oppia-editor-card-with-avatar">
   <div class="state-content-header-container" (click)="toggleConceptCard()">
     <div class="state-content-header oppia-mobile-collapsible-card-header">
@@ -12,7 +37,7 @@
       </i>
     </div>
   </div>
-  <div class="oppia-mobile-collapsible-card-content" *ngIf="conceptCardIsShown">
+  <div class="oppia-mobile-collapsible-card-content" *ngIf="conceptCardIsShown"  joyrideStep="editorTabTourContentEditorTab" [stepContent]="ContentEditorTab">
     <div class="oppia-editor-card-body oppia-editor-concept-container">
       <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar">
       <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
@@ -27,46 +52,48 @@
   </div>
 </mat-card>
 
-<div [hidden]="!interactionIsShown">
+<div joyrideStep="editorTabTourSlideStateInteractionEditorTab" [stepContent]="StateInteractionEditorTab">
   <oppia-state-interaction-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
                                   (onSaveInteractionId)="sendOnSaveInteractionId($event)"
                                   (onSaveInteractionCustomizationArgs)="sendOnSaveInteractionCustomizationArgs($event)"
                                   (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                   (onSaveSolution)="sendOnSaveSolution($event)"
                                   (recomputeGraph)="sendRecomputeGraph()"
-                                  (markAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                                  (markAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                                  [hidden]="!interactionIsShown">
   </oppia-state-interaction-editor>
 </div>
-
-<div [hidden]="!interactionIdIsSet || currentStateIsTerminal">
-  <oppia-state-responses [addState]="addState"
-                         (navigateToState)="sendNavigateToState($event)"
-                         (onResponsesInitialized)="reinitializeEditor()"
-                         (onSaveInapplicableSkillMisconceptionIds)="sendOnSaveInapplicableSkillMisconceptionIds($event)"
-                         (onSaveInteractionAnswerGroups)="sendOnSaveInteractionAnswerGroups($event)"
-                         (onSaveInteractionDefaultOutcome)="sendOnSaveInteractionDefaultOutcome($event)"
-                         (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
-                         (onSaveSolicitAnswerDetails)="sendOnSaveSolicitAnswerDetails($event)"
-                         (refreshWarnings)="sendRefreshWarnings()"
-                         (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
-  </oppia-state-responses>
-  <div>
-    <oppia-state-hints-editor (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
-                              (onSaveSolution)="sendOnSaveSolution($event)"
-                              (onSaveHints)="sendOnSaveHints($event)"
-                              (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
-    </oppia-state-hints-editor>
-  </div>
-  <div *ngIf="currentInteractionCanHaveSolution">
-    <oppia-state-solution-editor (saveSolution)="sendOnSaveSolution($event)"
-                                 (refreshWarnings)="sendRefreshWarnings()"
-                                 (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
-    </oppia-state-solution-editor>
-  </div>
-  <div *ngIf="explorationIsLinkedToStory">
-    <state-skill-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
-                        (onSaveLinkedSkillId)="sendOnSaveLinkedSkillId($event)">
-    </state-skill-editor>
+<div joyrideStep="editorTabTourStateResponsesTab" [stepContent]="StateResponsesTab">
+  <div [hidden]="!interactionIdIsSet || currentStateIsTerminal">
+    <oppia-state-responses [addState]="addState"
+                           (navigateToState)="sendNavigateToState($event)"
+                           (onResponsesInitialized)="reinitializeEditor()"
+                           (onSaveInapplicableSkillMisconceptionIds)="sendOnSaveInapplicableSkillMisconceptionIds($event)"
+                           (onSaveInteractionAnswerGroups)="sendOnSaveInteractionAnswerGroups($event)"
+                           (onSaveInteractionDefaultOutcome)="sendOnSaveInteractionDefaultOutcome($event)"
+                           (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
+                           (onSaveSolicitAnswerDetails)="sendOnSaveSolicitAnswerDetails($event)"
+                           (refreshWarnings)="sendRefreshWarnings()"
+                           (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+    </oppia-state-responses>
+    <div>
+      <oppia-state-hints-editor (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
+                                (onSaveSolution)="sendOnSaveSolution($event)"
+                                (onSaveHints)="sendOnSaveHints($event)"
+                                (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+      </oppia-state-hints-editor>
+    </div>
+    <div *ngIf="currentInteractionCanHaveSolution">
+      <oppia-state-solution-editor (saveSolution)="sendOnSaveSolution($event)"
+                                   (refreshWarnings)="sendRefreshWarnings()"
+                                   (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+      </oppia-state-solution-editor>
+    </div>
+    <div *ngIf="explorationIsLinkedToStory">
+      <state-skill-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
+                          (onSaveLinkedSkillId)="sendOnSaveLinkedSkillId($event)">
+      </state-skill-editor>
+    </div>
   </div>
 </div>
 

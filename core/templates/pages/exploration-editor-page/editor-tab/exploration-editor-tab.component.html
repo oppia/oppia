@@ -1,50 +1,73 @@
-<div class="exp-editor-content-container"
-     ng-joy-ride="$ctrl.tutorialInProgress"
-     config="$ctrl.EDITOR_TUTORIAL_OPTIONS"
-     on-finish="$ctrl.onFinishTutorial()"
-     on-skip="$ctrl.onSkipTutorial()">
+<ng-template #EditorTabTourContainer>
+  <h3 class="e2e-test-joyride-title">Creating in Oppia</h3>
+  <p>Explorations are learning experiences that you create using Oppia. Think of explorations as a conversation between a student and a tutor.</p>
+</ng-template>
+
+<ng-template #EditorTabTourTutorialComplete>
+  <h3 class="e2e-test-joyride-title">Tutorial Complete</h3>
+  <div>
+    <h4>Now for the fun part...</h4>
+      That's the end of the tour! To finish up, here are some things we suggest:
+    <ul>
+      <li>
+        Create your first card!
+      </li>
+      <li>
+        Preview your exploration.
+      </li>
+      <li>
+        Check out more resources in the
+        <a href="https://oppia.github.io/#/" rel="noopener" target="_blank">
+          Help Center.
+        </a>
+      </li>
+    </ul>
+  </div>
+</ng-template>
+
+<div class="exp-editor-content-container"  joyrideStep="editorTabTourContainer" [stepContent]="EditorTabTourContainer">
   <div class="exp-editor-main-editor">
     <div class="oppia-editor-cards-container e2e-test-editor-cards-container">
       <div class="oppia-editor-header">
         <oppia-state-name-editor></oppia-state-name-editor>
       </div>
       <div>
-        <md-checkbox class="checkpoint-selection-checkbox e2e-test-checkpoint-selection-checkbox"
-                     ng-change="$ctrl.onChangeCardIsCheckpoint()"
-                     ng-model="$ctrl.stateCardIsCheckpointService.displayed"
-                     ng-disabled="!$ctrl.isEditable()">
+        <mat-checkbox class="checkpoint-selection-checkbox e2e-test-checkpoint-selection-checkbox"
+                      (change)="onChangeCardIsCheckpoint()"
+                      [(ngModel)]="stateCardIsCheckpointService.displayed"
+                      [disabled]="!isEditable()">
           Set as a checkpoint for learners
-        </md-checkbox>
+        </mat-checkbox>
       </div>
-      <div ng-if="$ctrl.areParametersEnabled()">
+      <div *ngIf="areParametersEnabled()">
         <state-param-changes-editor></state-param-changes-editor>
       </div>
-
-      <oppia-state-editor (on-save-state-content)="$ctrl.saveStateContent($event)"
-                          (on-save-interaction-customization-args)="$ctrl.saveInteractionCustomizationArgs($event)"
-                          (on-save-next-content-id-index)="$ctrl.saveNextContentIdIndex($event)"
-                          (on-save-interaction-id)="$ctrl.saveInteractionId($event)"
-                          (on-save-interaction-default-outcome)="$ctrl.saveInteractionDefaultOutcome($event)"
-                          (on-save-interaction-answer-groups)="$ctrl.saveInteractionAnswerGroups($event)"
-                          (on-save-linked-skill-id)="$ctrl.saveLinkedSkillId($event)"
-                          (on-save-solution)="$ctrl.saveSolution($event)"
-                          (on-save-hints)="$ctrl.saveHints($event)"
-                          (on-save-solicit-answer-details)="$ctrl.saveSolicitAnswerDetails($event)"
-                          (recompute-graph)="$ctrl.recomputeGraph()"
-                          (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
-                          [state-content-placeholder]="$ctrl.getStateContentPlaceholder()"
-                          [state-content-save-button-placeholder]="$ctrl.getStateContentSaveButtonPlaceholder()"
-                          (navigate-to-state)="$ctrl.navigateToState($event)"
-                          (refresh-warnings)="$ctrl.refreshWarnings()"
-                          [add-state]="$ctrl.addState"
-                          [interaction-is-shown]="$ctrl.interactionIsShown"
-                          [exploration-is-linked-to-story]="$ctrl.explorationIsLinkedToStory">
+      <oppia-state-editor [stateContentPlaceholder]="getStateContentPlaceholder()"
+                          [stateContentSaveButtonPlaceholder]="getStateContentSaveButtonPlaceholder()"
+                          [addState]="addState.bind(this)"
+                          [interactionIsShown]="interactionIsShown"
+                          [explorationIsLinkedToStory]="explorationIsLinkedToStory"
+                          (onSaveStateContent)="saveStateContent($event)"
+                          (onSaveInteractionCustomizationArgs)="saveInteractionCustomizationArgs($event)"
+                          (onSaveNextContentIdIndex)="saveNextContentIdIndex($event)"
+                          (onSaveInteractionId)="saveInteractionId($event)"
+                          (onSaveInteractionDefaultOutcome)="saveInteractionDefaultOutcome($event)"
+                          (onSaveInteractionAnswerGroups)="saveInteractionAnswerGroups($event)"
+                          (onSaveLinkedSkillId)="saveLinkedSkillId($event)"
+                          (onSaveSolution)="saveSolution($event)"
+                          (onSaveHints)="saveHints($event)"
+                          (onSaveSolicitAnswerDetails)="saveSolicitAnswerDetails($event)"
+                          (recomputeGraph)="recomputeGraph()"
+                          (showMarkAllAudioAsNeedingUpdateModalIfRequired)="showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                          (navigateToState)="navigateToState($event)"
+                          (refreshWarnings)="refreshWarnings()">
       </oppia-state-editor>
     </div>
   </div>
   <div class="exp-editor-overview">
     <div class="exp-editor-overview-content">
       <oppia-exploration-graph></oppia-exploration-graph>
+      <div class="exp-editor-content-container"  joyrideStep="editorTabTourTutorialComplete" [stepContent]="EditorTabTourTutorialComplete"></div>
       <oppia-unresolved-answers-overview></oppia-unresolved-answers-overview>
     </div>
   </div>
@@ -52,23 +75,23 @@
 </div>
 
 <style>
-  exploration-editor-tab .exp-editor-content-container {
+  .exp-editor-content-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
   }
-  exploration-editor-tab .exp-editor-main-editor {
+  .exp-editor-main-editor {
     margin-right: 3%;
     width: 40%;
   }
-  exploration-editor-tab .exp-editor-overview {
+  .exp-editor-overview {
     width: 30%;
   }
-  exploration-editor-tab .exp-editor-overview-content {
+  .exp-editor-overview-content {
     margin-top: 40px;
   }
   @media screen and (max-width: 768px) {
-    exploration-editor-tab .exp-editor-main-editor {
+    .exp-editor-main-editor {
       margin-right: 0;
       width: 100%;
     }
