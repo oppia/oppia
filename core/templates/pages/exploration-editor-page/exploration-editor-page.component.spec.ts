@@ -349,6 +349,8 @@ describe('Exploration editor page component', () => {
         mockOpenEditorTutorialEmitter);
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
         mockOpenTranslationTutorialEmitter);
+      spyOn(rs, 'isLocationSetToNonStateEditorTab')
+        .and.returnValue(false);
 
       explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = ['data1', 'data2'];
@@ -361,8 +363,6 @@ describe('Exploration editor page component', () => {
     });
 
     it('should start editor tutorial when on main page', fakeAsync(() => {
-      spyOn(rs, 'isLocationSetToNonStateEditorTab')
-        .and.returnValue(false);
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
