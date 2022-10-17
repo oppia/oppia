@@ -21,7 +21,7 @@ const {
     ]});
     await goto('localhost:8181');
     await click('SIGN IN');
-    await write("testadmin@example.com", into(textBox('enter an email')));
+    await write('testadmin@example.com', into(textBox('enter an email')));
     await click(button('Sign In', below('Emulator Mode Sign In')));
     await goto('http://localhost:8181/creator-dashboard');
 
