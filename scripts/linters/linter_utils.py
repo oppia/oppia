@@ -25,9 +25,11 @@ import shutil
 import sys
 import tempfile
 
+from typing import Dict, Iterator, List, Optional, TextIO
+
 
 @contextlib.contextmanager
-def redirect_stdout(new_target):
+def redirect_stdout(new_target: TextIO) -> Iterator[TextIO]:
     """Redirect stdout to the new target.
 
     Args:
@@ -44,7 +46,7 @@ def redirect_stdout(new_target):
         sys.stdout = old_target
 
 
-def get_duplicates_from_list_of_strings(strings):
+def get_duplicates_from_list_of_strings(strings: List[str]) -> List[str]:
     """Returns a list of duplicate strings in the list of given strings.
 
     Args:
@@ -55,7 +57,7 @@ def get_duplicates_from_list_of_strings(strings):
         strings.
     """
     duplicates = []
-    item_count_map = collections.defaultdict(int)
+    item_count_map: Dict[str, int] = collections.defaultdict(int)
     for string in strings:
         item_count_map[string] += 1
         # Counting as duplicate once it's appeared twice in the list.
@@ -66,7 +68,9 @@ def get_duplicates_from_list_of_strings(strings):
 
 
 @contextlib.contextmanager
-def temp_dir(suffix='', prefix='', parent=None):
+def temp_dir(
+    suffix: str = '', prefix: str = '', parent: Optional[str] = None
+) -> Iterator[str]:
     """Creates a temporary directory which is only usable in a `with` context.
 
     Args:
@@ -85,7 +89,7 @@ def temp_dir(suffix='', prefix='', parent=None):
         shutil.rmtree(new_dir)
 
 
-def print_failure_message(failure_message):
+def print_failure_message(failure_message: str) -> None:
     """Prints the given failure message in red color.
 
     Args:
@@ -95,7 +99,7 @@ def print_failure_message(failure_message):
     print('\033[91m' + failure_message + '\033[0m')
 
 
-def print_success_message(success_message):
+def print_success_message(success_message: str) -> None:
     """Prints the given success_message in red color.
 
     Args:

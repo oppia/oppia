@@ -930,7 +930,10 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        self.assertEqual(
+            popen_calls[0].kwargs,
+            {'shell': True, 'stdout': subprocess.PIPE}
+        )
         program_args = popen_calls[0].program_args
         self.assertIn(
             '%s --unhandled-rejections=strict %s %s' % (

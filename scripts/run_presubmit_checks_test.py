@@ -77,7 +77,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         cmd_to_get_all_changed_file = [
             'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
             specified_branch]
-        def mock_check_output(cmd: list[str]) -> str:
+        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:  # pylint: disable=unused-argument
             if cmd == self.cmd_to_check_current_branch:
                 return self.current_branch
             elif cmd == self.cmd_to_match_current_branch_with_remote:
@@ -107,7 +107,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         cmd_to_get_all_changed_file = [
             'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
             'origin/%s' % self.current_branch]
-        def mock_check_output(cmd: list[str]) -> str:
+        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:  # pylint: disable=unused-argument
             if cmd == self.cmd_to_check_current_branch:
                 return self.current_branch
             elif cmd == self.cmd_to_match_current_branch_with_remote:
@@ -137,7 +137,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         cmd_to_get_all_changed_file = [
             'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
             'develop']
-        def mock_check_output(cmd: list[str]) -> str:
+        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:  # pylint: disable=unused-argument
             if cmd == self.cmd_to_check_current_branch:
                 return self.current_branch
             elif cmd == self.cmd_to_match_current_branch_with_remote:

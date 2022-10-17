@@ -21,16 +21,19 @@ from __future__ import annotations
 import os
 import subprocess
 
+from typing import List, Tuple
+from typing_extensions import Final
+
 from .. import common
 from .. import concurrent_task_utils
 
-STYLELINT_CONFIG = os.path.join('.stylelintrc')
+STYLELINT_CONFIG: Final = os.path.join('.stylelintrc')
 
 
 class ThirdPartyCSSLintChecksManager:
     """Manages all the third party Python linting functions."""
 
-    def __init__(self, files_to_lint):
+    def __init__(self, files_to_lint: List[str]) -> None:
         """Constructs a ThirdPartyCSSLintChecksManager object.
 
         Args:
@@ -40,12 +43,12 @@ class ThirdPartyCSSLintChecksManager:
         self.files_to_lint = files_to_lint
 
     @property
-    def all_filepaths(self):
+    def all_filepaths(self) -> List[str]:
         """Return all filepaths."""
         return self.files_to_lint
 
     @staticmethod
-    def _get_trimmed_error_output(css_lint_output):
+    def _get_trimmed_error_output(css_lint_output: str) -> str:
         """Remove extra bits from stylelint error messages.
 
         Args:
@@ -56,7 +59,7 @@ class ThirdPartyCSSLintChecksManager:
         """
         return '%s\n' % css_lint_output
 
-    def lint_css_files(self):
+    def lint_css_files(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors in the given list of CSS files.
 
         Returns:
@@ -103,7 +106,7 @@ class ThirdPartyCSSLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, stripped_error_messages, full_error_messages)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -120,7 +123,9 @@ class ThirdPartyCSSLintChecksManager:
         return [self.lint_css_files()]
 
 
-def get_linters(files_to_lint):
+def get_linters(
+    files_to_lint: List[str]
+) -> Tuple[None, ThirdPartyCSSLintChecksManager]:
     """Creates ThirdPartyCSSLintChecksManager and returns it.
 
     Args:

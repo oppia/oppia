@@ -23,44 +23,47 @@ import os
 
 from core.tests import test_utils
 
+from typing_extensions import Final
+
 from . import html_linter
 from . import pre_commit_linter
 
-NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES = multiprocessing.Manager().dict()
-NAME_SPACE.files = pre_commit_linter.FileCache()
-FILE_CACHE = NAME_SPACE.files
+NAME_SPACE: Final = multiprocessing.Manager().Namespace()
+NAME_SPACE.files = pre_commit_linter.FileCache()  # type: ignore[no-untyped-call]
+FILE_CACHE: Final = NAME_SPACE.files
 
-LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
-VALID_HTML_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.html')
-INVALID_STYLE_INDENTATION_HTML_FILEPATH = os.path.join(
+LINTER_TESTS_DIR: Final = os.path.join(
+    os.getcwd(), 'scripts', 'linters', 'test_files'
+)
+VALID_HTML_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.html')
+INVALID_STYLE_INDENTATION_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_style_indentation.html')
-INVALID_INDENTATION_HTML_FILEPATH = os.path.join(
+INVALID_INDENTATION_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_indentation.html')
-INVALID_QUOTES_HTML_FILEPATH = os.path.join(
+INVALID_QUOTES_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_quotes.html')
-INVALID_ALIGNMENT_HTML_FILEPATH = os.path.join(
+INVALID_ALIGNMENT_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_alignment_of_tags.html')
-INVALID_MISSING_HTML_TAG_HTML_FILEPATH = os.path.join(
+INVALID_MISSING_HTML_TAG_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_missing_html_tag.html')
-INVALID_TAG_MISMATCH_HTML_FILEPATH = os.path.join(
+INVALID_TAG_MISMATCH_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_tag_mismatch.html')
-INVALID_MISMATCH_INDENTATION_HTML_FILEPATH = os.path.join(
+INVALID_MISMATCH_INDENTATION_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_mismatch_indentation.html')
-INVALID_MISMATCHED_TAGS_HTML_FILEPATH = os.path.join(
+INVALID_MISMATCHED_TAGS_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_mismatched_tags.html')
-INVALID_SPACE_AROUND_ATTRIBUTE_HTML_FILEPATH = os.path.join(
+INVALID_SPACE_AROUND_ATTRIBUTE_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_space_around_attribute.html')
-INVALID_SPACE_AROUND_INNERHTML_ATTRIBUTE_HTML_FILEPATH = os.path.join(
+INVALID_SPACE_AROUND_INNERHTML_ATTRIBUTE_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_space_around_innerhtml_attribute.html')
-INVALID_SPACE_AROUND_DUPLICATE_ATTRIBUTE_HTML_FILEPATH = os.path.join(
+INVALID_SPACE_AROUND_DUPLICATE_ATTRIBUTE_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_space_around_duplicate_attribute.html')
 
 
 class CustomHTMLParserTests(test_utils.LinterTestBase):
     """Tests for CustomHTMLParser class."""
 
-    def test_custom_linter_with_invalid_style_indentation(self):
+    def test_custom_linter_with_invalid_style_indentation(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_STYLE_INDENTATION_HTML_FILEPATH], FILE_CACHE
             ).check_html_tags_and_attributes()
@@ -71,7 +74,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_custom_linter_with_invalid_indentation(self):
+    def test_custom_linter_with_invalid_indentation(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_INDENTATION_HTML_FILEPATH], FILE_CACHE
             ).check_html_tags_and_attributes()
@@ -81,7 +84,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_custom_linter_with_invalid_quotes(self):
+    def test_custom_linter_with_invalid_quotes(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_QUOTES_HTML_FILEPATH], FILE_CACHE
             ).check_html_tags_and_attributes()
@@ -92,7 +95,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_custom_linter_with_invalid_alignment(self):
+    def test_custom_linter_with_invalid_alignment(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_ALIGNMENT_HTML_FILEPATH], FILE_CACHE
             ).check_html_tags_and_attributes()
@@ -102,21 +105,21 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_custom_linter_with_invalid_tags(self):
+    def test_custom_linter_with_invalid_tags(self) -> None:
         with self.assertRaisesRegex(
             html_linter.TagMismatchException, 'Error in line 2 of file'):
             html_linter.HTMLLintChecksManager(
                 [INVALID_MISMATCHED_TAGS_HTML_FILEPATH], FILE_CACHE
                 ).perform_all_lint_checks()
 
-    def test_custom_linter_with_tag_mismatch(self):
+    def test_custom_linter_with_tag_mismatch(self) -> None:
         with self.assertRaisesRegex(
             html_linter.TagMismatchException, 'Error in line 13 of file'):
             html_linter.HTMLLintChecksManager(
                 [INVALID_TAG_MISMATCH_HTML_FILEPATH], FILE_CACHE
                 ).perform_all_lint_checks()
 
-    def test_custom_linter_with_mismatched_indentation(self):
+    def test_custom_linter_with_mismatched_indentation(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_MISMATCH_INDENTATION_HTML_FILEPATH], FILE_CACHE
             ).check_html_tags_and_attributes()
@@ -127,14 +130,14 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_custom_without_html_end_tag(self):
+    def test_custom_without_html_end_tag(self) -> None:
         with self.assertRaisesRegex(
             html_linter.TagMismatchException, 'Error in file'):
             html_linter.HTMLLintChecksManager(
                 [INVALID_MISSING_HTML_TAG_HTML_FILEPATH], FILE_CACHE
                 ).perform_all_lint_checks()
 
-    def test_space_around_attribute_name_reports_correctly(self):
+    def test_space_around_attribute_name_reports_correctly(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_SPACE_AROUND_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
         ).check_html_tags_and_attributes()
@@ -144,7 +147,9 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         ], lint_task_report.trimmed_messages)
         self.assertTrue(lint_task_report)
 
-    def test_space_around_attr_having_camelcase_name_reports_correctly(self):
+    def test_space_around_attr_having_camelcase_name_reports_correctly(
+        self
+    ) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_SPACE_AROUND_INNERHTML_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
         ).check_html_tags_and_attributes()
@@ -154,7 +159,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         ], lint_task_report.trimmed_messages)
         self.assertTrue(lint_task_report)
 
-    def test_space_around_duplicate_attr_reports_correctly(self):
+    def test_space_around_duplicate_attr_reports_correctly(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_SPACE_AROUND_DUPLICATE_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
         ).check_html_tags_and_attributes()
@@ -164,7 +169,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         ], lint_task_report.trimmed_messages)
         self.assertTrue(lint_task_report)
 
-    def test_valid_html_file_with_custom_linter(self):
+    def test_valid_html_file_with_custom_linter(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [VALID_HTML_FILEPATH], FILE_CACHE).check_html_tags_and_attributes()
         self.assertEqual(
@@ -173,7 +178,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 
-    def test_custom_linter_with_no_files(self):
+    def test_custom_linter_with_no_files(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
             [], FILE_CACHE).perform_all_lint_checks()
         self.assertEqual(
@@ -184,7 +189,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTML lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
-    def test_third_party_linter_with_no_files(self):
+    def test_third_party_linter_with_no_files(self) -> None:
         lint_task_report = html_linter.ThirdPartyHTMLLintChecksManager(
             []).perform_all_lint_checks()
         self.assertEqual(
@@ -195,7 +200,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTML lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
-    def test_third_party_linter_with_lint_errors(self):
+    def test_third_party_linter_with_lint_errors(self) -> None:
         lint_task_report = html_linter.ThirdPartyHTMLLintChecksManager(
             [INVALID_QUOTES_HTML_FILEPATH]).lint_html_files()
         self.assert_same_list_elements(
@@ -204,12 +209,12 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTMLLint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_third_party_perform_all_lint_checks(self):
+    def test_third_party_perform_all_lint_checks(self) -> None:
         lint_task_report = html_linter.ThirdPartyHTMLLintChecksManager(
             [INVALID_QUOTES_HTML_FILEPATH]).perform_all_lint_checks()
         self.assertTrue(isinstance(lint_task_report, list))
 
-    def test_get_linters_with_success(self):
+    def test_get_linters_with_success(self) -> None:
         custom_linter, third_party_linter = html_linter.get_linters(
             [VALID_HTML_FILEPATH], FILE_CACHE)
         self.assertTrue(

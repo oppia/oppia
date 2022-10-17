@@ -24,7 +24,6 @@ import sys
 from core.tests import test_utils
 from scripts import common
 from scripts import run_custom_eslint_tests
-from typing import Any
 
 
 class RunCustomEslintTestsTests(test_utils.GenericTestBase):
@@ -59,7 +58,8 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'Path not found.')
 
         def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
@@ -79,7 +79,8 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'All files | 100 | 100 | 100 | 100 | ', b'')
 
         def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
@@ -99,7 +100,8 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'All files | 100 | 100 | 100 | 100 | ', b'')
 
         def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
@@ -119,7 +121,8 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'All files | 100 | 98 | 100 | 100 | ', b'')
 
         def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)

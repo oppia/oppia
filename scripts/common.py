@@ -310,7 +310,8 @@ def open_new_tab_in_browser_if_possible(url: str) -> None:
 def get_remote_alias(remote_urls: List[str]) -> str:
     """Finds the correct alias for the given remote repository URLs."""
     git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v']).decode('utf-8').split('\n')
+        ['git', 'remote', '-v'], encoding='utf-8'
+    ).split('\n')
     remote_alias = None
     remote_url = None
     for remote_url in remote_urls:
@@ -349,7 +350,8 @@ def get_current_branch_name() -> str:
         str. The name of current branch.
     """
     git_status_output = subprocess.check_output(
-        ['git', 'status']).decode('utf-8').strip().split('\n')
+        ['git', 'status'], encoding='utf-8'
+    ).strip().split('\n')
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)

@@ -54,7 +54,6 @@ ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
 # the lint errors accordingly.
 EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
     'core/controllers/',
-    'scripts/'
 ]
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
