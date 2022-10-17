@@ -212,16 +212,17 @@ export class StateTranslationComponent
     this.updateTranslatedContent();
   }
 
-  updateTranslatedContent() {
+  updateTranslatedContent(): void {
     if (!this.translationTabActiveModeService.isVoiceoverModeActive()) {
       this.activeTranslatedContent = (
         this.entityTranslationsService.entityTranslation.getWrittenTranslation(
           this.translationTabActiveContentIdService.getActiveContentId()));
     }
-  };
+  }
+
   getHumanReadableRuleInputValues(
-    inputValue: { normalizedStrSet: string[]; unicodeStrSet: string[] },
-    inputType: string): string {
+      inputValue: { normalizedStrSet: string[]; unicodeStrSet: string[] },
+      inputType: string): string {
     if (inputType === 'TranslatableSetOfNormalizedString') {
       return ('[' + inputValue.normalizedStrSet.join(', ') + ']');
     } else if (inputType === 'TranslatableSetOfUnicodeString') {
@@ -232,10 +233,10 @@ export class StateTranslationComponent
   }
 
   summarizeDefaultOutcome(
-    defaultOutcome: Outcome,
-    interactionId: string,
-    answerGroupCount: number,
-    shortenRule: string
+      defaultOutcome: Outcome,
+      interactionId: string,
+      answerGroupCount: number,
+      shortenRule: string
   ): string {
     if (!defaultOutcome) {
       return '';
@@ -268,10 +269,10 @@ export class StateTranslationComponent
   }
 
   summarizeAnswerGroup(
-    answerGroup: AnswerGroup,
-    interactionId: string,
-    answerChoices: AnswerChoice[],
-    shortenRule: boolean
+      answerGroup: AnswerGroup,
+      interactionId: string,
+      answerChoices: AnswerChoice[],
+      shortenRule: boolean
   ): string {
     let summary = '';
     let outcome = answerGroup.outcome;
@@ -461,7 +462,7 @@ export class StateTranslationComponent
   }
 
   getSubtitledContentSummary(
-    subtitledContent: SubtitledHtml | SubtitledUnicode): string {
+      subtitledContent: SubtitledHtml | SubtitledUnicode): string {
     if (subtitledContent instanceof SubtitledHtml) {
       return this.formatRtePreviewPipe.transform(subtitledContent.html);
     } else if (subtitledContent instanceof SubtitledUnicode) {
@@ -495,7 +496,7 @@ export class StateTranslationComponent
   }
 
   getInteractionCustomizationArgTranslatableContents(
-    customizationArgs: InteractionCustomizationArgs
+      customizationArgs: InteractionCustomizationArgs
   ): { name: string; content: SubtitledUnicode | SubtitledHtml }[] {
     const translatableContents = [];
 
@@ -510,8 +511,8 @@ export class StateTranslationComponent
     };
 
     const traverseValueAndRetrieveSubtitledContent = (
-      name: string,
-      value: Object[] | Object,
+        name: string,
+        value: Object[] | Object,
     ): void => {
       if (value instanceof SubtitledUnicode ||
         value instanceof SubtitledHtml

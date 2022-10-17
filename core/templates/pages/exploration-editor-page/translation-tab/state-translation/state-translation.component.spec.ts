@@ -71,8 +71,8 @@ class MockNgbModal {
 @Pipe({ name: 'parameterizeRuleDescriptionPipe' })
 class MockParameterizeRuleDescriptionPipe {
   transform(
-    rule: Rule | null, interactionId: string | null,
-    choices: AnswerChoice[] | null): string {
+      rule: Rule | null, interactionId: string | null,
+      choices: AnswerChoice[] | null): string {
     return '';
   }
 }
@@ -360,308 +360,307 @@ describe('State translation component', () => {
 
   describe('when translation tab is not busy and voiceover mode is' +
     ' active', () => {
-      it('should init state translation when refreshing page', () => {
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        refreshStateTranslationEmitter.emit();
+    it('should init state translation when refreshing page', () => {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      refreshStateTranslationEmitter.emit();
 
-        expect(component.isActive('content')).toBe(true);
-        expect(component.isVoiceoverModeActive()).toBe(true);
-        expect(component.isDisabled('content')).toBe(false);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('content_1', 'html');
-      });
+      expect(component.isActive('content')).toBe(true);
+      expect(component.isVoiceoverModeActive()).toBe(true);
+      expect(component.isDisabled('content')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('content_1', 'html');
+    });
 
-      it('should navigate to a given state', () => {
-        spyOn(routerService, 'navigateToMainTab');
-        component.navigateToState('Introduction');
+    it('should navigate to a given state', () => {
+      spyOn(routerService, 'navigateToMainTab');
+      component.navigateToState('Introduction');
 
-        expect(routerService.navigateToMainTab).toHaveBeenCalledWith(
-          'Introduction');
-      });
+      expect(routerService.navigateToMainTab).toHaveBeenCalledWith(
+        'Introduction');
+    });
 
-      it('should get customization argument translatable customization' +
+    it('should get customization argument translatable customization' +
         ' arguments', () => {
-          let content = SubtitledHtml.createDefault('', '');
-          let translatableCa = (
-            component.getInteractionCustomizationArgTranslatableContents({
-              testingCustArgs: {
-                value: {
-                  innerValue: content
-                }
-              }
-            })
-          );
-          expect(translatableCa).toEqual([{
-            name: 'Testing Cust Args > Inner Value',
-            content
-          }]);
-        });
+      let content = SubtitledHtml.createDefault('', '');
+      let translatableCa = (
+        component.getInteractionCustomizationArgTranslatableContents({
+          testingCustArgs: {
+            value: {
+              innerValue: content
+            }
+          }
+        })
+      );
+      expect(translatableCa).toEqual([{
+        name: 'Testing Cust Args > Inner Value',
+        content
+      }]);
+    });
 
-      it('should broadcast copy to ck editor when clicking on content',
-        () => {
-          spyOn(ckEditorCopyContentService, 'broadcastCopy').and
-            .callFake(() => { });
+    it('should broadcast copy to ck editor when clicking on content',
+      () => {
+        spyOn(ckEditorCopyContentService, 'broadcastCopy').and
+          .callFake(() => { });
 
-          let mockEvent = {
-            stopPropagation: () => { },
-            target: {}
-          } as Event;
-          component.onContentClick(mockEvent);
+        let mockEvent = {
+          stopPropagation: () => { },
+          target: {}
+        } as Event;
+        component.onContentClick(mockEvent);
 
-          expect(ckEditorCopyContentService.broadcastCopy).toHaveBeenCalledWith(
-            mockEvent.target);
-        });
-
-      it('should activate content tab when clicking on tab', () => {
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.onTabClick('content');
-
-        expect(component.isActive('content')).toBe(true);
-        expect(component.isDisabled('content')).toBe(false);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('content_1', 'html');
-        expect(component.tabStatusColorStyle('content')).toEqual({
-          'border-top-color': '#D14836'
-        });
-        expect(component.tabNeedUpdatesStatus('content')).toBe(false);
-        expect(component.contentIdNeedUpdates('content_1')).toBe(false);
-        expect(component.contentIdStatusColorStyle('content_1')).toEqual({
-          'border-left': '3px solid #D14836'
-        });
+        expect(ckEditorCopyContentService.broadcastCopy).toHaveBeenCalledWith(
+          mockEvent.target);
       });
 
-      it('should activate interaction custimization arguments tab when ' +
-        'clicking on tab', () => {
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.onTabClick('ca');
+    it('should activate content tab when clicking on tab', () => {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('content');
 
-          expect(component.isActive('ca')).toBe(true);
-          expect(component.isDisabled('ca')).toBe(false);
-          expect(translationTabActiveContentIdService.setActiveContent)
-            .toHaveBeenCalledWith('ca_placeholder', 'unicode');
-          expect(component.tabStatusColorStyle('ca')).toEqual({
-            'border-top-color': '#D14836'
-          });
-          expect(component.tabNeedUpdatesStatus('ca')).toBe(false);
-          expect(component.contentIdNeedUpdates('ca_placeholder')).toBe(false);
-          expect(component.contentIdStatusColorStyle('ca_placeholder')).toEqual({
-            'border-left': '3px solid #D14836'
-          });
-        });
-
-      it('should activate feedback tab when clicking on tab', () => {
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.onTabClick('feedback');
-
-        expect(component.isActive('feedback')).toBe(true);
-        expect(component.isDisabled('feedback')).toBe(false);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('feedback_1', 'html');
-        expect(component.tabStatusColorStyle('feedback')).toEqual({
-          'border-top-color': '#D14836'
-        });
-        expect(component.tabNeedUpdatesStatus('feedback')).toBe(false);
-        expect(component.contentIdNeedUpdates('feedback_1')).toBe(false);
-        expect(component.contentIdStatusColorStyle('feedback_1')).toEqual({
-          'border-left': '3px solid #D14836'
-        });
+      expect(component.isActive('content')).toBe(true);
+      expect(component.isDisabled('content')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('content_1', 'html');
+      expect(component.tabStatusColorStyle('content')).toEqual({
+        'border-top-color': '#D14836'
       });
-
-      it('should activate hint tab when clicking on tab', () => {
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.onTabClick('hint');
-
-        expect(component.isActive('hint')).toBe(true);
-        expect(component.isDisabled('hint')).toBe(false);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('hint_1', 'html');
-        expect(component.tabStatusColorStyle('hint')).toEqual({
-          'border-top-color': '#D14836'
-        });
-        expect(component.tabNeedUpdatesStatus('hint')).toBe(false);
-        expect(component.contentIdNeedUpdates('hint_1')).toBe(false);
-        expect(component.contentIdStatusColorStyle('hint_1')).toEqual({
-          'border-left': '3px solid #D14836'
-        });
-      });
-
-      it('should activate solution tab when clicking on tab', () => {
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.onTabClick('solution');
-
-        expect(component.isActive('solution')).toBe(true);
-        expect(component.isDisabled('solution')).toBe(false);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('solution_1', 'html');
-        expect(component.tabStatusColorStyle('solution')).toEqual({
-          'border-top-color': '#D14836'
-        });
-        expect(component.tabNeedUpdatesStatus('solution')).toBe(false);
-        expect(component.contentIdNeedUpdates('solution')).toBe(false);
-        expect(component.contentIdStatusColorStyle('solution_1')).toEqual({
-          'border-left': '3px solid #D14836'
-        });
-      });
-
-      it('should activate rule inputs tab when clicking on tab', () => {
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.onTabClick('rule_input');
-
-        expect(component.isActive('rule_input')).toBe(true);
-        expect(component.isDisabled('rule_input')).toBe(false);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('rule_input_4', 'set_of_normalized_string');
-      });
-
-      it('should change active rule content index', () => {
-        component.onTabClick('rule_input');
-
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.changeActiveRuleContentIndex(1);
-
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('rule_input_5', 'set_of_normalized_string');
-      });
-
-      it('should not change active rule content index if it is equal to the ' +
-        'current one', () => {
-          component.onTabClick('rule_input');
-
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveRuleContentIndex(0);
-
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should change active hint index', () => {
-        component.onTabClick('hint');
-
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.changeActiveHintIndex(1);
-
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('hint_2', 'html');
-      });
-
-      it('should not change active hint index if it is equal to the current one',
-        () => {
-          component.onTabClick('hint');
-
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveHintIndex(0);
-
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should change active answer group index', () => {
-        component.onTabClick('feedback');
-
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.changeActiveAnswerGroupIndex(1);
-
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('feedback_2', 'html');
-      });
-
-      it('should not change active customization argument index if it is equal' +
-        ' to the current one',
-        () => {
-          component.onTabClick('ca');
-
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveCustomizationArgContentIndex(0);
-
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should change active answer group index to default outcome when' +
-        ' index provided is equal to answer groups length', () => {
-          component.onTabClick('feedback');
-
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveAnswerGroupIndex(2);
-
-          expect(translationTabActiveContentIdService.setActiveContent)
-            .toHaveBeenCalledWith('default_outcome', 'html');
-        });
-
-      it('should not change active hint index if it is equal to the current one',
-        () => {
-          component.onTabClick('feedback');
-
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveAnswerGroupIndex(0);
-
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should get subtitled html data translation', () => {
-        let subtitledObject = SubtitledHtml.createFromBackendDict({
-          content_id: 'content_1',
-          html: 'This is the html'
-        });
-        expect(component.getRequiredHtml(subtitledObject)).toBe(
-          'This is the html');
-        expect(component.getSubtitledContentSummary(subtitledObject)).toBe(
-          'This is the html');
-      });
-
-      it('should get empty content message when text translations haven\'t' +
-        ' been added yet', () => {
-          expect(component.getEmptyContentMessage()).toBe(
-            'The translation for this section has not been created yet.' +
-            ' Switch to translation mode to add a text translation.');
-        });
-
-      it('should get summary default outcome when outcome is linear',
-        () => {
-          expect(component.summarizeDefaultOutcome(
-            outcomeObjectFactory.createNew(
-              'unused', '1', 'Feedback Text', []), 'Continue', 0, 'true'))
-            .toBe('[] Feedback Text');
-        });
-
-      it('should get summary default outcome when answer group count' +
-        ' is greater than 0', () => {
-          expect(component.summarizeDefaultOutcome(
-            outcomeObjectFactory.createNew(
-              'unused', '1', 'Feedback Text', []), 'TextInput', 1, 'true'))
-            .toBe('[] Feedback Text');
-        });
-
-      it('should get summary default outcome when answer group count' +
-        ' is equal to 0', () => {
-          expect(component.summarizeDefaultOutcome(
-            outcomeObjectFactory.createNew(
-              'unused', '1', 'Feedback Text', []), 'TextInput', 0, 'true'))
-            .toBe('[] Feedback Text');
-        });
-
-      it('should get an empty summary when default outcome is a falsy value',
-        () => {
-          expect(component.summarizeDefaultOutcome(null, 'Continue', 0, 'true'))
-            .toBe('');
-        });
-
-      it('should get summary answer group', () => {
-        expect(component.summarizeAnswerGroup(
-          answerGroupObjectFactory.createNew(
-            [],
-            outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
-            null, '0'), '1', null, true))
-          .toBe('[] Feedback text');
+      expect(component.tabNeedUpdatesStatus('content')).toBe(false);
+      expect(component.contentIdNeedUpdates('content_1')).toBe(false);
+      expect(component.contentIdStatusColorStyle('content_1')).toEqual({
+        'border-left': '3px solid #D14836'
       });
     });
+
+    it('should activate interaction custimization arguments tab when ' +
+        'clicking on tab', () => {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('ca');
+
+      expect(component.isActive('ca')).toBe(true);
+      expect(component.isDisabled('ca')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('ca_placeholder', 'unicode');
+      expect(component.tabStatusColorStyle('ca')).toEqual({
+        'border-top-color': '#D14836'
+      });
+      expect(component.tabNeedUpdatesStatus('ca')).toBe(false);
+      expect(component.contentIdNeedUpdates('ca_placeholder')).toBe(false);
+      expect(component.contentIdStatusColorStyle('ca_placeholder')).toEqual({
+        'border-left': '3px solid #D14836'
+      });
+    });
+
+    it('should activate feedback tab when clicking on tab', () => {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('feedback');
+
+      expect(component.isActive('feedback')).toBe(true);
+      expect(component.isDisabled('feedback')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('feedback_1', 'html');
+      expect(component.tabStatusColorStyle('feedback')).toEqual({
+        'border-top-color': '#D14836'
+      });
+      expect(component.tabNeedUpdatesStatus('feedback')).toBe(false);
+      expect(component.contentIdNeedUpdates('feedback_1')).toBe(false);
+      expect(component.contentIdStatusColorStyle('feedback_1')).toEqual({
+        'border-left': '3px solid #D14836'
+      });
+    });
+
+    it('should activate hint tab when clicking on tab', () => {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('hint');
+
+      expect(component.isActive('hint')).toBe(true);
+      expect(component.isDisabled('hint')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('hint_1', 'html');
+      expect(component.tabStatusColorStyle('hint')).toEqual({
+        'border-top-color': '#D14836'
+      });
+      expect(component.tabNeedUpdatesStatus('hint')).toBe(false);
+      expect(component.contentIdNeedUpdates('hint_1')).toBe(false);
+      expect(component.contentIdStatusColorStyle('hint_1')).toEqual({
+        'border-left': '3px solid #D14836'
+      });
+    });
+
+    it('should activate solution tab when clicking on tab', () => {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('solution');
+
+      expect(component.isActive('solution')).toBe(true);
+      expect(component.isDisabled('solution')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('solution_1', 'html');
+      expect(component.tabStatusColorStyle('solution')).toEqual({
+        'border-top-color': '#D14836'
+      });
+      expect(component.tabNeedUpdatesStatus('solution')).toBe(false);
+      expect(component.contentIdNeedUpdates('solution')).toBe(false);
+      expect(component.contentIdStatusColorStyle('solution_1')).toEqual({
+        'border-left': '3px solid #D14836'
+      });
+    });
+
+    it('should activate rule inputs tab when clicking on tab', () => {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('rule_input');
+
+      expect(component.isActive('rule_input')).toBe(true);
+      expect(component.isDisabled('rule_input')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('rule_input_4', 'set_of_normalized_string');
+    });
+
+    it('should change active rule content index', () => {
+      component.onTabClick('rule_input');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveRuleContentIndex(1);
+
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('rule_input_5', 'set_of_normalized_string');
+    });
+
+    it('should not change active rule content index if it is equal to the ' +
+        'current one', () => {
+      component.onTabClick('rule_input');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveRuleContentIndex(0);
+
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should change active hint index', () => {
+      component.onTabClick('hint');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveHintIndex(1);
+
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('hint_2', 'html');
+    });
+
+    it('should not change active hint index if it is equal to the current one',
+      () => {
+        component.onTabClick('hint');
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+        component.changeActiveHintIndex(0);
+
+        expect(translationTabActiveContentIdService.setActiveContent).not
+          .toHaveBeenCalled();
+      });
+
+    it('should change active answer group index', () => {
+      component.onTabClick('feedback');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveAnswerGroupIndex(1);
+
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('feedback_2', 'html');
+    });
+
+    it('should not change active customization argument index if it is equal' +
+        ' to the current one',
+    () => {
+      component.onTabClick('ca');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveCustomizationArgContentIndex(0);
+
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should change active answer group index to default outcome when' +
+        ' index provided is equal to answer groups length', () => {
+      component.onTabClick('feedback');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveAnswerGroupIndex(2);
+
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('default_outcome', 'html');
+    });
+
+    it('should not change active hint index if it is equal to the current one',
+      () => {
+        component.onTabClick('feedback');
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+        component.changeActiveAnswerGroupIndex(0);
+
+        expect(translationTabActiveContentIdService.setActiveContent).not
+          .toHaveBeenCalled();
+      });
+
+    it('should get subtitled html data translation', () => {
+      let subtitledObject = SubtitledHtml.createFromBackendDict({
+        content_id: 'content_1',
+        html: 'This is the html'
+      });
+      expect(component.getRequiredHtml(subtitledObject)).toBe(
+        'This is the html');
+      expect(component.getSubtitledContentSummary(subtitledObject)).toBe(
+        'This is the html');
+    });
+
+    it('should get empty content message when text translations haven\'t' +
+        ' been added yet', () => {
+      expect(component.getEmptyContentMessage()).toBe(
+        'The translation for this section has not been created yet.' +
+            ' Switch to translation mode to add a text translation.');
+    });
+
+    it('should get summary default outcome when outcome is linear',
+      () => {
+        expect(component.summarizeDefaultOutcome(
+          outcomeObjectFactory.createNew(
+            'unused', '1', 'Feedback Text', []), 'Continue', 0, 'true'))
+          .toBe('[] Feedback Text');
+      });
+
+    it('should get summary default outcome when answer group count' +
+        ' is greater than 0', () => {
+      expect(component.summarizeDefaultOutcome(
+        outcomeObjectFactory.createNew(
+          'unused', '1', 'Feedback Text', []), 'TextInput', 1, 'true'))
+        .toBe('[] Feedback Text');
+    });
+
+    it('should get summary default outcome when answer group count' +
+        ' is equal to 0', () => {
+      expect(component.summarizeDefaultOutcome(
+        outcomeObjectFactory.createNew(
+          'unused', '1', 'Feedback Text', []), 'TextInput', 0, 'true'))
+        .toBe('[] Feedback Text');
+    });
+
+    it('should get an empty summary when default outcome is a falsy value',
+      () => {
+        expect(component.summarizeDefaultOutcome(null, 'Continue', 0, 'true'))
+          .toBe('');
+      });
+
+    it('should get summary answer group', () => {
+      expect(component.summarizeAnswerGroup(
+        answerGroupObjectFactory.createNew(
+          [],
+          outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
+          null, '0'), '1', null, true))
+        .toBe('[] Feedback text');
+    });
+  });
 });
 
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
-  let contextService: ContextService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
@@ -882,7 +881,7 @@ describe('State translation component', () => {
         recordedVoiceovers));
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
-    entityTranslationsService.init('exp1', 'exploration', 5)
+    entityTranslationsService.init('exp1', 'exploration', 5);
     entityTranslationsService.entityTranslation = (
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
@@ -920,138 +919,137 @@ describe('State translation component', () => {
 
   describe('when translation tab is busy and voiceover mode is not' +
     ' activate', () => {
-      it('should open translation tab busy modal when clicking on content' +
+    it('should open translation tab busy modal when clicking on content' +
         ' tab', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.onTabClick('content');
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('content');
 
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(component.isVoiceoverModeActive()).toBe(false);
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should open translation tab busy modal when clicking on interaction' +
-        'customization arguments tab', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.onTabClick('ca');
-
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should open translation tab busy modal when clicking on feedback' +
-        ' tab', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.onTabClick('feedback');
-
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should open translation tab busy modal when clicking on hint' +
-        ' tab', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.onTabClick('hint');
-
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should open translation tab busy modal when clicking on solution' +
-        ' tab', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.onTabClick('solution');
-
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should open translation tab busy modal when trying to change' +
-        ' active rule content index', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveRuleContentIndex(1);
-
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should open translation tab busy modal when trying to change' +
-        ' active hint index', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveHintIndex(1);
-
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should open translation tab busy modal when trying to change' +
-        ' active answer group index', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveAnswerGroupIndex(1);
-
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should open translation tab busy modal when trying to change' +
-        ' interaction customization argument index', () => {
-          spyOn(showTranslationTabBusyModalEmitter, 'emit');
-          spyOn(translationTabActiveContentIdService, 'setActiveContent');
-          component.changeActiveCustomizationArgContentIndex(0);
-
-          expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-          expect(translationTabActiveContentIdService.setActiveContent).not
-            .toHaveBeenCalled();
-        });
-
-      it('should get subtitled data', () => {
-        let subtitledObject = SubtitledHtml.createFromBackendDict({
-          content_id: 'content_1',
-          html: 'This is the html'
-        });
-        expect(component.getRequiredHtml(subtitledObject))
-          .toBe('This is the html');
-        expect(component.getSubtitledContentSummary(subtitledObject)).toBe(
-          'This is the html');
-
-        let subtitledObjectBack = subtitledUnicodeObjectFactory
-          .createFromBackendDict({
-            content_id: 'content_1',
-            unicode_str: 'This is the unicode'
-          });
-        expect(component.getSubtitledContentSummary(subtitledObjectBack)).toBe(
-          'This is the unicode');
-      });
-
-      it('should get content message warning that there is not text available' +
-        ' to translate', () => {
-          expect(component.getEmptyContentMessage()).toBe(
-            'There is no text available to translate.');
-        });
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(component.isVoiceoverModeActive()).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
     });
+
+    it('should open translation tab busy modal when clicking on interaction' +
+        'customization arguments tab', () => {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('ca');
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when clicking on feedback' +
+        ' tab', () => {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('feedback');
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when clicking on hint' +
+        ' tab', () => {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('hint');
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when clicking on solution' +
+        ' tab', () => {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('solution');
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when trying to change' +
+        ' active rule content index', () => {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveRuleContentIndex(1);
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when trying to change' +
+        ' active hint index', () => {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveHintIndex(1);
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when trying to change' +
+        ' active answer group index', () => {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveAnswerGroupIndex(1);
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when trying to change' +
+        ' interaction customization argument index', () => {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.changeActiveCustomizationArgContentIndex(0);
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should get subtitled data', () => {
+      let subtitledObject = SubtitledHtml.createFromBackendDict({
+        content_id: 'content_1',
+        html: 'This is the html'
+      });
+      expect(component.getRequiredHtml(subtitledObject))
+        .toBe('This is the html');
+      expect(component.getSubtitledContentSummary(subtitledObject)).toBe(
+        'This is the html');
+
+      let subtitledObjectBack = subtitledUnicodeObjectFactory
+        .createFromBackendDict({
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode'
+        });
+      expect(component.getSubtitledContentSummary(subtitledObjectBack)).toBe(
+        'This is the unicode');
+    });
+
+    it('should get content message warning that there is not text available' +
+        ' to translate', () => {
+      expect(component.getEmptyContentMessage()).toBe(
+        'There is no text available to translate.');
+    });
+  });
 });
 
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
   let ckEditorCopyContentService: CkEditorCopyContentService;
-  let contextService: ContextService;
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
@@ -1315,7 +1313,6 @@ describe('State translation component', () => {
     fixture = TestBed.createComponent(StateTranslationComponent);
     component = fixture.componentInstance;
 
-    contextService = TestBed.inject(ContextService);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
@@ -1332,7 +1329,7 @@ describe('State translation component', () => {
         recordedVoiceovers));
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
-    entityTranslationsService.init('exp1', 'exploration', 5)
+    entityTranslationsService.init('exp1', 'exploration', 5);
     entityTranslationsService.entityTranslation = (
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
@@ -1428,14 +1425,14 @@ describe('State translation component', () => {
   describe('when state has default outcome and no answer groups', () => {
     it('should activate feedback tab with default outcome when' +
       ' clicking on tab', () => {
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-        component.onTabClick('feedback');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      component.onTabClick('feedback');
 
-        expect(component.isActive('feedback')).toBe(true);
-        expect(component.isDisabled('feedback')).toBe(false);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('default_outcome', 'html');
-      });
+      expect(component.isActive('feedback')).toBe(true);
+      expect(component.isDisabled('feedback')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('default_outcome', 'html');
+    });
   });
 });
 
@@ -1755,36 +1752,36 @@ describe('State translation component', () => {
 
   describe('when state has a multiple choice interaction with no hints, ' +
     'solution or outcome', () => {
-      it('should evaluate feedback tab as disabled', () => {
-        expect(component.isDisabled('feedback')).toBe(true);
-      });
-
-      it('should evaluate hint tab as disabled', () => {
-        expect(component.isDisabled('hint')).toBe(true);
-      });
-
-      it('should evaluate solution tab as disabled', () => {
-        expect(component.isDisabled('solution')).toBe(true);
-      });
-
-      it('should change active customization argument index', () => {
-        component.onTabClick('ca');
-        spyOn(translationTabActiveContentIdService, 'setActiveContent');
-
-        component.changeActiveCustomizationArgContentIndex(1);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('ca_1', 'html');
-
-        component.changeActiveCustomizationArgContentIndex(0);
-        expect(translationTabActiveContentIdService.setActiveContent)
-          .toHaveBeenCalledWith('ca_0', 'unicode');
-      });
-
-      it('should isDisabled return true when stateinteractionId is null', () => {
-        component.TAB_ID_CONTENT = 'some_id';
-        component.stateInteractionId = null;
-
-        expect(component.isDisabled('any')).toBeTrue();
-      });
+    it('should evaluate feedback tab as disabled', () => {
+      expect(component.isDisabled('feedback')).toBe(true);
     });
+
+    it('should evaluate hint tab as disabled', () => {
+      expect(component.isDisabled('hint')).toBe(true);
+    });
+
+    it('should evaluate solution tab as disabled', () => {
+      expect(component.isDisabled('solution')).toBe(true);
+    });
+
+    it('should change active customization argument index', () => {
+      component.onTabClick('ca');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+      component.changeActiveCustomizationArgContentIndex(1);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('ca_1', 'html');
+
+      component.changeActiveCustomizationArgContentIndex(0);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('ca_0', 'unicode');
+    });
+
+    it('should isDisabled return true when stateinteractionId is null', () => {
+      component.TAB_ID_CONTENT = 'some_id';
+      component.stateInteractionId = null;
+
+      expect(component.isDisabled('any')).toBeTrue();
+    });
+  });
 });

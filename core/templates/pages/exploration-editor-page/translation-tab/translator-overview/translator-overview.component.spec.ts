@@ -120,9 +120,9 @@ describe('Translator Overview component', () => {
 
   it('should show tab mode switcher when language code is different' +
     ' from exploration\'s language code', () => {
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
-      expect(component.canShowTabModeSwitcher()).toBe(true);
-    });
+    spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+    expect(component.canShowTabModeSwitcher()).toBe(true);
+  });
 
   it('should change to voiceover active mode when changing translation tab',
     () => {
@@ -168,25 +168,25 @@ describe('Translator Overview component', () => {
 
   it('should get translation bar progress data when there are more' +
     ' than 1 item to be translated', () => {
-      spyOn(translationStatusService, 'getExplorationContentRequiredCount').and
-        .returnValue(3);
-      spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
-        .and.returnValue(1);
-      component.getTranslationProgressStyle();
-      expect(component.getTranslationProgressAriaLabel()).toBe(
-        '2 items translated out of 3 items');
-    });
+    spyOn(translationStatusService, 'getExplorationContentRequiredCount').and
+      .returnValue(3);
+    spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
+      .and.returnValue(1);
+    component.getTranslationProgressStyle();
+    expect(component.getTranslationProgressAriaLabel()).toBe(
+      '2 items translated out of 3 items');
+  });
 
   it('should get translation bar progress data when there is 1 item to be' +
     ' translated', () => {
-      spyOn(translationStatusService, 'getExplorationContentRequiredCount')
-        .and.returnValue(2);
-      spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
-        .and.returnValue(1);
-      component.getTranslationProgressStyle();
-      expect(component.getTranslationProgressAriaLabel()).toBe(
-        '1 item translated out of 2 items');
-    });
+    spyOn(translationStatusService, 'getExplorationContentRequiredCount')
+      .and.returnValue(2);
+    spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
+      .and.returnValue(1);
+    component.getTranslationProgressStyle();
+    expect(component.getTranslationProgressAriaLabel()).toBe(
+      '1 item translated out of 2 items');
+  });
 
   it('should apply autofocus to history tab element when tab is switched',
     () => {

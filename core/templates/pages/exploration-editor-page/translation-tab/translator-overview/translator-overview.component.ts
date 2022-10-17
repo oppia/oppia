@@ -115,7 +115,7 @@ export class TranslatorOverviewComponent implements OnInit {
   getTranslationProgressStyle(): {
     width: string;
     height: string;
-  } {
+    } {
     this.numberOfRequiredAudio = this.translationStatusService
       .getExplorationContentRequiredCount();
     this.numberOfAudioNotAvailable = this.translationStatusService
