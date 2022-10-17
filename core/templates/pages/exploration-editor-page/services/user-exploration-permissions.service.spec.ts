@@ -50,6 +50,15 @@ describe('User Exploration Permissions Service', () => {
   beforeEach(()=> {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [{
+        provide: ContextService,
+        useValue: {
+          getExplorationId: () => {
+            return sampleExplorationId;
+          },
+          setExplorationIsLinkedToStory: () => {}
+        }
+      }],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);

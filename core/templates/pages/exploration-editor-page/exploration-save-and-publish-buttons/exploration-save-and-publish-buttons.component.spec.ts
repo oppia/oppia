@@ -50,7 +50,7 @@ describe('Exploration save and publish buttons component', () => {
   let explorationWarningsService: ExplorationWarningsService;
   let editabilityService: EditabilityService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
-
+  let fetchPermissionsAsyncSpy;
   let mockExternalSaveEventEmitter = new EventEmitter<void>();
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
 
@@ -162,6 +162,14 @@ describe('Exploration save and publish buttons component', () => {
      editabilityService = TestBed.inject(EditabilityService);
      userExplorationPermissionsService = TestBed.inject(
        UserExplorationPermissionsService);
+
+     let userPermissions = {
+       canPublish: true
+     };
+     fetchPermissionsAsyncSpy = spyOn(
+       userExplorationPermissionsService, 'fetchPermissionsAsync');
+     fetchPermissionsAsyncSpy.and
+       .returnValue(Promise.resolve(userPermissions as ExplorationPermissions));
 
      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
        .returnValue(Promise.resolve({
@@ -329,7 +337,7 @@ describe('Exploration save and publish buttons component', () => {
        canPublish: true
      };
      component.explorationCanBePublished = false;
-     spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+     fetchPermissionsAsyncSpy.and
        .returnValue(Promise.resolve(userPermissions as ExplorationPermissions));
 
      component.showPublishExplorationModal();

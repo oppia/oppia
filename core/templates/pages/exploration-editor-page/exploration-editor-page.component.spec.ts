@@ -114,6 +114,8 @@ describe('Exploration editor page component', () => {
   let mockOpenEditorTutorialEmitter = new EventEmitter<void>();
   let mockOpenTranslationTutorialEmitter = new EventEmitter<void>();
   let mockInitExplorationPageEmitter = new EventEmitter<void>();
+  let isLocationSetToNonStateEditorTabSpy;
+
   let explorationId = 'exp1';
   let explorationData = {
     exploration_is_linked_to_story: true,
@@ -348,6 +350,10 @@ describe('Exploration editor page component', () => {
     explorationPermissionsBackendApiService = TestBed.inject(
       ExplorationPermissionsBackendApiService);
 
+    isLocationSetToNonStateEditorTabSpy = spyOn(
+      rs, 'isLocationSetToNonStateEditorTab');
+    isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
+
     spyOn(explorationPermissionsBackendApiService, 'getPermissionsAsync')
       .and.returnValue(Promise.resolve(
         new ExplorationPermissions(
@@ -362,6 +368,7 @@ describe('Exploration editor page component', () => {
   });
 
   afterEach(() => {
+    fixture.destroy();
     component.ngOnDestroy();
   });
 
@@ -419,8 +426,7 @@ describe('Exploration editor page component', () => {
 
     it('should start editor tutorial when on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(rs, 'isLocationSetToNonStateEditorTab')
-        .and.returnValue(false);
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(false);
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
@@ -512,7 +518,7 @@ describe('Exploration editor page component', () => {
     it('should navigate to main tab', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
-      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
       spyOn(rs, 'navigateToMainTab').and.callThrough();
 
@@ -614,6 +620,7 @@ describe('Exploration editor page component', () => {
 
   describe('Checking internet Connection', () => {
     beforeEach(() => {
+      ueps = TestBed.inject(UserExplorationPermissionsService);
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
       registerDeclineTutorialModalEventSpy = (
@@ -743,7 +750,7 @@ describe('Exploration editor page component', () => {
     });
 
     it('should navigate to feedback tab', fakeAsync(() => {
-      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
       spyOn(rs, 'navigateToFeedbackTab').and.callThrough();
 
@@ -779,7 +786,7 @@ describe('Exploration editor page component', () => {
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       spyOn(ics, 'startCheckingConnection');
       spyOn(cls, 'loadAutosavedChangeList');
-      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(true);
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(true);
 
       expect(component.explorationEditorPageHasInitialized).toEqual(false);
       mockInitExplorationPageEmitter.emit();
@@ -862,6 +869,7 @@ describe('Exploration editor page component', () => {
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
       tds = TestBed.inject(ThreadDataBackendApiService);
+      ueps = TestBed.inject(UserExplorationPermissionsService);
 
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));

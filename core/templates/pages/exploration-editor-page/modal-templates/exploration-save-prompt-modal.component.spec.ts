@@ -20,6 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ContextService } from 'services/context.service';
 import { ExplorationSavePromptModalComponent } from './exploration-save-prompt-modal.component';
 
 class MockActiveModal {
@@ -47,6 +48,15 @@ describe('Exploration Save Prompt Modal Component', () => {
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
+        },
+        {
+          provide: ContextService,
+          useValue: {
+            getExplorationId: () => {
+              return 'explorationId';
+            },
+            setExplorationIsLinkedToStory: () => {}
+          }
         },
       ],
       schemas: [NO_ERRORS_SCHEMA]
