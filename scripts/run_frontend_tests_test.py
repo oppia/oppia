@@ -22,7 +22,6 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-from typing import Any
 
 from . import build
 from . import check_frontend_test_coverage
@@ -69,11 +68,11 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         self.cmd_token_list: list[list[str]] = []
         def mock_success_check_call(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
         def mock_failed_check_call(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockFailedTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str) -> MockFailedTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockFailedTask()
 
