@@ -24,9 +24,11 @@ import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
+import { ActiveContributionDetailsDict, QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
 import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 
 class MockActiveModal {
   close(): void {
@@ -55,16 +57,16 @@ describe('Question Suggestion Review Modal component', () => {
   let skillBackendApiService: SkillBackendApiService;
   let skillObjectFactory: SkillObjectFactory;
   let contextService: ContextService;
-  let cancelSuggestionSpy = null;
+  let cancelSuggestionSpy: jasmine.Spy;
   let threadDataBackendApiService: ThreadDataBackendApiService;
   const authorName = 'Username 1';
   const contentHtml = 'Content html';
-  let question = null;
+  let question: Question;
   const questionHeader = 'Question header';
   const reviewable = true;
   const skillDifficulty = 0.3;
   const suggestionId = '1';
-  let misconceptionsBySkill = null;
+  let misconceptionsBySkill: MisconceptionSkillMap;
   let suggestionIdToContribution = {
     1: {
       details: {
@@ -487,7 +489,7 @@ describe('Question Suggestion Review Modal component', () => {
       () => {
         component.validationError = 'component is an error message';
         component.questionChanged();
-        expect(component.validationError).toBe(null);
+        expect(component.validationError).toBeNull();
       });
 
     it('should accept suggestion in suggestion modal when clicking accept' +
@@ -619,13 +621,15 @@ describe('Question Suggestion Review Modal component', () => {
       spyOn(component, 'cancel');
       let details1 = component.allContributions['1'].details;
       let details2 = component.allContributions['2'].details;
-      component.allContributions['2'].details = null;
+      component.allContributions['2'].details = (
+        {} as ActiveContributionDetailsDict);
 
       component.goToNextItem();
       expect(component.cancel).toHaveBeenCalled();
       component.allContributions['2'].details = details2;
       component.goToNextItem();
-      component.allContributions['1'].details = null;
+      component.allContributions['1'].details = (
+        {} as ActiveContributionDetailsDict);
 
       component.goToPreviousItem();
       expect(component.cancel).toHaveBeenCalledWith();

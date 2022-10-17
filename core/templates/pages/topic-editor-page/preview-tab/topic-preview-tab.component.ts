@@ -32,11 +32,11 @@ export class TopicPreviewTabComponent {
   private _TAB_STORY: string = 'story';
   private _TAB_SUBTOPIC: string = 'subtopic';
   private _TAB_PRACTICE: string = 'practice';
-  topic: Topic;
-  topicName: string;
-  subtopics: Subtopic[];
+  topic!: Topic;
+  topicName!: string;
+  subtopics!: Subtopic[];
   activeTab: string = this._TAB_STORY;
-  cannonicalStorySummaries: StorySummary[];
+  cannonicalStorySummaries!: StorySummary[];
   chapterCount: number = 0;
 
   constructor(
@@ -46,8 +46,9 @@ export class TopicPreviewTabComponent {
 
   ngOnInit(): void {
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicName = this.topic.getName();
-    this.subtopics = this.topic.getSubtopics();
+    this.topicName = (
+      this.topic ? this.topic.getName() : 'Topic name is loading.');
+    this.subtopics = this.topic ? this.topic.getSubtopics() : [];
     this.cannonicalStorySummaries = (
       this.topicEditorStateService.getCanonicalStorySummaries());
     for (let idx in this.cannonicalStorySummaries) {

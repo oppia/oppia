@@ -38,11 +38,12 @@ import { CompareVersionsService } from './services/compare-versions.service';
 import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 
-interface VersionMetadata {
+export interface VersionMetadata {
   versionNumber: number;
   committerId: string;
   createdOnMsecsStr: string;
   commitMessage: string;
+  tooltipText: string;
 }
 
 interface Metadata {
@@ -58,42 +59,46 @@ export class HistoryTabComponent
   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  firstVersion: string;
-  secondVersion: string;
-  hideHistoryGraph: boolean;
-  selectedVersionsArray: number[];
+  firstVersion!: string | null;
+  secondVersion!: string | null;
+  hideHistoryGraph!: boolean;
+  selectedVersionsArray!: number[];
 
   // Letiable explorationSnapshots is a list of all snapshots for the
   // exploration in ascending order.
-  explorationSnapshots: ExplorationSnapshot[];
+  explorationSnapshots!: ExplorationSnapshot[];
   currentPage: number = 0;
-  explorationVersionMetadata;
+  explorationVersionMetadata!: VersionMetadata[];
   versionCheckboxArray: {
     vnum: number;
     selected: boolean;
   }[] | null = [];
 
-  username: string;
-  displayedCurrentPageNumber: number;
-  versionNumbersToDisplay;
+  username!: string;
+  displayedCurrentPageNumber!: number;
+  versionNumbersToDisplay!: number | number[];
   VERSIONS_PER_PAGE: number = 10;
-  startingIndex: number;
-  endIndex: number;
-  versionChoices: number[];
-  explorationId: string;
-  explorationAllSnapshotsUrl: string;
-  checkRevertExplorationValidUrl: string;
-  revertExplorationUrl: string;
-  explorationDownloadUrl: string;
-  earlierVersionHeader: string;
-  laterVersionHeader: string;
-  totalExplorationVersionMetadata = [];
-  compareVersionMetadata;
-  currentVersion: number;
-  comparisonsAreDisabled: boolean;
-  compareVersionsButtonIsHidden: boolean;
-  compareVersions: object;
-  diffData: Metadata | object;
+  startingIndex!: number;
+  endIndex!: number;
+  versionChoices!: number[];
+  explorationId!: string;
+  explorationAllSnapshotsUrl!: string;
+  checkRevertExplorationValidUrl!: string;
+  revertExplorationUrl!: string;
+  explorationDownloadUrl!: string;
+  earlierVersionHeader!: string;
+  laterVersionHeader!: string;
+  totalExplorationVersionMetadata: VersionMetadata[] = [];
+  compareVersionMetadata!: {
+    earlierVersion?: VersionMetadata;
+    laterVersion?: VersionMetadata;
+  };
+
+  currentVersion!: number;
+  comparisonsAreDisabled!: boolean;
+  compareVersionsButtonIsHidden!: boolean;
+  compareVersions!: object;
+  diffData!: Metadata | null;
 
   constructor(
     private checkRevertService: CheckRevertService,
@@ -162,6 +167,9 @@ export class HistoryTabComponent
     this.loaderService.showLoadingScreen('Loading');
     this.explorationDataService.getDataAsync(() => {}).then((data) => {
       let currentVersion = data.version;
+      if (!currentVersion) {
+        throw new Error('Version cannot be undefined');
+      }
       this.currentVersion = currentVersion;
       // The this.compareVersionMetadata is an object with keys
       // 'earlierVersion' and 'laterVersion' whose values are the
@@ -178,7 +186,7 @@ export class HistoryTabComponent
 
       // Disable all comparisons if there are less than two revisions in
       // total.
-      this.comparisonsAreDisabled = (currentVersion < 2);
+      this.comparisonsAreDisabled = (this.currentVersion < 2);
       this.compareVersionsButtonIsHidden = this.comparisonsAreDisabled;
 
       this.historyTabBackendApiService
@@ -192,7 +200,7 @@ export class HistoryTabComponent
             this.explorationVersionMetadata = [];
             let lowestVersionIndex = 0;
             for (
-              let i = currentVersion - 1; i >= lowestVersionIndex; i--) {
+              let i = this.currentVersion - 1; i >= lowestVersionIndex; i--) {
               let versionNumber = this.explorationSnapshots[i].version_number;
               this.explorationVersionMetadata[versionNumber - 1] = {
                 committerId: this.explorationSnapshots[i].committer_id,
@@ -273,6 +281,10 @@ export class HistoryTabComponent
       }
     }
 
+    if (earlierIndex === null || laterIndex === null) {
+      throw new Error('Invalid version numbers');
+    }
+
     this.compareVersionMetadata.earlierVersion = (
       this.totalExplorationVersionMetadata[earlierIndex]);
     this.compareVersionMetadata.laterVersion = (
@@ -284,11 +296,16 @@ export class HistoryTabComponent
         this.loggerService.info('Retrieved version comparison data');
         this.loggerService.info(String(response));
 
+        let earlierVersion = this.compareVersionMetadata.earlierVersion;
+        let laterVersion = this.compareVersionMetadata.laterVersion;
+
+        if (!earlierVersion || !laterVersion) {
+          throw new Error('Invalid version metadata');
+        }
+
         this.diffData = response;
-        this.earlierVersionHeader = this.getVersionHeader(
-          this.compareVersionMetadata.earlierVersion);
-        this.laterVersionHeader = this.getVersionHeader(
-          this.compareVersionMetadata.laterVersion);
+        this.earlierVersionHeader = this.getVersionHeader(earlierVersion);
+        this.laterVersionHeader = this.getVersionHeader(laterVersion);
       }
     );
   }
@@ -331,9 +348,13 @@ export class HistoryTabComponent
     });
     modalRef.componentInstance.version = version;
     modalRef.result.then((version) => {
+      let currentVersion = this.explorationDataService.data.version;
+      if (currentVersion === undefined) {
+        throw new Error('Exploration version is undefined');
+      }
       let data = {
         revertExplorationUrl: this.revertExplorationUrl,
-        currentVersion: this.explorationDataService.data.version,
+        currentVersion: currentVersion,
         revertToVersion: version
       };
       this.historyTabBackendApiService.postData(data).then(
@@ -451,7 +472,7 @@ export class HistoryTabComponent
     * displayed in.
     *
     */
-    this.explorationVersionMetadata = null;
+    this.explorationVersionMetadata = [];
     this.versionCheckboxArray = [];
     this.username = '';
     this.firstVersion = '';

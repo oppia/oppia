@@ -32,7 +32,7 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface ClassificationInterface {
   answerGroupIndex: number;
-  newOutcome: Outcome;
+  newOutcome: Outcome | null;
 }
 
 @Component({
@@ -41,7 +41,7 @@ interface ClassificationInterface {
 })
 export class TrainingPanelComponent
   implements OnInit {
-  @Input() answer: InteractionAnswer;
+  @Input() answer!: InteractionAnswer;
   // The classification input is an object with two keys:
   //   -answerGroupIndex: This refers to which answer group the answer
   //      being trained has been classified to (for displaying feedback
@@ -53,12 +53,12 @@ export class TrainingPanelComponent
   //      list of feedback and a destination state name) which is
   //      non-null if, and only if, the creator has specified that a new
   //      response should be created for the trained answer.
-  @Input() classification: ClassificationInterface;
-  @Input() addingNewResponse: boolean;
+  @Input() classification!: ClassificationInterface;
+  @Input() addingNewResponse!: boolean;
 
   answerTemplate: string = '';
-  selectedAnswerGroupIndex: number;
-  allOutcomes: Outcome[];
+  selectedAnswerGroupIndex!: number;
+  allOutcomes!: Outcome[];
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -86,8 +86,12 @@ export class TrainingPanelComponent
   beginAddingNewResponse(): void {
     let contentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK);
+    let currentStateName = this.stateEditorService.getActiveStateName();
+    if (currentStateName === null) {
+      throw new Error('Cannot add new response from a null state.');
+    }
     this.classification.newOutcome = this.outcomeObjectFactory.createNew(
-      this.stateEditorService.getActiveStateName(), contentId, '', []);
+      currentStateName, contentId, '', []);
     this.addingNewResponse = true;
   }
 
@@ -117,6 +121,9 @@ export class TrainingPanelComponent
     this.addingNewResponse = false;
 
     let _stateName = this.stateEditorService.getActiveStateName();
+    if (_stateName === null) {
+      throw new Error('Cannot train from a null state.');
+    }
     let _state = this.explorationStatesService.getState(_stateName);
     this.allOutcomes = this.trainingDataService.getAllPotentialOutcomes(
       _state);

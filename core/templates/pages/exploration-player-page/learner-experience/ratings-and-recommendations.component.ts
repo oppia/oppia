@@ -63,28 +63,28 @@ export interface QuestionPlayerConfig {
   templateUrl: './ratings-and-recommendations.component.html'
 })
 export class RatingsAndRecommendationsComponent {
-  @Input() userIsLoggedIn: boolean;
-  @Input() explorationIsInPreviewMode: boolean;
-  @Input() questionPlayerConfig: QuestionPlayerConfig;
-  @Input() collectionSummary: CollectionSummary;
-  @Input() isRefresherExploration: boolean;
-  @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
-  @Input() parentExplorationIds: string[];
+  @Input() userIsLoggedIn!: boolean;
+  @Input() explorationIsInPreviewMode!: boolean;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig;
+  @Input() collectionSummary!: CollectionSummary;
+  @Input() isRefresherExploration!: boolean;
+  @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
+  @Input() parentExplorationIds!: string[];
   // The below property will be undefined when the current chapter
   // is the last chapter of a story.
-  @Input() nextLessonLink: string | undefined;
-  inStoryMode: boolean;
+  @Input() nextLessonLink!: string | undefined;
+  inStoryMode!: boolean;
   nextStoryNode: ReadOnlyStoryNode | null = null;
   practiceQuestionsAreEnabled: boolean = false;
   // The below properties will be undefined if the exploration is not being
   // played in story mode, i.e. inStoryMode is false.
-  storyViewerUrl: string | undefined;
-  nextStoryNodeIconUrl: string | undefined;
-  storyId: string | undefined;
-  collectionId: string;
-  userRating: number;
+  storyViewerUrl!: string | undefined;
+  nextStoryNodeIconUrl!: string | undefined;
+  storyId!: string | undefined;
+  collectionId!: string | null;
+  userRating!: number;
   directiveSubscriptions = new Subscription();
-  @ViewChild('feedbackPopOver') feedbackPopOver: NgbPopover;
+  @ViewChild('feedbackPopOver') feedbackPopOver!: NgbPopover;
 
   constructor(
     private alertsService: AlertsService,

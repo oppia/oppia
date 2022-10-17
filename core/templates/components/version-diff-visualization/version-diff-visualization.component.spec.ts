@@ -58,8 +58,8 @@ describe('Version Diff Visualization Component', () => {
     ngbModal = TestBed.inject(NgbModal);
 
     component.diffData = {
-      v1InitStateId: 'A',
-      v2InitStateId: 'B',
+      v1InitStateId: 0,
+      v2InitStateId: 1,
       links: [],
       finalStateIds: ['C', 'D'],
       nodes: {
@@ -175,9 +175,9 @@ describe('Version Diff Visualization Component', () => {
         v2States: {},
         v1States: {},
         finalStateIds: [],
-        v2InitStateId: '',
+        v2InitStateId: 0,
         links: [],
-        v1InitStateId: '',
+        v1InitStateId: 0,
       }
     );
 
@@ -226,9 +226,9 @@ describe('Version Diff Visualization Component', () => {
         v2States: {},
         v1States: {},
         finalStateIds: [],
-        v2InitStateId: '',
+        v2InitStateId: 0,
         links: [],
-        v1InitStateId: '',
+        v1InitStateId: 1,
       }
     );
 

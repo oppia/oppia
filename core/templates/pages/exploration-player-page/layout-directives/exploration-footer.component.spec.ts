@@ -40,8 +40,8 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations, WrittenTranslationsBackendDict, WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
@@ -49,6 +49,8 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactory';
 
 class MockCheckpointCelebrationUtilityService {
   private _openLessonInformationModalEmitter = new EventEmitter<void>();
@@ -362,10 +364,10 @@ describe('ExplorationFooterComponent', () => {
       .and.returnValue(Promise.resolve());
 
     const stateCard = new StateCard(
-      'End', '<p>Testing</p>', null, new Interaction(
-        [], [], null, null, [], 'EndExploration', null),
-      [], null, null, 'content', null
-    );
+      'End', '<p>Testing</p>', '', new Interaction(
+        [], [], {} as InteractionCustomizationArgs, null, [], 'EndExploration',
+        null), [], {} as RecordedVoiceovers, {} as WrittenTranslations,
+        'content', {} as AudioTranslationLanguageService);
 
     const endState = {
       classifier_model_id: null,
@@ -437,10 +439,11 @@ describe('ExplorationFooterComponent', () => {
         editableExplorationBackendApiService, 'resetExplorationProgressAsync');
 
       const stateCard = new StateCard(
-        'End', '<p>Testing</p>', null, new Interaction(
-          [], [], null, null, [], 'EndExploration', null),
-        [], null, null, 'content', null
-      );
+        'End', '<p>Testing</p>', '', new Interaction(
+          [], [], {} as InteractionCustomizationArgs, null, [],
+          'EndExploration', null), [], {} as RecordedVoiceovers,
+          {} as WrittenTranslations, 'content',
+          {} as AudioTranslationLanguageService);
 
       const endState = {
         classifier_model_id: null,
@@ -499,7 +502,7 @@ describe('ExplorationFooterComponent', () => {
   it('should handle error if backend call to learnerViewInfoBackendApiService' +
   ' fails while opening progress reminder modal', fakeAsync(() => {
     component.explorationId = 'expId';
-    component.expInfo = null;
+    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());
     spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
@@ -553,7 +556,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {} as ParamSpecsBackendDict,
         title: 'Exploration',
         language_code: 'en',
         correctness_feedback_enabled: true,
@@ -819,10 +822,10 @@ describe('ExplorationFooterComponent', () => {
       ));
 
     let stateCard = new StateCard(
-      'End', '<p>Testing</p>', null, new Interaction(
-        [], [], null, null, [], 'EndExploration', null),
-      [], null, null, 'content', null
-    );
+      'End', '<p>Testing</p>', '', new Interaction(
+        [], [], {} as InteractionCustomizationArgs, null, [], 'EndExploration',
+        null), [], {} as RecordedVoiceovers, {} as WrittenTranslations,
+        'content', {} as AudioTranslationLanguageService);
 
     spyOn(explorationEngineService, 'getStateCardByName')
       .and.returnValue(stateCard);
@@ -848,7 +851,7 @@ describe('ExplorationFooterComponent', () => {
       }));
 
     expect(component.openInformationCardModal).toHaveBeenCalled();
-    component.expInfo = null;
+    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
 
     component.showInformationCard();
     tick();
@@ -872,7 +875,7 @@ describe('ExplorationFooterComponent', () => {
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
     const card = StateCard.createNewCard(
       'State A', '<p>Content</p>', '<interaction></interaction>',
-      null,
+      {} as Interaction,
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
@@ -944,7 +947,7 @@ describe('ExplorationFooterComponent', () => {
   'to learnerViewInfoBackendApiService fails', fakeAsync(() => {
     let explorationId = 'expId';
     component.explorationId = explorationId;
-    component.expInfo = null;
+    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
 
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());
@@ -964,7 +967,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {} as ParamSpecsBackendDict,
         title: 'Exploration',
         language_code: 'en',
         correctness_feedback_enabled: true,
@@ -973,12 +976,12 @@ describe('ExplorationFooterComponent', () => {
           Introduction: {
             param_changes: [],
             classifier_model_id: null,
-            recorded_voiceovers: null,
+            recorded_voiceovers: {} as RecordedVoiceOverBackendDict,
             solicit_answer_details: true,
             card_is_checkpoint: true,
-            written_translations: null,
+            written_translations: {} as WrittenTranslationsBackendDict,
             linked_skill_id: null,
-            next_content_id_index: null,
+            next_content_id_index: 0,
             content: {
               html: '',
               content_id: 'content'
@@ -1058,7 +1061,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {} as ParamSpecsBackendDict,
         title: 'Exploration',
         language_code: 'en',
         correctness_feedback_enabled: true,
@@ -1067,12 +1070,12 @@ describe('ExplorationFooterComponent', () => {
           Introduction: {
             param_changes: [],
             classifier_model_id: null,
-            recorded_voiceovers: null,
+            recorded_voiceovers: {} as RecordedVoiceOverBackendDict,
             solicit_answer_details: true,
             card_is_checkpoint: true,
-            written_translations: null,
+            written_translations: {} as WrittenTranslationsBackendDict,
             linked_skill_id: null,
-            next_content_id_index: null,
+            next_content_id_index: 0,
             content: {
               html: '',
               content_id: 'content'

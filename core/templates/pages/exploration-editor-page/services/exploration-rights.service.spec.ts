@@ -23,20 +23,20 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationRightsService } from './exploration-rights.service';
-import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
+import { ExplorationRightsBackendApiService, ExplorationRightsBackendData } from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
 
 describe('Exploration rights service', () => {
-  let ers: ExplorationRightsService = null;
-  let als: AlertsService = null;
-  let httpTestingController: HttpTestingController = null;
+  let ers: ExplorationRightsService;
+  let als: AlertsService;
+  let httpTestingController: HttpTestingController;
   let explorationRightsBackendApiService: ExplorationRightsBackendApiService;
-  let csrfService = null;
-  let clearWarningsSpy = null;
-  let successHandler = null;
-  let failHandler = null;
-  let serviceData = {
+  let csrfService: CsrfTokenService;
+  let clearWarningsSpy: jasmine.Spy;
+  let successHandler: jasmine.Spy;
+  let failHandler: jasmine.Spy;
+  let serviceData: ExplorationRightsBackendData = {
     rights: {
       owner_names: ['abc'],
       editor_names: [],
@@ -127,7 +127,7 @@ describe('Exploration rights service', () => {
     expect(ers.isCloned()).toBe(true);
     expect(ers.clonedFrom()).toEqual('1234');
 
-    ers.init(['abc'], [], [], [], 'public', null, true, false);
+    ers.init(['abc'], [], [], [], 'public', '', true, false);
     expect(ers.isCloned()).toBe(false);
     expect(ers.clonedFrom()).toBeNull();
   });

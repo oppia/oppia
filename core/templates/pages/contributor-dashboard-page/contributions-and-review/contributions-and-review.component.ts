@@ -24,9 +24,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { ActiveContributionDict, TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
+import { TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
@@ -36,6 +36,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 
 export interface Suggestion {
   change: {
@@ -65,13 +66,18 @@ export interface Opportunity {
   id: string;
   heading: string;
   subheading: string;
-  labelText: string;
-  labelColor: string;
+  labelText?: string;
+  labelColor?: string;
   actionButtonTitle: string;
 }
 
 export interface GetOpportunitiesResponse {
   opportunitiesDicts: Opportunity[];
+  more: boolean;
+}
+
+export interface GetSuggestionsResponse {
+  suggestionIdToDetails: Record<string, SuggestionDetails>;
   more: boolean;
 }
 
@@ -102,21 +108,21 @@ export class ContributionsAndReview
    implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  SUGGESTION_TYPE_QUESTION: string;
-  SUGGESTION_TYPE_TRANSLATE: string;
-  TAB_TYPE_CONTRIBUTIONS: string;
-  TAB_TYPE_REVIEWS: string;
-  activeExplorationId: string;
-  contributions: Record<string, SuggestionDetails> | object;
-  userDetailsLoading: boolean;
-  userIsLoggedIn: boolean;
-  activeTabType: string;
-  activeSuggestionType: string;
-  dropdownShown: boolean;
-  activeDropdownTabChoice: string;
+  SUGGESTION_TYPE_QUESTION!: string;
+  SUGGESTION_TYPE_TRANSLATE!: string;
+  TAB_TYPE_CONTRIBUTIONS!: string;
+  TAB_TYPE_REVIEWS!: string;
+  activeExplorationId!: string | null;
+  contributions!: Record<string, SuggestionDetails>;
+  userDetailsLoading!: boolean;
+  userIsLoggedIn!: boolean;
+  activeTabType!: string;
+  activeSuggestionType!: string;
+  dropdownShown!: boolean;
+  activeDropdownTabChoice!: string;
   reviewTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
-  tabNameToOpportunityFetchFunction: {
+  tabNameToOpportunityFetchFunction!: {
     [key: string]: {
       [key: string]: Function;
     };
@@ -153,7 +159,7 @@ export class ContributionsAndReview
   getQuestionContributionsSummary(
       suggestionIdToSuggestions: Record<string, SuggestionDetails>):
       ContributionsSummary[] {
-    const questionContributionsSummaryList = [];
+    const questionContributionsSummaryList: ContributionsSummary[] = [];
     Object.keys(suggestionIdToSuggestions).forEach((key) => {
       const suggestion = suggestionIdToSuggestions[key].suggestion;
       const details = suggestionIdToSuggestions[key].details;
@@ -170,8 +176,10 @@ export class ContributionsAndReview
         heading: this.formatRtePreviewPipe.transform(
           suggestion.change.question_dict.question_state_data.content.html),
         subheading: subheading,
-        labelText: this.SUGGESTION_LABELS[suggestion.status].text,
-        labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
+        labelText: this.SUGGESTION_LABELS[
+          suggestion.status as keyof typeof this.SUGGESTION_LABELS].text,
+        labelColor: this.SUGGESTION_LABELS[
+          suggestion.status as keyof typeof this.SUGGESTION_LABELS].color,
         actionButtonTitle: (
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
       };
@@ -185,7 +193,7 @@ export class ContributionsAndReview
   getTranslationContributionsSummary(
       suggestionIdToSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
-    const translationContributionsSummaryList = [];
+    const translationContributionsSummaryList: ContributionsSummary[] = [];
 
     Object.keys(suggestionIdToSuggestions).forEach((key) => {
       const suggestion = suggestionIdToSuggestions[key].suggestion;
@@ -204,8 +212,10 @@ export class ContributionsAndReview
         id: suggestion.suggestion_id,
         heading: this.getTranslationSuggestionHeading(suggestion),
         subheading: subheading,
-        labelText: this.SUGGESTION_LABELS[suggestion.status].text,
-        labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
+        labelText: this.SUGGESTION_LABELS[
+          suggestion.status as keyof typeof this.SUGGESTION_LABELS].text,
+        labelColor: this.SUGGESTION_LABELS[
+          suggestion.status as keyof typeof this.SUGGESTION_LABELS].color,
         actionButtonTitle: (
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
       };
@@ -232,9 +242,9 @@ export class ContributionsAndReview
 
   _showQuestionSuggestionModal(
       suggestion: Suggestion,
-      suggestionIdToContribution: Record<string, ActiveContributionDict>,
+      suggestionIdToContribution: Record<string, SuggestionDetails>,
       reviewable: boolean,
-      question: Question,
+      question = undefined,
       misconceptionsBySkill: MisconceptionSkillMap): void {
     const targetId = suggestion.target_id;
     const suggestionId = suggestion.suggestion_id;
@@ -257,7 +267,11 @@ export class ContributionsAndReview
     modalRef.componentInstance.misconceptionsBySkill = (
       misconceptionsBySkill);
 
-    modalRef.componentInstance.editSuggestionEmitter.subscribe((value) => {
+    modalRef.componentInstance.editSuggestionEmitter.subscribe((value: {
+      suggestionId: string;
+      suggestion: Suggestion;
+      reviewable: boolean;
+    }) => {
       this.openQuestionSuggestionModal(
         value.suggestionId,
         value.suggestion,
@@ -275,10 +289,9 @@ export class ContributionsAndReview
   }
 
   _showTranslationSuggestionModal(
-      suggestionIdToContribution: Record<string, ActiveContributionDict>,
+      suggestionIdToContribution: Record<string, SuggestionDetails>,
       initialSuggestionId: string, reviewable: boolean): void {
-    const details = (
-       this.contributions[initialSuggestionId].details as ContributionDetails);
+    const details = this.contributions[initialSuggestionId].details;
     const subheading = (
       details.topic_name + ' / ' + details.story_title +
        ' / ' + details.chapter_title);
@@ -300,7 +313,7 @@ export class ContributionsAndReview
       this.contributionOpportunitiesService.
         removeOpportunitiesEventEmitter.emit(
           resolvedSuggestionIds);
-      resolvedSuggestionIds.forEach((suggestionId) => {
+      resolvedSuggestionIds.forEach((suggestionId: string) => {
         delete this.contributions[suggestionId];
       });
     }, () => {
@@ -327,7 +340,7 @@ export class ContributionsAndReview
       suggestion: Suggestion,
       reviewable: boolean,
       question = undefined): void {
-    const suggestionIdToContribution = {};
+    const suggestionIdToContribution: Record<string, SuggestionDetails> = {};
     for (let suggestionId in this.contributions) {
       var contribution = this.contributions[suggestionId];
       suggestionIdToContribution[suggestionId] = contribution;
@@ -338,7 +351,7 @@ export class ContributionsAndReview
       AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
 
     this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
-      const misconceptionsBySkill = {};
+      const misconceptionsBySkill: Record<string, Misconception[]> = {};
       const skill = skillDict.skill;
       misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
       this._showQuestionSuggestionModal(
@@ -355,7 +368,7 @@ export class ContributionsAndReview
       this.openQuestionSuggestionModal(suggestionId, suggestion, reviewable);
     }
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_TRANSLATE) {
-      const suggestionIdToContribution = {};
+      const suggestionIdToContribution: Record<string, SuggestionDetails> = {};
       for (let suggestionId in this.contributions) {
         const contribution = this.contributions[suggestionId];
         suggestionIdToContribution[suggestionId] = contribution;
@@ -376,6 +389,7 @@ export class ContributionsAndReview
     } else if (this.activeSuggestionType === this.SUGGESTION_TYPE_QUESTION) {
       return this.getQuestionContributionsSummary(suggestionIdToSuggestions);
     }
+    return [];
   }
 
   getActiveDropdownTabChoice(): string {
@@ -414,7 +428,7 @@ export class ContributionsAndReview
       .getReviewableTranslationOpportunitiesAsync(
         this.translationTopicService.getActiveTopicName())
       .then((response) => {
-        const opportunitiesDicts = [];
+        const opportunitiesDicts: Opportunity[] = [];
         response.opportunities.forEach(opportunity => {
           const opportunityDict = {
             id: opportunity.getExplorationId(),
@@ -450,7 +464,9 @@ export class ContributionsAndReview
     const fetchFunction = this.tabNameToOpportunityFetchFunction[
       this.activeSuggestionType][this.activeTabType];
 
-    return fetchFunction(shouldResetOffset).then((response) => {
+    return fetchFunction(shouldResetOffset).then((
+        response: GetSuggestionsResponse
+    ) => {
       Object.keys(response.suggestionIdToDetails).forEach(id => {
         this.contributions[id] = response.suggestionIdToDetails[id];
       });
@@ -525,76 +541,85 @@ export class ContributionsAndReview
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.userDetailsLoading = false;
       if (this.userIsLoggedIn) {
-        this.userService.getUserContributionRightsDataAsync().then(
-          (userContributionRights) => {
-            const userCanReviewTranslationSuggestionsInLanguages = (
-              userContributionRights
-                .can_review_translation_for_language_codes);
-            const userCanReviewQuestionSuggestions = (
-              userContributionRights.can_review_questions);
-            const userReviewableSuggestionTypes = [];
-            const userCanSuggestQuestions = (
-              userContributionRights.can_suggest_questions);
-            for (let index in this.contributionTabs) {
-              if (this.contributionTabs[index].suggestionType === (
-                this.SUGGESTION_TYPE_QUESTION)) {
-                this.contributionTabs[index].enabled = (
-                  userCanSuggestQuestions);
-              }
+        this.userService.getUserContributionRightsDataAsync().then((
+            userContributionRights: UserContributionRightsDataBackendDict | null
+        ) => {
+          if (!userContributionRights) {
+            return;
+          }
+          const userCanReviewTranslationSuggestionsInLanguages = (
+            userContributionRights
+              .can_review_translation_for_language_codes);
+          const userCanReviewQuestionSuggestions = (
+            userContributionRights.can_review_questions);
+          const userReviewableSuggestionTypes = [];
+          const userCanSuggestQuestions = (
+            userContributionRights.can_suggest_questions);
+          for (let index in this.contributionTabs) {
+            if (this.contributionTabs[index].suggestionType === (
+              this.SUGGESTION_TYPE_QUESTION)) {
+              this.contributionTabs[index].enabled = (
+                userCanSuggestQuestions);
             }
-            if (userCanReviewQuestionSuggestions) {
-              this.reviewTabs.push({
-                suggestionType: this.SUGGESTION_TYPE_QUESTION,
-                text: 'Review Questions',
-                enabled: false
-              });
-              userReviewableSuggestionTypes.push(this.SUGGESTION_TYPE_QUESTION);
-            }
-            if (
-              userCanReviewTranslationSuggestionsInLanguages
-                .length > 0) {
-              this.reviewTabs.push({
-                suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Review Translations',
-                enabled: false
-              });
-              userReviewableSuggestionTypes.push(
-                this.SUGGESTION_TYPE_TRANSLATE);
-            }
-            if (userReviewableSuggestionTypes.length > 0) {
-              this.switchToTab(
-                this.TAB_TYPE_REVIEWS, userReviewableSuggestionTypes[0]);
-            } else if (userCanSuggestQuestions) {
-              this.switchToTab(
-                this.TAB_TYPE_CONTRIBUTIONS, this.SUGGESTION_TYPE_QUESTION);
-            } else {
-              this.switchToTab(
-                this.TAB_TYPE_CONTRIBUTIONS, this.SUGGESTION_TYPE_TRANSLATE);
-            }
-          });
+          }
+          if (userCanReviewQuestionSuggestions) {
+            this.reviewTabs.push({
+              suggestionType: this.SUGGESTION_TYPE_QUESTION,
+              text: 'Review Questions',
+              enabled: false
+            });
+            userReviewableSuggestionTypes.push(this.SUGGESTION_TYPE_QUESTION);
+          }
+          if (
+            userCanReviewTranslationSuggestionsInLanguages
+              .length > 0) {
+            this.reviewTabs.push({
+              suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
+              text: 'Review Translations',
+              enabled: false
+            });
+            userReviewableSuggestionTypes.push(
+              this.SUGGESTION_TYPE_TRANSLATE);
+          }
+          if (userReviewableSuggestionTypes.length > 0) {
+            this.switchToTab(
+              this.TAB_TYPE_REVIEWS, userReviewableSuggestionTypes[0]);
+          } else if (userCanSuggestQuestions) {
+            this.switchToTab(
+              this.TAB_TYPE_CONTRIBUTIONS, this.SUGGESTION_TYPE_QUESTION);
+          } else {
+            this.switchToTab(
+              this.TAB_TYPE_CONTRIBUTIONS, this.SUGGESTION_TYPE_TRANSLATE);
+          }
+        });
       }
     });
 
     this.tabNameToOpportunityFetchFunction = {
       [this.SUGGESTION_TYPE_QUESTION]: {
-        [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
+        [this.TAB_TYPE_CONTRIBUTIONS]: (shouldResetOffset: boolean) => {
           return this.contributionAndReviewService
             .getUserCreatedQuestionSuggestionsAsync(
               shouldResetOffset);
         },
-        [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
+        [this.TAB_TYPE_REVIEWS]: (shouldResetOffset: boolean) => {
           return this.contributionAndReviewService
             .getReviewableQuestionSuggestionsAsync(
               shouldResetOffset);
         }
       },
       [this.SUGGESTION_TYPE_TRANSLATE]: {
-        [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
+        [this.TAB_TYPE_CONTRIBUTIONS]: (shouldResetOffset: boolean) => {
           return this.contributionAndReviewService
             .getUserCreatedTranslationSuggestionsAsync(
               shouldResetOffset);
         },
-        [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
+        [this.TAB_TYPE_REVIEWS]: (shouldResetOffset: boolean) => {
+          if (this.activeExplorationId === null) {
+            throw new Error(
+              'Active exploration id should not be null when fetching' +
+              ' reviewable translation suggestions.');
+          }
           return this.contributionAndReviewService
             .getReviewableTranslationSuggestionsAsync(
               shouldResetOffset,

@@ -48,6 +48,9 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
+import { DiffNodeData } from 'components/version-diff-visualization/version-diff-visualization.component';
 
 @Injectable({
   providedIn: 'root'
@@ -61,7 +64,7 @@ export class ExplorationSaveService {
   // at any one time.
   modalIsOpen: boolean = false;
 
-  diffData = null;
+  diffData!: DiffNodeData;
   _initExplorationPageEventEmitter = new EventEmitter();
 
   constructor(
@@ -177,13 +180,20 @@ export class ExplorationSaveService {
             this.editabilityService.markEditable();
             resolve();
           });
-        }, (errorResponse: {error: {error: string}}) => {
+        // The type of error 'e' is unknown because anything can be throw
+        // in TypeScript. We need to make sure to check the type of 'e'.
+        }, (errorResponse: unknown) => {
           this.saveIsInProgress = false;
           resolve();
           this.editabilityService.markEditable();
-          const errorMessage = errorResponse.error.error;
-          this.alertsService.addWarning(
-            'Error! Changes could not be saved - ' + errorMessage);
+          if (errorResponse instanceof HttpErrorResponse) {
+            const errorMessage = errorResponse.error.error;
+            this.alertsService.addWarning(
+              'Error! Changes could not be saved - ' + errorMessage);
+          } else {
+            this.alertsService.addWarning(
+              'Error! Changes could not be saved.');
+          }
         }
       );
     });
@@ -196,7 +206,7 @@ export class ExplorationSaveService {
       !this.explorationCategoryService.savedMemento ||
       this.explorationLanguageCodeService.savedMemento ===
       AppConstants.DEFAULT_LANGUAGE_CODE ||
-      (this.explorationTagsService.savedMemento as string[]).length === 0);
+      (this.explorationTagsService.savedMemento as ParamChange[]).length === 0);
   }
 
   async saveChangesAsync(

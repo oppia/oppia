@@ -32,7 +32,7 @@ export class TopicEditorRoutingService {
   private _TOPIC_PREVIEW_TAB = 'topic_preview';
   private _QUESTIONS_TAB = 'questions';
   private _lastTabVisited = 'main';
-  private _lastSubtopicId = null;
+  private _lastSubtopicId!: number;
   private _activeTabName = this._MAIN_TAB;
   private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
 

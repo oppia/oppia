@@ -25,8 +25,6 @@ import { TopicEditorStateService } from './topic-editor-state.service';
 
 describe('Subtopic validation service', () => {
   let subtopicValidationService: SubtopicValidationService;
-  let topicObjectFactory: TopicObjectFactory;
-  let topicEditorStateService: TopicEditorStateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -42,20 +40,12 @@ describe('Subtopic validation service', () => {
 
   beforeEach(() => {
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
-    topicEditorStateService = TestBed.inject(TopicEditorStateService);
-
-    let topic = topicObjectFactory.createInterstitialTopic();
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.setUrlFragment('subtopic-one');
     let subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
     subtopic2.setUrlFragment('subtopic-two');
     let subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
     subtopic3.setUrlFragment('subtopic-three');
-    topic.getSubtopics = () => {
-      return [subtopic1, subtopic2, subtopic3];
-    };
-    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
   });
 
   it('should validate subtopic name correctly', () => {

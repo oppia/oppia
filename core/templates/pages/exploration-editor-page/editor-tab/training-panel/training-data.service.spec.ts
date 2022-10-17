@@ -30,6 +30,9 @@ import { State } from 'domain/state/StateObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 class MockNgbModal {
   open() {
@@ -42,16 +45,32 @@ class MockNgbModal {
 class MockResponsesService {
   AnswerGroupArray = [
     new AnswerGroup([
-      new Rule('TextInput', null, null),
-      new Rule('TextInput', null, null)
-    ], null, ['trainingData 1'], null),
+      new Rule('TextInput', {
+        x: [],
+      }, {
+        x: 'ListOfSetsOfTranslatableHtmlContentIds'
+      }),
+      new Rule('TextInput', {
+        x: [],
+      }, {
+        x: 'ListOfSetsOfTranslatableHtmlContentIds'
+      }),
+    ], {} as Outcome, ['trainingData 1'], null),
     new AnswerGroup([
-      new Rule('TextInput', null, null),
-      new Rule('TextInput', null, null)
-    ], null, ['trainingData 1', 'trainingData 2'], null)
+      new Rule('TextInput', {
+        x: [],
+      }, {
+        x: 'ListOfSetsOfTranslatableHtmlContentIds'
+      }),
+      new Rule('TextInput', {
+        x: [],
+      }, {
+        x: 'ListOfSetsOfTranslatableHtmlContentIds'
+      }),
+    ], {} as Outcome, ['trainingData 1', 'trainingData 2'], null)
   ];
 
-  getAnswerGroup(index) {
+  getAnswerGroup(index: number) {
     return this.AnswerGroupArray[index];
   }
 
@@ -59,15 +78,15 @@ class MockResponsesService {
     return this.AnswerGroupArray;
   }
 
-  updateAnswerGroup(item1, item2, item3) {
+  updateAnswerGroup(item3: (arg0: null) => void) {
     item3(null);
   }
 
-  save(item1, item2, item3) {
+  save(item3: (arg0: null) => void) {
     item3(null);
   }
 
-  updateConfirmedUnclassifiedAnswers(item1) { }
+  updateConfirmedUnclassifiedAnswers() { }
   getConfirmedUnclassifiedAnswers() {
     return ['answer1', 'answer2'];
   }
@@ -78,11 +97,11 @@ class MockResponsesService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1, item2) { }
+  saveInteractionAnswerGroups() { }
 
-  saveInteractionDefaultOutcome(item1, item2) { }
+  saveInteractionDefaultOutcome() { }
 
-  saveConfirmedUnclassifiedAnswers(item1, item2) { }
+  saveConfirmedUnclassifiedAnswers() { }
 }
 
 class MockStateEditorService {
@@ -186,31 +205,52 @@ describe('Training Data Service', () => {
 
   it('should get all potential outcomes of an interaction', () => {
     // First the answer group's outcome is listed, then the default.
+
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'Outcome'." We need to suppress this error because of the need to
+    // test validations.
+    // @ts-ignore
     expect(trainingDataService.getAllPotentialOutcomes(
       new State(
-        'State', 'id', 'some', null,
+        'State', 'id', 'some', {} as SubtitledHtml,
         new Interaction([
           new AnswerGroup([
-            new Rule('TextInput', null, null),
-            new Rule('TextInput', null, null)
-          ], null, ['trainingData 1'], null),
+            new Rule('TextInput', {
+              x: [],
+            }, {
+              x: 'ListOfSetsOfTranslatableHtmlContentIds'
+            }),
+            new Rule('TextInput', {
+              x: [],
+            }, {
+              x: 'ListOfSetsOfTranslatableHtmlContentIds'
+            }),
+          ], {} as Outcome, ['trainingData 1'], null),
           new AnswerGroup([
-            new Rule('TextInput', null, null),
-            new Rule('TextInput', null, null)
-          ], null, ['trainingData 1'], null)
-        ], [], null, new Outcome(
+            new Rule('TextInput', {
+              x: [],
+            }, {
+              x: 'ListOfSetsOfTranslatableHtmlContentIds'
+            }),
+            new Rule('TextInput', {
+              x: [],
+            }, {
+              x: 'ListOfSetsOfTranslatableHtmlContentIds'
+            }),
+          ], {} as Outcome, ['trainingData 1'], null)
+        ], [], {} as InteractionCustomizationArgs, new Outcome(
           'Hola',
-          null,
+          '',
           new SubtitledHtml('<p> HTML string </p>', 'Id'),
           false,
           [],
           null,
           null,
         ), [], 'id', null),
-        null, null, true, true, null, 7)
+        [], {} as RecordedVoiceovers, true, true, {} as WrittenTranslations, 7)
     )).toEqual([null, null, new Outcome(
       'Hola',
-      null,
+      '',
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],

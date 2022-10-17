@@ -31,7 +31,7 @@ import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 export class ExplorationParamSpecsService extends
   ExplorationPropertyService {
   propertyName: string = 'param_specs';
-  savedMemento: ParamSpecs;
+  savedMemento!: ParamSpecs;
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,

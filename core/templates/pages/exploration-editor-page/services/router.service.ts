@@ -227,7 +227,7 @@ export class RouterService {
     return this._getCurrentStateFromLocationPath();
   }
 
-  navigateToMainTab(stateName: string): void {
+  navigateToMainTab(stateName: string | null): void {
     this._savePendingChanges();
     const state = this._getCurrentStateFromLocationPath();
     if (state === null) {

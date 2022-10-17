@@ -21,6 +21,16 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationSnapshot, VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { CompareVersionsService } from './compare-versions.service';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+
+interface stateDetails {
+  contentStr: string;
+  ruleDests: string[];
+}
+
+interface StatesData {
+  A?: stateDetails;
+}[];
 
 describe('Compare versions service', () => {
   let cvs: CompareVersionsService;
@@ -62,36 +72,49 @@ describe('Compare versions service', () => {
   //    links
   // Only information accessed by getDiffGraphData is included in the return
   // value.
-  let _getStatesAndMetadata = function(statesDetails) {
-    let statesData = {};
+  let _getStatesAndMetadata = function(statesDetails: StatesData) {
+    let statesData: Record<string, StateBackendDict> = {};
     for (let stateName in statesDetails) {
-      let newStateData = {
+      let stateDetail = statesDetails[
+        stateName as keyof StatesData] as stateDetails;
+      let newStateData: StateBackendDict = {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
-          html: statesDetails[stateName].contentStr
+          html: ''
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
-            default_outcome: {},
+            default_outcome: {}
           }
         },
         interaction: {
-          id: 'EndExploration',
           answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            buttonText: {
+              value: 'Continue'
+            }
+          },
           default_outcome: {
-            dest: 'default',
+            dest: 'End State',
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
             },
-            labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null
+            labelled_as_correct: true,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
-          hints: []
+          hints: [],
+          solution: null,
+          id: 'Continue'
         },
+        linked_skill_id: null,
+        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         written_translations: {
@@ -100,22 +123,29 @@ describe('Compare versions service', () => {
             default_outcome: {}
           }
         },
+        card_is_checkpoint: true
       };
       newStateData.interaction.answer_groups =
-          statesDetails[stateName].ruleDests.map(function(ruleDestName) {
+          stateDetail.ruleDests.map(function(ruleDestName) {
             return {
               outcome: {
                 dest: ruleDestName,
                 dest_if_really_stuck: null,
-                feedback: [],
+                feedback: {
+                  content_id: '',
+                  html: ''
+                },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
               rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             };
           });
-      statesData[stateName] = newStateData;
+      statesData[stateName as keyof StatesData] = newStateData;
     }
     let explorationMetadataDict = {
       title: 'An exploration',

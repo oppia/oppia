@@ -116,7 +116,7 @@ describe('Topic editor state service', () => {
               ]
             }
           ],
-          skill_id_2: null
+          skill_id_2: []
         },
         skillIdToDescriptionDict: {
           skill_id_1: 'Description 1',
@@ -296,7 +296,7 @@ describe('Topic editor state service', () => {
     spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
       .and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
-    topicEditorStateService.loadSubtopicPage(null, 2);
+    topicEditorStateService.loadSubtopicPage('', 2);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'There was an error when loading the topic.');

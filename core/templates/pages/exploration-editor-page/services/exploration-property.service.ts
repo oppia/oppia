@@ -27,12 +27,16 @@ import { ChangeListService } from 'pages/exploration-editor-page/services/change
 import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
 export type ExplorationPropertyValues = (
+  null |
   string |
+  string[] |
   boolean |
   ParamChange |
   ParamChange[] |
+  ParamSpecs |
   ParamChangeBackendDict |
   ParamChangeBackendDict[]
 );

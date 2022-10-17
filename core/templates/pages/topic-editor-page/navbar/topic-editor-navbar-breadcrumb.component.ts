@@ -27,7 +27,7 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
   templateUrl: './topic-editor-navbar-breadcrumb.component.html'
 })
 export class TopicEditorNavbarBreadcrumbComponent {
-  topic: Topic;
+  topic!: Topic;
 
   constructor(
     private topicEditorRoutingService: TopicEditorRoutingService,

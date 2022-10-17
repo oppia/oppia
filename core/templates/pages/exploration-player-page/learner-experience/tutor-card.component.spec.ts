@@ -47,6 +47,9 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -103,8 +106,9 @@ describe('Tutor card component', () => {
   let translateService: TranslateService;
 
   let mockDisplayedCard = new StateCard(
-    '', '', '', new Interaction([], [], null, null, [], null, null)
-    , [], null, null, '', null);
+    '', '', '', new Interaction([], [], {}, null, [], null, null)
+    , [], {} as RecordedVoiceovers, {} as WrittenTranslations, '',
+    {} as AudioTranslationLanguageService);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -640,7 +644,7 @@ describe('Tutor card component', () => {
     spyOn(currentInteractionService, 'registerPresubmitHook')
       .and.callFake(callb => callb());
     spyOn(mockDisplayedCard, 'getInteraction').and.returnValue(
-      new Interaction([], [], null, null, [], '', null));
+      new Interaction([], [], {}, null, [], '', null));
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
     spyOn(audioTranslationManagerService, 'setContentAudioTranslations');
     spyOn(audioPlayerService, 'clear');

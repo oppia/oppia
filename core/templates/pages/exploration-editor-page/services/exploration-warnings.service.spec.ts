@@ -103,10 +103,10 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -116,7 +116,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           customization_args: {
             rows: {
               value: true
@@ -133,7 +133,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -146,7 +146,7 @@ describe('Exploration Warnings Service', () => {
           }],
           default_outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
@@ -202,10 +202,10 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -216,7 +216,7 @@ describe('Exploration Warnings Service', () => {
         param_changes: [],
         interaction: {
           id: 'Continue',
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           answer_groups: [
             {
@@ -225,7 +225,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: '',
@@ -242,7 +242,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: '',
@@ -255,7 +255,7 @@ describe('Exploration Warnings Service', () => {
             }],
           default_outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
@@ -325,10 +325,10 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -338,14 +338,14 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: null,
           answer_groups: [{
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: false,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -360,7 +360,7 @@ describe('Exploration Warnings Service', () => {
           }],
           default_outcome: {
             labelled_as_correct: true,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
@@ -416,9 +416,9 @@ describe('Exploration Warnings Service', () => {
       explorationStatesService.init({
         Hola: {
           classifier_model_id: null,
-          solicit_answer_details: null,
+          solicit_answer_details: false,
           linked_skill_id: null,
-          next_content_id_index: null,
+          next_content_id_index: 0,
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
@@ -430,7 +430,7 @@ describe('Exploration Warnings Service', () => {
           param_changes: [],
           interaction: {
             id: 'TextInput',
-            confirmed_unclassified_answers: null,
+            confirmed_unclassified_answers: [],
             solution: {
               correct_answer: 'This is the correct answer',
               answer_is_exclusive: false,
@@ -443,7 +443,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: false,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: '',
@@ -458,7 +458,7 @@ describe('Exploration Warnings Service', () => {
             }],
             default_outcome: {
               labelled_as_correct: false,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
@@ -527,10 +527,10 @@ describe('Exploration Warnings Service', () => {
       explorationStatesService.init({
         Hola: {
           classifier_model_id: null,
-          solicit_answer_details: null,
+          solicit_answer_details: false,
           card_is_checkpoint: true,
           linked_skill_id: null,
-          next_content_id_index: null,
+          next_content_id_index: 0,
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}'
@@ -541,7 +541,7 @@ describe('Exploration Warnings Service', () => {
           param_changes: [],
           interaction: {
             id: 'TextInput',
-            confirmed_unclassified_answers: null,
+            confirmed_unclassified_answers: [],
             customization_args: {
               rows: {
                 value: true
@@ -564,7 +564,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: false,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: '',
@@ -577,7 +577,7 @@ describe('Exploration Warnings Service', () => {
             }],
             default_outcome: {
               labelled_as_correct: false,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
@@ -647,10 +647,10 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -663,7 +663,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           id: 'TextInput',
           solution: {
             correct_answer: 'This is the correct answer',
@@ -677,7 +677,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -692,7 +692,7 @@ describe('Exploration Warnings Service', () => {
           }],
           default_outcome: {
             labelled_as_correct: true,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'State',
@@ -756,10 +756,10 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -769,7 +769,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           customization_args: {
             rows: {
               value: true
@@ -793,7 +793,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -806,7 +806,7 @@ describe('Exploration Warnings Service', () => {
           }],
           default_outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
@@ -827,10 +827,10 @@ describe('Exploration Warnings Service', () => {
       },
       State: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'content'
@@ -841,7 +841,7 @@ describe('Exploration Warnings Service', () => {
         param_changes: [],
         interaction: {
           id: 'TextInput',
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           customization_args: {
             rows: {
               value: true
@@ -864,7 +864,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -877,7 +877,7 @@ describe('Exploration Warnings Service', () => {
           }],
           default_outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'State',
@@ -940,10 +940,10 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -953,7 +953,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           customization_args: {
             rows: {
               value: true
@@ -970,7 +970,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -983,7 +983,7 @@ describe('Exploration Warnings Service', () => {
           }],
           default_outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
@@ -1023,10 +1023,10 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -1039,7 +1039,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1048,7 +1048,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -1061,7 +1061,7 @@ describe('Exploration Warnings Service', () => {
           }],
           default_outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'End',
@@ -1090,10 +1090,10 @@ describe('Exploration Warnings Service', () => {
       },
       End: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -1103,7 +1103,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           customization_args: {
             recommendedExplorationIds: {
               value: []
@@ -1117,7 +1117,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -1162,9 +1162,9 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1175,7 +1175,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           default_outcome: null,
           id: 'TextInput',
@@ -1186,7 +1186,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State1',
@@ -1203,7 +1203,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State2',
@@ -1220,7 +1220,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State3',
@@ -1251,9 +1251,9 @@ describe('Exploration Warnings Service', () => {
       },
       State1: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1264,7 +1264,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1273,7 +1273,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State4',
@@ -1304,9 +1304,9 @@ describe('Exploration Warnings Service', () => {
       },
       State2: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1317,7 +1317,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1326,7 +1326,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State4',
@@ -1357,9 +1357,9 @@ describe('Exploration Warnings Service', () => {
       },
       State3: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1370,7 +1370,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1379,7 +1379,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State4',
@@ -1410,9 +1410,9 @@ describe('Exploration Warnings Service', () => {
       },
       State4: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1423,7 +1423,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1432,7 +1432,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State5',
@@ -1463,9 +1463,9 @@ describe('Exploration Warnings Service', () => {
       },
       State5: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1476,7 +1476,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1485,7 +1485,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State6',
@@ -1516,9 +1516,9 @@ describe('Exploration Warnings Service', () => {
       },
       State6: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1529,7 +1529,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1538,7 +1538,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State7',
@@ -1569,9 +1569,9 @@ describe('Exploration Warnings Service', () => {
       },
       State7: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1582,7 +1582,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1591,7 +1591,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'End',
@@ -1622,9 +1622,9 @@ describe('Exploration Warnings Service', () => {
       },
       End: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1636,13 +1636,13 @@ describe('Exploration Warnings Service', () => {
         param_changes: [],
         interaction: {
           id: 'EndExploration',
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           answer_groups: [{
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
@@ -1727,9 +1727,9 @@ describe('Exploration Warnings Service', () => {
     explorationStatesService.init({
       Hola: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1740,7 +1740,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           default_outcome: null,
           id: 'TextInput',
@@ -1751,7 +1751,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State1',
@@ -1768,7 +1768,7 @@ describe('Exploration Warnings Service', () => {
               tagged_skill_misconception_id: null,
               outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State2',
@@ -1799,9 +1799,9 @@ describe('Exploration Warnings Service', () => {
       },
       State1: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1812,7 +1812,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1821,7 +1821,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State3',
@@ -1852,9 +1852,9 @@ describe('Exploration Warnings Service', () => {
       },
       State2: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1865,7 +1865,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1874,7 +1874,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State5',
@@ -1905,9 +1905,9 @@ describe('Exploration Warnings Service', () => {
       },
       State3: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1918,7 +1918,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1927,7 +1927,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State4',
@@ -1958,9 +1958,9 @@ describe('Exploration Warnings Service', () => {
       },
       State4: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1971,7 +1971,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -1980,7 +1980,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State6',
@@ -2011,9 +2011,9 @@ describe('Exploration Warnings Service', () => {
       },
       State5: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -2024,7 +2024,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -2033,7 +2033,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'End',
@@ -2064,9 +2064,9 @@ describe('Exploration Warnings Service', () => {
       },
       State6: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -2077,7 +2077,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -2086,7 +2086,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State7',
@@ -2099,7 +2099,7 @@ describe('Exploration Warnings Service', () => {
           }],
           default_outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
@@ -2128,9 +2128,9 @@ describe('Exploration Warnings Service', () => {
       },
       State7: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: false,
         content: {
           content_id: 'content',
@@ -2141,7 +2141,7 @@ describe('Exploration Warnings Service', () => {
         },
         param_changes: [],
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           id: 'TextInput',
           answer_groups: [{
@@ -2150,7 +2150,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'End',
@@ -2166,7 +2166,7 @@ describe('Exploration Warnings Service', () => {
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
@@ -2197,9 +2197,9 @@ describe('Exploration Warnings Service', () => {
       },
       End: {
         classifier_model_id: null,
-        solicit_answer_details: null,
+        solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: null,
+        next_content_id_index: 0,
         card_is_checkpoint: false,
         content: {
           content_id: 'content',
@@ -2211,13 +2211,13 @@ describe('Exploration Warnings Service', () => {
         param_changes: [],
         interaction: {
           id: 'EndExploration',
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           solution: null,
           answer_groups: [{
             tagged_skill_misconception_id: null,
             outcome: {
               labelled_as_correct: true,
-              param_changes: null,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',

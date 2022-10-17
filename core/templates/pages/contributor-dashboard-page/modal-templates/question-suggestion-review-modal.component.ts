@@ -20,7 +20,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { State } from 'domain/state/StateObjectFactory';
@@ -38,7 +38,7 @@ interface QuestionSuggestionModalValue {
   suggestionId: string;
   suggestion: ActiveSuggestionDict;
   reviewable: boolean;
-  question: Question;
+  question?: Question;
 }
 
 interface SkillRubrics {
@@ -46,7 +46,7 @@ interface SkillRubrics {
   explanations: string[] | string;
 }
 
-interface ActiveContributionDetailsDict {
+export interface ActiveContributionDetailsDict {
   skill_description: string;
   skill_rubrics: SkillRubrics[];
   'chapter_title': string;
@@ -87,7 +87,7 @@ interface ActiveSuggestionDict {
 }
 
 interface ActiveContributionDict {
-  'details': ActiveContributionDetailsDict | null;
+  'details': ActiveContributionDetailsDict;
   'suggestion': ActiveSuggestionDict;
 }
 
@@ -97,21 +97,21 @@ interface ActiveContributionDict {
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() reviewable: boolean;
-  @Input() suggestionId: string;
-  @Input() misconceptionsBySkill: MisconceptionSkillMap;
+  @Input() reviewable!: boolean;
+  @Input() suggestionId!: string;
+  @Input() misconceptionsBySkill!: MisconceptionSkillMap;
 
   @Output() editSuggestionEmitter = (
     new EventEmitter<QuestionSuggestionModalValue>());
 
-  reviewMessage: string;
-  questionStateData: State;
-  questionId: string;
-  canEditQuestion: boolean;
-  skillDifficultyLabel: string;
-  skillRubricExplanations: string | string[];
-  suggestionIsRejected: boolean;
-  validationError: string;
+  reviewMessage!: string;
+  questionStateData!: State;
+  questionId!: string | null;
+  canEditQuestion!: boolean;
+  skillDifficultyLabel!: string;
+  skillRubricExplanations!: string | string[];
+  suggestionIsRejected!: boolean;
+  validationError!: string | null;
   allContributions!: Record<string, ActiveContributionDict>;
   suggestion!: ActiveSuggestionDict;
   question!: Question;
@@ -123,7 +123,7 @@ export class QuestionSuggestionReviewModalComponent
   skippedContributionIds!: string[];
   showQuestion: boolean = true;
   skillRubrics!: SkillRubrics[];
-  currentSuggestion: ActiveContributionDict;
+  currentSuggestion!: ActiveContributionDict;
   suggestionIdToContribution!: Record<string, ActiveContributionDict>;
   contentHtml!: string;
   questionHeader!: string;
@@ -149,8 +149,11 @@ export class QuestionSuggestionReviewModalComponent
 
   edit(): void {
     this.ngbActiveModal.dismiss();
-    this.skillBackendApiService.fetchSkillAsync(
-      this.suggestion.change.skill_id).then((skillDict) => {
+    let skillId = this.suggestion.change.skill_id;
+    if (skillId === undefined) {
+      throw new Error('skillId is undefined');
+    }
+    this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
       const modalRef = this.ngbModal.open(
         QuestionSuggestionEditorModalComponent, {
           size: 'lg',
@@ -224,10 +227,12 @@ export class QuestionSuggestionReviewModalComponent
       return;
     }
 
-    this.skillBackendApiService.fetchSkillAsync(
-      this.suggestion.change.skill_id
-    ).then((skillDict) => {
-      let misconceptionsBySkill = {};
+    let skillId = this.suggestion.change.skill_id;
+    if (skillId === undefined) {
+      throw new Error('skillId is undefined');
+    }
+    this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+      let misconceptionsBySkill: Record<string, Misconception[]> = {};
       const skill = skillDict.skill;
       misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
       this.misconceptionsBySkill = misconceptionsBySkill;
@@ -242,7 +247,8 @@ export class QuestionSuggestionReviewModalComponent
     this.showQuestion = false;
     this.skippedContributionIds.push(this.currentSuggestionId);
 
-    this.currentSuggestionId = this.remainingContributionIdStack.pop();
+    this.currentSuggestionId = (
+      this.remainingContributionIdStack.pop() as string);
 
     this.refreshActiveContributionState();
   }
@@ -254,14 +260,14 @@ export class QuestionSuggestionReviewModalComponent
     this.showQuestion = false;
     this.remainingContributionIdStack.push(this.currentSuggestionId);
 
-    this.currentSuggestionId = this.skippedContributionIds.pop();
+    this.currentSuggestionId = this.skippedContributionIds.pop() as string;
 
     this.refreshActiveContributionState();
   }
 
-  invertMap(originalMap: Object): Object {
+  invertMap(originalMap: Record<string, number>): Record<number, string> {
     return Object.keys(originalMap).reduce(
-      (invertedMap, key) => {
+      (invertedMap: Record<number, string>, key: string) => {
         invertedMap[originalMap[key]] = key;
         return invertedMap;
       },

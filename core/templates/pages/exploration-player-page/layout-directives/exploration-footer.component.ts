@@ -67,14 +67,14 @@ export class ExplorationFooterComponent {
   // Used to update the number of checkpoints completed
   // and decide the completed width of the progress bar.
   checkpointArray: number[] = [0];
-  expInfo: LearnerExplorationSummaryBackendDict;
-  expStates: StateObjectsBackendDict;
+  expInfo!: LearnerExplorationSummaryBackendDict;
+  expStates!: StateObjectsBackendDict;
   completedCheckpointsCount: number = 0;
   lastCheckpointWasCompleted: boolean = false;
   learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
   footerIsInQuestionPlayerMode: boolean = false;
-  CHECKPOINTS_FEATURE_IS_ENABLED = false;
+  CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
 
   constructor(
     private contextService: ContextService,
@@ -227,8 +227,12 @@ export class ExplorationFooterComponent {
     );
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
+      let stateName = state.name;
+      if (stateName === null) {
+        throw new Error('State name cannot be null.');
+      }
       let stateCard = this.explorationEngineService.getStateCardByName(
-        state.name);
+        stateName);
       if (stateCard.isTerminal()) {
         this.completedCheckpointsCount += 1;
       }
@@ -270,8 +274,12 @@ export class ExplorationFooterComponent {
     );
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
+      let stateName = state.name;
+      if (stateName === null) {
+        throw new Error('State name cannot be null.');
+      }
       let stateCard = this.explorationEngineService.getStateCardByName(
-        state.name);
+        stateName);
       if (stateCard.isTerminal()) {
         this.completedCheckpointsCount += 1;
       }

@@ -65,25 +65,4 @@ describe('Topic rights model', () => {
       exampleTopicRights.markTopicAsUnpublished();
     }).toThrowError('User is not allowed to unpublish this topic.');
   });
-
-  it('should create an empty topic rights object', () => {
-    var emptyTopicRightsBackendObject = (
-      TopicRights.createInterstitialRights());
-
-    expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
-    expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
-    expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(false);
-  });
-
-  it('should make a copy from another topic rights', () => {
-    var emptyTopicRightsBackendObject = (
-      TopicRights.createInterstitialRights());
-
-    emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
-
-    expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
-    expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(true);
-    expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(true);
-    expect(emptyTopicRightsBackendObject.canEditName()).toEqual(true);
-  });
 });

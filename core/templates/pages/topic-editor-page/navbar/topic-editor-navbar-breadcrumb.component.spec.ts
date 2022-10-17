@@ -17,18 +17,13 @@
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { TopicEditorNavbarBreadcrumbComponent } from './topic-editor-navbar-breadcrumb.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('TopicEditorNavbarBreadcrumbComponent', () => {
   let component: TopicEditorNavbarBreadcrumbComponent;
   let fixture: ComponentFixture<TopicEditorNavbarBreadcrumbComponent>;
-  let topicEditorStateService: TopicEditorStateService;
-  let topicObjectFactory: TopicObjectFactory;
   let topicEditorRoutingService: TopicEditorRoutingService;
 
   beforeEach(async(() => {
@@ -40,29 +35,10 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
 
   beforeEach(() => {
     topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
-    topicEditorStateService = TestBed.inject(TopicEditorStateService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     fixture = TestBed.createComponent(TopicEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
   });
 
-  it('should initialise component when user opens topic editor page', () => {
-    let topic = topicObjectFactory.createInterstitialTopic();
-    let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
-    subtopic1.setUrlFragment('subtopic-one');
-    let subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
-    subtopic2.setUrlFragment('subtopic-two');
-    let subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
-    subtopic3.setUrlFragment('subtopic-three');
-    topic.getSubtopics = () => {
-      return [subtopic1, subtopic2, subtopic3];
-    };
-    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
-
-    component.ngOnInit();
-
-    expect(component.topic).toEqual(topic);
-  });
 
   it('should navigate to main tab when user clicks \'Back to Topic\'', () => {
     spyOn(topicEditorRoutingService, 'navigateToMainTab');

@@ -28,8 +28,8 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 
 export class ChangeSubtopicAssignmentModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  subtopics: Subtopic[];
-  selectedSubtopicId: number;
+  subtopics!: Subtopic[];
+  selectedSubtopicId!: number | null;
   constructor(
     private ngbActiveModal: NgbActiveModal,
   ) {
@@ -40,7 +40,7 @@ export class ChangeSubtopicAssignmentModalComponent
     this.selectedSubtopicId = null;
   }
 
-  changeSelectedSubtopic(subtopicId: number): void {
+  changeSelectedSubtopic(subtopicId: number | null): void {
     this.selectedSubtopicId = subtopicId;
   }
 }

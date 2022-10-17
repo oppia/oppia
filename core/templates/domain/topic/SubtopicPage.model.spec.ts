@@ -39,16 +39,6 @@ describe('Subtopic page Model', () => {
     expect(subtopicPage.getLanguageCode()).toEqual('en');
   });
 
-  it('should be able to create an interstitial subtopic page object',
-    () => {
-      var subtopicPage =
-      SubtopicPage.createInterstitialSubtopicPage();
-      expect(subtopicPage.getId()).toEqual(null);
-      expect(subtopicPage.getTopicId()).toEqual(null);
-      expect(subtopicPage.getPageContents()).toEqual(null);
-      expect(subtopicPage.getLanguageCode()).toBe('en');
-    });
-
   it('should be able to copy from another subtopic page', () => {
     var firstSubtopicPage = SubtopicPage.createFromBackendDict({
       id: 'topic_id-1',

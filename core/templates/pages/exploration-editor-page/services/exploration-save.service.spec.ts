@@ -81,7 +81,10 @@ describe('Exploration save service ' +
         {
           provide: ExplorationDataService,
           useValue: {
-            save(changeList, message, successCb, errorCb) {
+            save(successCb: (
+                arg0: boolean,
+                arg1: { cmd: string; state_name: string}[]
+            ) => void) {
               successCb(false, [
                 {
                   cmd: 'add_state',
@@ -145,7 +148,7 @@ describe('Exploration save service ' +
   it('should open version mismatch modal', fakeAsync(() => {
     let modalSpy = spyOn(
       autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.returnValue(null);
+      .and.returnValue();
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     spyOn(ngbModal, 'open').and.returnValue(
@@ -168,7 +171,7 @@ describe('Exploration save service ' +
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let restoreSpy = spyOn(explorationTitleService, 'restoreFromMemento')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: Promise.reject()
@@ -190,7 +193,7 @@ describe('Exploration save service ' +
       } as NgbModalRef);
     });
     spyOn(changeListService, 'discardAllChanges')
-      .and.returnValue(Promise.resolve(null));
+      .and.returnValue(Promise.resolve());
 
     explorationSaveService.discardChanges();
     tick();
@@ -240,7 +243,7 @@ describe('Exploration save service ' +
         {
           provide: ExplorationDataService,
           useValue: {
-            save(changeList, message, successCb, errorCb) {
+            save(successCb: (arg0: boolean, arg1: []) => void) {
               successCb(true, []);
             }
           }
@@ -306,7 +309,7 @@ describe('Exploration save service ' +
   it('should not open version mismatch modal', fakeAsync(() => {
     let modalSpy = spyOn(
       autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.returnValue(null);
+      .and.returnValue();
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     spyOn(explorationRightsService, 'publish')
@@ -360,6 +363,9 @@ describe('Exploration save service ' +
     explorationLanguageCodeService.savedMemento = 'afk';
     explorationTagsService.savedMemento = 'invalid';
 
+    // This throws "Argument of type 'null' is not assignable.". We need
+    // to suppress this error because of strict type checking.
+    // @ts-ignore
     explorationSaveService.showPublishExplorationModal(null, null);
     tick();
     tick();
@@ -369,11 +375,11 @@ describe('Exploration save service ' +
 
   it('should mark exploaration as editable', fakeAsync(() => {
     let editableSpy = spyOn(editabilityService, 'markNotEditable')
-      .and.returnValue(null);
+      .and.returnValue();
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     spyOn(changeListService, 'discardAllChanges')
-      .and.returnValue(Promise.resolve(null));
+      .and.returnValue(Promise.resolve());
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: Promise.resolve(['1'])
@@ -422,7 +428,10 @@ describe('Exploration save service ' +
           {
             provide: ExplorationDataService,
             useValue: {
-              save(changeList, message, successCb, errorCb) {
+              save(
+                  successCb: (arg0: boolean, arg1: []) => void,
+                  errorCb: (arg0: { error: { error: string }}) => void
+              ) {
                 successCb(true, []);
                 errorCb({error: {error: 'errorMessage'}});
               },
@@ -467,7 +476,7 @@ describe('Exploration save service ' +
       changeListService = TestBed.inject(ChangeListService);
 
       spyOn(changeListService, 'discardAllChanges')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       spyOn(siteAnalyticsService, 'registerOpenPublishExplorationModalEvent')
         .and.stub();
       spyOn(siteAnalyticsService, 'registerPublishExplorationEvent')
@@ -517,7 +526,7 @@ describe('Exploration save service ' +
   let explorationWarningsService: ExplorationWarningsService;
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
   let alertsService: AlertsService;
-  let changeListServiceSpy;
+  let changeListServiceSpy: jasmine.Spy;
   class MockInternetConnectivityService {
     onInternetStateChange = mockConnectionServiceEmitter;
 
@@ -528,11 +537,11 @@ describe('Exploration save service ' +
 
   let statesBackendDict: StateObjectsBackendDict = {
     Hola: {
-      classifier_model_id: null,
-      solicit_answer_details: null,
-      card_is_checkpoint: null,
-      linked_skill_id: null,
-      next_content_id_index: null,
+      classifier_model_id: 'id',
+      solicit_answer_details: false,
+      card_is_checkpoint: true,
+      linked_skill_id: 'skill_id',
+      next_content_id_index: 0,
       content: {
         content_id: 'content',
         html: '{{HtmlValue}}'
@@ -545,17 +554,17 @@ describe('Exploration save service ' +
       },
       param_changes: [],
       interaction: {
-        confirmed_unclassified_answers: null,
-        customization_args: null,
+        confirmed_unclassified_answers: [],
+        customization_args: {},
         solution: null,
         id: null,
         answer_groups: [{
           rule_specs: [],
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: null,
           outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: '',
@@ -568,7 +577,7 @@ describe('Exploration save service ' +
         }],
         default_outcome: {
           labelled_as_correct: false,
-          param_changes: null,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'Hola',
@@ -588,11 +597,11 @@ describe('Exploration save service ' +
       },
     },
     State: {
-      classifier_model_id: null,
-      solicit_answer_details: null,
-      card_is_checkpoint: null,
-      linked_skill_id: null,
-      next_content_id_index: null,
+      classifier_model_id: 'id',
+      solicit_answer_details: false,
+      card_is_checkpoint: true,
+      linked_skill_id: 'skill_id',
+      next_content_id_index: 0,
       content: {
         content_id: 'content',
         html: 'content'
@@ -605,17 +614,17 @@ describe('Exploration save service ' +
       },
       param_changes: [],
       interaction: {
-        confirmed_unclassified_answers: null,
-        customization_args: null,
+        confirmed_unclassified_answers: [],
+        customization_args: {},
         solution: null,
-        id: null,
+        id: 'id',
         answer_groups: [{
           rule_specs: [],
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: null,
           outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: '',
@@ -628,7 +637,7 @@ describe('Exploration save service ' +
         }],
         default_outcome: {
           labelled_as_correct: false,
-          param_changes: null,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'State',
@@ -648,11 +657,11 @@ describe('Exploration save service ' +
       }
     },
     State2: {
-      classifier_model_id: null,
-      solicit_answer_details: null,
-      card_is_checkpoint: null,
-      linked_skill_id: null,
-      next_content_id_index: null,
+      classifier_model_id: 'id',
+      solicit_answer_details: false,
+      card_is_checkpoint: true,
+      linked_skill_id: 'skill_id',
+      next_content_id_index: 0,
       content: {
         content_id: 'content',
         html: 'content'
@@ -665,17 +674,17 @@ describe('Exploration save service ' +
       },
       param_changes: [],
       interaction: {
-        confirmed_unclassified_answers: null,
-        customization_args: null,
+        confirmed_unclassified_answers: [],
+        customization_args: {},
         solution: null,
-        id: null,
+        id: 'id',
         answer_groups: [{
           rule_specs: [],
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: null,
           outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: '',
@@ -688,7 +697,7 @@ describe('Exploration save service ' +
         }],
         default_outcome: {
           labelled_as_correct: false,
-          param_changes: null,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'State2',
@@ -708,11 +717,11 @@ describe('Exploration save service ' +
       }
     },
     State3: {
-      classifier_model_id: null,
-      solicit_answer_details: null,
-      card_is_checkpoint: null,
-      linked_skill_id: null,
-      next_content_id_index: null,
+      classifier_model_id: 'id',
+      solicit_answer_details: false,
+      card_is_checkpoint: true,
+      linked_skill_id: 'skill_id',
+      next_content_id_index: 0,
       content: {
         content_id: 'content',
         html: 'content'
@@ -725,17 +734,17 @@ describe('Exploration save service ' +
       },
       param_changes: [],
       interaction: {
-        confirmed_unclassified_answers: null,
-        customization_args: null,
+        confirmed_unclassified_answers: [],
+        customization_args: {},
         solution: null,
-        id: null,
+        id: 'id',
         answer_groups: [{
           rule_specs: [],
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: null,
           outcome: {
             labelled_as_correct: false,
-            param_changes: null,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: '',
@@ -748,7 +757,7 @@ describe('Exploration save service ' +
         }],
         default_outcome: {
           labelled_as_correct: false,
-          param_changes: null,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'State2',
@@ -782,7 +791,10 @@ describe('Exploration save service ' +
                 init_state_name: 'Hola'
               });
             },
-            save(changeList, message, successCb, errorCb) {
+            save(
+                successCb: (arg0: boolean, arg1: []) => void,
+                errorCb: (arg0: { error: { error: string }}) => void
+            ) {
               successCb(true, []);
               errorCb({error: {error: 'errorMessage'}});
             },
@@ -858,7 +870,7 @@ describe('Exploration save service ' +
     let sampleStates = statesObjectFactory.createFromBackendDict(
       statesBackendDict);
     spyOn(routerService, 'savePendingChanges')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(explorationStatesService, 'getStates')
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
@@ -915,7 +927,7 @@ describe('Exploration save service ' +
     let sampleStates = statesObjectFactory.createFromBackendDict(
       statesBackendDict);
     spyOn(routerService, 'savePendingChanges')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(explorationStatesService, 'getStates')
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
@@ -956,7 +968,7 @@ describe('Exploration save service ' +
     let sampleStates = statesObjectFactory.createFromBackendDict(
       statesBackendDict);
     spyOn(routerService, 'savePendingChanges')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(explorationStatesService, 'getStates')
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
@@ -995,7 +1007,7 @@ describe('Exploration save service ' +
     let sampleStates = statesObjectFactory.createFromBackendDict(
       statesBackendDict);
     spyOn(routerService, 'savePendingChanges')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(explorationStatesService, 'getStates')
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')

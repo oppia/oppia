@@ -358,7 +358,7 @@ export class TranslationStatusService implements OnInit {
     this._computeAllStatesStatus();
   }
 
-  getAllStatesNeedUpdatewarning(): object {
+  getAllStatesNeedUpdatewarning(): Record<string, string[]> {
     return this.stateNeedsUpdateWarnings;
   }
 

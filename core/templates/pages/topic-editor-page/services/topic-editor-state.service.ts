@@ -35,29 +35,35 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AlertsService } from 'services/alerts.service';
 import { TopicDeleteCanonicalStoryChange, TopicDeleteAdditionalStoryChange }
   from 'domain/editor/undo_redo/change.model';
+import { LoaderService } from 'services/loader.service';
+
+interface GroupedSkillSummaryDict {
+  current: SkillSummaryBackendDict[];
+  others: SkillSummaryBackendDict[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopicEditorStateService {
-  private _topic: Topic;
-  private _topicRights: TopicRights;
+  private _topic!: Topic;
+  private _topicRights!: TopicRights;
   // The array that caches all the subtopic pages loaded by the user.
   private _cachedSubtopicPages: SubtopicPage[] = [];
   // The array that stores all the ids of the subtopic pages that were not
   // loaded from the backend i.e those that correspond to newly created
   // subtopics (and not loaded from the backend).
   private _newSubtopicPageIds: string[] = [];
-  private _subtopicPage: SubtopicPage;
+  private _subtopicPage!: SubtopicPage;
   private _topicIsInitialized: boolean = false;
   private _topicIsLoading: boolean = false;
   private _topicIsBeingSaved: boolean = false;
   private _topicWithNameExists: boolean = false;
   private _topicWithUrlFragmentExists: boolean = false;
   private _canonicalStorySummaries: StorySummary[] = [];
-  private _skillIdToRubricsObject = {};
-  private _skillQuestionCountDict = {};
-  private _groupedSkillSummaries = {
+  private _skillIdToRubricsObject: Record<string, Rubric[]> = {};
+  private _skillQuestionCountDict: Record<string, number> = {};
+  private _groupedSkillSummaries: GroupedSkillSummaryDict = {
     current: [],
     others: []
   };
@@ -82,12 +88,9 @@ export class TopicEditorStateService {
     private editableTopicBackendApiService: EditableTopicBackendApiService,
     private topicObjectFactory: TopicObjectFactory,
     private topicRightsBackendApiService: TopicRightsBackendApiService,
+    private loaderService: LoaderService,
     private undoRedoService: UndoRedoService
-  ) {
-    this._topic = this.topicObjectFactory.createInterstitialTopic();
-    this._topicRights = TopicRights.createInterstitialRights();
-    this._subtopicPage = SubtopicPage.createInterstitialSubtopicPage();
-  }
+  ) {}
 
   private _getSubtopicPageId(topicId: string, subtopicId: number): string {
     if (topicId !== null && subtopicId !== null) {
@@ -126,7 +129,15 @@ export class TopicEditorStateService {
   }
 
   private _setTopic(topic: Topic): void {
-    this._topic.copyFromTopic(topic);
+    if (!this._topic) {
+      // The topic is set directly for the first load.
+      this._topic = topic;
+    } else {
+      // After first initialization, the topic object will be retained for
+      // the lifetime of the editor and on every data reload or update, the new
+      // contents will be copied into the same retained object.
+      this._topic.copyFromTopic(topic);
+    }
     // Reset the subtopic pages list after setting new topic.
     this._cachedSubtopicPages.length = 0;
     if (this._topicIsInitialized) {
@@ -159,13 +170,14 @@ export class TopicEditorStateService {
         newBackendTopicDict, skillIdToDescriptionDict));
   }
 
-  private _updateSkillIdToRubricsObject(skillIdToRubricsObject: object): void {
+  private _updateSkillIdToRubricsObject(
+      skillIdToRubricsObject: Record<string, RubricBackendDict[]>): void {
     for (let skillId in skillIdToRubricsObject) {
       // Skips deleted skills.
       if (!skillIdToRubricsObject[skillId]) {
         continue;
       }
-      let rubrics: RubricBackendDict[] = skillIdToRubricsObject[skillId].map(
+      let rubrics = skillIdToRubricsObject[skillId].map(
         (rubric: RubricBackendDict) => {
           return Rubric.createFromBackendDict(rubric);
         });
@@ -174,7 +186,15 @@ export class TopicEditorStateService {
   }
 
   private _setSubtopicPage(subtopicPage: SubtopicPage): void {
-    this._subtopicPage.copyFromSubtopicPage(subtopicPage);
+    if (!this._subtopicPage) {
+      // The sub topic rights are set directly for the first load.
+      this._subtopicPage = subtopicPage;
+    } else {
+      // After first initialization, the sub topic object will be retained
+      // for the lifetime of the editor and on every data reload or update,
+      // the new contents will be copied into the same retained object.
+      this._subtopicPage.copyFromSubtopicPage(subtopicPage);
+    }
     this._cachedSubtopicPages.push(cloneDeep(subtopicPage));
     this._subtopicPageLoadedEventEmitter.emit();
   }
@@ -186,7 +206,15 @@ export class TopicEditorStateService {
   }
 
   private _setTopicRights(topicRights: TopicRights): void {
-    this._topicRights.copyFromTopicRights(topicRights);
+    if (!this._topicRights) {
+      // The topic rights are set directly for the first load.
+      this._topicRights = topicRights;
+    } else {
+      // After first initialization, the topic rights object will be retained
+      // for the lifetime of the editor and on every data reload or update,
+      // the new contents will be copied into the same retained object.
+      this._topicRights.copyFromTopicRights(topicRights);
+    }
   }
 
   private _updateTopicRights(
@@ -221,6 +249,7 @@ export class TopicEditorStateService {
    */
   loadTopic(topicId: string): void {
     this._topicIsLoading = true;
+    this.loaderService.showLoadingScreen('Loading Topic Editor');
     let topicDataPromise = this.editableTopicBackendApiService
       .fetchTopicAsync(topicId);
     let storyDataPromise = this.editableTopicBackendApiService
@@ -255,6 +284,7 @@ export class TopicEditorStateService {
       this._updateTopicRights(newBackendTopicRightsObject);
       this._setCanonicalStorySummaries(canonicalStorySummaries);
       this._topicIsLoading = false;
+      this.loaderService.hideLoadingScreen();
     }, (error) => {
       this.alertsService.addWarning(
         error || 'There was an error when loading the topic editor.');
@@ -290,16 +320,19 @@ export class TopicEditorStateService {
    */
   loadSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
-    if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
+    let pageIndex = this._getSubtopicPageIndex(subtopicPageId);
+    if (pageIndex !== null) {
       this._subtopicPage = cloneDeep(
-        this._cachedSubtopicPages[this._getSubtopicPageIndex(subtopicPageId)]);
+        this._cachedSubtopicPages[pageIndex]);
       this._subtopicPageLoadedEventEmitter.emit();
       return;
     }
+    this.loaderService.showLoadingScreen('Loading Subtopic Editor');
     this.editableTopicBackendApiService.fetchSubtopicPageAsync(
       topicId, subtopicId).then(
       (newBackendSubtopicPageObject) => {
         this._updateSubtopicPage(newBackendSubtopicPageObject);
+        this.loaderService.hideLoadingScreen();
       },
       (error) => {
         this.alertsService.addWarning(
@@ -394,11 +427,18 @@ export class TopicEditorStateService {
    * _cachedSubtopicPages list.
    */
   setSubtopicPage(subtopicPage: SubtopicPage): void {
-    if (this._getSubtopicPageIndex(subtopicPage.getId()) !== null) {
-      this._cachedSubtopicPages[
-        this._getSubtopicPageIndex(subtopicPage.getId())] =
-        cloneDeep(subtopicPage);
-      this._subtopicPage.copyFromSubtopicPage(subtopicPage);
+    let pageIndex = this._getSubtopicPageIndex(subtopicPage.getId());
+    if (pageIndex !== null) {
+      this._cachedSubtopicPages[pageIndex] = cloneDeep(subtopicPage);
+      if (!this._subtopicPage) {
+        // The sub topic rights are set directly for the first load.
+        this._subtopicPage = subtopicPage;
+      } else {
+        // After first initialization, the sub topic object will be retained
+        // for the lifetime of the editor and on every data reload or update,
+        // the new contents will be copied into the same retained object.
+        this._subtopicPage.copyFromSubtopicPage(subtopicPage);
+      }
     } else {
       this._setSubtopicPage(subtopicPage);
       this._newSubtopicPageIds.push(subtopicPage.getId());
@@ -419,8 +459,9 @@ export class TopicEditorStateService {
       if (newIndex === -1) {
         return;
       }
+    } else {
+      this._cachedSubtopicPages.splice(index, 1);
     }
-    this._cachedSubtopicPages.splice(index, 1);
     // If the deleted subtopic page corresponded to a newly created
     // subtopic, then the 'subtopicId' part of the id of all subsequent
     // subtopic pages should be decremented to make it in sync with the

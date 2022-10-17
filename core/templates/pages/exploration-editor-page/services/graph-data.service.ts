@@ -27,7 +27,7 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
   providedIn: 'root'
 })
 export class GraphDataService {
-  _graphData: GraphData | null = null;
+  _graphData!: GraphData;
   updateGraphData = new EventEmitter();
 
   constructor(

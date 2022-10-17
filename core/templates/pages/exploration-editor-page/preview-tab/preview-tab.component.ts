@@ -51,8 +51,8 @@ export class PreviewTabComponent
   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  previewWarning: string;
-  isExplorationPopulated: boolean;
+  previewWarning!: string;
+  isExplorationPopulated!: boolean;
   allParams: ExplorationParams | object = {};
 
   constructor(
@@ -80,12 +80,12 @@ export class PreviewTabComponent
   ) { }
 
   getManualParamChanges(
-      initStateNameForPreview: string): Promise<string[] | string> {
+      initStateNameForPreview: string): Promise<ParamChange[]> {
     let unsetParametersInfo = this.parameterMetadataService
       .getUnsetParametersInfo([initStateNameForPreview]);
 
     // Construct array to hold required parameter changes.
-    let manualParamChanges = [];
+    let manualParamChanges: ParamChange[] = [];
     for (let i = 0; i < unsetParametersInfo.length; i++) {
       let newParamChange = this.paramChangeObjectFactory.createEmpty(
         unsetParametersInfo[i].paramName);
@@ -97,9 +97,9 @@ export class PreviewTabComponent
       this.showSetParamsModal(manualParamChanges, () => {
         return Promise.resolve(manualParamChanges);
       });
-    } else {
-      return Promise.resolve([]);
     }
+
+    return Promise.resolve([]);
   }
 
   showParameterSummary(): boolean {
@@ -108,7 +108,10 @@ export class PreviewTabComponent
       !isEqual({}, this.allParams));
   }
 
-  showSetParamsModal(manualParamChanges: string[], callback: Function): void {
+  showSetParamsModal(
+      manualParamChanges: ParamChange[],
+      callback: Function
+  ): void {
     const modalRef = this.ngbModal.open(PreviewSetParametersModalComponent, {
       backdrop: 'static',
       windowClass: 'oppia-preview-set-params-modal',
@@ -142,7 +145,7 @@ export class PreviewTabComponent
       this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
         explorationId).then((returnDict) => {
         this.explorationEngineService.init(
-          returnDict, null, null, null, null,
+          returnDict, null, null, false, [],
           () => {
             this.loadPreviewState(initStateNameForPreview, []);
           });
@@ -187,11 +190,9 @@ export class PreviewTabComponent
           this.explorationInitStateNameService.init(
             explorationData.init_state_name);
           this.graphDataService.recompute();
+          let stateName = this.stateEditorService.getActiveStateName();
           if (
-            !this.stateEditorService.getActiveStateName() ||
-                !this.explorationStatesService.getState(
-                  this.stateEditorService.getActiveStateName()
-                )
+            !stateName || !this.explorationStatesService.getState(stateName)
           ) {
             this.stateEditorService.setActiveStateName(
               this.explorationInitStateNameService.displayed as string);
@@ -199,6 +200,10 @@ export class PreviewTabComponent
         }
         let initStateNameForPreview = (
           this.stateEditorService.getActiveStateName());
+
+        if (initStateNameForPreview === null) {
+          throw new Error('Active state name cannot be null.');
+        }
 
         // Show a warning message if preview doesn't start from the first
         // state.
@@ -214,6 +219,9 @@ export class PreviewTabComponent
         // exploration.
         this.getManualParamChanges(initStateNameForPreview).then(
           (manualParamChanges) => {
+            if (initStateNameForPreview === null) {
+              throw new Error('Active state name cannot be null.');
+            }
             this.loadPreviewState(
               initStateNameForPreview, manualParamChanges);
           });

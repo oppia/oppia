@@ -33,18 +33,18 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 })
 export class SubtopicPreviewTab {
   directiveSubscriptions = new Subscription();
-  topic: Topic;
-  subtopicId: number;
-  subtopic: Subtopic;
-  editableTitle: string;
-  editableThumbnailFilename: string;
-  editableThumbnailBgColor: string;
-  subtopicPage: SubtopicPage;
-  pageContents: SubtopicPageContents;
-  htmlData: string;
+  topic!: Topic;
+  subtopicId!: number;
+  subtopic!: Subtopic | null;
+  editableTitle!: string;
+  editableThumbnailFilename!: string | null;
+  editableThumbnailBgColor!: string | null;
+  subtopicPage!: SubtopicPage;
+  pageContents!: SubtopicPageContents;
+  htmlData!: string;
   THUMBNAIL: string = 'thumbnail';
   CONTENT: string = 'content';
-  thumbnailIsShown: boolean;
+  thumbnailIsShown!: boolean;
 
   constructor(
     private topicEditorRoutingService: TopicEditorRoutingService,
@@ -58,6 +58,9 @@ export class SubtopicPreviewTab {
       this.topicEditorRoutingService.getSubtopicIdFromUrl());
     this.subtopic = (
       this.topic.getSubtopicById(this.subtopicId));
+    if (this.subtopic === null) {
+      throw new Error('Subtopic doesn\'t exist');
+    }
 
     if (this.topic.getId() && this.subtopic) {
       this.topicEditorStateService.loadSubtopicPage(

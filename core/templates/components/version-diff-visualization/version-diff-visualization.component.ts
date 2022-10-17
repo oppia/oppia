@@ -23,6 +23,7 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateDiffModalComponent } from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
+import { StateLink } from 'pages/exploration-editor-page/services/exploration-diff.service';
 
 interface NodesData {
   [key: string]: {
@@ -48,9 +49,9 @@ export interface DiffNodeData {
   v2States: Record<string, State>;
   v1States: Record<string, State>;
   finalStateIds: string[];
-  v2InitStateId: string;
-  links: string[];
-  v1InitStateId: string;
+  v2InitStateId: number;
+  links: StateLink[];
+  v1InitStateId: number;
 }
 
 interface DIFF_GRAPH_LINK_PROPERTY_MAPPING {
@@ -86,8 +87,8 @@ interface DiffGraphNodeColors {
 
 interface DiffGraphData {
   nodes: object;
-  links: string[];
-  initStateId: string;
+  links: StateLink[];
+  initStateId: number;
   finalStateIds: string[];
 }
 
@@ -153,7 +154,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
 
   diffGraphData!: DiffGraphData;
   diffGraphNodeColors!: DiffGraphNodeColors;
-  v1InitStateId!: string;
+  v1InitStateId!: number;
   diffGraphSecondaryLabels!: DiffGraphSecondaryLabels;
   DIFF_GRAPH_LINK_PROPERTY_MAPPING!: DIFF_GRAPH_LINK_PROPERTY_MAPPING;
   legendGraph!: LegendGraph;
