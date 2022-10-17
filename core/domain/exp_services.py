@@ -3048,7 +3048,7 @@ def get_interaction_id_for_state(exp_id: str, state_name: str) -> Optional[str]:
 
 def regenerate_missing_stats_for_exploration(
     exp_id: str
-) -> Tuple[list[str], list[str], int, int]:
+) -> Tuple[List[str], List[str], int, int]:
     """Regenerates missing ExplorationStats models and entries for all
     corresponding states in an exploration.
 
@@ -3221,9 +3221,13 @@ def regenerate_missing_stats_for_exploration(
                 # since been migrated but they do not have corresponding state
                 # stats models for the END state. So for such versions, a
                 # default state stats model should be created.
-                if current_interaction_id != prev_interaction_id or (
+                if (
+                    current_interaction_id != prev_interaction_id or
+                    (
                         current_interaction_id == 'EndExploration' and
-                        prev_state_name == 'END'):
+                        prev_state_name == 'END'
+                    )
+                ):
                     exp_stats_list_item.state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default()
                     )
