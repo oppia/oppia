@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rejecting suggestions whose content_id no longer exists."""
+"""Rejecting suggestions whose content_id no longer exists and
+updating the translation content.
+"""
 
 from __future__ import annotations
 
@@ -45,7 +47,7 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
+class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
     """Job that rejects the suggestions for missing content ids and
     updates the RTE content.
     """
@@ -72,7 +74,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
 
         if (
             tag[attr].strip() in
-            RejectSuggestionWithMissingContentIdJob.empty_values
+            RejectSuggestionWithMissingContentIdMigrationJob.empty_values
         ):
             tag.decompose()
             return True
@@ -135,7 +137,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                 tag['alt-with-value'] = '&quot;&quot;'
 
             if (
-                RejectSuggestionWithMissingContentIdJob.
+                RejectSuggestionWithMissingContentIdMigrationJob.
                 _is_tag_removed_with_invalid_attributes(
                     tag, 'filepath-with-value')
             ):
@@ -146,13 +148,13 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
 
         for tag in soup.find_all('oppia-noninteractive-skillreview'):
             if (
-                RejectSuggestionWithMissingContentIdJob.
+                RejectSuggestionWithMissingContentIdMigrationJob.
                 _is_tag_removed_with_invalid_attributes(tag, 'text-with-value')
             ):
                 continue
 
             if (
-                RejectSuggestionWithMissingContentIdJob.
+                RejectSuggestionWithMissingContentIdMigrationJob.
                 _is_tag_removed_with_invalid_attributes(
                 tag, 'skill_id-with-value')
             ):
@@ -181,7 +183,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                     tag['autoplay-with-value'] = 'false'
 
             if (
-                RejectSuggestionWithMissingContentIdJob.
+                RejectSuggestionWithMissingContentIdMigrationJob.
                 _is_tag_removed_with_invalid_attributes(
                 tag, 'video_id-with-value')
             ):
@@ -199,9 +201,9 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
 
         for tag in soup.find_all('oppia-noninteractive-link'):
             if (
-                RejectSuggestionWithMissingContentIdJob.
+                RejectSuggestionWithMissingContentIdMigrationJob.
                 _is_tag_removed_with_invalid_attributes(
-                tag, 'url-with-value')
+                    tag, 'url-with-value')
             ):
                 continue
 
@@ -210,15 +212,16 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
             else:
                 if (
                     tag['text-with-value'].strip() in
-                    RejectSuggestionWithMissingContentIdJob.empty_values
+                    RejectSuggestionWithMissingContentIdMigrationJob.
+                    empty_values
                 ):
                     tag['text-with-value'] = tag['url-with-value']
 
         for tag in soup.find_all('oppia-noninteractive-math'):
             if (
-                RejectSuggestionWithMissingContentIdJob.
+                RejectSuggestionWithMissingContentIdMigrationJob.
                 _is_tag_removed_with_invalid_attributes(
-                tag, 'math_content-with-value')
+                    tag, 'math_content-with-value')
             ):
                 continue
 
@@ -230,7 +233,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                 continue
             if (
                 math_content_list['raw_latex'].strip() in
-                RejectSuggestionWithMissingContentIdJob.empty_values
+                RejectSuggestionWithMissingContentIdMigrationJob.empty_values
             ):
                 tag.decompose()
                 continue
@@ -271,7 +274,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
             assert isinstance(content, str)
             if (
                 content.strip() in
-                RejectSuggestionWithMissingContentIdJob.empty_values
+                RejectSuggestionWithMissingContentIdMigrationJob.empty_values
             ):
                 tag.decompose()
                 return True
@@ -308,7 +311,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                     tag['tab_contents-with-value'])
                 tab_content_list = json.loads(tab_content_json)
                 if (
-                    RejectSuggestionWithMissingContentIdJob.
+                    RejectSuggestionWithMissingContentIdMigrationJob.
                     _is_tag_removed_with_empty_content(
                     tag, tab_content_list, is_collapsible=False)
                 ):
@@ -317,13 +320,15 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                 empty_tab_contents = []
                 for tab_content in tab_content_list:
                     tab_content['content'] = (
-                        RejectSuggestionWithMissingContentIdJob.fix_rte_tags(
+                        RejectSuggestionWithMissingContentIdMigrationJob.
+                        fix_rte_tags(
                             tab_content['content'],
                             is_tags_nested_inside_tabs_or_collapsible=True)
                     )
                     if (
                         tab_content['content'].strip() in
-                        RejectSuggestionWithMissingContentIdJob.empty_values
+                        RejectSuggestionWithMissingContentIdMigrationJob.
+                        empty_values
                     ):
                         empty_tab_contents.append(tab_content)
 
@@ -332,7 +337,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                     tab_content_list.remove(empty_content)
 
                 if (
-                    RejectSuggestionWithMissingContentIdJob.
+                    RejectSuggestionWithMissingContentIdMigrationJob.
                     _is_tag_removed_with_empty_content(
                         tag, tab_content_list, is_collapsible=False)
                 ):
@@ -341,6 +346,7 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                 tab_content_json = json.dumps(tab_content_list)
                 tag['tab_contents-with-value'] = utils.escape_html(
                     tab_content_json)
+
             else:
                 tag.decompose()
                 continue
@@ -355,19 +361,20 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                 collapsible_content = json.loads(
                     collapsible_content_json)
                 if (
-                    RejectSuggestionWithMissingContentIdJob.
+                    RejectSuggestionWithMissingContentIdMigrationJob.
                     _is_tag_removed_with_empty_content(
                         tag, collapsible_content, is_collapsible=True)
                 ):
                     continue
 
                 collapsible_content = (
-                    RejectSuggestionWithMissingContentIdJob.fix_rte_tags(
+                    RejectSuggestionWithMissingContentIdMigrationJob.
+                    fix_rte_tags(
                         collapsible_content,
                         is_tags_nested_inside_tabs_or_collapsible=True)
                 )
                 if (
-                    RejectSuggestionWithMissingContentIdJob.
+                    RejectSuggestionWithMissingContentIdMigrationJob.
                     _is_tag_removed_with_empty_content(
                         tag, collapsible_content, is_collapsible=True)
                 ):
@@ -376,12 +383,13 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
                 collapsible_content_json = json.dumps(collapsible_content)
                 tag['content-with-value'] = utils.escape_html(
                     collapsible_content_json)
+
             else:
                 tag.decompose()
                 continue
 
             if (
-                RejectSuggestionWithMissingContentIdJob.
+                RejectSuggestionWithMissingContentIdMigrationJob.
                 _is_tag_removed_with_invalid_attributes(
                     tag, 'heading-with-value')
             ):
@@ -399,10 +407,10 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
         Returns:
             html: str. The fixed html data.
         """
-        html = RejectSuggestionWithMissingContentIdJob.fix_rte_tags(
+        html = RejectSuggestionWithMissingContentIdMigrationJob.fix_rte_tags(
             html, is_tags_nested_inside_tabs_or_collapsible=False)
         html = (
-            RejectSuggestionWithMissingContentIdJob.
+            RejectSuggestionWithMissingContentIdMigrationJob.
             fix_tabs_and_collapsible_tags(html))
         return html
 
@@ -442,7 +450,8 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
 
             html = suggestion_change['translation_html']
             suggestion_change['translation_html'] = (
-                RejectSuggestionWithMissingContentIdJob._fix_content(html))
+                RejectSuggestionWithMissingContentIdMigrationJob._fix_content(
+                    html))
 
         return suggestions
 
@@ -513,3 +522,65 @@ class RejectSuggestionWithMissingContentIdJob(base_jobs.JobBase):
         )
 
         return updated_suggestions_count_job_run_results
+
+
+class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
+    """"""
+
+    @staticmethod
+    def _report_errors_from_suggestion_models():
+        """"""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the suggestion updation.
+
+        Returns:
+            PCollection. A PCollection of results from the suggestion
+            migration.
+        """
+        target_id_to_suggestion_models = (
+            self.pipeline
+            | 'Get translation suggestion models in review' >> ndb_io.GetModels(
+                suggestion_models.GeneralSuggestionModel.get_all(
+                    include_deleted=False).filter(
+                        (
+                            suggestion_models
+                            .GeneralSuggestionModel.suggestion_type
+                        ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                    ).filter(
+                        suggestion_models.GeneralSuggestionModel.status == (
+                            suggestion_models.STATUS_IN_REVIEW
+                        )
+                    )
+            )
+            | 'Add target id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.target_id)
+            | 'Group exploration suggestions' >> beam.GroupByKey()
+        )
+
+        exploration_models = (
+            self.pipeline
+            | 'Get all exploration models' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all())
+            | 'Add exploration id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.id)
+        )
+
+        errored_suggestion_results = (
+            {
+                'suggestions': target_id_to_suggestion_models,
+                'exploration': exploration_models
+            }
+            | 'Merge models' >> beam.CoGroupByKey()
+            | 'Remove keys' >> beam.Values()
+            | 'Filter unwanted exploration' >> beam.Filter(
+                lambda objects: len(objects['suggestions']) != 0)
+            | 'Transform and migrate model' >> beam.Map(
+                lambda objects: (
+                    self._report_errors_from_suggestion_models(
+                        objects['suggestions'][0],
+                        objects['exploration'][0]
+                    )
+                ))
+            | 'Flatten suggestion models' >> beam.FlatMap(lambda x: x)
+        )
