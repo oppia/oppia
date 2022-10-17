@@ -198,6 +198,11 @@ def get_exploration_from_model(
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_states_schema(
             versioned_exploration_states, init_state_name, language_code)
+        tags = exploration_model.tags
+        if len(tags) > 0:
+            exp_tags = sorted(list(set(tags)))
+            exp_tags = [tag for tag in exp_tags if tag and len(tag) <= 30]
+            exploration_model.tags = exp_tags[:10]
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,

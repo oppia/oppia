@@ -4785,26 +4785,32 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # Fix RTE content present inside the answer group's feedback.
             for answer_group in state['interaction']['answer_groups']:
                 feedback = answer_group['outcome']['feedback']['html']
-                if feedback in cls.empty_values:
-                    continue
-
-                answer_group['outcome']['feedback']['html'] = cls._fix_content(
-                    feedback)
+                if not feedback in cls.empty_values:
+                    answer_group['outcome']['feedback']['html'] = (
+                        cls._fix_content(feedback))
 
             # Fix RTE content present inside the default outcome.
             if state['interaction']['default_outcome'] is not None:
                 default_feedback = state['interaction']['default_outcome'][
                     'feedback']['html']
-                if default_feedback in cls.empty_values:
-                    continue
-
-                state['interaction']['default_outcome']['feedback']['html'] = (
-                    cls._fix_content(default_feedback))
+                if not default_feedback in cls.empty_values:
+                    state['interaction']['default_outcome']['feedback'][
+                        'html'] = cls._fix_content(default_feedback)
 
             # Fix RTE content present inside the Hint.
-            for hint in state['interaction']['hints']:
+            empty_hints = []
+            hints = state['interaction']['hints']
+            assert isinstance(hints, list)
+            for hint in hints:
                 hint_content = hint['hint_content']['html']
                 hint['hint_content']['html'] = cls._fix_content(hint_content)
+                if hint['hint_content']['html'] in cls.empty_values:
+                    empty_hints.append(hint)
+
+            for empty_hint in empty_hints:
+                hints.remove(empty_hint)
+                break
+            state['interaction']['hints'] = hints
 
             # Fix RTE content present inside the Solution.
             if state['interaction']['solution'] is not None:
