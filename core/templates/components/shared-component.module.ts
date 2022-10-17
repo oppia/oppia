@@ -169,12 +169,11 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
+import { JoyrideModule } from 'ngx-joyride';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateModule } from '@ngx-translate/core';
-import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 
 @NgModule({
   imports: [
@@ -199,13 +198,13 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    JoyrideModule.forRoot(),
     RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
     MatProgressSpinnerModule,
-    NgbModalModule,
-    TranslateModule,
+    NgbModalModule
   ],
 
   providers: [
@@ -339,7 +338,6 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
-    ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
   ],
 
@@ -466,7 +464,6 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
-    ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
   ],
 
@@ -604,8 +601,6 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
-    ComponentOverviewComponent,
-    TranslateModule,
     VisualizationSortedTilesComponent,
   ],
 })

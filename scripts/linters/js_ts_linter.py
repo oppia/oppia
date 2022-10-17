@@ -26,11 +26,19 @@ import subprocess
 
 import esprima
 
+from typing import Dict, List, Tuple, Union
+from typing_extensions import Final
+
 from .. import common
 from .. import concurrent_task_utils
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from scripts.linters import pre_commit_linter
 
-COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
+ParsedExpressionsType = Dict[str, Dict[str, List[esprima.nodes.Node]]]
+
+COMPILED_TYPESCRIPT_TMP_PATH: Final = 'tmpcompiledjs/'
 
 # The INJECTABLES_TO_IGNORE contains a list of services that are not supposed
 # to be included in angular-services.index.ts. These services are not required
@@ -38,7 +46,7 @@ COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 # class of legacy services that will soon be removed from the codebase.
 # NOTE TO DEVELOPERS: Don't add any more files to this list. If you have any
 # questions, please talk to @srijanreddy98.
-INJECTABLES_TO_IGNORE = [
+INJECTABLES_TO_IGNORE: Final = [
     # This file is required for the js-ts-linter-test.
     'MockIgnoredService',
     # We don't want this service to be present in the index.
@@ -48,7 +56,9 @@ INJECTABLES_TO_IGNORE = [
 ]
 
 
-def _parse_js_or_ts_file(filepath, file_content, **kwargs):
+def _parse_js_or_ts_file(
+    filepath: str, file_content: str, comment: bool = False
+) -> Union[esprima.nodes.Module, esprima.nodes.Script]:
     """Runs the correct function to parse the given file's source code.
 
     With ES2015 and later, a JavaScript program can be either a script or a
@@ -62,30 +72,32 @@ def _parse_js_or_ts_file(filepath, file_content, **kwargs):
     Args:
         filepath: str. Path of the source file.
         file_content: str. Code to compile.
-        **kwargs: dict(*: *). Passed along to esprima.
+        comment: bool. Whether to collect comments while parsing the js or ts
+            files.
 
     Returns:
-        dict. Parsed contents produced by esprima.
+        Union[Script, Module]. Parsed contents produced by esprima.
     """
     parse_function = (
         esprima.parseScript if filepath.endswith('.js') else
         esprima.parseModule)
-    return parse_function(file_content, **kwargs)
+    return parse_function(file_content, comment=comment)
 
 
 def _get_expression_from_node_if_one_exists(
-        parsed_node, components_to_check):
+    parsed_node: esprima.nodes.Node, possible_component_names: List[str]
+) -> esprima.nodes.Node:
     """This function first checks whether the parsed node represents
     the required angular component that needs to be derived by checking if
-    its in the 'components_to_check' list. If yes, then it  will return the
-    expression part of the node from which the component can be derived.
+    it's in the 'possible_component_names' list. If yes, then it will return
+    the expression part of the node from which the component can be derived.
     If no, it will return None. It is done by filtering out
     'AssignmentExpression' (as it represents an assignment) and 'Identifier'
     (as it represents a static expression).
 
     Args:
-        parsed_node: dict. Parsed node of the body of a JS file.
-        components_to_check: list(str). List of angular components to check
+        parsed_node: Node. Parsed node of the body of a JS file.
+        possible_component_names: list(str). List of angular components to check
             in a JS file. These include directives, factories, controllers,
             etc.
 
@@ -116,12 +128,12 @@ def _get_expression_from_node_if_one_exists(
         return
     # Get the component in the JS file.
     component = expression.callee.property.name
-    if component not in components_to_check:
+    if component not in possible_component_names:
         return
     return expression
 
 
-def compile_all_ts_files():
+def compile_all_ts_files() -> None:
     """Compiles all project typescript files into
     COMPILED_TYPESCRIPT_TMP_PATH. Previously, we only compiled
     the TS files that were needed, but when a relative import was used, the
@@ -143,7 +155,12 @@ def compile_all_ts_files():
 class JsTsLintChecksManager:
     """Manages all the Js and Ts linting functions."""
 
-    def __init__(self, js_files, ts_files, file_cache):
+    def __init__(
+        self,
+        js_files: List[str],
+        ts_files: List[str],
+        file_cache: pre_commit_linter.FileCache
+    ) -> None:
         """Constructs a JsTsLintChecksManager object.
 
         Args:
@@ -157,25 +174,27 @@ class JsTsLintChecksManager:
         self.js_files = js_files
         self.ts_files = ts_files
         self.file_cache = file_cache
-        self.parsed_js_and_ts_files = []
-        self.parsed_expressions_in_files = []
+        self.parsed_js_and_ts_files: Dict[str, esprima.nodes.Module] = {}
+        self.parsed_expressions_in_files: ParsedExpressionsType = {}
 
     @property
-    def js_filepaths(self):
+    def js_filepaths(self) -> List[str]:
         """Return all js filepaths."""
         return self.js_files
 
     @property
-    def ts_filepaths(self):
+    def ts_filepaths(self) -> List[str]:
         """Return all ts filepaths."""
         return self.ts_files
 
     @property
-    def all_filepaths(self):
+    def all_filepaths(self) -> List[str]:
         """Return all filepaths."""
         return self.js_filepaths + self.ts_filepaths
 
-    def _validate_and_parse_js_and_ts_files(self):
+    def _validate_and_parse_js_and_ts_files(
+        self
+    ) -> Dict[str, Union[esprima.nodes.Module, esprima.nodes.Script]]:
         """This function validates JavaScript and Typescript files and
         returns the parsed contents as a Python dictionary.
 
@@ -192,7 +211,7 @@ class JsTsLintChecksManager:
         parsed_js_and_ts_files = {}
         concurrent_task_utils.log('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
-            file_content = self.file_cache.read(filepath)
+            file_content = self.file_cache.read(filepath)  # type: ignore[no-untyped-call]
 
             try:
                 # Use esprima to parse a JS or TS file.
@@ -204,13 +223,13 @@ class JsTsLintChecksManager:
                 # Compile typescript file which has syntax invalid for JS file.
                 compiled_js_filepath = self._get_compiled_ts_filepath(filepath)
 
-                file_content = self.file_cache.read(compiled_js_filepath)
+                file_content = self.file_cache.read(compiled_js_filepath)  # type: ignore[no-untyped-call]
                 parsed_js_and_ts_files[filepath] = _parse_js_or_ts_file(
                     filepath, file_content)
 
         return parsed_js_and_ts_files
 
-    def _get_expressions_from_parsed_script(self):
+    def _get_expressions_from_parsed_script(self) -> ParsedExpressionsType:
         """This function returns the expressions in the script parsed using
         js and ts files.
 
@@ -219,7 +238,9 @@ class JsTsLintChecksManager:
             in the script parsed using js and ts files.
         """
 
-        parsed_expressions_in_files = collections.defaultdict(dict)
+        parsed_expressions_in_files: (
+            ParsedExpressionsType
+        ) = collections.defaultdict(dict)
         components_to_check = ['controller', 'directive', 'factory', 'filter']
 
         for filepath, parsed_script in self.parsed_js_and_ts_files.items():
@@ -235,7 +256,7 @@ class JsTsLintChecksManager:
 
         return parsed_expressions_in_files
 
-    def _get_compiled_ts_filepath(self, filepath):
+    def _get_compiled_ts_filepath(self, filepath: str) -> str:
         """Returns the path for compiled ts file.
 
         Args:
@@ -250,7 +271,7 @@ class JsTsLintChecksManager:
             os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
 
-    def _check_constants_declaration(self):
+    def _check_constants_declaration(self) -> concurrent_task_utils.TaskResult:
         """Checks the declaration of constants in the TS files to ensure that
         the constants are not declared in files other than *.constants.ajs.ts
         and that the constants are declared only single time. This also checks
@@ -266,7 +287,7 @@ class JsTsLintChecksManager:
         failed = False
 
         ts_files_to_check = self.ts_filepaths
-        constants_to_source_filepaths_dict = {}
+        constants_to_source_filepaths_dict: Dict[str, str] = {}
         for filepath in ts_files_to_check:
             # The following block extracts the corresponding Angularjs
             # constants file for the Angular constants file. This is
@@ -284,7 +305,7 @@ class JsTsLintChecksManager:
                 if is_corresponding_angularjs_filepath:
                     compiled_js_filepath = self._get_compiled_ts_filepath(
                         corresponding_angularjs_filepath)
-                    file_content = self.file_cache.read(compiled_js_filepath)
+                    file_content = self.file_cache.read(compiled_js_filepath)  # type: ignore[no-untyped-call]
 
                     parsed_script = (
                         _parse_js_or_ts_file(filepath, file_content))
@@ -357,26 +378,27 @@ class JsTsLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_angular_services_index(self):
+    def _check_angular_services_index(self) -> concurrent_task_utils.TaskResult:
         """Finds all @Injectable classes and makes sure that they are added to
             Oppia root and Angular Services Index.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            TaskResult. TaskResult having all the messages returned by the
+            lint checks.
         """
         name = 'Angular Services Index file'
-        error_messages = []
+        error_messages: List[str] = []
         injectable_pattern = '%s%s' % (
             'Injectable\\({\\n*\\s*providedIn: \'root\'\\n*}\\)\\n',
             'export class ([A-Za-z0-9]*)')
         angular_services_index_path = (
             './core/templates/services/angular-services.index.ts')
-        angular_services_index = self.file_cache.read(
+        angular_services_index = self.file_cache.read(  # type: ignore[no-untyped-call]
             angular_services_index_path)
         error_messages = []
         failed = False
         for file_path in self.ts_files:
-            file_content = self.file_cache.read(file_path)
+            file_content = self.file_cache.read(file_path)  # type: ignore[no-untyped-call]
             class_names = re.findall(injectable_pattern, file_content)
             for class_name in class_names:
                 if class_name in INJECTABLES_TO_IGNORE:
@@ -407,7 +429,7 @@ class JsTsLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -445,7 +467,7 @@ class JsTsLintChecksManager:
 class ThirdPartyJsTsLintChecksManager:
     """Manages all the third party Python linting functions."""
 
-    def __init__(self, files_to_lint):
+    def __init__(self, files_to_lint: List[str]) -> None:
         """Constructs a ThirdPartyJsTsLintChecksManager object.
 
         Args:
@@ -455,12 +477,12 @@ class ThirdPartyJsTsLintChecksManager:
         self.files_to_lint = files_to_lint
 
     @property
-    def all_filepaths(self):
+    def all_filepaths(self) -> List[str]:
         """Return all filepaths."""
         return self.files_to_lint
 
     @staticmethod
-    def _get_trimmed_error_output(eslint_output):
+    def _get_trimmed_error_output(eslint_output: str) -> str:
         """Remove extra bits from eslint messages.
 
         Args:
@@ -493,14 +515,20 @@ class ThirdPartyJsTsLintChecksManager:
             # and if that is True then we are replacing "error" with empty
             # string('') which is at the index 1 and message-id from the end.
             if re.search(r'^\d+:\d+', line.lstrip()):
-                error_string = re.search(r'error', line).group(0)
+                searched_error_string = re.search(r'error', line)
+                # If the regex '^\d+:\d+' is matched then the output line of
+                # es-lint is an error message, and in the error message, 'error'
+                # keyword is always present. So, 'searched_error_string' is
+                # never going to be None here.
+                assert searched_error_string is not None
+                error_string = searched_error_string.group(0)
                 error_message = line.replace(error_string, '', 1)
             else:
                 error_message = line
             trimmed_error_messages.append(error_message)
         return '\n'.join(trimmed_error_messages) + '\n'
 
-    def _lint_js_and_ts_files(self):
+    def _lint_js_and_ts_files(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors in the given list of JavaScript files.
 
         Returns:
@@ -545,7 +573,7 @@ class ThirdPartyJsTsLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, full_error_messages)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -562,7 +590,11 @@ class ThirdPartyJsTsLintChecksManager:
         return [self._lint_js_and_ts_files()]
 
 
-def get_linters(js_filepaths, ts_filepaths, file_cache):
+def get_linters(
+    js_filepaths: List[str],
+    ts_filepaths: List[str],
+    file_cache: pre_commit_linter.FileCache
+) -> Tuple[JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager]:
     """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
         objects and return them.
 
