@@ -361,6 +361,8 @@ describe('Exploration editor page component', () => {
     });
 
     it('should start editor tutorial when on main page', fakeAsync(() => {
+      spyOn(rs, 'isLocationSetToNonStateEditorTab')
+        .and.returnValue(false);
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
