@@ -71,6 +71,7 @@ describe('Exploration editor tab component', () => {
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let focusManagerService: FocusManagerService;
+  let contextService: ContextService;
   let mockRefreshStateEditorEventEmitter = null;
 
   class MockNgbModal {
@@ -161,15 +162,6 @@ describe('Exploration editor tab component', () => {
         },
         TemplatesService,
         {
-          provide: ContextService,
-          useValue: {
-            getExplorationId: () => {
-              return 'explorationId';
-            },
-            setExplorationIsLinkedToStory: () => {}
-          }
-        },
-        {
           provide: WindowRef,
           useClass: MockWindowRef
         },
@@ -224,8 +216,11 @@ describe('Exploration editor tab component', () => {
     stateEditorRefreshService = TestBed.inject(StateEditorRefreshService);
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService);
+    contextService = TestBed.inject(ContextService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
+    spyOn(contextService, 'getExplorationId').and.returnValue(
+      'explorationId');
     spyOn(stateEditorService, 'checkEventListenerRegistrationStatus')
       .and.returnValue(true);
     spyOn(document, 'getElementById').and.returnValue({
