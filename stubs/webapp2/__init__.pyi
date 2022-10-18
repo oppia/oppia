@@ -3,8 +3,16 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Pattern
 
 
 class Request:
+    uri: str
+    environ: Dict[str, Any]
+    route_kwargs: Dict[str, Any]
+    path: str
     cookies: Dict[str, str] = ...
     headers: Dict[str, str] = ...
+    GET: Dict[str, Any]
+
+    def arguments(self) -> List[str]: ...
+    def get(self, value: str) -> Any: ...
 
     @classmethod
     def blank(
@@ -17,11 +25,18 @@ class Request:
             **kwargs: Any
     ) -> Request: ...
 
-class ResponseHeaders:
+class ResponseHeaders(Dict[str, Any]):
     def get_all(self, key: str) -> List[str]: ...
 
 class Response:
     headers: ResponseHeaders = ...
+    content_type: str
+    charset: str
+    cache_control: Any
+    pragma: Any
+    expires: Any
+
+    def write(self, *args: Any, **Kwargs: Any) -> Any: ...
     def set_cookie(
             self,
             key: str,
@@ -43,6 +58,8 @@ class Response:
     ) -> None: ...
 
 class WSGIApplication:
+    debug: bool
+
     def __init__(
             self,
             routes: List[Route] = ...,
@@ -60,5 +77,28 @@ class Route:
     def __init__(
             self,
             template: Union[str, Pattern[Any]],
-            handler: Callable[..., object]
+            handler: Callable[..., object],
+            *,
+            name: str = ...
     ) -> None: ...
+
+class RequestHandler:
+    request: Request
+    response: Response
+    app: WSGIApplication
+
+    def error(self, code: int) -> None: ...
+    def dispatch(self) -> None: ...
+    def initialize(self, request: Request, response: Response) -> None: ...
+
+    @classmethod
+    def write(cls, content: bytes) -> None: ...
+    @classmethod
+    def redirect(
+        cls,
+        uri: str,
+        permanent: bool = False,
+        abort: bool = False,
+        code: Optional[int] = None,
+        body: Any = None
+    ) -> Response: ...

@@ -160,7 +160,7 @@ class SplashRedirectPage(base.BaseHandler):
 # backend. Should be changed in future as per the requirements.
 def get_redirect_route(
         regex_route: str,
-        handler: Type[base.BaseHandler],
+        handler: Type[webapp2.RequestHandler],
         defaults: Optional[Dict[str, str]] = None
 ) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
@@ -170,7 +170,7 @@ def get_redirect_route(
 
     Args:
         regex_route: unicode. A raw string representing a route.
-        handler: BaseHandler. A callable to handle the route.
+        handler: RequestHandler. A callable to handle the route.
         defaults: dict. Optional defaults parameter to be passed
             into the RedirectRoute object.
 

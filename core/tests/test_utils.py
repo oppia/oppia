@@ -2834,11 +2834,11 @@ title: Title
     def post_json(
         self,
         url: str,
-        data: Dict[str, Any],
+        data: Any,
         headers: Optional[Dict[str, str]] = None,
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200,
-        upload_files: Optional[List[Tuple[str, ...]]] = None,
+        upload_files: Optional[List[Tuple[str, str, bytes]]] = None,
         use_payload: bool = True,
         source: Optional[str] = None
     ) -> Dict[str, Any]:
@@ -2901,7 +2901,7 @@ title: Title
     # Here we use type Any because this method can return JSON response Dict
     # whose values can contain different types of values, like int, bool,
     # str and other types too.
-    def delete_json(
+    def delete_json(  # pylint: disable=dangerous-default-value
         self,
         url: str,
         params: Dict[str, Any] = {},
@@ -2944,7 +2944,7 @@ title: Title
         expect_errors: bool,
         expected_status_int: int = 200,
         upload_files: Optional[
-            Union[List[Tuple[str, ...]],
+            Union[List[Tuple[str, str, bytes]],
             Tuple[Tuple[bytes, ...], ...]]
         ] = None,
         headers: Optional[Dict[str, str]] = None
@@ -2973,7 +2973,7 @@ title: Title
         """
         # Convert the files to bytes.
         if upload_files is not None:
-            upload_files = tuple(
+            encoded_upload_files = tuple(
                 tuple(
                     f.encode('utf-8') if isinstance(f, str) else f
                     for f in upload_file
@@ -2982,7 +2982,9 @@ title: Title
 
         return app.post(
             url, params=data, headers=headers, status=expected_status_int,
-            upload_files=upload_files, expect_errors=expect_errors)
+            upload_files=(encoded_upload_files if upload_files else None),
+            expect_errors=expect_errors
+        )
 
     def post_task(
         self,

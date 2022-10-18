@@ -49,11 +49,10 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 
-import webapp2
-import webtest
-
 from typing import Dict, List, Union, cast
 from typing_extensions import Final, TypedDict
+import webapp2
+import webtest
 
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
@@ -339,7 +338,9 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
-    def test_page_not_found_exception_when_exploration_rights_is_none(self) -> None:
+    def test_page_not_found_exception_when_exploration_rights_is_none(
+        self
+    ) -> None:
         self.login(self.user_email)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         exp_rights_swap = self.swap_to_always_return(
@@ -1233,7 +1234,9 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_create_feedback_thread/%s'
                 % (feconf.DISABLED_EXPLORATION_IDS[0]), expected_status_int=404)
 
-    def test_viewer_cannot_create_feedback_for_private_exploration(self) -> None:
+    def test_viewer_cannot_create_feedback_for_private_exploration(
+        self
+    ) -> None:
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -1732,7 +1735,9 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
             'You do not have credentials to access release coordinator page.')
         self.logout()
 
-    def test_release_coordinator_can_access_release_coordinator_page(self) -> None:
+    def test_release_coordinator_can_access_release_coordinator_page(
+        self
+    ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2578,7 +2583,9 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
-    def test_voice_artist_can_only_voiceover_assigned_public_exploration(self) -> None:
+    def test_voice_artist_can_only_voiceover_assigned_public_exploration(
+        self
+    ) -> None:
         self.login(self.VOICE_ARTIST_EMAIL)
         # Checking voice artist can voiceover assigned public exploration.
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3382,17 +3389,17 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
 class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
     """Tests for can_resubmit_suggestion decorator."""
 
-    owner_username: Final = 'owner'
-    owner_email: Final = 'owner@example.com'
-    author_username: Final = 'author'
-    author_email: Final = 'author@example.com'
-    username: Final = 'user'
-    user_email: Final = 'user@example.com'
+    owner_username = 'owner'
+    owner_email = 'owner@example.com'
+    author_username = 'author'
+    author_email = 'author@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
     TARGET_TYPE: Final = 'exploration'
     SUGGESTION_TYPE: Final = 'edit_exploration_state_content'
-    exploration_id: Final = 'exp_id'
-    target_version_id: Final = 1
-    change_dict: Final = {
+    exploration_id = 'exp_id'
+    target_version_id = 1
+    change_dict = {
         'cmd': 'edit_state_property',
         'property_name': 'content',
         'state_name': 'Introduction',
@@ -3505,7 +3512,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.get_decorator_for_accepting_suggestion(
-            acl_decorators.open_access)
+            acl_decorators.open_access)  # type: ignore[override]
         def get(self, target_id: str, suggestion_id: str) -> None:
             self.render_json({
                 'target_id': target_id,
@@ -3773,8 +3780,8 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
 class PublishExplorationTests(test_utils.GenericTestBase):
     """Tests for can_publish_exploration decorator."""
 
-    private_exp_id: Final = 'exp_0'
-    public_exp_id: Final = 'exp_1'
+    private_exp_id = 'exp_0'
+    public_exp_id = 'exp_1'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -3855,9 +3862,9 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 class ModifyExplorationRolesTests(test_utils.GenericTestBase):
     """Tests for can_modify_exploration_roles decorator."""
 
-    private_exp_id: Final = 'exp_0'
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    private_exp_id = 'exp_0'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -3927,12 +3934,12 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
 class CollectionPublishStatusTests(test_utils.GenericTestBase):
     """Tests can_publish_collection and can_unpublish_collection decorators."""
 
-    user_email: Final = 'user@example.com'
-    username: Final = 'user'
-    published_exp_id: Final = 'exp_id_1'
-    private_exp_id: Final = 'exp_id_2'
-    published_col_id: Final = 'col_id_1'
-    private_col_id: Final = 'col_id_2'
+    user_email = 'user@example.com'
+    username = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
+    published_col_id = 'col_id_1'
+    private_col_id = 'col_id_2'
 
     class MockPublishHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -4059,10 +4066,10 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_access_learner_dashboard."""
 
-    user: Final = 'user'
-    user_email: Final = 'user@example.com'
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -4108,10 +4115,10 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_access_learner_groups."""
 
-    user: Final = 'user'
-    user_email: Final = 'user@example.com'
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -4157,10 +4164,10 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
 class EditTopicDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_topic."""
 
-    manager_username: Final = 'topicmanager'
-    manager_email: Final = 'topicmanager@example.com'
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
@@ -4236,8 +4243,8 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_delete_topic."""
 
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
@@ -4311,8 +4318,8 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
 class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_view_any_topic_editor."""
 
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
@@ -4389,10 +4396,10 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
 class EditStoryDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_story."""
 
-    manager_username: Final = 'topicmanager'
-    manager_email: Final = 'topicmanager@example.com'
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -4496,10 +4503,10 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_delete_story."""
 
-    manager_username: Final = 'topicmanager'
-    manager_email: Final = 'topicmanager@example.com'
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -4592,10 +4599,10 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
 class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_access_topics_and_skills_dashboard."""
 
-    manager_username: Final = 'topicmanager'
-    manager_email: Final = 'topicmanager@example.com'
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
@@ -4664,10 +4671,10 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
 class AddStoryToTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_add_new_story_to_topic."""
 
-    manager_username: Final = 'topicmanager'
-    manager_email: Final = 'topicmanager@example.com'
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
@@ -4763,8 +4770,8 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 class StoryViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_story_viewer_page."""
 
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -4813,7 +4820,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_story_viewer_page
         def get(self, _: str) -> None:
-            self.render_template('oppia-root.mainpage.html')  # type: ignore[no-untyped-call]
+            self.render_template('oppia-root.mainpage.html')
 
     def setUp(self) -> None:
         super().setUp()
@@ -4955,8 +4962,8 @@ class StoryViewerTests(test_utils.GenericTestBase):
 class SubtopicViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_subtopic_viewer_page."""
 
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5013,7 +5020,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             unused_topic_url_fragment: str,
             unused_subtopic_url_fragment: str
         ) -> None:
-            self.render_template('subtopic-viewer-page.mainpage.html')  # type: ignore[no-untyped-call]
+            self.render_template('subtopic-viewer-page.mainpage.html')
 
     def setUp(self) -> None:
         super().setUp()
@@ -5167,8 +5174,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
 class TopicViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_topic_viewer_page."""
 
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5207,7 +5214,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_topic_viewer_page
         def get(self, unused_topic_name: str) -> None:
-            self.render_template('topic-viewer-page.mainpage.html')  # type: ignore[no-untyped-call]
+            self.render_template('topic-viewer-page.mainpage.html')
 
     def setUp(self) -> None:
         super().setUp()
@@ -5303,8 +5310,8 @@ class TopicViewerTests(test_utils.GenericTestBase):
 class CreateSkillTests(test_utils.GenericTestBase):
     """Tests for decorator can_create_skill."""
 
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5359,9 +5366,9 @@ class CreateSkillTests(test_utils.GenericTestBase):
 class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_question_skill_status."""
 
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
-    skill_id: Final = '1'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    skill_id = '1'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5430,8 +5437,8 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 class CreateTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_create_topic."""
 
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5482,9 +5489,9 @@ class CreateTopicTests(test_utils.GenericTestBase):
 class ManageRightsForTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_rights_for_topic."""
 
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
-    topic_id: Final = 'topic_1'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+    topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5545,8 +5552,8 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
 class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     """Tests for decorator can_change_topic_publication_status."""
 
-    banned_user: Final = 'banneduser'
-    banned_user_email: Final = 'banned@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5622,8 +5629,8 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
     """Tests for decorator can_perform_tasks_in_taskqueue."""
 
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5673,8 +5680,8 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
 class PerformCronTaskTests(test_utils.GenericTestBase):
     """Tests for decorator can_perform_cron_tasks."""
 
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5723,11 +5730,11 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
 class EditSkillDecoratorTests(test_utils.GenericTestBase):
     """Tests permissions for accessing the skill editor."""
 
-    manager_username: Final = 'topicmanager'
-    manager_email: Final = 'topicmanager@example.com'
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
-    skill_id: Final = '1'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    skill_id = '1'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5801,9 +5808,9 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_delete_skill."""
 
-    viewer_username: Final = 'viewer'
-    viewer_email: Final = 'viewer@example.com'
-    skill_id: Final = '1'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    skill_id = '1'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5849,11 +5856,11 @@ class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
 class EditQuestionDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_question."""
 
-    question_id: Final = 'question_id'
-    user_a: Final = 'A'
-    user_a_email: Final = 'a@example.com'
-    user_b: Final = 'B'
-    user_b_email: Final = 'b@example.com'
+    question_id = 'question_id'
+    user_a = 'A'
+    user_a_email = 'a@example.com'
+    user_b = 'B'
+    user_b_email = 'b@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -5940,11 +5947,11 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_view_question_editor."""
 
-    question_id: Final = 'question_id'
-    user_a: Final = 'A'
-    user_a_email: Final = 'a@example.com'
-    user_b: Final = 'B'
-    user_b_email: Final = 'b@example.com'
+    question_id = 'question_id'
+    user_a = 'A'
+    user_a_email = 'a@example.com'
+    user_b = 'B'
+    user_b_email = 'b@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -6043,11 +6050,11 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
 class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_delete_question."""
 
-    question_id: Final = 'question_id'
-    user_a: Final = 'A'
-    user_a_email: Final = 'a@example.com'
-    user_b: Final = 'B'
-    user_b_email: Final = 'b@example.com'
+    question_id = 'question_id'
+    user_a = 'A'
+    user_a_email = 'a@example.com'
+    user_b = 'B'
+    user_b_email = 'b@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -6127,7 +6134,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
 class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_play_question."""
 
-    question_id: Final = 'question_id'
+    question_id = 'question_id'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -6167,10 +6174,10 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
 class PlayEntityDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_play_entity."""
 
-    user_email: Final = 'user@example.com'
-    username: Final = 'user'
-    published_exp_id: Final = 'exp_id_1'
-    private_exp_id: Final = 'exp_id_2'
+    user_email = 'user@example.com'
+    username = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -6271,10 +6278,10 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 class EditEntityDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_entity."""
 
-    username: Final = 'banneduser'
-    user_email: Final = 'user@example.com'
-    published_exp_id: Final = 'exp_0'
-    private_exp_id: Final = 'exp_1'
+    username = 'banneduser'
+    user_email = 'user@example.com'
+    published_exp_id = 'exp_0'
+    private_exp_id = 'exp_1'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -6477,15 +6484,15 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 class SaveExplorationTests(test_utils.GenericTestBase):
     """Tests for can_save_exploration decorator."""
 
-    role: Final = rights_domain.ROLE_VOICE_ARTIST
-    username: Final = 'user'
-    user_email: Final = 'user@example.com'
-    banned_username: Final = 'banneduser'
-    banned_user_email: Final = 'banneduser@example.com'
-    published_exp_id_1: Final = 'exp_1'
-    published_exp_id_2: Final = 'exp_2'
-    private_exp_id_1: Final = 'exp_3'
-    private_exp_id_2: Final = 'exp_4'
+    role = rights_domain.ROLE_VOICE_ARTIST
+    username = 'user'
+    user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banneduser@example.com'
+    published_exp_id_1 = 'exp_1'
+    published_exp_id_2 = 'exp_2'
+    private_exp_id_1 = 'exp_3'
+    private_exp_id_2 = 'exp_4'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -6649,8 +6656,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             request.
 
             Returns:
-                OppiaMLAuthInfo. Message at index 0, vm_id at index 1 and signature
-                at index 2.
+                OppiaMLAuthInfo. Message at index 0, vm_id at index 1 and
+                signature at index 2.
             """
             payload = cast(
                 MockHandlerNormalizedPayloadDict, self.normalized_payload
@@ -6731,18 +6738,18 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
 class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     """Tests for can_update_suggestion decorator."""
 
-    curriculum_admin_username: Final = 'adn'
-    curriculum_admin_email: Final = 'admin@example.com'
-    author_username: Final = 'author'
-    author_email: Final = 'author@example.com'
-    hi_language_reviewer: Final = 'reviewer1@example.com'
-    en_language_reviewer: Final = 'reviewer2@example.com'
-    username: Final = 'user'
-    user_email: Final = 'user@example.com'
+    curriculum_admin_username = 'adn'
+    curriculum_admin_email = 'admin@example.com'
+    author_username = 'author'
+    author_email = 'author@example.com'
+    hi_language_reviewer = 'reviewer1@example.com'
+    en_language_reviewer = 'reviewer2@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
     TARGET_TYPE: Final = 'exploration'
-    exploration_id: Final = 'exp_id'
-    target_version_id: Final = 1
-    change_dict: Final = {
+    exploration_id = 'exp_id'
+    target_version_id = 1
+    change_dict = {
         'cmd': 'add_written_translation',
         'content_id': 'content',
         'language_code': 'hi',

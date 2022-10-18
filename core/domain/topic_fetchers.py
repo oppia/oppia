@@ -300,19 +300,42 @@ def get_topics_by_ids(
     return topics
 
 
-def get_topic_by_name(topic_name: str) -> Optional[topic_domain.Topic]:
+@overload
+def get_topic_by_name(
+    topic_name: str, *, strict: Literal[True] = ...
+) -> topic_domain.Topic: ...
+
+
+@overload
+def get_topic_by_name(
+    topic_name: str, *, strict: Literal[False] = ...
+) -> Optional[topic_domain.Topic]: ...
+
+
+def get_topic_by_name(
+    topic_name: str, strict: bool = False
+) -> Optional[topic_domain.Topic]:
     """Returns a domain object representing a topic.
 
     Args:
         topic_name: str. The name of the topic.
+        strict: bool. Whether to fail noisily if no Topic exists for
+            the given topic name.
 
     Returns:
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
+
+    Raises:
+        Exception. No Topic exists for the given topic name.
     """
     topic_model: Optional[topic_models.TopicModel] = (
         topic_models.TopicModel.get_by_name(topic_name))
     if topic_model is None:
+        if strict:
+            raise Exception(
+                'No Topic exists for the given topic name: %s' % topic_name
+            )
         return None
 
     return get_topic_from_model(topic_model)

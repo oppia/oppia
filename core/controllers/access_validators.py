@@ -23,11 +23,20 @@ from core.domain import blog_services
 from core.domain import classroom_services
 from core.domain import user_services
 
-from typing import Any, Dict # isort: skip
+from typing import Dict, cast
+from typing_extensions import TypedDict
 
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
+
+class ClassroomAccessValidationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ClassroomAccessValidationHandler's
+    normalized_request dictionary.
+    """
+
+    classroom_url_fragment: str
+
 
 class ClassroomAccessValidationHandler(base.BaseHandler):
     """Validates whether request made to /learn route.
@@ -35,12 +44,8 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'classroom_url_fragment': {
                 'schema': {
@@ -50,16 +55,14 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
         }
     }
 
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
-        # Please use type casting here instead of type ignore[union-attr] once
-        # this attribute `normalized_request` has been type annotated in the
-        # parent class BaseHandler.
-        classroom_url_fragment = self.normalized_request.get( # type: ignore[union-attr]
-            'classroom_url_fragment')
-        classroom = classroom_services.get_classroom_by_url_fragment( # type: ignore[no-untyped-call]
+        request_data = cast(
+            ClassroomAccessValidationHandlerNormalizedRequestDict,
+            self.normalized_request
+        )
+        classroom_url_fragment = request_data['classroom_url_fragment']
+        classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
         if not classroom:
@@ -72,19 +75,10 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
-        'GET': {}
-    }
-
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.can_manage_own_account # type: ignore[misc]
+    @acl_decorators.can_manage_own_account
     def get(self) -> None:
         pass
 
@@ -94,29 +88,20 @@ class ProfileExistsValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {
+    URL_PATH_ARGS_SCHEMAS = {
         'username': {
             'schema': {
                 'type': 'basestring'
             }
         }
     }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
-        'GET': {}
-    }
-
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self, username: str) -> None:
         """Validates access to profile page."""
 
-        user_settings = user_services.get_user_settings_from_username( # type: ignore[no-untyped-call]
+        user_settings = user_services.get_user_settings_from_username(
             username)
 
         if not user_settings:
@@ -128,19 +113,10 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
-        'GET': {}
-    }
-
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.can_access_release_coordinator_page # type: ignore[misc]
+    @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
         """Handles GET requests."""
         pass
@@ -151,22 +127,21 @@ class BlogHomePageAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
-        'GET': {}
-    }
-
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
+    @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
         """Validates access to blog home page."""
         pass
+
+
+class BlogPostPageAccessValidationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BlogPostPageAccessValidationHandler's
+    normalized_request dictionary.
+    """
+
+    blog_post_url_fragment: str
 
 
 class BlogPostPageAccessValidationHandler(base.BaseHandler):
@@ -174,12 +149,8 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'blog_post_url_fragment': {
                 'schema': {
@@ -189,16 +160,14 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
         }
     }
 
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
+    @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
-        # Please use type casting here instead of type ignore[union-attr] once
-        # this attribute `normalized_request` has been type annotated in the
-        # parent class BaseHandler.
-        blog_post_url_fragment = self.normalized_request.get( # type: ignore[union-attr]
-            'blog_post_url_fragment')
-        blog_post = blog_services.get_blog_post_by_url_fragment( # type: ignore[no-untyped-call]
+        request_data = cast(
+            BlogPostPageAccessValidationHandlerNormalizedRequestDict,
+            self.normalized_request
+        )
+        blog_post_url_fragment = request_data['blog_post_url_fragment']
+        blog_post = blog_services.get_blog_post_by_url_fragment(
             blog_post_url_fragment)
 
         if not blog_post:
