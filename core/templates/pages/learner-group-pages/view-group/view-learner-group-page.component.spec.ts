@@ -202,11 +202,13 @@ describe('ViewLearnerGroupPageComponent', () => {
 
       component.ngOnInit();
       tick();
-      spyOn(component, 'setPageTitle');
+      spyOn(component, 'setPageTitle').and.callThrough();
       spyOn(translateService, 'instant').and.callThrough();
       spyOn(pageTitleService, 'setDocumentTitle');
 
       translateService.onLangChange.emit();
+
+      fixture.detectChanges();
 
       expect(component.setPageTitle).toHaveBeenCalled();
       expect(translateService.instant).toHaveBeenCalledWith(

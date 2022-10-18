@@ -77,6 +77,19 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
     LearnerGroupSubtopicSummary.createFromBackendDict(
       sampleSubtopicSummaryDict2));
 
+  const nodeDict1 = {
+    id: 'node_1',
+    thumbnail_filename: 'image1.png',
+    title: 'Chapter 1',
+    description: 'Description 1',
+    prerequisite_skill_ids: ['skill_1'],
+    acquired_skill_ids: ['skill_2'],
+    destination_node_ids: ['node_2'],
+    outline: 'Outline',
+    exploration_id: 'exp_1',
+    outline_is_finalized: false,
+    thumbnail_bg_color: '#a33f40'
+  };
   const sampleStorySummaryBackendDict = {
     id: 'story_id_0',
     title: 'Story Title',
@@ -87,7 +100,7 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
     story_is_published: true,
     completed_node_titles: ['Chapter 1'],
     url_fragment: 'story-title',
-    all_node_dicts: [],
+    all_node_dicts: [nodeDict1],
     topic_name: 'Topic',
     classroom_url_fragment: 'math',
     topic_url_fragment: 'topic'
@@ -301,5 +314,36 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
       sampleSubtopicSummary5);
     expect(masteryLevel).toBe(
       'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET');
+  });
+
+  it('should get story node link correctly', () => {
+    let storyNodeLink = '/explore/exp_1?topic_url_fragment=topic&' +
+    'classroom_url_fragment=math&story_url_fragment=story-title&' +
+    'node_id=node_1';
+
+    expect(component.getStoryNodeLink(sampleStorySummary)).toBe(storyNodeLink);
+  });
+
+  it('should get # as story node link url when classroom or topic url is ' +
+    'not present', () => {
+    const sampleStorySummaryBackendDict = {
+      id: '0',
+      title: 'Story Title',
+      description: 'Story Description',
+      node_titles: ['Chapter 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      story_is_published: true,
+      completed_node_titles: [],
+      url_fragment: 'story-title',
+      all_node_dicts: [nodeDict1],
+      topic_name: 'Topic',
+      classroom_url_fragment: undefined,
+      topic_url_fragment: 'topic'
+    };
+    const storySummary = StorySummary.createFromBackendDict(
+      sampleStorySummaryBackendDict);
+
+    expect(component.getStoryNodeLink(storySummary)).toBe('#');
   });
 });

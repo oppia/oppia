@@ -172,10 +172,14 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   getStoryNodeLink(storySummary: StorySummary): string {
     const classroomUrlFragment = storySummary.getClassroomUrlFragment();
     const topicUrlFragment = storySummary.getTopicUrlFragment();
-    let storyNodeToDisplay = storySummary.getAllNodes()[0];
-    storyNodeToDisplay = storySummary.getAllNodes().find(node => {
-      return !storySummary.getCompletedNodeTitles().includes(node.getTitle());
+    let storyNodeToDisplay = storySummary.getAllNodes().find(node => {
+      if (!storySummary.getCompletedNodeTitles().includes(node.getTitle())) {
+        return node;
+      }
     });
+    if (!storyNodeToDisplay) {
+      storyNodeToDisplay = storySummary.getAllNodes()[0];
+    }
     const explorationId = storyNodeToDisplay.getExplorationId();
     if (classroomUrlFragment === undefined || topicUrlFragment === undefined ||
       explorationId === null) {
