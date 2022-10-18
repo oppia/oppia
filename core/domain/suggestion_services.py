@@ -1705,59 +1705,6 @@ def check_can_resubmit_suggestion(suggestion_id: str, user_id: str) -> bool:
     return suggestion.author_id == user_id
 
 
-def _get_voiceover_application_class(
-    target_type: str
-) -> Type[suggestion_registry.ExplorationVoiceoverApplication]:
-    """Returns the voiceover application class for a given target type.
-
-    Args:
-        target_type: str. The target type of the voiceover application.
-
-    Returns:
-        class. The voiceover application class for the given target type.
-
-    Raises:
-        Exception. The voiceover application target type is invalid.
-    """
-    target_type_to_classes = (
-        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
-    if target_type in target_type_to_classes:
-        return target_type_to_classes[target_type]
-    else:
-        raise Exception(
-            'Invalid target type for voiceover application: %s' % target_type)
-
-
-def get_voiceover_application(
-    voiceover_application_id: str
-) -> suggestion_registry.BaseVoiceoverApplication:
-    """Returns the BaseVoiceoverApplication object for the give
-    voiceover application model object.
-
-    Args:
-        voiceover_application_id: str. The ID of the voiceover application.
-
-    Returns:
-        BaseVoiceoverApplication. The domain object out of the given voiceover
-        application model object.
-    """
-    voiceover_application_model = (
-        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-            voiceover_application_id))
-    voiceover_application_class = _get_voiceover_application_class(
-        voiceover_application_model.target_type)
-    return voiceover_application_class(
-        voiceover_application_model.id,
-        voiceover_application_model.target_id,
-        voiceover_application_model.status,
-        voiceover_application_model.author_id,
-        voiceover_application_model.final_reviewer_id,
-        voiceover_application_model.language_code,
-        voiceover_application_model.filename,
-        voiceover_application_model.content,
-        voiceover_application_model.rejection_message)
-
-
 def create_community_contribution_stats_from_model(
     community_contribution_stats_model: (
         suggestion_models.CommunityContributionStatsModel

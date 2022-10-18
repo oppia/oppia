@@ -708,30 +708,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             display_alias=self.GENERIC_DISPLAY_ALIAS_2
         ).put()
 
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_1_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id=self.USER_ID_1,
-            final_reviewer_id='reviewer_id',
-            language_code=self.SUGGESTION_LANGUAGE_CODE,
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None).put()
-
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_2_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id=self.USER_ID_1,
-            final_reviewer_id=None,
-            language_code=self.SUGGESTION_LANGUAGE_CODE,
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None).put()
-
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_user_id=self.USER_ID_1,
@@ -1648,27 +1624,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_topic_data = {
             'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
-        }
-
-        expected_voiceover_application_data = {
-            'application_1_id': {
-                'target_type': 'exploration',
-                'target_id': 'exp_id',
-                'status': 'review',
-                'language_code': 'en',
-                'filename': 'application_audio.mp3',
-                'content': '<p>Some content</p>',
-                'rejection_message': None
-            },
-            'application_2_id': {
-                'target_type': 'exploration',
-                'target_id': 'exp_id',
-                'status': 'review',
-                'language_code': 'en',
-                'filename': 'application_audio.mp3',
-                'content': '<p>Some content</p>',
-                'rejection_message': None
-            }
         }
 
         expected_contribution_rights_data = {
