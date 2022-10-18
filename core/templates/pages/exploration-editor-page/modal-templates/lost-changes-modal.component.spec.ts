@@ -25,6 +25,7 @@ import { LostChange, LostChangeObjectFactory } from
 
 import { LostChangesModalComponent } from './lost-changes-modal.component';
 import { LoggerService } from 'services/contextual/logger.service';
+import { UtilsService } from 'services/utils.service';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
@@ -52,19 +53,19 @@ describe('Lost Changes Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
-    utilsService: null,
-    getStatePropertyValue: null,
-    isEndingExploration: null,
-    isAddingInteraction: null,
-    isOldValueEmpty: null,
-    isNewValueEmpty: null,
-    isOutcomeFeedbackEqual: null,
-    isOutcomeDestEqual: null,
-    isDestEqual: null,
-    isFeedbackEqual: null,
-    isRulesEqual: null,
-    getRelativeChangeToGroups: null,
-    getLanguage: null
+    utilsService: new UtilsService,
+    isEndingExploration: () => false,
+    isAddingInteraction: () => false,
+    isOldValueEmpty: () => false,
+    isNewValueEmpty: () => false,
+    isOutcomeFeedbackEqual: () => false,
+    isOutcomeDestEqual: () => false,
+    isDestEqual: () => false,
+    isFeedbackEqual: () => false,
+    isRulesEqual: () => false,
+    getRelativeChangeToGroups: () => 'string',
+    getLanguage: () => 'en',
+    getStatePropertyValue: (value1) => 'string'
   } as LostChange];
 
   beforeEach(waitForAsync(() => {
