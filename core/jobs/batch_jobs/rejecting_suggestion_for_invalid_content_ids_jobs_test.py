@@ -21,13 +21,11 @@ rejecting_suggestion_for_invalid_content_ids_jobs.
 from __future__ import annotations
 
 from core import feconf
+from core.jobs import job_test_utils
 from core.jobs.batch_jobs import (
     rejecting_suggestion_for_invalid_content_ids_jobs)
-from core.jobs import job_test_utils
 from core.jobs.types import job_run_result
 from core.platform import models
-
-from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover

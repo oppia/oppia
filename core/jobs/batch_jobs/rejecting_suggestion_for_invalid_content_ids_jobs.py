@@ -74,8 +74,8 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
             exp_domain_obj.get_translatable_contents_collection())
 
         translatable_content_ids = []
-        for content_id in (
-            exp_translatable_contents.content_id_to_translatable_content.keys()
+        for content_id, _ in (
+            exp_translatable_contents.content_id_to_translatable_content.items()
         ):
             translatable_content_ids.append(content_id)
 
@@ -131,7 +131,7 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
                 'exploration': exploration_models
             }
             | 'Merge models' >> beam.CoGroupByKey()
-            | 'Remove keys' >> beam.Values()
+            | 'Remove keys' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Filter unwanted exploration' >> beam.Filter(
                 lambda objects: len(objects['suggestions']) != 0)
             | 'Transform and migrate model' >> beam.Map(
@@ -162,11 +162,13 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
 class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
     """Audits the suggestions and returns the results."""
 
+    # Here we use object because the beam job pcollection assumes that we are
+    # sending a type of Ptransform.
     @staticmethod
     def _report_errors_from_suggestion_models(
         suggestions: List[suggestion_models.GeneralSuggestionModel],
         exp_model: exp_models.ExplorationModel
-    ) -> List[Dict[str, List[Dict[str, str]]]]:
+    ) -> List[Dict[str, object]]:
         """Audits the translation suggestion. Reports the following
         - The info related to suggestion in case the content id is missing
         - Before and after content of the translation_html.
@@ -185,12 +187,13 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
         info_for_content_updation = []
         result_after_migrations = []
         exp_domain_obj = exp_fetchers.get_exploration_from_model(exp_model)
+        exp_id = str(exp_domain_obj.id)
         exp_translatable_contents = (
             exp_domain_obj.get_translatable_contents_collection())
 
         translatable_content_ids = []
-        for content_id in (
-            exp_translatable_contents.content_id_to_translatable_content.keys()
+        for content_id, _ in (
+            exp_translatable_contents.content_id_to_translatable_content.items()
         ):
             translatable_content_ids.append(content_id)
 
@@ -216,7 +219,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
 
         result_after_migrations.append(
             {
-                'exp_id': exp_domain_obj.id,
+                'exp_id': exp_id,
                 'missing_content_ids': info_for_missing_content_id,
                 'content_translation': info_for_content_updation
             }
@@ -265,7 +268,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
                 'exploration': exploration_models
             }
             | 'Merge models' >> beam.CoGroupByKey()
-            | 'Remove keys' >> beam.Values()
+            | 'Remove keys' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Filter unwanted exploration' >> beam.Filter(
                 lambda objects: len(objects['suggestions']) != 0)
             | 'Transform and migrate model' >> beam.Map(
