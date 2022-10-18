@@ -1879,8 +1879,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_collection_rights_data,
             'general_suggestion': expected_general_suggestion_data,
             'exploration_rights': expected_exploration_rights_data,
-            'general_voiceover_application':
-                expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
