@@ -51,6 +51,14 @@ class BeamJobRunHandlerNormalizedPayloadDict(TypedDict):
     job_id: str
 
 
+class BeamJobRunHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BeamJobRunHandler's normalized_request
+    dictionary.
+    """
+
+    job_id: str
+
+
 class BeamJobRunHandler(base.BaseHandler):
     """Handler for managing the execution of Apache Beam jobs."""
 
@@ -98,7 +106,7 @@ class BeamJobRunHandler(base.BaseHandler):
     @acl_decorators.can_run_any_job
     def delete(self) -> None:
         payload_data = cast(
-            BeamJobRunHandlerNormalizedPayloadDict, self.normalized_payload
+            BeamJobRunHandlerNormalizedRequestDict, self.normalized_request
         )
         job_id = payload_data['job_id']
         beam_job_run = beam_job_services.cancel_beam_job(job_id)
