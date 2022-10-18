@@ -159,6 +159,8 @@ import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualiz
 import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
 import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
 import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
+import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
+import { CopierComponent } from 'value_generators/templates/copier.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -469,6 +471,8 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
     VisualizationSortedTilesComponent,
+    CopierComponent,
+    RandomSelectorComponent
   ],
 
   exports: [
