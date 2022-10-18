@@ -291,7 +291,7 @@
     </div>
   </mat-card>
 
-  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames?.length > 0 && !explorationRightsService.isCloned()"
+  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()"
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('roles')">
@@ -312,7 +312,7 @@
           </span>
         </div>
 
-        <div [hidden]="!(explorationRightsService.ownerNames?.length > 0)">
+        <div [hidden]="!(explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0)">
           <strong>Managers</strong>
           <ul>
             <li *ngFor="let ownerName of explorationRightsService.ownerNames; let index = index">
@@ -325,7 +325,7 @@
           </ul>
         </div>
 
-        <div [hidden]="!(explorationRightsService.editorNames?.length > 0)">
+        <div [hidden]="!(explorationRightsService.editorNames && explorationRightsService.editorNames.length > 0)">
           <strong>Collaborators</strong>
           <ul>
             <li *ngFor="let editorName of explorationRightsService.editorNames; let index = index">
@@ -338,7 +338,7 @@
           </ul>
         </div>
 
-        <div [hidden]="!(explorationRightsService.viewerNames?.length > 0)">
+        <div [hidden]="!(explorationRightsService.viewerNames && explorationRightsService.viewerNames.length > 0)">
           <strong>Playtesters</strong>
           <ul>
             <li *ngFor="let viewerName of explorationRightsService.viewerNames; let index = index">
@@ -391,7 +391,7 @@
     </div>
   </mat-card>
 
-  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames?.length > 0 && !explorationRightsService.isCloned()"
+  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()"
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
@@ -407,7 +407,7 @@
       </div>
       <div class="oppia-mobile-collapsible-card-content" *ngIf="voiceArtistsCardIsShown">
         <div>
-          <div [hidden]="isVoiceoverFormOpen" class="oppia-no-voice-artist-message" *ngIf="!explorationRightsService.voiceArtistNames?.length">
+          <div [hidden]="isVoiceoverFormOpen" class="oppia-no-voice-artist-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
             No voice artists are assigned to this exploration.
           </div>
           <div *ngIf="canManageVoiceArtist" [hidden]="isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
@@ -417,7 +417,7 @@
           </div>
         </div>
 
-        <div [hidden]="!(explorationRightsService.voiceArtistNames?.length > 0)">
+        <div [hidden]="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length > 0)">
           <ul>
             <li *ngFor="let voiceArtistName of explorationRightsService.voiceArtistNames; let index = index">
               <div class="oppia-user-list-item .e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
@@ -493,7 +493,7 @@
           It is <strong>available</strong> in the Oppia library.
         </p>
 
-        <div *ngIf="explorationRightsService.ownerNames?.length === 0 && !explorationRightsService.isCloned()">
+        <div *ngIf="(explorationRightsService.ownerNames && explorationRightsService.ownerNames.length === 0) && !explorationRightsService.isCloned()">
           <h3>Permissions</h3>
           <div class="e2e-test-is-community-owned">
             This exploration is <strong>public</strong> and <strong>community-editable</strong>.
@@ -659,10 +659,10 @@
     <h3>Parameters used in this exploration</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div [hidden]="!(isEmpty(explorationParamSpecsService.savedMemento.getParamDict()))">
+        <div [hidden]="!(explorationParamSpecsService.savedMemento && explorationParamSpecsService.savedMemento.getParamDict())">
           <em>No parameters used.</em>
         </div>
-        <ol>
+        <ol *ngIf="explorationParamSpecsService.savedMemento">
           <li *ngFor="let item of explorationParamSpecsService.savedMemento.getParamDict() | keyvalue">
             <b>{{item.key}}</b> ({{item.value.getType().getName()}})
           </li>
@@ -680,8 +680,8 @@
 
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 e2e-test-exploration-edit-param-changes">
-        <param-changes-editor [paramChangesService]="explorationParamChangesService"
-                              [postSaveHook]="postSaveParamChangesHook"
+        <param-changes-editor [paramChangesServiceName]="'explorationParamChangesService'"
+                              [postSaveHook]="postSaveParamChangesHook.bind(this)"
                               [currentlyInSettingsTab]="true">
         </param-changes-editor>
       </div>

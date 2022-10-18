@@ -34,7 +34,20 @@ describe('NeedsGuidingResponsesTask component', function() {
   const stateName = 'Introduction';
   const totalAnswersCount = 50;
   let task = {targetId: stateName};
-  let stats = {answerStats: [], stateStats: {totalAnswersCount}};
+  let stats = {
+    answerStats: [],
+    stateStats: {
+      totalAnswersCount,
+      usefulFeedbackCount: null,
+      totalHitCount: null,
+      firstHitCount: null,
+      numTimesSolutionViewed: null,
+      numCompletions: null
+    },
+    cstPlaythroughIssues: null,
+    eqPlaythroughIssues: null,
+    misPlaythroughIssues: null
+  } as SupportingStateStats;
 
   class MockNgbModal {
     open() {
@@ -71,7 +84,7 @@ describe('NeedsGuidingResponsesTask component', function() {
     routerService = TestBed.inject(RouterService);
 
     component.task = task as NeedsGuidingResponsesTask;
-    component.stats = stats as unknown as SupportingStateStats;
+    component.stats = stats as SupportingStateStats;
     component.ngOnInit();
   });
 
