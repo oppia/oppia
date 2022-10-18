@@ -227,6 +227,11 @@ URLS = [
         access_validators.ReleaseCoordinatorAccessValidationHandler
     ),
 
+    get_redirect_route(
+        r'%s/does_learner_group_exist/<learner_group_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ViewLearnerGroupPageAccessValidationHandler),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -1034,8 +1039,6 @@ URLS = [
         learner_group.ExitLearnerGroupHandler),
     get_redirect_route(
         r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
-    get_redirect_route(
-        r'/learner-group/<group_id>', learner_group.ViewLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),

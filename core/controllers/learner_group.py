@@ -1012,40 +1012,6 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
         })
 
 
-class ViewLearnerGroupPage(base.BaseHandler):
-    """Page for learner view of a learner group."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'group_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
-                }]
-            },
-            'default_value': None
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.can_access_learner_groups
-    def get(self, group_id):
-        """Handles GET requests."""
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
-            raise self.PageNotFoundException
-
-        is_valid_request = learner_group_services.is_user_learner(
-            self.user_id, group_id)
-
-        if not is_valid_request:
-            raise self.PageNotFoundException
-
-        self.render_template('view-learner-group-page.mainpage.html')
-
-
 class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
     """The handler for fetching and updating progress sharing permissions of
     a learner for a given learner group.

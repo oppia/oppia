@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import config_services
+from core.domain import learner_group_fetchers
+from core.domain import learner_group_services
 from core.tests import test_utils
 
 ACCESS_VALIDATION_HANDLER_PREFIX = feconf.ACCESS_VALIDATION_HANDLER_PREFIX
@@ -153,4 +155,61 @@ class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         self.get_html_response( # type: ignore[no-untyped-call]
             '%s/can_manage_own_account' % ACCESS_VALIDATION_HANDLER_PREFIX)
+        self.logout()
+
+
+class ViewLearnerGroupPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase
+):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.facilitator_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.learner_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+        learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Title', 'Description',
+            [self.facilitator_id], [self.learner_id],
+            ['subtopic_id_1'], ['story_id_1'])
+
+        self.login(self.NEW_USER_EMAIL)
+
+    def test_validation_returns_false_with_learner_groups_feature_disabled(
+        self
+    ) -> None:
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', False)
+        self.get_json(
+            '%s/does_learner_group_exist/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                expected_status_int=404)
+        self.logout()
+
+    def test_validation_returns_false_with_user_not_being_a_learner(
+        self
+    ) -> None:
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', True)
+        self.get_json(
+            '%s/does_learner_group_exist/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                expected_status_int=404)
+        self.logout()
+
+    def test_validation_returns_true_for_valid_learner(self) -> None:
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.learner_id, False)
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', True)
+        self.get_html_response( # type: ignore[no-untyped-call]
+            '%s/does_learner_group_exist/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
         self.logout()

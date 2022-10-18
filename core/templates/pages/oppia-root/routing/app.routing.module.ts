@@ -195,7 +195,14 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/volunteer-page/volunteer-page.module')
       .then(m => m.VolunteerPageModule)
-  }
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_VIEWER.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/learner-group-pages/view-group/view-learner-group-page.module')
+      .then(m => m.ViewLearnerGroupPageModule)
+  },
 ];
 
 // Register stewards landing pages.

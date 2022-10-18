@@ -26,7 +26,6 @@ import { LearnerGroupBackendApiService } from
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { TranslateService } from '@ngx-translate/core';
-import { PageTitleService } from 'services/page-title.service';
 import { ViewLearnerGroupPageComponent } from './view-learner-group-page.component';
 import { ContextService } from 'services/context.service';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
@@ -58,9 +57,7 @@ describe('ViewLearnerGroupPageComponent', () => {
   let component: ViewLearnerGroupPageComponent;
   let fixture: ComponentFixture<ViewLearnerGroupPageComponent>;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
-  let translateService: TranslateService;
   let contextService: ContextService;
-  let pageTitleService: PageTitleService;
   let ngbModal: NgbModal;
   let loaderService: LoaderService;
   let windowRef: MockWindowRef;
@@ -141,8 +138,6 @@ describe('ViewLearnerGroupPageComponent', () => {
   beforeEach(() => {
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
-    translateService = TestBed.inject(TranslateService);
-    pageTitleService = TestBed.inject(PageTitleService);
     contextService = TestBed.inject(ContextService);
     ngbModal = TestBed.inject(NgbModal);
     loaderService = TestBed.inject(LoaderService);
@@ -170,13 +165,10 @@ describe('ViewLearnerGroupPageComponent', () => {
     ).and.returnValue(Promise.resolve(sampleLearnerGroupUserProg));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo));
-    spyOn(component, 'subscribeToOnLangChange');
-    spyOn(translateService.onLangChange, 'subscribe');
 
     component.ngOnInit();
     tick();
 
-    expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(component.activeTab).toEqual(
       LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.OVERVIEW);
     expect(component.learnerGroup).toEqual(learnerGroup);
@@ -184,51 +176,6 @@ describe('ViewLearnerGroupPageComponent', () => {
     expect(component.username).toBe('username1');
     expect(component.progressSharingPermission).toBe(true);
   }));
-
-  it('should call set page title whenever the language is changed',
-    fakeAsync(() => {
-      spyOn(learnerGroupBackendApiService, 'fetchLearnerGroupInfoAsync')
-        .and.returnValue(Promise.resolve(learnerGroup));
-      spyOn(
-        learnerGroupBackendApiService,
-        'fetchProgressSharingPermissionOfLearnerAsync'
-      ).and.returnValue(Promise.resolve(true));
-      spyOn(
-        learnerGroupSyllabusBackendApiService,
-        'fetchLearnerSpecificProgressInAssignedSyllabus'
-      ).and.returnValue(Promise.resolve(sampleLearnerGroupUserProg));
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(userInfo));
-
-      component.ngOnInit();
-      tick();
-      spyOn(component, 'setPageTitle').and.callThrough();
-      spyOn(translateService, 'instant').and.callThrough();
-      spyOn(pageTitleService, 'setDocumentTitle');
-
-      translateService.onLangChange.emit();
-
-      fixture.detectChanges();
-
-      expect(component.setPageTitle).toHaveBeenCalled();
-      expect(translateService.instant).toHaveBeenCalledWith(
-        'I18N_LEARNER_GROUP_PAGE_TITLE');
-      expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-        'I18N_LEARNER_GROUP_PAGE_TITLE');
-    })
-  );
-
-  it('should set page title', () => {
-    spyOn(translateService, 'instant').and.callThrough();
-    spyOn(pageTitleService, 'setDocumentTitle');
-
-    component.setPageTitle();
-
-    expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_LEARNER_GROUP_PAGE_TITLE');
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_LEARNER_GROUP_PAGE_TITLE');
-  });
 
   it('should set active tab and check if tab is active correctly', () => {
     component.setActiveTab(

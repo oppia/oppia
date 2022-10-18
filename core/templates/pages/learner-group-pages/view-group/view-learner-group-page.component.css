@@ -116,7 +116,7 @@
 }
 
 .learner-group-preferences-modal .modal-dialog {
-  margin: 100px auto;
+  margin: 150px auto;
 }
 
 .exit-learner-group-modal .modal-dialog {
@@ -150,6 +150,10 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+}
+
+.learner-group-preferences-modal .modal-body .mat-radio-button {
+  display: unset;
 }
 
 .learner-group-preferences-modal .modal-body .mat-radio-label {

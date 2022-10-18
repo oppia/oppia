@@ -208,7 +208,7 @@ def is_user_facilitator(user_id: str, group_id: str) -> bool:
 
 
 def is_user_learner(user_id: str, group_id: str) -> bool:
-    """Checks if the user is a learner of the leaner group.
+    """Checks if the user is a learner of the learner group.
 
     Args:
         user_id: str. The id of the user.

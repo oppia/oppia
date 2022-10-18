@@ -56,9 +56,16 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.LEARNER_GROUP_ID = (
             learner_group_fetchers.get_new_learner_group_id()
         )
+        self.LEARNER_GROUP_ID_2 = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
+            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
+            ['story_id_1'])
+        self.learner_group_2 = learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID_2, 'Learner Group 2', 'Description 2',
             [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
@@ -512,6 +519,8 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
     def test_update_progress_sharing_permission(self) -> None:
         learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.LEARNER_ID, True)
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID_2, self.LEARNER_ID, False)
 
         self.assertEqual(
             learner_group_fetchers.can_multi_learners_share_progress(

@@ -17,9 +17,12 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
+from core.domain import config_domain
+from core.domain import learner_group_services
 from core.domain import user_services
 
 from typing import Any, Dict # isort: skip
@@ -143,3 +146,44 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
     def get(self) -> None:
         """Handles GET requests."""
         pass
+
+
+class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
+    """Validates access to view learner group page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
+    # Type[str, Any] is used to match the type defined for this attribute in
+    # its parent class `base.BaseHandler`.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+        'GET': {}
+    }
+
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
+    @acl_decorators.can_access_learner_groups # type: ignore[misc]
+    def get(self, learner_group_id):
+        """Handles GET requests."""
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+            raise self.PageNotFoundException
+
+        is_valid_request = learner_group_services.is_user_learner(
+            self.user_id, learner_group_id)
+
+        if not is_valid_request:
+            raise self.PageNotFoundException

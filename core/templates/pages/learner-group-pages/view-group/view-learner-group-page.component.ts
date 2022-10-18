@@ -18,11 +18,9 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupBackendApiService } from
@@ -60,8 +58,6 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private loaderService: LoaderService,
-    private pageTitleService: PageTitleService,
-    private translateService: TranslateService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private contextService: ContextService,
     private userService: UserService,
@@ -97,21 +93,6 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
           });
       });
     }
-    this.subscribeToOnLangChange();
-  }
-
-  subscribeToOnLangChange(): void {
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitle();
-      })
-    );
-  }
-
-  setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_LEARNER_GROUP_PAGE_TITLE');
-    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   setActiveTab(newActiveTab: string): void {
