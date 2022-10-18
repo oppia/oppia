@@ -25,7 +25,7 @@ import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/acce
 import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
 import { ContextService } from 'services/context.service';
- 
+
 @Component({
   selector: 'oppia-view-learner-group-page-root',
   templateUrl: './view-learner-group-page-root.component.html'
