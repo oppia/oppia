@@ -101,6 +101,8 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
 import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
 import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
 import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
+import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
+import { CopierComponent } from 'value_generators/templates/copier.component';
 
 @NgModule({
   imports: [
@@ -249,7 +251,9 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
-    ExplorationEditorPageComponent
+    ExplorationEditorPageComponent,
+    CopierComponent,
+    RandomSelectorComponent
   ],
   providers: [
     {

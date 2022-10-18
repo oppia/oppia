@@ -38,6 +38,9 @@
   .oppia-card-parameter {
     opacity: 0.7;
   }
+  .oppia-param-editor-row {
+    margin-bottom: 15px;
+  }
 </style>
 
 <!--
@@ -60,15 +63,12 @@
       </span>
       <span>
         Change
-        <mat-form-field appearance="fill" class="e2e-test-history-version-dropdown-first">
-          <mat-label>Revision #1 :</mat-label>
-          <mat-select [(value)]="paramChange.generatorId" (change)="onChangeGeneratorType(paramChange)" disableRipple>
-            <mat-option *ngFor="let choice of PREAMBLE_TEXT | keyvalue; index as index"
-                        [value]="choice.key"
-                        (click)="changeSelectedVersions(firstVersion, 1)">{{ choice.value }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+        <select class="form-control e2e-test-history-version-dropdown-first"
+                [(ngModel)]="paramChange.generatorId"
+                (change)="onChangeGeneratorType(paramChange)">
+          <option *ngFor="let choice of PREAMBLE_TEXT | keyvalue; index as index" [value]="choice.key">{{ choice.value }}</option>
+        </select>
+        <br>
         <oppia-value-generator-editor [generatorId]="paramChange.generatorId"
                                       [customizationArgs]="paramChange.customizationArgs"
                                       [objType]="'UnicodeString'">
