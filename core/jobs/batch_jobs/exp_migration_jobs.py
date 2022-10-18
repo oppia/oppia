@@ -235,9 +235,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     .update_opportunity_with_updated_exploration(
                         migrated_exp.id))
             exp_versions_diff = (
-                exp_domain.ExplorationVersionsDiff(
-                    [change for change in exp_changes]
-                )
+                exp_domain.ExplorationVersionsDiff(list(exp_changes))
             )
             # Trigger statistics model update.
             new_exp_stats = stats_services.get_stats_for_new_exp_version(
