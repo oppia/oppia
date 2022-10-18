@@ -110,8 +110,6 @@
 /core/controllers/blog_homepage*.py @oppia/lace-backend-reviewers
 /core/templates/domain/blog/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-dashboard-page/ @oppia/lace-frontend-reviewers
-/core/templates/pages/blog-home-page/ @oppia/lace-frontend-reviewers
-/core/templates/pages/blog-post-page/ @oppia/lace-frontend-reviewers
 
 # Collection project.
 /core/controllers/collection*.py @oppia/lace-backend-reviewers
@@ -132,6 +130,7 @@
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
+/scripts/contributor_dashboard_debug.py @oppia/contributor-experience-team
 
 
 # Core documentation
@@ -225,7 +224,6 @@
 /core/templates/pages/exploration-editor-page/settings-tab/ @oppia/lace-frontend-reviewers
 /core/templates/pages/exploration-player-page/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
-/core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/context.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
@@ -352,8 +350,8 @@
 /core/domain/playthrough_issue_registry*.py @oppia/learner-analytics-reviewers
 /core/domain/stats*.py @oppia/learner-analytics-reviewers
 /core/domain/visualization_registry*.py @oppia/learner-analytics-reviewers
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @oppia/learner-analytics-reviewers
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component*.ts @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.html @oppia/learner-analytics-reviewers
 /core/templates/components/statistics-directives/ @oppia/learner-analytics-reviewers
 /core/templates/domain/statistics/ @oppia/learner-analytics-reviewers
 /core/templates/domain/improvements/ @oppia/learner-analytics-reviewers
@@ -547,6 +545,7 @@
 /core/templates/pages/admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/moderator-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-admin-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/classroom-admin-page/ @oppia/lace-frontend-reviewers
 
 
 # Release team.
@@ -683,19 +682,10 @@
 /assets/ @oppia/data-and-stability-reviewers
 /data/ @oppia/data-and-stability-reviewers
 /core/templates/karma.module.ts @oppia/lace-frontend-reviewers
-/core/tests/protractor_utils/ @oppia/automated-qa-reviewers
-/core/tests/protractor_desktop/ @oppia/automated-qa-reviewers
-/core/tests/protractor/ @oppia/automated-qa-reviewers
-/core/tests/protractor.conf.js @oppia/automated-qa-reviewers
 /core/tests/webdriverio_utils/ @oppia/automated-qa-reviewers
 /core/tests/webdriverio_desktop/ @oppia/automated-qa-reviewers
 /core/tests/webdriverio/ @oppia/automated-qa-reviewers
 /core/tests/wdio.conf.js @oppia/automated-qa-reviewers
-/extensions/interactions/*/protractor.js @oppia/automated-qa-reviewers
-/extensions/interactions/protractor.js @oppia/automated-qa-reviewers
-/extensions/rich_text_components/*/protractor.js @oppia/automated-qa-reviewers
-/extensions/rich_text_components/protractor.js @oppia/automated-qa-reviewers
-/extensions/objects/protractor.js @oppia/automated-qa-reviewers
 /extensions/interactions/*/webdriverio.js @oppia/automated-qa-reviewers
 /extensions/interactions/webdriverio.js @oppia/automated-qa-reviewers
 /extensions/rich_text_components/*/webdriverio.js @oppia/automated-qa-reviewers

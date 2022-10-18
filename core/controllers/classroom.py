@@ -113,6 +113,18 @@ class DefaultClassroomRedirectPage(base.BaseHandler):
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
+class ClassroomAdminPage(base.BaseHandler):
+    """Renders the classroom admin page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        """Handles GET requests."""
+        self.render_template('classroom-admin-page.mainpage.html')
+
+
 class ClassroomAdminDataHandler(base.BaseHandler):
     """Fetches relevant data for the classroom admin page."""
 
@@ -201,4 +213,32 @@ class ClassroomHandler(base.BaseHandler):
     def delete(self, classroom_id):
         """Deletes classroom from the classroom admin page."""
         classroom_config_services.delete_classroom(classroom_id)
+        self.render_json(self.values)
+
+
+class ClassroomUrlFragmentHandler(base.BaseHandler):
+    """A data handler for checking if a classroom with given url fragment
+    exists.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def get(self, classroom_url_fragment):
+        """Get request to check whether a classroom with given exists."""
+        classroom_url_fragment_exists = False
+        if classroom_config_services.get_classroom_by_url_fragment(
+                classroom_url_fragment):
+            classroom_url_fragment_exists = True
+
+        self.values.update({
+            'classroom_url_fragment_exists': classroom_url_fragment_exists
+        })
         self.render_json(self.values)

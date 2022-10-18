@@ -256,6 +256,9 @@ describe('Splash Page', () => {
   });
 
   it('should show android button if the feature is enabled', () => {
+    // The androidPageIsEnabled property is set when the component is
+    // constructed and the value is not modified after that so there is no
+    // pre-check for this test.
     mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
 
     const component = TestBed.createComponent(SplashPageComponent);

@@ -22,23 +22,29 @@ from proto_files import state_pb2
 
 RULE_SPEC_DTO = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
+from typing import List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class FractionInput(base.BaseInteraction):
     """Interaction for fraction input."""
 
-    name = 'Fraction Input'
-    description = 'Allows learners to enter integers and fractions.'
-    display_mode = base.DISPLAY_MODE_INLINE
-    is_trainable = False
-    _dependency_ids = []
-    answer_type = 'Fraction'
-    instructions = None
-    narrow_instructions = None
-    needs_summary = False
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Fraction Input'
+    description: str = 'Allows learners to enter integers and fractions.'
+    display_mode: str = base.DISPLAY_MODE_INLINE
+    is_trainable: bool = False
+    _dependency_ids: List[str] = []
+    answer_type: str = 'Fraction'
+    instructions: Optional[str] = None
+    narrow_instructions: Optional[str] = None
+    needs_summary: bool = False
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'requireSimplestForm',
         'description': 'Require the learner\'s answer to be in simplest form',
         'schema': {
@@ -72,7 +78,7 @@ class FractionInput(base.BaseInteraction):
         }
     }]
 
-    _answer_visualization_specs = [{
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
