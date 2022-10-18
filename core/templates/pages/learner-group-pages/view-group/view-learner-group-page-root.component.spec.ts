@@ -97,7 +97,7 @@ describe('View Learner Group Page Root', () => {
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(accessValidationBackendApiService.doesLearnerGroupExist)
-        .toHaveBeenCalled();
+      .toHaveBeenCalled();
     expect(component.pageIsShown).toBeTrue();
     expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
