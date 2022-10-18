@@ -25,8 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import Dict, List, Optional
-from typing_extensions import TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 # TODO(#15105): Refactor UserSettings to limit the number of Optional

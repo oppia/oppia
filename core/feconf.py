@@ -25,8 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, List, Union
-from typing_extensions import Final, TypedDict
+from typing import Callable, Dict, Final, List, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
