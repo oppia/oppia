@@ -898,7 +898,7 @@ class ExpSnapshotsMigrationAuditJobTests(
                 )
             ])
 
-    def test_audit_job_handles_missing_states_schema_version(self):
+    def test_audit_job_handles_missing_states_schema_version(self) -> None:
         swap_exp_schema_37 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37)
         with swap_exp_schema_37:
@@ -1215,7 +1215,7 @@ class ExpSnapshotsMigrationJobTests(
                 )
             ])
 
-    def test_audit_job_handles_missing_states_schema_version(self):
+    def test_audit_job_handles_missing_states_schema_version(self) -> None:
         swap_exp_schema_37 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37)
         with swap_exp_schema_37:
