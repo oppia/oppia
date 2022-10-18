@@ -31,7 +31,8 @@
       <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
         <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
-        <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
+        <button *ngIf="isConceptCardButtonVisible()"
+              class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
               (click)="showConceptCard()">
             <mat-icon>description</mat-icon>
         </button>

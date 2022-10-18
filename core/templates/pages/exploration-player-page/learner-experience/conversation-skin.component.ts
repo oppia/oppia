@@ -274,15 +274,15 @@ export class ConversationSkinComponent {
             );
           })
       );
-      
-      this.directiveSubscriptions.add(
-        this.conceptCardManagerService.onLearnerGetsReallyStuck
-          .subscribe(() => {
-            this.isLearnerReallyStuck = true;
-            console.log("Receiving val of learnerIsStuck");
-          })
-      );
     }
+
+    this.directiveSubscriptions.add(
+      this.conceptCardManagerService.onLearnerGetsReallyStuck
+        .subscribe(() => {
+          this.isLearnerReallyStuck = true;
+          console.log("Receiving val of learnerIsStuck");
+        })
+    );
 
     this.directiveSubscriptions.add(
       this.explorationPlayerStateService.onPlayerStateChange.subscribe(
@@ -1119,7 +1119,6 @@ export class ConversationSkinComponent {
           taggedSkillMisconceptionId, wasOldStateInitial,
           isFirstHit, isFinalQuestion, focusLabel) => {
         this.nextCard = nextCard;
-        console.log(this.conceptCardManagerService.isLearnerReallyStuck());
         if (!this._editorPreviewMode &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
           let oldStateName =

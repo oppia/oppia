@@ -64,6 +64,7 @@ export class ConceptCardManagerService {
     playerPositionService.onNewCardAvailable.subscribe(
       () => {
         this.correctAnswerSubmitted = true;
+        this.conceptCardReleased = false;
         this.tooltipIsOpen = false;
       }
     );
@@ -96,10 +97,6 @@ export class ConceptCardManagerService {
     this._timeoutElapsedEventEmitter.emit();
   }
 
-  isLearnerReallyStuck(): boolean {
-    return this.learnerIsReallyStuck;
-  }
-
   emitLearnerStuckedness(): void {
     console.log("Learner stuckness is emitted");
     if (!this.learnerIsReallyStuck) {
@@ -117,9 +114,7 @@ export class ConceptCardManagerService {
       this.tooltipTimeout = null;
     }
     this.conceptCardConsumed = true;
-
     this.wrongAnswersSinceConceptCardConsumed = 0;
-
     let funcToEnqueue = null;
     // Here we add func to enque that would wait for
     // 2 mins to dictate whether the leaner is stuck.
@@ -142,6 +137,7 @@ export class ConceptCardManagerService {
     this.conceptCardReleased = false;
     this.conceptCardConsumed = false;
     this.correctAnswerSubmitted = false;
+    this.wrongAnswersSinceConceptCardConsumed = 0;
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
