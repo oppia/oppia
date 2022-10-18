@@ -654,7 +654,7 @@ def check_can_edit_activity(
 
     if (
         user.user_id and (
-            activity_rights.is_owner(user.user_id) 
+            activity_rights.is_owner(user.user_id)
             or activity_rights.is_editor(user.user_id)
         )
     ):

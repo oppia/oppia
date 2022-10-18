@@ -962,7 +962,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         ):
             rights_manager.publish_exploration(guest_user, 'exp_id')
 
-
     def test_guest_user_cannot_unpublish_exploration_activities(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(

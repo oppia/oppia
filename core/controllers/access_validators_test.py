@@ -22,7 +22,9 @@ from core.tests import test_utils
 
 from typing_extensions import Final
 
-ACCESS_VALIDATION_HANDLER_PREFIX: Final = feconf.ACCESS_VALIDATION_HANDLER_PREFIX
+ACCESS_VALIDATION_HANDLER_PREFIX: Final = (
+    feconf.ACCESS_VALIDATION_HANDLER_PREFIX
+)
 
 
 class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):

@@ -298,7 +298,7 @@ def reject_voiceover_application(
 
     reviewer = user_services.get_user_actions_info(reviewer_id)
 
-    # Note to sahil: confirm this behavior before merging the PR. 
+    # Note to sahil: confirm this behavior before merging the PR.
     assert reviewer.user_id is not None
 
     voiceover_application.reject(reviewer.user_id, rejection_message)
