@@ -3348,6 +3348,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for translation in choice_translations.values():
                 translation['needs_update'] = True
 
+            choice_voiceovers = state_dict['recorded_voiceovers'][
+                'voiceovers_mapping'][content_id]
+            for choice_voiceover in choice_voiceovers.values():
+                choice_voiceover['needs_update'] = True
+
         # Fix RTE content present inside the choices.
         for choice in choices:
             choice_html = choice['html']
@@ -3616,6 +3621,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'translations_mapping'][content_id]
             for translation in continue_button_translations.values():
                 translation['needs_update'] = True
+
+            choice_voiceovers = state_dict['recorded_voiceovers'][
+                'voiceovers_mapping'][content_id]
+            for choice_voiceover in choice_voiceovers.values():
+                choice_voiceover['needs_update'] = True
 
     @classmethod
     def _fix_end_interaction(cls, state_dict: state_domain.StateDict) -> None:

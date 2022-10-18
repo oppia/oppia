@@ -7459,7 +7459,12 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_0: {}
+        ca_buttonText_0:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
         content: {}
         default_outcome: {}
     solicit_answer_details: false
@@ -7595,7 +7600,12 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_0: {}
+        ca_buttonText_0:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
         content: {}
         default_outcome: {}
     solicit_answer_details: false
@@ -7711,7 +7721,12 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_0: {}
+        ca_buttonText_0:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
         content: {}
         default_outcome: {}
     solicit_answer_details: false
@@ -7812,7 +7827,12 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_0: {}
+        ca_buttonText_0:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
         content: {}
         default_outcome: {}
     solicit_answer_details: false
@@ -9329,7 +9349,12 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_13: {}
+        ca_choices_13:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
         ca_choices_14: {}
         ca_choices_15: {}
         ca_choices_16: {}
@@ -9469,7 +9494,12 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_13: {}
+        ca_choices_13:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
         ca_choices_14: {}
         ca_choices_15: {}
         content: {}
