@@ -3068,7 +3068,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _remove_unwanted_content_ids_from_translations_and_voiceovers(
+    def _remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
         cls, state_dict: state_domain.StateDict, state_schema: int
     ) -> None:
         """Helper function to remove the content IDs from the translations
@@ -3175,7 +3175,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
+            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
                 state_dict, state_schema=51)
 
         return states_dict
@@ -4428,7 +4428,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         state_dict, state_name)
 
             # Update translations and voiceovers.
-            cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
+            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
                 state_dict, state_schema=52)
 
         return states_dict
@@ -4813,7 +4813,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state['interaction']['hints'] = hints
 
             # Update translations and voiceovers.
-            cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
+            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
                 state, state_schema=52)
 
         return states_dict

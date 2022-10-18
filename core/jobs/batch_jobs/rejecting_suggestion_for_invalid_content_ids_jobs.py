@@ -31,7 +31,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, List
+from typing import Dict, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -162,13 +162,11 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
 class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
     """Audits the suggestions and returns the results."""
 
-    # Here we use object because the beam job pcollection assumes that we are
-    # sending a type of Ptransform.
     @staticmethod
     def _report_errors_from_suggestion_models(
         suggestions: List[suggestion_models.GeneralSuggestionModel],
         exp_model: exp_models.ExplorationModel
-    ) -> List[Dict[str, object]]:
+    ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
         """Audits the translation suggestion. Reports the following
         - The info related to suggestion in case the content id is missing
         - Before and after content of the translation_html.
@@ -185,7 +183,8 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
         """
         info_for_missing_content_id = []
         info_for_content_updation = []
-        result_after_migrations = []
+        result_after_migrations: (
+            List[Dict[str, Union[str, List[Dict[str, str]]]]]) = []
         exp_domain_obj = exp_fetchers.get_exploration_from_model(exp_model)
         exp_id = str(exp_domain_obj.id)
         exp_translatable_contents = (
