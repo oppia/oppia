@@ -836,9 +836,9 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                 states=exp_snapshot_model.content['states']
             )
         )
-        while (
+        while ( # pragma: no branch
             current_state_schema_version < target_state_schema_version
-        ): # pragma: no branch
+        ):
             try:
                 with datastore_services.get_ndb_context():
                     exp_domain.Exploration.update_states_from_model(
@@ -852,7 +852,7 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                     'v%s: %s' % (
                         exp_id, current_state_schema_version + 1, e))
                 logging.exception(error_message)
-                return result.Err((exp_id, error_message))
+                return result.Err((exp_id, Exception(error_message)))
 
             if target_state_schema_version == current_state_schema_version:
                 return result.Ok((exp_id, 'SUCCESS'))
@@ -992,7 +992,7 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
                     'v%s: %s' % (
                         exp_id, current_state_schema_version + 1, e))
                 logging.exception(error_message)
-                return result.Err((exp_id, error_message))
+                return result.Err((exp_id, Exception(error_message)))
 
         exp_snapshot_model.content['states'] = (
             versioned_exploration_states['states']

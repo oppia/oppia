@@ -828,9 +828,9 @@ class ExpSnapshotsMigrationAuditJobTests(
                 job_run_result.JobRunResult(
                     stdout='',
                     stderr=(
-                        'EXP PROCESSED ERROR: "(\'exp_id0\', "Exploration '
-                        'snapshot exp_id0 failed migration to states v42: '
-                        '\'property_that_dne\'")": 1'
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("'
+                        'Exploration snapshot exp_id0 failed migration to '
+                        'states v42: \'property_that_dne\'"))": 1'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -947,11 +947,11 @@ class ExpSnapshotsMigrationAuditJobTests(
                     job_run_result.JobRunResult(
                         stdout='',
                         stderr=(
-                            'EXP PROCESSED ERROR: "(\'exp_id0\', "'
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("'
                             'Exploration snapshot exp_id0 failed migration to '
                             'states v1: type object \'Exploration\' has no '
                             'attribute \'_convert_states_v0_dict_to_v1_dict\''
-                            '")": 1'
+                            '"))": 1'
                         )
                     ),
                     job_run_result.JobRunResult(
@@ -1201,9 +1201,9 @@ class ExpSnapshotsMigrationJobTests(
                 job_run_result.JobRunResult(
                     stdout='',
                     stderr=(
-                        'EXP PROCESSED ERROR: "(\'exp_id0\', "Exploration '
-                        'snapshot exp_id0 failed migration to states v42: '
-                        '\'property_that_dne\'")": 1'
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("'
+                        'Exploration snapshot exp_id0 failed migration to '
+                        'states v42: \'property_that_dne\'"))": 1'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -1264,11 +1264,11 @@ class ExpSnapshotsMigrationJobTests(
                     job_run_result.JobRunResult(
                         stdout='',
                         stderr=(
-                            'EXP PROCESSED ERROR: "(\'exp_id0\', "'
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("'
                             'Exploration snapshot exp_id0 failed migration to '
                             'states v1: type object \'Exploration\' has no '
                             'attribute \'_convert_states_v0_dict_to_v1_dict\''
-                            '")": 1'
+                            '"))": 1'
                         )
                     ),
                     job_run_result.JobRunResult(
