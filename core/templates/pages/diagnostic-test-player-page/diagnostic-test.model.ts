@@ -16,6 +16,9 @@
  * @fileoverview Diagnostic test model.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
+
+
 
 interface TopicIdToRelatedTopicIds {
   [topicId: string]: string[];
@@ -67,16 +70,25 @@ export class DiagnosticTestModelData {
     this._topicIdToAncestorTopicIds = {};
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
       let ancestors = [];
-      let prerequisites = this._topicIdToPrerequisiteTopicIds[topicId];
+      let prerequisites = cloneDeep(this._topicIdToPrerequisiteTopicIds[topicId]);
 
       while (prerequisites.length > 0) {
         let len = prerequisites.length;
         let lastTopicId = prerequisites[len - 1];
         prerequisites.splice(len - 1, 1);
-        ancestors.push(lastTopicId);
+        if (ancestors.indexOf(lastTopicId) === -1) {
+          ancestors.push(lastTopicId);
+        }
+
+        prerequisites = prerequisites.concat(
+          this._topicIdToPrerequisiteTopicIds[lastTopicId]);
       }
       this._topicIdToAncestorTopicIds[topicId] = ancestors;
     }
+  }
+
+  getTopicIdToAncestorTopicIds(): TopicIdToRelatedTopicIds {
+    return this._topicIdToAncestorTopicIds;
   }
 
   setTopicIdToSuccessorTopicIds(): void {
@@ -91,6 +103,7 @@ export class DiagnosticTestModelData {
         topicIdToChildTopicId[prerequisiteTopicId].push(topicid);
       }
     }
+
     this._topicIdToSuccessorTopicIds = {};
     for (let topicid in topicIdToChildTopicId) {
       let successors = [];
@@ -101,9 +114,17 @@ export class DiagnosticTestModelData {
         let lastTopicId = children[len - 1];
         children.splice(len - 1, 1);
         successors.push(lastTopicId);
+
+        children = children.concat(
+          this._topicIdToSuccessorTopicIds[lastTopicId]);
       }
       this._topicIdToSuccessorTopicIds[topicid] = successors;
+      console.log(this._topicIdToSuccessorTopicIds);
     }
+  }
+
+  getTopicIdToSuccessorTopicIds(): TopicIdToRelatedTopicIds {
+    return this._topicIdToSuccessorTopicIds;
   }
 
   getAncestorsTopicIds(topicId: string): string[] {
