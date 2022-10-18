@@ -648,6 +648,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this._initTab(true);
   }
 
+  ngOnChanges() {
+    this.changeDetectorRef.detectChanges();
+  }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
