@@ -21,8 +21,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 
 @Component({
@@ -31,18 +29,13 @@ import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_ski
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL!: string;
-  diagnosticTestData;
   classroomId!: string;
   diagnosticTestStarted: boolean = false;
-  questionPlayerConfig;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private preventPageUnloadEventService: PreventPageUnloadEventService,
-    private classroomBackendApiService: ClassroomBackendApiService,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {}
 
   ngOnInit(): void {

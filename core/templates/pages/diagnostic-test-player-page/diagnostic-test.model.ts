@@ -36,9 +36,9 @@ export interface DiagnosticTestModel {
   _topicIdToSuccessorTopicIds: TopicIdToRelatedTopicIds;
   setTopicIdToAncestorTopicIds: () => void;
   setTopicIdToSuccessorTopicIds: () => void;
-  getAncestorsTopicIds: (string) => string[];
-  getSuccessorTopicIds: (string) => string[];
-  incrementNumberOfAttemptedQuestions: (number) => void;
+  getAncestorsTopicIds: (topicId: string) => string[];
+  getSuccessorTopicIds: (topicId: string) => string[];
+  incrementNumberOfAttemptedQuestions: (incrementByValue: number) => void;
   recordTopicPassed: () => void;
   recordTopicFailed: () => void;
   isTestFinished: () => boolean;
@@ -61,7 +61,14 @@ export class DiagnosticTestModelData {
 
   constructor(topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds) {
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
-
+    this._totalNumberOfAttemptedQuestions = 0;
+    this._eligibleTopicIds = Object.keys(this._topicIdToPrerequisiteTopicIds);
+    this._skippedTopicIds = [];
+    this._passedTopicIds = [];
+    this._failedTopicIds = [];
+    this._currentTopicId = '';
+    this._topicIdToAncestorTopicIds = {};
+    this._topicIdToSuccessorTopicIds = {};
     this.setTopicIdToAncestorTopicIds();
     this.setTopicIdToSuccessorTopicIds();
   }
@@ -93,7 +100,7 @@ export class DiagnosticTestModelData {
   }
 
   setTopicIdToSuccessorTopicIds(): void {
-    let topicIdToChildTopicId = {};
+    let topicIdToChildTopicId: TopicIdToRelatedTopicIds = {};
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
       topicIdToChildTopicId[topicId] = [];
     }
@@ -143,7 +150,7 @@ export class DiagnosticTestModelData {
     let ancestors = this._topicIdToAncestorTopicIds[this._currentTopicId];
     this._passedTopicIds.push(this._currentTopicId);
 
-    let topicIdsToRemoveFromEligibleList = [];
+    let topicIdsToRemoveFromEligibleList: string[] = [];
     topicIdsToRemoveFromEligibleList.concat(ancestors);
     topicIdsToRemoveFromEligibleList.push(this._currentTopicId);
 
@@ -161,7 +168,7 @@ export class DiagnosticTestModelData {
     let successors = this._topicIdToSuccessorTopicIds[this._currentTopicId];
     this._failedTopicIds.push(this._currentTopicId);
 
-    let topicIdsToRemoveFromEligibleList = [];
+    let topicIdsToRemoveFromEligibleList: string[] = [];
     topicIdsToRemoveFromEligibleList.concat(successors);
     topicIdsToRemoveFromEligibleList.push(this._currentTopicId);
 
@@ -215,11 +222,14 @@ export class DiagnosticTestModelData {
   }
 
   setCurrentTopicId(): void {
-    let topicIdToLengthOfExpectedRemoval = {};
-    let lengthOfAncestorTopicIds, lengthOfSuccessorTopicIds;
+    let topicIdToLengthOfExpectedRemoval: {[topicId: string]: number} = {};
+    let lengthOfAncestorTopicIds: number;
+    let lengthOfSuccessorTopicIds: number;
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
-      lengthOfAncestorTopicIds = this._topicIdToAncestorTopicIds[topicId];
-      lengthOfSuccessorTopicIds = this._topicIdToSuccessorTopicIds[topicId];
+      lengthOfAncestorTopicIds = (
+        this._topicIdToAncestorTopicIds[topicId].length);
+      lengthOfSuccessorTopicIds = (
+        this._topicIdToSuccessorTopicIds[topicId].length);
 
       topicIdToLengthOfExpectedRemoval[topicId] = Math.min(
         lengthOfAncestorTopicIds, lengthOfSuccessorTopicIds);
