@@ -19,7 +19,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 
-
 interface TopicIdToRelatedTopicIds {
   [topicId: string]: string[];
 }

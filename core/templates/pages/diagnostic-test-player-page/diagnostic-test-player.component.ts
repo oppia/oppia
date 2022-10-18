@@ -28,9 +28,7 @@ import { PreventPageUnloadEventService } from 'services/prevent-page-unload-even
   templateUrl: './diagnostic-test-player.component.html'
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
-  OPPIA_AVATAR_IMAGE_URL!: string;
-  classroomId!: string;
-  diagnosticTestStarted: boolean = false;
+  OPPIA_AVATAR_IMAGE_URL: string = '';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -39,10 +37,14 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.preventPageUnloadEventService.addListener();
+    this.getOppiaAvatarImageURL();
+  }
+
+  getOppiaAvatarImageURL(): void {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
-    this.preventPageUnloadEventService.addListener();
   }
 
   returnBackToClassroom(): void {
