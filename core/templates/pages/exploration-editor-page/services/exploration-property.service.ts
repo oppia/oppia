@@ -70,7 +70,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string | boolean | ParamChange[]): void {
+  init(value: string | boolean | ParamChange[] | ParamSpecs): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }

@@ -290,7 +290,7 @@ export class ExplorationSaveService {
     });
   }
 
-  get onInitExplorationPage(): unknown {
+  get onInitExplorationPage(): EventEmitter<void> {
     return this._initExplorationPageEventEmitter;
   }
 
