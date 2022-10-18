@@ -25,7 +25,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicRightsBackendApiService, TopicRightsBackendResponse } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -55,7 +55,6 @@ describe('Topic Editor Navbar', () => {
   let fixture: ComponentFixture<TopicEditorNavbarComponent>;
   let componentInstance: TopicEditorNavbarComponent;
   let topicEditorStateService: TopicEditorStateService;
-  let topicObjectFactory: TopicObjectFactory;
   let urlService: UrlService;
   let topic: Topic;
   let undoRedoService: UndoRedoService;
@@ -97,7 +96,6 @@ describe('Topic Editor Navbar', () => {
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     ngbModal = TestBed.inject(NgbModal);
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     urlService = TestBed.inject(UrlService);
     undoRedoService = TestBed.inject(UndoRedoService);
     alertsService = TestBed.inject(AlertsService);
@@ -109,7 +107,11 @@ describe('Topic Editor Navbar', () => {
     subtopic.setUrlFragment('dummy-url');
     let skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
-    topic = topicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
     topic._skillSummariesForDiagnosticTest = [skillSummary];
@@ -137,9 +139,6 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.topicSkillIds).toEqual(['skill_1']);
     expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
     expect(componentInstance.validationIssues).toEqual([]);
-    expect(componentInstance.topicRights).toEqual(
-      TopicRights.createInterstitialRights()
-    );
   });
 
   it('should validate topic when topic is initialised', () => {

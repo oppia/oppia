@@ -132,7 +132,7 @@ describe('Learner dashboard page', () => {
     version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
-
+    auto_tts_enabled: true,
   };
 
   let titleList = [
