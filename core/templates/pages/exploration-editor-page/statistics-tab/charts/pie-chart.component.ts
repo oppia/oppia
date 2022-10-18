@@ -29,14 +29,14 @@ export type ChartLegendPosition = (
   templateUrl: './pie-chart.component.html'
 })
 export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
-   @ViewChild('pieChart') pieChart: ElementRef;
+   @ViewChild('pieChart') pieChart!: ElementRef;
 
    // A read-only array representing the table of chart data.
-   @Input() data: string[];
+   @Input() data!: string[];
    // A read-only object containing several chart options. This object
    // should have the following keys: pieHole, pieSliceTextStyleColor,
    // chartAreaWidth, colors, height, legendPosition, width.
-   @Input() options: {
+   @Input() options!: {
      chartAreaWidth: number;
      colors: string[];
      height: number;
@@ -50,7 +50,7 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
    };
 
    directiveSubscriptions = new Subscription();
-   chart: google.visualization.PieChart;
+   chart!: google.visualization.PieChart;
 
    constructor(
      private windowDimensionsService: WindowDimensionsService,

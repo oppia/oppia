@@ -28,12 +28,12 @@ import { RouterService } from '../services/router.service';
   templateUrl: './needs-guiding-responses-task.component.html'
 })
 export class NeedsGuidingResponsesTaskComponent implements OnInit {
-   @Input() stats: SupportingStateStats;
-   @Input() task: NeedsGuidingResponsesTask;
+   @Input() stats!: SupportingStateStats;
+   @Input() task!: NeedsGuidingResponsesTask;
 
-   sortedTilesData: AnswerStats[];
-   sortedTilesTotalFrequency: number;
-   sortedTilesOptions: {
+   sortedTilesData!: AnswerStats[];
+   sortedTilesTotalFrequency!: number;
+   sortedTilesOptions!: {
      header: string;
      use_percentages: boolean;
    };

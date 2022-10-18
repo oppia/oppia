@@ -19,6 +19,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+// This throws "Object is possibly undefined." The type undefined
+// comes here from ngx joyride dependency. We need to suppress this
+// error because of strict type checking.
+// @ts-ignore
 import { JoyrideService } from 'ngx-joyride';
 import { Subscription } from 'rxjs';
 import { WelcomeTranslationModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
@@ -51,10 +55,10 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
   _ID_TUTORIAL_TRANSLATION_OVERVIEW: string = (
     '#tutorialTranslationOverview');
 
-  isTranslationTabBusy: boolean;
-  tutorialInProgress: boolean;
-  showTranslationTabSubDirectives: boolean;
-  permissions: {
+  isTranslationTabBusy!: boolean;
+  tutorialInProgress!: boolean;
+  showTranslationTabSubDirectives!: boolean;
+  permissions!: {
     canVoiceover: boolean;
   };
 
@@ -80,6 +84,9 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     this.stateTutorialFirstTimeService.initTranslation(
       this.contextService.getExplorationId());
     let stateName = this.stateEditorService.getActiveStateName();
+    if (stateName === null) {
+      throw new Error('State name is null');
+    }
     this.stateRecordedVoiceoversService.init(
       stateName, this.explorationStatesService.getRecordedVoiceoversMemento(
         stateName));
@@ -121,13 +128,14 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
         themeColor: '#212f23',
         }
       ).subscribe(
-        (value) => {
+        () => {
+          let element = document.querySelector<HTMLElement>(
+            '.joyride-step__holder') as HTMLElement;
           // This code make the joyride visible over navbar
           // by overriding the properties of joyride-step__holder class.
-          document.querySelector<HTMLElement>(
-            '.joyride-step__holder').style.zIndex = '1007';
+          element.style.zIndex = '1007';
         },
-        (value) => {},
+        () => {},
         () => {
           this.leaveTutorial();
         }

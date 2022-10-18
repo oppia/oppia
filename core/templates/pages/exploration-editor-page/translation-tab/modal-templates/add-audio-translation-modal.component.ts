@@ -29,16 +29,16 @@ import { ContextService } from 'services/context.service';
 })
 export class AddAudioTranslationModalComponent
    extends ConfirmOrCancelModal implements OnInit {
-   @Input() audioFile: File;
-   @Input() generatedFilename: string;
-   @Input() isAudioAvailable: boolean;
-   @Input() languageCode: string;
+   @Input() audioFile!: File;
+   @Input() generatedFilename!: string;
+   @Input() isAudioAvailable!: boolean;
+   @Input() languageCode!: string;
 
-   uploadedFile: Blob;
-   droppedFile: File;
-   saveButtonText: string;
-   saveInProgress: boolean;
-   errorMessage: string;
+   uploadedFile!: Blob | null;
+   droppedFile!: File;
+   saveButtonText!: string;
+   saveInProgress!: boolean;
+   errorMessage!: string | null;
    BUTTON_TEXT_SAVE: string = 'Save';
    BUTTON_TEXT_SAVING: string = 'Saving...';
    ERROR_MESSAGE_BAD_FILE_UPLOAD: string = (
@@ -54,7 +54,7 @@ export class AddAudioTranslationModalComponent
 
    isAudioTranslationValid(): boolean {
      return (
-       this.uploadedFile &&
+       Boolean(this.uploadedFile) &&
        this.uploadedFile !== null &&
        this.uploadedFile.size !== null &&
        this.uploadedFile.size > 0);
@@ -76,15 +76,21 @@ export class AddAudioTranslationModalComponent
        this.saveInProgress = true;
        let explorationId = (
          this.contextService.getExplorationId());
-
+       let file = this.uploadedFile;
+       if (file === null) {
+         throw new Error('File cannot be null.');
+       }
        Promise.resolve(
          this.assetsBackendApiService.saveAudio(
-           explorationId, this.generatedFilename, this.uploadedFile)
+           explorationId, this.generatedFilename, file)
        ).then((response) => {
+         if (file === null) {
+           throw new Error('File cannot be null.');
+         }
          this.ngbActiveModal.close({
            languageCode: this.languageCode,
            filename: this.generatedFilename,
-           fileSizeBytes: this.uploadedFile.size,
+           fileSizeBytes: file.size,
            durationSecs: response.duration_secs
          });
        }, (errorResponse) => {

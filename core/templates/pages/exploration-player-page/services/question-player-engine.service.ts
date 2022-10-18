@@ -160,7 +160,7 @@ export class QuestionPlayerEngineService {
   init(
       questionObjects: Question[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-      errorCallback?: () => void): void {
+      errorCallback: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
     let currentIndex = questionObjects.length;

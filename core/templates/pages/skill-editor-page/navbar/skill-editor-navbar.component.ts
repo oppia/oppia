@@ -35,10 +35,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './skill-editor-navbar.component.html',
 })
 export class SkillEditorNavabarComponent implements OnInit {
-  showNavigationOptions: boolean;
-  activeTab: string;
-  showSkillEditOptions: boolean;
-  skill: Skill;
+  showNavigationOptions!: boolean;
+  activeTab!: string;
+  showSkillEditOptions!: boolean;
+  skill!: Skill;
 
   constructor(
     private alertsService: AlertsService,

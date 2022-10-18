@@ -122,8 +122,8 @@ describe('State Translation Status Graph Component', () => {
   });
 
   describe('when translation tab is busy', () => {
-    let showTranslationTabBusyModalspy = null;
-    let testSubscriptions = null;
+    let showTranslationTabBusyModalspy: jasmine.Spy;
+    let testSubscriptions: Subscription;
 
     beforeEach(() => {
       component.isTranslationTabBusy = true;

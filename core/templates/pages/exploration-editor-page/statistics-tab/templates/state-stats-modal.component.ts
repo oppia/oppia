@@ -43,16 +43,16 @@ interface PieChartOpitons {
 })
 export class StateStatsModalComponent
    extends ConfirmOrCancelModal implements OnInit {
-  @Input() visualizationsInfo: {
+  @Input() visualizationsInfo!: {
     data: string;
     options: string;
     id: string;
     addressed_info_is_supported: boolean;
   } [];
 
-  @Input() interactionArgs: InteractionCustomizationArgs;
-  @Input() stateName: string;
-  @Input() stateStats: {
+  @Input() interactionArgs!: InteractionCustomizationArgs;
+  @Input() stateName!: string;
+  @Input() stateStats!: {
     usefulFeedbackCount: number;
     totalAnswersCount: number;
     numTimesSolutionViewed: number;
@@ -60,16 +60,16 @@ export class StateStatsModalComponent
     numCompletions: number;
   };
 
-  solutionUsagePieChartOptions: PieChartOpitons;
-  answerFeedbackPieChartOptions: PieChartOpitons;
-  answerFeedbackPieChartData: (string[] | [string, number])[];
-  solutionUsagePieChartData: (string[] | [string, number])[];
-  totalAnswersCount: number;
-  usefulFeedbackCount: number;
-  numTimesSolutionViewed: number;
-  numEnters: number;
-  numQuits: number;
-  hasExplorationBeenAnswered: boolean;
+  solutionUsagePieChartOptions!: PieChartOpitons;
+  answerFeedbackPieChartOptions!: PieChartOpitons;
+  answerFeedbackPieChartData!: (string[] | [string, number])[];
+  solutionUsagePieChartData!: (string[] | [string, number])[];
+  totalAnswersCount!: number;
+  usefulFeedbackCount!: number;
+  numTimesSolutionViewed!: number;
+  numEnters!: number;
+  numQuits!: number;
+  hasExplorationBeenAnswered!: boolean;
 
   constructor(
      private ngbActiveModal: NgbActiveModal,

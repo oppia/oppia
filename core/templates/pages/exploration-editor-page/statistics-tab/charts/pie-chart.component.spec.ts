@@ -27,7 +27,7 @@ describe('Pie Chart component', () => {
   let component: PieChartComponent;
   let fixture: ComponentFixture<PieChartComponent>;
   let resizeEvent = new EventEmitter();
-  let mockedChart = null;
+  let mockedChart: google.visualization.PieChart;
 
   class MockWindowDimensionsService {
     getResizeEvent() {
@@ -59,10 +59,8 @@ describe('Pie Chart component', () => {
       PieChartComponent);
     component = fixture.componentInstance;
 
-    mockedChart = {
-      draw: () => {},
-      data: 1
-    };
+    mockedChart = new google.visualization.PieChart(
+      document.createElement('div'));
 
     // This approach was choosen because spyOnProperty() doesn't work on
     // properties that doesn't have a get access type.
@@ -78,8 +76,8 @@ describe('Pie Chart component', () => {
     component.chart = mockedChart;
     component.options = {
       title: 'Pie title',
-      legendPosition: null,
-      pieHole: null,
+      legendPosition: '',
+      pieHole: 0,
       pieSliceTextStyleColor: '#fff',
       pieSliceBorderColor: '#fff',
       left: 0,
@@ -103,7 +101,7 @@ describe('Pie Chart component', () => {
         }
       },
       charts: {
-        setOnLoadCallback: (callback) => {
+        setOnLoadCallback: (callback: () => void) => {
           callback();
         }
       }
@@ -121,12 +119,12 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor(value) {}
+          constructor() {}
           draw() {}
         }
       },
       charts: {
-        setOnLoadCallback: (callback) => {
+        setOnLoadCallback: (callback: () => void) => {
           callback();
         }
       }
@@ -134,7 +132,7 @@ describe('Pie Chart component', () => {
     component.pieChart = {
       nativeElement: null
     };
-    component.chart = null;
+    component.chart = {} as google.visualization.PieChart;
     component.ngAfterViewInit();
     tick();
 
@@ -145,12 +143,12 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor(value) {}
+          constructor() {}
           draw() {}
         }
       },
       charts: {
-        setOnLoadCallback: (callback) => {
+        setOnLoadCallback: (callback: () => void) => {
           callback();
         }
       }
@@ -168,12 +166,12 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor(value) {}
+          constructor() {}
           draw() {}
         }
       },
       charts: {
-        setOnLoadCallback: (callback) => {
+        setOnLoadCallback: (callback: () => void) => {
           callback();
         }
       }

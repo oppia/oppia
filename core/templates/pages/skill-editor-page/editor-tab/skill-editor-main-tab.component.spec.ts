@@ -28,7 +28,7 @@ import { SkillEditorStateService } from '../services/skill-editor-state.service'
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }

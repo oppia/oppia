@@ -33,8 +33,10 @@ import { StatisticsTabComponent } from './statistics-tab.component';
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
 import { StateStatsModalComponent } from './templates/state-stats-modal.component';
-import { State, StateBackendDict } from 'domain/state/StateObjectFactory';
-import { InteractionBackendDict } from 'domain/exploration/InteractionObjectFactory';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+import { OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
+import { SolutionBackendDict } from 'domain/exploration/SolutionObjectFactory';
+import { ExplorationMetadataBackendDict } from 'domain/exploration/ExplorationMetadataObjectFactory';
 
 describe('Statistics Tab Component', () => {
   let component: StatisticsTabComponent;
@@ -62,8 +64,14 @@ describe('Statistics Tab Component', () => {
       html: 'This is a html text'
     },
     interaction: {
-      customization_args: null
-    } as InteractionBackendDict,
+      answer_groups: [],
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: {} as OutcomeBackendDict,
+      hints: [],
+      solution: {} as SolutionBackendDict,
+      id: ''
+    },
     linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
@@ -118,7 +126,8 @@ describe('Statistics Tab Component', () => {
     computeGraphService = TestBed.inject(
       ComputeGraphService);
 
-    spyOn(statesObjectFactory, 'createFromBackendDict').and.returnValue(null);
+    spyOn(statesObjectFactory, 'createFromBackendDict').and.returnValue(
+      {} as States);
 
     spyOn(
       readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
@@ -128,30 +137,30 @@ describe('Statistics Tab Component', () => {
           states: {
             State1: state as StateBackendDict
           },
-          param_changes: null,
-          param_specs: null,
-          title: null,
-          language_code: null,
-          objective: null,
-          correctness_feedback_enabled: null,
+          param_changes: [],
+          param_specs: {},
+          title: '',
+          language_code: 'en',
+          objective: '',
+          correctness_feedback_enabled: true,
         } as ReadOnlyExplorationBackendDict,
-        can_edit: null,
-        exploration_metadata: null,
-        exploration_id: null,
-        is_logged_in: null,
-        session_id: null,
-        version: null,
-        preferred_audio_language_code: null,
-        preferred_language_codes: null,
-        auto_tts_enabled: null,
-        correctness_feedback_enabled: null,
-        record_playthrough_probability: null,
-        draft_change_list_id: null,
-        has_viewed_lesson_info_modal_once: null,
-        furthest_reached_checkpoint_exp_version: null,
-        furthest_reached_checkpoint_state_name: null,
-        most_recently_reached_checkpoint_state_name: null,
-        most_recently_reached_checkpoint_exp_version: null,
+        can_edit: false,
+        exploration_metadata: {} as ExplorationMetadataBackendDict,
+        exploration_id: '',
+        is_logged_in: false,
+        session_id: '',
+        version: 0,
+        preferred_audio_language_code: 'en',
+        preferred_language_codes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: false,
+        record_playthrough_probability: 0,
+        draft_change_list_id: 0,
+        has_viewed_lesson_info_modal_once: false,
+        furthest_reached_checkpoint_exp_version: 0,
+        furthest_reached_checkpoint_state_name: '',
+        most_recently_reached_checkpoint_state_name: '',
+        most_recently_reached_checkpoint_exp_version: 0,
       } as FetchExplorationBackendResponse));
 
     spyOn(explorationStatsService, 'getExplorationStatsAsync').and.returnValue(
@@ -167,19 +176,10 @@ describe('Statistics Tab Component', () => {
       } as StateInteractionStats));
 
     spyOn (computeGraphService, 'compute').and.stub();
-    component.states = {
-      getState: (name) => {
-        return {
-          interaction: {
-            customizationArgs: null,
-          }
-        } as State;
-      }
-    } as States;
+    component.states = {} as States;
 
-    component.expStats = {
-      getStateStats: (name) => null
-    } as ExplorationStats;
+    component.expStats = (
+      new ExplorationStats('', 0, 0, 0, 0, new Map()));
 
     component.ngOnInit();
   });

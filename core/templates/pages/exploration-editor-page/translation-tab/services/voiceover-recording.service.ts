@@ -30,14 +30,14 @@ declare global {
   providedIn: 'root'
 })
 export class VoiceoverRecordingService {
-  audioContextAvailable: typeof AudioContext;
-  definedAudioContext: AudioContext; // Will be defined audio context.
-  isAvailable: boolean;
+  audioContextAvailable!: typeof AudioContext;
+  definedAudioContext!: AudioContext; // Will be defined audio context.
+  isAvailable!: boolean;
   isRecording: boolean = false;
-  microphone: MediaStreamAudioSourceNode;
-  microphoneStream: MediaStream;
-  mp3Worker: Worker = null;
-  processor: ScriptProcessorNode;
+  microphone!: MediaStreamAudioSourceNode;
+  microphoneStream!: MediaStream;
+  mp3Worker!: Worker | null;
+  processor!: ScriptProcessorNode;
   defer: EventEmitter<string> = new EventEmitter();
 
   constructor(
@@ -79,7 +79,7 @@ export class VoiceoverRecordingService {
     };
   }
 
-  async startRecordingAsync(): Promise<MediaStream> {
+  async startRecordingAsync(): Promise<MediaStream | null> {
     // If worker is not available then do not start recording.
     if (this.mp3Worker === null) {
       return null;
@@ -141,7 +141,7 @@ export class VoiceoverRecordingService {
   _onAudioProcess(
       event: {
          inputBuffer: {
-           getChannelData: (value) => Transferable[];
+           getChannelData: (value: number) => Transferable[];
          };
        }): void {
     let array = event.inputBuffer.getChannelData(0);
@@ -188,6 +188,11 @@ export class VoiceoverRecordingService {
     // to choose the best bufferSize.
     this.processor = this.definedAudioContext.createScriptProcessor(0, 1, 1);
     // Process microphone to mp3 encoding.
+
+    // This throws "Object is possibly undefined." The type undefined
+    // comes here from audio context dependency. We need to suppress this
+    // error because of strict type checking.
+    // @ts-ignore
     this.processor.onaudioprocess = this._onAudioProcess.bind(this);
 
     this.microphone = this.definedAudioContext.createMediaStreamSource(stream);

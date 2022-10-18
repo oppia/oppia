@@ -53,15 +53,15 @@ interface PieChartOptions {
 export class StatisticsTabComponent implements
     OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  stateStatsModalIsOpen: boolean;
-  explorationHasBeenVisited: boolean;
-  pieChartOptions: PieChartOptions;
-  pieChartData: ((string | number)[] | string[]) [];
-  statsGraphData: GraphData;
-  numPassersby: number;
-  states: States;
-  expStats: ExplorationStats;
-  expId: string;
+  stateStatsModalIsOpen!: boolean;
+  explorationHasBeenVisited!: boolean;
+  pieChartOptions!: PieChartOptions;
+  pieChartData!: ((string | number)[] | string[]) [];
+  statsGraphData!: GraphData;
+  numPassersby!: number;
+  states!: States;
+  expStats!: ExplorationStats;
+  expId!: string;
 
   constructor(
     private alertsService: AlertsService,

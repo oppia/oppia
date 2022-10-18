@@ -36,18 +36,18 @@ import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/ex
   templateUrl: './translator-overview.component.html'
 })
 export class TranslatorOverviewComponent implements OnInit {
-  @Input() isTranslationTabBusy: boolean;
+  @Input() isTranslationTabBusy!: boolean;
 
-  inTranslationMode: boolean;
-  inVoiceoverMode: boolean;
-  languageCode: string;
-  numberOfRequiredAudio: number;
-  numberOfAudioNotAvailable: number;
-  VOICEOVER_MODE: string;
-  TRANSLATION_MODE: string;
-  allAudioLanguageCodes: string[];
-  LAST_SELECTED_TRANSLATION_LANGUAGE: string;
-  languageCodesAndDescriptions: { id: string; description: string}[];
+  inTranslationMode!: boolean;
+  inVoiceoverMode!: boolean;
+  languageCode!: string;
+  numberOfRequiredAudio!: number;
+  numberOfAudioNotAvailable!: number;
+  VOICEOVER_MODE!: string;
+  TRANSLATION_MODE!: string;
+  allAudioLanguageCodes!: string[];
+  LAST_SELECTED_TRANSLATION_LANGUAGE!: string;
+  languageCodesAndDescriptions!: { id: string; description: string}[];
 
   constructor(
     private explorationLanguageCodeService:
@@ -129,8 +129,12 @@ export class TranslatorOverviewComponent implements OnInit {
 
   changeTranslationLanguage(): void {
     if (this.isTranslationTabBusy) {
-      this.languageCode = this.windowRef.nativeWindow.localStorage.getItem(
-        this.LAST_SELECTED_TRANSLATION_LANGUAGE);
+      let lastSelectedTranslationLanguage = (
+        this.windowRef.nativeWindow.localStorage.getItem(
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE));
+      this.languageCode = lastSelectedTranslationLanguage ? (
+        lastSelectedTranslationLanguage) : (
+          ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
       this.stateEditorService.onShowTranslationTabBusyModal.emit();
       return;
     }
@@ -164,8 +168,12 @@ export class TranslatorOverviewComponent implements OnInit {
   ngOnInit(): void {
     this.LAST_SELECTED_TRANSLATION_LANGUAGE = (
       'last_selected_translation_lang');
-    let prevLanguageCode = this.windowRef.nativeWindow.localStorage.getItem(
-      this.LAST_SELECTED_TRANSLATION_LANGUAGE);
+    let lastSelectedTranslationLanguage = (
+      this.windowRef.nativeWindow.localStorage.getItem(
+        this.LAST_SELECTED_TRANSLATION_LANGUAGE));
+    let prevLanguageCode = lastSelectedTranslationLanguage ? (
+      lastSelectedTranslationLanguage) : (
+        ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
     let allAudioLanguageCodes = this.languageUtilService
       .getAllVoiceoverLanguageCodes();
 

@@ -18,6 +18,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Rubric } from 'domain/skill/rubric.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Subscription } from 'rxjs';
 import { GroupedSkillSummaries, SkillEditorStateService } from '../services/skill-editor-state.service';
@@ -27,9 +28,9 @@ import { GroupedSkillSummaries, SkillEditorStateService } from '../services/skil
   templateUrl: './skill-questions-tab.component.html'
 })
 export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
-  skill: Skill;
-  groupedSkillSummaries: GroupedSkillSummaries;
-  skillIdToRubricsObject = {};
+  skill!: Skill;
+  groupedSkillSummaries!: GroupedSkillSummaries;
+  skillIdToRubricsObject: Record<string, Rubric[]> = {};
 
   constructor(
     private skillEditorStateService: SkillEditorStateService
