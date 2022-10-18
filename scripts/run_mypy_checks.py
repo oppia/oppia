@@ -45,8 +45,7 @@ EXCLUDED_DIRECTORIES: Final = [
 
 # List of files who should be type-annotated but are not.
 NOT_FULLY_COVERED_FILES: Final = [
-    'core/controllers/admin.py',
-    'core/controllers/admin_test.py',
+    'core/controllers/base_test.py',
     'core/controllers/blog_dashboard.py',
     'core/controllers/blog_dashboard_test.py',
     'core/controllers/blog_homepage.py',

@@ -2799,7 +2799,7 @@ title: Title
     def get_json(
         self,
         url: str,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Any]] = None,
         expected_status_int: int = 200,
         headers: Optional[Dict[str, str]] = None
     ) -> Any:
@@ -3011,7 +3011,7 @@ title: Title
     def put_json(
         self,
         url: str,
-        payload: Mapping[str, Union[str, int]],
+        payload: Mapping[str, Any],
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
