@@ -29,8 +29,8 @@ from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Set, overload
-from typing_extensions import Literal, TypedDict
+from typing import (
+    Dict, List, Literal, Optional, Sequence, Set, TypedDict, overload)
 
 MYPY = False
 if MYPY:  # pragma: no cover

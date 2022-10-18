@@ -31,8 +31,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional, Tuple, Union
-from typing_extensions import TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover

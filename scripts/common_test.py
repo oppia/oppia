@@ -40,8 +40,7 @@ from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
 import github
-from typing import Generator, List, NoReturn
-from typing_extensions import Literal
+from typing import Generator, List, Literal, NoReturn
 
 from . import common
 

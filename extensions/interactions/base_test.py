@@ -38,8 +38,7 @@ from core.tests import test_utils
 from extensions import domain
 from extensions.interactions import base
 
-from typing import Any, Dict, List, Set, Tuple, Type
-from typing_extensions import Final, Literal
+from typing import Any, Dict, Final, List, Literal, Set, Tuple, Type
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.

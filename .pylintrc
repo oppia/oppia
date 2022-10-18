@@ -111,6 +111,8 @@ disable=abstract-method,
         not-context-manager,
         redefined-variable-type,
         redundant-returns-doc,
+# TODO(#12912): Python interpreter migration to 3.8.12 causing failing lint check. Fix it later.
+        redundant-u-string-prefix,
         too-many-arguments,
         too-many-boolean-expressions,
         too-many-branches,

@@ -28,7 +28,7 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Final
 
 
 class StoryChangeTests(test_utils.GenericTestBase):

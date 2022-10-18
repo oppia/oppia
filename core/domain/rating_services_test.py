@@ -27,8 +27,7 @@ from core.domain import rating_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Optional, overload
-from typing_extensions import Final, Literal
+from typing import Final, Literal, Optional, overload
 
 MYPY = False
 if MYPY: # pragma: no cover

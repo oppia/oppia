@@ -29,8 +29,7 @@ from core.domain import param_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Callable, OrderedDict
-from typing_extensions import Final
+from typing import Callable, Final, OrderedDict
 import webapp2
 
 email_services = models.Registry.import_email_services()

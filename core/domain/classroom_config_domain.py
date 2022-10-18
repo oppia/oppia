@@ -28,8 +28,7 @@ import copy
 from core import utils
 from core.constants import constants
 
-from typing import Dict, List
-from typing_extensions import TypedDict
+from typing import Dict, List, TypedDict
 
 
 class ClassroomDict(TypedDict):

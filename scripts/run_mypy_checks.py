@@ -27,8 +27,7 @@ import sys
 from scripts import common
 from scripts import install_third_party_libs
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Tuple
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES: Final = [

@@ -40,8 +40,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import Any, Generic, Iterator, Type, TypeVar, Union
-from typing_extensions import Final
+from typing import Any, Final, Generic, Iterator, Type, TypeVar, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover

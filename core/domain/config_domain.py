@@ -23,8 +23,7 @@ from core import schema_utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Any, Dict, List, Optional, Sequence, Union
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Optional, Sequence, TypedDict, Union
 
 from core.domain import caching_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip

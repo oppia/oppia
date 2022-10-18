@@ -23,8 +23,7 @@ import shutil
 
 from core.tests import test_utils
 
-from typing import List
-from typing_extensions import Literal
+from typing import List, Literal
 
 from . import clean
 

@@ -29,8 +29,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Tuple
 
 gae_search_services = models.Registry.import_search_services()
 

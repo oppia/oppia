@@ -45,8 +45,7 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Sequence
-from typing_extensions import Final
+from typing import Final, List, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover

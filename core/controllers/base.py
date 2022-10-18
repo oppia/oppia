@@ -799,7 +799,10 @@ class CsrfTokenManager:
         # Round time to seconds.
         issued_on = str(int(issued_on))
 
-        digester = hmac.new(CSRF_SECRET.value.encode('utf-8'))
+        digester = hmac.new(
+            key=CSRF_SECRET.value.encode('utf-8'),
+            digestmod='md5'
+        )
         digester.update(user_id.encode('utf-8'))
         digester.update(b':')
         digester.update(issued_on.encode('utf-8'))

@@ -34,8 +34,8 @@ from core.domain import stats_services
 from core.domain import user_domain
 from core.domain import user_services
 
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
-from typing_extensions import TypedDict
+from typing import (
+    Callable, Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast)
 
 
 class DisplayableCollectionSummaryDict(TypedDict):

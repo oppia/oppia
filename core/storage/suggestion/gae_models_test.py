@@ -24,8 +24,7 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Mapping
-from typing_extensions import Final
+from typing import Dict, Final, Mapping
 
 MYPY = False
 if MYPY: # pragma: no cover

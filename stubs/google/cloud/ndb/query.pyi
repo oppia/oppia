@@ -1,8 +1,7 @@
 from . import Cursor, Key, TYPE_MODEL, Property
 from typing import (
-    Any, Iterator, List, Optional, Sequence, TypeVar, Tuple, Union,
+    Any, Iterator, List, Literal, Optional, Sequence, TypeVar, Tuple, Union,
     overload)
-from typing_extensions import Literal
 
 _T = TypeVar('_T', covariant=True)
 

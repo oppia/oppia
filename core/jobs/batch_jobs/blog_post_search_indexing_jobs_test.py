@@ -28,8 +28,7 @@ from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, List, Tuple, Type, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:

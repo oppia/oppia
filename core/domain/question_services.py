@@ -30,8 +30,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, Union, cast, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Tuple, Union, cast, overload
 
 MYPY = False
 if MYPY: # pragma: no cover

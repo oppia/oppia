@@ -589,8 +589,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return [
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
-                'dependency-5-0.5.3-py3.7.egg-info',
-                'dependency_6-0.5.3-py3.7.egg-info',
+                'dependency-5-0.5.3-py3.8.egg-info',
+                'dependency_6-0.5.3-py3.8.egg-info',
             ]
 
         def mock_is_dir(unused_path):

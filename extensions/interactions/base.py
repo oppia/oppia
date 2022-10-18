@@ -47,8 +47,7 @@ from extensions import domain
 from extensions.objects.models import objects
 from extensions.visualizations import models
 
-from typing import Dict, List, Optional, Tuple, Type
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Optional, Tuple, Type, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover

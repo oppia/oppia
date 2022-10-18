@@ -22,8 +22,7 @@ from core import schema_utils
 from core import utils
 from core.domain import calculation_registry
 
-from typing import Any, Dict, List, Mapping, Union
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Mapping, TypedDict, Union
 
 OptionsDictType = Mapping[str, Union[str, List[str], bool]]
 

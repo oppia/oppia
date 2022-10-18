@@ -48,8 +48,7 @@ from core import utils
 from core.domain import exp_domain
 from core.domain import stats_domain
 
-from typing import Dict, FrozenSet, Iterable, List, Optional
-from typing_extensions import TypedDict
+from typing import Dict, FrozenSet, Iterable, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover

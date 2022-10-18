@@ -34,8 +34,7 @@ from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils
 
-from typing import List, Tuple, Type
-from typing_extensions import Final
+from typing import Final, List, Tuple, Type
 
 # File names ending in any of these suffixes will be ignored when checking for
 # RTE component validity.

@@ -28,8 +28,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_configs
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 import github  # isort:skip pylint: disable=wrong-import-position
 

@@ -29,8 +29,7 @@ from core.tests import test_utils
 
 import bs4
 
-from typing import Dict, List
-from typing_extensions import TypedDict
+from typing import Dict, List, TypedDict
 
 
 class SvgDiagramTestCaseDict(TypedDict):

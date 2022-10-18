@@ -25,8 +25,7 @@ from core.domain import skill_domain
 from core.domain import state_domain
 from core.tests import test_utils
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 
 class SkillDomainUnitTests(test_utils.GenericTestBase):

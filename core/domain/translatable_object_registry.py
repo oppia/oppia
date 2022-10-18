@@ -20,8 +20,7 @@ import inspect
 
 from extensions.objects.models import objects
 
-from typing import Dict, List, Type, Union, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Type, Union, overload
 
 TranslatableObjectNames = Literal[
     'TranslatableHtml',

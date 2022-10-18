@@ -24,8 +24,7 @@ import argparse
 import os
 import re
 
-from typing import Dict, List, Optional
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after

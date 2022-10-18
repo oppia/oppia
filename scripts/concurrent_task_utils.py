@@ -23,8 +23,7 @@ import threading
 import time
 import traceback
 
-from typing import Any, Callable, List, Optional
-from typing_extensions import Final
+from typing import Any, Callable, Final, List, Optional
 
 LOG_LOCK: Final = threading.Lock()
 ALL_ERRORS: Final = []

@@ -22,8 +22,7 @@ import subprocess
 import sys
 import tarfile
 
-from typing import List, Optional
-from typing_extensions import Final
+from typing import Final, List, Optional
 
 from . import clean
 from . import common
@@ -50,9 +49,9 @@ def create_directory(directory_path: str) -> None:
 # It checks this input for a specific version of python and returns false
 # if it does not match the expected prefix.
 def test_python_version() -> None:
-    running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
-    if running_python_version != '3.7':
-        print('Please use Python 3.7. Exiting...')
+    running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
+    if running_python_version != '3.8.12':
+        print('Please use Python 3.8.12. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():

@@ -30,8 +30,7 @@ import urllib
 from core import utils
 from scripts import common
 
-from typing import Dict, List, Optional, Tuple
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Optional, Tuple, TypedDict
 
 GITHUB_API_PR_ENDPOINT: Final = (
     'https://api.github.com/repos/%s/%s/pulls/%s')

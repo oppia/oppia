@@ -36,8 +36,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Callable, Dict, List, Optional, Sequence, Set, Type, Union
-from typing_extensions import Final
+from typing import (
+    Callable, Dict, Final, List, Optional, Sequence, Set, Type, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -23,8 +23,7 @@ import enum
 from core import feconf
 from core import utils
 
-from typing import Dict, List
-from typing_extensions import TypedDict
+from typing import Dict, List, TypedDict
 
 
 class TranslatableContentFormat(enum.Enum):

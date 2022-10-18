@@ -27,8 +27,7 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 
 class ActivityServicesTests(test_utils.GenericTestBase):

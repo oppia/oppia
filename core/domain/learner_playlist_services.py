@@ -23,8 +23,7 @@ from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover

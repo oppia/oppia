@@ -27,8 +27,7 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 FRONTEND_FEATURE_NAMES_PATH: Final = os.path.join(
     os.getcwd(),

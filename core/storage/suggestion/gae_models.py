@@ -21,8 +21,9 @@ import datetime
 from core import feconf
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union
-from typing_extensions import Final, Literal, TypedDict
+from typing import (
+    Dict, Final, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
+    Union)
 
 MYPY = False
 if MYPY: # pragma: no cover

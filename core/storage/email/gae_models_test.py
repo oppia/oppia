@@ -25,8 +25,7 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
-from typing_extensions import Final
+from typing import Final, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
