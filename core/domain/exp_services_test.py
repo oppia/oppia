@@ -9313,6 +9313,12 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                 [], [], 1, 1))
 
     def test_fail_to_fetch_exploration_snapshots(self) -> None:
+        observed_log_messages = []
+        def _mock_logging_function(msg: str, *args: str) -> None:
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+
         self.save_new_default_exploration('ID', 'owner_id')
         exp_snapshot_id = exp_models.ExplorationModel.get_snapshot_id('ID', 1)
         exp_snapshot = exp_models.ExplorationSnapshotMetadataModel.get_by_id(
@@ -9320,9 +9326,16 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_snapshot.commit_cmds[0] = {}
         exp_snapshot.update_timestamps()
         exp_models.ExplorationSnapshotMetadataModel.put(exp_snapshot)
-        error_message = 'snapshots contain invalid commit_cmds'
-        with self.assertRaisesRegex(Exception, error_message):
+
+        with logging_swap:
             exp_services.regenerate_missing_stats_for_exploration('ID')
+        self.assertEqual(
+            observed_log_messages,
+            [
+                'Exploration(id=\'ID\') snapshots contains invalid '
+                'commit_cmd: {}'
+            ]
+        )
 
     def test_handle_state_name_is_not_found_in_state_stats_mapping(
         self
