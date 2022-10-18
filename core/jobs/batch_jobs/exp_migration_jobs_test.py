@@ -898,6 +898,72 @@ class ExpSnapshotsMigrationAuditJobTests(
                 )
             ])
 
+    def test_audit_job_handles_missing_states_schema_version(self):
+        swap_exp_schema_37 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37)
+        with swap_exp_schema_37:
+            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    self.VALID_EXP_ID, title='title', category='category')
+                exp_services.save_new_exploration(
+                    feconf.SYSTEM_COMMITTER_ID, exploration)
+
+            # Bring the main exploration to the latest schema.
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+                [self.VALID_EXP_ID])
+            migration_change_list = [
+                exp_domain.ExplorationChange({
+                    'cmd': (
+                        exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
+                    'from_version': '41',
+                    'to_version': '44'
+                })
+            ]
+            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+                exp_services.update_exploration(
+                    feconf.SYSTEM_COMMITTER_ID,
+                    self.VALID_EXP_ID,
+                    migration_change_list,
+                    'Ran Exploration Migration job.'
+                )
+            exploration_model = exp_models.ExplorationModel.get(
+                self.VALID_EXP_ID)
+            self.assertEqual(exploration_model.states_schema_version, 44)
+
+            # Modify the snapshot to have no states schema version. (This
+            # implies a schema version of 0.)
+            snapshot_content_model = (
+                exp_models.ExplorationSnapshotContentModel.get(
+                    '%s-1' % self.VALID_EXP_ID))
+            del snapshot_content_model.content['states_schema_version']
+            snapshot_content_model.update_timestamps(
+                update_last_updated_time=False)
+            snapshot_content_model.put()
+
+            # There is no failure due to a missing states schema version.
+            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+                self.assert_job_output_is([
+                    job_run_result.JobRunResult(
+                        stdout='',
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', "'
+                            'Exploration snapshot exp_id0 failed migration to '
+                            'states v1: type object \'Exploration\' has no '
+                            'attribute \'_convert_states_v0_dict_to_v1_dict\''
+                            '")": 1'
+                        )
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='',
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\''
+                            'Snapshot is already at latest schema version\'))":'
+                            ' 1'
+                        )
+                    )
+                ])
+
 
 class ExpSnapshotsMigrationJobTests(
     job_test_utils.JobTestBase,
@@ -1087,3 +1153,130 @@ class ExpSnapshotsMigrationJobTests(
                     )
                 )
             ])
+
+    def test_migration_job_audit_failure(self) -> None:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
+
+        # Bring the main exploration to the latest schema.
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
+        latest_schema_version = str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '42',
+                'to_version': latest_schema_version
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID,
+            self.VALID_EXP_ID,
+            migration_change_list,
+            'Ran Exploration Migration job.'
+        )
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        self.assertEqual(
+            exploration_model.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        # Make a mock conversion function that raises an error when trying to
+        # convert the old snapshot.
+        mock_conversion = classmethod(
+            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+
+        with self.swap(
+            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
+            mock_conversion
+        ):
+            self.assert_job_output_is([
+                job_run_result.JobRunResult(
+                    stdout='',
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', "Exploration '
+                        'snapshot exp_id0 failed migration to states v42: '
+                        '\'property_that_dne\'")": 1'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='',
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\''
+                        'Snapshot is already at latest schema version\'))": 1'
+                    )
+                )
+            ])
+
+    def test_audit_job_handles_missing_states_schema_version(self):
+        swap_exp_schema_37 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37)
+        with swap_exp_schema_37:
+            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    self.VALID_EXP_ID, title='title', category='category')
+                exp_services.save_new_exploration(
+                    feconf.SYSTEM_COMMITTER_ID, exploration)
+
+            # Bring the main exploration to the latest schema.
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+                [self.VALID_EXP_ID])
+            migration_change_list = [
+                exp_domain.ExplorationChange({
+                    'cmd': (
+                        exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
+                    'from_version': '41',
+                    'to_version': '44'
+                })
+            ]
+            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+                exp_services.update_exploration(
+                    feconf.SYSTEM_COMMITTER_ID,
+                    self.VALID_EXP_ID,
+                    migration_change_list,
+                    'Ran Exploration Migration job.'
+                )
+            exploration_model = exp_models.ExplorationModel.get(
+                self.VALID_EXP_ID)
+            self.assertEqual(exploration_model.states_schema_version, 44)
+
+            # Modify the snapshot to have no states schema version. (This
+            # implies a schema version of 0.)
+            snapshot_content_model = (
+                exp_models.ExplorationSnapshotContentModel.get(
+                    '%s-1' % self.VALID_EXP_ID))
+            del snapshot_content_model.content['states_schema_version']
+            snapshot_content_model.update_timestamps(
+                update_last_updated_time=False)
+            snapshot_content_model.put()
+
+            # There is no failure due to a missing states schema version.
+            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+                self.assert_job_output_is([
+                    job_run_result.JobRunResult(
+                        stdout='',
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', "'
+                            'Exploration snapshot exp_id0 failed migration to '
+                            'states v1: type object \'Exploration\' has no '
+                            'attribute \'_convert_states_v0_dict_to_v1_dict\''
+                            '")": 1'
+                        )
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='',
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\''
+                            'Snapshot is already at latest schema version\'))":'
+                            ' 1'
+                        )
+                    )
+                ])
