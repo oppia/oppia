@@ -30,12 +30,11 @@ import { QuestionSuggestionBackendApiService } from '../services/question-sugges
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { Question, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { Skill, SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { State, StateBackendDict } from 'domain/state/StateObjectFactory';
-import { ImagesData } from 'services/image-local-storage.service';
+import { State } from 'domain/state/StateObjectFactory';
 
 class MockNgbModalRef {
   componentInstance!: {

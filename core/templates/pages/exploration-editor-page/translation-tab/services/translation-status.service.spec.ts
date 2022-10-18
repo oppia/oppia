@@ -26,7 +26,6 @@ import { StateWrittenTranslationsService } from 'components/state-editor/state-e
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
 
 class MockNgbModal {

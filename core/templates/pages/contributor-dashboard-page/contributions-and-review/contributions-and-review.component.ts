@@ -25,7 +25,7 @@ import { Subscription } from 'rxjs';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';

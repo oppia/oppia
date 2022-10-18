@@ -33,7 +33,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserInfo } from 'domain/user/user-info.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { AlertsService } from 'services/alerts.service';
-import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 
