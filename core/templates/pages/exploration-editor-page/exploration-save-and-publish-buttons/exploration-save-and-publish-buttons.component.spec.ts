@@ -23,7 +23,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
-import { ContextService } from 'services/context.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { EditabilityService } from 'services/editability.service';
 import { ChangeListService } from '../services/change-list.service';
@@ -38,12 +37,14 @@ import { ExternalSaveService } from 'services/external-save.service';
 import { ExplorationSavePromptModalComponent } from '../modal-templates/exploration-save-prompt-modal.component';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ContextService } from 'services/context.service';
 
 describe('Exploration save and publish buttons component', () => {
   let component: ExplorationSaveAndPublishButtonsComponent;
   let fixture: ComponentFixture<ExplorationSaveAndPublishButtonsComponent>;
   let changeListService: ChangeListService;
   let ngbModal: NgbModal;
+  let contextService: ContextService;
   let ics: InternetConnectivityService;
   let explorationRightsService: ExplorationRightsService;
   let explorationSaveService: ExplorationSaveService;
@@ -132,15 +133,6 @@ describe('Exploration save and publish buttons component', () => {
            useClass: MockWindowRef
          },
          {
-           provide: ContextService,
-           useValue: {
-             getExplorationId: () => {
-               return 'exp1';
-             },
-             setExplorationIsLinkedToStory: () => {}
-           }
-         },
-         {
            provide: NgbModal,
            useClass: MockNgbModal
          }
@@ -155,11 +147,13 @@ describe('Exploration save and publish buttons component', () => {
      component = fixture.componentInstance;
 
      changeListService = TestBed.inject(ChangeListService);
+     contextService = TestBed.inject(ContextService);
      ngbModal = TestBed.inject(NgbModal);
      ics = TestBed.inject(InternetConnectivityService);
      explorationRightsService = TestBed.inject(ExplorationRightsService);
      explorationSaveService = TestBed.inject(ExplorationSaveService);
      explorationWarningsService = TestBed.inject(ExplorationWarningsService);
+     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
      editabilityService = TestBed.inject(EditabilityService);
      userExplorationPermissionsService = TestBed.inject(
        UserExplorationPermissionsService);
