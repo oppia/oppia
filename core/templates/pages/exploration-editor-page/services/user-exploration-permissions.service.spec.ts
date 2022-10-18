@@ -49,9 +49,6 @@ describe('User Exploration Permissions Service', () => {
   beforeEach(()=> {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        ContextService
-      ],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
