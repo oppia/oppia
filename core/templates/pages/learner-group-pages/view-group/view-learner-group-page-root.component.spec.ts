@@ -23,6 +23,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { ContextService } from 'services/context.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
@@ -44,6 +45,7 @@ describe('View Learner Group Page Root', () => {
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let loaderService: LoaderService;
   let translateService: TranslateService;
+  let contextService: ContextService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -74,6 +76,9 @@ describe('View Learner Group Page Root', () => {
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
     translateService = TestBed.inject(TranslateService);
+    contextService = TestBed.inject(ContextService);
+
+    spyOn(contextService, 'getLearnerGroupId').and.returnValue('groupId');
   });
 
   it('should successfully instantiate the component',
@@ -91,8 +96,8 @@ describe('View Learner Group Page Root', () => {
     tick();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(
-      accessValidationBackendApiService.doesProfileExist).toHaveBeenCalled();
+    expect(accessValidationBackendApiService.doesLearnerGroupExist)
+        .toHaveBeenCalled();
     expect(component.pageIsShown).toBeTrue();
     expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
@@ -109,7 +114,7 @@ describe('View Learner Group Page Root', () => {
       tick();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.doesProfileExist)
+      expect(accessValidationBackendApiService.doesLearnerGroupExist)
         .toHaveBeenCalled();
       expect(component.pageIsShown).toBeFalse();
       expect(component.errorPageIsShown).toBeTrue();
@@ -130,10 +135,10 @@ describe('View Learner Group Page Root', () => {
   }));
 
   it('should update page title whenever the language changes', () => {
-    spyOn(accessValidationBackendApiService, 'doesProfileExist')
+    spyOn(accessValidationBackendApiService, 'doesLearnerGroupExist')
       .and.returnValue(Promise.resolve());
     component.ngOnInit();
-    spyOn(component, 'setPageTitleAndMetaTags');
+    spyOn(component, 'setPageTitleAndMetaTags').and.callThrough();
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
 

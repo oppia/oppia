@@ -519,7 +519,7 @@ describe('Learner dashboard page', () => {
         .and.returnValue(Promise.resolve(true));
 
       spyOn(urlService, 'getUrlParams').and.returnValue({
-        active_tab: 'learner_groups',
+        active_tab: 'learner-groups',
       });
 
       component.ngOnInit();
