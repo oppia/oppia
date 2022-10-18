@@ -78,6 +78,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 import './conversation-skin.component.css';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -160,6 +161,7 @@ export class ConversationSkinComponent {
   CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
+  isLearnerReallyStuck: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -186,6 +188,7 @@ export class ConversationSkinComponent {
     private focusManagerService: FocusManagerService,
     private guestCollectionProgressService: GuestCollectionProgressService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
+    private conceptCardManagerService: ConceptCardManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private imagePreloaderService: ImagePreloaderService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
@@ -300,6 +303,14 @@ export class ConversationSkinComponent {
           this.triggerIfLearnerStuckAction();
         }
       )
+    );
+
+    this.directiveSubscriptions.add(
+      this.conceptCardManagerService.onLearnerGetsReallyStuck
+        .subscribe(() => {
+          this.isLearnerReallyStuck = true;
+          console.log("Receiving val of learnerIsStuck");
+        })
     );
 
     this.directiveSubscriptions.add(
@@ -1241,23 +1252,8 @@ export class ConversationSkinComponent {
           if (remainOnCurrentCard) {
             // Stay on the same card.
             this.hintsAndSolutionManagerService.recordWrongAnswer();
-            if (feedbackHtml) {
-              this.playerTranscriptService.addNewResponse(feedbackHtml);
-              if (!this.displayedCard.isInteractionInline()) {
-                this.playerPositionService.onHelpCardAvailable.emit({
-                  helpCardHtml: null,
-                  hasContinueButton: true
-                });
-              }
-              this.playerPositionService.onNewCardAvailable.emit();
-              this._nextFocusLabel = (
-                ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
-              this.focusManagerService.setFocusIfOnDesktop(
-                this._nextFocusLabel);
-              this.scrollToBottom();
-            }
-
-
+            this.conceptCardManagerService.recordWrongAnswer();
+            console.log("Aage badh gya fn");
             this.playerTranscriptService.addNewResponse(feedbackHtml);
             let helpCardAvailable = false;
             if (feedbackHtml &&

@@ -44,6 +44,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 import './exploration-footer.component.css';
+import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 
 @Component({
@@ -60,6 +63,7 @@ export class ExplorationFooterComponent {
   windowIsNarrow!: boolean;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
+  isVisible: boolean = true;
 
   // Stores the number of checkpoints in an exploration.
   checkpointCount: number = 0;
@@ -75,6 +79,9 @@ export class ExplorationFooterComponent {
   userIsLoggedIn: boolean = false;
   footerIsInQuestionPlayerMode: boolean = false;
   CHECKPOINTS_FEATURE_IS_ENABLED = false;
+
+  conceptCardForStateExists: boolean = true;
+  linkedSkillId: string | null = null;
 
   constructor(
     private contextService: ContextService,
@@ -98,7 +105,8 @@ export class ExplorationFooterComponent {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private checkpointCelebrationUtilityService:
-      CheckpointCelebrationUtilityService
+      CheckpointCelebrationUtilityService,
+    private conceptCardManagerService: ConceptCardManagerService
   ) {}
 
   ngOnInit(): void {
@@ -183,6 +191,17 @@ export class ExplorationFooterComponent {
           this.showInformationCard();
         })
     );
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onNewCardOpened.subscribe(
+        (newCard: StateCard) => {
+          this.conceptCardManagerService.reset();
+        }
+      )
+    );
+  }
+
+  isConceptCardButtonVisible(): boolean {
+    return this.conceptCardManagerService.isConceptCardViewable();
   }
 
   showProgressReminderModal(): void {
@@ -298,6 +317,28 @@ export class ExplorationFooterComponent {
     });
   }
 
+  openConceptCardModal(): void {
+    // The catch at the end was needed according to this thread:
+    // https://github.com/angular-ui/bootstrap/issues/6501, where in
+    // AngularJS 1.6.3, $uibModalInstance.cancel() throws console error.
+    // The catch prevents that when clicking outside as well as for
+    // cancel.
+    const modalRef = this.ngbModal.open(
+      OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+      {backdrop: true}
+    );
+    this.conceptCardManagerService.consumeConceptCard();
+    modalRef.componentInstance.skillId = this.linkedSkillId;
+    modalRef.result.then(() => {}, (res) => {
+      this.contextService.removeCustomEntityContext();
+      const allowedDismissActions = (
+        ['cancel', 'escape key press', 'backdrop click']);
+      if (!allowedDismissActions.includes(res)) {
+        throw new Error(res);
+      }
+    });
+  }
+
   showInformationCard(): void {
     let stringifiedExpIds = JSON.stringify(
       [this.explorationId]);
@@ -323,6 +364,13 @@ export class ExplorationFooterComponent {
           this.explorationId);
       });
     }
+  }
+
+  showConceptCard(): void {
+    let state = this.explorationEngineService.getState();
+    this.linkedSkillId = state.linkedSkillId;
+    console.log(this.linkedSkillId);
+      this.openConceptCardModal();
   }
 
   getStaticImageUrl(imagePath: string): string {
