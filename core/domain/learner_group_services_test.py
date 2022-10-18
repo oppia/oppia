@@ -348,7 +348,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
-            [self.LEARNER_GROUP_ID])
+            [self.LEARNER_GROUP_ID, self.LEARNER_GROUP_ID_2])
 
         learner_group_services.invite_learners_to_learner_group(
             'group_id_2', [self.LEARNER_ID])
@@ -357,7 +357,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
-            [self.LEARNER_GROUP_ID, 'group_id_2'])
+            [self.LEARNER_GROUP_ID, self.LEARNER_GROUP_ID_2, 'group_id_2'])
 
         learner_group_services.remove_invited_learners_from_learner_group(
             self.LEARNER_GROUP_ID, [self.LEARNER_ID], True)
@@ -366,7 +366,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
-            ['group_id_2'])
+            [self.LEARNER_GROUP_ID_2, 'group_id_2'])
 
     def test_invite_learners_to_learner_group(self) -> None:
         # Ruling out the possibility of None for mypy type checking.
@@ -377,7 +377,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model_1.invited_to_learner_groups_ids,
-            [self.LEARNER_GROUP_ID])
+            [self.LEARNER_GROUP_ID, self.LEARNER_GROUP_ID_2])
         user_model_2 = user_models.LearnerGroupsUserModel.get(
             new_learner_id, strict=False)
         self.assertIsNone(user_model_2)
@@ -389,7 +389,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model_1.invited_to_learner_groups_ids,
-            [self.LEARNER_GROUP_ID, 'group_id_2'])
+            [self.LEARNER_GROUP_ID, self.LEARNER_GROUP_ID_2, 'group_id_2'])
 
         user_model_2 = user_models.LearnerGroupsUserModel.get(
             new_learner_id, strict=True)
