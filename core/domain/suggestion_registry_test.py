@@ -3085,28 +3085,6 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.assertTrue(self.voiceover_application.is_handled)
 
-    def test_accept_voiceover_application(self) -> None:
-        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
-        self.assertEqual(self.voiceover_application.status, 'review')
-
-        self.voiceover_application.accept(self.reviewer_id)
-
-        self.assertEqual(
-            self.voiceover_application.final_reviewer_id, self.reviewer_id)
-        self.assertEqual(self.voiceover_application.status, 'accepted')
-
-    def test_reject_voiceover_application(self) -> None:
-        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
-        self.assertEqual(self.voiceover_application.status, 'review')
-
-        self.voiceover_application.reject(self.reviewer_id, 'rejection message')
-
-        self.assertEqual(
-            self.voiceover_application.final_reviewer_id, self.reviewer_id)
-        self.assertEqual(self.voiceover_application.status, 'rejected')
-        self.assertEqual(
-            self.voiceover_application.rejection_message, 'rejection message')
-
 
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the CommunityContributionStats class."""
