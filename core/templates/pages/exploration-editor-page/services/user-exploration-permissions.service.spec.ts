@@ -45,20 +45,15 @@ describe('User Exploration Permissions Service', () => {
     can_manage_voice_artist: false
   };
   let permissionsResponse: ExplorationPermissions;
+  let contextService: ContextService;
 
 
   beforeEach(()=> {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{
-        provide: ContextService,
-        useValue: {
-          getExplorationId: () => {
-            return sampleExplorationId;
-          },
-          setExplorationIsLinkedToStory: () => {}
-        }
-      }],
+      providers: [
+        ContextService
+      ],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
