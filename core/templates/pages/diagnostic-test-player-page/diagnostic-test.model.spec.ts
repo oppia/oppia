@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { DiagnosticTestModelData } from './diagnostic-test.model';
 
-fdescribe('Diagnostic test model', () => {
+describe('Diagnostic test model', () => {
   let diagnosticTestModelData: DiagnosticTestModelData;
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -37,26 +37,25 @@ fdescribe('Diagnostic test model', () => {
       topicID7: ['topicID2', 'topicID3', 'topicID6'],
       topicID8: ['topicID7'],
       topicID9: ['topicID5', 'topicID8'],
-
-    }
+    };
     diagnosticTestModelData = new DiagnosticTestModelData(
       topicIdToPrerequisiteTopicIds);
   });
 
   it('should be able to get topic ID to ancestor topic IDs', () => {
     const expectedAncestorTopicIds = {
-        topicID1: [],
-        topicID2: ['topicID1'],
-        topicID3: ['topicID2', 'topicID1'],
-        topicID4: ['topicID3', 'topicID2', 'topicID1'],
-        topicID5: ['topicID4', 'topicID3', 'topicID2', 'topicID1'],
-        topicID6: [],
-        topicID7: ['topicID6', 'topicID3', 'topicID2', 'topicID1'],
-        topicID8: [
-          'topicID7', 'topicID6', 'topicID3', 'topicID2', 'topicID1'],
-        topicID9: [
-          'topicID8', 'topicID7', 'topicID6', 'topicID3', 'topicID2',
-          'topicID1', 'topicID5', 'topicID4']
+      topicID1: [],
+      topicID2: ['topicID1'],
+      topicID3: ['topicID2', 'topicID1'],
+      topicID4: ['topicID3', 'topicID2', 'topicID1'],
+      topicID5: ['topicID4', 'topicID3', 'topicID2', 'topicID1'],
+      topicID6: [],
+      topicID7: ['topicID6', 'topicID3', 'topicID2', 'topicID1'],
+      topicID8: [
+        'topicID7', 'topicID6', 'topicID3', 'topicID2', 'topicID1'],
+      topicID9: [
+        'topicID8', 'topicID7', 'topicID6', 'topicID3', 'topicID2',
+        'topicID1', 'topicID5', 'topicID4']
     };
 
     expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
@@ -96,4 +95,4 @@ fdescribe('Diagnostic test model', () => {
     expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
       expectedEligibleTopicIDs);
   });
-})
+});

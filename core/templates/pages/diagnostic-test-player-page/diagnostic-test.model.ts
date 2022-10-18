@@ -70,7 +70,8 @@ export class DiagnosticTestModelData {
     this._topicIdToAncestorTopicIds = {};
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
       let ancestors = [];
-      let prerequisites = cloneDeep(this._topicIdToPrerequisiteTopicIds[topicId]);
+      let prerequisites = cloneDeep(
+        this._topicIdToPrerequisiteTopicIds[topicId]);
 
       while (prerequisites.length > 0) {
         let len = prerequisites.length;
@@ -107,7 +108,7 @@ export class DiagnosticTestModelData {
     this._topicIdToSuccessorTopicIds = {};
     for (let topicid in topicIdToChildTopicId) {
       let successors = [];
-      let children = topicIdToChildTopicId[topicid];
+      let children = cloneDeep(topicIdToChildTopicId[topicid]);
 
       while (children.length > 0) {
         let len = children.length;
@@ -119,7 +120,6 @@ export class DiagnosticTestModelData {
           this._topicIdToSuccessorTopicIds[lastTopicId]);
       }
       this._topicIdToSuccessorTopicIds[topicid] = successors;
-      console.log(this._topicIdToSuccessorTopicIds);
     }
   }
 
