@@ -42,6 +42,7 @@ export class HintsAndSolutionManagerService {
   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 20000;
 
   _solutionViewedEventEmitter = new EventEmitter();
+  _learnerReallyStuckEventEmitter = new EventEmitter();
   private _timeoutElapsedEventEmitter = new EventEmitter();
   onTimeoutElapsed$ = this._timeoutElapsedEventEmitter.asObservable();
 
@@ -51,6 +52,7 @@ export class HintsAndSolutionManagerService {
   solutionConsumed: boolean = false;
   hintsForLatestCard: Hint[] = [];
   wrongAnswersSinceLastHintConsumed: number = 0;
+  wrongAnswersAfterHintsExhausted: number = 0;
   correctAnswerSubmitted: boolean = false;
 
   _hintConsumedEventEmitter = new EventEmitter();
@@ -152,6 +154,7 @@ export class HintsAndSolutionManagerService {
     this.hintsForLatestCard = newHints;
     this.solutionForLatestCard = newSolution;
     this.wrongAnswersSinceLastHintConsumed = 0;
+    this.wrongAnswersAfterHintsExhausted = 0;
     this.correctAnswerSubmitted = false;
     if (this.timeout) {
       clearTimeout(this.timeout);
@@ -236,6 +239,13 @@ export class HintsAndSolutionManagerService {
         this.accelerateHintRelease();
       }
     }
+    else {
+      this.wrongAnswersAfterHintsExhausted++;
+      console.log(this.wrongAnswersAfterHintsExhausted);
+      if (this.wrongAnswersAfterHintsExhausted > 2) {
+        this._learnerReallyStuckEventEmitter.emit();
+      }
+    }
   }
 
   get onSolutionViewedEventEmitter(): EventEmitter<unknown> {
@@ -248,6 +258,10 @@ export class HintsAndSolutionManagerService {
 
   get onHintsExhausted(): EventEmitter<unknown> {
     return this._hintsExhaustedEventEmitter;
+  }
+
+  get onLearnerReallyStuck(): EventEmitter<unknown> {
+    return this._learnerReallyStuckEventEmitter;
   }
 }
 

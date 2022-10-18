@@ -280,7 +280,15 @@ export class ConversationSkinComponent {
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
           this.nextCardIfStuck = null;
-          this.triggerRedirectionOrSolutionIfLearnerStuck();
+          this.triggerIfLearnerStuckAction();
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.hintsAndSolutionManagerService.onLearnerReallyStuck.subscribe(
+        () => {
+          this.triggerIfLearnerStuckActionDirectly();
         }
       )
     );
@@ -289,7 +297,7 @@ export class ConversationSkinComponent {
       this.hintsAndSolutionManagerService.onHintsExhausted.subscribe(
         () => {
           console.log("Subscribed");
-          this.triggerRedirectionOrSolutionIfLearnerStuck();
+          this.triggerIfLearnerStuckAction();
         }
       )
     );
@@ -1003,7 +1011,7 @@ export class ConversationSkinComponent {
     }
   }
 
-  triggerRedirectionOrSolutionIfLearnerStuck(): void {
+  triggerIfLearnerStuckAction(): void {
     console.log("func run");
     if (this.timeout) {
       clearTimeout(this.timeout);
@@ -1021,14 +1029,38 @@ export class ConversationSkinComponent {
         // Release solution
         this.hintsAndSolutionManagerService.releaseSolution();
       }
-    }, 12000);
+    }, 15000);
     this.timeout = setTimeout(() => {
       if (this.nextCardIfStuck) {
         console.log("redirection started");
         this.nextCard = this.nextCardIfStuck;
         this.showPendingCard();
       }
-    }, 15000);
+    }, 18000);
+  }
+
+  triggerIfLearnerStuckActionDirectly(): void {
+    console.log("func run directly");
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+    if (this.responseTimeout) {
+      clearTimeout(this.responseTimeout);
+      this.responseTimeout = null;
+    }
+    // Directly trigger action for the really stuck learner.
+    if (this.nextCardIfStuck) {
+      if (this.nextCardIfStuck) {
+        this.playerTranscriptService.addNewResponse("Response");
+        this.nextCard = this.nextCardIfStuck;
+        this.showPendingCard();
+      }
+      else {
+        // Release solution
+        this.hintsAndSolutionManagerService.releaseSolution();
+      }
+    }
   }
 
   showQuestionAreNotAvailable(): void {
