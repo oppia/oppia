@@ -66,7 +66,7 @@ export class ExplorationStatesService {
   )[] = [];
 
   stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
-  private _states!: States;
+  private _states: States | null = null;
   private _refreshGraphEventEmitter: EventEmitter<unknown> = new EventEmitter();
 
   constructor(

@@ -113,11 +113,12 @@ export class ExplorationEngineService {
     if (explorationContext) {
       this._explorationId = this.contextService.getExplorationId();
       const version = this.urlService.getExplorationVersionFromUrl();
-      if (version === null) {
-        throw new Error('Invalid version.');
-      } else {
-        this.version = version;
-      }
+      // if (version === null) {
+      //   throw new Error('Invalid version.');
+      // } else {
+      //   this.version = version;
+      // }
+      this.version = version;
       this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
       this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
       if (
@@ -272,9 +273,9 @@ export class ExplorationEngineService {
         this.exploration.initStateName, newParams);
     }
 
-    if (interactionHtml === null) {
-      throw new Error('Interaction HTML not found.');
-    }
+    // if (interactionHtml === null) {
+    //   throw new Error('Interaction HTML not found.');
+    // }
 
     let contentId = initialState.content.contentId;
     if (contentId === null) {
