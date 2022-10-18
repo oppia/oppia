@@ -1,9 +1,52 @@
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Diagnostic test model.
+ */
+
+
 interface TopicIdToRelatedTopicIds {
-  [topicId: string]: string[]
+  [topicId: string]: string[];
 }
 
-export class DiagnosticTestModel {
-  _totalNumberOfAttemptedQuestions :number;
+export interface DiagnosticTestModel {
+  _totalNumberOfAttemptedQuestions: number;
+  _currentTopicId: string;
+  _eligibleTopicIds: string[];
+  _skippedTopicIds: string[];
+  _passedTopicIds: string[];
+  _failedTopicIds: string[];
+  _topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
+  _topicIdToAncestorTopicIds: TopicIdToRelatedTopicIds;
+  _topicIdToSuccessorTopicIds: TopicIdToRelatedTopicIds;
+  setTopicIdToAncestorTopicIds: () => void;
+  setTopicIdToSuccessorTopicIds: () => void;
+  getAncestorsTopicIds: (string) => string[];
+  getSuccessorTopicIds: (string) => string[];
+  incrementNumberOfAttemptedQuestions: (number) => void;
+  recordTopicPassed: () => void;
+  recordTopicFailed: () => void;
+  isTestFinished: () => boolean;
+  getEligibleTopicIds: () => string[];
+  getFailedTopicIds: () => string[];
+  getCurrentTopicId: () => string;
+  setCurrentTopicId: () => void;
+}
+
+export class DiagnosticTestModelData {
+  _totalNumberOfAttemptedQuestions: number;
   _currentTopicId: string;
   _eligibleTopicIds: string[];
   _skippedTopicIds: string[];
@@ -13,7 +56,7 @@ export class DiagnosticTestModel {
   _topicIdToAncestorTopicIds: TopicIdToRelatedTopicIds;
   _topicIdToSuccessorTopicIds: TopicIdToRelatedTopicIds;
 
-  constructor(topicIdToPrerequisiteTopicIds) {
+  constructor(topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds) {
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
 
     this.setTopicIdToAncestorTopicIds();
@@ -21,15 +64,15 @@ export class DiagnosticTestModel {
   }
 
   setTopicIdToAncestorTopicIds(): void {
-    this._topicIdToAncestorTopicIds = {}
+    this._topicIdToAncestorTopicIds = {};
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
-      let ancestors = []
-      let prerequisites = this._topicIdToPrerequisiteTopicIds[topicId]
+      let ancestors = [];
+      let prerequisites = this._topicIdToPrerequisiteTopicIds[topicId];
+
       while (prerequisites.length > 0) {
         let len = prerequisites.length;
-
         let lastTopicId = prerequisites[len - 1];
-        prerequisites.splice(len-1, 1);
+        prerequisites.splice(len - 1, 1);
         ancestors.push(lastTopicId);
       }
       this._topicIdToAncestorTopicIds[topicId] = ancestors;
@@ -37,38 +80,37 @@ export class DiagnosticTestModel {
   }
 
   setTopicIdToSuccessorTopicIds(): void {
-    let topicIdToChildTopicId = {}
+    let topicIdToChildTopicId = {};
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
-      topicIdToChildTopicId[topicId] = []
+      topicIdToChildTopicId[topicId] = [];
     }
 
     for (let topicid in this._topicIdToPrerequisiteTopicIds) {
-      let prerequisites = this._topicIdToPrerequisiteTopicIds[topicid]
+      let prerequisites = this._topicIdToPrerequisiteTopicIds[topicid];
       for (let prerequisiteTopicId of prerequisites) {
-        topicIdToChildTopicId[prerequisiteTopicId].push(topicid)
+        topicIdToChildTopicId[prerequisiteTopicId].push(topicid);
       }
     }
-    this._topicIdToSuccessorTopicIds = {}
+    this._topicIdToSuccessorTopicIds = {};
     for (let topicid in topicIdToChildTopicId) {
       let successors = [];
       let children = topicIdToChildTopicId[topicid];
-      while(children.length > 0) {
-        let len = children.length;
 
+      while (children.length > 0) {
+        let len = children.length;
         let lastTopicId = children[len - 1];
-        children.splice(len-1, 1);
+        children.splice(len - 1, 1);
         successors.push(lastTopicId);
       }
       this._topicIdToSuccessorTopicIds[topicid] = successors;
     }
-
   }
 
-  getAncestorsTopicIds(topicId: string) {
+  getAncestorsTopicIds(topicId: string): string[] {
     return this._topicIdToAncestorTopicIds[topicId];
   }
 
-  getSuccessorTopicIds(topicId: string) {
+  getSuccessorTopicIds(topicId: string): string[] {
     return this._topicIdToSuccessorTopicIds[topicId];
   }
 
@@ -114,7 +156,7 @@ export class DiagnosticTestModel {
 
   isTestFinished(): boolean {
     if (
-        this._eligibleTopicIds.length > 0 &&
+      this._eligibleTopicIds.length > 0 &&
         this._failedTopicIds.length === 0 &&
         this._totalNumberOfAttemptedQuestions >= 15
     ) {
@@ -122,7 +164,7 @@ export class DiagnosticTestModel {
     }
 
     if (
-        this._eligibleTopicIds.length === 0 &&
+      this._eligibleTopicIds.length === 0 &&
         this._skippedTopicIds.length > 0 &&
         this._failedTopicIds.length > 0
     ) {
@@ -130,7 +172,7 @@ export class DiagnosticTestModel {
     }
 
     if (
-        this._eligibleTopicIds.length === 0 &&
+      this._eligibleTopicIds.length === 0 &&
         this._skippedTopicIds.length === 0
     ) {
       return true;
@@ -148,12 +190,11 @@ export class DiagnosticTestModel {
   }
 
   getCurrentTopicId(): string {
-    // return Object.keys(this._topicIdToPrerequisiteTopicIds)[0];
     return this._currentTopicId;
   }
 
   setCurrentTopicId(): void {
-    let topicIdToLengthOfExpectedRemoval = {}
+    let topicIdToLengthOfExpectedRemoval = {};
     let lengthOfAncestorTopicIds, lengthOfSuccessorTopicIds;
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
       lengthOfAncestorTopicIds = this._topicIdToAncestorTopicIds[topicId];
@@ -168,7 +209,7 @@ export class DiagnosticTestModel {
       topicIdToLengthOfExpectedRemoval[tempTopicId]);
     for (let topicId in topicIdToLengthOfExpectedRemoval) {
       if (
-          topicIdToLengthOfExpectedRemoval[topicId] >
+        topicIdToLengthOfExpectedRemoval[topicId] >
           tempLenghtOfExpectedRemoval
       ) {
         tempLenghtOfExpectedRemoval = topicIdToLengthOfExpectedRemoval[topicId];
