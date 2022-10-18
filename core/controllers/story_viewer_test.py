@@ -59,9 +59,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.NODE_ID_3 = 'node_3'
         self.EXP_ID_0 = '0'
         self.EXP_ID_1 = '1'
-        self.EXP_ID_2 = '2'
         self.EXP_ID_3 = 'exp_3'
         self.EXP_ID_7 = '7'
+        self.EXP_ID_9 = '9'
         self.NEW_TOPIC_ID = 'new_topic_id'
         self.NEW_STORY_ID = 'new_story_id'
 
@@ -72,14 +72,14 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End',
             correctness_feedback_enabled=True)
         self.save_new_valid_exploration(
-            self.EXP_ID_2, self.admin_id, title='Title 4', end_state_name='End',
+            self.EXP_ID_9, self.admin_id, title='Title 4', end_state_name='End',
             correctness_feedback_enabled=True)
         self.save_new_valid_exploration(
             self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End',
             correctness_feedback_enabled=True)
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
-        self.publish_exploration(self.admin_id, self.EXP_ID_2)
+        self.publish_exploration(self.admin_id, self.EXP_ID_9)
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
 
         story = story_domain.Story.create_default_story(
