@@ -847,7 +847,9 @@ def get_playthrough_from_model(
         playthrough_model.issue_customization_args, actions)
 
 
-def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
+def create_and_put_stats_model(
+    exploration_stats: stats_domain.ExplorationStats
+) -> str:
     """Creates an ExplorationStatsModel in datastore given an ExplorationStats
     domain object.
 
@@ -862,7 +864,7 @@ def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
         state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
         for state_name in exploration_stats.state_stats_mapping
     }
-    instance_id = stats_models.ExplorationStatsModel.create(
+    instance_id = stats_models.ExplorationStatsModel.create_and_put(
         exploration_stats.exp_id,
         exploration_stats.exp_version,
         exploration_stats.num_starts_v1,
@@ -874,6 +876,34 @@ def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
         new_state_stats_mapping
     )
     return instance_id
+
+
+def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
+    """Creates an ExplorationStatsModel given an ExplorationStats
+    domain object.
+
+    Args:
+        exploration_stats: ExplorationStats. The domain object for exploration
+            statistics.
+
+    Returns:
+        ExplorationStatsModel. The ExplorationStatsModel.
+    """
+    new_state_stats_mapping = {
+        state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
+        for state_name in exploration_stats.state_stats_mapping
+    }
+    return stats_models.ExplorationStatsModel.create(
+        exploration_stats.exp_id,
+        exploration_stats.exp_version,
+        exploration_stats.num_starts_v1,
+        exploration_stats.num_starts_v2,
+        exploration_stats.num_actual_starts_v1,
+        exploration_stats.num_actual_starts_v2,
+        exploration_stats.num_completions_v1,
+        exploration_stats.num_completions_v2,
+        new_state_stats_mapping
+    )
 
 
 def save_stats_model(

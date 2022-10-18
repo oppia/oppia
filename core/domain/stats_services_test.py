@@ -52,7 +52,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.exp_id = 'exp_id1'
         self.exp_version = 1
         self.stats_model_id = (
-            stats_models.ExplorationStatsModel.create(
+            stats_models.ExplorationStatsModel.create_and_put(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
         stats_models.ExplorationIssuesModel.create(
             self.exp_id, self.exp_version, [])
@@ -453,7 +453,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 list(exploration.states.keys())
             )
         )
-        stats_services.create_stats_model(exploration_stats_for_new_exploration)
+        stats_services.create_and_put_stats_model(
+            exploration_stats_for_new_exploration
+        )
 
         newly_created_exploration_stats = (
             stats_services.get_exploration_stats_by_id(
@@ -618,7 +620,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exp_versions_diff,
             None
         )
-        stats_services.create_stats_model(exploration_stats)
+        stats_services.create_and_put_stats_model(exploration_stats)
 
         exploration_stats_with_none = (
             stats_services.get_exploration_stats_by_id(
@@ -657,7 +659,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exp_versions_diff,
             None
         )
-        stats_services.create_stats_model(exploration_stats)
+        stats_services.create_and_put_stats_model(exploration_stats)
 
         exploration_stats_with_none = (
             stats_services.get_exploration_stats_by_id(
@@ -686,7 +688,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exp_versions_diff,
             None
         )
-        stats_services.create_stats_model(exploration_stats)
+        stats_services.create_and_put_stats_model(exploration_stats)
 
         exploration_stats_with_none = (
             stats_services.get_exploration_stats_by_id(
@@ -724,7 +726,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exp_versions_diff,
             None
         )
-        stats_services.create_stats_model(exploration_stats)
+        stats_services.create_and_put_stats_model(exploration_stats)
 
         exploration_stats_with_none = (
             stats_services.get_exploration_stats_by_id(
@@ -763,7 +765,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exp_versions_diff,
             None
         )
-        stats_services.create_stats_model(exploration_stats)
+        stats_services.create_and_put_stats_model(exploration_stats)
 
         exploration_stats_with_none = (
             stats_services.get_exploration_stats_by_id(
@@ -820,7 +822,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exp_versions_diff,
             None
         )
-        stats_services.create_stats_model(exploration_stats)
+        stats_services.create_and_put_stats_model(exploration_stats)
 
         exp_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -860,7 +862,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 5
             )
         )
-        stats_services.create_stats_model(exploration_stats_for_new_exp_version)
+        stats_services.create_and_put_stats_model(
+            exploration_stats_for_new_exp_version
+        )
 
         newly_created_exploration_stats = (
             stats_services.get_exploration_stats_by_id(
@@ -897,7 +901,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exp_versions_diff,
             None
         )
-        stats_services.create_stats_model(exploration_stats)
+        stats_services.create_and_put_stats_model(exploration_stats)
 
         exploration.rename_state('New state 5', 'New state 7')
         exploration.rename_state('New state 6', 'New state 5')
@@ -924,7 +928,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exp_versions_diff,
             None
         )
-        stats_services.create_stats_model(exploration_stats)
+        stats_services.create_and_put_stats_model(exploration_stats)
 
         exploration_stats_with_none = (
             stats_services.get_exploration_stats_by_id(
@@ -985,14 +989,14 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'Introduction': stats_domain.StateStats.create_default()
         })
 
-    def test_create_stats_model(self) -> None:
-        """Test the create_stats_model method."""
+    def test_create_and_put_stats_model(self) -> None:
+        """Test the create_and_put_stats_model method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         # Ruling out the possibility of None for mypy type checking.
         assert exploration_stats is not None
         exploration_stats.exp_version += 1
-        model_id = stats_services.create_stats_model(exploration_stats)
+        model_id = stats_services.create_and_put_stats_model(exploration_stats)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version + 1)
         # Ruling out the possibility of None for mypy type checking.
@@ -1017,7 +1021,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert exploration_stats is not None
         exploration_stats.exp_version += 1
-        model_id = stats_services.create_stats_model(exploration_stats)
+        model_id = stats_services.create_and_put_stats_model(exploration_stats)
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 3)
@@ -1044,6 +1048,44 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 }
             })
 
+    def test_create_stats_model(self) -> None:
+        """Test the create_stats_model method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration_stats is not None
+        exploration_stats.exp_version += 1
+        exploration_stats_model = stats_services.create_stats_model(
+            exploration_stats
+        )
+        # Check that the version is not updated yet.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version + 1)
+        self.assertIsNone(exploration_stats)
+        # Put the stats model with updated version.
+        exploration_stats_model.update_timestamps()
+        exploration_stats_model.put()
+        # Check that the version is updated.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version + 1)
+        self.assertEqual(exploration_stats.exp_version, self.exp_version + 1)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version + 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration_stats is not None
+        self.assertEqual(exploration_stats.exp_id, 'exp_id1')
+        self.assertEqual(exploration_stats.exp_version, 2)
+        self.assertEqual(exploration_stats.num_starts_v1, 0)
+        self.assertEqual(exploration_stats.num_starts_v2, 0)
+        self.assertEqual(exploration_stats.num_actual_starts_v1, 0)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
+        self.assertEqual(exploration_stats.num_completions_v1, 0)
+        self.assertEqual(exploration_stats.num_completions_v2, 0)
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
+
     def test_save_stats_model(self) -> None:
         """Test the save_stats_model method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -1065,7 +1107,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
     def test_get_exploration_stats_multi(self) -> None:
         """Test the get_exploration_stats_multi method."""
-        stats_models.ExplorationStatsModel.create(
+        stats_models.ExplorationStatsModel.create_and_put(
             'exp_id2', 2, 10, 0, 0, 0, 0, 0, {})
         exp_version_references = [
             exp_domain.ExpVersionReference(self.exp_id, self.exp_version),

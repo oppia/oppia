@@ -242,8 +242,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 migrated_exp.id, migrated_exp.version,
                 list(migrated_exp.states.keys()),
                 exp_versions_diff, None)
-            # Puts new stats model corresponding to the new version.
-            stats_services.create_stats_model(new_exp_stats)
+            models_to_put_values.append(
+                stats_services.create_stats_model(new_exp_stats)
+            )
         datastore_services.update_timestamps_multi(list(models_to_put_values))
 
         return models_to_put_values
