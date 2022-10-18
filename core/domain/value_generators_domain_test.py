@@ -111,7 +111,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         )
         expected_generators = {
             'RandomSelector': type(generators.RandomSelector())
-            }
+        }
         with self.swap(module, 'Copier', MockCopier):
             value_generators = (
                 value_generators_domain.Registry.get_all_generator_classes()
