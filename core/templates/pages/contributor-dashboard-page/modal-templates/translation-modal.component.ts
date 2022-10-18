@@ -38,7 +38,10 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { RteOutputDisplayComponent } from 'extensions/rich_text_components/rte-output-display.component';
+// This throws "TS2307". We need to
+// suppress this error because rte-output-display is not strictly typed yet.
+// @ts-ignore
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');

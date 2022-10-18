@@ -61,9 +61,9 @@ export class UnresolvedAnswersOverviewComponent
 
   isUnresolvedAnswersOverviewShown(): boolean {
     let activeStateName = this.stateEditorService.getActiveStateName();
-    if (activeStateName === null) {
-      throw new Error('State name should not be null.');
-    }
+    // if (activeStateName === null) {
+    //   throw new Error('State name should not be null.');
+    // }
     return this.stateTopAnswersStatsService.hasStateStats(activeStateName) &&
       this.isStateRequiredToBeResolved(activeStateName);
   }
