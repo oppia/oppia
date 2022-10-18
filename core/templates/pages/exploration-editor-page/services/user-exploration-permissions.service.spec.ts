@@ -45,8 +45,6 @@ describe('User Exploration Permissions Service', () => {
     can_manage_voice_artist: false
   };
   let permissionsResponse: ExplorationPermissions;
-  let contextService: ContextService;
-
 
   beforeEach(()=> {
     TestBed.configureTestingModule({
