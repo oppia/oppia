@@ -37,6 +37,7 @@ describe('Exploration Save Prompt Modal Component', () => {
   let component: ExplorationSavePromptModalComponent;
   let fixture: ComponentFixture<ExplorationSavePromptModalComponent>;
   let ngbActiveModal: NgbActiveModal;
+  let contextService: ContextService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -49,15 +50,7 @@ describe('Exploration Save Prompt Modal Component', () => {
           provide: NgbActiveModal,
           useClass: MockActiveModal
         },
-        {
-          provide: ContextService,
-          useValue: {
-            getExplorationId: () => {
-              return 'explorationId';
-            },
-            setExplorationIsLinkedToStory: () => {}
-          }
-        },
+        ContextService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -68,7 +61,11 @@ describe('Exploration Save Prompt Modal Component', () => {
     component = fixture.componentInstance;
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    contextService = TestBed.inject(ContextService);
 
+    spyOn(contextService, 'getExplorationId').and.returnValue(
+      'explorationId');
     fixture.detectChanges();
   });
 
