@@ -29,6 +29,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import rights_manager
+from core.domain import stats_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -233,6 +234,18 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     opportunity_services
                     .update_opportunity_with_updated_exploration(
                         migrated_exp.id))
+            exp_versions_diff = (
+                exp_domain.ExplorationVersionsDiff(
+                    [change for change in exp_changes]
+                )
+            )
+            # Trigger statistics model update.
+            new_exp_stats = stats_services.get_stats_for_new_exp_version(
+                migrated_exp.id, migrated_exp.version,
+                list(migrated_exp.states.keys()),
+                exp_versions_diff, None)
+            # Puts new stats model corresponding to the new version.
+            stats_services.create_stats_model(new_exp_stats)
         datastore_services.update_timestamps_multi(list(models_to_put_values))
 
         return models_to_put_values
