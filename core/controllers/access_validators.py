@@ -153,9 +153,7 @@ class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {
+    URL_PATH_ARGS_SCHEMAS = {
         'learner_group_id': {
             'schema': {
                 'type': 'basestring',
@@ -168,9 +166,7 @@ class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
         }
     }
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, str] = {
         'GET': {}
     }
 
