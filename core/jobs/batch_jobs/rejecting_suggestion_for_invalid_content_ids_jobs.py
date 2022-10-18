@@ -84,9 +84,9 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
             if not suggestion_change['content_id'] in translatable_content_ids:
                 suggestion.status = suggestion_models.STATUS_REJECTED
 
-            html = suggestion_change['translation_html']
             suggestion_change['translation_html'] = (
-                exp_domain.Exploration.fix_content(html))
+                exp_domain.Exploration.fix_content(
+                    suggestion_change['translation_html']))
 
         return suggestions
 
@@ -112,16 +112,15 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
                         )
                     )
             )
-            | 'Add target id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+            | 'Add target id as key' >> beam.GroupBy(  # pylint: disable=no-value-for-parameter
                 lambda model: model.target_id)
-            | 'Group exploration suggestions' >> beam.GroupByKey()
         )
 
         exploration_models = (
             self.pipeline
             | 'Get all exploration models' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all())
-            | 'Add exploration id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+            | 'Add exploration id as key' >> beam.GroupBy(  # pylint: disable=no-value-for-parameter
                 lambda model: model.id)
         )
 
