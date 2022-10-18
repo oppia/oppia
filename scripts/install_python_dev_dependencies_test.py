@@ -28,7 +28,7 @@ import sys
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
-from typing import Any, Dict, Generator, List, Tuple
+from typing import Dict, Generator, List
 
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
@@ -142,9 +142,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_install_dev_dependencies(self) -> None:
 
-        def mock_run(
-            *_args: Tuple[Any], **_kwargs: Dict[Any, Any],
-        ) -> None:  # pylint: disable=unused-argument
+        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
             pass
 
         run_swap = self.swap_with_checks(
@@ -161,14 +159,10 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_compile_pip_requirements_no_change(self) -> None:
 
-        def mock_run(
-            *_args: Tuple[Any], **_kwargs: Dict[Any, Any],
-        ) -> None:  # pylint: disable=unused-argument
+        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
             pass
 
-        def mock_open(
-                *_args: Tuple[Any],
-                **_kwargs: Dict[Any, Any]) -> io.StringIO:
+        def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             return io.StringIO('mock file contents')
 
         run_swap = self.swap_with_checks(
@@ -201,16 +195,12 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_compile_pip_requirements_change(self) -> None:
 
-        def mock_run(
-            *_args: Tuple[Any], **_kwargs: Dict[Any, Any],
-        ) -> None:  # pylint: disable=unused-argument
+        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
             pass
 
         counter = []
 
-        def mock_open(
-                *_args: Tuple[Any],
-                **_kwargs: Dict[Any, Any]) -> io.StringIO:
+        def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             counter.append(1)
             return io.StringIO(f'mock file contents {len(counter)}')
 
@@ -246,7 +236,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_func() -> None:
             pass
 
-        def mock_compile(*_args: Any) -> bool:
+        def mock_compile(*_args: str) -> bool:
             return False
 
         assert_swap = self.swap_with_checks(
@@ -270,7 +260,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_func() -> None:
             pass
 
-        def mock_compile(*_args: Any) -> bool:
+        def mock_compile(*_args: str) -> bool:
             return False
 
         assert_swap = self.swap_with_checks(
@@ -295,7 +285,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_func() -> None:
             pass
 
-        def mock_compile(*_args: Any) -> bool:
+        def mock_compile(*_args: str) -> bool:
             return True
 
         assert_swap = self.swap_with_checks(
@@ -319,7 +309,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_func() -> None:
             pass
 
-        def mock_compile(*_args: Any) -> bool:
+        def mock_compile(*_args: str) -> bool:
             return True
 
         assert_swap = self.swap_with_checks(
