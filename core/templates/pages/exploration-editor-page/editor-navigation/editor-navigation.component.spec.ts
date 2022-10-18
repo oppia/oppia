@@ -174,6 +174,10 @@ describe('Editor Navigation Component', () => {
     component.ngOnInit();
   });
 
+  afterEach(() => {
+    fixture.destroy();
+  });
+
   describe('when screen is large', () => {
     beforeEach(() => {
       contextService = TestBed.inject(ContextService);

@@ -261,6 +261,7 @@ describe('State Name Editor component', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+    fixture.destroy();
   });
 
   it('should not save state name when it is longer than 50 characters',

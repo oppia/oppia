@@ -74,6 +74,10 @@ describe('Create Activity Modal Component', () =>{
     userService = TestBed.get(UserService);
   }));
 
+  afterEach(() => {
+    fixture.destroy();
+  });
+
   it('should evalute component properties after component is initialized',
     fakeAsync(() => {
       const UserInfoObject = {
