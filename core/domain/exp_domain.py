@@ -3351,7 +3351,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Fix RTE content present inside the choices.
         for choice in choices:
             choice_html = choice['html']
-            choice['html'] = cls._fix_content(choice_html)
+            choice['html'] = cls.fix_content(choice_html)
 
     @classmethod
     def _set_lower_and_upper_bounds(
@@ -4151,7 +4151,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Fix RTE content present inside the choices.
         for choice_drag in choices_drag_drop:
             choice_html = choice_drag['html']
-            choice_drag['html'] = cls._fix_content(choice_html)
+            choice_drag['html'] = cls.fix_content(choice_html)
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -4463,7 +4463,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return False
 
     @classmethod
-    def fix_rte_tags(
+    def _fix_rte_tags(
         cls, html: str,
         *,
         is_tags_nested_inside_tabs_or_collapsible: bool = False
@@ -4641,7 +4641,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return False
 
     @classmethod
-    def fix_tabs_and_collapsible_tags(cls, html: str) -> str:
+    def _fix_tabs_and_collapsible_tags(cls, html: str) -> str:
         """Fixes all tabs and collapsible tags, performs the following:
         - `oppia-noninteractive-tabs`
             - If no `tab_contents-with-value` attribute, tag will be removed
@@ -4671,7 +4671,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 empty_tab_contents = []
                 for tab_content in tab_content_list:
-                    tab_content['content'] = cls.fix_rte_tags(
+                    tab_content['content'] = cls._fix_rte_tags(
                         tab_content['content'],
                         is_tags_nested_inside_tabs_or_collapsible=True
                     )
@@ -4706,7 +4706,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     tag, collapsible_content, is_collapsible=True):
                     continue
 
-                collapsible_content = cls.fix_rte_tags(
+                collapsible_content = cls._fix_rte_tags(
                     collapsible_content,
                     is_tags_nested_inside_tabs_or_collapsible=True
                 )
@@ -4728,7 +4728,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return str(soup).replace('<br/>', '<br>')
 
     @classmethod
-    def _fix_content(cls, html: str) -> str:
+    def fix_content(cls, html: str) -> str:
         """Helper function to fix the html.
 
         Args:
@@ -4737,9 +4737,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             html: str. The fixed html data.
         """
-        html = cls.fix_rte_tags(
+        html = cls._fix_rte_tags(
             html, is_tags_nested_inside_tabs_or_collapsible=False)
-        html = cls.fix_tabs_and_collapsible_tags(html)
+        html = cls._fix_tabs_and_collapsible_tags(html)
         return html
 
     @classmethod
@@ -4759,7 +4759,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for state in states_dict.values():
             # Fix tags for state content.
             html = state['content']['html']
-            state['content']['html'] = cls._fix_content(html)
+            state['content']['html'] = cls.fix_content(html)
 
             # Fix tags for written translations.
             written_translations = (
@@ -4770,18 +4770,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         translated_element_list = []
                         for element in translation['translation']:
                             translated_element_list.append(
-                                cls._fix_content(element))
+                                cls.fix_content(element))
                         translation['translation'] = translated_element_list
                     else:
                         html = translation['translation']
-                        translation['translation'] = cls._fix_content(html)
+                        translation['translation'] = cls.fix_content(html)
 
             # Fix RTE content present inside the answer group's feedback.
             for answer_group in state['interaction']['answer_groups']:
                 feedback = answer_group['outcome']['feedback']['html']
                 if not feedback in cls.empty_values:
                     answer_group['outcome']['feedback']['html'] = (
-                        cls._fix_content(feedback))
+                        cls.fix_content(feedback))
 
             # Fix RTE content present inside the default outcome.
             if state['interaction']['default_outcome'] is not None:
@@ -4789,14 +4789,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'feedback']['html']
                 if not default_feedback in cls.empty_values:
                     state['interaction']['default_outcome']['feedback'][
-                        'html'] = cls._fix_content(default_feedback)
+                        'html'] = cls.fix_content(default_feedback)
 
             # Fix RTE content present inside the Solution.
             if state['interaction']['solution'] is not None:
                 solution = state['interaction']['solution']['explanation'][
                     'html']
                 state['interaction']['solution']['explanation']['html'] = (
-                    cls._fix_content(solution))
+                    cls.fix_content(solution))
 
             # Fix RTE content present inside the Hint.
             empty_hints = []
@@ -4804,7 +4804,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             assert isinstance(hints, list)
             for hint in hints:
                 hint_content = hint['hint_content']['html']
-                hint['hint_content']['html'] = cls._fix_content(hint_content)
+                hint['hint_content']['html'] = cls.fix_content(hint_content)
                 if hint['hint_content']['html'] in cls.empty_values:
                     empty_hints.append(hint)
 

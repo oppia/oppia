@@ -359,9 +359,7 @@ class DraftUpgradeUtil:
                 # type checking.
                 assert isinstance(exp_change.new_value, dict)
                 html = exp_change.new_value['html']
-                html = exp_domain.Exploration.fix_rte_tags(html)
-                html = exp_domain.Exploration.fix_tabs_and_collapsible_tags(
-                    html)
+                html = exp_domain.Exploration.fix_content(html)
                 exp_change.new_value['html'] = html
 
             elif exp_change.property_name == (
@@ -386,13 +384,8 @@ class DraftUpgradeUtil:
                                     'Conversion cannot be completed.')
 
                             fixed_translation = (
-                                exp_domain.Exploration.fix_rte_tags(
+                                exp_domain.Exploration.fix_content(
                                     written_translation['translation']))
-                            fixed_translation = (
-                                exp_domain.Exploration.
-                                fix_tabs_and_collapsible_tags(
-                                    fixed_translation)
-                            )
                             written_translation['translation'] = (
                                 fixed_translation)
         return draft_change_list

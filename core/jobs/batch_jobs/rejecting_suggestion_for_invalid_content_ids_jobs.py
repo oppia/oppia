@@ -21,7 +21,7 @@ updating the translation content.
 from __future__ import annotations
 
 from core import feconf
-from core import utils
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -30,10 +30,8 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-import bs4
-import json
 
-from typing import List, Union
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -52,373 +50,11 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
     updates the RTE content.
     """
 
-    empty_values = [
-        '&quot;&quot;', '\\"&quot;&quot;\\"', '', '\'\'', '\"\"', '<p></p>']
-
-    @staticmethod
-    def _is_tag_removed_with_invalid_attributes(
-        tag: bs4.BeautifulSoup, attr: str
-    ) -> bool:
-        """Returns True when the tag is removed due to invalid attribute.
-
-        Args:
-            tag: bs4.BeautifulSoup. The RTE tag.
-            attr: str. The attribute that needs to be checked.
-
-        Returns:
-            bool. Returns True when the tag has been deleted.
-        """
-        if not tag.has_attr(attr):
-            tag.decompose()
-            return True
-
-        if (
-            tag[attr].strip() in
-            RejectSuggestionWithMissingContentIdMigrationJob.empty_values
-        ):
-            tag.decompose()
-            return True
-
-        return False
-
-    @staticmethod
-    def fix_rte_tags(
-        html: str,
-        *,
-        is_tags_nested_inside_tabs_or_collapsible: bool = False
-    ) -> str:
-        """Handles all the invalid RTE tags, performs the following:
-            - `oppia-noninteractive-image`
-                - If `alt-with-value` attribute not in the image tag,
-                introduces the attribute and assign empty value
-                - If `filepath-with-value` attribute not in image tag,
-                removes the tag
-                - If `filepath-with-value` attribute empty then removes
-                the tag
-                - If `caption-with-value` attribute not in the image tag,
-                introduces the attribute and assign empty value
-            - `oppia-noninteractive-skillreview`
-                - If `text-with-value` attribute is not present or empty or
-                None, removes the tag
-                - If `skill_id-with-value` attribute is not present or empty or
-                None, removes the tag
-            - `oppia-noninteractive-math`
-                - If `math_content-with-value` attribute not in math tag,
-                removes the tag
-                - If `raw_latex` is not present or empty or None, removes
-                the tag
-            - `oppia-noninteractive-video`
-                - If `start-with-value` or `end-with-value` is not present,
-                introduce them to the tag and assign 0 to them
-                - If `autoplay-with-value` is not present or is not boolean,
-                introduce it to the tag and assign `false` to them
-                - If `video_id-with-value` is not present or empty, removes
-                the tag
-                - If `start-with-value` > `end-with-value`, set both to '0'
-            - `oppia-noninteractive-link`
-                - If `text-with-value` or `url-with-value` is not present,
-                or is empty simply removes the tag
-            - `oppia-noninteractive-tabs` and `oppia-noninteractive-collapsible`
-                - If these tags are nested inside tabs and collapsible tag, we
-                will simply remove the tag
-
-        Args:
-            html: str. The RTE tags.
-            is_tags_nested_inside_tabs_or_collapsible: bool. If the tag is
-                present inside the tabs or collapsible tag.
-
-        Returns:
-            str. Returns the updated html value.
-        """
-        soup = bs4.BeautifulSoup(html, 'html.parser')
-
-        for tag in soup.find_all('oppia-noninteractive-image'):
-            if not tag.has_attr('alt-with-value'):
-                tag['alt-with-value'] = '&quot;&quot;'
-
-            if (
-                RejectSuggestionWithMissingContentIdMigrationJob.
-                _is_tag_removed_with_invalid_attributes(
-                    tag, 'filepath-with-value')
-            ):
-                continue
-
-            if not tag.has_attr('caption-with-value'):
-                tag['caption-with-value'] = '&quot;&quot;'
-
-        for tag in soup.find_all('oppia-noninteractive-skillreview'):
-            if (
-                RejectSuggestionWithMissingContentIdMigrationJob.
-                _is_tag_removed_with_invalid_attributes(tag, 'text-with-value')
-            ):
-                continue
-
-            if (
-                RejectSuggestionWithMissingContentIdMigrationJob.
-                _is_tag_removed_with_invalid_attributes(
-                tag, 'skill_id-with-value')
-            ):
-                continue
-
-        for tag in soup.find_all('oppia-noninteractive-video'):
-            if not tag.has_attr('start-with-value'):
-                tag['start-with-value'] = '0'
-            else:
-                if not tag['start-with-value'].isdigit():
-                    tag['start-with-value'] = '0'
-
-            if not tag.has_attr('end-with-value'):
-                tag['end-with-value'] = '0'
-            else:
-                if not tag['end-with-value'].isdigit():
-                    tag['end-with-value'] = '0'
-
-            if not tag.has_attr('autoplay-with-value'):
-                tag['autoplay-with-value'] = 'false'
-            else:
-                if tag['autoplay-with-value'].strip() not in (
-                    'true', 'false', '\'true\'', '\'false\'',
-                    '\"true\"', '\"false\"', True, False
-                ):
-                    tag['autoplay-with-value'] = 'false'
-
-            if (
-                RejectSuggestionWithMissingContentIdMigrationJob.
-                _is_tag_removed_with_invalid_attributes(
-                tag, 'video_id-with-value')
-            ):
-                continue
-
-            start_value = float(tag['start-with-value'])
-            end_value = float(tag['end-with-value'])
-            if (
-                start_value > end_value and
-                start_value != 0 and
-                end_value != 0
-            ):
-                tag['end-with-value'] = '0'
-                tag['start-with-value'] = '0'
-
-        for tag in soup.find_all('oppia-noninteractive-link'):
-            if (
-                RejectSuggestionWithMissingContentIdMigrationJob.
-                _is_tag_removed_with_invalid_attributes(
-                    tag, 'url-with-value')
-            ):
-                continue
-
-            if not tag.has_attr('text-with-value'):
-                tag['text-with-value'] = tag['url-with-value']
-            else:
-                if (
-                    tag['text-with-value'].strip() in
-                    RejectSuggestionWithMissingContentIdMigrationJob.
-                    empty_values
-                ):
-                    tag['text-with-value'] = tag['url-with-value']
-
-        for tag in soup.find_all('oppia-noninteractive-math'):
-            if (
-                RejectSuggestionWithMissingContentIdMigrationJob.
-                _is_tag_removed_with_invalid_attributes(
-                    tag, 'math_content-with-value')
-            ):
-                continue
-
-            math_content_json = utils.unescape_html(
-                tag['math_content-with-value'])
-            math_content_list = json.loads(math_content_json)
-            if 'raw_latex' not in math_content_list:
-                tag.decompose()
-                continue
-            if (
-                math_content_list['raw_latex'].strip() in
-                RejectSuggestionWithMissingContentIdMigrationJob.empty_values
-            ):
-                tag.decompose()
-                continue
-
-        if is_tags_nested_inside_tabs_or_collapsible:
-            tabs_tags = soup.find_all('oppia-noninteractive-tabs')
-            if len(tabs_tags) > 0:
-                for tabs_tag in tabs_tags:
-                    tabs_tag.decompose()
-                    continue
-            collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
-            if len(collapsible_tags) > 0:
-                for collapsible_tag in collapsible_tags:
-                    collapsible_tag.decompose()
-                    continue
-
-        return str(soup).replace('<br/>', '<br>')
-
-    @staticmethod
-    def _is_tag_removed_with_empty_content(
-        tag: bs4.BeautifulSoup,
-        content: Union[str, List[str]],
-        *,
-        is_collapsible: bool = False
-    ) -> bool:
-        """Returns True when the tag is removed for having empty content.
-
-        Args:
-            tag: bs4.BeautifulSoup. The RTE tag.
-            content: Union[str, List[str]]. The content that needs to be
-                checked.
-            is_collapsible: bool. True if the tag is collapsible tag.
-
-        Returns:
-            bool. Returns True when the tag has been deleted.
-        """
-        if is_collapsible:
-            assert isinstance(content, str)
-            if (
-                content.strip() in
-                RejectSuggestionWithMissingContentIdMigrationJob.empty_values
-            ):
-                tag.decompose()
-                return True
-        else:
-            if len(content) == 0:
-                tag.decompose()
-                return True
-
-        return False
-
-    @staticmethod
-    def fix_tabs_and_collapsible_tags(html: str) -> str:
-        """Fixes all tabs and collapsible tags, performs the following:
-        - `oppia-noninteractive-tabs`
-            - If no `tab_contents-with-value` attribute, tag will be removed
-            - If `tab_contents-with-value` is empty then the tag will be removed
-        - `oppia-noninteractive-collapsible`
-            - If no `content-with-value` attribute, tag will be removed
-            - If `content-with-value` is empty then the tag will be removed
-            - If no `heading-with-value` attribute, tag will be removed
-            - If `heading-with-value` is empty then the tag will be removed
-
-        Args:
-            html: str. The RTE tags.
-
-        Returns:
-            str. Returns the updated html value.
-        """
-        soup = bs4.BeautifulSoup(html, 'html.parser')
-        tabs_tags = soup.find_all('oppia-noninteractive-tabs')
-        for tag in tabs_tags:
-            if tag.has_attr('tab_contents-with-value'):
-                tab_content_json = utils.unescape_html(
-                    tag['tab_contents-with-value'])
-                tab_content_list = json.loads(tab_content_json)
-                if (
-                    RejectSuggestionWithMissingContentIdMigrationJob.
-                    _is_tag_removed_with_empty_content(
-                    tag, tab_content_list, is_collapsible=False)
-                ):
-                    continue
-
-                empty_tab_contents = []
-                for tab_content in tab_content_list:
-                    tab_content['content'] = (
-                        RejectSuggestionWithMissingContentIdMigrationJob.
-                        fix_rte_tags(
-                            tab_content['content'],
-                            is_tags_nested_inside_tabs_or_collapsible=True)
-                    )
-                    if (
-                        tab_content['content'].strip() in
-                        RejectSuggestionWithMissingContentIdMigrationJob.
-                        empty_values
-                    ):
-                        empty_tab_contents.append(tab_content)
-
-                # Remove empty tab content from the tag.
-                for empty_content in empty_tab_contents:
-                    tab_content_list.remove(empty_content)
-
-                if (
-                    RejectSuggestionWithMissingContentIdMigrationJob.
-                    _is_tag_removed_with_empty_content(
-                        tag, tab_content_list, is_collapsible=False)
-                ):
-                    continue
-
-                tab_content_json = json.dumps(tab_content_list)
-                tag['tab_contents-with-value'] = utils.escape_html(
-                    tab_content_json)
-
-            else:
-                tag.decompose()
-                continue
-
-        collapsibles_tags = soup.find_all(
-            'oppia-noninteractive-collapsible')
-        for tag in collapsibles_tags:
-            if tag.has_attr('content-with-value'):
-                collapsible_content_json = (
-                    utils.unescape_html(tag['content-with-value'])
-                )
-                collapsible_content = json.loads(
-                    collapsible_content_json)
-                if (
-                    RejectSuggestionWithMissingContentIdMigrationJob.
-                    _is_tag_removed_with_empty_content(
-                        tag, collapsible_content, is_collapsible=True)
-                ):
-                    continue
-
-                collapsible_content = (
-                    RejectSuggestionWithMissingContentIdMigrationJob.
-                    fix_rte_tags(
-                        collapsible_content,
-                        is_tags_nested_inside_tabs_or_collapsible=True)
-                )
-                if (
-                    RejectSuggestionWithMissingContentIdMigrationJob.
-                    _is_tag_removed_with_empty_content(
-                        tag, collapsible_content, is_collapsible=True)
-                ):
-                    continue
-
-                collapsible_content_json = json.dumps(collapsible_content)
-                tag['content-with-value'] = utils.escape_html(
-                    collapsible_content_json)
-
-            else:
-                tag.decompose()
-                continue
-
-            if (
-                RejectSuggestionWithMissingContentIdMigrationJob.
-                _is_tag_removed_with_invalid_attributes(
-                    tag, 'heading-with-value')
-            ):
-                continue
-
-        return str(soup).replace('<br/>', '<br>')
-
-    @staticmethod
-    def _fix_content(html: str) -> str:
-        """Helper function to fix the html.
-
-        Args:
-            html: str. The html data to fix.
-
-        Returns:
-            html: str. The fixed html data.
-        """
-        html = RejectSuggestionWithMissingContentIdMigrationJob.fix_rte_tags(
-            html, is_tags_nested_inside_tabs_or_collapsible=False)
-        html = (
-            RejectSuggestionWithMissingContentIdMigrationJob.
-            fix_tabs_and_collapsible_tags(html))
-        return html
-
     @staticmethod
     def _update_suggestion_model(
         suggestions: List[suggestion_models.GeneralSuggestionModel],
         exp_model: exp_models.ExplorationModel
-    ) -> None:
+    ) -> List[suggestion_models.GeneralSuggestionModel]:
         """Updates the translation suggestion. The translation whose
         content_id no longer exists, the suggestion status will be marked
         as `rejected`. The RTE content of the suggestion will be updated
@@ -433,9 +69,9 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
             suggestions. List[GeneralSuggestionModel]. Result containing the
             list of updated suggestion models.
         """
-        exp_domain = exp_fetchers.get_exploration_from_model(exp_model)
+        exp_domain_obj = exp_fetchers.get_exploration_from_model(exp_model)
         exp_translatable_contents = (
-            exp_domain.get_translatable_contents_collection())
+            exp_domain_obj.get_translatable_contents_collection())
 
         translatable_content_ids = []
         for content_id in (
@@ -450,8 +86,7 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
 
             html = suggestion_change['translation_html']
             suggestion_change['translation_html'] = (
-                RejectSuggestionWithMissingContentIdMigrationJob._fix_content(
-                    html))
+                exp_domain.Exploration.fix_content(html))
 
         return suggestions
 
@@ -525,11 +160,69 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
 
 
 class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
-    """"""
+    """Audits the suggestions and returns the results."""
 
     @staticmethod
-    def _report_errors_from_suggestion_models():
-        """"""
+    def _report_errors_from_suggestion_models(
+        suggestions: List[suggestion_models.GeneralSuggestionModel],
+        exp_model: exp_models.ExplorationModel
+    ) -> List[Dict[str, List[Dict[str, str]]]]:
+        """Audits the translation suggestion. Reports the following
+        - The info related to suggestion in case the content id is missing
+        - Before and after content of the translation_html.
+
+        Args:
+            suggestions: list(GeneralSuggestionModel). A list of translation
+                suggestion models corresponding to the given exploration.
+            exp_model: ExplorationModel. The exploration model.
+
+        Returns:
+            result_after_migrations. list(dict). Result containing the info
+            of missing content id and the translation before and after
+            migration.
+        """
+        info_for_missing_content_id = []
+        info_for_content_updation = []
+        result_after_migrations = []
+        exp_domain_obj = exp_fetchers.get_exploration_from_model(exp_model)
+        exp_translatable_contents = (
+            exp_domain_obj.get_translatable_contents_collection())
+
+        translatable_content_ids = []
+        for content_id in (
+            exp_translatable_contents.content_id_to_translatable_content.keys()
+        ):
+            translatable_content_ids.append(content_id)
+
+        for suggestion in suggestions:
+            suggestion_change = suggestion.change_cmd
+            if not suggestion_change['content_id'] in translatable_content_ids:
+                info_for_missing_content_id.append(
+                    {
+                        'content_id': suggestion_change['content_id'],
+                        'state_name': suggestion_change['state_name']
+                    }
+                )
+
+            html_before = suggestion_change['translation_html']
+            html_after = exp_domain.Exploration.fix_content(html_before)
+            info_for_content_updation.append(
+                {
+                    'content_before': html_before,
+                    'content_after': html_after
+                }
+            )
+            suggestion_change['translation_html'] = html_after
+
+        result_after_migrations.append(
+            {
+                'exp_id': exp_domain_obj.id,
+                'missing_content_ids': info_for_missing_content_id,
+                'content_translation': info_for_content_updation
+            }
+        )
+
+        return result_after_migrations
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the suggestion updation.
@@ -566,7 +259,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
                 lambda model: model.id)
         )
 
-        errored_suggestion_results = (
+        suggestion_results = (
             {
                 'suggestions': target_id_to_suggestion_models,
                 'exploration': exploration_models
@@ -583,4 +276,31 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
                     )
                 ))
             | 'Flatten suggestion models' >> beam.FlatMap(lambda x: x)
+        )
+
+        report_suggestions = (
+            suggestion_results
+            | 'Report the suggestions data' >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stderr(
+                        f'Results are - {result}'
+                    )
+                )
+            )
+        )
+
+        report_count_suggestion = (
+            suggestion_results
+            | 'Report count for suggestions' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'GROUP OF SUGGESTION PER EXP')
+            )
+        )
+
+        return (
+            (
+                report_suggestions,
+                report_count_suggestion
+            )
+            | 'Combine results' >> beam.Flatten()
         )
