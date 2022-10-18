@@ -52,7 +52,20 @@ describe('Lost Changes Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
-  } as unknown as LostChange];
+    utilsService: null,
+    getStatePropertyValue: null,
+    isEndingExploration: null,
+    isAddingInteraction: null,
+    isOldValueEmpty: null,
+    isNewValueEmpty: null,
+    isOutcomeFeedbackEqual: null,
+    isOutcomeDestEqual: null,
+    isDestEqual: null,
+    isFeedbackEqual: null,
+    isRulesEqual: null,
+    getRelativeChangeToGroups: null,
+    getLanguage: null
+  } as LostChange];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
