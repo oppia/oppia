@@ -84,9 +84,9 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
             if not suggestion_change['content_id'] in translatable_content_ids:
                 suggestion.status = suggestion_models.STATUS_REJECTED
 
-            html = suggestion_change['translation_html']
             suggestion_change['translation_html'] = (
-                exp_domain.Exploration.fix_content(html))
+                exp_domain.Exploration.fix_content(
+                    suggestion_change['translation_html']))
 
         return suggestions
 
