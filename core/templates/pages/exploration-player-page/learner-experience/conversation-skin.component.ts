@@ -1432,13 +1432,12 @@ export class ConversationSkinComponent {
   }
 
   isDisplayedCardCompletedInPrevSession(): boolean {
-    let k =  (
+    return (
       this.displayedCard.getInteraction() &&
       (this.prevSessionStatesProgress.indexOf(
         this.displayedCard.getStateName()) !== -1
       )
     );
-    return k;
   }
 
   isProgressClearanceMessageShown(): boolean {

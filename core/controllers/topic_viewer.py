@@ -147,16 +147,3 @@ class TopicPageDataHandler(base.BaseHandler):
             'page_title_fragment_for_web': topic.page_title_fragment_for_web
         })
         self.render_json(self.values)
-
-
-class TopicDiagnosticTestSkillIds:
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self, topic_id):
-        topic = topic_fetchers.get_topic_by_id(topic_id)
-        skill_ids_for_diagnostic_test = topic.skill_ids_for_diagnostic_test
-
-        self.values.update({
-            'skill_ids_for_diagnostic_test': skill_ids_for_diagnostic_test
-        })

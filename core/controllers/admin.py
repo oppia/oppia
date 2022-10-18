@@ -795,8 +795,6 @@ class AdminHandler(base.BaseHandler):
 
             classroom_1 = classroom_config_domain.Classroom.from_dict(
                 classroom_dict_1)
-            print(classroom_dict_1)
-            print('nikhil')
             classroom_2 = classroom_config_domain.Classroom.from_dict(
                 classroom_dict_2)
 

@@ -22,8 +22,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { DiagnosticTestModel } from './diagnostic-test.model';
-import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 
 @Component({
@@ -55,36 +54,6 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   returnBackToClassroom(): void {
     this.windowRef.nativeWindow.location.href = '/learn/math';
-  }
-
-  startDiagnosticTest(): void {
-    // fetch the math topic ID.
-    const classroomId = 'mhO3GQHDNfqk';
-
-    this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
-      response => {
-        this.diagnosticTestData = new DiagnosticTestModel(
-          response.classroomDict.topicIdToPrerequisiteTopicIds);
-        this.diagnosticTestData.setCurrentTopicId();
-        let currentTopicId = this.diagnosticTestData.getCurrentTopicId();
-
-      this.topicsAndSkillsDashboardBackendApiService
-        .fetchTopicIdToDiagnosticTestSkillIdsAsync([currentTopicId]).then(
-          (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
-            let diagnosticTestSkillIds = (
-              responseDict.topicIdToDiagnosticTestSkillIds[currentTopicId]);
-
-            this.questionPlayerConfig = {
-              resultActionButtons: [],
-              skillList: diagnosticTestSkillIds,
-              questionCount: 2,
-              questionsSortedByDifficulty: true
-            };
-
-            this.diagnosticTestStarted = true;
-          });
-      }
-    );
   }
 }
 
