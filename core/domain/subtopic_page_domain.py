@@ -24,8 +24,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import Callable, List, Optional, Union
-from typing_extensions import Final, Literal, TypedDict
+from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
