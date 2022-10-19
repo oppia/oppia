@@ -706,7 +706,7 @@
     "I18N_LEARNER_GROUP_PREFERENCES_TAB": "Preferences",
     "I18N_LEARNER_GROUP_PROGRESS_IN_STORIES_SECTION": "Progress in Stories",
     "I18N_LEARNER_GROUP_PROGRESS_NO_LEARNERS": "There are no learners in this group. Please invite learners to see their progress.",
-    "I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT": "As a learner, you can decide if facilitators are able to view your lesson progress and provide you feedback. You can change this setting at any time.",
+    "I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT": "As a learner, you can decide if facilitators are able to view your lesson progress and provide you with feedback. You can change this setting at any time.",
     "I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TITLE": "Set sharing permissions:",
     "I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_FALSE": "No, maybe later",
     "I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_TRUE": "Yes, I would like to share my progress",
