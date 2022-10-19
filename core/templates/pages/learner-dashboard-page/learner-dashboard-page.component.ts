@@ -154,7 +154,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
-  learnerGroupsImageUrl: string = '';
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
@@ -199,8 +198,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       '/learner_dashboard/todolist.svg');
     this.progressImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/progress.svg');
-    this.learnerGroupsImageUrl = this.getStaticImageUrl(
-      '/learner_dashboard/learner-groups.svg');
 
     let dashboardTopicAndStoriesDataPromise = (
       this.learnerDashboardBackendApiService
