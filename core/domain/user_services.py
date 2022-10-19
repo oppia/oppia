@@ -39,8 +39,8 @@ from core.platform import models
 
 import requests
 
-from typing import Dict, List, Optional, Sequence, overload
-from typing_extensions import Final, Literal, TypedDict
+from typing import (
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover

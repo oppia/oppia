@@ -27,7 +27,6 @@ from scripts import build
 from scripts import common
 from scripts import run_lighthouse_tests
 from scripts import servers
-from typing import Any
 
 GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
@@ -56,7 +55,7 @@ class MockCompilerContextManager():
     def __enter__(self) -> MockCompiler:
         return MockCompiler()
 
-    def __exit__(self, *unused_args: Any) -> None:
+    def __exit__(self, *unused_args: str) -> None:
         pass
 
 
@@ -117,7 +116,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'https://oppia.org/skill_editor/4\n',
                     b'Task output.')
 
-        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
@@ -141,7 +140,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'https://oppia.org/skill_editor/4\n',
                     b'ABC error.')
 
-        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
@@ -190,7 +189,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 pass
             def __enter__(self) -> MockFailedCompiler:
                 return MockFailedCompiler()
-            def __exit__(self, *unused_args: Any) -> None:
+            def __exit__(self, *unused_args: str) -> None:
                 pass
 
         def mock_failed_context_manager() -> MockFailedCompilerContextManager:
@@ -215,7 +214,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'Task output',
                     b'No error.')
 
-        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
@@ -236,7 +235,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'Task failed.',
                     b'ABC error.')
 
-        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
@@ -259,7 +258,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 return (
                     b'Task output',
                     b'No error.')
-        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap(
             subprocess, 'Popen', mock_popen)
@@ -294,7 +293,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
             lambda *unused_args: None, expected_args=(('performance', '1'),))
-        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap(
             subprocess, 'Popen', mock_popen)
