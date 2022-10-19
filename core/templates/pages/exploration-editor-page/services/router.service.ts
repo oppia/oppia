@@ -227,13 +227,10 @@ export class RouterService {
     return this._getCurrentStateFromLocationPath();
   }
 
-  navigateToMainTab(stateName: string | null): void {
+  navigateToMainTab(stateName: string): void {
     this._savePendingChanges();
-    const state = this._getCurrentStateFromLocationPath();
-    if (state === null) {
-      return;
-    }
-    let oldState = decodeURI(state);
+    let oldState = decodeURI(
+      this._getCurrentStateFromLocationPath());
 
     if (oldState === ('/' + stateName)) {
       return;
