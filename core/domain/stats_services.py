@@ -877,7 +877,9 @@ def create_and_put_stats_model(
     return instance_id
 
 
-def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
+def create_stats_model(
+    exploration_stats: stats_domain.ExplorationStats
+) -> stats_models.ExplorationStatsModel:
     """Creates an ExplorationStatsModel given an ExplorationStats
     domain object.
 

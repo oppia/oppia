@@ -642,21 +642,21 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         model.update_timestamps()
         model.put()
         model_id = model.id
-        model = stats_models.ExplorationStatsModel.get_model(
+        fetched_model = stats_models.ExplorationStatsModel.get_model(
             'exp_id1', 1)
 
         # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
-        self.assertEqual(model.id, model_id)
-        self.assertEqual(model.exp_id, 'exp_id1')
-        self.assertEqual(model.exp_version, 1)
-        self.assertEqual(model.num_starts_v1, 0)
-        self.assertEqual(model.num_actual_starts_v1, 0)
-        self.assertEqual(model.num_completions_v1, 0)
-        self.assertEqual(model.num_starts_v2, 0)
-        self.assertEqual(model.num_actual_starts_v2, 0)
-        self.assertEqual(model.num_completions_v2, 0)
-        self.assertEqual(model.state_stats_mapping, {})
+        assert fetched_model is not None
+        self.assertEqual(fetched_model.id, model_id)
+        self.assertEqual(fetched_model.exp_id, 'exp_id1')
+        self.assertEqual(fetched_model.exp_version, 1)
+        self.assertEqual(fetched_model.num_starts_v1, 0)
+        self.assertEqual(fetched_model.num_actual_starts_v1, 0)
+        self.assertEqual(fetched_model.num_completions_v1, 0)
+        self.assertEqual(fetched_model.num_starts_v2, 0)
+        self.assertEqual(fetched_model.num_actual_starts_v2, 0)
+        self.assertEqual(fetched_model.num_completions_v2, 0)
+        self.assertEqual(fetched_model.state_stats_mapping, {})
 
     def test_get_multi_stats_models(self) -> None:
         stats_models.ExplorationStatsModel.create_and_put(

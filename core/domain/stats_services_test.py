@@ -1067,6 +1067,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         # Check that the version is updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version + 1)
+        assert exploration_stats is not None
         self.assertEqual(exploration_stats.exp_version, self.exp_version + 1)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version + 1)

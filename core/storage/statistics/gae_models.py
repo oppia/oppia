@@ -1343,7 +1343,7 @@ class ExplorationStatsModel(base_models.BaseModel):
         num_completions_v1: int,
         num_completions_v2: int,
         state_stats_mapping: Dict[str, Dict[str, int]]
-    ) -> str:
+    ) -> ExplorationStatsModel:
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
 
@@ -1362,7 +1362,7 @@ class ExplorationStatsModel(base_models.BaseModel):
                 dicts.
 
         Returns:
-            str. ID of the new ExplorationStatsModel instance.
+            ExplorationStatsModel. The ExplorationStatsModel instance.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         stats_instance = cls(
