@@ -29,8 +29,7 @@ import os
 import sys
 import unittest
 
-from typing import List, Optional
-from typing_extensions import Final
+from typing import Final, List, Optional
 
 sys.path.insert(1, os.getcwd())
 
