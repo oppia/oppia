@@ -27,6 +27,8 @@ from core.domain import story_fetchers
 from core.domain import subtopic_page_services
 from core.domain import user_services
 
+from typing import Dict
+
 
 LEARNER_GROUP_SCHEMA = {
     'group_title': {
@@ -44,7 +46,7 @@ LEARNER_GROUP_SCHEMA = {
     'learner_usernames': {
         'schema': {
             'type': 'list',
-            'items': {
+            'itemsDict[str, Dict[str]]': {
                 'type': 'basestring',
                 'validators': [{
                     'id': 'has_length_at_most',
@@ -91,13 +93,13 @@ LEARNER_GROUP_SCHEMA = {
 class CreateLearnerGroupHandler(base.BaseHandler):
     """Handles creation of a new learner group."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': LEARNER_GROUP_SCHEMA
     }
 
     @acl_decorators.can_access_learner_groups
-    def post(self):
+    def post(self) -> None:
         """Creates a new learner group."""
 
         title = self.normalized_payload.get('group_title')
@@ -143,8 +145,7 @@ class LearnerGroupHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
 
@@ -154,7 +155,7 @@ class LearnerGroupHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def put(self, learner_group_id):
+    def put(self, learner_group_id: str) -> None:
         """Updates an existing learner group."""
 
         title = self.normalized_payload.get('group_title')
@@ -201,7 +202,7 @@ class LearnerGroupHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_access_learner_groups
-    def delete(self, learner_group_id):
+    def delete(self, learner_group_id: str) -> None:
         """Deletes a learner group."""
 
         is_valid_request = learner_group_services.is_user_facilitator(
@@ -232,8 +233,7 @@ class LearnerGroupLearnerProgressHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
 
@@ -249,7 +249,7 @@ class LearnerGroupLearnerProgressHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self, learner_group_id: str) -> None:
         """Handles GET requests for users progress through learner
         group syllabus.
         """
@@ -327,17 +327,16 @@ class LearnerGroupLearnerSpecificProgressHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
 
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self, learner_group_id: str) -> None:
         """Handles GET requests for user progress through learner
         group syllabus.
         """
@@ -395,16 +394,16 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self, learner_group_id: str) -> None:
         """Handles GET requests for the learner group syllabus."""
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
@@ -432,7 +431,7 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -470,7 +469,7 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests for learner group syllabus views."""
 
         search_keyword = self.normalized_request.get('search_keyword')
@@ -500,8 +499,8 @@ class FacilitatorDashboardHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
@@ -543,16 +542,15 @@ class ViewLearnerGroupInfoHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self, learner_group_id: str) -> None:
         """Handles GET requests for viewing learner group info."""
 
         is_valid_facilitator = learner_group_services.is_user_facilitator(
@@ -584,13 +582,13 @@ class ViewLearnerGroupInfoHandler(base.BaseHandler):
 class FacilitatorDashboardPage(base.BaseHandler):
     """Page showing the teacher dashboard."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
@@ -601,13 +599,13 @@ class FacilitatorDashboardPage(base.BaseHandler):
 class CreateLearnerGroupPage(base.BaseHandler):
     """Page for creating a new learner group."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
@@ -620,7 +618,7 @@ class LearnerGroupSearchLearnerHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -640,7 +638,7 @@ class LearnerGroupSearchLearnerHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
 
         username: str = self.normalized_request.get('username')
@@ -694,16 +692,15 @@ class EditLearnerGroupPage(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, group_id):
+    def get(self, group_id: str) -> None:
         """Handles GET requests."""
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
@@ -730,17 +727,16 @@ class LearnerGroupLearnersInfoHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
 
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self, learner_group_id: str) -> None:
         """Handles GET requests."""
 
         is_valid_request = learner_group_services.is_user_facilitator(
@@ -791,8 +787,7 @@ class LearnerGroupLearnerInvitationHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
 
@@ -823,7 +818,7 @@ class LearnerGroupLearnerInvitationHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def put(self, learner_group_id):
+    def put(self, learner_group_id: str) -> None:
         """Handles PUT requests."""
 
         learner_username = self.normalized_payload.get('learner_username')
@@ -873,8 +868,7 @@ class ExitLearnerGroupHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
 
@@ -893,7 +887,7 @@ class ExitLearnerGroupHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def put(self, learner_group_id):
+    def put(self, learner_group_id: str) -> None:
         """Handles PUT requests."""
 
         learner_username = self.normalized_payload.get('learner_username')
@@ -947,7 +941,7 @@ class LearnerStoriesChaptersProgressHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, username):
+    def get(self, username: str) -> None:
         """Handles GET requests."""
 
         story_ids = self.normalized_request.get('story_ids')
@@ -965,13 +959,13 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests for the fetching learner groups on learner
         dashboard.
         """
@@ -1027,8 +1021,7 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
                 }]
-            },
-            'default_value': None
+            }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -1044,7 +1037,7 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self, learner_group_id: str) -> None:
         """Handles GET requests."""
 
         progress_sharing_permission = (
@@ -1056,7 +1049,7 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_access_learner_groups
-    def put(self, learner_group_id):
+    def put(self, learner_group_id: str) -> None:
         """Handles PUT requests."""
 
         progress_sharing_permission = (
@@ -1078,13 +1071,13 @@ class LearnerGroupsFeatureStatusHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_json({
             'feature_is_enabled': (
