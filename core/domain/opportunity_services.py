@@ -359,7 +359,6 @@ def update_exploration_opportunities_with_story_changes(
         exploration_opportunity_summary_list)
 
 
-
 def delete_exploration_opportunities(exp_ids: List[str]) -> None:
     """Deletes the ExplorationOpportunitySummaryModel models corresponding to
     the given exp_ids.
