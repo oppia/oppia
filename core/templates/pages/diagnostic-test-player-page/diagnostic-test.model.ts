@@ -19,7 +19,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 
-interface TopicIdToRelatedTopicIds {
+export interface TopicIdToRelatedTopicIds {
   [topicId: string]: string[];
 }
 
@@ -72,61 +72,28 @@ export class DiagnosticTestModelData {
     this.setTopicIdToSuccessorTopicIds();
   }
 
-  setTopicIdToAncestorTopicIds(): void {
-    this._topicIdToAncestorTopicIds = {};
-    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
-      let ancestors = [];
-      let prerequisites = cloneDeep(
-        this._topicIdToPrerequisiteTopicIds[topicId]);
-
-      while (prerequisites.length > 0) {
-        let len = prerequisites.length;
-        let lastTopicId = prerequisites[len - 1];
-        prerequisites.splice(len - 1, 1);
-        if (ancestors.indexOf(lastTopicId) === -1) {
-          ancestors.push(lastTopicId);
-        }
-
-        prerequisites = prerequisites.concat(
-          this._topicIdToPrerequisiteTopicIds[lastTopicId]);
-      }
-      this._topicIdToAncestorTopicIds[topicId] = ancestors;
-    }
-  }
-
   getTopicIdToAncestorTopicIds(): TopicIdToRelatedTopicIds {
     return this._topicIdToAncestorTopicIds;
   }
 
-  setTopicIdToSuccessorTopicIds(): void {
-    let topicIdToChildTopicId: TopicIdToRelatedTopicIds = {};
-    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
-      topicIdToChildTopicId[topicId] = [];
-    }
+  getEligibleTopicIds(): string[] {
+    return this._eligibleTopicIds;
+  }
 
-    for (let topicid in this._topicIdToPrerequisiteTopicIds) {
-      let prerequisites = this._topicIdToPrerequisiteTopicIds[topicid];
-      for (let prerequisiteTopicId of prerequisites) {
-        topicIdToChildTopicId[prerequisiteTopicId].push(topicid);
-      }
-    }
+  getFailedTopicIds(): string[] {
+    return this._failedTopicIds;
+  }
 
-    this._topicIdToSuccessorTopicIds = {};
-    for (let topicid in topicIdToChildTopicId) {
-      let successors = [];
-      let children = cloneDeep(topicIdToChildTopicId[topicid]);
+  getPassedTopicIds(): string[] {
+    return this._passedTopicIds;
+  }
 
-      while (children.length > 0) {
-        let len = children.length;
-        let lastTopicId = children[len - 1];
-        children.splice(len - 1, 1);
-        successors.push(lastTopicId);
+  getCurrentTopicId(): string {
+    return this._currentTopicId;
+  }
 
-        children = children.concat(
-          this._topicIdToSuccessorTopicIds[lastTopicId]);
-      }
-      this._topicIdToSuccessorTopicIds[topicid] = successors;
-    }
+  getSkippedTopicIds(): string[] {
+    return this._skippedTopicIds;
   }
 
   getTopicIdToSuccessorTopicIds(): TopicIdToRelatedTopicIds {
@@ -145,79 +112,60 @@ export class DiagnosticTestModelData {
     this._totalNumberOfAttemptedQuestions += incrementByValue;
   }
 
-  recordTopicPassed(): void {
-    let ancestors = this._topicIdToAncestorTopicIds[this._currentTopicId];
-    this._passedTopicIds.push(this._currentTopicId);
+  getNumberOfAttemptedQuestions(): number {
+    return this._totalNumberOfAttemptedQuestions;
+  }
 
-    let topicIdsToRemoveFromEligibleList: string[] = [];
-    topicIdsToRemoveFromEligibleList.concat(ancestors);
-    topicIdsToRemoveFromEligibleList.push(this._currentTopicId);
+  setTopicIdToAncestorTopicIds(): void {
+    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
+      let ancestors: string[] = [];
+      let prerequisites: string[] = cloneDeep(
+        this._topicIdToPrerequisiteTopicIds[topicId]);
 
-    this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
-      if (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1) {
-        return true;
+      while (prerequisites.length > 0) {
+        let len = prerequisites.length;
+        let lastTopicId = prerequisites[len - 1];
+        prerequisites.splice(len - 1, 1);
+        if (ancestors.indexOf(lastTopicId) === -1) {
+          ancestors.push(lastTopicId);
+        }
+
+        prerequisites = prerequisites.concat(
+          this._topicIdToPrerequisiteTopicIds[lastTopicId]);
       }
-      return false;
-    });
-
-    this._skippedTopicIds.concat(ancestors);
+      this._topicIdToAncestorTopicIds[topicId] = ancestors;
+    }
   }
 
-  recordTopicFailed(): void {
-    let successors = this._topicIdToSuccessorTopicIds[this._currentTopicId];
-    this._failedTopicIds.push(this._currentTopicId);
+  setTopicIdToSuccessorTopicIds(): void {
+    let topicIdToChildTopicId: TopicIdToRelatedTopicIds = {};
 
-    let topicIdsToRemoveFromEligibleList: string[] = [];
-    topicIdsToRemoveFromEligibleList.concat(successors);
-    topicIdsToRemoveFromEligibleList.push(this._currentTopicId);
+    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
+      topicIdToChildTopicId[topicId] = [];
+    }
 
-    this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
-      if (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1) {
-        return true;
+    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
+      let prereq = this._topicIdToPrerequisiteTopicIds[topicId];
+      for (let prereqTopicId of prereq) {
+        topicIdToChildTopicId[prereqTopicId].push(topicId);
       }
-      return false;
-    });
-
-    this._skippedTopicIds.concat(successors);
-  }
-
-  isTestFinished(): boolean {
-    if (
-      this._eligibleTopicIds.length > 0 &&
-        this._failedTopicIds.length === 0 &&
-        this._totalNumberOfAttemptedQuestions >= 15
-    ) {
-      return true;
     }
 
-    if (
-      this._eligibleTopicIds.length === 0 &&
-        this._skippedTopicIds.length > 0 &&
-        this._failedTopicIds.length > 0
-    ) {
-      return true;
+    for (let topicId in topicIdToChildTopicId) {
+      let successors: string[] = [];
+      let children: string[] = topicIdToChildTopicId[topicId];
+
+      while (children.length > 0) {
+        let len = children.length;
+        let lastTopicId = children[len - 1];
+        children.splice(len - 1, 1);
+        if (successors.indexOf(lastTopicId) === -1) {
+          successors.push(lastTopicId);
+        }
+        children = children.concat(topicIdToChildTopicId[lastTopicId]);
+      }
+      this._topicIdToSuccessorTopicIds[topicId] = successors;
     }
-
-    if (
-      this._eligibleTopicIds.length === 0 &&
-        this._skippedTopicIds.length === 0
-    ) {
-      return true;
-    }
-
-    return false;
-  }
-
-  getEligibleTopicIds(): string[] {
-    return this._eligibleTopicIds;
-  }
-
-  getFailedTopicIds(): string[] {
-    return this._failedTopicIds;
-  }
-
-  getCurrentTopicId(): string {
-    return this._currentTopicId;
   }
 
   setCurrentTopicId(): void {
@@ -247,5 +195,58 @@ export class DiagnosticTestModelData {
       }
     }
     this._currentTopicId = tempTopicId;
+  }
+
+  recordTopicPassed(): void {
+    let ancestors = this._topicIdToAncestorTopicIds[this._currentTopicId];
+    this._passedTopicIds.push(this._currentTopicId);
+
+    let topicIdsToRemoveFromEligibleList: string[] = [];
+    topicIdsToRemoveFromEligibleList = (
+      topicIdsToRemoveFromEligibleList.concat(ancestors));
+    topicIdsToRemoveFromEligibleList.push(this._currentTopicId);
+
+    this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
+      if (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1) {
+        return true;
+      }
+      return false;
+    });
+
+    this._skippedTopicIds = this._skippedTopicIds.concat(ancestors);
+  }
+
+  recordTopicFailed(): void {
+    let successors = this._topicIdToSuccessorTopicIds[this._currentTopicId];
+    this._failedTopicIds.push(this._currentTopicId);
+
+    let topicIdsToRemoveFromEligibleList: string[] = [];
+    topicIdsToRemoveFromEligibleList = (
+      topicIdsToRemoveFromEligibleList.concat(successors));
+    topicIdsToRemoveFromEligibleList.push(this._currentTopicId);
+
+    this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
+      if (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1) {
+        return true;
+      }
+      return false;
+    });
+
+    this._skippedTopicIds = this._skippedTopicIds.concat(successors);
+  }
+
+  isTestFinished(): boolean {
+    if (this._eligibleTopicIds.length === 0) {
+      return true;
+    }
+
+    if (
+      this._eligibleTopicIds.length > 0 &&
+        this._totalNumberOfAttemptedQuestions >= 15
+    ) {
+      return true;
+    }
+
+    return false;
   }
 }

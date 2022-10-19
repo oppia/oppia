@@ -17,17 +17,20 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { DiagnosticTestModelData } from './diagnostic-test.model';
+import { DiagnosticTestModelData, TopicIdToRelatedTopicIds } from './diagnostic-test.model';
+
 
 describe('Diagnostic test model', () => {
   let diagnosticTestModelData: DiagnosticTestModelData;
+  let topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: []
     });
 
-    const topicIdToPrerequisiteTopicIds = {
+    topicIdToPrerequisiteTopicIds = {
       topicID1: [],
       topicID2: ['topicID1'],
       topicID3: ['topicID2'],
@@ -38,11 +41,11 @@ describe('Diagnostic test model', () => {
       topicID8: ['topicID7'],
       topicID9: ['topicID5', 'topicID8'],
     };
-    diagnosticTestModelData = new DiagnosticTestModelData(
-      topicIdToPrerequisiteTopicIds);
   });
 
   it('should be able to get topic ID to ancestor topic IDs', () => {
+    diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
     const expectedAncestorTopicIds = {
       topicID1: [],
       topicID2: ['topicID1'],
@@ -67,27 +70,38 @@ describe('Diagnostic test model', () => {
   });
 
   it('should be able to able to get topic ID to successor topic IDs', () => {
+    diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
+
     const expectedSuccessorTopicIds = {
       topicID1: [
-        'topicID2', 'topicID3', 'topicID4', 'topicID5', 'topicID7',
-        'topicID8', 'topicID9'],
+        'topicID2', 'topicID7', 'topicID8', 'topicID9', 'topicID3',
+        'topicID4', 'topicID5'],
       topicID2: [
-        'topicID3', 'topicID4', 'topicID5', 'topicID7', 'topicID8',
-        'topicID9'],
-      topicID3: ['topicID4', 'topicID5', 'topicID7', 'topicID8', 'I'],
+        'topicID7', 'topicID8', 'topicID9', 'topicID3', 'topicID4', 'topicID5'],
+      topicID3: ['topicID7', 'topicID8', 'topicID9', 'topicID4', 'topicID5'],
       topicID4: ['topicID5', 'topicID9'],
       topicID5: ['topicID9'],
       topicID6: ['topicID7', 'topicID8', 'topicID9'],
       topicID7: ['topicID8', 'topicID9'],
       topicID8: ['topicID9'],
-      topicID9: []
+      topicID9: [],
     };
 
     expect(diagnosticTestModelData.getTopicIdToSuccessorTopicIds()).toEqual(
       expectedSuccessorTopicIds);
+
+    expect(diagnosticTestModelData.getSuccessorTopicIds('topicID3')).toEqual(
+      ['topicID7', 'topicID8', 'topicID9', 'topicID4', 'topicID5']);
+
+    expect(diagnosticTestModelData.getSuccessorTopicIds('topicID6')).toEqual(
+      ['topicID7', 'topicID8', 'topicID9']);
   });
 
   it('should be able to get eligible topic IDs', () => {
+    diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
+
     const expectedEligibleTopicIDs = [
       'topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5', 'topicID6',
       'topicID7', 'topicID8', 'topicID9'];
@@ -95,4 +109,105 @@ describe('Diagnostic test model', () => {
     expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
       expectedEligibleTopicIDs);
   });
+
+  it('should be able to get current topic ID', () => {
+    diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
+
+    const expectedTopicId = 'topicID3';
+
+    diagnosticTestModelData.setCurrentTopicId();
+
+    expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
+      expectedTopicId);
+  });
+
+  it('should be able to record topic as failed', () => {
+    diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
+
+    diagnosticTestModelData.setCurrentTopicId();
+    diagnosticTestModelData.recordTopicFailed();
+
+    const expectedEligibleTopicIDs = ['topicID1', 'topicID2', 'topicID6'];
+    const expectedSkippedTopicIDs = [
+      'topicID7', 'topicID8', 'topicID9', 'topicID4', 'topicID5'];
+
+    expect(diagnosticTestModelData.getFailedTopicIds()).toEqual(['topicID3']);
+
+    expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
+      expectedEligibleTopicIDs);
+
+    expect(diagnosticTestModelData.getSkippedTopicIds()).toEqual(
+      expectedSkippedTopicIDs);
+  });
+
+  it('should be able to record topic as passed', () => {
+    diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
+
+    diagnosticTestModelData.setCurrentTopicId();
+    diagnosticTestModelData.recordTopicPassed();
+
+    const expectedEligibleTopicIDs = [
+      'topicID4', 'topicID5', 'topicID6', 'topicID7', 'topicID8', 'topicID9'];
+    const expectedSkippedTopicIDs = ['topicID2', 'topicID1'];
+
+    expect(diagnosticTestModelData.getPassedTopicIds()).toEqual(['topicID3']);
+
+    expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
+      expectedEligibleTopicIDs);
+
+    expect(diagnosticTestModelData.getSkippedTopicIds()).toEqual(
+      expectedSkippedTopicIDs);
+  });
+
+  it('should be able to increment number of attempted questions', () => {
+    diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
+
+    const initialAttemptedQuestions = 0;
+
+    expect(diagnosticTestModelData.getNumberOfAttemptedQuestions()).toEqual(
+      initialAttemptedQuestions);
+
+    diagnosticTestModelData.incrementNumberOfAttemptedQuestions(5);
+
+    expect(diagnosticTestModelData.getNumberOfAttemptedQuestions()).toEqual(
+      initialAttemptedQuestions + 5);
+  });
+
+  it(
+    'should be able to terminate the test when eligible topic IDs list is ' +
+    'empty', () => {
+      diagnosticTestModelData = new DiagnosticTestModelData(
+        topicIdToPrerequisiteTopicIds);
+      diagnosticTestModelData._eligibleTopicIds = [];
+
+      expect(diagnosticTestModelData.isTestFinished()).toBeTrue();
+    });
+
+  it(
+    'should be able to terminate the test when eligible topic IDs list ' +
+    'is non empty and the number of attempted question is greater than 15',
+    () => {
+      diagnosticTestModelData = new DiagnosticTestModelData(
+        topicIdToPrerequisiteTopicIds);
+      diagnosticTestModelData._eligibleTopicIds = ['topicID'];
+      diagnosticTestModelData._totalNumberOfAttemptedQuestions = 15;
+
+      expect(diagnosticTestModelData.isTestFinished()).toBeTrue();
+    });
+
+  it(
+    'should not be able to terminate the test when any eligible topic ID ' +
+    'is left for testing and number of attempted question is less than 15',
+    () => {
+      diagnosticTestModelData = new DiagnosticTestModelData(
+        topicIdToPrerequisiteTopicIds);
+      diagnosticTestModelData._eligibleTopicIds = ['topicID'];
+      diagnosticTestModelData._totalNumberOfAttemptedQuestions = 13;
+
+      expect(diagnosticTestModelData.isTestFinished()).toBeFalse();
+    });
 });
