@@ -46,7 +46,7 @@ LEARNER_GROUP_SCHEMA = {
     'learner_usernames': {
         'schema': {
             'type': 'list',
-            'itemsDict[str, Dict[str]]': {
+            'items': {
                 'type': 'basestring',
                 'validators': [{
                     'id': 'has_length_at_most',
