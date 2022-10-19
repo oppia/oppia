@@ -64,8 +64,8 @@ from core.domain import user_services
 from core.platform import models
 
 import deepdiff
-from typing import Dict, List, Optional, Sequence, Tuple, Type, Union, cast
-from typing_extensions import Final, TypedDict
+from typing import (
+    Dict, Final, List, Optional, Sequence, Tuple, Type, TypedDict, Union, cast)
 
 MYPY = False
 if MYPY:  # pragma: no cover
