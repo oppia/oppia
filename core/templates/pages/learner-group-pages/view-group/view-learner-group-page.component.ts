@@ -16,9 +16,8 @@
  * @fileoverview Component for the view learner group page.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
 
 import { LoaderService } from 'services/loader.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
@@ -43,8 +42,7 @@ import './view-learner-group-page.component.css';
   selector: 'oppia-view-learner-group-page',
   templateUrl: './view-learner-group-page.component.html'
 })
-export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
-  directiveSubscriptions = new Subscription();
+export class ViewLearnerGroupPageComponent implements OnInit {
   VIEW_LEARNER_GROUP_TABS_I18N_IDS = (
     LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS);
 
@@ -182,10 +180,6 @@ export class ViewLearnerGroupPageComponent implements OnInit, OnDestroy {
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
     });
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
   }
 }
 
