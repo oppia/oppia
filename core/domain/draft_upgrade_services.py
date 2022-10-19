@@ -351,7 +351,7 @@ class DraftUpgradeUtil:
                 raise InvalidDraftConversionException(
                     'Conversion cannot be completed.')
 
-            elif exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+            if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                 # Ruling out the possibility of any other type for mypy
                 # type checking.
                 assert isinstance(exp_change.new_value, dict)

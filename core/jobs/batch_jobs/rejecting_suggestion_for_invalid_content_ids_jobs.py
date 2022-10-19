@@ -22,7 +22,6 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms

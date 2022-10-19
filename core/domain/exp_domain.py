@@ -4587,20 +4587,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if cls._is_tag_removed_with_invalid_attributes(
                 tag, 'url-with-value'):
                 continue
-            else:
-                url = tag['url-with-value'].replace(
-                    '&quot;', '').replace(' ', '')
-                if utils.get_url_scheme(url) == 'http':
-                    url = url.replace('http', 'https')
 
-                if (
-                    utils.get_url_scheme(url) not in
-                    constants.ACCEPTABLE_SCHEMES
-                ):
-                    tag.decompose()
-                    continue
+            url = tag['url-with-value'].replace(
+                '&quot;', '').replace(' ', '')
+            if utils.get_url_scheme(url) == 'http':
+                url = url.replace('http', 'https')
 
-                tag['url-with-value'] = '&quot;' + url + '&quot;'
+            if (
+                utils.get_url_scheme(url) not in
+                constants.ACCEPTABLE_SCHEMES
+            ):
+                tag.decompose()
+                continue
+
+            tag['url-with-value'] = '&quot;' + url + '&quot;'
 
             if not tag.has_attr('text-with-value'):
                 tag['text-with-value'] = tag['url-with-value']

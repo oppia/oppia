@@ -387,8 +387,10 @@ def get_random_choice(alist: List[T]) -> T:
 
 def get_url_scheme(url: str) -> str:
     """Gets the url scheme used by a link.
+
     Args:
         url: str. The URL.
+
     Returns:
         str. Returns the URL scheme.
     """

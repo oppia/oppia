@@ -9568,7 +9568,6 @@ tags: []
 title: ''
 """)
 
-        self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_multiple_choice_interac)
         self.assertEqual(
