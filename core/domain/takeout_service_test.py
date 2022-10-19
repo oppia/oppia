@@ -1069,9 +1069,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': []
         }
 
-        expected_voiceover_application_data: Dict[
-            str, Dict[str, Optional[str]]
-        ] = {}
         expected_contrib_proficiency_data: Dict[
             str, Dict[str, Union[int, bool]]
         ] = {}
@@ -1147,8 +1144,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'collection_rights': collection_rights_data,
             'general_suggestion': general_suggestion_data,
             'exploration_rights': exploration_rights_data,
-            'general_voiceover_application':
-                expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
