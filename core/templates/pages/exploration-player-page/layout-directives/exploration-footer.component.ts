@@ -63,7 +63,7 @@ export class ExplorationFooterComponent {
   windowIsNarrow!: boolean;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
-  isVisible: boolean = true;
+  isVisible: boolean = false;
 
   // Stores the number of checkpoints in an exploration.
   checkpointCount: number = 0;
@@ -236,6 +236,10 @@ export class ExplorationFooterComponent {
     }
   }
 
+  isTooltipVisible(): boolean {
+    return this.conceptCardManagerService.isConceptCardTooltipOpen();
+  }
+
   openProgressReminderModal(): void {
     let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
       windowClass: 'oppia-progress-reminder-modal'
@@ -329,14 +333,6 @@ export class ExplorationFooterComponent {
     );
     this.conceptCardManagerService.consumeConceptCard();
     modalRef.componentInstance.skillId = this.linkedSkillId;
-    modalRef.result.then(() => {}, (res) => {
-      this.contextService.removeCustomEntityContext();
-      const allowedDismissActions = (
-        ['cancel', 'escape key press', 'backdrop click']);
-      if (!allowedDismissActions.includes(res)) {
-        throw new Error(res);
-      }
-    });
   }
 
   showInformationCard(): void {
@@ -369,8 +365,9 @@ export class ExplorationFooterComponent {
   showConceptCard(): void {
     let state = this.explorationEngineService.getState();
     this.linkedSkillId = state.linkedSkillId;
-    console.log(this.linkedSkillId);
+    if (this.linkedSkillId) {
       this.openConceptCardModal();
+    }
   }
 
   getStaticImageUrl(imagePath: string): string {

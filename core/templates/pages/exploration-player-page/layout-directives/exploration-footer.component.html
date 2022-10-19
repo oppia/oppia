@@ -32,15 +32,15 @@
         <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
         <button *ngIf="isConceptCardButtonVisible()"
-              class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
+              class="oppia-concept-card-button md-button md-default-theme e2e-test-view-hint"
               (click)="showConceptCard()">
             <mat-icon>description</mat-icon>
         </button>
       </div>
     </div>
     <div class="hint-container">
-      <div class="hint-box hint-box-add-ons" *ngIf="isVisible">
-        <span [innerHTML]="'I18N_HINT_NEED_HELP' | translate"></span>
+      <div class="hint-box hint-box-add-ons" *ngIf="isVisible && isTooltipVisible()">
+        <span [innerHTML]="'I18N_CONCEPT_CARD_NEED_HELP' | translate"></span>
         <button type="button"
                 class="btn close"
                 aria-label="Close"
@@ -56,7 +56,7 @@
   .oppia-navbar-breadcrumb-icon .oppia-footer-info-icon .fa-info-circle {
     padding: 6%;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button {
+  .md-button.md-default-theme.oppia-concept-card-button {
     border-radius: 50%;
     height: 32px;
     line-height: 32px;
@@ -68,20 +68,20 @@
     width: 32px;
   }
 
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed {
+  .md-button.md-default-theme.oppia-concept-card-button.viewed {
     background: #009688;
   }
 
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:hover,
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:focus {
+  .md-button.md-default-theme.oppia-concept-card-button.viewed:hover,
+  .md-button.md-default-theme.oppia-concept-card-button.viewed:focus {
     background: #038a7d;
   }
 
-  .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons {
+  .md-button.md-default-theme.oppia-concept-card-button .material-icons {
     font-size: 22px;
   }
 
-  .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
+  .md-button.md-default-theme.oppia-concept-card-button .material-icons.oppia-lightbulb-yellow {
     color: #f5da57;
     font-size: 23px;
   }

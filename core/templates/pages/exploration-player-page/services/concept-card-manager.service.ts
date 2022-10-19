@@ -167,12 +167,6 @@ export class ConceptCardManagerService {
     return true;
   }
 
-  hintsForStateCardExist(): boolean {
-  let numHints = this.hintsAndSolutionManagerService.getNumHints();
-  console.log("Hints calculated" + numHints);
-  return numHints > 0;
-  }
-
   isConceptCardTooltipOpen(): boolean {
     return this.tooltipIsOpen;
   }
