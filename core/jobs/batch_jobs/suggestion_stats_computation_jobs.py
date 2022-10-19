@@ -38,8 +38,8 @@ import apache_beam as beam
 
 import result
 
-from typing import Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
-from typing_extensions import TypedDict
+from typing import (
+    Dict, Iterable, Iterator, List, Optional, Set, Tuple, TypedDict, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
