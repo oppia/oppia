@@ -23,8 +23,7 @@ from core import feconf
 from core import utils
 from core.domain import state_domain
 
-from typing import Dict, List
-from typing_extensions import TypedDict
+from typing import Dict, List, TypedDict
 
 
 class ClassifierTrainingJobDict(TypedDict):
