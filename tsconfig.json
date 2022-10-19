@@ -41,7 +41,8 @@
       "static/*": ["third_party/static/*"],
       "tests/*": ["core/templates/tests/*"],
       "utility/*": ["core/templates/utility/*"],
-      "visualizations/*": ["extensions/visualizations/*"]
+      "visualizations/*": ["extensions/visualizations/*"],
+      "value_generators/*": ["extensions/value_generators/*"]
     }
   },
   "files": [

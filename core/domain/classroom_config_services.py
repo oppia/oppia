@@ -27,8 +27,7 @@ from __future__ import annotations
 from core.domain import classroom_config_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, overload
 
 MYPY = False
 if MYPY: # pragma: no cover

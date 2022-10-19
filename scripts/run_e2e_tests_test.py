@@ -32,8 +32,7 @@ from scripts import run_e2e_tests
 from scripts import scripts_test_utils
 from scripts import servers
 
-from typing import ContextManager, Tuple
-from typing_extensions import Final
+from typing import ContextManager, Final, Tuple
 
 CHROME_DRIVER_VERSION: Final = '77.0.3865.40'
 

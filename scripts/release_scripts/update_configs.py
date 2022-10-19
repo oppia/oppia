@@ -29,8 +29,7 @@ import os
 import re
 
 import github
-from typing import List, Optional
-from typing_extensions import Final
+from typing import Final, List, Optional
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after

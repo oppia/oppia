@@ -22,8 +22,7 @@ import inspect
 
 from extensions.answer_summarizers import models
 
-from typing import Callable, Dict, overload
-from typing_extensions import Literal
+from typing import Callable, Dict, Literal, overload
 
 
 class Registry:
