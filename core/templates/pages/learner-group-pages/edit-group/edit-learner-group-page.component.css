@@ -101,9 +101,17 @@
     width: 100%;
   }
 
+  .oppia-dashboard-view-tabs-container .group-info {
+    padding: 0 20px;
+  }
+
+  .oppia-dashboard-view-tabs-container .group-info-description {
+    display: none;
+  }
+
   .oppia-edit-learner-group .oppia-dashboard-view-tabs {
     display: flex;
-    margin: 40px 10px 0;
+    margin: 20px 10px 0;
     width: 100%;
   }
 

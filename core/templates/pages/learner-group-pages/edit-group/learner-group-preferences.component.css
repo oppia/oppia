@@ -223,10 +223,24 @@
     font-size: 20px;
     line-height: 28px;
   }
+
+  .oppia-learner-group-preferences .preferences-tab-sections {
+    box-shadow: unset;
+    padding: unset;
+  }
+
+  .oppia-learner-group-preferences .current-group-learners {
+    margin-top: 20px;
+  }
 }
 
 @media screen and (max-width: 480px) {
-  .oppia-learner-group-syllabus .preferences-tab-title {
+  .oppia-learner-group-preferences .preferences-tab-title {
     display: none;
+  }
+
+  .oppia-learner-group-preferences .delete-group-button-container,
+  .oppia-learner-group-preferences .delete-group-button {
+    width: 100%;
   }
 }
