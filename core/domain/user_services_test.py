@@ -3775,7 +3775,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_contribution_rights.can_review_translation_for_language_codes,
             ['en', 'hi'])
 
-
     def test_voiceover_review_assignement_adds_language_in_sorted_order(
         self
     ) -> None:
@@ -3959,7 +3958,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             user_services.can_review_translation_suggestions(
                 self.translator_id, language_code='hi'))
-
 
     def test_remove_question_review_rights(self) -> None:
         user_services.allow_user_to_review_question(self.question_reviewer_id)
