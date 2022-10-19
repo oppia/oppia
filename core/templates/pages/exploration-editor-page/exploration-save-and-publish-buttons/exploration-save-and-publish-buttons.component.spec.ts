@@ -23,7 +23,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
-import { ContextService } from 'services/context.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { EditabilityService } from 'services/editability.service';
 import { ChangeListService } from '../services/change-list.service';
@@ -37,6 +36,8 @@ import { ExplorationWarningsService } from '../services/exploration-warnings.ser
 import { ExternalSaveService } from 'services/external-save.service';
 import { ExplorationSavePromptModalComponent } from '../modal-templates/exploration-save-prompt-modal.component';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { ContextService } from 'services/context.service';
 
 describe('Exploration save and publish buttons component', () => {
   let component: ExplorationSaveAndPublishButtonsComponent;
@@ -50,6 +51,7 @@ describe('Exploration save and publish buttons component', () => {
   let explorationWarningsService: ExplorationWarningsService;
   let editabilityService: EditabilityService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
+  let fetchPermissionsAsyncSpy;
 
   let mockExternalSaveEventEmitter = new EventEmitter<void>();
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
@@ -64,6 +66,48 @@ describe('Exploration save and publish buttons component', () => {
          result: Promise.resolve()
        };
      }
+   }
+
+   class MockWindowRef {
+     location = { path: '/create/2234' };
+     nativeWindow = {
+       scrollTo: (value1, value2) => {},
+       sessionStorage: {
+         promoIsDismissed: null,
+         setItem: (testKey1, testKey2) => {},
+         removeItem: (testKey) => {}
+       },
+       gtag: (value1, value2, value3) => {},
+       navigator: {
+         onLine: true,
+         userAgent: null
+       },
+       location: {
+         path: '/create/2234',
+         pathname: '/',
+         hostname: 'oppiaserver.appspot.com',
+         search: '',
+         protocol: '',
+         reload: () => {},
+         hash: '',
+         href: '',
+       },
+       document: {
+         documentElement: {
+           setAttribute: (value1, value2) => {},
+           clientWidth: null,
+           clientHeight: null,
+         },
+         body: {
+           clientWidth: null,
+           clientHeight: null,
+           style: {
+             overflowY: ''
+           }
+         }
+       },
+       addEventListener: (value1, value2) => {}
+     };
    }
 
    beforeEach(waitForAsync(() => {
@@ -83,6 +127,10 @@ describe('Exploration save and publish buttons component', () => {
          {
            provide: ExternalSaveService,
            useClass: MockExternalSaveService
+         },
+         {
+           provide: WindowRef,
+           useClass: MockWindowRef
          },
          {
            provide: NgbModal,
@@ -109,6 +157,14 @@ describe('Exploration save and publish buttons component', () => {
      editabilityService = TestBed.inject(EditabilityService);
      userExplorationPermissionsService = TestBed.inject(
        UserExplorationPermissionsService);
+
+     let userPermissions = {
+       canPublish: true
+     };
+     fetchPermissionsAsyncSpy = spyOn(
+       userExplorationPermissionsService, 'fetchPermissionsAsync');
+     fetchPermissionsAsyncSpy.and
+       .returnValue(Promise.resolve(userPermissions as ExplorationPermissions));
 
      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
        .returnValue(Promise.resolve({
@@ -276,7 +332,7 @@ describe('Exploration save and publish buttons component', () => {
        canPublish: true
      };
      component.explorationCanBePublished = false;
-     spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+     fetchPermissionsAsyncSpy.and
        .returnValue(Promise.resolve(userPermissions as ExplorationPermissions));
 
      component.showPublishExplorationModal();

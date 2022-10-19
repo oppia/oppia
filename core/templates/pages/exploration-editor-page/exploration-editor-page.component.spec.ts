@@ -60,6 +60,8 @@ import { RouterService } from './services/router.service';
 import { StateTutorialFirstTimeService } from './services/state-tutorial-first-time.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 
  class MockNgbModalRef {
    componentInstance = {};
@@ -102,6 +104,8 @@ describe('Exploration editor page component', () => {
   let registerAcceptTutorialModalEventSpy;
   let registerDeclineTutorialModalEventSpy;
   let focusManagerService: FocusManagerService;
+  let explorationPermissionsBackendApiService:
+    ExplorationPermissionsBackendApiService;
   let ngbModal: NgbModal;
   let refreshGraphEmitter = new EventEmitter<void>();
   let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
@@ -110,6 +114,8 @@ describe('Exploration editor page component', () => {
   let mockOpenEditorTutorialEmitter = new EventEmitter<void>();
   let mockOpenTranslationTutorialEmitter = new EventEmitter<void>();
   let mockInitExplorationPageEmitter = new EventEmitter<void>();
+  let isLocationSetToNonStateEditorTabSpy;
+
   let explorationId = 'exp1';
   let explorationData = {
     exploration_is_linked_to_story: true,
@@ -196,6 +202,48 @@ describe('Exploration editor page component', () => {
     show_state_translation_tutorial_on_load: true
   };
 
+  class MockWindowRef {
+    location = { path: '/create/2234' };
+    nativeWindow = {
+      scrollTo: (value1, value2) => {},
+      sessionStorage: {
+        promoIsDismissed: null,
+        setItem: (testKey1, testKey2) => {},
+        removeItem: (testKey) => {}
+      },
+      gtag: (value1, value2, value3) => {},
+      navigator: {
+        onLine: true,
+        userAgent: null
+      },
+      location: {
+        path: '/create/2234',
+        pathname: '/',
+        hostname: 'oppiaserver.appspot.com',
+        search: '',
+        protocol: '',
+        reload: () => {},
+        hash: '',
+        href: '',
+      },
+      document: {
+        documentElement: {
+          setAttribute: (value1, value2) => {},
+          clientWidth: null,
+          clientHeight: null,
+        },
+        body: {
+          clientWidth: null,
+          clientHeight: null,
+          style: {
+            overflowY: ''
+          }
+        }
+      },
+      addEventListener: (value1, value2) => {}
+    };
+  }
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -242,6 +290,10 @@ describe('Exploration editor page component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
         },
         {
           provide: ExplorationDataService,
@@ -295,7 +347,18 @@ describe('Exploration editor page component', () => {
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     ueps = TestBed.inject(UserExplorationPermissionsService);
     focusManagerService = TestBed.inject(FocusManagerService);
+    explorationPermissionsBackendApiService = TestBed.inject(
+      ExplorationPermissionsBackendApiService);
 
+    isLocationSetToNonStateEditorTabSpy = spyOn(
+      rs, 'isLocationSetToNonStateEditorTab');
+    isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
+
+    spyOn(explorationPermissionsBackendApiService, 'getPermissionsAsync')
+      .and.returnValue(Promise.resolve(
+        new ExplorationPermissions(
+          null, null, null, null, null, null, true, null)
+      ));
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.callFake((value) => {});
     spyOn(autosaveInfoModalsService, 'showLostChangesModal').and.stub();
@@ -306,6 +369,11 @@ describe('Exploration editor page component', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+
+    // This will destroy the fixture once the test gone end
+    // this is going to makesure that each testcase is going
+    // to run independent of another test case.
+    fixture.destroy();
   });
 
   describe('when user permission is true and draft changes not valid', () => {
@@ -362,6 +430,7 @@ describe('Exploration editor page component', () => {
 
     it('should start editor tutorial when on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(false);
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
@@ -452,12 +521,13 @@ describe('Exploration editor page component', () => {
 
     it('should navigate to main tab', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
-      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
       spyOn(rs, 'navigateToMainTab').and.callThrough();
 
       component.selectMainTab();
+      component.initExplorationPage();
       tick();
 
       expect(rs.navigateToMainTab).toHaveBeenCalled();
@@ -554,6 +624,7 @@ describe('Exploration editor page component', () => {
 
   describe('Checking internet Connection', () => {
     beforeEach(() => {
+      ueps = TestBed.inject(UserExplorationPermissionsService);
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
       registerDeclineTutorialModalEventSpy = (
@@ -566,7 +637,7 @@ describe('Exploration editor page component', () => {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
       spyOn(tds, 'getFeedbackThreadsAsync')
         .and.returnValue(Promise.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
@@ -683,7 +754,7 @@ describe('Exploration editor page component', () => {
     });
 
     it('should navigate to feedback tab', fakeAsync(() => {
-      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
       spyOn(rs, 'navigateToFeedbackTab').and.callThrough();
 
@@ -719,7 +790,7 @@ describe('Exploration editor page component', () => {
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       spyOn(ics, 'startCheckingConnection');
       spyOn(cls, 'loadAutosavedChangeList');
-      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(true);
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(true);
 
       expect(component.explorationEditorPageHasInitialized).toEqual(false);
       mockInitExplorationPageEmitter.emit();
@@ -802,6 +873,7 @@ describe('Exploration editor page component', () => {
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
       tds = TestBed.inject(ThreadDataBackendApiService);
+      ueps = TestBed.inject(UserExplorationPermissionsService);
 
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
