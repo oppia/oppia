@@ -175,6 +175,9 @@ describe('Editor Navigation Component', () => {
   });
 
   afterEach(() => {
+    // This will destroy the fixture once the test gone end
+    // this is going to makesure that each testcase is going
+    // to run independent of another test case.
     fixture.destroy();
   });
 
