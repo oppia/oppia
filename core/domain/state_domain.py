@@ -36,10 +36,8 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Tuple, Type, Union,
-    cast, overload
-)
-from typing_extensions import Final, Literal, TypedDict
+    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Tuple,
+    Type, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -1882,10 +1880,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         if self.solution:
             self.solution.validate(self.id)
-
-        if self.solution and not self.hints:
-            raise utils.ValidationError(
-                'Hint(s) must be specified if solution is specified')
 
         # TODO(#16236): Find a way to encode these checks more declaratively.
         # Conceptually the validation code should go in each interaction

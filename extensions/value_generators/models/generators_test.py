@@ -29,7 +29,7 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         generator = generators.Copier()
         self.assertEqual(generator.generate_value(None, 'a'), 'a')
         self.assertIn(
-            'init-args="initArgs" value="customizationArgs.value"',
+            '[initArgs]="initArgs" [(value)]="customizationArgs.value"',
             generator.get_html_template())
 
     def test_random_selector(self) -> None:
@@ -37,6 +37,6 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertIn(generator.generate_value(
             {}, ['a', 'b', 'c']), ['a', 'b', 'c'])
         self.assertIn(
-            '[schema]="$ctrl.SCHEMA" ' +
-            'ng-model="$ctrl.customizationArgs.list_of_values"',
+            '[schema]="SCHEMA" ' +
+            '[(ngModel)]="customizationArgs.list_of_values"',
             generator.get_html_template())

@@ -1,7 +1,6 @@
 from .mailchimpclient import MailChimpClient as MailChimpClient
 
-from typing import Any, Dict, List, Optional, Sequence
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Optional, Sequence, TypedDict
 
 
 class ListsDataDict(TypedDict):
