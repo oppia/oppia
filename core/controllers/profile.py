@@ -151,8 +151,6 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
 class AndroidListSubscriptionHandler(base.BaseHandler):
     """Adds user to Android mailing list."""
 
-    EMAIL_REGEX = r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
-
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -161,7 +159,7 @@ class AndroidListSubscriptionHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': EMAIL_REGEX
+                        'regex_pattern': constants.EMAIL_REGEX
                     }]
                 }
             },

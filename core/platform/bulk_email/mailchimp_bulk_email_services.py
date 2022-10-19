@@ -87,8 +87,8 @@ def _create_user_in_mailchimp_db(
         client: mailchimp3.MailChimp. A mailchimp instance with the API key and
             username initialized.
         subscribed_mailchimp_data: dict. Post body with required fields for a
-            new user. The required fields are email_address, status and tags
-            with any relevant merge_fields as optional.
+            new user. The required fields are email_address, status and tags.
+            Any relevant merge_fields are optional.
 
     Returns:
         bool. Whether the user was successfully added to the db. (This will be
@@ -161,6 +161,7 @@ def add_or_update_user_status(
         user_email: str,
         merge_fields: Dict[str, str],
         tag: str,
+        *,
         can_receive_email_updates: bool
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
@@ -177,8 +178,8 @@ def add_or_update_user_status(
         merge_fields: dict. Additional 'merge fields' used by mailchimp for
             adding extra information for each user. The format is
             { 'KEY': value } where the key is defined in the mailchimp
-            dashboard .
-            (reference:
+            dashboard.
+            (Reference:
             https://mailchimp.com/developer/marketing/docs/merge-fields/).
         tag: str. Tag to add to user in mailchimp.
 

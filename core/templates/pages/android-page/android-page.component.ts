@@ -27,7 +27,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { AppConstants } from 'app.constants';
-
 import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
 
 import './android-page.component.css';
@@ -77,8 +76,8 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   featuresShown = 0;
   androidUpdatesSectionIsSeen = false;
   featuresMainTextIsSeen = false;
-  emailAddress: string = '';
-  name: string = '';
+  emailAddress: string | null = null;
+  name: string | null = null;
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
@@ -157,13 +156,13 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
         this.alertsService.addInfoMessage('Done!', 1000);
       } else {
         this.alertsService.addInfoMessage(
-          'Sorry, some unexpected occurred. Please email admin@oppia.org to ' +
-          'add you to the mailing list.', 10000);
+          'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+          'to be added to the mailing list.', 10000);
       }
     }).catch(errorResponse => {
       this.alertsService.addInfoMessage(
-        'Sorry, some unexpected occurred. Please email admin@oppia.org to ' +
-        'add you to the mailing list.', 10000);
+        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+        'to be added to the mailing list.', 10000);
     });
   }
 

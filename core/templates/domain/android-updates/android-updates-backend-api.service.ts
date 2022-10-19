@@ -20,8 +20,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface ReturnStatusData {
+export interface AndroidListReturnStatusData {
   status: boolean;
+}
+
+export interface AndroidListPayload {
+  email: string;
+  name: string;
 }
 
 @Injectable({
@@ -31,9 +36,9 @@ export class AndroidUpdatesBackendApiService {
   constructor(private http: HttpClient) {}
 
   private async _putRequestAsync(
-      handlerUrl: string, payload: Object): Promise<boolean> {
+      handlerUrl: string, payload: AndroidListPayload): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.http.put<ReturnStatusData>(
+      this.http.put<AndroidListReturnStatusData>(
         handlerUrl, payload).toPromise()
         .then(response => {
           resolve(response.status);
@@ -44,7 +49,8 @@ export class AndroidUpdatesBackendApiService {
   }
 
   async subscribeUserToAndroidList(
-      email: string, name: string): Promise<boolean> {
+      email: string, name: string
+  ): Promise<boolean> {
     let payload = {
       email: email,
       name: name,
