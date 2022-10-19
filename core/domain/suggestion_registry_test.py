@@ -37,8 +37,7 @@ from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union, cast
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Optional, TypedDict, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover

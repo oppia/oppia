@@ -36,8 +36,7 @@ from core.domain import user_services
 from core.domain import wipeout_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Type, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional, Sequence, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
