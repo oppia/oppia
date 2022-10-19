@@ -149,7 +149,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             len(number_of_published_blogs),
             1
         )
-        change_dict = {
+        change_dict: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title',
             'thumbnail_filename': 'thummbnail.svg',
             'content': '<p>Hello</p>',

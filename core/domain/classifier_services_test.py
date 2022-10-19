@@ -696,10 +696,13 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         vm_id = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         message = 'test message'
+        # Here we use MyPy ignore because the argument `message`
+        # of generate_signature method can only accept values of type
+        # Bytes, but also handles the case when the message is of type str.
+        # To test whether it behaves correctly when message is of type str,
+        # we silence the mypy error using ignore.
         signature = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            message,
-            vm_id)
+            secret.encode('utf-8'), message, vm_id)  # type: ignore[arg-type]
         expected_signature = (
             '9c2f9f607c0eefc2b8ba153bad9331843a6efc71c82e690f5f0341bbc38b7fa7')
         self.assertEqual(signature, expected_signature)
