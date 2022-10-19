@@ -875,12 +875,22 @@ describe('Exploration save service ' +
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
-        nodes: 'nodes',
-        links: ['links'],
+        nodes: {
+          nodes: {
+            newestStateName: 'newestStateName',
+            originalStateName: 'originalStateName',
+            stateProperty: 'stateProperty',
+          }
+        },
+        links: [{
+          source: 0,
+          target: 0,
+          linkProperty: 'links'
+        }],
         finalStateIds: ['finalStaeIds'],
-        originalStateIds: ['Hola'],
-        stateIds: [],
-      } as unknown as ProcessedStateIdsAndData);
+        originalStateIds: {Hola: 0},
+        stateIds: {Hola: 0},
+      } as ProcessedStateIdsAndData);
     let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
         {
           componentInstance: {
@@ -932,12 +942,23 @@ describe('Exploration save service ' +
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
-        nodes: 'nodes',
-        links: ['links'],
+        nodes: {
+          nodes: {
+            newestStateName: 'nodes',
+            originalStateName: 'originalStateName',
+            stateProperty: 'stateProperty',
+          }
+        },
+        links: [{
+          source: 0,
+          target: 0,
+          linkProperty: 'links'
+        }],
         finalStateIds: ['finalStaeIds'],
-        originalStateIds: ['Hola'],
-        stateIds: [],
-      } as unknown as ProcessedStateIdsAndData);
+        originalStateIds: {Hola: 0},
+        stateIds: {Hola: 0},
+      } as ProcessedStateIdsAndData);
+
     let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
         {
           componentInstance: {
@@ -973,12 +994,22 @@ describe('Exploration save service ' +
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
-        nodes: 'nodes',
-        links: ['links'],
+        nodes: {
+          nodes: {
+            newestStateName: 'newestStateName',
+            originalStateName: 'originalStateName',
+            stateProperty: 'stateProperty',
+          }
+        },
+        links: [{
+          source: 0,
+          target: 0,
+          linkProperty: 'links'
+        }],
         finalStateIds: ['finalStaeIds'],
-        originalStateIds: ['Hola'],
-        stateIds: [],
-      } as unknown as ProcessedStateIdsAndData);
+        originalStateIds: {Hola: 0},
+        stateIds: {Hola: 0},
+      } as ProcessedStateIdsAndData);
     changeListServiceSpy.and.returnValue(Promise.resolve(null));
     let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
       {
@@ -1012,12 +1043,22 @@ describe('Exploration save service ' +
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
-        nodes: 'nodes',
-        links: ['links'],
+        nodes: {
+          nodes: {
+            newestStateName: 'newestStateName',
+            originalStateName: 'originalStateName',
+            stateProperty: 'stateProperty',
+          }
+        },
+        links: [{
+          source: 0,
+          target: 0,
+          linkProperty: 'links'
+        }],
         finalStateIds: ['finalStaeIds'],
-        originalStateIds: ['Hola'],
-        stateIds: [],
-      } as unknown as ProcessedStateIdsAndData);
+        originalStateIds: {Hola: 0},
+        stateIds: {Hola: 0},
+      } as ProcessedStateIdsAndData);
     let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
       {
         componentInstance: {
