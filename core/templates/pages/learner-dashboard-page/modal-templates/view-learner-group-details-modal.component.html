@@ -18,7 +18,7 @@
     <div>{{ learnerGroup.description }}</div>
   </div>
   <div class="group-facilitator">
-    <b [innerHTML]="'I18N_LEARNER_GROUP_FACILITATOR_MODAL_TEXT' | translate"></b>
+    <b [innerHTML]="'I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT' | translate"></b>
     <div>
       <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames; let last = last">
         <span *ngIf="last">{{ facilitator }}</span>

@@ -38,7 +38,7 @@
               {{ learnerGroupSummary.title }}
             </div>
             <div class="oppia-learner-group-summary-card-learners">
-              Facilitator: <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
+              <span translate="I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT">: <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
             </div>
           </div>
           <div class="oppia-learner-group-summary-card-cta-buttons">
@@ -69,7 +69,7 @@
             {{ learnerGroupSummary.title }}
           </div>
           <div class="oppia-learner-group-summary-card-learners">
-            Facilitator: <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
+            <span translate="I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT">: <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
           </div>
         </a>
         <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">
