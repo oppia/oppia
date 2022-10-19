@@ -138,7 +138,6 @@ export class ConceptCardManagerService {
 
   reset(): void {
     if (this.hintsAvailable) {
-      console.log("NON");
       return;
     }
     console.log("Subscription works fine");

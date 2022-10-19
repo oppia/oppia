@@ -1034,20 +1034,23 @@ export class ConversationSkinComponent {
     }
     this.responseTimeout = setTimeout(() => {
       if (this.nextCardIfStuck) {
+        // Let the learner know about the redirection to a state
+        // for clearing concepts.
         this.playerTranscriptService.addNewResponse("Response");
       }
       else {
-        // Release solution
+        // Release solution if no separate state for addressing
+        // the stuck learner exists.
         this.hintsAndSolutionManagerService.releaseSolution();
       }
-    }, 15000);
+    }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
     this.timeout = setTimeout(() => {
       if (this.nextCardIfStuck) {
-        console.log("redirection started");
+        // Redirect the learner.
         this.nextCard = this.nextCardIfStuck;
         this.showPendingCard();
       }
-    }, 18000);
+    }, ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
   }
 
   triggerIfLearnerStuckActionDirectly(): void {
@@ -1062,15 +1065,16 @@ export class ConversationSkinComponent {
     }
     // Directly trigger action for the really stuck learner.
     if (this.nextCardIfStuck) {
-      if (this.nextCardIfStuck) {
-        this.playerTranscriptService.addNewResponse("Response");
+      this.playerTranscriptService.addNewResponse("Response");
+      setTimeout(() => {
         this.nextCard = this.nextCardIfStuck;
         this.showPendingCard();
-      }
-      else {
-        // Release solution
-        this.hintsAndSolutionManagerService.releaseSolution();
-      }
+      }, 10000);
+    }
+    else {
+      // Release solution
+      console.log("Release soln called.")
+      this.hintsAndSolutionManagerService.releaseSolution();
     }
   }
 
@@ -1253,7 +1257,6 @@ export class ConversationSkinComponent {
             // Stay on the same card.
             this.hintsAndSolutionManagerService.recordWrongAnswer();
             this.conceptCardManagerService.recordWrongAnswer();
-            console.log("Aage badh gya fn");
             this.playerTranscriptService.addNewResponse(feedbackHtml);
             let helpCardAvailable = false;
             if (feedbackHtml &&
