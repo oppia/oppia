@@ -472,8 +472,7 @@
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
           </a>
         </li>
-        <li class="nav-item"
-            *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
+        <li class="nav-item" *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/facilitator-dashboard"
              class="dropdown-item nav-link">
