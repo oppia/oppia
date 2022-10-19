@@ -36,8 +36,7 @@ import re
 
 from core.constants import constants
 
-from typing import List, Optional
-from typing_extensions import Final
+from typing import Final, List, Optional
 
 _OPENING_PARENS: List[str] = ['[', '{', '(']
 _CLOSING_PARENS: List[str] = [')', '}', ']']
