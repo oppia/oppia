@@ -149,6 +149,23 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             len(number_of_published_blogs),
             1
         )
+        change_dict = {
+            'title': 'Sample Title',
+            'thumbnail_filename': 'thummbnail.svg',
+            'content': '<p>Hello</p>',
+            'tags': ['one']
+        }
+        blog_services.update_blog_post(
+            self.blog_post_b_id,
+            change_dict)
+        blog_services.publish_blog_post(self.blog_post_b_id)
+        number_of_published_blogs = (
+            blog_services.get_published_blog_post_summaries(size=1)
+        )
+        self.assertEqual(
+            len(number_of_published_blogs),
+            1
+        )
 
     def test_get_total_number_of_published_blog_post_summaries(self) -> None:
         number_of_published_blogs = (
@@ -326,6 +343,11 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_blog_post.url_fragment, 'sample-title' + lower_id)
 
+        # Providing same title in change dict raises no error.
+        change_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
+            'title': 'Sample Title'
+        }
+        blog_services.update_blog_post(self.blog_post_a_id, change_dict)
         blog_services.update_blog_post(self.blog_post_a_id, self.change_dict)
         updated_blog_post = (
             blog_services.get_blog_post_by_id(self.blog_post_a_id))
@@ -624,6 +646,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.publish_blog_post(all_blog_post_ids[i])
 
         with add_docs_swap:
+            blog_services.index_blog_post_summaries_given_ids([])
+            self.assertEqual(add_docs_counter.times_called, 0)
             blog_services.index_blog_post_summaries_given_ids(all_blog_post_ids)
 
         self.assertEqual(add_docs_counter.times_called, 1)
@@ -817,14 +841,14 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_ids_matching_query(
                 '',
                 [],
-                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+                size=5
             )
         )
         self.assertEqual(
             sorted(blog_post_ids),
-            sorted(self.all_blog_post_ids[:6])
+            sorted(self.all_blog_post_ids[:5])
         )
-        self.assertIsNone(search_offset)
+        self.assertEqual(search_offset, 5)
 
     def test_get_blog_post_summaries_with_deleted_blog_post(self) -> None:
         # Ensure deleted blog posts do not show up in search results. Deleting

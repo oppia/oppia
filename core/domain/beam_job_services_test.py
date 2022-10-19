@@ -196,6 +196,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             beam_job_run_models)
 
     def test_get_beam_job_runs_with_refresh(self) -> None:
+        self.assertEqual(beam_job_services.get_beam_job_runs(refresh=True), [])
         beam_job_run_models = [
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.DONE.value),

@@ -489,10 +489,13 @@ def delete_classifier_training_job(job_id: str) -> None:
     """
     classifier_training_job_model = (
         classifier_models.ClassifierTrainingJobModel.get(job_id))
-    if classifier_training_job_model is not None:
-        fs_services.delete_classifier_data(
-            classifier_training_job_model.exp_id, job_id)
-        classifier_training_job_model.delete()
+    # If 'job_id' is invalid, i.e, a classifier_training_job_model is not found
+    # for the provided job_id, an Exception will be thrown by the get() method
+    # above.
+    assert classifier_training_job_model is not None
+    fs_services.delete_classifier_data(
+        classifier_training_job_model.exp_id, job_id)
+    classifier_training_job_model.delete()
 
 
 def get_classifier_training_job(

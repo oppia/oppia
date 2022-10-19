@@ -846,8 +846,9 @@ def apply_change_list(
                     collection.update_language_code(
                         edit_collection_property_language_code_cmd.new_value
                     )
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_TAGS):
+                else:
+                    assert (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_TAGS)
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyTagsCmd.
                     edit_collection_property_tags_cmd = cast(
@@ -857,8 +858,9 @@ def apply_change_list(
                     collection.update_tags(
                         edit_collection_property_tags_cmd.new_value
                     )
-            elif (change.cmd ==
-                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+            else:
+                assert (change.cmd ==
+                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION)
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
