@@ -211,3 +211,22 @@
     width: 90%;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-preferences {
+    width: 100%;
+    background: #fff;
+    padding: 20px;
+  }
+
+  .oppia-learner-group-preferences .preferences-tab-title {
+    font-size: 20px;
+    line-height: 28px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .oppia-learner-group-syllabus .preferences-tab-title {
+    display: none;
+  }
+}

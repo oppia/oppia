@@ -32,7 +32,6 @@ import { ViewLearnerGroupDetailsModalComponent } from './modal-templates/view-le
 
 import './learner-groups-tab.component.css';
 
-
  @Component({
    selector: 'oppia-learner-groups-tab',
    templateUrl: './learner-groups-tab.component.html'

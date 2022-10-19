@@ -18,7 +18,7 @@
               <div class="learner-groups-heading">
                 <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_INVITATIONS' | translate"></span>
               </div>
-              <div *ngIf="invitedToLearnerGroups.length > 0" class="invitations-count-pill">{{invitedToLearnerGroups.length}}</div>
+              <div *ngIf="invitedToLearnerGroups.length > 0" class="invitations-count-pill">{{ invitedToLearnerGroups.length }}</div>
             </div>
             <div class="drop-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -35,10 +35,10 @@
               *ngFor="let learnerGroupSummary of invitedToLearnerGroups">
           <div class="oppia-learner-group-summary-card-info">
             <div class="oppia-learner-group-summary-card-title">
-              {{learnerGroupSummary.title}}
+              {{ learnerGroupSummary.title }}
             </div>
             <div class="oppia-learner-group-summary-card-learners">
-              Facilitator: <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{facilitator}} &nbsp;</span>
+              Facilitator: <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
             </div>
           </div>
           <div class="oppia-learner-group-summary-card-cta-buttons">
@@ -66,10 +66,10 @@
             *ngFor="let learnerGroupSummary of learnerGroupsJoined; let idx = index;">
         <a [href]="getLearnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
           <div class="oppia-learner-group-summary-card-title">
-            {{learnerGroupSummary.title}}
+            {{ learnerGroupSummary.title }}
           </div>
           <div class="oppia-learner-group-summary-card-learners">
-            Facilitator: <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{facilitator}} &nbsp;</span>
+            Facilitator: <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
           </div>
         </a>
         <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">

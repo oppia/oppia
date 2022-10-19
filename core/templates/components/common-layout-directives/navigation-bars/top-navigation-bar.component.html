@@ -496,8 +496,7 @@
             <span [innerHTML]="'I18N_TOPNAV_BLOG_DASHBOARD' | translate"></span>
           </a>
         </li>
-        <li class="nav-item"
-            *ngIf="isModerator">
+        <li class="nav-item" *ngIf="isModerator">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"

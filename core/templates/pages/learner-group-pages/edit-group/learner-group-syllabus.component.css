@@ -207,3 +207,18 @@
     width: 90%;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-syllabus {
+    width: 100%;
+    background: #fff;
+    padding: 20px;
+  }
+
+  .oppia-learner-group-syllabus .assigned-syllabus-tab-title {
+    color: #00645c;
+    font-size: 20px;
+    font-style: normal;
+    line-height: 28px;
+  }
+}

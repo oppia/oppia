@@ -3,10 +3,10 @@
     <div class="group-info-container">
       <div class="group-info">
         <div class="group-info-title">
-          <span>{{learnerGroup.title}}</span>
+          <span>{{ learnerGroup.title }}</span>
         </div>
         <div class="group-info-description">
-          Facilitator: <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames">{{facilitator}} &nbsp;</span>
+          Facilitator: <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
         </div>
       </div>
       <div class="group-cta-buttons-container">
@@ -21,14 +21,14 @@
            (click)="setActiveTab(VIEW_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW)"
            [ngClass]="{'active': isTabActive(VIEW_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW)}">
         <span class="oppia-dashboard-view-tabs-item-text">
-          {{'I18N_LEARNER_GROUP_OVERVIEW_TAB' | translate}}
+          {{ 'I18N_LEARNER_GROUP_OVERVIEW_TAB' | translate }}
         </span>
       </div>
       <div class="oppia-dashboard-view-tabs-item"
            (click)="setActiveTab(VIEW_LEARNER_GROUP_TABS_I18N_IDS.ASSIGNED_SYLLABUS)"
            [ngClass]="{'active': isTabActive(VIEW_LEARNER_GROUP_TABS_I18N_IDS.ASSIGNED_SYLLABUS)}">
         <span class="oppia-dashboard-view-tabs-item-text">
-          {{'I18N_LEARNER_GROUP_ASSIGNED_SYLLABUS_TAB' | translate}}
+          {{ 'I18N_LEARNER_GROUP_ASSIGNED_SYLLABUS_TAB' | translate }}
         </span>
       </div>
     </div>
@@ -41,11 +41,11 @@
         </div>
         <div class="learner-group-overview-summary-card-content" *ngIf="learnerProgress">
           <div class="assigned-stories-info">
-            <div class="stories-count">{{getCompletedStoriesCountByLearner()}}</div>
+            <div class="stories-count">{{ getCompletedStoriesCountByLearner() }}</div>
             <div>Stories Completed</div>
           </div>
           <div class="assigned-skills-info">
-            <div class="skills-count">{{getMasteredSubtopicsCountOfLearner()}}</div>
+            <div class="skills-count">{{ getMasteredSubtopicsCountOfLearner() }}</div>
             <div>Skills Mastered</div>
           </div>
         </div>

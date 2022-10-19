@@ -46,11 +46,10 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
-
-import './learner-dashboard-page.component.css';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 
+import './learner-dashboard-page.component.css';
 
 @Component({
   selector: 'oppia-learner-dashboard-page',

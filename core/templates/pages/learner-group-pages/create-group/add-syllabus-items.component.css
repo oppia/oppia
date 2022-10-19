@@ -102,6 +102,7 @@
   border-radius: 4px;
   display: grid;
   justify-items: center;
+  max-width: 130px;
   min-width: 130px;
   position: relative;
 }

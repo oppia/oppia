@@ -14,14 +14,14 @@
   </div>
   <div class="group-description">
     <b>Description</b>
-    <div>{{learnerGroup.description}}</div>
+    <div>{{ learnerGroup.description }}</div>
   </div>
   <div class="group-facilitator">
     <b [innerHTML]="'I18N_LEARNER_GROUP_FACILITATOR_MODAL_TEXT' | translate"></b>
     <div>
       <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames; let last = last">
-        <span *ngIf="last">{{facilitator}}</span>
-        <span *ngIf="!last">{{facilitator}}, </span>
+        <span *ngIf="last">{{ facilitator }}</span>
+        <span *ngIf="!last">{{ facilitator }}, </span>
       </span>
     </div>
   </div>

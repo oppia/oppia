@@ -37,7 +37,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { LearnerGroupPreferencesModalComponent } from
   '../templates/learner-group-preferences-modal.component';
 
-
 import './view-learner-group-page.component.css';
 
 @Component({

@@ -30,7 +30,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
 import { PracticeSessionPageConstants } from 'pages/practice-session-page/practice-session-page.constants';
 
-
 import './learner-group-view-assigned-syllabus.component.css';
 
 @Component({
