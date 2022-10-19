@@ -133,7 +133,16 @@
 }
 
 @media screen and (max-width: 940px) {
-  .oppia-learner-group-learners-progress {
+  .oppia-learner-group-learners-progress,
+  .learner-specific-progress-view-selectors {
     width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-learners-progress,
+  .learner-specific-progress-view-selectors {
+    padding: 20px;
+    width: 100%;
   }
 }

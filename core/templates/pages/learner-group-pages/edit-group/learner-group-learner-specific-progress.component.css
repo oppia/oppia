@@ -322,3 +322,16 @@
   color: #00645c;
   font-size: 14px;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-learner-specific-progress {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-learner-specific-progress {
+    padding: 20px;
+    width: 100%;
+  }
+}

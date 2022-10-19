@@ -211,6 +211,10 @@
   padding-right: 40px;
 }
 
+.view-learner-group-invitation-modal .modal-body .mat-radio-button {
+  display: unset;
+}
+
 @media screen and (max-width: 575px) {
   .learner-groups-tab .oppia-learner-groups-section-title-container {
     flex-direction: column;
