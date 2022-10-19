@@ -25,7 +25,7 @@ from core.domain import config_domain
 from core.domain import learner_group_services
 from core.domain import user_services
 
-from typing import Any, Dict # isort: skip
+from typing import Dict # isort: skip
 
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
