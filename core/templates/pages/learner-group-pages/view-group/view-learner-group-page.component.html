@@ -6,7 +6,7 @@
           <span>{{ learnerGroup.title }}</span>
         </div>
         <div class="group-info-description">
-          <span translate="I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT">: <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
+          <span translate="I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT"></span>: <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
         </div>
       </div>
       <div class="group-cta-buttons-container">
@@ -42,11 +42,15 @@
         <div class="learner-group-overview-summary-card-content" *ngIf="learnerProgress">
           <div class="assigned-stories-info">
             <div class="stories-count">{{ getCompletedStoriesCountByLearner() }}</div>
-            <div>Stories Completed</div>
+            <div>
+              <span translate="I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION"></span>
+            </div>
           </div>
           <div class="assigned-skills-info">
             <div class="skills-count">{{ getMasteredSubtopicsCountOfLearner() }}</div>
-            <div>Skills Mastered</div>
+            <div>
+              <span translate="I18N_LEARNER_GROUP_SKILLS_MASTERED_SECTION"></span>
+            </div>
           </div>
         </div>
       </div>
