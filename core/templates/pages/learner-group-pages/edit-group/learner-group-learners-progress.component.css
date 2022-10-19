@@ -131,3 +131,9 @@
   cursor: pointer;
   font-weight: 500;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-learners-progress {
+    width: 90%;
+  }
+}

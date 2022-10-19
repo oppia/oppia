@@ -111,3 +111,9 @@
   padding: 10px;
   width: max-content;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-overview {
+    width: 90%;
+  }
+}

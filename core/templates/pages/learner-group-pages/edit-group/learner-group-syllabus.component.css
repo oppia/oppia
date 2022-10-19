@@ -201,3 +201,9 @@
 .added-syllabus-items-successfully-modal .modal-body {
   padding: 15px 40px;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-syllabus {
+    width: 90%;
+  }
+}

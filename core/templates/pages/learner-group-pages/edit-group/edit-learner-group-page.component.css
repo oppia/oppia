@@ -83,3 +83,9 @@
 .oppia-edit-learner-group .oppia-dashboard-view-tabs-item.active svg path {
   fill: #00645c;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-dashboard-view-tabs-container {
+    width: 25%;
+  }
+}

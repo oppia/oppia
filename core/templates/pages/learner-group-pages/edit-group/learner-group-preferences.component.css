@@ -205,3 +205,9 @@
   right: 15px;
   top: 15px;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-preferences {
+    width: 90%;
+  }
+}
