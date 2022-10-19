@@ -309,7 +309,7 @@ export class ConversationSkinComponent {
       this.conceptCardManagerService.onLearnerGetsReallyStuck
         .subscribe(() => {
           this.isLearnerReallyStuck = true;
-          console.log("Receiving val of learnerIsStuck");
+          this.triggerIfLearnerStuckActionDirectly();
         })
     );
 

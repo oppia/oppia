@@ -18,6 +18,7 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
@@ -32,6 +33,7 @@ export class ConceptCardManagerService {
   // or when the service is reset.
   timeout: NodeJS.Timeout | null = null;
   tooltipTimeout: NodeJS.Timeout | null = null;
+  hintsAvailable: number = 0;
 
   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 2000;
 
@@ -68,6 +70,12 @@ export class ConceptCardManagerService {
         this.tooltipIsOpen = false;
       }
     );
+
+    playerPositionService.onNewCardOpened.subscribe(
+      (displayedCard: StateCard) => {
+        this.hintsAvailable = displayedCard.getHints().length;
+      }
+    )
   }
 
   // This replaces any timeouts that are already queued.
@@ -129,7 +137,7 @@ export class ConceptCardManagerService {
   }
 
   reset(): void {
-    if (this.hintsForStateCardExist()) {
+    if (this.hintsAvailable) {
       console.log("NON");
       return;
     }
@@ -164,7 +172,7 @@ export class ConceptCardManagerService {
   let numHints = this.hintsAndSolutionManagerService.getNumHints();
   console.log("Hints calculated" + numHints);
   return numHints > 0;
-}
+  }
 
   isConceptCardTooltipOpen(): boolean {
     return this.tooltipIsOpen;
