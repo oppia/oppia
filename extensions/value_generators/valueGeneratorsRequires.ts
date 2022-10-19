@@ -16,5 +16,5 @@
  * @fileoverview Requires for all the value generators directives.
  */
 
-require('value_generators/templates/copier.directive.ts');
-require('value_generators/templates/random-selector.directive.ts');
+require('value_generators/templates/copier.component.ts');
+require('value_generators/templates/random-selector.component.ts');
