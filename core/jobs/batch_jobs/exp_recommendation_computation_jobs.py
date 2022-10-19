@@ -29,8 +29,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, Iterable, List, Tuple, Union
-from typing_extensions import Final
+from typing import Dict, Final, Iterable, List, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover

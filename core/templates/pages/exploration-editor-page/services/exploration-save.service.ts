@@ -45,7 +45,6 @@ import { ExplorationTitleService } from './exploration-title.service';
 import { ExplorationWarningsService } from './exploration-warnings.service';
 import { RouterService } from './router.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -160,7 +159,7 @@ export class ExplorationSaveService {
           draftChanges !== null &&
           draftChanges.length > 0) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
-            changeList as unknown as LostChange[]);
+              changeList);
             return;
           }
 

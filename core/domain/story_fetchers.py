@@ -33,8 +33,7 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
