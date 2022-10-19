@@ -195,7 +195,7 @@ describe('LearnerGroupViewAssignedSyllabusComponent', () => {
     expect(component.learnerGroup).toEqual(learnerGroup);
 
     component.ngOnInit();
-    tick(100);
+    tick();
 
     expect(component.storySummaries).toEqual(
       mockLearnerProgress.storiesProgress);

@@ -218,7 +218,7 @@ describe('ViewLearnerGroupPageComponent', () => {
     component.username = 'username1';
 
     component.exitLearnerGroup();
-    tick(100);
+    tick();
 
     expect(windowRef.nativeWindow.location.href).toBe(
       '/learner-dashboard?active_tab=learner-groups');
@@ -246,7 +246,7 @@ describe('ViewLearnerGroupPageComponent', () => {
       component.progressSharingPermission = true;
 
       component.viewLearnerGroupPreferences();
-      tick(100);
+      tick();
 
       expect(component.progressSharingPermission).toBe(false);
     })

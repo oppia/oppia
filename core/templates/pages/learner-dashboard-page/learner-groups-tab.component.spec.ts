@@ -150,7 +150,7 @@ describe('Learner groups tab Component', () => {
       component.invitedToLearnerGroups = [sampleShortLearnerGroupSummary];
 
       component.declineLearnerGroupInvitation(sampleShortLearnerGroupSummary);
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.invitedToLearnerGroups).toEqual([]);
@@ -174,7 +174,7 @@ describe('Learner groups tab Component', () => {
       component.learnerGroupsJoined = [];
 
       component.acceptLearnerGroupInvitation(sampleShortLearnerGroupSummary);
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.invitedToLearnerGroups).toEqual([]);
@@ -193,7 +193,7 @@ describe('Learner groups tab Component', () => {
       } as NgbModalRef);
 
       component.viewLearnerGroupDetails(sampleShortLearnerGroupSummary);
-      tick(100);
+      tick();
       fixture.detectChanges();
     })
   );
