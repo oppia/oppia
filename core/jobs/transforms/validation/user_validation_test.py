@@ -31,7 +31,7 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
-from typing_extensions import Final
+from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover

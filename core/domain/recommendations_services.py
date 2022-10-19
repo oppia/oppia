@@ -28,8 +28,7 @@ from core.domain import exp_domain
 from core.domain import rights_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence, cast
-from typing_extensions import Final
+from typing import Dict, Final, List, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
