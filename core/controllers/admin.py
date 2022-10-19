@@ -60,8 +60,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
 
-from typing import Any, Dict, List, Optional, cast
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Optional, TypedDict, cast
 
 
 class AdminPage(base.BaseHandler):
@@ -917,7 +916,7 @@ class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
 
 
 class AdminRoleHandlerNormalizedDeleteRequestDict(TypedDict):
-    """Dict representation of AdminRoleHandler's normalized_request
+    """Dict representation of AdminRoleHandler's DELETE normalized_request
     dictionary.
     """
 
@@ -1331,9 +1330,9 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
         )
 
 
-class DataExtractionQueryHandlerNormalizedPayloadDict(TypedDict):
+class DataExtractionQueryHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of DataExtractionQueryHandler's
-    normalized_payload dictionary.
+    normalized_request dictionary.
     """
 
     exp_id: str
@@ -1374,12 +1373,12 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        payload_data = cast(
-            DataExtractionQueryHandlerNormalizedPayloadDict,
+        request_data = cast(
+            DataExtractionQueryHandlerNormalizedRequestDict,
             self.normalized_request
         )
-        exp_id = payload_data['exp_id']
-        exp_version = payload_data['exp_version']
+        exp_id = request_data['exp_id']
+        exp_version = request_data['exp_version']
 
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
@@ -1388,8 +1387,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
                 'Entity for exploration with id %s and version %s not found.'
                 % (exp_id, exp_version))
 
-        state_name = payload_data['state_name']
-        num_answers = payload_data['num_answers']
+        state_name = request_data['state_name']
+        num_answers = request_data['num_answers']
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(
@@ -1506,9 +1505,9 @@ class NumberOfDeletionRequestsHandler(base.BaseHandler):
         })
 
 
-class VerifyUserModelsDeletedHandlerNormalizedPayloadDict(TypedDict):
+class VerifyUserModelsDeletedHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of VerifyUserModelsDeletedHandler's
-    normalized_payload dictionary.
+    normalized_request dictionary.
     """
 
     user_id: str
@@ -1531,11 +1530,11 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        payload_data = cast(
-            VerifyUserModelsDeletedHandlerNormalizedPayloadDict,
+        request_data = cast(
+            VerifyUserModelsDeletedHandlerNormalizedRequestDict,
             self.normalized_request
         )
-        user_id = payload_data['user_id']
+        user_id = request_data['user_id']
 
         user_is_deleted = wipeout_service.verify_user_deleted(
             user_id, include_delete_at_end_models=True)

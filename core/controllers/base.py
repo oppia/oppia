@@ -38,8 +38,7 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
 
-from typing import Any, Dict, Mapping, Optional, Union
-from typing_extensions import Final, TypedDict
+from typing import Any, Dict, Final, Mapping, Optional, TypedDict, Union
 import webapp2
 
 ONE_DAY_AGO_IN_SECS: Final = -24 * 60 * 60
@@ -164,7 +163,10 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.start_time = datetime.datetime.utcnow()
 
-        # Initializes the return dict for the handlers.
+        # Here we use type Any because dict 'self.values' is a return dict
+        # for the handlers, and different handlers can return different
+        # key-value pairs. So, to allow every type of key-value pair, we
+        # used Any type here.
         self.values: Dict[str, Any] = {}
 
         # This try-catch block is intended to log cases where getting the
@@ -190,12 +192,13 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
-        # Once the attribute `normalized_request` is type annotated here, make
-        # sure to fix all the subclasses using normalized_request.get() method
-        # by removing their type: ignore[union-attr] and using a type cast
-        # instead to eliminate the possibility on union types.
-        # e.g. ClassroomAccessValidationHandler.
+        # Here we use type Any because dict 'self.normalized_request' can
+        # contain normalized version of arg's value, and these arg values
+        # can be of any type. So, to allow every type, we used Any here.
         self.normalized_request: Optional[Dict[str, Any]] = None
+        # Here we use type Any because dict 'self.normalized_payload' can
+        # contain normalized version of arg's value, and these arg values
+        # can be of any type. So, to allow every type, we used Any here.
         self.normalized_payload: Optional[Dict[str, Any]] = None
 
         try:
@@ -481,6 +484,9 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.normalized_payload[arg] = normalized_arg_values.get(arg)
 
+        # Here we use MyPy ignore because here we assigning RaiseErrorOnGet's
+        # instance to a 'get' method, and according to MyPy assignment to a
+        # method is not allowed.
         self.request.get = RaiseErrorOnGet(  # type: ignore[assignment]
             'Use self.normalized_request instead of self.request.').get
         self.payload = RaiseErrorOnGet(
@@ -924,6 +930,8 @@ class CsrfTokenHandler(BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REDIRECT_UNFINISHED_SIGNUPS = False
 
+    # Here we use MyPy ignore because the signature of 'get' method is not
+    # compatible with super class's (BaseHandler) 'get' method.
     def get(self) -> None:  # type: ignore[override]
         csrf_token = CsrfTokenManager.create_csrf_token(
             self.user_id)
@@ -936,6 +944,9 @@ class OppiaMLVMHandler(BaseHandler):
     """Base class for the handlers that communicate with Oppia-ML VM instances.
     """
 
+    # Here we use type Any because this method is implemented in a subclasses
+    # with a return type. So, if we define return type as None here then
+    # subclasses will throw error for incompatible signature.
     def extract_request_message_vm_id_and_signature(self) -> Any:
         """Returns the OppiaMLAuthInfo domain object containing
         information from the incoming request that is necessary for

@@ -20,7 +20,7 @@ from core import feconf
 from core.domain import config_services
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Final
 
 ACCESS_VALIDATION_HANDLER_PREFIX: Final = (
     feconf.ACCESS_VALIDATION_HANDLER_PREFIX

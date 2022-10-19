@@ -1443,8 +1443,14 @@ def assign_role(
         Exception. The assignee is already a manager for the topic.
         Exception. The assignee doesn't have enough rights to become a manager.
         Exception. The role is invalid.
+        Exception. Guest user is not allowed to assign roles to a user.
+        Exception. The role of the Guest user cannot be changed.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to assign roles to a user.'
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
@@ -1455,11 +1461,10 @@ def assign_role(
         raise Exception(
             'UnauthorizedUserException: Could not assign new role.')
 
-    assert committer_id is not None
-
     if assignee.user_id is None:
-        raise Exception
-
+        raise Exception(
+            'Cannot change the role of the Guest user.'
+        )
     assignee_username = user_services.get_username(assignee.user_id)
     if role_services.ACTION_EDIT_OWNED_TOPIC not in assignee.actions:
         raise Exception(

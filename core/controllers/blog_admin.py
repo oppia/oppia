@@ -28,8 +28,7 @@ from core.domain import config_services
 from core.domain import role_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, Union, cast
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Optional, TypedDict, Union, cast
 
 BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN

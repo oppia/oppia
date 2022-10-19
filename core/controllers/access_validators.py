@@ -22,8 +22,7 @@ from core.controllers import base
 from core.domain import classroom_services
 from core.domain import user_services
 
-from typing import Dict, cast
-from typing_extensions import TypedDict
+from typing import Dict, TypedDict, cast
 
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler

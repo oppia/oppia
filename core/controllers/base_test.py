@@ -47,8 +47,7 @@ from core.platform import models
 from core.tests import test_utils
 import main
 
-from typing import Dict, FrozenSet, List, Optional, cast
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 import webapp2
 from webapp2_extras import routes
 import webtest
