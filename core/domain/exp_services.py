@@ -25,7 +25,6 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import collections
-import copy
 import datetime
 import io
 import logging
@@ -65,8 +64,8 @@ from core.domain import user_services
 from core.platform import models
 
 import deepdiff
-from typing import Dict, List, Optional, Sequence, Tuple, Type, Union, cast
-from typing_extensions import Final, TypedDict
+from typing import (
+    Dict, Final, List, Optional, Sequence, Tuple, Type, TypedDict, Union, cast)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1028,8 +1027,8 @@ def populate_exp_summary_model_fields(
 def update_states_version_history(
     states_version_history: Dict[str, state_domain.StateVersionHistory],
     change_list: List[exp_domain.ExplorationChange],
-    old_states: Dict[str, state_domain.State],
-    new_states: Dict[str, state_domain.State],
+    old_states_dict: Dict[str, state_domain.StateDict],
+    new_states_dict: Dict[str, state_domain.StateDict],
     current_version: int,
     committer_id: str
 ) -> Dict[str, state_domain.StateVersionHistory]:
@@ -1042,9 +1041,9 @@ def update_states_version_history(
             exploration.
         change_list: list(ExplorationChange). A list of changes introduced in
             this commit.
-        old_states: dict(str, State). The states in the previous version of
+        old_states_dict: dict(str, dict). The states in the previous version of
             the exploration.
-        new_states: dict(str, State). The states in the current version of
+        new_states_dict: dict(str, dict). The states in the current version of
             the exploration.
         current_version: int. The latest version of the exploration.
         committer_id: str. The id of the user who made the commit.
@@ -1055,26 +1054,11 @@ def update_states_version_history(
     """
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
     prev_version = current_version - 1
-    old_states_dict = copy.deepcopy({
-        state_name: state.to_dict()
-        for (state_name, state) in old_states.items()
-    })
-    new_states_dict = copy.deepcopy({
-        state_name: state.to_dict()
-        for (state_name, state) in new_states.items()
-    })
 
     # Firstly, delete the states from the state version history which were
     # deleted during this commit.
     for state_name in exp_versions_diff.deleted_state_names:
         del states_version_history[state_name]
-
-    # Now, add the states which were newly added during this commit. The
-    # version history of these states are initialized as None because they
-    # were newly added and have no 'previously edited version'.
-    for state_name in exp_versions_diff.added_state_names:
-        states_version_history[state_name] = (
-            state_domain.StateVersionHistory(None, None, committer_id))
 
     # Now, handle the updation of version history of states which were renamed.
     # Firstly, we need to clean up the exp_versions_diff.old_to_new_state_names
@@ -1100,7 +1084,7 @@ def update_states_version_history(
     # The following list includes states which exist in both the old states
     # and new states and were not renamed.
     states_which_were_not_renamed = []
-    for state_name in old_states:
+    for state_name in old_states_dict:
         if (
             state_name not in exp_versions_diff.deleted_state_names and
             state_name not in effective_old_to_new_state_names
@@ -1147,14 +1131,21 @@ def update_states_version_history(
                         prev_version, state_name, committer_id
                     ))
 
+    # Finally, add the states which were newly added during this commit. The
+    # version history of these states are initialized as None because they
+    # were newly added and have no 'previously edited version'.
+    for state_name in exp_versions_diff.added_state_names:
+        states_version_history[state_name] = (
+            state_domain.StateVersionHistory(None, None, committer_id))
+
     return states_version_history
 
 
 def update_metadata_version_history(
     metadata_version_history: exp_domain.MetadataVersionHistory,
     change_list: List[exp_domain.ExplorationChange],
-    old_metadata: exp_domain.ExplorationMetadata,
-    new_metadata: exp_domain.ExplorationMetadata,
+    old_metadata_dict: exp_domain.ExplorationMetadataDict,
+    new_metadata_dict: exp_domain.ExplorationMetadataDict,
     current_version: int,
     committer_id: str
 ) -> exp_domain.MetadataVersionHistory:
@@ -1166,9 +1157,9 @@ def update_metadata_version_history(
             history at the previous version of the exploration.
         change_list: list(ExplorationChange). A list of changes introduced in
             this commit.
-        old_metadata: ExplorationMetadata. The exploration metadata at the
+        old_metadata_dict: dict. The exploration metadata at the
             previous version of the exploration.
-        new_metadata: ExplorationMetadata. The exploration metadata at the
+        new_metadata_dict: dict. The exploration metadata at the
             current version of the exploration.
         current_version: int. The latest version of the exploration.
         committer_id: str. The id of the user who made the commit.
@@ -1176,8 +1167,6 @@ def update_metadata_version_history(
     Returns:
         MetadataVersionHistory. The updated metadata version history.
     """
-    old_metadata_dict = copy.deepcopy(old_metadata.to_dict())
-    new_metadata_dict = copy.deepcopy(new_metadata.to_dict())
     prev_version = current_version - 1
 
     metadata_was_changed = any(
@@ -1252,8 +1241,16 @@ def update_version_history(
         version_history_model_id, strict=False)
 
     if version_history_model is not None:
-        new_states = exploration.states
-        new_metadata = exploration.get_metadata()
+        old_states_dict = {
+            state_name: state.to_dict()
+            for state_name, state in old_states.items()
+        }
+        new_states_dict = {
+            state_name: state.to_dict()
+            for state_name, state in exploration.states.items()
+        }
+        old_metadata_dict = old_metadata.to_dict()
+        new_metadata_dict = exploration.get_metadata().to_dict()
         states_version_history = {
             state_name: state_domain.StateVersionHistory.from_dict(
                 state_version_history_dict)
@@ -1265,12 +1262,12 @@ def update_version_history(
             version_history_model.metadata_last_edited_committer_id)
 
         updated_states_version_history = update_states_version_history(
-            states_version_history, change_list, old_states, new_states,
-            exploration.version, committer_id
+            states_version_history, change_list, old_states_dict,
+            new_states_dict, exploration.version, committer_id
         )
         updated_metadata_version_history = update_metadata_version_history(
-            metadata_version_history, change_list, old_metadata, new_metadata,
-            exploration.version, committer_id)
+            metadata_version_history, change_list, old_metadata_dict,
+            new_metadata_dict, exploration.version, committer_id)
         updated_committer_ids = get_updated_committer_ids(
             updated_states_version_history,
             updated_metadata_version_history.last_edited_committer_id)
@@ -1884,6 +1881,19 @@ def validate_exploration_for_story(
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
+
+        if state.interaction.id == 'MultipleChoiceInput':
+            choices = (
+                state.interaction.customization_args['choices'].value)
+            error_string = (
+                'Exploration in a story having MultipleChoiceInput '
+                'interaction should have at least 4 choices present. '
+                'Exploration with ID %s and state name %s have fewer than '
+                '4 choices.' % (exp.id, state_name)
+            )
+            if len(choices) < 4 and strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
 
         if state.classifier_model_id is not None:
             error_string = (

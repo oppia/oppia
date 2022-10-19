@@ -25,8 +25,6 @@ from core import utils
 from core.tests import test_utils
 from scripts import third_party_size_check
 
-from typing import Any
-
 
 class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
     """Unit tests for scripts/third_party_size_check.py"""
@@ -83,7 +81,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
         print_swap = self.swap_with_checks(
             builtins, 'print', lambda _: None,
             expected_args=((err,),))
-        def mock_open_file(*unused_args: Any) -> None:
+        def mock_open_file(*unused_args: str) -> None:
             raise err
         swap_open = self.swap_with_checks(
             utils, 'open_file', mock_open_file,
