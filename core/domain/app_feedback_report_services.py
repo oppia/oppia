@@ -26,8 +26,7 @@ from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, cast, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Sequence, cast, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
