@@ -3274,9 +3274,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         invalid_choices_index = []
         invalid_choices_content_ids = []
         content_ids_of_choices_to_update = []
+        choices_content = []
         for choice in choices:
             if choice['html'].strip() in ('<p></p>', ''):
                 empty_choices.append(choice)
+            choices_content.append(choice['html'])
 
         if len(empty_choices) == 1:
             invalid_choices_index.append(choices.index(empty_choices[0]))
@@ -3284,11 +3286,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
             choices_to_remove.append(empty_choices[0])
         else:
             for idx, empty_choice in enumerate(empty_choices):
-                empty_choice['html'] = (
+                valid_choice = (
                     '<p>' + 'Choice ' + str(idx + 1) + '</p>'
                 )
-                content_ids_of_choices_to_update.append(
-                    empty_choice['content_id'])
+                if valid_choice in choices_content:
+                    choices_to_remove.append(empty_choice)
+                else:
+                    empty_choice['html'] = valid_choice
+                    content_ids_of_choices_to_update.append(
+                        empty_choice['content_id'])
 
         # Duplicate choices.
         for choice in choices:
@@ -4583,6 +4589,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if cls._is_tag_removed_with_invalid_attributes(
                 tag, 'url-with-value'):
                 continue
+            else:
+                url = tag['url-with-value'].replace(
+                    '&quot;', '').replace(' ', '')
+                if utils.get_url_scheme(url) == 'http':
+                    url = url.replace('http', 'https')
+
+                if (
+                    utils.get_url_scheme(url) not in
+                    constants.ACCEPTABLE_SCHEMES
+                ):
+                    tag.decompose()
+                    continue
+
+                tag['url-with-value'] = '&quot;' + url + '&quot;'
 
             if not tag.has_attr('text-with-value'):
                 tag['text-with-value'] = tag['url-with-value']

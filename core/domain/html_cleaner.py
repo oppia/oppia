@@ -24,6 +24,7 @@ import logging
 import urllib
 
 from core import utils
+from core.constants import constants
 from core.domain import rte_component_registry
 
 import bleach
@@ -401,6 +402,13 @@ def validate_rte_tags(
             'url-with-value',
             'Link'
         )
+
+        url = tag['url-with-value'].replace('&quot;', '').replace(' ', '')
+        if utils.get_url_scheme(url) not in constants.ACCEPTABLE_SCHEMES:
+            raise utils.ValidationError(
+                'Link should be prefix with acceptable schemas '
+                f'which are - {constants.ACCEPTABLE_SCHEMES}'
+            )
 
     for tag in soup.find_all('oppia-noninteractive-math'):
         if not tag.has_attr('math_content-with-value'):

@@ -334,25 +334,22 @@ class DraftUpgradeUtil:
             InvalidDraftConversionException. The conversion cannot be
                 completed.
         """
+        drafts_to_remove = [
+            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            exp_domain.STATE_PROPERTY_INTERACTION_STICKY,
+            exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+            exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+            exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+        ]
         for exp_change in draft_change_list:
             if exp_change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
 
-            if (
-                exp_change.property_name ==
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-            ):
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
-                assert isinstance(exp_change.new_value, list)
-                answer_group_dicts = exp_change.new_value
-                for answer_group in answer_group_dicts:
-                    answer_group['tagged_skill_misconception_id'] = None
-                    answer_group['outcome']['refresher_exploration_id'] = None
-                    if len(answer_group['rule_specs']) == 0:
-                        answer_group_dicts.remove(answer_group)
-                    if answer_group['outcome']['dest'] == exp_change.state_name:
-                        answer_group['outcome']['labelled_as_correct'] = False
+            if exp_change.property_name in drafts_to_remove:
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
 
             elif exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                 # Ruling out the possibility of any other type for mypy

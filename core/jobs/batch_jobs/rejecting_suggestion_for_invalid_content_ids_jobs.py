@@ -69,19 +69,16 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
             suggestions. List[GeneralSuggestionModel]. Result containing the
             list of updated suggestion models.
         """
-        exp_domain_obj = exp_fetchers.get_exploration_from_model(exp_model)
-        exp_translatable_contents = (
-            exp_domain_obj.get_translatable_contents_collection())
-
-        translatable_content_ids = []
-        for content_id, _ in (
-            exp_translatable_contents.content_id_to_translatable_content.items()
-        ):
-            translatable_content_ids.append(content_id)
+        total_content_ids = []
+        for state in exp_model.states.values():
+            written_translations = (
+                state['written_translations']['translations_mapping'])
+            for content_id, _ in written_translations.items():
+                total_content_ids.append(content_id)
 
         for suggestion in suggestions:
             suggestion_change = suggestion.change_cmd
-            if not suggestion_change['content_id'] in translatable_content_ids:
+            if not suggestion_change['content_id'] in total_content_ids:
                 suggestion.status = suggestion_models.STATUS_REJECTED
 
             suggestion_change['translation_html'] = (
@@ -185,20 +182,17 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
         info_for_content_updation = []
         result_after_migrations: (
             List[Dict[str, Union[str, List[Dict[str, str]]]]]) = []
-        exp_domain_obj = exp_fetchers.get_exploration_from_model(exp_model)
-        exp_id = str(exp_domain_obj.id)
-        exp_translatable_contents = (
-            exp_domain_obj.get_translatable_contents_collection())
+        total_content_ids = []
 
-        translatable_content_ids = []
-        for content_id, _ in (
-            exp_translatable_contents.content_id_to_translatable_content.items()
-        ):
-            translatable_content_ids.append(content_id)
+        for state in exp_model.states.values():
+            written_translations = (
+                state['written_translations']['translations_mapping'])
+            for content_id, _ in written_translations.items():
+                total_content_ids.append(content_id)
 
         for suggestion in suggestions:
             suggestion_change = suggestion.change_cmd
-            if not suggestion_change['content_id'] in translatable_content_ids:
+            if not suggestion_change['content_id'] in total_content_ids:
                 info_for_missing_content_id.append(
                     {
                         'content_id': suggestion_change['content_id'],
@@ -218,7 +212,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
 
         result_after_migrations.append(
             {
-                'exp_id': exp_id,
+                'exp_id': exp_model.id,
                 'missing_content_ids': info_for_missing_content_id,
                 'content_translation': info_for_content_updation
             }

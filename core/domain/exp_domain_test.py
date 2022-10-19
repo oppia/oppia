@@ -1340,6 +1340,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration, 'Link tag \'url-with-value\' attribute '
             'should not be empty.')
 
+        self.state.content.html = (
+          '<oppia-noninteractive-link text-with-value="&amp;quot;Google'
+          '&amp;quot;" url-with-value="&amp;quot;http://www.google.com&amp;'
+          'quot;"></oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+          self.new_exploration, (
+            'Link should be prefix with acceptable schemas '
+            f'which are - {constants.ACCEPTABLE_SCHEMES}')
+        )
+
     def test_math_rte_tag(self) -> None:
         """Validate Math tag."""
         self.state.content.html = (
@@ -7392,6 +7403,8 @@ states:
         <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
         <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>
         <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-link text-with-value="&amp;quotLink;&amp;quot;" url-with-value="&amp;quot;mailto:example@example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;" url-with-value="&amp;quot;http://www.google.com&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-link url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
@@ -7542,6 +7555,7 @@ states:
         filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
         <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
         filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;" url-with-value="&amp;quot;https://www.google.com&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-link text-with-value="&amp;quot;Link value&amp;quot;"
         url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
         <oppia-noninteractive-link text-with-value="&amp;quot;https://www.example.com&amp;quot;"
@@ -9329,6 +9343,8 @@ states:
             html: <p>1</p>
           - content_id: ca_choices_16
             html: <p>1</p>
+          - content_id: ca_choices_17
+            html: <p>Choice 2</p>
         showChoicesInShuffledOrder:
           value: true
       default_outcome:
@@ -9358,6 +9374,7 @@ states:
         ca_choices_14: {}
         ca_choices_15: {}
         ca_choices_16: {}
+        ca_choices_17: {}
         content: {}
         default_outcome: {}
         feedback_17: {}
@@ -9374,6 +9391,7 @@ states:
         ca_choices_14: {}
         ca_choices_15: {}
         ca_choices_16: {}
+        ca_choices_17: {}
         content: {}
         default_outcome: {}
         feedback_17: {}
@@ -9470,10 +9488,10 @@ states:
           value:
           - content_id: ca_choices_13
             html: <p>Choice 1</p>
-          - content_id: ca_choices_14
-            html: <p>Choice 2</p>
           - content_id: ca_choices_15
             html: <p>1</p>
+          - content_id: ca_choices_17
+            html: <p>Choice 2</p>
         showChoicesInShuffledOrder:
           value: true
       default_outcome:
@@ -9500,8 +9518,8 @@ states:
             file_size_bytes: 37198
             filename: default_outcome-hi-en-7hl9iw3az8.mp3
             needs_update: true
-        ca_choices_14: {}
         ca_choices_15: {}
+        ca_choices_17: {}
         content: {}
         default_outcome: {}
         feedback_17: {}
@@ -9514,8 +9532,8 @@ states:
             data_format: html
             needs_update: true
             translation: <p>choicewa</p>
-        ca_choices_14: {}
         ca_choices_15: {}
+        ca_choices_17: {}
         content: {}
         default_outcome: {}
         feedback_17: {}
@@ -9551,6 +9569,7 @@ tags: []
 title: ''
 """)
 
+        self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_multiple_choice_interac)
         self.assertEqual(
