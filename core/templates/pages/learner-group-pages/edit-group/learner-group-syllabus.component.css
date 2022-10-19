@@ -210,9 +210,9 @@
 
 @media screen and (max-width: 768px) {
   .oppia-learner-group-syllabus {
-    width: 100%;
     background: #fff;
     padding: 20px;
+    width: 100%;
   }
 
   .oppia-learner-group-syllabus .assigned-syllabus-tab-title {

@@ -214,9 +214,9 @@
 
 @media screen and (max-width: 768px) {
   .oppia-learner-group-preferences {
-    width: 100%;
     background: #fff;
     padding: 20px;
+    width: 100%;
   }
 
   .oppia-learner-group-preferences .preferences-tab-title {
