@@ -13,27 +13,37 @@
 // limitations under the License.
 
 /**
- * @fileoverview Routing module for blog home page.
+ * @fileoverview Module for the Dynamic Component.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { BlogPostPageRootComponent } from './blog-post-page-root.component';
+import { FormsModule } from '@angular/forms';
 
-const routes: Route[] = [
-  {
-    path: '',
-    component: BlogPostPageRootComponent
-  }
-];
+import { CopierComponent } from './copier.component';
+import { RandomSelectorComponent } from './random-selector.component';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 @NgModule({
   imports: [
-    RouterModule.forChild(routes)
+    CommonModule,
+    FormsModule,
+    SharedFormsModule
+  ],
+  providers: [
+    RandomSelectorComponent,
+    CopierComponent
+  ],
+  declarations: [
+    RandomSelectorComponent,
+    CopierComponent
   ],
   exports: [
-    RouterModule
-  ]
+    RandomSelectorComponent,
+    CopierComponent
+  ],
 })
 
-export class BlogPostPageRoutingModule {}
+export class DynamicComponentModule { }
