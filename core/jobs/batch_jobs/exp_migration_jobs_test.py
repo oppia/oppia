@@ -506,51 +506,6 @@ class AuditExplorationMigrationJobTests(
         self.assertEqual(
             updated_opp_summary.to_dict(), expected_opp_summary_dict)
 
-    def test_unmigrated_invalid_published_exp_raise_error(self) -> None:
-        swap_states_schema_48 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
-        swap_exp_schema_53 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
-
-        with swap_states_schema_48, swap_exp_schema_53:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
-            exp_services.save_new_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exploration)
-
-            owner_action = user_services.get_user_actions_info(
-                feconf.SYSTEM_COMMITTER_ID)
-            exp_services.publish_exploration_and_update_user_profiles(
-                owner_action, self.NEW_EXP_ID)
-            opportunity_model = (
-                opportunity_models.ExplorationOpportunitySummaryModel(
-                    id=self.NEW_EXP_ID,
-                    topic_id='topic_id1',
-                    topic_name='topic',
-                    story_id='story_id_1',
-                    story_title='A story title',
-                    chapter_title='Title 1',
-                    content_count=20,
-                    incomplete_translation_language_codes=['hi', 'ar'],
-                    translation_counts={'hi': 1, 'ar': 2},
-                    language_codes_needing_voice_artists=['en'],
-                    language_codes_with_assigned_voice_artists=[]))
-            opportunity_model.put()
-
-            self.create_story_linked_to_exploration()
-
-            self.assertEqual(exploration.states_schema_version, 48)
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'EXP PROCESSED ERROR: "(\'exp_1\', ''ValidationError('
-                    '\'This state does not have any interaction specified.\')'
-                    ')": 1'
-                )
-            )
-        ])
-
 
 class RegenerateMissingExplorationStatsModelsJobTests(
     job_test_utils.JobTestBase,
