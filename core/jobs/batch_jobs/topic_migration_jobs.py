@@ -100,6 +100,16 @@ class MigrateTopicJob(base_jobs.JobBase):
                 'to_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION
             })
             yield (topic_id, topic_change)
+        
+        story_version = topic_model.story_reference_schema_version
+        if story_version < feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION:
+            topic_change = topic_domain.TopicChange({
+                'cmd': (
+                    topic_domain.CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION), # pylint: disable=line-too-long
+                'from_version': story_version,
+                'to_version': feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            })
+            yield (topic_id, topic_change)
 
     @staticmethod
     def _update_topic(
