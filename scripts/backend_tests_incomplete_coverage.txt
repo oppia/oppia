@@ -86,7 +86,6 @@ core.domain.user_domain_test
 core.domain.user_query_domain_test
 core.domain.user_query_services_test
 core.domain.user_services_test
-core.domain.value_generators_domain_test
 core.domain.visualization_registry_test
 core.domain.voiceover_services_test
 core.domain.wipeout_domain_test
