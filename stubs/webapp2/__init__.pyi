@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Pattern
+from re import Pattern
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 class Request:
@@ -36,7 +37,7 @@ class Response:
     pragma: Any
     expires: Any
 
-    def write(self, *args: Any, **Kwargs: Any) -> Any: ...
+    def write(self, content: Union[bytes, str]) -> None: ...
     def set_cookie(
             self,
             key: str,
@@ -76,7 +77,7 @@ class WSGIApplication:
 class Route:
     def __init__(
             self,
-            template: Union[str, Pattern[Any]],
+            template: Union[str, Pattern[str]],
             handler: Callable[..., object],
             *,
             name: str = ...

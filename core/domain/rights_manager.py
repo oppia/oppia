@@ -619,13 +619,15 @@ def check_can_access_activity(
             role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY in user.actions)
     elif activity_rights.is_private():
         return bool(
-            (role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user.actions) or
-            user.user_id and (
-                activity_rights.is_viewer(user.user_id) or
-                activity_rights.is_owner(user.user_id) or
-                activity_rights.is_editor(user.user_id) or
-                activity_rights.is_voice_artist(user.user_id) or
-                activity_rights.viewable_if_private
+            role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user.actions or
+            (
+                user.user_id and (
+                    activity_rights.is_viewer(user.user_id) or
+                    activity_rights.is_owner(user.user_id) or
+                    activity_rights.is_editor(user.user_id) or
+                    activity_rights.is_voice_artist(user.user_id) or
+                    activity_rights.viewable_if_private
+                )
             )
         )
     return False
@@ -654,8 +656,8 @@ def check_can_edit_activity(
 
     if (
         user.user_id and (
-            activity_rights.is_owner(user.user_id)
-            or activity_rights.is_editor(user.user_id)
+            activity_rights.is_owner(user.user_id) or
+            activity_rights.is_editor(user.user_id)
         )
     ):
         return True
@@ -776,9 +778,9 @@ def check_can_delete_activity(
     if role_services.ACTION_DELETE_ANY_ACTIVITY in user.actions:
         return True
     elif (
-        activity_rights.is_private() and (
-            role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions
-        ) and user.user_id and activity_rights.is_owner(user.user_id)
+        activity_rights.is_private() and
+        role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions and
+        user.user_id and activity_rights.is_owner(user.user_id)
     ):
         return True
     elif (activity_rights.is_published() and

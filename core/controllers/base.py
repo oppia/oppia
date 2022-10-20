@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+
+import abc
 import base64
 import datetime
 import functools
@@ -34,6 +36,7 @@ from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
@@ -593,9 +596,14 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s' % filename)
         self.response.charset = 'utf-8'
-        # We use this super in order to bypass the write method
-        # in webapp2.Response, since webapp2.Response doesn't support writing
-        # bytes.
+        # Here we use MyPy ignore because according to MyPy super can
+        # accept 'super class and self' as arguments but here we are passing
+        # 'webapp2.Response, and self.response' which confuses MyPy about the
+        # typing of super, and due to this MyPy is unable to recognize the
+        # 'write' method and throws an error. This change in arguments is
+        # done because we use 'super' method in order to bypass the write
+        # method in webapp2.Response, since webapp2.Response doesn't support
+        # writing bytes.
         super(webapp2.Response, self.response).write(file.getvalue())  # type: ignore[misc] # pylint: disable=bad-super-call
 
     def render_template(
@@ -947,7 +955,10 @@ class OppiaMLVMHandler(BaseHandler):
     # Here we use type Any because this method is implemented in a subclasses
     # with a return type. So, if we define return type as None here then
     # subclasses will throw error for incompatible signature.
-    def extract_request_message_vm_id_and_signature(self) -> Any:
+    @abc.abstractmethod
+    def extract_request_message_vm_id_and_signature(
+        self
+    ) -> classifier_domain.OppiaMLAuthInfo:
         """Returns the OppiaMLAuthInfo domain object containing
         information from the incoming request that is necessary for
         authentication.

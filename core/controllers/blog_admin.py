@@ -57,6 +57,8 @@ class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
     config_property_id: Optional[str]
 
 
+# TODO(#16364): Refactor 'BlogAdminHandler' so that we don't have to use action
+# property in the request but rather have two separate handlers for each action.
 class BlogAdminHandler(base.BaseHandler):
     """Handler for the blog admin page."""
 
