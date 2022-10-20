@@ -1397,7 +1397,7 @@ def _compute_models_to_put(
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, list(exploration.states.keys()),
-        exp_versions_diff, None)
+        exp_versions_diff, revert_to_version=None)
 
     new_state_stats_mapping = {
         state_name: new_exp_stats.state_stats_mapping[state_name].to_dict()
