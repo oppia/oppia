@@ -23,8 +23,7 @@ from core import utils
 from core.domain import story_domain
 from core.domain import subtopic_page_domain
 
-from typing import List
-from typing_extensions import TypedDict
+from typing import List, TypedDict
 
 
 class LearnerGroupDict(TypedDict):
