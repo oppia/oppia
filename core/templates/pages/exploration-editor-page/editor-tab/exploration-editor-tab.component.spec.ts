@@ -59,6 +59,10 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationDataService } from '../services/exploration-data.service';
+import { StateDiffData, VersionHistoryService } from '../services/version-history.service';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { ContextService } from 'services/context.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -84,6 +88,11 @@ describe('Exploration editor tab component', function() {
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
+  var versionHistoryService = null;
+  var stateObject = null;
+  var stateObjectFactory = null;
+  var versionHistoryBackendApiService = null;
+  var contextService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
@@ -118,6 +127,11 @@ describe('Exploration editor tab component', function() {
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.get(SolutionObjectFactory);
     focusManagerService = TestBed.get(FocusManagerService);
+    versionHistoryService = TestBed.get(VersionHistoryService);
+    stateObjectFactory = TestBed.get(StateObjectFactory);
+    versionHistoryBackendApiService = TestBed.get(
+      VersionHistoryBackendApiService);
+    contextService = TestBed.get(ContextService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -153,6 +167,14 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'WrittenTranslationsObjectFactory',
       TestBed.get(WrittenTranslationsObjectFactory));
+    $provide.value(
+      'VersionHistoryBackendApiService',
+      TestBed.get(VersionHistoryBackendApiService));
+    $provide.value(
+      'VersionHistoryService',
+      TestBed.get(VersionHistoryService));
+    $provide.value(
+      'ContextService', TestBed.get(ContextService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -179,6 +201,10 @@ describe('Exploration editor tab component', function() {
     spyOnProperty(
       stateEditorRefreshService, 'onRefreshStateEditor').and.returnValue(
       mockRefreshStateEditorEventEmitter);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(
+      versionHistoryService, 'getLatestVersionOfExploration'
+    ).and.returnValue(3);
 
     explorationStatesService.init({
       'First State': {
@@ -323,6 +349,74 @@ describe('Exploration editor tab component', function() {
           }
         }
       }
+    });
+
+    stateObject = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      linked_skill_id: null,
+      next_content_id_index: 0,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+          hint_1: {},
+          rule_input_2: {}
+        }
+      }
+    };
+
+    let stateData = stateObjectFactory
+      .createFromBackendDict('State', stateObject);
+    spyOn(
+      versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+    ).and.resolveTo({
+      lastEditedVersionNumber: 2,
+      stateNameInPreviousVersion: 'State',
+      stateInPreviousVersion: stateData,
+      lastEditedCommitterUsername: 'some'
     });
 
     $scope = $rootScope.$new();
@@ -1006,5 +1100,66 @@ describe('Exploration editor tab component', function() {
       $scope.$apply();
       expect(ctrl.EDITOR_TUTORIAL_OPTIONS[9].heading).not.toBe('Save');
     });
+  });
+
+  it('should get the last edited version number for the active state', () => {
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
+      oldVersionNumber: 3
+    } as StateDiffData);
+
+    expect(ctrl.getLastEditedVersionNumber()).toEqual(3);
+  });
+
+  it('should get the last edited committer username for the active state',
+    () => {
+      spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
+        committerUsername: 'some'
+      } as StateDiffData);
+
+      expect(ctrl.getLastEditedCommitterUsername()).toEqual('some');
+    });
+
+  it('should get whether version history can be explored', () => {
+    spyOn(
+      versionHistoryService, 'canShowBackwardStateDiffData'
+    ).and.returnValue(true);
+
+    expect(ctrl.canShowExploreVersionHistoryButton()).toBeTrue();
+  });
+
+  it('should open the state version history modal on clicking the explore ' +
+  'version history button', () => {
+    class MockComponentInstance {
+      compoenentInstance: {
+        newState: null;
+        newStateName: 'A';
+        oldState: null;
+        oldStateName: 'B';
+        headers: {
+          leftPane: '';
+          rightPane: '';
+        };
+      };
+    }
+    spyOn(ngbModal, 'open').and.returnValues({
+      componentInstance: MockComponentInstance,
+      result: Promise.resolve()
+    } as NgbModalRef, {
+      componentInstance: MockComponentInstance,
+      result: Promise.reject()
+    } as NgbModalRef);
+    let stateData = stateObjectFactory
+      .createFromBackendDict('State', stateObject);
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
+      oldState: stateData,
+      newState: stateData,
+      oldVersionNumber: 3
+    } as StateDiffData);
+
+    ctrl.onClickExploreVersionHistoryButton();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+
+    ctrl.onClickExploreVersionHistoryButton();
   });
 });
