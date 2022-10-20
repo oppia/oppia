@@ -63,8 +63,8 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
     def test_registry_template_random_selector_contents(self) -> None:
         contents_registry = (
-            '<schema-based-editor [schema]="$ctrl.SCHEMA" '
-            'ng-model="$ctrl.customizationArgs.list_of_values">\n'
+            '<schema-based-editor [schema]="SCHEMA" '
+            '[(ngModel)]="customizationArgs.list_of_values">\n'
             '</schema-based-editor>\n'
         )
         class_object = value_generators_domain.Registry()
@@ -78,8 +78,8 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
     def test_registry_template_copier_contents(self) -> None:
         contents_registry = (
             '<span class="d-inline-block align-middle">\n  '
-            '<object-editor obj-type="<[objType]>" init-args="initArgs" '
-            'value="customizationArgs.value" always-editable="true">\n  '
+            '<object-editor [objType]="objType" [initArgs]="initArgs" '
+            '[(value)]="customizationArgs.value" [alwaysEditable]="true">\n  '
             '</object-editor>\n</span>\n'
         )
         class_object = value_generators_domain.Registry()
