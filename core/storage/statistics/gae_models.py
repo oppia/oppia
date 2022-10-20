@@ -1285,7 +1285,7 @@ class ExplorationStatsModel(base_models.BaseModel):
         return exploration_stats_model
 
     @classmethod
-    def create_and_put(
+    def create(
         cls,
         exp_id: str,
         exp_version: int,
@@ -1330,51 +1330,6 @@ class ExplorationStatsModel(base_models.BaseModel):
         stats_instance.update_timestamps()
         stats_instance.put()
         return instance_id
-
-    @classmethod
-    def create(
-        cls,
-        exp_id: str,
-        exp_version: int,
-        num_starts_v1: int,
-        num_starts_v2: int,
-        num_actual_starts_v1: int,
-        num_actual_starts_v2: int,
-        num_completions_v1: int,
-        num_completions_v2: int,
-        state_stats_mapping: Dict[str, Dict[str, int]]
-    ) -> ExplorationStatsModel:
-        """Creates an ExplorationStatsModel instance and writes it to the
-        datastore.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            exp_version: int. Version of the exploration.
-            num_starts_v1: int. Number of learners who started the exploration.
-            num_starts_v2: int. As above, but for events with version 2.
-            num_actual_starts_v1: int. Number of learners who attempted the
-                exploration.
-            num_actual_starts_v2: int. As above, but for events with version 2.
-            num_completions_v1: int. Number of learners who completed the
-                exploration.
-            num_completions_v2: int. As above, but for events with version 2.
-            state_stats_mapping: dict. Mapping from state names to state stats
-                dicts.
-
-        Returns:
-            ExplorationStatsModel. The ExplorationStatsModel instance.
-        """
-        instance_id = cls.get_entity_id(exp_id, exp_version)
-        stats_instance = cls(
-            id=instance_id, exp_id=exp_id, exp_version=exp_version,
-            num_starts_v1=num_starts_v1,
-            num_starts_v2=num_starts_v2,
-            num_actual_starts_v1=num_actual_starts_v1,
-            num_actual_starts_v2=num_actual_starts_v2,
-            num_completions_v1=num_completions_v1,
-            num_completions_v2=num_completions_v2,
-            state_stats_mapping=state_stats_mapping)
-        return stats_instance
 
     @classmethod
     def get_multi_versions(

@@ -1800,7 +1800,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         exploration_stats = stats_domain.ExplorationStats(
             self.exp_id, self.exp_version, 0, 0, 0, 0, 0, 0,
             state_stats_mapping)
-        stats_services.create_and_put_stats_model(exploration_stats)
+        stats_services.create_stats_model(exploration_stats)
 
         self.aggregated_stats = {
             'num_starts': 1,
