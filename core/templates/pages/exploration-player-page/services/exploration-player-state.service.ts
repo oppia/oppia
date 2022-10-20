@@ -25,6 +25,7 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { DiagnosticTestModelData } from 'pages/diagnostic-test-player-page/diagnostic-test.model';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
@@ -36,6 +37,7 @@ import { NumberAttemptsService } from './number-attempts.service';
 import { PlayerCorrectnessFeedbackEnabledService } from './player-correctness-feedback-enabled.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
+import { DiagnosticTestPlayerEngineService } from './diagnostic-test-player-engine.service';
 import { StatsReportingService } from './stats-reporting.service';
 
 interface QuestionPlayerConfigDict {
@@ -54,10 +56,15 @@ export class ExplorationPlayerStateService {
   private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
-  currentEngineService: ExplorationEngineService | QuestionPlayerEngineService;
+  currentEngineService: (
+    ExplorationEngineService |
+    QuestionPlayerEngineService |
+    DiagnosticTestPlayerEngineService
+  );
   explorationMode: string = ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
   editorPreviewMode: boolean;
   questionPlayerMode: boolean;
+  diagnosticTestPlayerMode: boolean;
   explorationId: string;
   version: number;
   storyUrlFragment: string;
@@ -86,6 +93,8 @@ export class ExplorationPlayerStateService {
     private questionBackendApiService: QuestionBackendApiService,
     private questionObjectFactory: QuestionObjectFactory,
     private questionPlayerEngineService: QuestionPlayerEngineService,
+    private diagnosticTestPlayerEngineService:
+      DiagnosticTestPlayerEngineService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
@@ -211,6 +220,12 @@ export class ExplorationPlayerStateService {
     this.currentEngineService = this.questionPlayerEngineService;
   }
 
+  setDiagnosticTestPlayerMode(): void {
+    this.explorationMode = (
+      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER);
+    this.currentEngineService = this.diagnosticTestPlayerEngineService;
+  }
+
   setStoryChapterMode(): void {
     this.explorationMode = ExplorationPlayerConstants
       .EXPLORATION_MODE.STORY_CHAPTER;
@@ -311,8 +326,24 @@ export class ExplorationPlayerStateService {
     this.initQuestionPlayer(config, successCallback, errorCallback);
   }
 
+  initializeDiagnosticPlayer(
+      config: QuestionPlayerConfigDict,
+      diagnosticTestModelData: DiagnosticTestModelData,
+      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
+      errorCallback?: () => void
+  ): void {
+    this.diagnosticTestPlayerEngineService.init(
+      config,
+      diagnosticTestModelData,
+      successCallback,
+      errorCallback
+    );
+  }
+
   getCurrentEngineService():
-    ExplorationEngineService | QuestionPlayerEngineService {
+    ExplorationEngineService |
+    QuestionPlayerEngineService |
+    DiagnosticTestPlayerEngineService {
     return this.currentEngineService;
   }
 
@@ -330,6 +361,12 @@ export class ExplorationPlayerStateService {
   isInQuestionPlayerMode(): boolean {
     return this.explorationMode === ExplorationPlayerConstants
       .EXPLORATION_MODE.QUESTION_PLAYER;
+  }
+
+  isInDiagnosticTestPlayerMode(): boolean {
+    return (
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER)
   }
 
   isInStoryChapterMode(): boolean {

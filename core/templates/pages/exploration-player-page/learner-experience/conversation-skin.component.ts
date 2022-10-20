@@ -93,6 +93,7 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
+  @Input() diagnosticTestModel;
   directiveSubscriptions = new Subscription();
   // The minimum width, in pixels, needed to be able to show two cards
   // side-by-side.
@@ -223,6 +224,9 @@ export class ConversationSkinComponent {
   }
 
   ngOnInit(): void {
+    console.log('in the init of conversation skin');
+    console.log(this.diagnosticTestModel);
+    console.log(this.questionPlayerConfig);
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
 
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
@@ -1037,11 +1041,18 @@ export class ConversationSkinComponent {
     this.hasInteractedAtLeastOnce = false;
     this.recommendedExplorationSummaries = [];
     this.playerPositionService.init(this._navigateToDisplayedCard.bind(this));
-    if (this.questionPlayerConfig) {
+    if (this.questionPlayerConfig && !this.diagnosticTestModel) {
       this.explorationPlayerStateService.initializeQuestionPlayer(
         this.questionPlayerConfig,
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable);
+    } else if(this.questionPlayerConfig && this.diagnosticTestModel) {
+      console.log('In the init page for diagnostic test');
+      this.explorationPlayerStateService.initializeDiagnosticPlayer(
+        this.questionPlayerConfig,
+        this.diagnosticTestModel,
+        this._initializeDirectiveComponents.bind(this)
+      );
     } else {
       this.explorationPlayerStateService.initializePlayer(
         this._initializeDirectiveComponents.bind(this));

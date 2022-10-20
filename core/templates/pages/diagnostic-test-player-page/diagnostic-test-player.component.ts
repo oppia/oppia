@@ -18,9 +18,12 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { DiagnosticTestModelData } from './diagnostic-test.model';
 
 
 @Component({
@@ -29,11 +32,17 @@ import { PreventPageUnloadEventService } from 'services/prevent-page-unload-even
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL: string = '';
+  diagnosticTestModelData;
+  questionPlayerConfig;
+  diagnosticTestStarted = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private preventPageUnloadEventService: PreventPageUnloadEventService
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService:
+    TopicsAndSkillsDashboardBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +59,42 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   returnBackToClassroom(): void {
     this.windowRef.nativeWindow.location.href = '/learn/math';
   }
+
+  startDiagnosticTest(): void {
+    // fetch the math topic ID.
+    const classroomId = 'IUHeUmbJtAY7';
+
+    this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
+      response => {
+        this.diagnosticTestModelData = new DiagnosticTestModelData(
+          response.classroomDict.topicIdToPrerequisiteTopicIds);
+        this.diagnosticTestModelData.setCurrentTopicId();
+        let currentTopicId = this.diagnosticTestModelData.getCurrentTopicId();
+        console.log('current topic...');
+        console.log(currentTopicId);
+
+      this.topicsAndSkillsDashboardBackendApiService
+        .fetchTopicIdToDiagnosticTestSkillIdsAsync([currentTopicId]).then(
+          (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
+            let diagnosticTestSkillIds = (
+              responseDict.topicIdToDiagnosticTestSkillIds[currentTopicId]);
+            console.log(diagnosticTestSkillIds);
+
+            this.questionPlayerConfig = {
+              resultActionButtons: [],
+              skillList: diagnosticTestSkillIds,
+              questionCount: 2,
+              questionsSortedByDifficulty: true
+            };
+            this.diagnosticTestStarted = true;
+
+            console.log(this.questionPlayerConfig);
+            console.log(this.diagnosticTestStarted);
+          });
+      }
+    );
+  }
+
 }
 
 angular.module('oppia').directive(

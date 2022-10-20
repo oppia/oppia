@@ -1,0 +1,68 @@
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Diagnostic test topic state model.
+ */
+
+
+export class DiagnosticTestTopicStateData {
+  numberOfAttemptedQuestion: number;
+  skillIdToQuestionsList;
+  currentSkill;
+  _lifeLineIsConsumed;
+  _topicIsPassed;
+  _topicTestingIsComplete;
+  _diagnosticTestSkills;
+  _currenSkillIndex;
+  skillIdToPassedStateDict;
+
+  constructor(skillIdToQuestions) {
+    this.numberOfAttemptedQuestion = 0;
+    this._lifeLineIsConsumed = false;
+    this.skillIdToQuestionsList = skillIdToQuestions;
+    this._currenSkillIndex = 0;
+    this._diagnosticTestSkills = Object.keys(this.skillIdToQuestionsList);
+    for (let skillId of this._diagnosticTestSkills) {
+      this.skillIdToPassedStateDict[skillId] = false;
+    }
+  }
+
+  getNextQuestionFromCurrentSkill() {
+    this.numberOfAttemptedQuestion += 1;
+    return this.skillIdToQuestionsList[this.currentSkill][1];
+  }
+
+  getNextQuestion() {
+    this.numberOfAttemptedQuestion += 1;
+    this._currenSkillIndex += 1;
+  }
+
+  isTopicPassed() {
+    for (let skillId of this._diagnosticTestSkills) {
+      if (this.skillIdToPassedStateDict[skillId] === false) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  isLifeLineConsumed() {
+    return this._lifeLineIsConsumed;
+  }
+
+  consumeLifeLine() {
+    this._lifeLineIsConsumed = true;
+  }
+}
