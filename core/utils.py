@@ -43,9 +43,7 @@ import yaml
 
 from typing import ( # isort:skip
     Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
-    Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
-from typing_extensions import Literal # isort:skip
-
+    Literal, Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'

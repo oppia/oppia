@@ -48,6 +48,8 @@ import { ExplorationPermissions } from 'domain/exploration/exploration-permissio
 import { State } from 'domain/state/StateObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { TranslationBackendDict } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { ContextService } from 'services/context.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
@@ -69,6 +71,7 @@ describe('Exploration editor tab component', () => {
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let focusManagerService: FocusManagerService;
+  let contextService: ContextService;
   let mockRefreshStateEditorEventEmitter = null;
 
   class MockNgbModal {
@@ -96,6 +99,48 @@ describe('Exploration editor tab component', () => {
     closeTour() {}
   }
 
+  class MockWindowRef {
+    location = { path: '/create/2234' };
+    nativeWindow = {
+      scrollTo: (value1, value2) => {},
+      sessionStorage: {
+        promoIsDismissed: null,
+        setItem: (testKey1, testKey2) => {},
+        removeItem: (testKey) => {}
+      },
+      gtag: (value1, value2, value3) => {},
+      navigator: {
+        onLine: true,
+        userAgent: null
+      },
+      location: {
+        path: '/create/2234',
+        pathname: '/',
+        hostname: 'oppiaserver.appspot.com',
+        search: '',
+        protocol: '',
+        reload: () => {},
+        hash: '',
+        href: '',
+      },
+      document: {
+        documentElement: {
+          setAttribute: (value1, value2) => {},
+          clientWidth: null,
+          clientHeight: null,
+        },
+        body: {
+          clientWidth: null,
+          clientHeight: null,
+          style: {
+            overflowY: ''
+          }
+        }
+      },
+      addEventListener: (value1, value2) => {}
+    };
+  }
+
   class MockRouter {}
 
   beforeEach(waitForAsync(() => {
@@ -116,6 +161,10 @@ describe('Exploration editor tab component', () => {
           useClas: MockRouter,
         },
         TemplatesService,
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
         JoyrideOptionsService,
         JoyrideStepsContainerService,
         LoggerService,
@@ -167,8 +216,11 @@ describe('Exploration editor tab component', () => {
     stateEditorRefreshService = TestBed.inject(StateEditorRefreshService);
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService);
+    contextService = TestBed.inject(ContextService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
+    spyOn(contextService, 'getExplorationId').and.returnValue(
+      'explorationId');
     spyOn(stateEditorService, 'checkEventListenerRegistrationStatus')
       .and.returnValue(true);
     spyOn(document, 'getElementById').and.returnValue({

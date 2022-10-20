@@ -27,8 +27,7 @@ import subprocess
 
 import github
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after

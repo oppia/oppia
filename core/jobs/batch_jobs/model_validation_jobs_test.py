@@ -26,8 +26,7 @@ from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
