@@ -278,7 +278,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
               AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
                 componentDefn.id) === -1);
       if (!(
-        hideComplexExtensionFlag || notSupportedOnAndroidFlag ||
+        hideComplexExtensionFlag ||
+        notSupportedOnAndroidFlag ||
         this.isInvalidForBlogPostEditorRTE(componentDefn)
       )) {
         names.push(componentDefn.id);
@@ -545,7 +546,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     return (
       this.contextService.isInBlogPostEditorPage() && (
         invalidComponents.some(
-          (invalidComponents) => invalidComponents === compDefn.id)
+          (invalidComponents) => invalidComponents === compDefn.id
+        )
       )
     );
   }
