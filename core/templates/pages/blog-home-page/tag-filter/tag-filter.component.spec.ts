@@ -21,6 +21,7 @@ import { MaterialModule } from 'modules/material.module';
 import { TagFilterComponent } from './tag-filter.component';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { BlogPostSearchService } from 'services/blog-search.service';
+import { BlogHomePageConstants } from '../blog-home-page.constants';
 /**
  * @fileoverview Unit tests for Tag Filter Component.
  */
@@ -81,7 +82,9 @@ describe('Tag Filter component', () => {
         }
       } as ElementRef;
       component.selectTag(({ option: { viewValue: 'tag3'}}));
-      tick(1501);
+      // Search with applied tags will be executed only when no change in tag
+      // filter is done for 1500ms. We add 1ms extra to avoid flaking of test.
+      tick(BlogHomePageConstants.DEBOUNCE_TIME + 1);
 
       expect(component.selectedTags).toEqual(['tag1', 'tag2', 'tag3']);
       expect(component.searchDropDownTags).toEqual(['tag4']);
