@@ -750,11 +750,18 @@ def get_system_user() -> user_domain.UserActionsInfo:
     return get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
 
 
-def _save_user_settings(user_settings: user_domain.UserSettings) -> None:
+def _save_user_settings(
+    user_settings: user_domain.UserSettings,
+    should_put_model: bool = True
+) -> user_models.UserSettingsModel:
     """Commits a user settings object to the datastore.
 
     Args:
         user_settings: UserSettings. The user setting domain object to be saved.
+        should_put_model: bool. Whether to put the model in the datastore.
+
+    Returns:
+        UserSettingsModel. The updated user settings model that was saved.
     """
     user_settings.validate()
 
@@ -769,8 +776,10 @@ def _save_user_settings(user_settings: user_domain.UserSettings) -> None:
         user_settings_dict['id'] = user_settings.user_id
         user_model = user_models.UserSettingsModel(**user_settings_dict)
 
-    user_model.update_timestamps()
-    user_model.put()
+    if should_put_model:
+        user_model.update_timestamps()
+        user_model.put()
+    return user_model
 
 
 def _get_user_settings_from_model(
@@ -940,7 +949,7 @@ def _create_new_user_transactional(
             corresponding to the newly created user.
     """
     _save_user_settings(user_settings)
-    create_user_contributions(user_settings.user_id, [], [])
+    create_user_contributions(user_settings.user_id, [], []).put()
     auth_services.associate_auth_id_with_user_id(
         auth_domain.AuthIdUserIdPair(auth_id, user_settings.user_id))
 
@@ -1409,22 +1418,26 @@ def update_subject_interests(
 
 def _update_first_contribution_msec(
     user_id: str, first_contribution_msec: float
-) -> None:
+) -> user_models.UserSettingsModel:
     """Updates first_contribution_msec of user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
         first_contribution_msec: float. New time to set in milliseconds
             representing user's first contribution to Oppia.
+
+    Returns:
+        UserSettingsModel. The user settings model with updated
+        first_contribution_msec.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.first_contribution_msec = first_contribution_msec
-    _save_user_settings(user_settings)
+    return _save_user_settings(user_settings, should_put_model=False)
 
 
-def update_first_contribution_msec_if_not_set(
+def update_first_contribution_msec_if_not_set_in_model(
     user_id: str, first_contribution_msec: float
-) -> None:
+) -> user_models.UserSettingsModel|None:
     """Updates first_contribution_msec of user with given user_id
     if it is set to None.
 
@@ -1432,10 +1445,14 @@ def update_first_contribution_msec_if_not_set(
         user_id: str. The unique ID of the user.
         first_contribution_msec: float. New time to set in milliseconds
             representing user's first contribution to Oppia.
+
+    Returns:
+        UserSettingsModel. The user settings model with updated
+        first_contribution_msec.
     """
     user_settings = get_user_settings(user_id, strict=True)
     if user_settings.first_contribution_msec is None:
-        _update_first_contribution_msec(
+        return _update_first_contribution_msec(
             user_id, first_contribution_msec)
 
 
@@ -1664,17 +1681,22 @@ def record_user_logged_in(user_id: str) -> None:
     _save_user_settings(user_settings)
 
 
-def record_user_edited_an_exploration(user_id: str) -> None:
+def record_user_edited_an_exploration_in_model(
+    user_id: str
+) -> user_models.UserSettingsModel:
     """Updates last_edited_an_exploration to the current datetime for
     the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
+
+    Returns:
+        UserSettingsModel. The updated UserSettingsModel.
     """
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is not None:
         user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
-        _save_user_settings(user_settings)
+        return _save_user_settings(user_settings, should_put_model=False)
 
 
 def record_user_created_an_exploration(user_id: str) -> None:
@@ -1947,7 +1969,7 @@ def create_user_contributions(
     user_id: str,
     created_exploration_ids: List[str],
     edited_exploration_ids: List[str]
-) -> Optional[user_domain.UserContributions]:
+) -> user_models.UserContributionsModel:
     """Creates a new UserContributionsModel and returns the domain object.
     Note: This does not create a contributions model if the user is
     OppiaMigrationBot.
@@ -1977,8 +1999,7 @@ def create_user_contributions(
 
     user_contributions = user_domain.UserContributions(
         user_id, created_exploration_ids, edited_exploration_ids)
-    _save_user_contributions(user_contributions)
-    return user_contributions
+    return _get_validated_user_contributions_model(user_contributions)
 
 
 def update_user_contributions(
@@ -2008,7 +2029,7 @@ def update_user_contributions(
     user_contributions.created_exploration_ids = created_exploration_ids
     user_contributions.edited_exploration_ids = edited_exploration_ids
 
-    _save_user_contributions(user_contributions)
+    _get_validated_user_contributions_model(user_contributions).put()
 
 
 def add_created_exploration_id(user_id: str, exploration_id: str) -> None:
@@ -2022,47 +2043,63 @@ def add_created_exploration_id(user_id: str, exploration_id: str) -> None:
     user_contributions = get_user_contributions(user_id, strict=False)
 
     if not user_contributions:
-        create_user_contributions(user_id, [exploration_id], [])
+        create_user_contributions(user_id, [exploration_id], []).put()
     elif exploration_id not in user_contributions.created_exploration_ids:
         user_contributions.created_exploration_ids.append(exploration_id)
         user_contributions.created_exploration_ids.sort()
-        _save_user_contributions(user_contributions)
+        _get_validated_user_contributions_model(user_contributions).put()
 
 
-def add_edited_exploration_id(user_id: str, exploration_id: str) -> None:
+def add_edited_exploration_id_to_model(
+    user_id: str,
+    exploration_id: str
+) -> user_models.UserContributionsModel:
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of edited explorations.
 
     Args:
         user_id: str. The unique ID of the user.
         exploration_id: str. The exploration id.
+
+    Returns:
+        UserContributionsModel. The updated UserContributionsModel.
     """
+    user_contribution_models = []
     user_contributions = get_user_contributions(user_id, strict=False)
 
     if not user_contributions:
-        create_user_contributions(user_id, [], [exploration_id])
+        user_contribution_models.extend(
+            create_user_contributions(user_id, [], [exploration_id])
+        )
 
     elif exploration_id not in user_contributions.edited_exploration_ids:
         user_contributions.edited_exploration_ids.append(exploration_id)
         user_contributions.edited_exploration_ids.sort()
-        _save_user_contributions(user_contributions)
+        user_contribution_models.extend(
+            _get_validated_user_contributions_model(user_contributions)
+        )
+    return user_contribution_models
 
 
-def _save_user_contributions(
+def _get_validated_user_contributions_model(
     user_contributions: user_domain.UserContributions
-) -> None:
-    """Commits a user contributions object to the datastore.
+) -> user_models.UserContributionsModel:
+    """Updates user contributions object.
 
     Args:
         user_contributions: UserContributions. Value object representing
             a user's contributions.
+
+    Returns:
+        UserContributionsModel. The UserContributionsModel object that was
+        updated.
     """
     user_contributions.validate()
-    user_models.UserContributionsModel(
+    return user_models.UserContributionsModel(
         id=user_contributions.user_id,
         created_exploration_ids=user_contributions.created_exploration_ids,
         edited_exploration_ids=user_contributions.edited_exploration_ids,
-    ).put()
+    )
 
 
 def migrate_dashboard_stats_to_latest_schema(

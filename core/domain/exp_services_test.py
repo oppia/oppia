@@ -7835,7 +7835,14 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(updated_exp)
 
     def test_draft_discarded(self) -> None:
-        exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
+        user_data_model = (
+            exp_services.get_user_data_model_with_draft_discarded(
+                self.EXP_ID1,
+                self.USER_ID
+            )
+        )
+        user_data_model.update_timestamps()
+        user_data_model.put()
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertIsNone(exp_user_data.draft_change_list)

@@ -36,10 +36,13 @@ from typing import List, Literal, Optional, Sequence, overload
 MYPY = False
 if MYPY:  # pragma: no cover
     from core.domain import state_domain
+    from mypy_imports import base_models
     from mypy_imports import stats_models
     from mypy_imports import transaction_services
 
-(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
+(base_models, stats_models,) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.STATISTICS]
+)
 transaction_services = models.Registry.import_transaction_services()
 
 # NOTE TO DEVELOPERS: The functions:
@@ -492,11 +495,11 @@ def create_exp_issues_for_new_exploration(
     stats_models.ExplorationIssuesModel.create(exp_id, exp_version, [])
 
 
-def update_exp_issues_for_new_exp_version(
+def update_exp_issues_models_for_new_exp_version(
     exploration: exp_domain.Exploration,
     exp_versions_diff: Optional[exp_domain.ExplorationVersionsDiff],
     revert_to_version: Optional[int]
-) -> None:
+) -> List[base_models.BaseModel]:
     """Retrieves the ExplorationIssuesModel for the old exp_version and makes
     any required changes to the structure of the model.
 
@@ -510,21 +513,29 @@ def update_exp_issues_for_new_exp_version(
     Raises:
         Exception. ExplorationVersionsDiff cannot be None when the change
             is not a revert.
+
+    Returns:
+        list(BaseModel). A list of model instances related to exploration
+        issues that were updated.
     """
+    models_to_put = []
     exp_issues = get_exp_issues(
         exploration.id, exploration.version - 1, strict=False
     )
     if exp_issues is None:
-        create_exp_issues_for_new_exploration(
-            exploration.id, exploration.version - 1)
-        return
+        models_to_put.extend(
+            stats_models.ExplorationIssuesModel(
+                exploration.id, exploration.version - 1, []
+            )
+        )
+        return models_to_put
 
     if revert_to_version:
         old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
         exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
         exp_issues.exp_version = exploration.version + 1
-        create_exp_issues_model(exp_issues)
-        return
+        models_to_put.extend(create_exp_issues_model(exp_issues))
+        return models_to_put
 
     if exp_versions_diff is None:
         raise Exception(
@@ -603,10 +614,7 @@ def update_exp_issues_for_new_exp_version(
             action.to_dict() for action in playthrough.actions]
         updated_playthrough_models.append(playthrough_model)
 
-    stats_models.PlaythroughModel.update_timestamps_multi(
-        updated_playthrough_models
-    )
-    stats_models.PlaythroughModel.put_multi(updated_playthrough_models)
+    models_to_put.extend(updated_playthrough_models)
 
     for exp_issue in exp_issues.unresolved_issues:
         if 'state_names' in exp_issue.issue_customization_args:
@@ -644,7 +652,8 @@ def update_exp_issues_for_new_exp_version(
                 old_to_new_state_names[state_name])
 
     exp_issues.exp_version += 1
-    create_exp_issues_model(exp_issues)
+    models_to_put.extend(create_exp_issues_model(exp_issues))
+    return models_to_put
 
 
 @overload
@@ -949,17 +958,30 @@ def save_stats_model(
     exploration_stats_model.put()
 
 
-def create_exp_issues_model(exp_issues: stats_domain.ExplorationIssues) -> None:
-    """Creates a new ExplorationIssuesModel in the datastore.
+def create_exp_issues_model(
+    exp_issues: stats_domain.ExplorationIssues
+) -> stats_models.ExplorationIssuesModel:
+    """Creates a new ExplorationIssuesModel instance.
 
     Args:
         exp_issues: ExplorationIssues. The exploration issues domain object.
+
+    Returns:
+        ExplorationIssuesModel. The ExplorationIssuesModel.
     """
     unresolved_issues_dicts = [
         unresolved_issue.to_dict()
         for unresolved_issue in exp_issues.unresolved_issues]
-    stats_models.ExplorationIssuesModel.create(
-        exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
+    instance_id = stats_models.ExplorationIssuesModel.get_entity_id(
+        exp_issues.exp_id,
+        exp_issues.exp_version
+    )
+    return stats_models.ExplorationIssuesModel(
+        id=instance_id,
+        exp_id=exp_issues.exp_id,
+        exp_version=exp_issues.exp_version,
+        unresolved_issues=unresolved_issues_dicts
+    )
 
 
 def save_exp_issues_model(exp_issues: stats_domain.ExplorationIssues) -> None:
