@@ -93,6 +93,7 @@ CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version' # pylint: disable=line-too-long
 CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION = 'migrate_story_reference_schema_to_latest_version' # pylint: disable=line-too-long
 
+
 class TopicChange(change_domain.BaseChange):
     """Domain object for changes made to topic object.
 

@@ -100,7 +100,7 @@ class MigrateTopicJob(base_jobs.JobBase):
                 'to_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION
             })
             yield (topic_id, topic_change)
-        
+
         story_version = topic_model.story_reference_schema_version
         if story_version < feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION:
             topic_change = topic_domain.TopicChange({
