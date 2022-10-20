@@ -684,7 +684,7 @@
     "I18N_LEARNER_GROUP_INVITATION_MODAL_HEADER": "Learner group invitation",
     "I18N_LEARNER_GROUP_INVITE_LEARNERS": "Invite Learners",
     "I18N_LEARNER_GROUP_INVITE_LEARNERS_BY_USERNAME": "Invite a learner with their username",
-    "I18N_LEARNER_GROUP_INVITE_LEARNERS_PLACEHOLDER_TEXT": "Add username of the learner to invite and press enter",
+    "I18N_LEARNER_GROUP_INVITE_LEARNERS_PLACEHOLDER_TEXT": "Add the learner's username and hit enter",
     "I18N_LEARNER_GROUP_INVITE_LIST_TEXT": "Invite List",
     "I18N_LEARNER_GROUP_ITEM_ADDED_TO_SYLLABUS": "Added",
     "I18N_LEARNER_GROUP_ITEM_ALREADY_ADDED_TO_SYLLABUS": "Already In Syllabus",
