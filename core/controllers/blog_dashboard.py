@@ -28,14 +28,25 @@ from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import user_services
 
-from typing import Any, Dict, List
+from typing import Dict, List, Optional, TypedDict, cast
 
 
-# Here we are using Dict[str, Any] for the return value `summary_dicts` since
-# we have to return a list with each element being domain object converted to
-# a dictionary.
+class BlogCardSummaryDict(TypedDict):
+    """Type for the dict representation of blog_card_summary_dicts."""
+
+    id: str
+    title: str
+    summary: str
+    url_fragment: str
+    tags: List[str]
+    thumbnail_filename: Optional[str]
+    last_updated: Optional[str]
+    published_on: Optional[str]
+
+
 def _get_blog_card_summary_dicts_for_dashboard(
-        summaries: List[blog_domain.BlogPostSummary]) -> List[Dict[str, Any]]:
+    summaries: List[blog_domain.BlogPostSummary]
+) -> List[BlogCardSummaryDict]:
     """Creates summary dicts for use in blog dashboard.
 
     Args:
@@ -43,23 +54,29 @@ def _get_blog_card_summary_dicts_for_dashboard(
             domain objects.
 
     Returns:
-        list(Dict(str, *)). The list of blog post summary dicts.
+        list(BlogCardSummaryDict). The list of blog post summary dicts.
     """
-    summary_dicts = []
+    summary_dicts: List[BlogCardSummaryDict] = []
     for summary in summaries:
         summary_dict = summary.to_dict()
-        del summary_dict['author_id']
-        summary_dicts.append(summary_dict)
+        summary_dicts.append({
+            'id': summary_dict['id'],
+            'title': summary_dict['title'],
+            'summary': summary_dict['summary'],
+            'url_fragment': summary_dict['url_fragment'],
+            'tags': summary_dict['tags'],
+            'thumbnail_filename': summary_dict['thumbnail_filename'],
+            'last_updated': summary_dict['last_updated'],
+            'published_on': summary_dict['published_on'],
+        })
     return summary_dicts
 
 
 class BlogDashboardPage(base.BaseHandler):
     """Blog Dashboard Page Handler to render the frontend template."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
@@ -72,8 +89,8 @@ class BlogDashboardDataHandler(base.BaseHandler):
     """Provides user data for the blog dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {},
         'POST': {},
     }
@@ -81,6 +98,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
 
         no_of_published_blog_posts = 0
@@ -118,8 +136,27 @@ class BlogDashboardDataHandler(base.BaseHandler):
     @acl_decorators.can_access_blog_dashboard
     def post(self) -> None:
         """Handles POST requests to create a new blog post draft."""
+        assert self.user_id is not None
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
+
+
+class BlogPostHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of BlogPostHandler's normalized_payload
+    dictionary.
+    """
+
+    change_dict: blog_services.BlogPostChangeDict
+    new_publish_status: str
+    thumbnail_filename: str
+
+
+class BlogPostHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BlogPostHandler's normalized_request
+    dictionary.
+    """
+
+    image: bytes
 
 
 class BlogPostHandler(base.BaseHandler):
@@ -175,20 +212,40 @@ class BlogPostHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The blog post with the given id or url doesn\'t exist.')
         user_settings = user_services.get_users_settings(
-            [blog_post.author_id], strict=False, include_marked_deleted=True)
+            [blog_post.author_id], strict=True, include_marked_deleted=True)
         username = user_settings[0].username
 
-        max_no_of_tags = config_domain.Registry.get_config_property(
-            'max_number_of_tags_assigned_to_blog_post').value
-        list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post').value
+        max_no_of_tags_config_property = (
+            config_domain.Registry.get_config_property(
+                'max_number_of_tags_assigned_to_blog_post'
+            )
+        )
+        assert max_no_of_tags_config_property is not None
+        max_no_of_tags = max_no_of_tags_config_property.value
+
+        list_of_default_tags_config_property = (
+            config_domain.Registry.get_config_property(
+                'list_of_default_tags_for_blog_post'
+            )
+        )
+        assert list_of_default_tags_config_property is not None
+        list_of_default_tags = list_of_default_tags_config_property.value
 
         blog_post_dict = blog_post.to_dict()
-        del blog_post_dict['author_id']
-        blog_post_dict['author_username'] = username
+        blog_post_dict_for_dashboard = {
+            'id': blog_post_dict['id'],
+            'title': blog_post_dict['title'],
+            'author_username': username,
+            'content': blog_post_dict['content'],
+            'url_fragment': blog_post_dict['url_fragment'],
+            'tags': blog_post_dict['tags'],
+            'thumbnail_filename': blog_post_dict['thumbnail_filename'],
+            'last_updated': blog_post_dict['last_updated'],
+            'published_on': blog_post_dict['published_on'],
+        }
 
         self.values.update({
-            'blog_post_dict': blog_post_dict,
+            'blog_post_dict': blog_post_dict_for_dashboard,
             'username': username,
             'profile_picture_data_url': (
                 user_settings[0].profile_picture_data_url),
@@ -201,14 +258,18 @@ class BlogPostHandler(base.BaseHandler):
     @acl_decorators.can_edit_blog_post
     def put(self, blog_post_id: str) -> None:
         """Updates properties of the given blog post."""
+        payload_data = cast(
+            BlogPostHandlerNormalizedPayloadDict,
+            self.normalized_payload
+        )
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
-            blog_services.get_blog_post_rights(blog_post_id, strict=False))
+            blog_services.get_blog_post_rights(blog_post_id, strict=True))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
-        change_dict = self.normalized_payload.get('change_dict')
+        change_dict = payload_data['change_dict']
 
         blog_services.update_blog_post(blog_post_id, change_dict)
-        new_publish_status = self.normalized_payload.get('new_publish_status')
+        new_publish_status = payload_data['new_publish_status']
         if new_publish_status:
             blog_services.publish_blog_post(blog_post_id)
         elif blog_post_currently_published:
@@ -225,9 +286,17 @@ class BlogPostHandler(base.BaseHandler):
     @acl_decorators.can_edit_blog_post
     def post(self, blog_post_id: str) -> None:
         """Stores thumbnail of the blog post in the datastore."""
+        payload_data = cast(
+            BlogPostHandlerNormalizedPayloadDict,
+            self.normalized_payload
+        )
+        request_data = cast(
+            BlogPostHandlerNormalizedRequestDict,
+            self.normalized_request
+        )
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
-        raw_image = self.normalized_request.get('image')
-        thumbnail_filename = self.normalized_payload.get('thumbnail_filename')
+        raw_image = request_data['image']
+        thumbnail_filename = payload_data['thumbnail_filename']
         try:
             file_format = image_validation_services.validate_image_and_filename(
                 raw_image, thumbnail_filename)

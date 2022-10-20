@@ -27,17 +27,17 @@ from core.tests import test_utils
 class BlogDashboardPageTests(test_utils.GenericTestBase):
     """Checks the access to the blog dashboard page and its rendering."""
 
-    def test_blog_dashboard_page_access_without_logging_in(self):
+    def test_blog_dashboard_page_access_without_logging_in(self) -> None:
         """Tests access to the Blog Dashboard page."""
         self.get_html_response('/blog-dashboard', expected_status_int=302)
 
-    def test_blog_dashboard_page_access_without_having_rights(self):
+    def test_blog_dashboard_page_access_without_having_rights(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response('/blog-dashboard', expected_status_int=401)
         self.logout()
 
-    def test_blog_dashboard_page_access_as_blog_admin(self):
+    def test_blog_dashboard_page_access_as_blog_admin(self) -> None:
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
@@ -45,7 +45,7 @@ class BlogDashboardPageTests(test_utils.GenericTestBase):
         self.get_html_response('/blog-dashboard', expected_status_int=200)
         self.logout()
 
-    def test_blog_dashboard_page_access_as_blog_post_editor(self):
+    def test_blog_dashboard_page_access_as_blog_post_editor(self) -> None:
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
@@ -59,7 +59,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(
@@ -77,7 +77,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.blog_editor_id = (
             self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
 
-    def test_get_dashboard_page_data(self):
+    def test_get_dashboard_page_data(self) -> None:
         # Checks blog editor can access blog dashboard.
         self.login(self.BLOG_EDITOR_EMAIL)
         json_response = self.get_json(
@@ -106,7 +106,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
 
         # Checks for correct published and draft blog post summary data.
         blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
-        change_dict = {
+        change_dict: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title',
             'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Bloggers<p>',
@@ -133,7 +133,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             json_response['published_blog_post_summary_dicts'][0]['title'])
         self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
 
-    def test_create_new_blog_post(self):
+    def test_create_new_blog_post(self) -> None:
         # Checks blog editor can create a new blog post.
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -157,7 +157,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(
@@ -177,13 +177,14 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.blog_post = (
             blog_services.create_new_blog_post(self.blog_editor_id))
 
-    def test_get_blog_post_editor_page_data(self):
+    def test_get_blog_post_editor_page_data(self) -> None:
         # Checks blog editor can access blog post editor.
         self.login(self.BLOG_EDITOR_EMAIL)
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             )
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
+        assert self.blog_post.last_updated is not None
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
             'author_username': self.BLOG_EDITOR_USERNAME,
@@ -238,7 +239,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             expected_status_int=401)
         self.logout()
 
-    def test_get_blog_post_data_by_invalid_blog_post_id(self):
+    def test_get_blog_post_data_by_invalid_blog_post_id(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
         self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, '123'),
@@ -251,7 +252,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_blog_post_data(self):
+    def test_put_blog_post_data(self) -> None:
         # Checks blog editor can edit owned blog post.
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -278,7 +279,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_blog_post_data_by_invalid_blog_post_id(self):
+    def test_put_blog_post_data_by_invalid_blog_post_id(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -300,7 +301,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             payload, csrf_token=csrf_token, expected_status_int=404)
 
-    def test_update_blog_post_with_invalid_change_dict(self):
+    def test_update_blog_post_with_invalid_change_dict(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -316,7 +317,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             response['error'], 'Schema validation for \'change_dict\''
             ' failed: Title should be a string.')
 
-    def test_publishing_unpublishing_blog_post(self):
+    def test_publishing_unpublishing_blog_post(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -347,7 +348,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         blog_post_rights = blog_services.get_blog_post_rights(self.blog_post.id)
         self.assertFalse(blog_post_rights.blog_post_is_published)
 
-    def test_uploading_thumbnail_with_valid_image(self):
+    def test_uploading_thumbnail_with_valid_image(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -362,12 +363,12 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             payload,
             csrf_token=csrf_token,
-            upload_files=(('image', 'unused_filename', raw_image),),
+            upload_files=[('image', 'unused_filename', raw_image)],
             expected_status_int=200)
 
         self.logout()
 
-    def test_updating_blog_post_fails_with_invalid_image(self):
+    def test_updating_blog_post_fails_with_invalid_image(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -384,13 +385,13 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             payload,
             csrf_token=csrf_token,
-            upload_files=(('image', 'unused_filename', raw_image),),
+            upload_files=[('image', 'unused_filename', raw_image)],
             expected_status_int=400)
 
         self.assertEqual(
             json_response['error'], 'Image exceeds file size limit of 100 KB.')
 
-    def test_guest_can_not_delete_blog_post(self):
+    def test_guest_can_not_delete_blog_post(self) -> None:
         response = self.delete_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             expected_status_int=401)
@@ -398,7 +399,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             response['error'],
             'You must be logged in to access this resource.')
 
-    def test_cannot_delete_invalid_blog_post(self):
+    def test_cannot_delete_invalid_blog_post(self) -> None:
         # Check that an invalid blog post can not be deleted.
         # Error is raised by acl decorator.
         self.login(self.BLOG_ADMIN_EMAIL)
@@ -414,7 +415,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
         self.logout()
 
-    def test_blog_post_handler_delete_by_admin(self):
+    def test_blog_post_handler_delete_by_admin(self) -> None:
         # Check that blog admins can delete a blog post.
         self.login(self.BLOG_ADMIN_EMAIL)
         self.delete_json(
@@ -423,7 +424,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             expected_status_int=200)
         self.logout()
 
-    def test_blog_post_handler_delete_by_blog_editor(self):
+    def test_blog_post_handler_delete_by_blog_editor(self) -> None:
         # Check that editor who owns the blog post can delete it.
         self.login(self.BLOG_EDITOR_EMAIL)
         self.delete_json(
@@ -432,7 +433,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             expected_status_int=200)
         self.logout()
 
-    def test_cannot_delete_post_by_blog_editor(self):
+    def test_cannot_delete_post_by_blog_editor(self) -> None:
         # Check that blog editor who does not own the blog post can not
         # delete it.
         self.add_user_role(
