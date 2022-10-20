@@ -616,7 +616,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_and_get_analytics_model(self) -> None:
         model_id = (
-            stats_models.ExplorationStatsModel.create_and_put(
+            stats_models.ExplorationStatsModel.create(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
 
         model = stats_models.ExplorationStatsModel.get_model(
@@ -659,11 +659,11 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(fetched_model.state_stats_mapping, {})
 
     def test_get_multi_stats_models(self) -> None:
-        stats_models.ExplorationStatsModel.create_and_put(
+        stats_models.ExplorationStatsModel.create(
             'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
-        stats_models.ExplorationStatsModel.create_and_put(
+        stats_models.ExplorationStatsModel.create(
             'exp_id1', 2, 0, 0, 0, 0, 0, 0, {})
-        stats_models.ExplorationStatsModel.create_and_put(
+        stats_models.ExplorationStatsModel.create(
             'exp_id2', 1, 0, 0, 0, 0, 0, 0, {})
 
         exp_version_reference_dicts = [
@@ -687,9 +687,9 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stat_models[2].exp_version, 1)
 
     def test_get_multi_versions(self) -> None:
-        stats_models.ExplorationStatsModel.create_and_put(
+        stats_models.ExplorationStatsModel.create(
             'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
-        stats_models.ExplorationStatsModel.create_and_put(
+        stats_models.ExplorationStatsModel.create(
             'exp_id1', 2, 0, 0, 0, 0, 0, 0, {})
 
         stat_models = stats_models.ExplorationStatsModel.get_multi_versions(

@@ -53,7 +53,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.exp_id = 'exp_id1'
         self.exp_version = 1
         self.stats_model_id = (
-            stats_models.ExplorationStatsModel.create_and_put(
+            stats_models.ExplorationStatsModel.create(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
         stats_models.ExplorationIssuesModel.create(
             self.exp_id, self.exp_version, [])
@@ -991,7 +991,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         })
 
     def test_create_stats_model(self) -> None:
-        """Test the create_and_put_stats_model method."""
+        """Test the create method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         # Ruling out the possibility of None for mypy type checking.
@@ -1109,7 +1109,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
     def test_get_exploration_stats_multi(self) -> None:
         """Test the get_exploration_stats_multi method."""
-        stats_models.ExplorationStatsModel.create_and_put(
+        stats_models.ExplorationStatsModel.create(
             'exp_id2', 2, 10, 0, 0, 0, 0, 0, {})
         exp_version_references = [
             exp_domain.ExpVersionReference(self.exp_id, self.exp_version),
