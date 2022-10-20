@@ -215,6 +215,10 @@
   width: 330px;
 }
 
+.oppia-learner-group-learner-specific-progress .subtopic-progress.no-progress {
+  justify-content: center;
+}
+
 .oppia-learner-group-learner-specific-progress .subtopic-progress-bar {
   border: 1px solid #00609c;
   border-radius: 6px;
@@ -348,5 +352,33 @@
   .learner-specific-progress-view-selectors .learners-dropdown-menu {
     max-width: unset;
     width: 100%;
+  }
+}
+
+@media screen and (max-width: 540px) {
+  .oppia-learner-group-learner-specific-progress .story-chapter-progress,
+  .oppia-learner-group-learner-specific-progress .subtopic-progress-info {
+    display: grid;
+    gap: 10px;
+  }
+
+  .oppia-learner-group-learner-specific-progress .chapter-progress-container,
+  .oppia-learner-group-learner-specific-progress .subtopic-progress,
+  .oppia-learner-group-learner-specific-progress .subtopic-progress.no-progress {
+    justify-content: unset;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .oppia-learner-group-learner-specific-progress .mat-expansion-panel-header {
+    padding: 0;
+  }
+
+  .oppia-learner-group-learner-specific-progress .mat-expansion-panel-header-title {
+    margin-right: unset;
+  }
+
+  .oppia-learner-group-learner-specific-progress .story-info-summary {
+    gap: 20px;
   }
 }

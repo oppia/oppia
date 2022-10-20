@@ -177,7 +177,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     expect(component.learnerGroup).toEqual(learnerGroup);
 
     component.ngOnInit();
-    tick(100);
+    tick();
 
     expect(component.currentLearnersInfo).toEqual([learnerInfo3]);
     expect(component.invitedLearnersInfo).toEqual([learnerInfo1, learnerInfo2]);
@@ -205,7 +205,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     component.newLearnerGroupDescription = 'description';
 
     component.saveLearnerGroupInfo();
-    tick(100);
+    tick();
     fixture.detectChanges();
 
     expect(component.learnerGroup.title).toBe('title');
@@ -266,7 +266,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     component.invitedLearnersInfo = [];
 
     component.openInviteLearnersModal();
-    tick(100);
+    tick();
     fixture.detectChanges();
 
     expect(component.learnerGroup).toEqual(learnerGroup);
@@ -307,7 +307,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       component.currentLearnersInfo = [learnerInfo];
 
       component.openInviteLearnersModal();
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(demoLearnerGroup);
@@ -359,7 +359,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       component.invitedLearnersInfo = [];
 
       component.openInviteLearnersModal();
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
@@ -402,7 +402,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       component.currentLearnersInfo = [learnerInfo];
 
       component.openRemoveLearnerFromGroupModal(learnerInfo);
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
@@ -445,7 +445,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       component.invitedLearnersInfo = [learnerInfo];
 
       component.openWithdrawLearnerInvitationModal(learnerInfo);
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
@@ -467,7 +467,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     component.learnerGroup = learnerGroup;
 
     component.deleteLearnerGroup();
-    tick(100);
+    tick();
 
     expect(windowRef.nativeWindow.location.href).toBe(
       '/facilitator-dashboard');
