@@ -1163,8 +1163,14 @@ def publish_collection_and_update_user_profiles(
         )
     contributor_ids = collection_summary.contributor_ids
     for contributor in contributor_ids:
-        user_services.update_first_contribution_msec_if_not_set_in_model(
-            contributor, contribution_time_msec).put()
+        user_settings_model = (
+            user_services.update_first_contribution_msec_if_not_set_in_model(
+                contributor,
+                contribution_time_msec
+            )
+        )
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
 
 
 def update_collection(
@@ -1206,8 +1212,16 @@ def update_collection(
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
-        user_services.update_first_contribution_msec_if_not_set_in_model(
-            committer_id, utils.get_current_time_in_millisecs()).put()
+        user_settings_model = (
+            user_services
+            .update_first_published_collection_msec_if_not_set_in_model(
+                committer_id,
+                utils.get_current_time_in_millisecs()
+            )
+        )
+        if user_settings_model:
+            user_settings_model.update_timestamps()
+            user_settings_model.put()
 
 
 def regenerate_collection_summary_with_new_contributor(

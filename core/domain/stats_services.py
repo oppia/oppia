@@ -534,7 +534,7 @@ def update_exp_issues_models_for_new_exp_version(
         old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
         exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
         exp_issues.exp_version = exploration.version + 1
-        models_to_put.extend(create_exp_issues_model(exp_issues))
+        models_to_put.append(create_exp_issues_model(exp_issues))
         return models_to_put
 
     if exp_versions_diff is None:
@@ -652,7 +652,7 @@ def update_exp_issues_models_for_new_exp_version(
                 old_to_new_state_names[state_name])
 
     exp_issues.exp_version += 1
-    models_to_put.extend(create_exp_issues_model(exp_issues))
+    models_to_put.append(create_exp_issues_model(exp_issues))
     return models_to_put
 
 

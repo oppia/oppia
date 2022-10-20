@@ -1364,13 +1364,15 @@ def _compute_models_to_put(
         if exploration_model.version == 0
         else feconf.COMMIT_TYPE_EDIT
     )
-    models_to_put.extend(exploration_model.compute_models_to_commit(
-        feconf.MIGRATION_BOT_USERNAME,
-        commit_type,
-        commit_message,
-        change_list_dict,
-        additional_models={'rights_model': exploration_rights}
-    ))
+    models_to_put.extend(
+        exploration_model.compute_models_to_commit(
+            feconf.MIGRATION_BOT_USERNAME,
+            commit_type,
+            commit_message,
+            change_list_dict,
+            additional_models={'rights_model': exploration_rights}
+        ).values()
+    )
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_EXPLORATION,
         None,
@@ -1401,8 +1403,15 @@ def _compute_models_to_put(
         state_name: new_exp_stats.state_stats_mapping[state_name].to_dict()
         for state_name in new_exp_stats.state_stats_mapping
     }
+    new_exp_stats_instance_id = (
+        stats_models.ExplorationStatsModel.get_entity_id(
+            new_exp_stats.exp_id,
+            new_exp_stats.exp_version
+        )
+    )
     models_to_put.append(
         stats_models.ExplorationStatsModel(
+            id=new_exp_stats_instance_id,
             exp_id=new_exp_stats.exp_id,
             exp_version=new_exp_stats.exp_version,
             num_starts_v1=new_exp_stats.num_starts_v1,
@@ -1836,8 +1845,15 @@ def publish_exploration_and_update_user_profiles(
     contributor_ids = exp_fetchers.get_exploration_summary_by_id(
         exp_id).contributor_ids
     for contributor in contributor_ids:
-        user_services.update_first_contribution_msec_if_not_set_in_model(
-            contributor, contribution_time_msec).put()
+        user_settings_model = (
+            user_services.update_first_contribution_msec_if_not_set_in_model(
+                contributor,
+                contribution_time_msec
+            )
+        )
+        if user_settings_model:
+            user_settings_model.update_timestamps()
+            user_settings_model.put()
 
 
 def validate_exploration_for_story(
@@ -2090,19 +2106,26 @@ def update_exploration(
                 exploration_id
             )
         )
-        models_to_put.extend(
-            user_services.record_user_edited_an_exploration_in_model(
-                committer_id
-            )
+        user_settings_model = user_services.get_user_settings(
+            committer_id,
+            strict=False
         )
-        if not rights_manager.is_exploration_private(exploration_id):
-            models_to_put.extend(
-                user_services
-                .update_first_contribution_msec_if_not_set_in_model(
-                    committer_id,
-                    utils.get_current_time_in_millisecs()
+        if user_settings_model:
+            models_to_put.append(
+                user_services.record_user_edited_an_exploration_in_model(
+                    committer_id
                 )
             )
+            if not rights_manager.is_exploration_private(exploration_id):
+                updated_user_settings_model = (
+                    user_services
+                    .update_first_contribution_msec_if_not_set_in_model(
+                        committer_id,
+                        utils.get_current_time_in_millisecs()
+                    )
+                )
+                if updated_user_settings_model:
+                    models_to_put.append(updated_user_settings_model)
 
     if opportunity_services.is_exploration_available_for_contribution(
             exploration_id):
@@ -2138,9 +2161,8 @@ def update_exploration(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
             committer_id)
     if should_put_models:
-        datastore_services.put_multi(
-            [model for model in models_to_put if model is not None]
-        )
+        datastore_services.update_timestamps_multi(models_to_put)
+        datastore_services.put_multi(models_to_put)
     return models_to_put
 
 

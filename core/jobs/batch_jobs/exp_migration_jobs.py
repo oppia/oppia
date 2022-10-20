@@ -111,8 +111,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
-                'from_version': exp_states_version,
-                'to_version': feconf.CURRENT_STATE_SCHEMA_VERSION
+                'from_version': str(exp_states_version),
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
             })
             yield (exp_id, exp_change)
 
@@ -167,13 +167,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
         ) % (
             feconf.CURRENT_STATE_SCHEMA_VERSION
         )
-        change_dicts = [change.to_dict() for change in exp_changes]
         models_to_put_values = []
         with datastore_services.get_ndb_context():
             models_to_put_values = exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME,
                 updated_exp_model.id,
-                change_dicts,
+                exp_changes,
                 commit_message,
                 is_synchronous=True,
                 should_put_models=False
@@ -294,15 +293,15 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
-        unused_put_results = (
-            (
-                exp_related_models_to_put
+        with datastore_services.get_ndb_context():
+            unused_put_results = (
+                (
+                    exp_related_models_to_put
+                )
+                | 'Filter None models' >> beam.Filter(
+                    lambda x: x is not None)
+                | 'Put models into datastore' >> ndb_io.PutModels()
             )
-            | 'Merge models' >> beam.Flatten()
-            | 'Filter None models' >> beam.Filter(
-                lambda x: x is not None)
-            | 'Put models into datastore' >> ndb_io.PutModels()
-        )
 
         return (
             (
@@ -380,8 +379,8 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
-                'from_version': exp_states_version,
-                'to_version': feconf.CURRENT_STATE_SCHEMA_VERSION
+                'from_version': str(exp_states_version),
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
             })
             yield (exp_id, exp_change)
 

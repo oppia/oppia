@@ -2068,14 +2068,14 @@ def add_edited_exploration_id_to_model(
     user_contributions = get_user_contributions(user_id, strict=False)
 
     if not user_contributions:
-        user_contribution_models.extend(
+        user_contribution_models.append(
             create_user_contributions(user_id, [], [exploration_id])
         )
 
     elif exploration_id not in user_contributions.edited_exploration_ids:
         user_contributions.edited_exploration_ids.append(exploration_id)
         user_contributions.edited_exploration_ids.sort()
-        user_contribution_models.extend(
+        user_contribution_models.append(
             _get_validated_user_contributions_model(user_contributions)
         )
     return user_contribution_models
