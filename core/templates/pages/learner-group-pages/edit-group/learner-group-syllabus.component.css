@@ -222,3 +222,9 @@
     line-height: 28px;
   }
 }
+
+@media screen and (max-width: 540px) {
+  .oppia-learner-group-syllabus .assigned-syllabus-tab-title {
+    display: none;
+  }
+}
