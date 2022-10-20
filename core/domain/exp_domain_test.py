@@ -1347,7 +1347,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
           self.new_exploration, (
             'Link should be prefix with acceptable schemas '
-            f'which are - {constants.ACCEPTABLE_SCHEMES}')
+            'which are \\[\'https\', \'\']')
         )
 
     def test_math_rte_tag(self) -> None:

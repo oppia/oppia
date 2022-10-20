@@ -406,7 +406,7 @@ def validate_rte_tags(
         if utils.get_url_scheme(url) not in constants.ACCEPTABLE_SCHEMES:
             raise utils.ValidationError(
                 'Link should be prefix with acceptable schemas '
-                f'which are - {constants.ACCEPTABLE_SCHEMES}'
+                f'which are {constants.ACCEPTABLE_SCHEMES}'
             )
 
     for tag in soup.find_all('oppia-noninteractive-math'):
