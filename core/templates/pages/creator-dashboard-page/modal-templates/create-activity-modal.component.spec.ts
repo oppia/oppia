@@ -74,6 +74,13 @@ describe('Create Activity Modal Component', () =>{
     userService = TestBed.get(UserService);
   }));
 
+  afterEach(() => {
+    // This will destroy the fixture once the test gone end
+    // this is going to makesure that each testcase is going
+    // to run independent of another test case.
+    fixture.destroy();
+  });
+
   it('should evalute component properties after component is initialized',
     fakeAsync(() => {
       const UserInfoObject = {
