@@ -4094,7 +4094,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         len(rule_value) < min_value or
                         len(rule_value) > max_value
                     ):
-                        if answer_group['outcome']['dest'] == state_name:
+                        if (
+                            answer_group['outcome']['dest'] == state_name or
+                            len(rule_value) == 0
+                        ):
                             invalid_rules.append(rule_spec)
                         else:
                             min_value = min(min_value, len(rule_value))
