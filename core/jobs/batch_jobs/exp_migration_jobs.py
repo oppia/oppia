@@ -887,7 +887,8 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                     exp_domain.Exploration.update_states_from_model(
                         versioned_exploration_states,
                         current_state_schema_version,
-                        exp_id)
+                        exp_id,
+                        exploration_model.language_code)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -1027,7 +1028,8 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
                     exp_domain.Exploration.update_states_from_model(
                         versioned_exploration_states,
                         current_state_schema_version,
-                        exp_id)
+                        exp_id,
+                        exploration_model.language_code)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
