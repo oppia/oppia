@@ -37,6 +37,9 @@ export class DiagnosticTestTopicStateData {
     for (let skillId of this._diagnosticTestSkills) {
       this.skillIdToPassedStateDict[skillId] = false;
     }
+
+    console.log('skill ID to questions');
+    console.log(skillIdToQuestions);
   }
 
   getNextQuestionFromCurrentSkill() {
@@ -47,6 +50,8 @@ export class DiagnosticTestTopicStateData {
   getNextQuestion() {
     this.numberOfAttemptedQuestion += 1;
     this._currenSkillIndex += 1;
+    this.currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
+    return this.skillIdToQuestionsList[this.currentSkill][0];
   }
 
   isTopicPassed() {

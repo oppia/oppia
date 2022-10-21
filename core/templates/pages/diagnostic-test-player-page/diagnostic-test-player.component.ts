@@ -62,7 +62,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   startDiagnosticTest(): void {
     // fetch the math topic ID.
-    const classroomId = 'IUHeUmbJtAY7';
+    const classroomId = 'u6DmmcdaEK4d';
 
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {

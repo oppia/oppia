@@ -36,6 +36,8 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { DiagnosticTestModelData } from 'pages/diagnostic-test-player-page/diagnostic-test.model';
 import { DiagnosticTestTopicStateData } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-state.model';
+import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 @Injectable({
     providedIn: 'root'
@@ -47,6 +49,7 @@ export class DiagnosticTestPlayerEngineService {
   private nextIndex: number = null;
   private diagnosticTestModelData;
   private diagnosticTestTopicStateData;
+  private currentQuestion;
 
   constructor(
     private alertsService: AlertsService,
@@ -56,7 +59,29 @@ export class DiagnosticTestPlayerEngineService {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
-    private questionObjectFactory: QuestionObjectFactory) {
+    private questionObjectFactory: QuestionObjectFactory,
+    private questionBackendApiService: QuestionBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService:
+    TopicsAndSkillsDashboardBackendApiService) {
+  }
+
+  getSkillIdToQuestionsDict(skillIds, questions) {
+    let skillIdToQuestions = {};
+
+    for (let skillId of skillIds) {
+      skillIdToQuestions[skillId] = [];
+    }
+
+    for (let skillId of skillIds) {
+      for (let question of questions) {
+        let skillIds = question.getLinkedSkillIds();
+
+        if (skillIds.indexOf(skillId)) {
+          skillIdToQuestions[skillId].push(question);
+        }
+      }
+    }
+    return skillIdToQuestions;
   }
 
   init(
@@ -65,10 +90,161 @@ export class DiagnosticTestPlayerEngineService {
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback?: () => void
   ) {
+    let skillIdToQuestions = {};
     this.diagnosticTestModelData = diagnosticTestModelData;
+
+    this.questionBackendApiService.fetchQuestionsAsync(
+      config.skillList,
+      config.questionCount,
+      config.questionsSortedByDifficulty
+    ).then((questionData) => {
+      let questions = questionData.map(
+        function(questionDict) {
+          return this.questionObjectFactory.createFromBackendDict(
+            questionDict);
+      });
+
+      skillIdToQuestions = this.getSkillIdToQuestionsDict(
+        config.skillList, questions)
+
+      this.diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
+        skillIdToQuestions);
+
+      this.createCard(successCallback, errorCallback);
+    });
   }
 
-  submitAnswer(): boolean {
-    return false;
+  submitAnswer(
+      answer: InteractionAnswer,
+      interactionRulesService: InteractionRulesService,
+      successCallback: (
+          nextCard: StateCard,
+          refreshInteraction: boolean,
+          feedbackHtml: string,
+          feedbackAudioTranslations: BindableVoiceovers,
+          refresherExplorationId,
+          missingPrerequisiteSkillId,
+          remainOnCurrentCard: boolean,
+          taggedSkillMisconceptionId: string,
+          wasOldStateInitial,
+          isFirstHit,
+          isFinalQuestion: boolean,
+          focusLabel: string) => void
+  ): boolean {
+    const answerString = answer as string;
+    const oldState = this.currentQuestion.getStateData();
+    const classificationResult = (
+      this.answerClassificationService.getMatchingClassificationResult(
+        null, oldState.interaction, answer,
+        interactionRulesService));
+    const answerGroupIndex = classificationResult.answerGroupIndex;
+    const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+
+
+
+
+    let taggedSkillMisconceptionId = null;
+    if (oldState.interaction.answerGroups[answerGroupIndex]) {
+      taggedSkillMisconceptionId =
+        oldState.interaction.answerGroups[answerGroupIndex]
+          .taggedSkillMisconceptionId;
+    }
+
+    // Use angular.copy() to clone the object
+    // since classificationResult.outcome points
+    // at oldState.interaction.default_outcome.
+    const outcome = angular.copy(classificationResult.outcome);
+    // Compute the data for the next state.
+    const oldParams = {
+      answer: answerString
+    };
+    let newState = null;
+    if (answerIsCorrect && (this.currentIndex < this.questions.length - 1)) {
+      newState = this.questions[this.currentIndex + 1].getStateData();
+    } else {
+      newState = oldState;
+    }
+
+    let questionHtml = this.makeQuestion(newState, [oldParams, {
+      answer: 'answer'
+    }]);
+    if (questionHtml === null) {
+      this.alertsService.addWarning('Question name should not be empty.');
+      return;
+    }
+
+    const interactionId = oldState.interaction.id;
+    const interactionIsInline = (
+      !interactionId ||
+      InteractionSpecsConstants.
+        INTERACTION_SPECS[interactionId].display_mode ===
+        AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+    const refreshInteraction = (
+      answerIsCorrect || interactionIsInline);
+
+    // add comment
+    const onSameCard = false;
+
+    const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    let nextCard = null;
+    // if (!isFinalQuestion) {
+    //   let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
+
+    //   questionHtml = questionHtml + this.getRandomSuffix();
+    //   nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
+    //   nextCard = StateCard.createNewCard(
+    //     'true', questionHtml, nextInteractionHtml,
+    //     this.getNextStateData().interaction,
+    //     this.getNextStateData().recordedVoiceovers,
+    //     this.getNextStateData().writtenTranslations,
+    //     this.getNextStateData().content.contentId,
+    //     this.audioTranslationLanguageService
+    //   );
+    // }
+    successCallback(
+      nextCard, refreshInteraction, null,
+      null,
+      null, null, onSameCard, taggedSkillMisconceptionId,
+      null, null, false, _nextFocusLabel);
+    return answerIsCorrect;
+  }
+
+  createCard(
+      successCallback:(initialCard: StateCard, nextFocusLabel: string) => void,
+      errorCallback: () => void
+  ) {
+    const stateData = this.diagnosticTestTopicStateData.getNextQuestion();
+
+    const questionHtml = this.makeQuestion(stateData, []);
+    if (questionHtml === null) {
+      this.alertsService.addWarning('Question name should not be empty.');
+      errorCallback();
+      return;
+    }
+    const interaction = stateData.interaction;
+    const nextFocusLabel = this.focusManagerService.generateFocusLabel();
+
+    const interactionId = interaction.id;
+    let interactionHtml = null;
+
+    if (interactionId) {
+      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
+        interactionId, interaction.customizationArgs, true, nextFocusLabel,
+        null);
+    }
+    const initialCard =
+      StateCard.createNewCard(
+        null, questionHtml, interactionHtml, interaction,
+        stateData.recordedVoiceovers,
+        stateData.writtenTranslations, stateData.content.contentId,
+        this.audioTranslationLanguageService);
+    successCallback(initialCard, nextFocusLabel);
+  }
+
+  // Evaluate question string.
+  private makeQuestion(
+      newState: State, envs: Record<string, string>[]): string {
+    return this.expressionInterpolationService.processHtml(
+      newState.content.html, envs);
   }
 }

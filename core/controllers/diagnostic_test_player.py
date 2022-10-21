@@ -35,3 +35,17 @@ class DiagnosticTestPlayerPage(base.BaseHandler):
     def get(self) -> None:
         """Handles GET requests."""
         self.render_template('diagnostic-test-player-page.mainpage.html') # type: ignore[no-untyped-call]
+
+
+class DiagnosticTestSkillsToQuestionLinkHandler(base.BaseHandler):
+    """ """
+
+    def get(self) -> None:
+        skill_ids = self.normalized_request('skill_ids')
+        question_count = len(skill_ids) * 2
+        fetch_by_difficulty = True
+        questions = (
+            question_services.get_questions_by_skill_ids(
+                int(question_count), skill_ids, fetch_by_difficulty)
+        )
+        skill_id_to_questions_ids = {}
