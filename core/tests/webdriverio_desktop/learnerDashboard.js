@@ -296,7 +296,7 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
 
-    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 1', 1);
+    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 1', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
 
@@ -407,9 +407,9 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.navigateToReassignModal();
     await topicEditorPage.expectUncategorizedSkillsToBe(
       ['Learner Dashboard Skill 2']);
-    await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, []);
-    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 2', 1);
-    await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, [
+    await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, []);
+    await topicEditorPage.dragSkillToSubtopic('Learner Dashboard Skill 2', 0);
+    await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, [
       'Learner Dashboard Skill 2']);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');

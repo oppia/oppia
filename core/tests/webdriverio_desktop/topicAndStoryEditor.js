@@ -33,8 +33,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../webdriverio_utils/ExplorationPlayerPage.js');
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Topic editor functionality', function() {
+describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
@@ -226,17 +225,17 @@ fdescribe('Topic editor functionality', function() {
       await topicEditorPage.navigateToReassignModal();
       await topicEditorPage.expectUncategorizedSkillsToBe(
         ['Skill 3', 'Skill 2']);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, []);
       await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, []);
-      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(2, []);
 
-      await topicEditorPage.dragSkillToSubtopic('Skill 2', 1);
-      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, ['Skill 2']);
-      await topicEditorPage.dragSkillToSubtopic('Skill 3', 2);
-      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(2, ['Skill 3']);
-      await topicEditorPage.dragSkillFromSubtopicToSubtopic(2, 1, 'Skill 3');
+      await topicEditorPage.dragSkillToSubtopic('Skill 2', 0);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, ['Skill 2']);
+      await topicEditorPage.dragSkillToSubtopic('Skill 3', 1);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, ['Skill 3']);
+      await topicEditorPage.dragSkillFromSubtopicToSubtopic(1, 0, 'Skill 3');
       await topicEditorPage.expectSubtopicWithIndexToHaveSkills(
-        1, ['Skill 2', 'Skill 3']);
-      await topicEditorPage.dragSkillFromSubtopicToUncategorized(1, 'Skill 2');
+        0, ['Skill 2', 'Skill 3']);
+      await topicEditorPage.dragSkillFromSubtopicToUncategorized(0, 'Skill 2');
       await topicEditorPage.expectUncategorizedSkillsToBe(
         ['Skill 2']);
       await topicEditorPage.saveRearrangedSkills();

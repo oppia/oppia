@@ -110,7 +110,7 @@ describe('Classroom page functionality', function() {
       await topicEditorPage.navigateToTopicEditorTab();
       await topicEditorPage.navigateToReassignModal();
 
-      await topicEditorPage.dragSkillToSubtopic('Skill 1', 1);
+      await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
       await topicEditorPage.saveRearrangedSkills();
       await topicEditorPage.saveTopic('Added skill to subtopic.');
 
