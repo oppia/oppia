@@ -72,10 +72,6 @@ export class DiagnosticTestModelData {
     this.setTopicIdToSuccessorTopicIds();
   }
 
-  getTopicIdToAncestorTopicIds(): TopicIdToRelatedTopicIds {
-    return this._topicIdToAncestorTopicIds;
-  }
-
   getEligibleTopicIds(): string[] {
     return this._eligibleTopicIds;
   }
@@ -92,16 +88,20 @@ export class DiagnosticTestModelData {
     return this._currentTopicId;
   }
 
+  getAncestorsTopicIds(topicId: string): string[] {
+    return this._topicIdToAncestorTopicIds[topicId];
+  }
+
   getSkippedTopicIds(): string[] {
     return this._skippedTopicIds;
   }
 
-  getTopicIdToSuccessorTopicIds(): TopicIdToRelatedTopicIds {
-    return this._topicIdToSuccessorTopicIds;
+  getTopicIdToAncestorTopicIds(): TopicIdToRelatedTopicIds {
+    return this._topicIdToAncestorTopicIds;
   }
 
-  getAncestorsTopicIds(topicId: string): string[] {
-    return this._topicIdToAncestorTopicIds[topicId];
+  getTopicIdToSuccessorTopicIds(): TopicIdToRelatedTopicIds {
+    return this._topicIdToSuccessorTopicIds;
   }
 
   getSuccessorTopicIds(topicId: string): string[] {
@@ -169,28 +169,36 @@ export class DiagnosticTestModelData {
   }
 
   setCurrentTopicId(): void {
-    let topicIdToLengthOfExpectedRemoval: {[topicId: string]: number} = {};
-    let lengthOfAncestorTopicIds: number;
-    let lengthOfSuccessorTopicIds: number;
-    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
-      lengthOfAncestorTopicIds = (
-        this._topicIdToAncestorTopicIds[topicId].length);
-      lengthOfSuccessorTopicIds = (
-        this._topicIdToSuccessorTopicIds[topicId].length);
+    let topicIdToLengthOfRelatedTopicIds: {[topicId: string]: number} = {};
+    let lengthOfEligibleAncestorTopicIds: number;
+    let lengthOfEligibleSuccessorTopicIds: number;
 
-      topicIdToLengthOfExpectedRemoval[topicId] = Math.min(
-        lengthOfAncestorTopicIds, lengthOfSuccessorTopicIds);
+    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
+      let ancestors = this._topicIdToAncestorTopicIds[topicId];
+      let successors = this._topicIdToSuccessorTopicIds[topicId];
+
+      lengthOfEligibleAncestorTopicIds = ancestors.filter((topic) => {
+        return (this._eligibleTopicIds.indexOf(topic) !== -1);
+      }).length;
+
+      lengthOfEligibleSuccessorTopicIds = successors.filter((topic) => {
+        return (this._eligibleTopicIds.indexOf(topic) !== -1);
+      }).length;
+
+      topicIdToLengthOfRelatedTopicIds[topicId] = Math.min(
+        lengthOfEligibleAncestorTopicIds, lengthOfEligibleSuccessorTopicIds);
     }
 
-    let tempTopicId = Object.keys(topicIdToLengthOfExpectedRemoval)[0];
+    let tempTopicId = Object.keys(topicIdToLengthOfRelatedTopicIds)[0];
     let tempLenghtOfExpectedRemoval = (
-      topicIdToLengthOfExpectedRemoval[tempTopicId]);
-    for (let topicId in topicIdToLengthOfExpectedRemoval) {
+      topicIdToLengthOfRelatedTopicIds[tempTopicId]);
+
+    for (let topicId in topicIdToLengthOfRelatedTopicIds) {
       if (
-        topicIdToLengthOfExpectedRemoval[topicId] >
+        topicIdToLengthOfRelatedTopicIds[topicId] >
           tempLenghtOfExpectedRemoval
       ) {
-        tempLenghtOfExpectedRemoval = topicIdToLengthOfExpectedRemoval[topicId];
+        tempLenghtOfExpectedRemoval = topicIdToLengthOfRelatedTopicIds[topicId];
         tempTopicId = topicId;
       }
     }
@@ -207,10 +215,7 @@ export class DiagnosticTestModelData {
     topicIdsToRemoveFromEligibleList.push(this._currentTopicId);
 
     this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
-      if (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1) {
-        return true;
-      }
-      return false;
+      return (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1);
     });
 
     this._skippedTopicIds = this._skippedTopicIds.concat(ancestors);
@@ -226,10 +231,7 @@ export class DiagnosticTestModelData {
     topicIdsToRemoveFromEligibleList.push(this._currentTopicId);
 
     this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
-      if (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1) {
-        return true;
-      }
-      return false;
+      return (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1);
     });
 
     this._skippedTopicIds = this._skippedTopicIds.concat(successors);

@@ -210,4 +210,50 @@ describe('Diagnostic test model', () => {
 
       expect(diagnosticTestModelData.isTestFinished()).toBeFalse();
     });
+
+  it(
+    'should be able to update the current topic after recording the existing' +
+    ' topic as passed', () => {
+      diagnosticTestModelData = new DiagnosticTestModelData(
+        topicIdToPrerequisiteTopicIds);
+
+      let expectedTopicId = 'topicID3';
+
+      diagnosticTestModelData.setCurrentTopicId();
+
+      expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
+        expectedTopicId);
+
+      diagnosticTestModelData.recordTopicPassed();
+
+      expectedTopicId = 'topicID5';
+
+      diagnosticTestModelData.setCurrentTopicId();
+
+      expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
+        expectedTopicId);
+    });
+
+  it(
+    'should be able to update the current topic after recording the existing' +
+    ' topic as failed', () => {
+      diagnosticTestModelData = new DiagnosticTestModelData(
+        topicIdToPrerequisiteTopicIds);
+
+      let expectedTopicId = 'topicID3';
+
+      diagnosticTestModelData.setCurrentTopicId();
+
+      expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
+        expectedTopicId);
+
+      diagnosticTestModelData.recordTopicFailed();
+
+      expectedTopicId = 'topicID1';
+
+      diagnosticTestModelData.setCurrentTopicId();
+
+      expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
+        expectedTopicId);
+    });
 });
