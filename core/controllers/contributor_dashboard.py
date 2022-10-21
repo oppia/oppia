@@ -812,7 +812,7 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
 
         if stats.translation_contribution_stats is not None:
             response['translation_contribution_stats'] = _get_client_side_stats(
-                 stats.translation_contribution_stats)
+                stats.translation_contribution_stats)
 
         if stats.translation_review_stats is not None:
             response['translation_review_stats'] = _get_client_side_stats(
@@ -824,7 +824,7 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
 
         if stats.question_review_stats is not None:
             response['question_review_stats'] = _get_client_side_stats(
-                 stats.question_review_stats)
+                stats.question_review_stats)
 
         self.render_json(response)
 
