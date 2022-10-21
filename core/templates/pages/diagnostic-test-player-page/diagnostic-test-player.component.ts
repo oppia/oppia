@@ -20,7 +20,6 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 
 
@@ -34,16 +33,11 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private loaderService: LoaderService,
     private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {}
 
   ngOnInit(): void {
     this.preventPageUnloadEventService.addListener();
-    this.getOppiaAvatarImageURL();
-  }
-
-  getOppiaAvatarImageURL(): void {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
