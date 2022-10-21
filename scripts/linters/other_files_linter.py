@@ -25,8 +25,7 @@ import re
 
 from core import utils
 
-from typing import Any, Dict, List, Tuple
-from typing_extensions import Final, TypedDict
+from typing import Any, Dict, Final, List, Tuple, TypedDict
 import yaml
 
 from .. import concurrent_task_utils
