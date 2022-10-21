@@ -21,8 +21,6 @@ import commonConstants from 'assets/constants';
 export const AppConstants = {
   ...commonConstants,
 
-  END_EXPLORATION: 'End Exploration',
-
   DEFAULT_TRANSLATIONS: {
     I18N_LIBRARY_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Library',
     I18N_LIBRARY_LOADING: 'Loading',
@@ -209,5 +207,9 @@ export const AppConstants = {
   CONTRIBUTION_STATS_TYPE_TRANSLATION: 'translation',
   CONTRIBUTION_STATS_TYPE_QUESTION: 'question',
   CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
-  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review'
+  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
+
+  INTERACTION_NAMES: {
+    END_EXPLORATION: 'End Exploration'
+  }
 } as const;

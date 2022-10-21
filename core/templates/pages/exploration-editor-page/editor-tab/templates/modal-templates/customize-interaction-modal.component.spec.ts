@@ -103,6 +103,7 @@ class MockStateEditorService {
   }
 }
 
+ 
 fdescribe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
   let contextService: ContextService;
@@ -242,7 +243,7 @@ fdescribe('Customize Interaction Modal Component', () => {
 
   it('should enable Save Interaction button when no recommendation IDs are added', () => {
     spyOn(component, 'getTitle').and.returnValue(
-      AppConstants.END_EXPLORATION);
+      AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
     let className = 'oppia-exploration-id-input';
 
@@ -255,7 +256,7 @@ fdescribe('Customize Interaction Modal Component', () => {
 
   it('should enable Save Interaction button when recommendation IDs are added', () => {
     spyOn(component, 'getTitle').and
-      .returnValue(AppConstants.END_EXPLORATION);
+      .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
     let inputField = document.createElement('input');
     let inputValue = angular.element(inputField);
@@ -270,7 +271,7 @@ fdescribe('Customize Interaction Modal Component', () => {
 
   it('should disable Save Interaction button when recommendation ID is empty', () => {
     spyOn(component, 'getTitle').and
-      .returnValue(AppConstants.END_EXPLORATION);
+      .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
     let inputField = document.createElement('input');
     let inputValue = angular.element(inputField);
