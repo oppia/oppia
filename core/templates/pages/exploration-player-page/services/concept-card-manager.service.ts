@@ -46,7 +46,6 @@ export class ConceptCardManagerService {
   conceptCardReleased: boolean = false;
   conceptCardConsumed: boolean = false;
   wrongAnswersSinceConceptCardConsumed: number = 0;
-  correctAnswerSubmitted: boolean = false;
   learnerIsReallyStuck: boolean = false;
 
 
@@ -63,13 +62,6 @@ export class ConceptCardManagerService {
     private explorationEngineService: ExplorationEngineService
     ) {
     // TODO(#10904): Refactor to move subscriptions into components.
-    playerPositionService.onNewCardAvailable.subscribe(
-      () => {
-        this.correctAnswerSubmitted = true;
-        this.conceptCardReleased = false;
-        this.tooltipIsOpen = false;
-      }
-    );
 
     playerPositionService.onNewCardOpened.subscribe(
       (displayedCard: StateCard) => {
@@ -94,14 +86,11 @@ export class ConceptCardManagerService {
   }
 
   releaseConceptCard(): void {
-    console.log("Card is released");
-    if (!this.correctAnswerSubmitted) {
       this.conceptCardReleased = true;
       if (!this.conceptCardDiscovered && !this.tooltipTimeout) {
         this.tooltipTimeout = setTimeout(
           this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
-    }
     this._timeoutElapsedEventEmitter.emit();
   }
 
@@ -123,27 +112,17 @@ export class ConceptCardManagerService {
     }
     this.conceptCardConsumed = true;
     this.wrongAnswersSinceConceptCardConsumed = 0;
-    let funcToEnqueue = null;
-    // Here we add func to enque that would wait for
-    // 2 mins to dictate whether the leaner is stuck.
-    
-    console.log("Card is consumed");
-    funcToEnqueue = this.emitLearnerStuckedness;
-    if (funcToEnqueue) {
       this.enqueueTimeout(
-        funcToEnqueue,
+        this.emitLearnerStuckedness,
         ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
-    }
   }
 
   reset(): void {
     if (this.hintsAvailable) {
       return;
     }
-    console.log("Subscription works fine");
     this.conceptCardReleased = false;
     this.conceptCardConsumed = false;
-    this.correctAnswerSubmitted = false;
     this.wrongAnswersSinceConceptCardConsumed = 0;
     if (this.timeout) {
       clearTimeout(this.timeout);
@@ -162,9 +141,8 @@ export class ConceptCardManagerService {
   }
 
   conceptCardForStateExists(): boolean {
-    // let state = this.explorationEngineService.getState();
-    // return state.linkedSkillId !== null;
-    return true;
+    let state = this.explorationEngineService.getState();
+    return state.linkedSkillId !== null;
   }
 
   isConceptCardTooltipOpen(): boolean {

@@ -98,7 +98,7 @@ class MockNgbModalRef {
   };
 }
 
-fdescribe('ExplorationFooterComponent', () => {
+describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
   let fixture: ComponentFixture<ExplorationFooterComponent>;
   let contextService: ContextService;
