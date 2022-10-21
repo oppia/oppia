@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in classroom-admin panel.
+ * @fileoverview Directives required in diagnostic test player panel.
  */
 
 import 'core-js/es7/reflect';

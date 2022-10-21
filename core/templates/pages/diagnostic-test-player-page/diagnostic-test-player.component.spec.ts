@@ -76,16 +76,20 @@ describe('Diagnostic test player component', () => {
     expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
   });
 
-  it('should be able to get Oppia\'s avatar image URL', () => {
-    expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual('');
+  it(
+    'should be able to get Oppia\'s avatar image URL after initialization',
+    () => {
+      spyOn(preventPageUnloadEventService, 'addListener');
 
-    const avatarImageLocation = (
-      '/assets/images/avatar/oppia_avatar_100px.svg');
+      expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual('');
 
-    component.getOppiaAvatarImageURL();
+      const avatarImageLocation = (
+        '/assets/images/avatar/oppia_avatar_100px.svg');
 
-    expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual(avatarImageLocation);
-  });
+      component.ngOnInit();
+
+      expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual(avatarImageLocation);
+    });
 
   it('should open classroom page on clicking back button', () => {
     expect(windowRef.nativeWindow.location.href).toBe('');

@@ -38,10 +38,6 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   ngOnInit(): void {
     this.preventPageUnloadEventService.addListener();
-    this.getOppiaAvatarImageURL();
-  }
-
-  getOppiaAvatarImageURL(): void {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
