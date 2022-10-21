@@ -36,8 +36,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Callable, Dict, List, Optional, Sequence, Set, Type, Union
-from typing_extensions import Final
+from typing import (
+    Callable, Dict, Final, List, Optional, Sequence, Set, Type, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -673,6 +673,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
     ) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            email_manager.SIGNUP_EMAIL_CONTENT.default_value, dict
+        )
         config_services.set_property(
             self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
                 'subject': (

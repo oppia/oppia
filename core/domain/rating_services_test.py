@@ -27,8 +27,7 @@ from core.domain import rating_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Optional, overload
-from typing_extensions import Final, Literal
+from typing import Final, Literal, Optional, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -175,18 +174,18 @@ class RatingServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             ValueError, 'Expected the rating to be an integer, received 2'
             ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, '2')  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(
             ValueError, 'Expected the rating to be an integer, received aaa'
             ):
-            # TODO(#13059): After we fully type the codebase we plan to get
-            # rid of the tests that intentionally test wrong inputs that we
-            # can normally catch by typing.
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, 'aaa')  # type: ignore[arg-type]
 

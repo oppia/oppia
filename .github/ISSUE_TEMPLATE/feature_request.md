@@ -1,6 +1,7 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
+labels: triage needed, enhancement
 ---
 <!--
   - Thanks for taking the time to propose a new feature for the Oppia project.

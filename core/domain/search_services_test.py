@@ -29,8 +29,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Tuple
 
 gae_search_services = models.Registry.import_search_services()
 
@@ -133,7 +132,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             language_codes: List[str],
             offset: Optional[int] = None,
             size: int = 20,
-            ids_only: bool = False,
             retries: int = 3
         ) -> Tuple[List[str], Optional[int]]:
             self.assertEqual(query_string, expected_query_string)
@@ -142,7 +140,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(language_codes, [])
             self.assertEqual(offset, expected_offset)
             self.assertEqual(size, expected_size)
-            self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
             return doc_ids, expected_result_offset
@@ -170,7 +167,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             language_codes: List[str],
             offset: Optional[int] = None,
             size: int = 20,
-            ids_only: bool = False,
             retries: int = 3
         ) -> Tuple[List[str], Optional[int]]:
             self.assertEqual(query_string, expected_query_string)
@@ -180,7 +176,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(language_codes, [])
             self.assertEqual(offset, expected_offset)
             self.assertEqual(size, expected_size)
-            self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
             return doc_ids, expected_result_offset
@@ -312,14 +307,12 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
             tags: List[str],
             offset: Optional[int] = None,
             size: int = 20,
-            ids_only: bool = False,
             retries: int = 3
         ) -> Tuple[List[str], Optional[int]]:
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(tags, [])
             self.assertEqual(offset, expected_offset)
             self.assertEqual(size, expected_size)
-            self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
             return doc_ids, expected_result_offset

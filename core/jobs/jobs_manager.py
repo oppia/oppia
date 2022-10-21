@@ -26,6 +26,7 @@ from core import feconf
 from core.domain import beam_job_services
 from core.jobs import base_jobs
 from core.jobs import job_options
+from core.jobs.io import cache_io
 from core.jobs.io import job_io
 from core.platform import models
 from core.storage.beam_job import gae_models as beam_job_models
@@ -130,7 +131,7 @@ def run_job(
 
     # NOTE: Exceptions raised within this context are logged and suppressed.
     with _job_bookkeeping_context(job_name) as run_model:
-        _ = job.run() | job_io.PutResults(run_model.id)
+        _ = job.run() | job_io.PutResults(run_model.id) | cache_io.FlushCache()
 
         run_result = pipeline.run()
 

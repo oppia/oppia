@@ -18,17 +18,115 @@
 
 from __future__ import annotations
 
+from typing import Any, Dict, List, Optional, TypedDict, Union
+
+
+class VertexDict(TypedDict):
+    """Type for the dictionary representation of graph's vertices."""
+
+    x: float
+    y: float
+    label: str
+
+
+class EdgeDict(TypedDict):
+    """Type for the dictionary representation of graph's edges."""
+
+    src: int
+    dst: int
+    weight: int
+
+
+class GraphDict(TypedDict):
+    """Type for the dictionary representation of graph."""
+
+    vertices: List[VertexDict]
+    edges: List[EdgeDict]
+    isLabeled: bool
+    isDirected: bool
+    isWeighted: bool
+
+
+class RegionDict(TypedDict):
+    """Type representing the dictionary for region's area."""
+
+    regionType: str
+    area: List[List[float]]
+
+
+class LabeledRegionDict(TypedDict):
+    """Type representing the dictionary for image's labeled region."""
+
+    label: str
+    region: RegionDict
+
+
+class ImageAndRegionDict(TypedDict):
+    """Dictionary representation of imageAndRegions customization arg value."""
+
+    imagePath: str
+    labeledRegions: List[LabeledRegionDict]
+
+
+class CustomizationArgSubtitledUnicodeDefaultDict(TypedDict):
+    """Type for the dictionary representation of CustomizationArgSpec's
+    SubtitledUnicode default_value.
+    """
+
+    content_id: Optional[str]
+    unicode_str: str
+
+
+class CustomizationArgSubtitledHtmlDefaultDict(TypedDict):
+    """Type for the dictionary representation of CustomizationArgSpec's
+    SubtitledHtml default_value.
+    """
+
+    content_id: Optional[str]
+    html: str
+
+
+AllowedDefaultValueTypes = Union[
+    str,
+    float,
+    GraphDict,
+    ImageAndRegionDict,
+    CustomizationArgSubtitledUnicodeDefaultDict,
+    List[CustomizationArgSubtitledHtmlDefaultDict],
+    None
+]
+
+
+class CustomizationArgSpecsDict(TypedDict):
+    """Dictionary representing the CustomizationArgSpec object."""
+
+    name: str
+    description: str
+    # Here we use type Any because values in schema dictionary can be of type
+    # str, List, Dict, nested Dict and other types too.
+    schema: Dict[str, Any]
+    default_value: AllowedDefaultValueTypes
+
 
 class CustomizationArgSpec:
     """Value object for a customization arg specification."""
 
-    def __init__(self, name, description, schema, default_value):
+    # Here we use type Any because the argument 'schema' can accept schema
+    # dictionaries and values in schema dictionaries can be of type str, List,
+    # Dict, nested Dict and other types too.
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        schema: Dict[str, Any],
+        default_value: AllowedDefaultValueTypes
+    ) -> None:
         self.name = name
         self.description = description
         self.schema = schema
         self.default_value = default_value
 
-    def to_dict(self):
+    def to_dict(self) -> CustomizationArgSpecsDict:
         """Returns a dict representing this CustomizationArgSpec domain object.
 
         Returns:

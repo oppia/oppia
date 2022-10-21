@@ -25,8 +25,7 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
-from typing_extensions import Final
+from typing import Final, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -176,9 +175,10 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'Expected datetime, received Not a datetime object of type '
             '<class \'str\'>'
         ):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[arg-type] is used to test method
-            # get_by_hash() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this
+            # test after the backend is fully type-annotated. Here
+            # ignore[arg-type] is used to test method get_by_hash()
+            # for invalid input type.
             email_models.SentEmailModel.get_by_hash(
                 'Email Hash',
                 sent_datetime_lower_bound='Not a datetime object') # type: ignore[arg-type]

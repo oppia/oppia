@@ -29,8 +29,7 @@ from core.jobs.batch_jobs import story_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = False
 if MYPY:
@@ -106,9 +105,9 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             'next_node_id': 'node_2222'
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.broken_contents['nodes'][0]['description'] = 123  # type: ignore[arg-type]
 
         self.unmigrated_contents = copy.deepcopy(self.latest_contents)
@@ -305,9 +304,9 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             'next_node_id': 'node_2222'
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.broken_contents['nodes'][0]['description'] = 123  # type: ignore[arg-type]
 
         self.unmigrated_contents = copy.deepcopy(self.latest_contents)

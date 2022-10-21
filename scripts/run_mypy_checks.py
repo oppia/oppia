@@ -27,8 +27,10 @@ import sys
 from scripts import common
 from scripts import install_third_party_libs
 
+from typing import Final, List, Optional, Tuple
+
 # List of directories whose files won't be type-annotated ever.
-EXCLUDED_DIRECTORIES = [
+EXCLUDED_DIRECTORIES: Final = [
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
@@ -41,56 +43,147 @@ EXCLUDED_DIRECTORIES = [
 ]
 
 # List of files who should be type-annotated but are not.
-NOT_FULLY_COVERED_FILES = [
-    'core/controllers/',
-    'core/platform_feature_list.py',
-    'core/platform_feature_list_test.py',
-    'core/storage/storage_models_test.py',
-    'extensions/',
-    'scripts/check_if_pr_is_low_risk.py',
-    'scripts/check_if_pr_is_low_risk_test.py',
-    'scripts/concurrent_task_utils.py',
-    'scripts/concurrent_task_utils_test.py',
+NOT_FULLY_COVERED_FILES: Final = [
+    'core/controllers/access_validators.py',
+    'core/controllers/access_validators_test.py',
+    'core/controllers/acl_decorators.py',
+    'core/controllers/acl_decorators_test.py',
+    'core/controllers/admin.py',
+    'core/controllers/admin_test.py',
+    'core/controllers/android_e2e_config.py',
+    'core/controllers/android_e2e_config_test.py',
+    'core/controllers/base.py',
+    'core/controllers/base_test.py',
+    'core/controllers/beam_jobs.py',
+    'core/controllers/beam_jobs_test.py',
+    'core/controllers/blog_admin.py',
+    'core/controllers/blog_admin_test.py',
+    'core/controllers/blog_dashboard.py',
+    'core/controllers/blog_dashboard_test.py',
+    'core/controllers/blog_homepage.py',
+    'core/controllers/blog_homepage_test.py',
+    'core/controllers/classifier.py',
+    'core/controllers/classifier_test.py',
+    'core/controllers/classroom.py',
+    'core/controllers/classroom_test.py',
+    'core/controllers/collection_editor.py',
+    'core/controllers/collection_editor_test.py',
+    'core/controllers/collection_viewer.py',
+    'core/controllers/collection_viewer_test.py',
+    'core/controllers/concept_card_viewer.py',
+    'core/controllers/concept_card_viewer_test.py',
+    'core/controllers/contributor_dashboard_admin.py',
+    'core/controllers/contributor_dashboard_admin_test.py',
+    'core/controllers/contributor_dashboard.py',
+    'core/controllers/contributor_dashboard_test.py',
+    'core/controllers/creator_dashboard.py',
+    'core/controllers/creator_dashboard_test.py',
+    'core/controllers/cron.py',
+    'core/controllers/cron_test.py',
+    'core/controllers/custom_landing_pages.py',
+    'core/controllers/custom_landing_pages_test.py',
+    'core/controllers/domain_objects_validator.py',
+    'core/controllers/domain_objects_validator_test.py',
+    'core/controllers/editor.py',
+    'core/controllers/editor_test.py',
+    'core/controllers/email_dashboard.py',
+    'core/controllers/email_dashboard_test.py',
+    'core/controllers/features.py',
+    'core/controllers/features_test.py',
+    'core/controllers/feedback.py',
+    'core/controllers/feedback_test.py',
+    'core/controllers/improvements.py',
+    'core/controllers/improvements_test.py',
+    'core/controllers/incoming_app_feedback_report.py',
+    'core/controllers/incoming_app_feedback_report_test.py',
+    'core/controllers/learner_dashboard.py',
+    'core/controllers/learner_dashboard_test.py',
+    'core/controllers/learner_goals.py',
+    'core/controllers/learner_goals_test.py',
+    'core/controllers/learner_group.py',
+    'core/controllers/learner_group_test.py',
+    'core/controllers/learner_playlist.py',
+    'core/controllers/learner_playlist_test.py',
+    'core/controllers/library.py',
+    'core/controllers/library_test.py',
+    'core/controllers/moderator.py',
+    'core/controllers/moderator_test.py',
+    'core/controllers/oppia_root.py',
+    'core/controllers/oppia_root_test.py',
+    'core/controllers/pages.py',
+    'core/controllers/pages_test.py',
+    'core/controllers/payload_validator.py',
+    'core/controllers/payload_validator_test.py',
+    'core/controllers/platform_feature.py',
+    'core/controllers/platform_feature_test.py',
+    'core/controllers/practice_sessions.py',
+    'core/controllers/practice_sessions_test.py',
+    'core/controllers/profile.py',
+    'core/controllers/profile_test.py',
+    'core/controllers/question_editor.py',
+    'core/controllers/question_editor_test.py',
+    'core/controllers/questions_list.py',
+    'core/controllers/questions_list_test.py',
+    'core/controllers/reader.py',
+    'core/controllers/reader_test.py',
+    'core/controllers/recent_commits.py',
+    'core/controllers/recent_commits_test.py',
+    'core/controllers/release_coordinator.py',
+    'core/controllers/release_coordinator_test.py',
+    'core/controllers/resources.py',
+    'core/controllers/resources_test.py',
+    'core/controllers/review_tests.py',
+    'core/controllers/review_tests_test.py',
+    'core/controllers/skill_editor.py',
+    'core/controllers/skill_editor_test.py',
+    'core/controllers/skill_mastery.py',
+    'core/controllers/skill_mastery_test.py',
+    'core/controllers/story_editor.py',
+    'core/controllers/story_editor_test.py',
+    'core/controllers/story_viewer.py',
+    'core/controllers/story_viewer_test.py',
+    'core/controllers/subscriptions.py',
+    'core/controllers/subscriptions_test.py',
+    'core/controllers/subtopic_viewer.py',
+    'core/controllers/subtopic_viewer_test.py',
+    'core/controllers/suggestion.py',
+    'core/controllers/suggestion_test.py',
+    'core/controllers/tasks.py',
+    'core/controllers/tasks_test.py',
+    'core/controllers/topic_editor.py',
+    'core/controllers/topic_editor_test.py',
+    'core/controllers/topic_viewer.py',
+    'core/controllers/topic_viewer_test.py',
+    'core/controllers/topics_and_skills_dashboard.py',
+    'core/controllers/topics_and_skills_dashboard_test.py',
+    'core/controllers/voice_artist.py',
+    'core/controllers/voice_artist_test.py',
     'scripts/docstrings_checker.py',
     'scripts/docstrings_checker_test.py',
-    'scripts/flake_checker.py',
-    'scripts/flake_checker_test.py',
     'scripts/install_python_prod_dependencies.py',
     'scripts/install_python_prod_dependencies_test.py',
     'scripts/install_third_party_libs.py',
     'scripts/install_third_party_libs_test.py',
     'scripts/install_third_party.py',
     'scripts/install_third_party_test.py',
-    'scripts/pre_commit_hook.py',
-    'scripts/pre_commit_hook_test.py',
-    'scripts/pre_push_hook.py',
-    'scripts/pre_push_hook_test.py',
     'scripts/run_backend_tests.py',
-    'scripts/run_e2e_tests.py',
-    'scripts/run_e2e_tests_test.py',
-    'scripts/run_lighthouse_tests.py',
-    'scripts/run_mypy_checks.py',
-    'scripts/run_mypy_checks_test.py',
-    'scripts/run_portserver.py',
-    'scripts/run_presubmit_checks.py',
-    'scripts/script_import_test.py',
-    'scripts/servers.py',
-    'scripts/servers_test.py',
-    'scripts/setup.py',
-    'scripts/setup_test.py',
-    'scripts/linters/',
-    'scripts/release_scripts/'
+    'scripts/linters/pre_commit_linter.py',
+    'scripts/linters/pre_commit_linter_test.py',
+    'scripts/linters/pylint_extensions.py',
+    'scripts/linters/pylint_extensions_test.py',
+    'scripts/linters/python_linter.py',
+    'scripts/linters/python_linter_test.py',
 ]
 
 
-CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
-MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
-MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
-PYTHON3_CMD = 'python3'
+CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
+MYPY_REQUIREMENTS_FILE_PATH: Final = os.path.join('.', 'mypy_requirements.txt')
+MYPY_TOOLS_DIR: Final = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
+PYTHON3_CMD: Final = 'python3'
 
-_PATHS_TO_INSERT = [MYPY_TOOLS_DIR, ]
+_PATHS_TO_INSERT: Final = [MYPY_TOOLS_DIR, ]
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description='Python type checking using mypy script.'
 )
 
@@ -124,11 +217,16 @@ def install_third_party_libraries(skip_install: bool) -> None:
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, mypy_exec_path, using_global_mypy):
+def get_mypy_cmd(
+    files: Optional[List[str]],
+    mypy_exec_path: str,
+    using_global_mypy: bool
+) -> List[str]:
     """Return the appropriate command to be run.
 
     Args:
-        files: list(list(str)). List having first element as list of string.
+        files: Optional[List[str]]. List of files provided to check for MyPy
+            type checking, or None if no file is provided explicitly.
         mypy_exec_path: str. Path of mypy executable.
         using_global_mypy: bool. Whether generated command should run using
             global mypy.
@@ -152,7 +250,7 @@ def get_mypy_cmd(files, mypy_exec_path, using_global_mypy):
     return cmd
 
 
-def install_mypy_prerequisites(install_globally):
+def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
     """Install mypy and type stubs from mypy_requirements.txt.
 
     Args:
@@ -162,6 +260,9 @@ def install_mypy_prerequisites(install_globally):
     Returns:
         tuple(int, str). The return code from installing prerequisites and the
         path of the mypy executable.
+
+    Raises:
+        Exception. No USER_BASE found for the user.
     """
     # TODO(#13398): Change MyPy installation after Python3 migration. Now, we
     # install packages globally for CI. In CI, pip installation is not in a way
@@ -186,6 +287,10 @@ def install_mypy_prerequisites(install_globally):
             cmd + uextention_text, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         new_process.communicate()
+        if site.USER_BASE is None:
+            raise Exception(
+                'No USER_BASE found for the user.'
+            )
         _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
         mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
         return (new_process.returncode, mypy_exec_path)
@@ -195,7 +300,7 @@ def install_mypy_prerequisites(install_globally):
         return (process.returncode, mypy_exec_path)
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> int:
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 

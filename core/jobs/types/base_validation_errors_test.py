@@ -118,9 +118,10 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             def __init__(
                 self, model: Union[base_models.BaseModel, str]
             ) -> None:
-                # TODO(#13059): After we fully type the codebase we plan to get
-                # rid of the tests that intentionally test wrong inputs that we
-                # can normally catch by typing.
+                # TODO(#13059): Here we use MyPy ignore because after we
+                # fully type the codebase we plan to get rid of the tests
+                # that intentionally test wrong inputs that we can normally
+                # catch by typing.
                 super().__init__(123, model)  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(TypeError, 'must be a string'):

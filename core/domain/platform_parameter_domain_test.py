@@ -25,8 +25,7 @@ from core import utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional, Union
 
 ServerMode = parameter_domain.ServerMode
 
@@ -275,10 +274,11 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                # The expected type of 'server_mode' key is Enum defined under
-                # the name ServerMode, but for testing purpose we are providing
-                # namedtuple (MockEnum) which causes MyPy to throw error. Thus
-                # to avoid the error, we used ignore here.
+                # Here we use MyPy ignore because the expected type of
+                # 'server_mode' key is Enum defined under the name ServerMode,
+                # but for testing purpose we are providing namedtuple (MockEnum)
+                # which causes MyPy to throw error. Thus to avoid the error,
+                # we used ignore here.
                 'server_mode': mock_enum,  # type: ignore[typeddict-item]
             },
         )

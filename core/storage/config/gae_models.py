@@ -79,9 +79,7 @@ class ConfigPropertyModel(base_models.VersionedModel):
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with VersionedModel.commit().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def commit( # type: ignore[override]

@@ -135,9 +135,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid interaction id'):
             training_job.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_training_data_without_answer_group_index(self) -> None:
         self.training_job_dict['training_data'] = [
             {  # type: ignore[typeddict-item]
@@ -151,9 +151,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'list item'):
             training_job.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_training_data_without_answers(self) -> None:
         self.training_job_dict['training_data'] = [
             {  # type: ignore[typeddict-item]
@@ -184,9 +184,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid algorithm id'):
             training_job.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_training_data(self) -> None:
         self.training_job_dict['training_data'] = {}  # type: ignore[arg-type]
         training_job = self._get_training_job_from_dict(self.training_job_dict)

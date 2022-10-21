@@ -20,8 +20,8 @@
     <div *ngIf="(activeTab === TAB_NAME_TOPICS) && totalTopicSummaries.length">
       <i class="fa fa-plus-circle" aria-hidden="true" (click)="createTopic()" *ngIf="userCanCreateTopic"></i>
     </div>
-    <div *ngIf="activeTab === TAB_NAME_SKILLS && skillSummaries.length">
-      <i class="fa fa-plus-circle" aria-hidden="true" (click)="createSkill()" *ngIf="userCanCreateSkill"></i>
+    <div *ngIf="activeTab === TAB_NAME_SKILLS">
+      <i class="fa fa-plus-circle e2e-test-mobile-create-skill-button-secondary" aria-hidden="true" (click)="createSkill()" *ngIf="userCanCreateSkill"></i>
     </div>
   </div>
   <div *ngIf="totalTopicSummaries.length > 0 || untriagedSkillSummaries.length > 0">
@@ -44,7 +44,7 @@
           </ul>
         </div>
         <div class="filter-mobile-box">
-          <button class="btn btn-default" (click)="toggleFilterBox()">
+          <button class="btn btn-default e2e-test-mobile-toggle-filter" (click)="toggleFilterBox()">
             <span *ngIf="activeTab === TAB_NAME_TOPICS">TOPIC FILTERS</span>
             <span *ngIf="activeTab === TAB_NAME_SKILLS">SKILL FILTERS</span>
           </button>
@@ -169,7 +169,7 @@
                 <span>Filter</span>
               </div>
               <div class="topic-skill-filter-action-box">
-                <i class="fa fa-times dashboard-cross-icon" (click)="toggleFilterBox()"></i>
+                <i class="fa fa-times dashboard-cross-icon e2e-test-mobile-filter-close" (click)="toggleFilterBox()"></i>
                 <div class="topic-skill-filter-action-reset">
                   <span (click)="resetFilters()">Reset</span>
                 </div>

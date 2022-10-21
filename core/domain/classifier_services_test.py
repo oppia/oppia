@@ -31,6 +31,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
@@ -121,11 +122,13 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
         new_answer_group.rule_specs[0].inputs[
             'x']['contentId'] = 'rule_input_4'
+        new_answer_group.rule_specs[0].inputs[
+            'x']['normalizedStrSet'] = ['Divide']
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
         state.recorded_voiceovers.voiceovers_mapping[
             'rule_input_4'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
-        answer_groups = []
+        answer_groups: List[state_domain.AnswerGroupDict] = []
         for answer_group in state.interaction.answer_groups:
             answer_groups.append(answer_group.to_dict())
         change_list = [exp_domain.ExplorationChange({
@@ -210,6 +213,8 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
         new_answer_group.rule_specs[0].inputs[
             'x']['contentId'] = 'rule_input_4'
+        new_answer_group.rule_specs[0].inputs[
+            'x']['normalizedStrSet'] = ['Multiplication']
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
         state.recorded_voiceovers.voiceovers_mapping[
             'rule_input_4'] = {}
@@ -541,10 +546,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
     def test_fetch_next_job(self) -> None:
         """Test the fetch_next_jobs method."""
-        exp1_id = u'1'
+        exp1_id = '1'
         state_name = 'Home'
         interaction_id = 'TextInput'
-        exp2_id = u'2'
+        exp2_id = '0'
 
         job1_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
@@ -676,12 +681,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
         vm_id = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        message = 'test message'
-        # TODO(#13059): After we fully type the codebase, convert message
-        # to bytes and remove assertion from the main file for the same.
+        message = b'test message'
         signature = classifier_services.generate_signature(
             secret.encode('utf-8'),
-            message,  # type: ignore[arg-type]
+            message,
             vm_id)
         expected_signature = (
             '9c2f9f607c0eefc2b8ba153bad9331843a6efc71c82e690f5f0341bbc38b7fa7')

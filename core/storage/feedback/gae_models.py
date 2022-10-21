@@ -32,8 +32,8 @@ from core import utils
 from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, overload
-from typing_extensions import Final, Literal
+from typing import (
+    Dict, Final, List, Literal, Optional, Sequence, Tuple, Union, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -488,7 +488,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         return [cls(id=instance_id) for instance_id in instance_ids]
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @overload # type: ignore[override]
     @classmethod
@@ -514,6 +514,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         cls, thread_id: str, message_id: int, *, strict: bool = ...
     ) -> Optional[GeneralFeedbackMessageModel]: ...
 
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
         cls, thread_id: str, message_id: int, strict: bool = True
@@ -717,7 +719,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """
         return '%s.%s' % (user_id, thread_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -781,7 +783,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         GeneralFeedbackThreadUserModel.put_multi(new_instances)
         return new_instances
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]

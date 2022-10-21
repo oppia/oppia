@@ -187,10 +187,11 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         return errors if sum(counts) == 0 else []
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
-# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
-# we added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class ApplyAuditDoFns(beam.PTransform):  # type: ignore[misc]
     """Runs every Audit DoFn targeting the models of a specific kind."""
 
@@ -228,10 +229,11 @@ class ApplyAuditDoFns(beam.PTransform):  # type: ignore[misc]
         )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
-# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
-# we added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
     """Returns PCollection of (key, count) pairs for each input model."""
 
@@ -264,10 +266,11 @@ class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
         )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
-# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
-# we added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
     """Returns PCollection of (key, error) pairs for each referenced model."""
 

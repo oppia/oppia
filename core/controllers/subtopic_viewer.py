@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import subtopic_page_services
@@ -25,6 +26,25 @@ from core.domain import topic_fetchers
 
 class SubtopicViewerPage(base.BaseHandler):
     """Renders the subtopic viewer page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'subtopic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, *args):

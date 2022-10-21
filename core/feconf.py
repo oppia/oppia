@@ -25,8 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, List, Union
-from typing_extensions import Final, TypedDict
+from typing import Callable, Dict, Final, List, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -838,14 +837,16 @@ LINEAR_INTERACTION_IDS = ['Continue']
 DEMO_EXPLORATIONS = {
     u'0': 'welcome',
     u'1': 'multiples.yaml',
-    u'2': 'binary_search',
+    # Exploration with ID 2 was removed as it contained string values inside
+    # NumericInput interaction.
     u'3': 'root_linear_coefficient_theorem',
     u'4': 'three_balls',
     # TODO(bhenning): Replace demo exploration '5' with a new exploration
     # described in #1376.
     u'6': 'boot_verbs.yaml',
     u'7': 'hola.yaml',
-    u'8': 'adventure.yaml',
+    # Exploration with ID 8 was removed as it contained string values inside
+    # NumericInput interaction.
     u'9': 'pitch_perfect.yaml',
     u'10': 'test_interactions',
     u'11': 'modeling_graphs',
@@ -896,8 +897,9 @@ TASK_URL_FLAG_EXPLORATION_EMAILS = (
     '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
-TASK_URL_SUGGESTION_EMAILS = (
-    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS = (
+    '%s/email/contributordashboardachievementnotificationemailhandler' % (
+        TASKQUEUE_URL_PREFIX))
 TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
@@ -906,6 +908,7 @@ ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_PAGE_URL = '/blog-admin'
+CLASSROOM_ADMIN_PAGE_URL = '/classroom-admin'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
@@ -926,6 +929,8 @@ COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_STATS_SUMMARIES_URL = '/contributorstatssummaries'
+CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = '/contributorallstatssummaries'
 CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
@@ -1056,6 +1061,7 @@ SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
+TOPIC_ID_TO_TOPIC_NAME = '/topic_id_to_topic_name_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_NAME_HANDLER = '/topic_name_handler'
@@ -1081,6 +1087,7 @@ EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
+CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1593,6 +1600,7 @@ CONTRIBUTION_TYPE_QUESTION: Final = 'question'
 CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
 CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
+CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [

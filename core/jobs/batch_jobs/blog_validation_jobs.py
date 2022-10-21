@@ -113,10 +113,11 @@ class FindDuplicateBlogPostSummaryUrlsJob(base_jobs.JobBase):
         )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus to
-# avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')) , we
-# added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[misc]
     """Helper class to retrieve models with duplicate properties."""
 

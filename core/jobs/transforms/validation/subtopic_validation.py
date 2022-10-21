@@ -69,8 +69,8 @@ class ValidateSubtopicPageCommitLogEntryModel(
     """Overrides _get_change_domain_class for SubtopicPageCommitLogEntryModel.
     """
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's _get_change_domain_class() method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's _get_change_domain_class() method.
     def _get_change_domain_class(  # type: ignore[override]
         self, input_model: subtopic_models.SubtopicPageCommitLogEntryModel
     ) -> Optional[Type[subtopic_page_domain.SubtopicPageChange]]:

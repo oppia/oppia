@@ -81,6 +81,46 @@ var suites = {
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
 
+  embedding: [
+    './core/tests/webdriverio_desktop/embedding.js'
+  ],
+
+  explorationFeedbackTab: [
+    './core/tests/webdriverio_desktop/explorationFeedbackTab.js'
+  ],
+
+  explorationImprovementsTab: [
+    './core/tests/webdriverio_desktop/explorationImprovementsTab.js'
+  ],
+
+  explorationHistoryTab: [
+    './core/tests/webdriverio_desktop/explorationHistoryTab.js'
+  ],
+
+  explorationStatisticsTab: [
+    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
+  ],
+
+  explorationTranslationTab: [
+    './core/tests/webdriverio_desktop/explorationTranslationTab.js'
+  ],
+
+  extensions: [
+    './core/tests/webdriverio_desktop/extensions.js'
+  ],
+
+  featureGating: [
+    './core/tests/webdriverio/featureGatingFlow.js'
+  ],
+
+  fileUploadExtensions: [
+    './core/tests/webdriverio_desktop/fileUploadExtensions.js'
+  ],
+
+  fileUploadFeatures: [
+    './core/tests/webdriverio_desktop/voiceoverUploadFeatures.js'
+  ],
+
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
   ],
@@ -89,8 +129,16 @@ var suites = {
     './core/tests/webdriverio_desktop/learnerDashboard.js'
   ],
 
+  library: [
+    './core/tests/webdriverio/libraryFlow.js'
+  ],
+
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
+  ],
+
+  playVoiceovers: [
+    './core/tests/webdriverio_desktop/playVoiceovers.js'
   ],
 
   preferences: [
@@ -103,6 +151,10 @@ var suites = {
 
   profileMenu: [
     './core/tests/webdriverio/profileMenuFlow.js'
+  ],
+
+  publication: [
+    './core/tests/webdriverio_desktop/publicationAndLibrary.js'
   ],
 
   skillEditor: [
@@ -163,6 +215,9 @@ exports.config = {
   // specific capability.
   capabilities: [{
     browserName: 'chrome',
+    'goog:loggingPrefs': {
+      browser: 'ALL',
+    },
     'goog:chromeOptions': {
       args: [
         '--lang=en-EN',
@@ -268,6 +323,32 @@ exports.config = {
    * @param {Object}         browser instance of created browser/device session
    */
   before: function() {
+    // eslint-disable-next-line eqeqeq
+    mobileViewportArg = process.env.MOBILE == 'true';
+
+    // eslint-disable-next-line eqeqeq
+    if (mobileViewportArg) {
+      browser.setWindowSize(600, 1000);
+    } else {
+      // Set a wide enough window size for the navbar in the library pages to
+      // display fully.
+      browser.setWindowSize(1285, 1000);
+    }
+
+
+    // Configure the Firebase Admin SDK to communicate with the emulator.
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+    FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+
+    // Navigate to the splash page so that tests can begin on an Angular page.
+    browser.url('http://localhost:9001');
+  },
+  /**
+    * Function to be executed before a test (in Mocha/Jasmine only)
+    * @param {Object} test    test object
+    * @param {Object} context scope object the test was executed with
+    */
+  beforeTest: function(test, context) {
     if (process.env.GITHUB_ACTIONS &&
       // eslint-disable-next-line eqeqeq
       process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
@@ -290,6 +371,9 @@ exports.config = {
       videoPath = path.resolve(dirPath, name);
       ffmpegArgs.push(videoPath);
       ffmpegProcess = childProcess.spawn('ffmpeg', ffmpegArgs);
+      // eslint-disable-next-line no-console
+      console.log(
+        'Test name: ' + test.fullName + ' has video path ' + videoPath);
       ffmpegProcess.on('message', (message) => {
         // eslint-disable-next-line no-console
         console.log(`ffmpeg stdout: ${message}`);
@@ -302,17 +386,6 @@ exports.config = {
         console.log(`ffmpeg exited with code ${code}`);
       });
     }
-    // Set a wide enough window size for the navbar in the library pages to
-    // display fully.
-    browser.setWindowSize(1285, 1000);
-
-
-    // Configure the Firebase Admin SDK to communicate with the emulator.
-    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
-    FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
-
-    // Navigate to the splash page so that tests can begin on an Angular page.
-    browser.url('http://localhost:9001');
   },
   /**
    * Function to be executed after a test
@@ -328,6 +401,18 @@ exports.config = {
    */
   afterTest: async function(
       test, context, { error, result, duration, passed, retries }) {
+    if (process.env.GITHUB_ACTIONS &&
+      // eslint-disable-next-line eqeqeq
+      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+      ffmpegProcess.kill();
+      if (passed === true && !ALL_VIDEOS && fs.existsSync(videoPath)) {
+        fs.unlinkSync(videoPath);
+        // eslint-disable-next-line no-console
+        console.log(
+          `Video for test: ${test.fullName}` +
+          'was deleted successfully (test passed).');
+      }
+    }
     // If a test fails then only the error will be defined and
     // the screenshot will be taken and saved.
     if (error) {
@@ -343,27 +428,6 @@ exports.config = {
       var filePath = path.join(screenshotPath, fileName);
       // Save screenshot.
       await browser.saveScreenshot(filePath);
-    }
-  },
-  /**
-    * Gets executed after all tests are done. You still have access to all
-    * global variables from the test.
-    * @param {Number} result 0 - test pass, 1 - test fail
-    * @param {Array.<Object>} capabilities list of capabilities details
-    * @param {Array.<String>} specs List of spec file paths that ran
-    */
-  after: function(result, capabilities, specs) {
-    if (process.env.GITHUB_ACTIONS &&
-      // eslint-disable-next-line eqeqeq
-      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
-      ffmpegProcess.kill();
-      if (result === 0 && !ALL_VIDEOS && fs.existsSync(videoPath)) {
-        fs.unlinkSync(videoPath);
-        // eslint-disable-next-line no-console
-        console.log(
-          `Video for test: ${specs}` +
-          'was deleted successfully (test passed).');
-      }
     }
   },
 };

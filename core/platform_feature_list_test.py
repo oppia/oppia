@@ -27,19 +27,25 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
-FRONTEND_FEATURE_NAMES_PATH = os.path.join(
+from typing import Final, List
+
+FRONTEND_FEATURE_NAMES_PATH: Final = os.path.join(
     os.getcwd(),
     'core/templates/domain/platform_feature',
     'feature-status-summary.model.ts')
 
-ENUM_BODY_REGEXP = re.compile(r'enum FeatureNames \{(.+?)\}', flags=re.DOTALL)
-ENUM_MEMBER_REGEXP = re.compile(r'([a-zA-Z0-9_]+?)\s+=\s+\'([a-zA-Z0-9_]+?)\'')
+ENUM_BODY_REGEXP: Final = re.compile(
+    r'enum FeatureNames \{(.+?)\}', flags=re.DOTALL
+)
+ENUM_MEMBER_REGEXP: Final = re.compile(
+    r'([a-zA-Z0-9_]+?)\s+=\s+\'([a-zA-Z0-9_]+?)\''
+)
 
 
 class PlatformFeatureListTest(test_utils.GenericTestBase):
     """Tests for feature flags listed in platform_feature_list.py."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.all_features_list = (
@@ -48,15 +54,18 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             platform_feature_list.PROD_FEATURES_LIST)
         self.all_features_set = set(self.all_features_list)
 
-    def _parse_feature_names_in_frontend(self):
+    def _parse_feature_names_in_frontend(self) -> List[str]:
         """Reads and parses feature flag definition in frontend."""
         with utils.open_file(FRONTEND_FEATURE_NAMES_PATH, 'r') as f:
             content = f.read()
 
-        body = ENUM_BODY_REGEXP.search(content).group(1)
+        body_content = ENUM_BODY_REGEXP.search(content)
+        # Ruling out the possibility of None for mypy type checking.
+        assert body_content is not None
+        body = body_content.group(1)
         return [name for _, name in ENUM_MEMBER_REGEXP.findall(body)]
 
-    def test_all_names_in_features_lists_exist(self):
+    def test_all_names_in_features_lists_exist(self) -> None:
         missing_names = []
         for feature in self.all_features_set:
             if feature.value not in registry.Registry.parameter_registry:
@@ -67,7 +76,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
                 missing_names)
         )
 
-    def test_no_duplicated_names_in_features_lists(self):
+    def test_no_duplicated_names_in_features_lists(self) -> None:
         duplicate_names = []
         for feature in self.all_features_set:
             if self.all_features_list.count(feature) > 1:
@@ -78,7 +87,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             ': %s.' % (duplicate_names)
         )
 
-    def test_no_duplicate_names_in_deprecated_names_list(self):
+    def test_no_duplicate_names_in_deprecated_names_list(self) -> None:
         duplicate_names = []
         deprecated_features = platform_feature_list.DEPRECATED_FEATURE_NAMES
         for feature in set(deprecated_features):
@@ -90,7 +99,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             'list: %s.' % (duplicate_names)
         )
 
-    def test_no_deprecated_names_in_features_lists(self):
+    def test_no_deprecated_names_in_features_lists(self) -> None:
         deprecated_names_set = set(
             platform_feature_list.DEPRECATED_FEATURE_NAMES)
         found_deprecated_names = []
@@ -103,7 +112,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             'not be used: %s.' % (found_deprecated_names)
         )
 
-    def test_all_entries_in_features_lists_are_features(self):
+    def test_all_entries_in_features_lists_are_features(self) -> None:
         non_feature_names = []
         for feature in self.all_features_set:
             feature_flag = (
@@ -116,7 +125,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
                 non_feature_names)
         )
 
-    def test_all_entries_in_dev_features_list_are_in_dev_stage(self):
+    def test_all_entries_in_dev_features_list_are_in_dev_stage(self) -> None:
         invalid_feature_names = []
         for feature in platform_feature_list.DEV_FEATURES_LIST:
             feature_flag = (
@@ -130,7 +139,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             '\'dev\' stage: %s.' % (invalid_feature_names)
         )
 
-    def test_all_entries_in_test_features_list_are_in_test_stage(self):
+    def test_all_entries_in_test_features_list_are_in_test_stage(self) -> None:
         invalid_feature_names = []
         for feature in platform_feature_list.TEST_FEATURES_LIST:
             feature_flag = (
@@ -144,7 +153,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             '\'test\' stage: %s.' % (invalid_feature_names)
         )
 
-    def test_all_entries_in_prod_features_list_are_in_prod_stage(self):
+    def test_all_entries_in_prod_features_list_are_in_prod_stage(self) -> None:
         invalid_feature_names = []
         for feature in platform_feature_list.PROD_FEATURES_LIST:
             feature_flag = (
@@ -158,7 +167,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             '\'prod\' stage: %s.' % (invalid_feature_names)
         )
 
-    def test_all_names_in_features_lists_exist_in_frontend(self):
+    def test_all_names_in_features_lists_exist_in_frontend(self) -> None:
         feature_names_in_frontend = self._parse_feature_names_in_frontend()
         all_feature_names_set = [
             feature.value for feature in self.all_features_set]
@@ -170,7 +179,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
                 list(missing_features))
         )
 
-    def test_all_names_in_frontend_are_known(self):
+    def test_all_names_in_frontend_are_known(self) -> None:
         feature_names_in_frontend = self._parse_feature_names_in_frontend()
         all_feature_names_set = [
             feature.value for feature in self.all_features_set]

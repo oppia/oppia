@@ -31,11 +31,11 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
 
-from typing import List, Optional, Sequence, overload
-from typing_extensions import Literal
+from typing import List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from core.domain import state_domain
     from mypy_imports import stats_models
     from mypy_imports import transaction_services
 
@@ -1104,7 +1104,7 @@ def get_sample_answers(
     exploration_id: str,
     exploration_version: int,
     state_name: str
-) -> List[Optional[str]]:
+) -> List[state_domain.AcceptableCorrectAnswerTypes]:
     """Fetches a list of sample answers that were submitted to the specified
     exploration state (at the given version of the exploration).
 

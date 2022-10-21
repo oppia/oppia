@@ -29,6 +29,7 @@ import { AppConstants } from 'app.constants';
 export class MathInteractionsService {
   private warningText = '';
   private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
+  private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   private cleanErrorMessage(
       errorMessage: string, expressionString: string): string {
@@ -637,6 +638,25 @@ export class MathInteractionsService {
   containsAtLeastOneVariable(expressionString: string): boolean {
     let variablesList = nerdamer(expressionString).variables();
     return variablesList.length > 0;
+  }
+
+  checkUnsupportedFunctions(expressionString: string): string[] {
+    let matches = expressionString.match(/[a-zA-Z]+\(/g) || [];
+    let unsupportedFunctions = [];
+    for (let match of matches) {
+      match = match.slice(0, -1); // Removing the "(".
+      let matchIsSupported = false;
+      for (let functionName of this.supportedFunctionNames) {
+        if (functionName === match) {
+          matchIsSupported = true;
+          break;
+        }
+      }
+      if (!matchIsSupported) {
+        unsupportedFunctions.push(match);
+      }
+    }
+    return unsupportedFunctions;
   }
 }
 

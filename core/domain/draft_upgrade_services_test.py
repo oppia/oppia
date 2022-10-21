@@ -27,8 +27,7 @@ from core.domain import exp_services
 from core.domain import state_domain
 from core.tests import test_utils
 
-from typing import Dict
-from typing_extensions import Final
+from typing import Dict, Final
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -1185,22 +1184,37 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         # versions of the domain object there are some fields
                         # (eg: html) that are discontinued in the latest domain
                         # object. So, while defining these old keys MyPy throw
-                        # a error. To avoid the error, we used ignore here.
+                        # an error. To avoid the error, we used ignore here.
                         'content1': {
                             'en': {  # type: ignore[typeddict-item]
                                 'html': html_content,
                                 'needs_update': True
                             },
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
                             'hi': {  # type: ignore[typeddict-item]
                                 'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
                             'hi': {  # type: ignore[typeddict-item]
                                 'html': html_content,
                                 'needs_update': False
                             },
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
                             'en': {  # type: ignore[typeddict-item]
                                 'html': 'hello!',
                                 'needs_update': False
@@ -1395,22 +1409,37 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         # versions of the domain object there are some fields
                         # (eg: html) that are discontinued in the latest domain
                         # object. So, while defining these old keys MyPy throw
-                        # a error. To avoid the error, we used ignore here.
+                        # an error. To avoid the error, we used ignore here.
                         'content1': {
                             'en': {  # type: ignore[typeddict-item]
                                 'html': expected_html_content,
                                 'needs_update': True
                             },
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
                             'hi': {  # type: ignore[typeddict-item]
                                 'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
                             'hi': {  # type: ignore[typeddict-item]
                                 'html': expected_html_content,
                                 'needs_update': False
                             },
+                            # Here we use MyPy ignore because here we are
+                            # defining 'html' key that was deprecated from
+                            # the latest domain object and causing MyPy to
+                            # throw an error. Thus, to silence the error,
+                            # we used ignore here.
                             'en': {  # type: ignore[typeddict-item]
                                 'html': 'hello!',
                                 'needs_update': False

@@ -22,8 +22,7 @@ import collections
 
 from core import utils
 
-from typing import Any, Optional
-from typing_extensions import TypedDict
+from typing import Any, Optional, TypedDict
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
@@ -96,7 +95,7 @@ class AuthClaims:
     def __hash__(self) -> int:
         return hash((self.auth_id, self.email, self.role_is_super_admin))
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         # https://docs.python.org/2/library/constants.html#NotImplemented.

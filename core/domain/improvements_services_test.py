@@ -27,7 +27,7 @@ from core.domain import improvements_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -564,9 +564,10 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
-        # Here, `resolved_on` can only accept datetime values but for testing
-        # purposes here we are providing string value which causes MyPy to
-        # throw an error. Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because `resolved_on` can only accept
+        # datetime values but for testing purposes here we are providing
+        # string value which causes MyPy to throw an error. Thus to avoid
+        # the error, we used ignore here.
         task_entry.resolved_on = self.owner_id  # type: ignore[assignment]
 
         self.assertFalse(
