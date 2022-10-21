@@ -685,6 +685,7 @@
 	"I18N_LEARNER_GROUP_INVITE_LEARNERS": "Text shown for the invite learners section on the learner group creation page.",
 	"I18N_LEARNER_GROUP_INVITE_LEARNERS_BY_USERNAME": "Label text shown for the username input field on the learner group invite learners section.",
 	"I18N_LEARNER_GROUP_INVITE_LEARNERS_PLACEHOLDER_TEXT": "Placeholder text shown for the username input field on the learner group invite learners section.",
+	"I18N_LEARNER_GROUP_INVITE_LEARNER_BUTTON_TEXT": "Button text to invite a learner to the learner group.",
 	"I18N_LEARNER_GROUP_INVITE_LIST_TEXT": "Text shown for the list of learners invited to the learner group.",
 	"I18N_LEARNER_GROUP_ITEM_ADDED_TO_SYLLABUS": "Button text shown on a syllabus item card when that syllabus item is already added to the learner group syllabus.",
 	"I18N_LEARNER_GROUP_ITEM_ALREADY_ADDED_TO_SYLLABUS": "Message shown on a syllabus item card when that syllabus item is already added to the learner group syllabus.",
