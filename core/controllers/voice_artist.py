@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
@@ -40,7 +41,11 @@ class AudioUploadHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
@@ -55,6 +60,10 @@ class AudioUploadHandler(base.BaseHandler):
             'filename': {
                 'schema': {
                     'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'[^\s]+(\.(?i)(mp3))$'
+                    }]
                 }
             }
         }
