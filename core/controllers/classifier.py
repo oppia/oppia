@@ -23,10 +23,17 @@ from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
+from core.domain import state_domain
 from proto_files import training_job_response_payload_pb2
 
+from typing import Dict, List, Optional, TypedDict, cast
 
-def validate_job_result_message_proto(job_result_proto):
+
+def validate_job_result_message_proto(
+    job_result_proto: (  # type: ignore[name-defined]
+        training_job_response_payload_pb2.TrainingJobResponsePayload.JobResult
+    )
+) -> bool:
     """Validates the data-type of the message payload data.
 
     Args:
@@ -42,6 +49,16 @@ def validate_job_result_message_proto(job_result_proto):
     return True
 
 
+class TrainedClassifierHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TrainedClassifierHandler's normalized_request
+    dictionary.
+    """
+
+    exploration_id: str
+    exploration_version: Optional[str]
+    state_name: str
+
+
 class TrainedClassifierHandler(base.OppiaMLVMHandler):
     """This handler stores the result of the training job in datastore and
     updates the status of the job.
@@ -49,7 +66,7 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exploration_id': {
@@ -72,12 +89,14 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
         'POST': {}
     }
 
-    def extract_request_message_vm_id_and_signature(self):
+    def extract_request_message_vm_id_and_signature(
+        self
+    ) -> classifier_domain.OppiaMLAuthInfo:
         """Returns message, vm_id and signature retrieved from incoming request.
 
         Returns:
-            tuple(str). Message at index 0, vm_id at index 1 and signature at
-            index 2.
+            OppiaMLAuthInfo. Message at index 0, vm_id at index 1 and signature
+            at index 2.
         """
         payload_proto = (
             training_job_response_payload_pb2.TrainingJobResponsePayload())
@@ -88,7 +107,7 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
             payload_proto.job_result.SerializeToString(), vm_id, signature)
 
     @acl_decorators.is_from_oppia_ml
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
         payload_proto = (
             training_job_response_payload_pb2.TrainingJobResponsePayload())
@@ -121,18 +140,24 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
         return self.render_json({})
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests.
 
         Retrieves the name of the file on GCS storing the trained model
         parameters and transfers it to the frontend.
         """
-        exploration_id = self.normalized_request.get('exploration_id')
-        state_name = self.normalized_request.get('state_name')
+        request_data = cast(
+            TrainedClassifierHandlerNormalizedRequestDict,
+            self.normalized_request
+        )
+        exploration_id = request_data['exploration_id']
+        state_name = request_data['state_name']
 
         try:
-            exp_version = int(self.normalized_request.get(
-                'exploration_version'))
+            if request_data['exploration_version'] is None:
+                raise Exception
+            exp_version = int(request_data[
+                'exploration_version'])
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=exp_version)
             interaction_id = exploration.states[state_name].interaction.id
@@ -140,8 +165,11 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
             raise self.InvalidInputException(
                 'Entity for exploration with id %s, version %s and state %s '
                 'not found.' % (
-                    exploration_id, self.normalized_request.get(
-                        'exploration_version'), state_name)) from e
+                        exploration_id,
+                        request_data['exploration_version'],
+                        state_name
+                    )
+                ) from e
 
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise self.PageNotFoundException(
@@ -199,13 +227,32 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
         })
 
 
+class NextJobHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of NextJobHandler's normalized_payload
+    dictionary.
+    """
+
+    message: bytes
+    vm_id: str
+    signature: str
+
+
+class NextJobHandlerResponseDict(TypedDict):
+    """Dict representation of NextJobHandler's response dictionary."""
+
+    job_id: str
+    algorithm_id: str
+    algorithm_version: int
+    training_data: List[state_domain.TrainingDataDict]
+
+
 class NextJobHandler(base.OppiaMLVMHandler):
     """This handler fetches next job to be processed according to the time
     and sends back job_id, algorithm_id and training data to the VM.
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'vm_id': {
@@ -226,28 +273,37 @@ class NextJobHandler(base.OppiaMLVMHandler):
         }
     }
 
-    def extract_request_message_vm_id_and_signature(self):
+    def extract_request_message_vm_id_and_signature(
+        self
+    ) -> classifier_domain.OppiaMLAuthInfo:
         """Returns message, vm_id and signature retrieved from incoming request.
 
         Returns:
             tuple(str). Message at index 0, vm_id at index 1 and signature at
             index 2.
         """
-        signature = self.normalized_payload.get('signature')
-        vm_id = self.normalized_payload.get('vm_id')
-        message = self.normalized_payload.get('message')
+        payload_data = cast(
+            NextJobHandlerNormalizedPayloadDict,
+            self.normalized_payload
+        )
+        signature = payload_data['signature']
+        vm_id = payload_data['vm_id']
+        message = payload_data['message']
         return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
     @acl_decorators.is_from_oppia_ml
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-        response = {}
         next_job = classifier_services.fetch_next_job()
-        if next_job is not None:
-            classifier_services.mark_training_job_pending(next_job.job_id)
-            response['job_id'] = next_job.job_id
-            response['algorithm_id'] = next_job.algorithm_id
-            response['algorithm_version'] = next_job.algorithm_version
-            response['training_data'] = next_job.training_data
+        if next_job is None:
+            return self.render_json({})
+    
+        classifier_services.mark_training_job_pending(next_job.job_id)
+        response: NextJobHandlerResponseDict = {
+            'job_id': next_job.job_id,
+            'algorithm_id': next_job.algorithm_id,
+            'algorithm_version': next_job.algorithm_version,
+            'training_data': next_job.training_data
+        }
 
         return self.render_json(response)

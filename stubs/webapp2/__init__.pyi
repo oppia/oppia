@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Pattern
 class Request:
     uri: str
     environ: Dict[str, Any]
+    body: Dict[str, Any]
     route_kwargs: Dict[str, Any]
     path: str
     cookies: Dict[str, str] = ...

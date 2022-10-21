@@ -24,6 +24,10 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import user_models
+
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
@@ -33,7 +37,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Complete the setup process for testing."""
         super().setUp()
         self.signup(
@@ -45,7 +49,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
         blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
-        self.change_dict = {
+        self.change_dict: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title',
             'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Bloggers<p>',
@@ -54,13 +58,18 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         blog_services.update_blog_post(blog_post.id, self.change_dict)
         blog_services.publish_blog_post(blog_post.id)
 
-    def test_get_homepage_data(self):
+    def test_get_homepage_data(self) -> None:
         self.login(self.user_email)
         json_response = self.get_json(
             '%s' % (feconf.BLOG_HOMEPAGE_DATA_URL),
             )
-        default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post').value
+        default_tags_config_property = (
+            config_domain.Registry.get_config_property(
+                'list_of_default_tags_for_blog_post'
+            )
+        )
+        assert default_tags_config_property is not None
+        default_tags = default_tags_config_property.value
         self.assertEqual(default_tags, json_response['list_of_default_tags'])
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
@@ -69,7 +78,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             len(json_response['blog_post_summary_dicts']), 1)
 
         blog_post_two = blog_services.create_new_blog_post(self.blog_admin_id)
-        change_dict_two = {
+        change_dict_two: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Two',
             'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Blog<p>',
@@ -98,7 +107,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Complete the setup process for testing."""
         super().setUp()
         self.signup(
@@ -110,7 +119,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
             feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
         self.blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
-        self.change_dict = {
+        self.change_dict: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title',
             'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Bloggers</p>',
@@ -119,7 +128,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
         blog_services.update_blog_post(self.blog_post.id, self.change_dict)
         blog_services.publish_blog_post(self.blog_post.id)
 
-    def test_get_post_page_data(self):
+    def test_get_post_page_data(self) -> None:
         self.login(self.user_email)
         blog_post = blog_services.get_blog_post_by_id(self.blog_post.id)
         json_response = self.get_json(
@@ -136,7 +145,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
 
         blog_post_two_id = (
             blog_services.create_new_blog_post(self.blog_admin_id).id)
-        change_dict_two = {
+        change_dict_two: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Two',
             'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Blog</p>',
@@ -158,7 +167,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
             len(json_response['summary_dicts']), 2)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
 
-    def test_raise_exception_if_blog_post_does_not_exists(self):
+    def test_raise_exception_if_blog_post_does_not_exists(self) -> None:
         self.login(self.user_email)
         blog_post = blog_services.get_blog_post_by_id(self.blog_post.id)
         self.get_json(
@@ -178,7 +187,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Complete the setup process for testing."""
         super().setUp()
         self.signup(
@@ -189,7 +198,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
         self.blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
-        self.change_dict = {
+        self.change_dict: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title',
             'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Bloggers</p>',
@@ -198,7 +207,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         blog_services.update_blog_post(self.blog_post.id, self.change_dict)
         blog_services.publish_blog_post(self.blog_post.id)
 
-    def test_get_authors_page_data(self):
+    def test_get_authors_page_data(self) -> None:
         self.login(self.user_email)
         json_response = self.get_json(
             '%s/%s' % (
@@ -220,7 +229,9 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
             )
         self.assertEqual(json_response['summary_dicts'], [])
 
-    def test_get_authors_data_raises_exception_if_user_deleted_account(self):
+    def test_get_authors_data_raises_exception_if_user_deleted_account(
+        self
+    ) -> None:
         self.login(self.user_email)
         json_response = self.get_json(
             '%s/%s' % (
@@ -241,7 +252,9 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
                 self.BLOG_ADMIN_USERNAME),
             expected_status_int=404)
 
-    def test_raise_exception_if_username_provided_is_not_of_author(self):
+    def test_raise_exception_if_username_provided_is_not_of_author(
+        self
+    ) -> None:
         self.login(self.user_email)
         self.get_json(
             '%s/%s' % (
@@ -264,14 +277,14 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Complete the setup process for testing."""
 
         super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         self.signup(self.user_email, self.username)
 
@@ -328,7 +341,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
         for blog_id in self.all_blog_post_ids:
             blog_services.publish_blog_post(blog_id)
 
-    def test_get_search_page_data(self):
+    def test_get_search_page_data(self) -> None:
         self.login(self.user_email)
 
         # Load the search results with an empty query.
@@ -347,17 +360,13 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['summary_dicts']), 2)
 
-    def test_library_handler_with_exceeding_query_limit_logs_error(self):
+    def test_library_handler_with_exceeding_query_limit_logs_error(
+        self
+    ) -> None:
         self.login(self.user_email)
         response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['summary_dicts']), 4)
         self.assertEqual(response_dict['search_offset'], None)
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *_):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
 
         default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 2)
         max_cards_limit_swap = self.swap(
@@ -376,7 +385,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
                 self.assertEqual(len(response_dict['summary_dicts']), 2)
                 self.assertEqual(response_dict['search_offset'], 2)
 
-    def test_handler_with_given_query_and_tag(self):
+    def test_handler_with_given_query_and_tag(self) -> None:
         self.login(self.user_email)
         response_dict = self.get_json(
             feconf.BLOG_SEARCH_DATA_URL, params={
