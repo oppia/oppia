@@ -582,6 +582,7 @@ class AuditExplorationMigrationJobTests(
             )
         ])
 
+
 class RegenerateMissingExplorationStatsModelsJobTests(
     job_test_utils.JobTestBase,
     test_utils.GenericTestBase
