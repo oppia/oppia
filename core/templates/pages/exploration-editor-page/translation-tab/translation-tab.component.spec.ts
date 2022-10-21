@@ -86,6 +86,20 @@ describe('Translation tab component', () => {
     closeTour() {}
   }
 
+  class MockUserExplorationPermissionsService {
+    getPermissionsAsync() {
+      return Promise.resolve({
+        canVoiceover: true
+      } as ExplorationPermissions);
+    }
+
+    fetchPermissionsAsync() {
+      return Promise.resolve({
+        canVoiceover: true
+      } as ExplorationPermissions);
+    }
+  }
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -99,6 +113,10 @@ describe('Translation tab component', () => {
         JoyrideStepService,
         JoyrideOptionsService,
         JoyrideStepsContainerService,
+        {
+          provide: UserExplorationPermissionsService,
+          useClass: MockUserExplorationPermissionsService,
+        },
         {
           provide: JoyrideService,
           useClass: MockJoyrideService,
@@ -235,6 +253,7 @@ describe('Translation tab component', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+    fixture.destroy();
   });
 
   it('should initialize component properties after controller is initialized',
