@@ -26,10 +26,18 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 
+from typing import cast
+
+
+class ClassroomTopicSummaryDict(topic_domain.TopicSummaryDict):
+    """Dict representation of classroom topic summary dict."""
+
+    is_published: bool
+
 
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -38,7 +46,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
 
 class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
 
-    def test_redirect_to_default_classroom(self):
+    def test_redirect_to_default_classroom(self) -> None:
         response = self.get_html_response('/learn', expected_status_int=302)
         self.assertEqual(
             'http://localhost/learn/math', response.headers['location'])
@@ -46,7 +54,7 @@ class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
 
 class ClassroomPageTests(BaseClassroomControllerTests):
 
-    def test_any_user_can_access_classroom_page(self):
+    def test_any_user_can_access_classroom_page(self) -> None:
         response = self.get_html_response('/learn/math')
         self.assertIn(
             '<lightweight-oppia-root></lightweight-oppia-root>', response)
@@ -55,17 +63,19 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 class ClassroomAdminPageTests(BaseClassroomControllerTests):
     """Checks the access to the classroom admin page and its rendering."""
 
-    def test_classroom_admin_page_access_without_logging_in(self):
+    def test_classroom_admin_page_access_without_logging_in(self) -> None:
         """Tests access to the Classroom Admin page."""
         self.get_html_response('/classroom-admin', expected_status_int=302)
 
-    def test_classroom_admin_page_access_without_being_curriculum_admin(self):
+    def test_classroom_admin_page_access_without_being_curriculum_admin(
+        self
+    ) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response('/classroom-admin', expected_status_int=401)
         self.logout()
 
-    def test_classroom_admin_page_access_as_curriculum_admin(self):
+    def test_classroom_admin_page_access_as_curriculum_admin(self) -> None:
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -75,7 +85,7 @@ class ClassroomAdminPageTests(BaseClassroomControllerTests):
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
-    def test_get(self):
+    def test_get(self) -> None:
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -125,11 +135,19 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
         json_response = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
-        public_topic_summary_dict = (
-            topic_fetchers.get_topic_summary_by_id(topic_id_2).to_dict())
+        public_topic_summary_dict: ClassroomTopicSummaryDict = (
+            cast(
+                ClassroomTopicSummaryDict,
+                topic_fetchers.get_topic_summary_by_id(topic_id_2).to_dict()
+            )
+        )
         public_topic_summary_dict['is_published'] = True
-        private_topic_summary_dict = (
-            topic_fetchers.get_topic_summary_by_id(topic_id_1).to_dict())
+        private_topic_summary_dict: ClassroomTopicSummaryDict = (
+            cast(
+                ClassroomTopicSummaryDict,
+                topic_fetchers.get_topic_summary_by_id(topic_id_1).to_dict()
+            )
+        )
         private_topic_summary_dict['is_published'] = False
 
         expected_dict = {
@@ -142,7 +160,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    def test_get_fails_for_invalid_classroom_name(self):
+    def test_get_fails_for_invalid_classroom_name(self) -> None:
         self.get_json(
             '%s/%s' % (
                 feconf.CLASSROOM_DATA_HANDLER, 'invalid_subject'),
@@ -152,7 +170,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 class ClassroomPromosStatusHandlerTests(BaseClassroomControllerTests):
     """Unit test for ClassroomPromosStatusHandler."""
 
-    def test_get_request_returns_correct_status(self):
+    def test_get_request_returns_correct_status(self) -> None:
         self.set_config_property(
             config_domain.CLASSROOM_PROMOS_ARE_ENABLED, False)
 
@@ -306,7 +324,7 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_duplicate_classroom_url_fragment_should_return_true(self):
+    def test_duplicate_classroom_url_fragment_should_return_true(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         # The classroom with the names ‘math’ and ‘physics’ is already created
         # in the setUp method of the test class.
@@ -318,7 +336,9 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         self.assertTrue(json_response['classroom_url_fragment_exists'])
         self.logout()
 
-    def test_non_duplicate_classroom_url_fragment_should_return_false(self):
+    def test_non_duplicate_classroom_url_fragment_should_return_false(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         # The classroom with the names ‘math’ and ‘physics’ is already created
         # in the setUp method of the test class.
