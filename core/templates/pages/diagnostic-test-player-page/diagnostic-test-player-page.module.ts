@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the classroom-admin page.
+ * @fileoverview Module for the diagnostic test player page.
  */
 
 
