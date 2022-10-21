@@ -217,7 +217,8 @@ export class SkillConceptCardEditorComponent implements OnInit {
       this.windowDimensionsService.getResizeEvent().subscribe(
         () => {
           this.workedExamplesListIsShown = (
-            !this.windowDimensionsService.isWindowNarrow());
+            !this.windowDimensionsService.isWindowNarrow()
+          );
         }
       )
     );
