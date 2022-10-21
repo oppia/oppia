@@ -26,8 +26,7 @@ import subprocess
 
 import esprima
 
-from typing import Dict, List, Tuple, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Tuple, Union
 
 from .. import common
 from .. import concurrent_task_utils

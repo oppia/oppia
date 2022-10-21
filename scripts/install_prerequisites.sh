@@ -42,7 +42,7 @@ pip install --upgrade pip==21.2.3
 sudo apt-get install make
 sudo apt-get install build-essential
 sudo apt-get install libssl-dev
-sudo apt-get install lib1g-dev
+sudo apt-get install zlib1g-dev
 sudo apt-get install libbz2-dev
 sudo apt-get install libreadline-dev
 sudo apt-get install libsqlite3-dev

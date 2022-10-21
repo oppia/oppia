@@ -29,8 +29,7 @@ from scripts import concurrent_task_utils
 
 import esprima
 
-from typing import List, Tuple
-from typing_extensions import Final
+from typing import Final, List, Tuple
 
 from . import js_ts_linter
 from . import pre_commit_linter

@@ -21,8 +21,7 @@ from __future__ import annotations
 import os
 import re
 
-from typing import Dict, List, Pattern, Tuple
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Pattern, Tuple, TypedDict
 
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses

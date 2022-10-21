@@ -22,8 +22,7 @@ import glob
 import os
 import subprocess
 
-from typing import Iterator, List, Tuple
-from typing_extensions import Final
+from typing import Final, Iterator, List, Tuple
 
 from .. import concurrent_task_utils
 

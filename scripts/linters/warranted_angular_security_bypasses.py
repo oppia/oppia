@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from typing_extensions import Final
+from typing import Final
 
 # Contains the tuples of all files that bypasses Angular's security mechanisms.
 # Please keep the list in alphabetical order.

@@ -24,8 +24,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 
-from typing import List, Optional
-from typing_extensions import Final
+from typing import Final, List, Optional
 
 from . import common
 from . import run_backend_tests

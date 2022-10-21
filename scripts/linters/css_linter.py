@@ -21,8 +21,7 @@ from __future__ import annotations
 import os
 import subprocess
 
-from typing import List, Tuple
-from typing_extensions import Final
+from typing import Final, List, Tuple
 
 from .. import common
 from .. import concurrent_task_utils
