@@ -27,6 +27,7 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SkillRubricsEditorComponent } from './skill-rubrics-editor.component';
 import { Rubric } from 'domain/skill/rubric.model';
+import { of } from 'rxjs';
 
 describe('Skill Rubrics Editor Component', () => {
   let component: SkillRubricsEditorComponent;
@@ -37,6 +38,7 @@ describe('Skill Rubrics Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
   let sampleSkill: Skill;
+  let resizeEvent = new Event('resize');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,6 +53,7 @@ describe('Skill Rubrics Editor Component', () => {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
           }
         }
       ],
@@ -182,5 +185,67 @@ describe('Skill Rubrics Editor Component', () => {
 
       expect(component.rubricsListIsShown).toBeTrue();
     });
+  });
+
+  it('should toggle skill editor card on clicking', () => {
+    component.skillEditorCardIsShown = true;
+    spyOn(windowDimensionsService, 'isWindowNarrow')
+      .and.returnValue(true);
+
+    component.toggleSkillEditorCard();
+
+    expect(component.skillEditorCardIsShown).toBeFalse();
+
+    component.toggleSkillEditorCard();
+
+    expect(component.skillEditorCardIsShown).toBeTrue();
+  });
+
+  it('should show Rubrics list when the window is narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+      mockEventEmitter);
+    component.windowIsNarrow = false;
+
+    expect(component.rubricsListIsShown).toBe(false);
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.rubricsListIsShown).toBe(false);
+    expect(component.windowIsNarrow).toBe(true);
+  });
+
+  it('should show Rubrics list when the window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    component.windowIsNarrow = true;
+
+    expect(component.rubricsListIsShown).toBe(false);
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.rubricsListIsShown).toBe(true);
+    expect(component.windowIsNarrow).toBe(false);
+  });
+
+  it('should not toggle Rubrics list when window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    component.rubricsListIsShown = true;
+
+    component.toggleRubricsList();
+
+    expect(component.rubricsListIsShown).toBe(true);
+  });
+
+  it('should not toggle skill card editor when window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    component.skillEditorCardIsShown = true;
+
+    component.toggleRubricsList();
+
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 });
