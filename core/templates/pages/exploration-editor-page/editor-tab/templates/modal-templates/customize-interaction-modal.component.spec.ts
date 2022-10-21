@@ -103,8 +103,7 @@ class MockStateEditorService {
   }
 }
 
- 
-fdescribe('Customize Interaction Modal Component', () => {
+describe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
   let contextService: ContextService;
   let changeDetectorRef: ChangeDetectorRef;
@@ -241,7 +240,7 @@ fdescribe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable Save Interaction button when no recommendation IDs are added', () => {
+  it('should enable Save Interaction button when no recommendation IDs', () => {
     spyOn(component, 'getTitle').and.returnValue(
       AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
@@ -254,34 +253,33 @@ fdescribe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable Save Interaction button when recommendation IDs are added', () => {
+  it('should enable Save Interaction button when exploration IDs added', () => {
     spyOn(component, 'getTitle').and
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
     let inputField = document.createElement('input');
     let inputValue = angular.element(inputField);
+    let className = 'oppia-exploration-id-input';
 
-    // (inputValue as any).attr !== '';
-    // spyOn(
-    //   document, 'getElementsByClassName'
-    // ).withArgs('oppia-exploration-id-input').and.returnValue(inputValue);
+    spyOn(
+      document, 'getElementsByClassName'
+    ).withArgs(className).and.returnValue(inputValue as any);
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should disable Save Interaction button when recommendation ID is empty', () => {
+  it('should disable Save Interaction button when empty exploration ID', () => {
     spyOn(component, 'getTitle').and
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
-    let inputField = document.createElement('input');
-    let inputValue = angular.element(inputField);
+    let inputValue = '';
+    let className = 'oppia-exploration-id-input';
 
-    // (inputValue as any).attr === '';
-    // spyOn(
-    //   document, 'getElementsByClassName'
-    // ).withArgs('oppia-exploration-id-input').and.returnValue(inputValue);
+    spyOn(
+      document, 'getElementsByClassName'
+    ).withArgs(className).and.returnValue(inputValue as any);
 
-    expect(component.isSaveInteractionButtonEnabled()).toBeFalse();
+    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
   it('should open intreaction when user click on it', () => {
