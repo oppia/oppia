@@ -355,6 +355,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
             | 'Add exploration rights ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda exp_rights_model: exp_rights_model.id)
+            # TODO(#15871): This filter should be removed after the explorations
+            # are fixed and it is possible to migrate them.
+            | 'Remove exp rights for broken explorations' >> beam.Filter(
+                lambda exp_rights_model: exp_rights_model[0] not in (
+                    'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
         exp_summary_models = (
@@ -633,6 +638,11 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
                     exp_rights.status == constants.ACTIVITY_STATUS_PUBLIC
                 )
             )
+            # TODO(#15871): This filter should be removed after the explorations
+            # are fixed and it is possible to migrate them.
+            | 'Remove exp rights for broken exps' >> beam.Filter(
+                lambda exp_rights: exp_rights[0] not in (
+                    'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
         migrated_exp_results = (
