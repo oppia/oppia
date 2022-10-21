@@ -23,8 +23,7 @@ import os
 
 from core.tests import test_utils
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 from . import codeowner_linter
 from . import pre_commit_linter
