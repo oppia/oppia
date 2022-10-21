@@ -203,6 +203,7 @@ describe('Topic editor tab directive', function() {
     );
     $scope.reassignSkillsInSubtopics();
     $rootScope.$apply();
+
     expect(uibModalSpy).toHaveBeenCalled();
   });
 
