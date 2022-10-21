@@ -74,7 +74,8 @@ describe('Skill Concept Card Editor Component', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
-        UrlInterpolationService
+        UrlInterpolationService,
+
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -314,5 +315,53 @@ describe('Skill Concept Card Editor Component', () => {
     let result = component.getWorkedExampleSummary('<p>Worked Example</p>');
 
     expect(result).toBe('Worked Example');
+  });
+
+  it('should show worked examples list when the window is narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+      mockEventEmitter);
+    component.windowIsNarrow = false;
+
+    expect(component.workedExamplesListIsShown).toBe(false);
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.workedExamplesListIsShown).toBe(false);
+    expect(component.windowIsNarrow).toBe(true);
+  });
+
+  it('should show worked examples list when the window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    component.windowIsNarrow = true;
+
+    expect(component.workedExamplesListIsShown).toBe(false);
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.workedExamplesListIsShown).toBe(true);
+    expect(component.windowIsNarrow).toBe(false);
+  });
+
+  it('should not toggle Worked Example list when window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    component.workedExamplesListIsShown = true;
+
+    component.toggleWorkedExampleList();
+
+    expect(component.workedExamplesListIsShown).toBe(true);
+  });
+
+  it('should not toggle skill card editor when window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    component.skillEditorCardIsShown = true;
+
+    component.toggleWorkedExampleList();
+
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 });
