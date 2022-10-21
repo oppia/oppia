@@ -24,8 +24,7 @@ import json
 from core import feconf
 from core.platform import models
 
-from typing import Any, Dict
-from typing_extensions import Final
+from typing import Any, Dict, Final
 
 MYPY = False
 if MYPY: # pragma: no cover

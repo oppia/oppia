@@ -28,8 +28,7 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
-from typing import Dict, FrozenSet, Iterator, List, Set, Tuple, Type
-from typing_extensions import Final
+from typing import Dict, Final, FrozenSet, Iterator, List, Set, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
