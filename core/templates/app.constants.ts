@@ -206,5 +206,23 @@ export const AppConstants = {
   CONTRIBUTION_STATS_TYPE_TRANSLATION: 'translation',
   CONTRIBUTION_STATS_TYPE_QUESTION: 'question',
   CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
-  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review'
+  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
+  CONTRIBUTION_STATS_TYPES: {
+    TRANSALTION_CONTRIBUTION: {
+      NAME: 'translationContribution',
+      DISPLAY_NAME: 'Translation Contributions'
+    },
+    TRANSALTION_REVIEW: {
+      NAME: 'translationReview',
+      DISPLAY_NAME: 'Translation Reviews'
+    },
+    QUESTION_CONTRIBUTION: {
+      NAME: 'questionContribution',
+      DISPLAY_NAME: 'Question Contributions'
+    },
+    QUESTION_REVIEW: {
+      NAME: 'questionReview',
+      DISPLAY_NAME: 'Question Reviews'
+    }
+  }
 } as const;

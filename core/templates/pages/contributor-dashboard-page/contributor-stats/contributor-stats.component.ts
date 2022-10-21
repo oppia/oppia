@@ -22,6 +22,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ContributionAndReviewStatsService, QuestionContributionBackendDict, QuestionReviewBackendDict, TranslationContributionBackendDict, TranslationReviewBackendDict } from '../services/contribution-and-review-stats.service';
 import { UserService } from 'services/user.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { AppConstants } from 'app.constants';
+
+interface Option {
+  contributionType: string;
+  displayName: string;
+}
 
 interface PagedStats {
   language?: string;
@@ -31,43 +37,43 @@ interface PagedStats {
 }
 
 interface Stats {
-    pageNumber?: number;
-    // eslint-disable-next-line max-len
-    stats: TranslationContributionStats[] | TranslationReviewStats[] | QuestionContributionStats[] | QuestionReviewStats[];
+  pageNumber?: number;
+  // eslint-disable-next-line max-len
+  stats: TranslationContributionStats[] | TranslationReviewStats[] | QuestionContributionStats[] | QuestionReviewStats[];
 }
 
 interface TranslationContributionStats {
-    firstContributionDate: string;
-    lastContributionDate: string;
-    topicName: string;
-    acceptedCards: number;
-    acceptedWordCount: number;
+  firstContributionDate: string;
+  lastContributionDate: string;
+  topicName: string;
+  acceptedCards: number;
+  acceptedWordCount: number;
 }
 
 interface TranslationReviewStats {
-    firstContributionDate: string;
-    lastContributionDate: string;
-    topicName: string;
-    acceptedCards: number;
-    acceptedWordCount: number;
-    reviewedCards: number;
-    reviewedWordCount: number;
+  firstContributionDate: string;
+  lastContributionDate: string;
+  topicName: string;
+  acceptedCards: number;
+  acceptedWordCount: number;
+  reviewedCards: number;
+  reviewedWordCount: number;
 }
 
 interface QuestionContributionStats {
-    firstContributionDate: string;
-    lastContributionDate: string;
-    topicName: string;
-    acceptedQuestions: number;
-    acceptedQuestionsWithoutEdits: number;
+  firstContributionDate: string;
+  lastContributionDate: string;
+  topicName: string;
+  acceptedQuestions: number;
+  acceptedQuestionsWithoutEdits: number;
 }
 
 interface QuestionReviewStats {
-    firstContributionDate: string;
-    lastContributionDate: string;
-    topicName: string;
-    reviewedQuestions: number;
-    acceptedQuestions: number;
+  firstContributionDate: string;
+  lastContributionDate: string;
+  topicName: string;
+  reviewedQuestions: number;
+  acceptedQuestions: number;
 }
 
 @Component({
@@ -106,106 +112,97 @@ export class ContributorStatsComponent {
     translationContribution: [
       {
         name: 'Months',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Topic Names',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Accepted Cards',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Accepted Word Count',
-        styles: 'dashboard-table-headings stats-data'
       }
     ],
     translationReview: [
       {
         name: 'Months',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Topic Names',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Reviewed Cards',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Reviewed Word Count',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Accepted Cards',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Accepted Word Count',
-        styles: 'dashboard-table-headings stats-data'
       }
     ],
     questionContribution: [
       {
         name: 'Months',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Topic Names',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Accepted Questions',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Accepted Questions WIthout Edits',
-        styles: 'dashboard-table-headings stats-data'
       }
     ],
     questionReview: [
       {
         name: 'Months',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Topic Names',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Reviewed Questions',
-        styles: 'dashboard-table-headings stats-data'
       },
       {
         name: 'Accepted Questions',
-        styles: 'dashboard-table-headings stats-data'
       }
     ],
   };
 
-  translationContributionOption = {
-    displayName: 'Translation Contributions',
-    contributionType: 'translationContribution'
+  translationContributionOption: Option = {
+    displayName:
+      AppConstants.CONTRIBUTION_STATS_TYPES
+        .TRANSALTION_CONTRIBUTION.DISPLAY_NAME,
+    contributionType:
+     AppConstants.CONTRIBUTION_STATS_TYPES.TRANSALTION_CONTRIBUTION.NAME
   };
 
-  translationReviewOption = {
-    displayName: 'Translation Review',
-    contributionType: 'translationReview'
+  translationReviewOption: Option = {
+    displayName:
+      AppConstants.CONTRIBUTION_STATS_TYPES.TRANSALTION_REVIEW.DISPLAY_NAME,
+    contributionType:
+     AppConstants.CONTRIBUTION_STATS_TYPES.TRANSALTION_REVIEW.NAME
   };
 
-  questionContributionOption = {
-    displayName: 'Question Contributions',
-    contributionType: 'questionContribution'
+  questionContributionOption: Option = {
+    displayName:
+      AppConstants.CONTRIBUTION_STATS_TYPES.QUESTION_CONTRIBUTION.DISPLAY_NAME,
+    contributionType:
+     AppConstants.CONTRIBUTION_STATS_TYPES.QUESTION_CONTRIBUTION.NAME
   };
 
-  questionReviewOption = {
-    displayName: 'Question Review',
-    contributionType: 'questionReview'
+  questionReviewOption: Option = {
+    displayName:
+      AppConstants.CONTRIBUTION_STATS_TYPES.QUESTION_REVIEW.DISPLAY_NAME,
+    contributionType:
+     AppConstants.CONTRIBUTION_STATS_TYPES.QUESTION_REVIEW.NAME
   };
 
-  options = [
+  options: Option[] = [
     this.translationContributionOption
   ];
 

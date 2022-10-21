@@ -35,6 +35,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
 class MockNgbModalRef {
@@ -54,16 +55,26 @@ class MockNgbModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ContributorDashboardAccomplishments: {
+      isEnabled: false
+    }
+  };
+}
+
 describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   var contextService: ContextService;
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
   var skillBackendApiService: SkillBackendApiService;
   var skillObjectFactory: SkillObjectFactory;
   var translationTopicService: TranslationTopicService;
+  var platformFeatureService: PlatformFeatureService;
   var userService: UserService;
   let alertsService: AlertsService;
   let questionObjectFactory: QuestionObjectFactory;
@@ -94,6 +105,10 @@ describe('Contributions and review component', () => {
         CsrfTokenService,
         AlertsService,
         TranslationTopicService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
         UserService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -117,6 +132,7 @@ describe('Contributions and review component', () => {
     formatRtePreviewPipe = TestBed.inject(
       FormatRtePreviewPipe);
     translationTopicService = TestBed.inject(TranslationTopicService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     spyOn(
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
@@ -464,6 +480,8 @@ describe('Contributions and review component', () => {
         },
         more: false
       }));
+    mockPlatformFeatureService.
+      status.ContributorDashboardAccomplishments.isEnabled = true;
 
     fixture.detectChanges();
 

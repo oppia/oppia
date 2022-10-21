@@ -150,7 +150,7 @@ describe('Contributor stats component', () => {
 
       expect(component.dropdownShown).toBeFalse;
       expect(component.selectedContributionType).toEqual(
-        'Translation Review');
+        'Translation Reviews');
     }));
 
     it('should show question contribution stats', fakeAsync(() => {
@@ -166,7 +166,7 @@ describe('Contributor stats component', () => {
 
       expect(component.dropdownShown).toBeFalse;
       expect(component.selectedContributionType).toEqual(
-        'Question Review');
+        'Question Reviews');
     }));
 
     it('should page stats', fakeAsync(() => {

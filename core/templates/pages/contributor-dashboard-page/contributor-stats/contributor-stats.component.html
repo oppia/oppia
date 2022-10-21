@@ -53,7 +53,7 @@
           <table class="dashboard-table e2e-test-topics-table">
             <tr>
               <th *ngFor="let column of COLUMNS[type]"
-                  class="{{column.styles}}">
+                  class="dashboard-table-headings stats-data">
                   <div class="stats-column-name-container">
                       {{column.name}}
                   </div>
@@ -80,6 +80,94 @@
               </td>
             </tr>
           </table>
+          <div *ngIf="type == 'translationContribution'" class="mobile-stats-block">
+            <div class="mobile-stats-data-container" *ngFor="let row of block.pagedStats[block.currentPage - 1].stats">
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][0].name}}</b>
+                </div>
+                <div>
+                  {{row.firstContributionDate}} - {{row.lastContributionDate}}
+                </div>
+              </div>
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][1].name}}</b>
+                </div>
+                <div>
+                  {{row.topicName}}
+                </div>
+              </div>
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][2].name}}</b>
+                </div>
+                <div>
+                  {{row.acceptedCards}}
+                </div>
+              </div>
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][3].name}}</b>
+                </div>
+                <div>
+                  {{row.acceptedWordCount}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="type == 'translationReview'" class="mobile-stats-block">
+            <div class="mobile-stats-data-container" *ngFor="let row of block.pagedStats[block.currentPage - 1].stats">
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][0].name}}</b>
+                </div>
+                <div>
+                  {{row.firstContributionDate}} - {{row.lastContributionDate}}
+                </div>
+              </div>
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][1].name}}</b>
+                </div>
+                <div>
+                  {{row.topicName}}
+                </div>
+              </div>
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][2].name}}</b>
+                </div>
+                <div>
+                  {{row.reviewedCards}}
+                </div>
+              </div>
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][3].name}}</b>
+                </div>
+                <div>
+                  {{row.reviewedWordCount}}
+                </div>
+              </div>
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][4].name}}</b>
+                </div>
+                <div>
+                  {{row.acceptedCards}}
+                </div>
+              </div>
+              <div class="mobile-stats-row">
+                <div class="mobile-stats-name">
+                  <b>{{COLUMNS[type][5].name}}</b>
+                </div>
+                <div>
+                  {{row.acceptedWordCount}}
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="oppia-pagination-container">
             <button type="button"
                     class="oppia-pagination-button"
@@ -109,7 +197,7 @@
             <table class="dashboard-table e2e-test-topics-table">
               <tr>
                 <th *ngFor="let column of COLUMNS[type]"
-                    class="{{column.styles}}">
+                    class="dashboard-table-headings stats-data">
                     <div class="stats-column-name-container">
                         {{column.name}}
                     </div>
@@ -133,6 +221,78 @@
                 </td>
               </tr>
             </table>
+            <div *ngIf="type == 'questionContribution'" class="mobile-stats-block">
+              <div class="mobile-stats-data-container" *ngFor="let row of block.pagedStats[block.currentPage - 1].stats">
+                <div class="mobile-stats-row">
+                  <div class="mobile-stats-name">
+                    <b>{{COLUMNS[type][0].name}}</b>
+                  </div>
+                  <div>
+                    {{row.firstContributionDate}} - {{row.lastContributionDate}}
+                  </div>
+                </div>
+                <div class="mobile-stats-row">
+                  <div class="mobile-stats-name">
+                    <b>{{COLUMNS[type][1].name}}</b>
+                  </div>
+                  <div>
+                    {{row.topicName}}
+                  </div>
+                </div>
+                <div class="mobile-stats-row">
+                  <div class="mobile-stats-name">
+                    <b>{{COLUMNS[type][2].name}}</b>
+                  </div>
+                  <div>
+                    {{row.acceptedQuestions}}
+                  </div>
+                </div>
+                <div class="mobile-stats-row">
+                  <div class="mobile-stats-name">
+                    <b>{{COLUMNS[type][3].name}}</b>
+                  </div>
+                  <div>
+                    {{row.acceptedQuestionsWithoutEdits}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="type == 'questionReview'" class="mobile-stats-block">
+              <div class="mobile-stats-data-container" *ngFor="let row of block.pagedStats[block.currentPage - 1].stats">
+                <div class="mobile-stats-row">
+                  <div class="mobile-stats-name">
+                    <b>{{COLUMNS[type][0].name}}</b>
+                  </div>
+                  <div>
+                    {{row.firstContributionDate}} - {{row.lastContributionDate}}
+                  </div>
+                </div>
+                <div class="mobile-stats-row">
+                  <div class="mobile-stats-name">
+                    <b>{{COLUMNS[type][1].name}}</b>
+                  </div>
+                  <div>
+                    {{row.topicName}}
+                  </div>
+                </div>
+                <div class="mobile-stats-row">
+                  <div class="mobile-stats-name">
+                    <b>{{COLUMNS[type][2].name}}</b>
+                  </div>
+                  <div>
+                    {{row.reviewedQuestions}}
+                  </div>
+                </div>
+                <div class="mobile-stats-row">
+                  <div class="mobile-stats-name">
+                    <b>{{COLUMNS[type][3].name}}</b>
+                  </div>
+                  <div>
+                    {{row.acceptedQuestions}}
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="oppia-pagination-container">
               <button type="button"
                       class="oppia-pagination-button"
@@ -206,6 +366,26 @@
     padding: 0 20px;
     width: 100%;
   }
+  .mobile-stats-block {
+    margin-top: 30px;
+  }
+  .mobile-stats-data-container {
+    display: none;
+    font-size: 2.5vw;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+  }
+  .mobile-stats-row {
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .mobile-stats-name {
+    width: 50%;
+  }
+  .mobile-stats-data-container:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
   .stats-column-name-container {
     margin-left: auto;
     margin-right: auto;
@@ -244,7 +424,7 @@
     margin-top: 10px;
   }
   .dashboard-table {
-    font-size: 15px;
+    font-size: 1.2vw;
     width: 100%;
     margin-top: 40px;
   }
@@ -362,6 +542,12 @@
       padding-top: 5px;
       width: 100vw;
       margin-left: calc(-50vw + 50% + 0px);
+    }
+    .dashboard-table {
+      display: none;
+    }
+    .mobile-stats-data-container {
+      display: table;
     }
     .stats-container {
       margin-left: 0px;
