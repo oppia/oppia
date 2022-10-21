@@ -25,10 +25,8 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_services
-from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import suggestion_registry
-from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import wipeout_service
 
@@ -70,26 +68,6 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         email_manager.send_feedback_message_email(user_id, messages)
         feedback_services.pop_feedback_message_references_transactional(
             user_id, len(references))
-        self.render_json({})
-
-
-class SuggestionEmailHandler(base.BaseHandler):
-    """Handler task of sending email of suggestion."""
-
-    @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self):
-        payload = json.loads(self.request.body)
-        exploration_id = payload['exploration_id']
-        thread_id = payload['thread_id']
-
-        exploration_rights = (
-            rights_manager.get_exploration_rights(exploration_id))
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
-
-        email_manager.send_suggestion_email(
-            exploration.title, exploration.id, suggestion.author_id,
-            exploration_rights.owner_ids)
         self.render_json({})
 
 

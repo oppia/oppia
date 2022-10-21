@@ -33,8 +33,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, List, Optional, cast
-from typing_extensions import Final, Literal, TypedDict
+from typing import Dict, Final, List, Literal, Optional, TypedDict, cast
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
