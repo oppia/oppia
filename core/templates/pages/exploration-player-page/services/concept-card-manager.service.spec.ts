@@ -19,8 +19,6 @@
 import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Hint, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { ConceptCardManagerService } from './concept-card-manager.service';
@@ -31,7 +29,7 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
 
-fdescribe('HintsAndSolutionManager service', () => {
+describe('HintsAndSolutionManager service', () => {
 let ccms: ConceptCardManagerService;
 let pps: PlayerPositionService;
 let ees: ExplorationEngineService;
@@ -260,111 +258,7 @@ it('should correctly consume concept card', fakeAsync(() => {
     expect(ccms.wrongAnswersSinceConceptCardConsumed).toEqual(0);
     tick(WAIT_BEFORE_REALLY_STUCK_MSEC);
     expect(ccms.learnerIsReallyStuck).toEqual(true);
-
-
 }));
-
-// it('should correctly retrieve the solution', fakeAsync(() => {
-//     // Initialize the service with two hints and a solution.
-//     ccms.reset([firstHint, secondHint], solution);
-
-//     tick(WAIT_FOR_FIRST_HINT_MSEC);
-
-//     expect(ccms.isSolutionConsumed()).toBe(false);
-//     expect(ccms.displaySolution()?.correctAnswer).toBe(
-//     'This is a correct answer!');
-//     expect(ccms.isSolutionConsumed()).toBe(true);
-// }));
-
-// it('should reset the service', fakeAsync(() => {
-//     // Initialize the service with two hints and a solution.
-//     ccms.reset([firstHint, secondHint], solution);
-
-//     ccms.reset([firstHint, secondHint, thirdHint], solution);
-//     expect(ccms.getNumHints()).toBe(3);
-
-//     expect(ccms.isHintViewable(0)).toBe(false);
-//     expect(ccms.isHintViewable(1)).toBe(false);
-//     expect(ccms.isHintViewable(2)).toBe(false);
-//     expect(ccms.isSolutionViewable()).toBe(false);
-
-//     tick(WAIT_FOR_FIRST_HINT_MSEC);
-
-//     expect(ccms.isHintViewable(0)).toBe(true);
-//     expect(ccms.isHintViewable(1)).toBe(false);
-//     expect(ccms.isHintViewable(2)).toBe(false);
-//     expect(ccms.isSolutionViewable()).toBe(false);
-//     expect(ccms.displayHint(0)?.html).toBe('one');
-
-//     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
-
-//     expect(ccms.isHintViewable(0)).toBe(true);
-//     expect(ccms.isHintViewable(1)).toBe(true);
-//     expect(ccms.isHintViewable(2)).toBe(false);
-//     expect(ccms.isSolutionViewable()).toBe(false);
-//     expect(ccms.displayHint(0)?.html).toBe('one');
-//     expect(ccms.displayHint(1)?.html).toBe('two');
-
-//     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
-
-//     expect(ccms.isHintViewable(0)).toBe(true);
-//     expect(ccms.isHintViewable(1)).toBe(true);
-//     expect(ccms.isHintViewable(2)).toBe(true);
-//     expect(ccms.isSolutionViewable()).toBe(false);
-//     expect(ccms.displayHint(0)?.html).toBe('one');
-//     expect(ccms.displayHint(1)?.html).toBe('two');
-//     expect(ccms.displayHint(2)?.html).toBe('three');
-
-//     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
-
-//     expect(ccms.isSolutionViewable()).toBe(true);
-// }));
-
-// it('should reset the service when timeouts was called before',
-//     fakeAsync(() => {
-//     // Initialize the service with two hints and a solution.
-//     ccms.reset([firstHint, secondHint], solution);
-
-//     // Set timeout.
-//     tick(WAIT_FOR_FIRST_HINT_MSEC);
-//     // Set tooltipTimeout.
-//     tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
-
-//     // Reset service to 0 solutions so releaseHint timeout won't be called.
-//     ccms.reset([], solution);
-
-//     // There is no timeout to flush. timeout and tooltipTimeout variables
-//     // were cleaned.
-//     expect(flush()).toBe(0);
-//     }));
-
-// it('should not record the wrong answer when a hint is already released',
-//     fakeAsync(() => {
-//     // Initialize the service with two hints and a solution.
-//     ccms.reset([firstHint, secondHint], solution);
-
-//     expect(ccms.isHintTooltipOpen()).toBe(false);
-//     expect(ccms.isHintViewable(0)).toBe(false);
-//     expect(ccms.isHintViewable(1)).toBe(false);
-//     expect(ccms.isSolutionViewable()).toBe(false);
-
-//     tick(WAIT_FOR_FIRST_HINT_MSEC);
-//     tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
-
-//     expect(ccms.isHintTooltipOpen()).toBe(true);
-//     // It only changes hint visibility.
-//     expect(ccms.isHintViewable(0)).toBe(true);
-//     expect(ccms.isHintViewable(1)).toBe(false);
-//     expect(ccms.isHintViewable(2)).toBe(false);
-//     expect(ccms.isSolutionViewable()).toBe(false);
-
-//     ccms.recordWrongAnswer();
-
-//     expect(ccms.isHintTooltipOpen()).toBe(true);
-//     expect(ccms.isHintViewable(0)).toBe(true);
-//     expect(ccms.isHintViewable(1)).toBe(false);
-//     expect(ccms.isSolutionViewable()).toBe(false);
-//     }));
 
 it('should record the wrong answer twice', fakeAsync(() => {
     // Initialize the service with two hints and a solution.
@@ -391,12 +285,6 @@ it('should record the wrong answer twice', fakeAsync(() => {
     expect(ccms.learnerIsReallyStuck).toEqual(true);
     flush();
 }));
-
-// it('should send the solution viewed event emitter', () => {
-//     let mockSolutionViewedEventEmitter = new EventEmitter();
-//     expect(ccms.onSolutionViewedEventEmitter).toEqual(
-//     mockSolutionViewedEventEmitter);
-// });
 
 it('should fetch EventEmitter for consumption of hint', () => {
     let mockOnLearnerGetsReallyStuck = new EventEmitter();
