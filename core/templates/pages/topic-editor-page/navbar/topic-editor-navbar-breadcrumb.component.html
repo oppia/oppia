@@ -1,5 +1,5 @@
 <div class="nav navbar-nav oppia-navbar-breadcrumb">
-  <span>
+  <span *ngIf="topic">
     <a href="/topics-and-skills-dashboard"
        ngbTooltip="Back to Topics and Skills Dashboard"
        *ngIf="!canNavigateToTopicEditorPage()"

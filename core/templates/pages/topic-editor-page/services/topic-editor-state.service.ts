@@ -107,12 +107,17 @@ export class TopicEditorStateService {
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
-    for (let idx in groupedSkillSummaries[this._topic.getName()]) {
+    for (let idx in groupedSkillSummaries[
+      this._topic ? this._topic.getName() : 'Topic name is loading.'
+    ]) {
       this._groupedSkillSummaries.current.push(
-        groupedSkillSummaries[this._topic.getName()][idx]);
+        groupedSkillSummaries[
+          this._topic ? this._topic.getName() : 'Topic name is loading.'
+        ][idx]);
     }
     for (let name in groupedSkillSummaries) {
-      if (name === this._topic.getName()) {
+      if (name === (
+        this._topic ? this._topic.getName() : 'Topic name is loading.')) {
         continue;
       }
       let skillSummaries = groupedSkillSummaries[name];

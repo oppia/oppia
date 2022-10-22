@@ -118,16 +118,36 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.$applyAsync();
               FocusManagerService.setFocus('addStoryBtn');
             }
-            $scope.editableName = $scope.topic.getName();
-            $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
+            $scope.editableName = (
+              $scope.topic ? $scope.topic.getName() : 'Topic name is loading.');
+            $scope.editableMetaTagContent = (
+              $scope.topic ?
+              $scope.topic.getMetaTagContent() :
+              'Topic meta tag content is loading.'
+            );
             $scope.editablePageTitleFragmentForWeb = (
-              $scope.topic.getPageTitleFragmentForWeb());
+              $scope.topic ?
+              $scope.topic.getPageTitleFragmentForWeb() :
+              'Topic page title is loading.');
             $scope.editablePracticeIsDisplayed = (
-              $scope.topic.getPracticeTabIsDisplayed());
-            $scope.initialTopicName = $scope.topic.getName();
-            $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
-            $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
-            $scope.editableDescription = $scope.topic.getDescription();
+              $scope.topic ? $scope.topic.getPracticeTabIsDisplayed() : false);
+            $scope.initialTopicName = (
+              $scope.topic ? $scope.topic.getName() : 'Topic name is loading.');
+            $scope.initialTopicUrlFragment = (
+              $scope.topic ?
+              $scope.topic.getUrlFragment() :
+              'Topic url is loading.'
+            );
+            $scope.editableTopicUrlFragment = (
+              $scope.topic ?
+              $scope.topic.getUrlFragment() :
+              'Topic url is loading.'
+            );
+            $scope.editableDescription = (
+              $scope.topic ?
+              $scope.topic.getDescription() :
+              'Topic description is loading.'
+            );
             $scope.allowedBgColors = (
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
             $scope.topicNameExists = false;
@@ -136,7 +156,9 @@ angular.module('oppia').directive('topicEditorTab', [
 
             $scope.getEligibleSkillSummariesForDiagnosticTest = function() {
               let availableSkillSummaries = (
-                $scope.topic.getAvailableSkillSummariesForDiagnosticTest());
+                $scope.topic ?
+                $scope.topic.getAvailableSkillSummariesForDiagnosticTest() :
+                []);
 
               return availableSkillSummaries.filter(skillSummary => {
                 return (
@@ -148,7 +170,9 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.availableSkillSummariesForDiagnosticTest = (
               $scope.getEligibleSkillSummariesForDiagnosticTest());
             $scope.selectedSkillSummariesForDiagnosticTest = (
-              $scope.topic.getSkillSummariesForDiagnosticTest());
+              $scope.topic ?
+              $scope.topic.getSkillSummariesForDiagnosticTest() :
+              []);
             $scope.diagnosticTestSkillsDropdownIsShown = false;
             $scope.selectedSkillForDiagnosticTest = null;
 
@@ -205,7 +229,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
-            $scope.subtopics = $scope.topic.getSubtopics();
+            $scope.subtopics = $scope.topic ? $scope.topic.getSubtopics() : [];
             $scope.subtopicQuestionCountDict = {};
             $scope.subtopics.map((subtopic) => {
               const subtopicId = subtopic.getId();
@@ -216,11 +240,15 @@ angular.module('oppia').directive('topicEditorTab', [
               });
             });
             $scope.uncategorizedSkillSummaries = (
-              $scope.topic.getUncategorizedSkillSummaries());
+              $scope.topic ?
+              $scope.topic.getUncategorizedSkillSummaries() :
+              []);
             $scope.editableThumbnailDataUrl = (
               ImageUploadHelperService
                 .getTrustedResourceUrlForThumbnailFilename(
-                  $scope.topic.getThumbnailFilename(),
+                  $scope.topic ?
+                  $scope.topic.getThumbnailFilename() :
+                  'Topic thumbnail file name is loading.',
                   ContextService.getEntityType(),
                   ContextService.getEntityId()));
           };
@@ -237,7 +265,10 @@ angular.module('oppia').directive('topicEditorTab', [
           // editor, it gets assigned to that topic, and to reflect that
           // change, we need to fetch the topic again from the backend.
           $scope.refreshTopic = function() {
-            TopicEditorStateService.loadTopic($scope.topic.getId());
+            TopicEditorStateService.loadTopic(
+              $scope.topic ?
+              $scope.topic.getId() :
+              'Topic id is loading');
           };
 
           $scope.getStaticImageUrl = function(imagePath) {
@@ -366,7 +397,10 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
-            if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
+            if (newThumbnailFilename ===
+              $scope.topic ?
+              $scope.topic.getThumbnailFilename() :
+              'Topic thumbnail file name is loading.') {
               return;
             }
             TopicUpdateService.setTopicThumbnailFilename(
@@ -375,7 +409,10 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
-            if (newThumbnailBgColor === $scope.topic.getThumbnailBgColor()) {
+            if (newThumbnailBgColor ===
+              $scope.topic ?
+              $scope.topic.getThumbnailBgColor() :
+              'Topic thumbnail background color is loading.') {
               return;
             }
             TopicUpdateService.setTopicThumbnailBgColor(
@@ -384,14 +421,20 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicDescription = function(newDescription) {
-            if (newDescription !== $scope.topic.getDescription()) {
+            if (newDescription !==
+              $scope.topic ?
+              $scope.topic.getDescription() :
+              'Topic description is loading.') {
               TopicUpdateService.setTopicDescription(
                 $scope.topic, newDescription);
             }
           };
 
           $scope.updateTopicMetaTagContent = function(newMetaTagContent) {
-            if (newMetaTagContent !== $scope.topic.getMetaTagContent()) {
+            if (newMetaTagContent !==
+              $scope.topic ?
+              $scope.topic.getMetaTagContent() :
+              'Topic meta tag content is loading.') {
               TopicUpdateService.setMetaTagContent(
                 $scope.topic, newMetaTagContent);
             }
@@ -399,7 +442,10 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.updateTopicPageTitleFragmentForWeb = function(
               newTopicPageTitleFragmentForWeb) {
-            let currentValue = $scope.topic.getPageTitleFragmentForWeb();
+            let currentValue =
+            $scope.topic ?
+            $scope.topic.getPageTitleFragmentForWeb() :
+            'Topic page title fragment for web is loading.';
             if (newTopicPageTitleFragmentForWeb !== currentValue) {
               TopicUpdateService.setPageTitleFragmentForWeb(
                 $scope.topic, newTopicPageTitleFragmentForWeb);
@@ -458,7 +504,8 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.deleteSubtopic = function(subtopicId) {
             TopicEditorStateService.deleteSubtopicPage(
-              $scope.topic.getId(), subtopicId);
+              $scope.topic ? $scope.topic.getId() : 'Topic ID is loading.',
+              subtopicId);
             TopicUpdateService.deleteSubtopic($scope.topic, subtopicId);
             ctrl.initEditor();
           };
@@ -485,7 +532,7 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.getPreviewFooter = function() {
             var canonicalStoriesLength = (
-              $scope.topic.getCanonicalStoryIds().length);
+              ($scope.topic ? $scope.topic.getCanonicalStoryIds() : []).length);
             if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
               return canonicalStoriesLength + ' Stories';
             }

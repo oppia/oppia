@@ -72,7 +72,7 @@ export class TopicEditorNavbarComponent {
   }
 
   _validateTopic(): void {
-    this.validationIssues = this.topic.validate();
+    this.validationIssues = this.topic ? this.topic.validate() : [];
     if (this.topicEditorStateService.getTopicWithNameExists()) {
       this.validationIssues.push(
         'A topic with this name already exists.');
@@ -82,9 +82,9 @@ export class TopicEditorNavbarComponent {
         'Topic URL fragment already exists.');
     }
     let prepublishTopicValidationIssues = (
-      this.topic.prepublishValidate());
+      this.topic ? this.topic.prepublishValidate() : []);
     let subtopicPrepublishValidationIssues = (
-      [].concat.apply([], this.topic.getSubtopics().map(
+      [].concat.apply([], (this.topic ? this.topic.getSubtopics() : []).map(
         (subtopic) => subtopic.prepublishValidate())));
     this.prepublishValidationIssues = (
       prepublishTopicValidationIssues.concat(
@@ -92,7 +92,7 @@ export class TopicEditorNavbarComponent {
   }
 
   publishTopic(): void {
-    if (!this.topicRights.canPublishTopic()) {
+    if (!this.topicRights ? this.topicRights.canPublishTopic() : false) {
       this.ngbModal.open(TopicEditorSendMailComponent, {
         backdrop: true
       }).result.then(() => {
@@ -267,7 +267,7 @@ export class TopicEditorNavbarComponent {
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicSkillIds = this.topic.getSkillIds();
+    this.topicSkillIds = this.topic ? this.topic.getSkillIds() : [];
     this.discardChangesButtonIsShown = false;
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
