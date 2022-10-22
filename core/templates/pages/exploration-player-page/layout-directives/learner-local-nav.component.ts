@@ -91,9 +91,9 @@ export class LearnerLocalNavComponent implements OnInit {
   ngOnInit(): void {
     this.explorationId = this.explorationEngineService.getExplorationId();
     let version = this.explorationEngineService.getExplorationVersion();
-    if (version === null) {
-      throw new Error('Version should not be null.');
-    }
+    // if (version === null) {
+    //   throw new Error('Version should not be null.');
+    // }
     this.readOnlyExplorationBackendApiService
       .loadExplorationAsync(this.explorationId, version)
       .then((exploration) => {

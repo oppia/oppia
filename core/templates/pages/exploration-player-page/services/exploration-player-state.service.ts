@@ -140,9 +140,9 @@ export class ExplorationPlayerStateService {
       callback: (stateCard: StateCard, str: string) => void
   ): void {
     let collectionUrl = this.urlService.getCollectionIdFromExplorationUrl();
-    if (collectionUrl === null) {
-      throw new Error('Collection ID should not be null.');
-    }
+    // if (collectionUrl === null) {
+    //   throw new Error('Collection ID should not be null.');
+    // }
     // For some cases, version is set only after
     // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
     // Use returnDict.version for non-null version value.
@@ -269,9 +269,9 @@ export class ExplorationPlayerStateService {
         this.explorationId, this.version) :
       this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
         this.explorationId);
-    if (this.storyUrlFragment === null) {
-      throw new Error('Story URL fragment should not be null.');
-    }
+    // if (this.storyUrlFragment === null) {
+    //   throw new Error('Story URL fragment should not be null.');
+    // }
     Promise.all([
       explorationDataPromise,
       this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
