@@ -30,8 +30,12 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
 
+from typing import Dict, List, Optional, TypedDict, cast
 
-def _require_valid_version(version_from_payload, collection_version):
+
+def _require_valid_version(
+    version_from_payload: Optional[int], collection_version: int
+) -> None:
     """Check that the payload version matches the given collection version."""
     if version_from_payload is None:
         raise base.BaseHandler.InvalidInputException(
@@ -44,14 +48,7 @@ def _require_valid_version(version_from_payload, collection_version):
             % (collection_version, version_from_payload))
 
 
-class CollectionEditorHandler(base.BaseHandler):
-    """Base class for all handlers for the collection editor page."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {}
-
-
-class CollectionEditorPage(CollectionEditorHandler):
+class CollectionEditorPage(base.BaseHandler):
     """The editor page for a single collection."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -61,17 +58,25 @@ class CollectionEditorPage(CollectionEditorHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_collection
-    def get(self, _):
+    def get(self, _: str) -> None:
         """Handles GET requests."""
         self.render_template('collection-editor-page.mainpage.html')
 
 
-class EditableCollectionDataHandler(CollectionEditorHandler):
+class EditableCollectionDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of EditableCollectionDataHandler's normalized_payload
+    dictionary.
+    """
+
+    version: Optional[int]
+    commit_message: Optional[str]
+    change_list: List[collection_domain.CollectionChange]
+
+
+class EditableCollectionDataHandler(base.BaseHandler):
     """A data handler for collections which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -114,7 +119,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
     }
 
     @acl_decorators.can_edit_collection
-    def get(self, collection_id):
+    def get(self, collection_id: str) -> None:
         """Populates the data on the individual collection page."""
 
         collection_dict = (
@@ -129,15 +134,20 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_collection
-    def put(self, collection_id):
+    def put(self, collection_id: str) -> None:
         """Updates properties of the given collection."""
+        assert self.user_id is not None
 
+        payload_data = cast(
+            EditableCollectionDataHandlerNormalizedPayloadDict,
+            self.normalized_payload
+        )
         collection = collection_services.get_collection_by_id(collection_id)
-        version = self.normalized_payload.get('version')
+        version = payload_data['version']
         _require_valid_version(version, collection.version)
 
-        commit_message = self.normalized_payload.get('commit_message')
-        change_list = self.normalized_payload.get('change_list')
+        commit_message = payload_data['commit_message']
+        change_list = payload_data['change_list']
 
         collection_services.update_collection(
             self.user_id,
@@ -159,7 +169,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         self.render_json(self.values)
 
 
-class CollectionRightsHandler(CollectionEditorHandler):
+class CollectionRightsHandler(base.BaseHandler):
     """Handles management of collection editing rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -170,12 +180,10 @@ class CollectionRightsHandler(CollectionEditorHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_collection
-    def get(self, collection_id):
+    def get(self, collection_id: str) -> None:
         """Gets the editing rights for the given collection.
 
         Args:
@@ -184,6 +192,12 @@ class CollectionRightsHandler(CollectionEditorHandler):
         (collection, collection_rights) = (
             collection_services.get_collection_and_collection_rights_by_id(
                 collection_id))
+
+        if collection is None:
+            raise Exception(
+                'No collection found for the given collection_id: %s' %
+                collection_id
+            )
 
         self.values.update({
             'can_edit': True,
@@ -196,6 +210,14 @@ class CollectionRightsHandler(CollectionEditorHandler):
         })
 
         self.render_json(self.values)
+
+
+class CollectionPublishHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of CollectionPublishHandler's normalized_payload
+    dictionary.
+    """
+
+    version: Optional[int]
 
 
 class CollectionPublishHandler(base.BaseHandler):
@@ -220,10 +242,16 @@ class CollectionPublishHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_publish_collection
-    def put(self, collection_id):
+    def put(self, collection_id: str) -> None:
         """Publishes the given collection."""
-        collection = collection_services.get_collection_by_id(collection_id)
-        version = self.normalized_payload.get('version')
+        collection = collection_services.get_collection_by_id(
+            collection_id, strict=True
+        )
+        payload_data = cast(
+            CollectionPublishHandlerNormalizedPayloadDict,
+            self.normalized_payload
+        )
+        version = payload_data['version']
         _require_valid_version(version, collection.version)
 
         collection.validate(strict=True)
@@ -250,6 +278,14 @@ class CollectionPublishHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class CollectionUnpublishHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of CollectionUnpublishHandler's normalized_payload
+    dictionary.
+    """
+
+    version: Optional[int]
+
+
 class CollectionUnpublishHandler(base.BaseHandler):
     """Handles the unpublication of the given collection."""
 
@@ -272,10 +308,14 @@ class CollectionUnpublishHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_unpublish_collection
-    def put(self, collection_id):
+    def put(self, collection_id: str) -> None:
         """Unpublishes the given collection."""
         collection = collection_services.get_collection_by_id(collection_id)
-        version = self.normalized_payload.get('version')
+        payload_data = cast(
+            CollectionUnpublishHandlerNormalizedPayloadDict,
+            self.normalized_payload
+        )
+        version = payload_data['version']
         _require_valid_version(version, collection.version)
 
         rights_manager.unpublish_collection(self.user, collection_id)
@@ -297,11 +337,20 @@ class CollectionUnpublishHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class ExplorationMetadataSearchHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ExplorationMetadataSearchHandler's
+    normalized_payload dictionary.
+    """
+
+    q: str
+    offset: Optional[int]
+
+
 class ExplorationMetadataSearchHandler(base.BaseHandler):
     """Provides data for exploration search."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'q': {
@@ -319,16 +368,20 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         # The query is encoded into base64 string in the frontend, and b64decode
         # accepts base64 bytes, thus we need to encode the base64 string to
         # base64 bytes, then decode them to just bytes and then decode those
         # back to string.
-        q = self.normalized_request.get('q').encode('utf-8')
+        request_data = cast(
+            ExplorationMetadataSearchHandlerNormalizedRequestDict,
+            self.normalized_request
+        )
+        q = request_data['q'].encode('utf-8')
         query_string = base64.b64decode(q).decode('utf-8')
 
-        search_offset = self.normalized_request.get('offset')
+        search_offset = request_data.get('offset')
 
         collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(
