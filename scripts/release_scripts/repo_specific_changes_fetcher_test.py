@@ -24,8 +24,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import repo_specific_changes_fetcher
 
-from typing import Dict, List
-from typing_extensions import Final
+from typing import Dict, Final, List
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_FECONF_FILEPATH: Final = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
