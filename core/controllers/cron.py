@@ -33,6 +33,8 @@ from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import suggestion_stats_computation_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 
+from typing import Dict
+
 
 class CronModelsCleanupHandler(base.BaseHandler):
     """Handler for cleaning up models that are marked as deleted and marking
@@ -40,11 +42,11 @@ class CronModelsCleanupHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Cron handler that hard-deletes all models that were marked as deleted
         (have deleted field set to True) more than some period of time ago.
         Also, for some types of models (that we shouldn't keep for long time)
@@ -62,11 +64,11 @@ class CronUserDeletionHandler(base.BaseHandler):
     """Handler for running the user deletion one off job."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
@@ -78,11 +80,11 @@ class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
     """Handler for running the fully complete user deletion one off job."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
@@ -97,11 +99,11 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Sends each reviewer an email with up to
         suggestion_services.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER
         suggestions that have been waiting the longest for review, based on
@@ -134,11 +136,11 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Sends each admin up to two emails: an email to alert the admins that
         there are suggestion types that need more reviewers and/or an email
         to alert the admins that specific suggestions have been waiting too long
@@ -188,11 +190,11 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
 class CronAppFeedbackReportsScrubberHandlerPage(base.BaseHandler):
     """Handler for scrubbing app feedback reports that are expiring."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests to scrub reports. This cron handler scrubs all
         app feedback report models that are expiring; expired reports have a
         created_on field at least feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS
@@ -206,11 +208,11 @@ class CronDashboardStatsHandler(base.BaseHandler):
     """Handler for appending dashboard stats to a list."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=(
@@ -221,11 +223,11 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
     """Handler for computing exploration recommendations."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=(
@@ -237,11 +239,11 @@ class CronActivitySearchRankHandler(base.BaseHandler):
     """Handler for computing activity search ranks."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob)
@@ -251,11 +253,11 @@ class CronBlogPostSearchRankHandler(base.BaseHandler):
     """Handler for indexing blog post in search handler."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
@@ -266,11 +268,11 @@ class CronTranslationContributionStatsHandler(base.BaseHandler):
     """Handler for running the translation contribution stats populate job."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=(
