@@ -3274,7 +3274,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         content_ids_of_choices_to_update = []
         choices_content = []
         for choice in choices:
-            if choice['html'].strip() in ('<p></p>', ''):
+            soup = bs4.BeautifulSoup(choice['html'], 'html.parser')
+            p_value = soup.find('p').getText()
+            if p_value.strip() in ('<p></p>', ''):
                 empty_choices.append(choice)
             choices_content.append(choice['html'])
 
