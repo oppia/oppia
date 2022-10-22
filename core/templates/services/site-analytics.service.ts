@@ -169,6 +169,11 @@ export class SiteAnalyticsService {
       network, 'share', this.windowRef.nativeWindow.location.pathname);
   }
 
+  registerShareBlogPostEvent(network: string): void {
+    this._sendEventToGoogleAnalytics(
+      network, 'share', this.windowRef.nativeWindow.location.pathname);
+  }
+
   registerOpenEmbedInfoEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
   }

@@ -1,17 +1,23 @@
 <div class="oppia-sharing-links" [ngClass]="getFontAndFlexClass()">
   <div class="fx-main-center fx-cross-center padding-0-2">
     <a title="Facebook" class="fx-main-center fx-cross-start" [href]="getUrl('facebook')" (click)="registerShareEvent('facebook')" target="_window">
-      <i class="oppia-share-icons fab fa-facebook-square" [ngClass]="smallFont ? 'font-small' : 'font-big'" ></i>
+      <i class="oppia-share-icons fab fa-facebook-square" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
       <span class="oppia-icon-accessibility-label">Facebook</span>
     </a>
   </div>
   <div class="fx-main-center fx-cross-center padding-0-2 twitter-icon">
     <a title="Twitter" class="fx-main-center fx-cross-start" [href]="getUrl('twitter')"  (click)="registerShareEvent('twitter')" target="_window">
-      <i class="oppia-share-icons fab fa-twitter-square" [ngClass]="smallFont ? 'font-small' : 'font-big'" ></i>
+      <i class="oppia-share-icons fab fa-twitter-square" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
       <span class="oppia-icon-accessibility-label">Twitter</span>
     </a>
   </div>
-  <div class="fx-main-center fx-cross-center padding-0-2 classroom-icon">
+  <div *ngIf="shareType === 'blog'" class="fx-main-center fx-cross-center padding-0-2 linkedin-icon">
+    <a title="LinkedIn" class="fx-main-center fx-cross-start" [href]="getUrl('linkedin')"  (click)="registerShareEvent('linkedin')" target="_window">
+      <i class="oppia-share-icons fab fa-linkedin" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
+      <span class="oppia-icon-accessibility-label">LinkedIn</span>
+    </a>
+  </div>
+  <div *ngIf="shareType !== 'blog'" class="fx-main-center fx-cross-center padding-0-2 classroom-icon">
     <a class="fx-main-center fx-cross-center" title="Google Classroom" [href]="getUrl('classroom')"  (click)="registerShareEvent('classroom')" target="_window">
       <img class="share-option-img share-icons" [ngClass]="smallFont ? 'font-small' : 'font-big'"  [src]="classroomUrl" alt="Classroom">
     </a>
@@ -135,5 +141,17 @@
   }
   .fx-row.collection-footer-sharing-links .classroom-icon {
     margin-top: 1.5px;
+  }
+  i.fab.fa-facebook-square.blog-post-sharing-link-icon {
+    font-size: 30px;
+    margin-right: 5px
+  }
+  i.fab.fa-twitter-square.blog-post-sharing-link-icon {
+    font-size: 30px;
+    margin-right: 5px
+  }
+  i.fab.fa-linkedin.blog-post-sharing-link-icon {
+    font-size: 30px;
+    margin-right: 5px
   }
 </style>
