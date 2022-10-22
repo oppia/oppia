@@ -90,12 +90,4 @@ describe('Diagnostic test player component', () => {
 
       expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual(avatarImageLocation);
     });
-
-  it('should open classroom page on clicking back button', () => {
-    expect(windowRef.nativeWindow.location.href).toBe('');
-
-    component.returnBackToClassroom();
-
-    expect(windowRef.nativeWindow.location.href).toBe('/learn/math');
-  });
 });
