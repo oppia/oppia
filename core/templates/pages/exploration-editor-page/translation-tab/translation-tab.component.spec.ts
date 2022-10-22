@@ -253,7 +253,6 @@ describe('Translation tab component', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
-    fixture.destroy();
   });
 
   it('should initialize component properties after controller is initialized',
