@@ -114,6 +114,10 @@ class SuggestionHandler(base.BaseHandler):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             suggestion_services.update_translation_contribution_stats_at_submission(suggestion)
 
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            suggestion_services.update_question_contribution_stats_at_submission(suggestion)
+
         suggestion_change = suggestion.change
         if (
                 suggestion_change.cmd == 'add_written_translation' and
