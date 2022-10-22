@@ -261,6 +261,10 @@ describe('State Name Editor component', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+    // This will destroy the fixture once the test gone end
+    // this is going to makesure that each testcase is going
+    // to run independent of another test case.
+    fixture.destroy();
   });
 
   it('should not save state name when it is longer than 50 characters',

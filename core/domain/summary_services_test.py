@@ -35,7 +35,7 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Final
 
 
 class ExplorationDisplayableSummariesTest(

@@ -30,6 +30,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'oppia-skill-prerequisite-skills-editor',
@@ -46,7 +47,10 @@ implements OnInit {
   skillIdToSummaryMap!: Record<string, string>;
   skill!: Skill;
   prerequisiteSkillsAreShown: boolean = false;
+  skillEditorCardIsShown: boolean = false;
   allAvailableSkills: SkillSummary[] = [];
+  directiveSubscriptions = new Subscription();
+  windowIsNarrow!: boolean;
 
   constructor(
     private skillUpdateService: SkillUpdateService,
@@ -124,6 +128,12 @@ implements OnInit {
     }
   }
 
+  toggleSkillEditorCard(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.skillEditorCardIsShown = !this.skillEditorCardIsShown;
+    }
+  }
+
   // Return null if the skill is not found.
   getSkillDescription(skillIdUpdate: string): string | null {
     for (let skill of this.allAvailableSkills) {
@@ -135,6 +145,18 @@ implements OnInit {
   }
 
   ngOnInit(): void {
+    this.skillEditorCardIsShown = true;
+    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+          this.prerequisiteSkillsAreShown = (
+            !this.windowDimensionsService.isWindowNarrow());
+        }
+      )
+    );
+
     this.groupedSkillSummaries = this.skillEditorStateService
       .getGroupedSkillSummaries();
 
@@ -159,6 +181,10 @@ implements OnInit {
           skillSummaries[idx].description;
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

@@ -27,8 +27,7 @@ import subprocess
 
 import github
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -166,8 +165,8 @@ def get_previous_release_version(
         Exception. Previous release version is same as current release version.
     """
     all_tags = subprocess.check_output(
-        ['git', 'tag']
-    )[:-1].decode('utf-8').split('\n')
+        ['git', 'tag'], encoding='utf-8'
+    )[:-1].split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
     # version.
     # Standard output is in bytes, we need to decode the line to print it.
