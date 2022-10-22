@@ -51,6 +51,7 @@ import { TranslationBackendDict } from 'domain/exploration/WrittenTranslationObj
 import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { StateDiffData, VersionHistoryService } from '../services/version-history.service';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
@@ -77,6 +78,7 @@ describe('Exploration editor tab component', () => {
   let versionHistoryService: VersionHistoryService;
   let stateObjectFactory: StateObjectFactory;
   let stateObject: StateBackendDict;
+  let versionHistoryBackendApiService: VersionHistoryBackendApiService;
 
   class MockNgbModal {
     open() {
@@ -224,6 +226,8 @@ describe('Exploration editor tab component', () => {
     contextService = TestBed.inject(ContextService);
     versionHistoryService = TestBed.inject(VersionHistoryService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
+    versionHistoryBackendApiService = TestBed.inject(
+      VersionHistoryBackendApiService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
     spyOn(contextService, 'getExplorationId').and.returnValue(
@@ -239,6 +243,9 @@ describe('Exploration editor tab component', () => {
     let element = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue((
       element as HTMLElement));
+    spyOn(
+      versionHistoryService, 'getLatestVersionOfExploration'
+    ).and.returnValue(3);
 
     stateObject = {
       classifier_model_id: null,
@@ -296,6 +303,16 @@ describe('Exploration editor tab component', () => {
         }
       }
     };
+    let stateData = stateObjectFactory.createFromBackendDict(
+      'State', stateObject);
+    spyOn(
+      versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+    ).and.resolveTo({
+      lastEditedVersionNumber: 2,
+      stateNameInPreviousVersion: 'State',
+      stateInPreviousVersion: stateData,
+      lastEditedCommitterUsername: 'some'
+    });
 
     explorationStatesService.init({
       'First State': {
