@@ -113,6 +113,11 @@ describe('Translation tab component', () => {
         JoyrideStepService,
         JoyrideOptionsService,
         JoyrideStepsContainerService,
+        // The UserExplorationPermissionsService has been
+        // mocked here because spying the function of 
+        // UserExplorationPermissionsService is not able to
+        // stop afterAll error i.e. ContextService should not
+        // be used outside the context of an exploration or a question.
         {
           provide: UserExplorationPermissionsService,
           useClass: MockUserExplorationPermissionsService,
