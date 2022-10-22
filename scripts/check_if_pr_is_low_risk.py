@@ -110,6 +110,9 @@ def load_diff(
         elif len(split) == 2:
             diff_files.append((split[1], split[1]))
         else:
+            # When we rule out the possibility of 'len' being less than 2 or
+            # greater than 3, 'len' can only have two values. If len is not 2,
+            # then it must be 3.
             assert len(split) == 3
             diff_files.append((split[1], split[2]))
     file_diffs = {}

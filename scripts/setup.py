@@ -144,9 +144,7 @@ def download_and_install_node() -> None:
             elif common.is_linux_os():
                 node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
             # Oppia only suppports windows, mac and linux operating systems.
-            # Hence we use the 'no cover' flag since the else condition will
-            # never occur.
-            else: # pragma: no cover
+            else:
                 raise Exception(
                     'System\'s Operating System is not compatible.')
         else:

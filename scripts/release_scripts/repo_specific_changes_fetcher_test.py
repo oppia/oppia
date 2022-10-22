@@ -33,10 +33,6 @@ MOCK_FECONF_FILEPATH: Final = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
     """Test the methods for obtaining repo specific changes."""
 
-    def setUp(self) -> None:
-        super().setUp()
-        self.call_counter = 0
-
     def test_get_changed_schema_version_constant_names_with_no_diff(
         self
     ) -> None:
@@ -103,22 +99,26 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         self.assertEqual(actual_storgae_models, expected_storage_models)
 
     def test_get_changes(self) -> None:
+        call_counter = 0
         def mock_get_changed_schema_version_constant_names(
             unused_release_tag_to_diff_against: str
         ) -> Optional[List[str]]:
-            if self.call_counter:
+            nonlocal call_counter
+            if call_counter:
                 return ['version_change']
             return None
         def mock_get_setup_scripts_changes_status(
             unused_release_tag_to_diff_against: str
-        ) -> Optional[List[str]]:
-            if self.call_counter:
+        ) -> Optional[Dict[str, bool]]:
+            nonlocal call_counter
+            if call_counter:
                 return {'setup_changes': True}
             return None
         def mock_get_changed_storage_models_filenames(
             unused_release_tag_to_diff_against: str
         ) -> Optional[List[str]]:
-            if self.call_counter:
+            nonlocal call_counter
+            if call_counter:
                 return ['storage_changes']
             return None
 
@@ -139,7 +139,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             self.assertEqual(
                 repo_specific_changes_fetcher.get_changes('release_tag'),
                 expected_changes)
-            self.call_counter = 1
+            call_counter = 1
             expected_changes = [
                 '\n### Feconf version changes:\nThis indicates '
                 'that a migration may be needed\n\n', '* version_change\n',

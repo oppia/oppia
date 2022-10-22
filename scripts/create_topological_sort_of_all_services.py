@@ -105,6 +105,12 @@ def make_graph() -> Tuple[Dict[str, List[str]], Set[str]]:
                     parsed_script = esprima.parseScript(dep_lines, comment=True)
                     parsed_nodes = parsed_script.body
                     for parsed_node in parsed_nodes:
+                        # We make sure that 'dep_lines' contains only the
+                        # expressions beginning with the 'require' keyword.
+                        # Hence the below assert statements always hold.
+                        assert parsed_node.type == 'ExpressionStatement'
+                        assert parsed_node.expression.callee.name == (
+                            'require')
                         arguments = parsed_node.expression.arguments
                         for argument in arguments:
                             dep_path = argument.value

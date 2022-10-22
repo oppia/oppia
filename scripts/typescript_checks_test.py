@@ -123,7 +123,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
     def test_error_is_raised_for_invalid_compilation_of_temp_strict_tsconfig(
             self) -> None:
         """Test that error is produced if stdout is not empty."""
-        class MockOuput:
+        class MockOutput:
             def __init__(self, call_counter: int = 0) -> None:
                 self.call_counter = call_counter
             def readline(self) -> str: # pylint: disable=missing-docstring
@@ -136,7 +136,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     return ''
 
         class MockProcess:
-            stdout = MockOuput()
+            stdout = MockOutput()
         def mock_popen_for_errors(
             unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
         ) -> MockProcess:  # pylint: disable=unsubscriptable-object

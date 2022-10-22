@@ -336,7 +336,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertEqual('Newline at EOF', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_file_with_newline_at_eof(self):
+    def test_file_with_newline_at_eof(self) -> None:
         linter = general_purpose_linter.GeneralPurposeLinter(
             [VALID_PY_FILE_PATH], FILE_CACHE)
         lint_task_report = linter.check_newline_at_eof()
@@ -423,19 +423,18 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report.failed)
 
     def test_check_bad_patterns_in_excluded_dirs(self) -> None:
-        bad_pattern_regexp = {
-            'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
-            'message': 'Please link TODO comments to an issue '
-                    'in the format TODO(#issuenum): XXX. ',
+        bad_pattern_regexp: general_purpose_linter.BadPatternRegexpDict= {
+            'regexp': re.compile(r'[ \t]+$'),
+            'message': 'There should not be any trailing whitespaces.',
             'excluded_files': (),
             'excluded_dirs': (LINTER_TESTS_DIR,)
         }
-        check_status, error_message = (
+        check_status, error_messages = (
             general_purpose_linter.check_bad_pattern_in_file(
                 os.path.join(LINTER_TESTS_DIR, 'some_file.py'),
-                '# TODO(): Todo not linked to issues.\n',
+                'unused_variable = 5 \n',
                 bad_pattern_regexp
             )
         )
         self.assertFalse(check_status)
-        self.assertEqual(error_message, [])
+        self.assertEqual(error_messages, [])

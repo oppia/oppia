@@ -48,7 +48,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.check_function_calls = {
             'check_call_is_called': False,
         }
-        self.call_counter = 0
         self.print_arr = []
         def mock_check_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             self.check_function_calls['check_call_is_called'] = True
@@ -95,9 +94,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
 
     def test_tweak_yarn_executable(self):
+        call_counter = 0
         def mock_is_file(unused_filename):
-            if self.call_counter == 0:
-                self.call_counter = 1
+            nonlocal call_counter
+            if call_counter == 0:
+                call_counter = 1
                 return False
             return True
 
