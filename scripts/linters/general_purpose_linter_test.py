@@ -423,7 +423,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report.failed)
 
     def test_check_bad_patterns_in_excluded_dirs(self) -> None:
-        bad_pattern_regexp: general_purpose_linter.BadPatternRegexpDict= {
+        bad_pattern_regexp: general_purpose_linter.BadPatternRegexpDict = {
             'regexp': re.compile(r'[ \t]+$'),
             'message': 'There should not be any trailing whitespaces.',
             'excluded_files': (),
