@@ -940,7 +940,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange(
                 {
                     'cmd': 'edit_exploration_property',
@@ -951,7 +951,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange(
                 {
                     'cmd': 'edit_exploration_property',

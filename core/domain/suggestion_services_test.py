@@ -314,7 +314,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 len(suggestion_services.get_all_stale_suggestion_ids()), 0)
 
-    def mock_compute_models_for_updating_exploration(
+    def mock_update_exploration(
         self,
         unused_user_id: str,
         unused_exploration_id: str,
@@ -354,7 +354,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'state 1',
         })]
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.author_id, self.target_id, change_list, 'Add state.')
 
         new_suggestion_content = state_domain.SubtitledHtml(
@@ -891,7 +891,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'html': '<p>old content html</p>'
             }
         })]
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -1053,7 +1053,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'html': '<p>old content html</p>'
             }
         })]
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -1148,7 +1148,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'html': '<p>old content html</p>'
             }
         })]
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -2043,7 +2043,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'state_name': 'State 1',
             'new_value': recorded_voiceovers_dict,
         })
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.editor_id, exploration.id,
             [content_change, recorded_voiceovers_change], '')
 
@@ -3319,7 +3319,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         assert outcome_object is not None
         default_outcome_dict = outcome_object.to_dict()
         default_outcome_dict['dest'] = 'End State'
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

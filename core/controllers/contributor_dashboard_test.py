@@ -545,7 +545,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         init_state = exp_100.states[exp_100.init_state_name]
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = 'End state'
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, exp_100.id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -626,7 +626,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             }]
         )
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, exp_100.id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -951,7 +951,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
     def test_handler_returns_correct_data(self):
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1126,7 +1126,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             output['error'], error_msg)
 
     def test_handler_with_invalid_content_ids_returns_none(self):
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1195,7 +1195,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             output['error'], error_msg)
 
     def test_handler_with_valid_input_returns_translation(self):
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,

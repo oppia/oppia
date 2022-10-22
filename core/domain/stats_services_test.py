@@ -425,7 +425,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'get_stats_for_new_exp_version',
             stats_for_new_exp_version_log):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
 
         # Now, the stats creation for new explorations method will be called
@@ -508,7 +508,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         stats_services.save_stats_model(exploration_stats)
 
         # Update exploration to next version 2 and its stats.
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             'committer_id_v2', exploration.id, [], 'Updated')
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exp_id, 2)
@@ -1442,7 +1442,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.exp.id,
             [
@@ -1465,7 +1465,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.exp.id,
             [
@@ -1517,7 +1517,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_eq_playthrough('B')], 'B')
             ]))
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.exp.id,
             [
@@ -1539,7 +1539,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_eq_playthrough('A')], 'A')
             ]))
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.exp.id,
             [
@@ -1581,7 +1581,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('B', 2)], 'B', 2)
             ]))
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.exp.id,
             [
@@ -1603,7 +1603,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('A', 2)], 'A', 2)
             ]))
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.exp.id,
             [
@@ -1654,7 +1654,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('B', 3)], 'B', 3),
             ]))
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.exp.id,
             [
@@ -1725,7 +1725,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
         first_state_name = exp.init_state_name
         second_state_name = 'State 2'
         third_state_name = 'State 3'
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             'fake@user.com',
             'eid',
             [

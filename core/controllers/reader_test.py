@@ -2320,7 +2320,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             owner_id,
             exp_id,
             change_list,
@@ -2834,7 +2834,7 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             owner_id,
             exp_id,
             change_list,
@@ -3010,7 +3010,7 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             owner_id,
             exp_id,
             change_list,
@@ -3149,7 +3149,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             owner_id,
             exp_id,
             change_list,
@@ -3270,7 +3270,7 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.EXP_ID,
             [
@@ -3359,7 +3359,7 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.EXP_ID,
                 [

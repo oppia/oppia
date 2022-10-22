@@ -262,7 +262,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             user_b_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',

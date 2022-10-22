@@ -1162,14 +1162,15 @@ def publish_collection_and_update_user_profiles(
             % collection_id
         )
     contributor_ids = collection_summary.contributor_ids
+    user_settings_models = []
     for contributor in contributor_ids:
-        user_settings = (
+        user_settings_models.extend(
             user_services.update_first_contribution_msec_if_not_set_in_model(
                 contributor,
                 contribution_time_msec
             )
         )
-        user_services.save_user_settings(user_settings)
+    datastore_services.put_multi(user_settings_models)
 
 
 def update_collection(

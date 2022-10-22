@@ -699,7 +699,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.editor_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1304,7 +1304,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.editor_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1378,7 +1378,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             {'filename': 'img.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.editor_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -2149,7 +2149,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2461,7 +2461,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Login and update exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

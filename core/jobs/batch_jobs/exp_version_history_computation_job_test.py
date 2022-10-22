@@ -72,7 +72,7 @@ class ComputeExplorationVersionHistoryJobTests(
     ) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -131,7 +131,7 @@ class ComputeExplorationVersionHistoryJobTests(
     ) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -145,7 +145,7 @@ class ComputeExplorationVersionHistoryJobTests(
         exp_services.revert_exploration(
             self.user_1_id, self.EXP_ID_1, 2, 1
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -217,7 +217,7 @@ class ComputeExplorationVersionHistoryJobTests(
     ) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -302,7 +302,7 @@ class ComputeExplorationVersionHistoryJobTests(
         assert self.user_2_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -368,7 +368,7 @@ class ComputeExplorationVersionHistoryJobTests(
         assert self.user_2_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -439,7 +439,7 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_ignore_changes_in_deprecated_properties(self) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -482,7 +482,7 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_with_invalid_change_list(self) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -574,7 +574,7 @@ class VerifyVersionHistoryModelsJobTests(
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
         self.save_new_valid_exploration('3', self.user_2_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -585,7 +585,7 @@ class VerifyVersionHistoryModelsJobTests(
             ],
             'A commit messages.'
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_2_id,
             self.EXP_ID_2,
             [
@@ -596,7 +596,7 @@ class VerifyVersionHistoryModelsJobTests(
             ],
             'A commit messages.'
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_2_id,
             '3',
             [
@@ -626,7 +626,7 @@ class VerifyVersionHistoryModelsJobTests(
         self.save_new_valid_exploration('3', self.user_2_id)
         self.save_new_valid_exploration('4', self.user_2_id)
         self.save_new_valid_exploration('5', self.user_2_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -637,7 +637,7 @@ class VerifyVersionHistoryModelsJobTests(
             ],
             'A commit messages.'
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_2_id,
             self.EXP_ID_2,
             [
@@ -649,7 +649,7 @@ class VerifyVersionHistoryModelsJobTests(
             ],
             'A commit message.'
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_2_id,
             '3',
             [
@@ -661,7 +661,7 @@ class VerifyVersionHistoryModelsJobTests(
             ],
             'A commit message.'
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             '4',
             [
@@ -672,7 +672,7 @@ class VerifyVersionHistoryModelsJobTests(
             ],
             'A commit messages.'
         )
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_2_id,
             '5',
             [
@@ -776,7 +776,7 @@ class VerifyVersionHistoryModelsJobTests(
     def test_ignore_changes_in_deprecated_properties(self) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [
@@ -840,7 +840,7 @@ class DeleteExplorationVersionHistoryModelsJobTest(
     def test_with_vh_models(self) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_1_id,
             self.EXP_ID_1,
             [

@@ -97,7 +97,7 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -106,14 +106,14 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
             })], 'Changed title to Albert1 title.')
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.albert_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -140,14 +140,14 @@ class ExplorationDisplayableSummariesTest(
             self.user_c_id, self.USER_C_PROFILE_PICTURE)
 
         self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_d_id, self.EXP_ID_4, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration updated title'
             })], 'Changed title once.')
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_d_id, self.EXP_ID_4, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -895,7 +895,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
         # Test that editing an exploration does not change its
         # 'recently-published' status.
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',

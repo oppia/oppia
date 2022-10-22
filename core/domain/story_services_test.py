@@ -1433,7 +1433,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
@@ -1482,7 +1482,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
             end_state_name='End', correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1530,7 +1530,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
             correctness_feedback_enabled=True)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',
@@ -1568,7 +1568,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id_2', self.user_id_a, title='title 2', category='Algebra',
             interaction_id='GraphInput', correctness_feedback_enabled=True)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',

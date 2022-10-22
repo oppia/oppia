@@ -434,7 +434,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -548,7 +548,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'data_format': 'html'
             }),
         ]
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, '0', change_list, 'commit message')
 
         # get_translation_opportunities should no longer return the opportunity
@@ -566,7 +566,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'content_id': 'content',
             'language_code': 'hi'
         })]
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id, '0', translation_needs_update_change_list,
             'commit message')
         translation_opportunities, _, _ = (

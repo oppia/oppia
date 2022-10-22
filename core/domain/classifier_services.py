@@ -231,7 +231,7 @@ def get_job_models_that_handle_trainable_states(
     return models_to_put
 
 
-def handle_non_retrainable_states(
+def get_job_models_that_handle_non_trainable_states(
     exploration: exp_domain.Exploration,
     state_names: List[str],
     exp_versions_diff: exp_domain.ExplorationVersionsDiff

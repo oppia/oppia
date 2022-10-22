@@ -67,7 +67,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 2, 1, self.EXP_ID)
 
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -77,7 +77,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
     def test_try_upgrade_failure_due_to_unsupported_commit_type(self) -> None:
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -89,7 +89,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     def test_try_upgrade_failure_due_to_unimplemented_upgrade_methods(
         self
     ) -> None:
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
             'Ran Exploration Migration job.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -146,7 +146,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
 
             # Create and migrate the exploration.
             self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 self.USER_ID, self.EXP_ID, exp_migration_change_list,
                 'Ran Exploration Migration job.')
 

@@ -103,8 +103,8 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
     def test_creation_of_jobs_and_mappings(self) -> None:
         """Test the handle_trainable_states method and
-        handle_non_retrainable_states method by triggering
-        compute_models_for_updating_exploration() method.
+        get_job_models_that_handle_non_trainable_states method by triggering
+        update_exploration() method.
         """
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
@@ -143,7 +143,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -161,7 +161,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and three mappings in the data store now.
@@ -182,7 +182,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_state_name': 'Home3'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should still be only two jobs and four mappings in the data
@@ -234,7 +234,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -252,7 +252,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', False):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -272,7 +272,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be three jobs and three mappings in the data store now.
@@ -318,8 +318,8 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             classifier_services.get_job_models_that_handle_trainable_states(
                 exploration, state_names)
 
-    def test_handle_non_retrainable_states(self) -> None:
-        """Test the handle_non_retrainable_states method."""
+    def test_get_job_models_that_handle_non_trainable_states(self) -> None:
+        """Test the get_job_models_that_handle_non_trainable_states method."""
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
@@ -336,12 +336,12 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         with self.assertRaisesRegex(
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
-            classifier_services.handle_non_retrainable_states(
+            classifier_services.get_job_models_that_handle_non_trainable_states(
                 exploration, state_names, exp_versions_diff)
 
         exploration.version += 1
         # Test that mapping cant be created if job doesn't exist.
-        classifier_services.handle_non_retrainable_states(
+        classifier_services.get_job_models_that_handle_non_trainable_states(
             exploration, state_names, exp_versions_diff)
         # There will be only one mapping (because of the creation of the
         # exploration).
@@ -364,7 +364,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 2)
 
-        classifier_services.handle_non_retrainable_states(
+        classifier_services.get_job_models_that_handle_non_trainable_states(
             exploration, state_names, exp_versions_diff)
 
         # There should be three mappings (the first mapping because of the
@@ -838,7 +838,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'A new title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
@@ -888,7 +888,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': None
         })]
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration.id, change_list, '')
         state_training_jobs_mapping = (
             classifier_domain.StateTrainingJobsMapping('44', 2, 'New state', {})

@@ -1223,7 +1223,7 @@ def get_updated_version_history_model(
     old_states: Dict[str, state_domain.State],
     old_metadata: exp_domain.ExplorationMetadata
 ) -> exp_models.ExplorationVersionHistoryModel:
-    """Returns an the updated ExplorationVersionHistoryModel for the new version
+    """Returns an updated ExplorationVersionHistoryModel for the new version
     of the exploration (after the commit).
 
     Args:
@@ -1307,8 +1307,9 @@ def _compute_models_to_put(
     commit_message: Optional[str],
     change_list: List[exp_domain.ExplorationChange]
 ) -> List[base_models.BaseModel]:
-    """Validates an exploration and returns a list of updated models related
-    to the exploration model to be put to the datastore.
+    """Returns a list of updated models related to the exploration model to be
+    put to the datastore. The caller should ensure that the Exploration is
+    strictly valid before calling this function.
 
     If successful, increments the version number of the incoming exploration
     domain object by 1.
@@ -1330,12 +1331,6 @@ def _compute_models_to_put(
         list(BaseModel). A list of models to be put to the datastore.
     """
     models_to_put = []
-    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    exploration_is_public = (
-        exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
-    )
-    exploration.validate(strict=exploration_is_public)
-
     exploration_model = exp_models.ExplorationModel.get(exploration.id)
 
     if exploration.version > exploration_model.version:
@@ -1364,6 +1359,7 @@ def _compute_models_to_put(
         if exploration_model.version == 0
         else feconf.COMMIT_TYPE_EDIT
     )
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     models_to_put.extend(
         exploration_model.compute_models_to_commit(
             feconf.MIGRATION_BOT_USERNAME,
@@ -1437,9 +1433,12 @@ def _compute_models_to_put(
                 state_names_without_classifier,
                 state_training_jobs_mapping_models_to_put
             ) = (
-                classifier_services.handle_non_retrainable_states(
+                classifier_services
+                .get_job_models_that_handle_non_trainable_states(
                     exploration, state_names_with_unchanged_answer_groups,
-                    exp_versions_diff))
+                    exp_versions_diff
+                )
+            )
             state_names_to_train_classifier.extend(
                 state_names_without_classifier)
             models_to_put.extend(state_training_jobs_mapping_models_to_put)
@@ -2013,6 +2012,58 @@ def validate_exploration_for_story(
     return validation_error_messages
 
 
+def update_exploration(
+    committer_id: str,
+    exploration_id: str,
+    change_list: Optional[List[exp_domain.ExplorationChange]],
+    commit_message: Optional[str],
+    is_suggestion: bool = False,
+    is_by_voice_artist: bool = False,
+    is_synchronous: bool = False,
+) -> None:
+    """Update an exploration. Commits changes.
+
+    Args:
+        committer_id: str. The id of the user who is performing the update
+            action.
+        exploration_id: str. The id of the exploration to be updated.
+        change_list: list(ExplorationChange) or None. A change list to be
+            applied to the given exploration. If None, it corresponds to an
+            empty list.
+        commit_message: str or None. A description of changes made to the state.
+            For published explorations, this must be present; for unpublished
+            explorations, it should be equal to None. For suggestions that are
+            being accepted, and only for such commits, it should start with
+            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
+        is_suggestion: bool. Whether the update is due to a suggestion being
+            accepted.
+        is_by_voice_artist: bool. Whether the changes are made by a
+            voice artist.
+        is_synchronous: bool. Whether the update should be done
+            synchronously.
+
+    Raises:
+        ValueError. No commit message is supplied and the exploration is public.
+        ValueError. The update is due to a suggestion and the commit message is
+            invalid.
+        ValueError. The update is not due to a suggestion, and the commit
+            message starts with the same prefix as the commit message for
+            accepted suggestions.
+    """
+    models_to_put = compute_models_for_updating_exploration(
+        committer_id=committer_id,
+        exploration_id=exploration_id,
+        change_list=change_list,
+        commit_message=commit_message,
+        is_suggestion=is_suggestion,
+        is_by_voice_artist=is_by_voice_artist,
+        is_synchronous=is_synchronous
+    )
+
+    datastore_services.update_timestamps_multi(models_to_put)
+    datastore_services.put_multi(models_to_put)
+
+
 def compute_models_for_updating_exploration(
     committer_id: str,
     exploration_id: str,
@@ -2021,7 +2072,6 @@ def compute_models_for_updating_exploration(
     is_suggestion: bool = False,
     is_by_voice_artist: bool = False,
     is_synchronous: bool = False,
-    should_put_models: bool = True
 ) -> List[base_models.BaseModel]:
     """Update an exploration. Commits changes.
 
@@ -2043,7 +2093,6 @@ def compute_models_for_updating_exploration(
             voice artist.
         is_synchronous: bool. Whether the update should be done
             synchronously.
-        should_put_models: bool. Whether to put the models in the datastore.
 
     Raises:
         ValueError. No commit message is supplied and the exploration is public.
@@ -2085,6 +2134,13 @@ def compute_models_for_updating_exploration(
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
+    exploration_rights = rights_manager.get_exploration_rights(
+        updated_exploration.id
+    )
+    exploration_is_public = (
+        exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    )
+    updated_exploration.validate(strict=exploration_is_public)
     models_to_put.extend(
         _compute_models_to_put(
             committer_id,
@@ -2164,9 +2220,6 @@ def compute_models_for_updating_exploration(
             taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
             committer_id)
-    if should_put_models:
-        datastore_services.update_timestamps_multi(models_to_put)
-        datastore_services.put_multi(models_to_put)
     return models_to_put
 
 

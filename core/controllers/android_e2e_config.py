@@ -147,7 +147,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         exp_services.load_demo(exp_id)
         rights_manager.release_ownership_of_exploration(
             user_services.get_system_user(), exp_id)
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             user_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'correctness_feedback_enabled',

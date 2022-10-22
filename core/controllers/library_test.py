@@ -95,7 +95,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         # Change title and category.
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.editor_id, '0', [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',

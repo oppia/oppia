@@ -371,7 +371,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, new_exp_id, change_list, '')
 
         params = {
@@ -409,7 +409,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.compute_models_for_updating_exploration(
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, new_exp_id, change_list, '')
 
         params = {

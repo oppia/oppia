@@ -637,7 +637,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(json_response['exploration_version'], 1)
 
         # Update to version 2.
-        exp_services.compute_models_for_updating_exploration(
+        exp_services.update_exploration(
             self.owner_id,
             self.EXP_ID,
             None,
