@@ -63,8 +63,10 @@ describe('Diagnostic test model', () => {
 
     expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
       expectedAncestorTopicIds);
+
     expect(diagnosticTestModelData.getAncestorsTopicIds('topicID4')).toEqual(
       ['topicID3', 'topicID2', 'topicID1']);
+
     expect(diagnosticTestModelData.getAncestorsTopicIds('topicID5')).toEqual(
       ['topicID4', 'topicID3', 'topicID2', 'topicID1']);
   });
@@ -189,8 +191,8 @@ describe('Diagnostic test model', () => {
 
   it(
     'should be able to terminate the test when eligible topic IDs list ' +
-    'is non empty and the number of attempted question is greater than 15',
-    () => {
+    'is non empty and the number of attempted question is greater than or ' +
+    'equal to 15', () => {
       diagnosticTestModelData = new DiagnosticTestModelData(
         topicIdToPrerequisiteTopicIds);
       diagnosticTestModelData._eligibleTopicIds = ['topicID'];

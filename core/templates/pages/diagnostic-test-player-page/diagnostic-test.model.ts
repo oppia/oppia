@@ -16,6 +16,7 @@
  * @fileoverview Diagnostic test model.
  */
 
+import constants from 'assets/constants';
 import cloneDeep from 'lodash/cloneDeep';
 
 
@@ -244,7 +245,8 @@ export class DiagnosticTestModelData {
 
     if (
       this._eligibleTopicIds.length > 0 &&
-        this._totalNumberOfAttemptedQuestions >= 15
+        this._totalNumberOfAttemptedQuestions >=
+        constants.MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST
     ) {
       return true;
     }
