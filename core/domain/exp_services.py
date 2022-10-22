@@ -3729,8 +3729,13 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
 
 
 def fix_commit_commands():
-    snapshot_id = exp_models.ExplorationModel.get_snapshot_id('Q4POXOibJEH6', 3)
-    snapshot_metadata = exp_models.ExplorationSnapshotMetadataModel.get(snapshot_id)
+    """Fixes the commit commands for a problematic exploration with
+    ID Q4POXOibJEH6.
+    """
+    snapshot_id = exp_models.ExplorationModel.get_snapshot_id(
+        'Q4POXOibJEH6', 3)
+    snapshot_metadata = exp_models.ExplorationSnapshotMetadataModel.get(
+        snapshot_id)
     snapshot_metadata.commit_cmds.append(exp_domain.ExplorationChange({
         'cmd': 'add_state',
         'state_name': 'END'
