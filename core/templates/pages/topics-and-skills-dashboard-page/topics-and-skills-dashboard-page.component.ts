@@ -219,9 +219,9 @@ export class TopicsAndSkillsDashboardPageComponent {
   fetchSkills(): void {
     if (this.moreSkillsPresent) {
       let nextCursor = this.nextCursor;
-      if (nextCursor === null) {
-        throw new Error('Next cursor is null');
-      }
+      // if (nextCursor === null) {
+      //   throw new Error('Next cursor is null');
+      // }
       this.topicsAndSkillsDashboardBackendApiService
         .fetchSkillsDashboardDataAsync(
           this.filterObject, this.itemsPerPage, nextCursor).then(
