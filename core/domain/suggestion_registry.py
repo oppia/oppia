@@ -532,7 +532,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         # Before calling this accept method we are already checking if user
         # with 'final_reviewer_id' exists or not.
         assert self.final_reviewer_id is not None
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.final_reviewer_id, self.target_id, change_list,
             commit_message, is_suggestion=True)
 
@@ -756,13 +756,13 @@ class SuggestionTranslateContent(BaseSuggestion):
                 state_domain.WrittenTranslation.is_data_format_list(
                     self.change.data_format)
         ):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.final_reviewer_id, self.target_id, [self.change],
                 commit_message, is_suggestion=True)
             return
 
         self._copy_new_images_to_target_entity_storage()
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.final_reviewer_id, self.target_id, [self.change],
             commit_message, is_suggestion=True)
 

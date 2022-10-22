@@ -1223,8 +1223,8 @@ def get_updated_version_history_model(
     old_states: Dict[str, state_domain.State],
     old_metadata: exp_domain.ExplorationMetadata
 ) -> exp_models.ExplorationVersionHistoryModel:
-    """Creates the updated ExplorationVersionHistoryModel for the new version
-    of the exploration (after the commit) and puts it into the datastore.
+    """Returns an the updated ExplorationVersionHistoryModel for the new version
+    of the exploration (after the commit).
 
     Args:
         exploration: Exploration. The explortion after the latest commit.
@@ -1445,7 +1445,7 @@ def _compute_models_to_put(
             models_to_put.extend(state_training_jobs_mapping_models_to_put)
         if state_names_to_train_classifier:
             models_to_put.extend(
-                classifier_services.handle_trainable_states(
+                classifier_services.get_job_models_that_handle_trainable_states(
                     exploration, state_names_to_train_classifier
                 )
             )
@@ -1541,7 +1541,7 @@ def _create_exploration(
 
         if state_names_to_train:
             datastore_services.put_multi(
-                classifier_services.handle_trainable_states(
+                classifier_services.get_job_models_that_handle_trainable_states(
                     exploration,
                     state_names_to_train
                 )
@@ -1845,15 +1845,14 @@ def publish_exploration_and_update_user_profiles(
     contributor_ids = exp_fetchers.get_exploration_summary_by_id(
         exp_id).contributor_ids
     for contributor in contributor_ids:
-        user_settings_model = (
+        user_settings = (
             user_services.update_first_contribution_msec_if_not_set_in_model(
                 contributor,
                 contribution_time_msec
             )
         )
-        if user_settings_model:
-            user_settings_model.update_timestamps()
-            user_settings_model.put()
+        if user_settings:
+            user_services.save_user_settings(user_settings)
 
 
 def validate_exploration_for_story(
@@ -2014,7 +2013,7 @@ def validate_exploration_for_story(
     return validation_error_messages
 
 
-def update_exploration(
+def compute_models_for_updating_exploration(
     committer_id: str,
     exploration_id: str,
     change_list: Optional[List[exp_domain.ExplorationChange]],
@@ -2117,15 +2116,20 @@ def update_exploration(
                 )
             )
             if not rights_manager.is_exploration_private(exploration_id):
-                updated_user_settings_model = (
+                updated_user_settings = (
                     user_services
                     .update_first_contribution_msec_if_not_set_in_model(
                         committer_id,
                         utils.get_current_time_in_millisecs()
                     )
                 )
-                if updated_user_settings_model:
-                    models_to_put.append(updated_user_settings_model)
+                if updated_user_settings:
+                    user_settings_model = (
+                        user_services.convert_to_user_settings_model(
+                            updated_user_settings
+                        )
+                    )
+                    models_to_put.append(user_settings_model)
 
     if opportunity_services.is_exploration_available_for_contribution(
             exploration_id):
@@ -3156,8 +3160,27 @@ def get_exp_with_draft_applied(
     return updated_exploration
 
 
-def get_user_data_model_with_draft_discarded(exp_id: str, user_id: str) -> None:
+def discard_draft(exp_id: str, user_id: str) -> None:
     """Discard the draft for the given user and exploration.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        user_id: str. The id of the user whose draft is to be discarded.
+    """
+
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id)
+    if exp_user_data:
+        exp_user_data.draft_change_list = None
+        exp_user_data.draft_change_list_last_updated = None
+        exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.update_timestamps()
+        exp_user_data.put()
+
+
+def get_user_data_model_with_draft_discarded(exp_id: str, user_id: str) -> None:
+    """Clears change list related fields in the ExplorationUserDataModel and
+    returns it.
 
     Args:
         exp_id: str. The id of the exploration.

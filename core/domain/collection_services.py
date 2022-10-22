@@ -1163,14 +1163,13 @@ def publish_collection_and_update_user_profiles(
         )
     contributor_ids = collection_summary.contributor_ids
     for contributor in contributor_ids:
-        user_settings_model = (
+        user_settings = (
             user_services.update_first_contribution_msec_if_not_set_in_model(
                 contributor,
                 contribution_time_msec
             )
         )
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
+        user_services.save_user_settings(user_settings)
 
 
 def update_collection(

@@ -2320,7 +2320,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True
         )
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id,
             exp_id,
             change_list,
@@ -2834,7 +2834,7 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True
         )
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id,
             exp_id,
             change_list,
@@ -3010,7 +3010,7 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True
         )
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id,
             exp_id,
             change_list,
@@ -3149,7 +3149,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True
         )
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id,
             exp_id,
             change_list,
@@ -3270,16 +3270,21 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'b'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                'new_state_name': 'a'
-            })
-        ], 'A commit message.')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.EXP_ID,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'b'
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': 'a'
+                })
+            ],
+            'A commit message.'
+        )
 
     def test_raises_error_when_version_history_does_not_exist(self):
         self.login(self.OWNER_EMAIL)
@@ -3354,13 +3359,18 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'New title'
-            })
-        ], 'A commit message.')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.EXP_ID,
+                [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
+            ],
+            'A commit message.'
+        )
 
     def test_raises_error_when_version_history_does_not_exist(self):
         self.login(self.OWNER_EMAIL)

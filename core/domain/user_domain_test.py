@@ -573,7 +573,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.assertIsNone(
-            user_services.create_user_contributions(
+            user_services.compute_user_contributions(
                 feconf.MIGRATION_BOT_USER_ID, [], []))
 
     def test_update_user_contributions(self) -> None:
@@ -593,7 +593,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
             Exception,
             'User contributions model for user %s already exists.'
             % self.owner_id):
-            user_services.create_user_contributions(self.owner_id, [], [])
+            user_services.compute_user_contributions(self.owner_id, [], [])
 
     def test_cannot_update_user_contributions_with_invalid_user_id(
         self

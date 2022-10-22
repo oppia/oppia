@@ -184,7 +184,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         # Update exploration to version 3.
@@ -192,7 +192,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state 2',
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         exploration_latest = exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
@@ -217,7 +217,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         # Update exploration to version 3.
@@ -225,7 +225,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state 2',
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         with self.assertRaisesRegex(
@@ -335,7 +335,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         self.assertIsNone(version_history)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_1_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -693,7 +693,7 @@ title: Old Title
             'from_version': str(exploration_model.states_schema_version),
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.MIGRATION_BOT_USERNAME, exploration_model.id, commit_cmds,
             'Update exploration states from schema version %d to %d.' % (
                 exploration_model.states_schema_version,
@@ -775,7 +775,7 @@ title: Old Title
 
         # Ensure that if a converted, then reverted, then converted exploration
         # is saved, it will be the up-to-date version within the datastore.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, exp_id, [], 'Resave after reversion')
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)

@@ -440,7 +440,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             '0', owner_id, title='title', end_state_name='End State',
             correctness_feedback_enabled=True)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -454,7 +454,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'cmd': 'edit_state_property',
             'property_name': 'content'
             })], 'Update 1')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -468,7 +468,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'cmd': 'edit_state_property',
             'property_name': 'content'
             })], 'Update 2')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -482,7 +482,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'cmd': 'edit_state_property',
             'property_name': 'content'
             })], 'Update 3')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',

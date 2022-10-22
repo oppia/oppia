@@ -489,19 +489,19 @@ class AdminHandler(base.BaseHandler):
             self._reload_exploration('6')
             self._reload_exploration('25')
             self._reload_exploration('13')
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.user_id, '6', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'correctness_feedback_enabled',
                     'new_value': True
                 })], 'Changed correctness_feedback_enabled.')
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.user_id, '25', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'correctness_feedback_enabled',
                     'new_value': True
                 })], 'Changed correctness_feedback_enabled.')
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.user_id, '13', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'correctness_feedback_enabled',
@@ -553,7 +553,7 @@ class AdminHandler(base.BaseHandler):
                         '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                         ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
 
-                exp_services.update_exploration(
+                exp_services.compute_models_for_updating_exploration(
                     self.user_id, exp_id, [exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                         'property_name': 'category',

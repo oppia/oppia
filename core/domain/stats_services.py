@@ -534,7 +534,9 @@ def update_exp_issues_models_for_new_exp_version(
         old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
         exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
         exp_issues.exp_version = exploration.version + 1
-        models_to_put.append(create_exp_issues_model(exp_issues))
+        models_to_put.append(
+            get_exp_issues_model_from_domain_object(exp_issues)
+        )
         return models_to_put
 
     if exp_versions_diff is None:
@@ -652,7 +654,7 @@ def update_exp_issues_models_for_new_exp_version(
                 old_to_new_state_names[state_name])
 
     exp_issues.exp_version += 1
-    models_to_put.append(create_exp_issues_model(exp_issues))
+    models_to_put.append(get_exp_issues_model_from_domain_object(exp_issues))
     return models_to_put
 
 
@@ -855,10 +857,8 @@ def get_playthrough_from_model(
         playthrough_model.issue_customization_args, actions)
 
 
-def create_stats_model(
-    exploration_stats: stats_domain.ExplorationStats
-) -> stats_models.ExplorationStatsModel:
-    """Creates an ExplorationStatsModel given an ExplorationStats
+def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
+    """Creates an ExplorationStatsModel in datastore given an ExplorationStats
     domain object.
 
     Args:
@@ -866,13 +866,13 @@ def create_stats_model(
             statistics.
 
     Returns:
-        ExplorationStatsModel. The ExplorationStatsModel.
+        str. ID of the datastore instance for ExplorationStatsModel.
     """
     new_state_stats_mapping = {
         state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
         for state_name in exploration_stats.state_stats_mapping
     }
-    return stats_models.ExplorationStatsModel.create(
+    instance_id = stats_models.ExplorationStatsModel.create(
         exploration_stats.exp_id,
         exploration_stats.exp_version,
         exploration_stats.num_starts_v1,
@@ -883,6 +883,7 @@ def create_stats_model(
         exploration_stats.num_completions_v2,
         new_state_stats_mapping
     )
+    return instance_id
 
 
 def save_stats_model(
@@ -927,7 +928,7 @@ def save_stats_model(
     exploration_stats_model.put()
 
 
-def create_exp_issues_model(
+def get_exp_issues_model_from_domain_object(
     exp_issues: stats_domain.ExplorationIssues
 ) -> stats_models.ExplorationIssuesModel:
     """Creates a new ExplorationIssuesModel instance.

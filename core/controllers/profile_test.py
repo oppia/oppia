@@ -262,7 +262,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             user_b_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -301,8 +301,13 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Update the first_contribution_msec to the current time in
         # milliseconds.
         first_time_in_msecs = utils.get_current_time_in_millisecs()
-        user_services.update_first_contribution_msec_if_not_set_in_model(
-            user_id, first_time_in_msecs).put()
+        user_settings = (
+            user_services.update_first_contribution_msec_if_not_set_in_model(
+                user_id,
+                first_time_in_msecs
+            )
+        )
+        user_services.save_user_settings(user_settings)
 
         # Test the contribution date correctly changes to current_time_in_msecs.
         response_dict = self.get_json(
@@ -314,8 +319,13 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Test that the contribution date is not changed after the first time it
         # is set.
         second_time_in_msecs = utils.get_current_time_in_millisecs()
-        user_services.update_first_contribution_msec_if_not_set_in_model(
-            user_id, second_time_in_msecs).put()
+        user_settings = (
+            user_services.update_first_contribution_msec_if_not_set_in_model(
+                user_id,
+                second_time_in_msecs
+            )
+        )
+        user_services.save_user_settings(user_settings)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(

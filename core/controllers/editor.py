@@ -211,10 +211,10 @@ class ExplorationHandler(EditorHandler):
 
         try:
             if can_edit and changes_are_mergeable:
-                exp_services.update_exploration(
+                exp_services.compute_models_for_updating_exploration(
                     self.user_id, exploration_id, change_list, commit_message)
             elif can_voiceover and changes_are_mergeable:
-                exp_services.update_exploration(
+                exp_services.compute_models_for_updating_exploration(
                     self.user_id, exploration_id, change_list, commit_message,
                     is_by_voice_artist=True)
         except utils.ValidationError as e:
@@ -762,13 +762,7 @@ class ExplorationRevertHandler(EditorHandler):
                 'Cannot revert to version %s from version %s.' %
                 (revert_to_version, current_version))
 
-        user_data_model = exp_services.get_user_data_model_with_draft_discarded(
-            exploration_id,
-            self.user_id
-        )
-        if user_data_model is not None:
-            user_data_model.update_timestamps()
-            user_data_model.put()
+        exp_services.discard_draft(exploration_id, self.user_id)
         exp_services.revert_exploration(
             self.user_id, exploration_id, current_version, revert_to_version)
         self.render_json({})
@@ -1136,14 +1130,7 @@ class EditorAutosaveHandler(ExplorationHandler):
     @acl_decorators.can_save_exploration
     def post(self, exploration_id):
         """Handles POST request for discarding draft changes."""
-        user_data_model = (
-            exp_services.get_user_data_model_with_draft_discarded(
-                exploration_id,
-                self.user_id
-            )
-        )
-        user_data_model.update_timestamps()
-        user_data_model.put()
+        exp_services.discard_draft(exploration_id, self.user_id)
         self.render_json({})
 
 

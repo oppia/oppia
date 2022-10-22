@@ -110,7 +110,7 @@ def verify_signature(
     return True
 
 
-def handle_trainable_states(
+def get_job_models_that_handle_trainable_states(
     exploration: exp_domain.Exploration,
     state_names: List[str]
 ) -> List[
@@ -130,8 +130,8 @@ def handle_trainable_states(
         Exception. No classifier algorithm found for the given interaction id.
 
     Returns:
-        list(ClassifierTrainingJobModel|StateTrainingJobsMappingModel). List of
-        ClassifierTrainingJobModel and StateTrainingJobsMappingModel instances.
+        list(ClassifierTrainingJobModel|StateTrainingJobsMappingModel). The list
+        of job models corresponding to trainable states in the exploration.
     """
     models_to_put = []
     job_dicts_list: List[JobInfoDict] = []
@@ -176,7 +176,7 @@ def handle_trainable_states(
     job_ids = []
     for job_dict in job_dicts_list:
         instance_id = (
-            classifier_models.ClassifierTrainingJobModel.get_entity_id(
+            classifier_models.ClassifierTrainingJobModel.generate_id(
                 job_dict['exp_id']
             )
         )
@@ -236,7 +236,7 @@ def handle_non_retrainable_states(
     state_names: List[str],
     exp_versions_diff: exp_domain.ExplorationVersionsDiff
 ) -> tuple(List[str], List[classifier_models.StateTrainingJobsMappingModel]):
-    """Creates new StateTrainingJobsMappingModel instances for all the
+    """Returns list of StateTrainingJobsMappingModels for all the
     state names passed into the function. The mapping is created from the
     state in the new version of the exploration to the ClassifierTrainingJob of
     the state in the older version of the exploration. If there's been a change
@@ -259,8 +259,12 @@ def handle_non_retrainable_states(
             number 1.
 
     Returns:
-        list(str). State names which don't have classifier model for previous
-        version of exploration.
+        tuple(list(str), list(StateTrainingJobsMappingModel)). A 2-tuple
+        whose elements are as follows:
+        - list(str). State names which don't have classifier model for previous
+            version of exploration.
+        - list(StateTrainingJobsMappingModel). StateTrainingJobsMappingModels
+            for all the state names passed into the function.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
@@ -301,8 +305,6 @@ def handle_non_retrainable_states(
         state_training_jobs_mapping.validate()
         state_training_jobs_mappings.append(state_training_jobs_mapping)
 
-    classifier_models.StateTrainingJobsMappingModel.create_multi(
-        state_training_jobs_mappings)
     mapping_models = []
     for state_training_job_mapping in state_training_jobs_mappings:
         instance_id = (

@@ -750,18 +750,31 @@ def get_system_user() -> user_domain.UserActionsInfo:
     return get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
 
 
-def _save_user_settings(
-    user_settings: user_domain.UserSettings,
-    should_put_model: bool = True
-) -> user_models.UserSettingsModel:
+def save_user_settings(user_settings: user_domain.UserSettings) -> None:
     """Commits a user settings object to the datastore.
 
     Args:
         user_settings: UserSettings. The user setting domain object to be saved.
-        should_put_model: bool. Whether to put the model in the datastore.
 
     Returns:
         UserSettingsModel. The updated user settings model that was saved.
+    """
+    user_model = convert_to_user_settings_model(user_settings)
+    user_model.update_timestamps()
+    user_model.put()
+
+
+def convert_to_user_settings_model(
+    user_settings: user_domain.UserSettings
+) -> user_models.UserSettingsModel:
+    """Converts a UserSettings domain object to a UserSettingsModel.
+
+    Args:
+        user_settings: UserSettings. The user setting domain object to be
+            converted.
+
+    Returns:
+        UserSettingsModel. The user settings model that was converted.
     """
     user_settings.validate()
 
@@ -776,9 +789,6 @@ def _save_user_settings(
         user_settings_dict['id'] = user_settings.user_id
         user_model = user_models.UserSettingsModel(**user_settings_dict)
 
-    if should_put_model:
-        user_model.update_timestamps()
-        user_model.put()
     return user_model
 
 
@@ -948,8 +958,12 @@ def _create_new_user_transactional(
         user_settings: UserSettings. The user settings domain object
             corresponding to the newly created user.
     """
-    _save_user_settings(user_settings)
-    create_user_contributions(user_settings.user_id, [], []).put()
+    save_user_settings(user_settings)
+    user_contributions = compute_user_contributions(
+        user_settings.user_id, [], []
+    )
+    user_contributions.update_timestamps()
+    user_contributions.put()
     auth_services.associate_auth_id_with_user_id(
         auth_domain.AuthIdUserIdPair(auth_id, user_settings.user_id))
 
@@ -1023,7 +1037,7 @@ def _create_new_profile_transactional(
         user_auth_details: UserAuthDetails. The user auth details domain
             object corresponding to the newly created list of users.
     """
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
     _save_user_auth_details(user_auth_details)
 
 
@@ -1313,7 +1327,7 @@ def set_username(user_id: str, new_username: str) -> None:
             'Sorry, the username \"%s\" is already taken! Please pick '
             'a different one.' % new_username)
     user_settings.username = new_username
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def record_agreement_to_terms(user_id: str) -> None:
@@ -1324,7 +1338,7 @@ def record_agreement_to_terms(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_agreed_to_terms = datetime.datetime.utcnow()
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_profile_picture_data_url(
@@ -1338,7 +1352,7 @@ def update_profile_picture_data_url(
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.profile_picture_data_url = profile_picture_data_url
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_user_bio(user_id: str, user_bio: str) -> None:
@@ -1350,7 +1364,7 @@ def update_user_bio(user_id: str, user_bio: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_user_default_dashboard(
@@ -1364,7 +1378,7 @@ def update_user_default_dashboard(
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.default_dashboard = default_dashboard
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_user_creator_dashboard_display(
@@ -1380,7 +1394,7 @@ def update_user_creator_dashboard_display(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.creator_dashboard_display_pref = (
         creator_dashboard_display_pref)
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_subject_interests(
@@ -1413,12 +1427,12 @@ def update_subject_interests(
 
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.subject_interests = subject_interests
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def _update_first_contribution_msec(
     user_id: str, first_contribution_msec: float
-) -> user_models.UserSettingsModel:
+) -> user_domain.UserSettings:
     """Updates first_contribution_msec of user with given user_id.
 
     Args:
@@ -1432,12 +1446,12 @@ def _update_first_contribution_msec(
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.first_contribution_msec = first_contribution_msec
-    return _save_user_settings(user_settings, should_put_model=False)
+    return user_settings
 
 
 def update_first_contribution_msec_if_not_set_in_model(
     user_id: str, first_contribution_msec: float
-) -> user_models.UserSettingsModel|None:
+) -> user_domain.UserSettings|None:
     """Updates first_contribution_msec of user with given user_id
     if it is set to None.
 
@@ -1468,7 +1482,7 @@ def update_preferred_language_codes(
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_language_codes = preferred_language_codes
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_preferred_site_language_code(
@@ -1484,7 +1498,7 @@ def update_preferred_site_language_code(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_site_language_code = (
         preferred_site_language_code)
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_preferred_audio_language_code(
@@ -1500,7 +1514,7 @@ def update_preferred_audio_language_code(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_audio_language_code = (
         preferred_audio_language_code)
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_preferred_translation_language_code(
@@ -1517,7 +1531,7 @@ def update_preferred_translation_language_code(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_translation_language_code = (
         preferred_translation_language_code)
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def add_user_role(user_id: str, role: str) -> None:
@@ -1541,7 +1555,7 @@ def add_user_role(user_id: str, role: str) -> None:
         user_id, feconf.ROLE_ACTION_ADD, role=role,
         username=user_settings.username)
 
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def remove_user_role(user_id: str, role: str) -> None:
@@ -1566,7 +1580,7 @@ def remove_user_role(user_id: str, role: str) -> None:
         user_id, feconf.ROLE_ACTION_REMOVE, role=role,
         username=user_settings.username)
 
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def mark_user_for_deletion(user_id: str) -> None:
@@ -1577,7 +1591,7 @@ def mark_user_for_deletion(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
     user_auth_details = auth_services.get_user_auth_details_from_model(
         auth_models.UserAuthDetailsModel.get(user_id))
     user_auth_details.deleted = True
@@ -1652,7 +1666,7 @@ def record_user_started_state_editor_tutorial(user_id: str) -> None:
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
         datetime.datetime.utcnow())
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def record_user_started_state_translation_tutorial(user_id: str) -> None:
@@ -1665,7 +1679,7 @@ def record_user_started_state_translation_tutorial(user_id: str) -> None:
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_translation_tutorial = (
         datetime.datetime.utcnow())
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def record_user_logged_in(user_id: str) -> None:
@@ -1678,7 +1692,7 @@ def record_user_logged_in(user_id: str) -> None:
 
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_logged_in = datetime.datetime.utcnow()
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def record_user_edited_an_exploration_in_model(
@@ -1696,7 +1710,7 @@ def record_user_edited_an_exploration_in_model(
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is not None:
         user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
-        return _save_user_settings(user_settings, should_put_model=False)
+        return convert_to_user_settings_model(user_settings)
 
 
 def record_user_created_an_exploration(user_id: str) -> None:
@@ -1709,7 +1723,7 @@ def record_user_created_an_exploration(user_id: str) -> None:
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is not None:
         user_settings.last_created_an_exploration = datetime.datetime.utcnow()
-        _save_user_settings(user_settings)
+        save_user_settings(user_settings)
 
 
 def update_email_preferences(
@@ -1965,12 +1979,12 @@ def get_user_contributions(
     return result
 
 
-def create_user_contributions(
+def compute_user_contributions(
     user_id: str,
     created_exploration_ids: List[str],
     edited_exploration_ids: List[str]
 ) -> user_models.UserContributionsModel:
-    """Creates a new UserContributionsModel and returns the domain object.
+    """Computes new UserContributionsModel and returns it.
     Note: This does not create a contributions model if the user is
     OppiaMigrationBot.
 
@@ -1982,9 +1996,8 @@ def create_user_contributions(
             user has edited.
 
     Returns:
-        UserContributions|None. The domain object representing the newly-created
-        UserContributionsModel. If the user id is for oppia migration bot, None
-        is returned.
+        UserContributionsModel|None. The newly-created UserContributionsModel.
+        If the user id is for oppia migration bot, None is returned.
 
     Raises:
         Exception. The UserContributionsModel for the given user_id already
@@ -2043,7 +2056,11 @@ def add_created_exploration_id(user_id: str, exploration_id: str) -> None:
     user_contributions = get_user_contributions(user_id, strict=False)
 
     if not user_contributions:
-        create_user_contributions(user_id, [exploration_id], []).put()
+        updated_user_contributions = compute_user_contributions(
+            user_id, [exploration_id], []
+        )
+        updated_user_contributions.update_timestamps()
+        updated_user_contributions.put()
     elif exploration_id not in user_contributions.created_exploration_ids:
         user_contributions.created_exploration_ids.append(exploration_id)
         user_contributions.created_exploration_ids.sort()
@@ -2069,7 +2086,7 @@ def add_edited_exploration_id_to_model(
 
     if not user_contributions:
         user_contribution_models.append(
-            create_user_contributions(user_id, [], [exploration_id])
+            compute_user_contributions(user_id, [], [exploration_id])
         )
 
     elif exploration_id not in user_contributions.edited_exploration_ids:
@@ -2640,7 +2657,7 @@ def mark_user_banned(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id)
     user_settings.mark_banned()
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def unmark_user_banned(user_id: str) -> None:
@@ -2658,7 +2675,7 @@ def unmark_user_banned(user_id: str) -> None:
             feconf.ROLE_ID_MOBILE_LEARNER
         ))
 
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def get_dashboard_stats(user_id: str) -> DashboardStatsDict:
@@ -2867,7 +2884,7 @@ def set_user_has_viewed_lesson_info_modal_once(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id)
     user_settings.mark_lesson_info_modal_viewed()
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def clear_learner_checkpoint_progress(

@@ -107,13 +107,12 @@ def get_exploration_opportunity_summary_from_model(
         {})
 
 
-def _update_multi_exploration_opportunity_summary_models(
+def _create_opportunity_summary_models(
     exploration_opportunity_summary_list: List[
         opportunity_domain.ExplorationOpportunitySummary
     ]
 ) -> List[opportunity_models.ExplorationOpportunitySummaryModel]:
-    """Stores multiple ExplorationOpportunitySummary into datastore as a
-    ExplorationOpportunitySummaryModel.
+    """Create ExplorationOpportunitySummaryModels from domain objects.
 
     Args:
         exploration_opportunity_summary_list: list(
@@ -122,7 +121,7 @@ def _update_multi_exploration_opportunity_summary_models(
 
     Returns:
         list(ExplorationOpportunitySummaryModel). A list of
-        ExplorationOpportunitySummaryModel stored in the datastore.
+        ExplorationOpportunitySummaryModel to be stored in the datastore.
     """
     exploration_opportunity_summary_model_list = []
     for opportunity_summary in exploration_opportunity_summary_list:
@@ -145,6 +144,30 @@ def _update_multi_exploration_opportunity_summary_models(
 
         exploration_opportunity_summary_model_list.append(model)
     return exploration_opportunity_summary_model_list
+
+
+def _save_multi_exploration_opportunity_summary(
+    exploration_opportunity_summary_list: List[
+        opportunity_domain.ExplorationOpportunitySummary
+    ]
+) -> None:
+    """Stores multiple ExplorationOpportunitySummary into datastore as a
+    ExplorationOpportunitySummaryModel.
+
+    Args:
+        exploration_opportunity_summary_list: list(
+            ExplorationOpportunitySummary). A list of exploration opportunity
+            summary object.
+    """
+    exploration_opportunity_summary_model_list = (
+        _create_opportunity_summary_models(exploration_opportunity_summary_list)
+    )
+    (
+        opportunity_models.ExplorationOpportunitySummaryModel
+        .update_timestamps_multi(exploration_opportunity_summary_model_list)
+    )
+    opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
+        exploration_opportunity_summary_model_list)
 
 
 def create_exp_opportunity_summary(
@@ -263,16 +286,9 @@ def _create_exploration_opportunities(
         exploration_opportunity_summary_list.append(
             create_exp_opportunity_summary(
                 topic, story, exploration))
-    exploration_opportunity_summary_model_list = (
-        _update_multi_exploration_opportunity_summary_models(
-            exploration_opportunity_summary_list
-        )
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list
     )
-    (
-        opportunity_models.ExplorationOpportunitySummaryModel
-        .update_timestamps_multi(exploration_opportunity_summary_model_list))
-    opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
-        exploration_opportunity_summary_model_list)
 
 
 def update_opportunity_models_with_updated_exploration(
@@ -333,7 +349,7 @@ def update_opportunity_models_with_updated_exploration(
 
     exploration_opportunity_summary.validate()
 
-    return _update_multi_exploration_opportunity_summary_models(
+    return _create_opportunity_summary_models(
         [exploration_opportunity_summary])
 
 
@@ -368,16 +384,9 @@ def update_exploration_opportunities_with_story_changes(
         exploration_opportunity_summary_list.append(
             exploration_opportunity_summary)
 
-    exploration_opportunity_summary_model_list = (
-        _update_multi_exploration_opportunity_summary_models(
-            exploration_opportunity_summary_list
-        )
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list
     )
-    (
-        opportunity_models.ExplorationOpportunitySummaryModel
-        .update_timestamps_multi(exploration_opportunity_summary_model_list))
-    opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
-        exploration_opportunity_summary_model_list)
 
 
 def update_exploration_voiceover_opportunities(
@@ -402,16 +411,9 @@ def update_exploration_voiceover_opportunities(
         .language_codes_with_assigned_voice_artists.append(
             assigned_voice_artist_in_language_code))
     exploration_opportunity_summary.validate()
-    exploration_opportunity_summary_model_list = (
-        _update_multi_exploration_opportunity_summary_models(
-            exploration_opportunity_summary
-        )
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary
     )
-    (
-        opportunity_models.ExplorationOpportunitySummaryModel
-        .update_timestamps_multi(exploration_opportunity_summary_model_list))
-    opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
-        exploration_opportunity_summary_model_list)
 
 
 def delete_exploration_opportunities(exp_ids: List[str]) -> None:
@@ -732,16 +734,9 @@ def update_opportunities_with_new_topic_name(
         exploration_opportunity_summary_list.append(
             exploration_opportunity_summary)
 
-    exploration_opportunity_summary_model_list = (
-        _update_multi_exploration_opportunity_summary_models(
-            exploration_opportunity_summary_list
-        )
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list
     )
-    (
-        opportunity_models.ExplorationOpportunitySummaryModel
-        .update_timestamps_multi(exploration_opportunity_summary_model_list))
-    opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
-        exploration_opportunity_summary_model_list)
 
 
 def get_skill_opportunity_from_model(
@@ -1054,14 +1049,6 @@ def regenerate_opportunities_related_to_topic(
                 create_exp_opportunity_summary(
                     topic, story, exp_ids_to_exp[exp_id]))
 
-    exploration_opportunity_summary_model_list = (
-        _update_multi_exploration_opportunity_summary_models(
-            exploration_opportunity_summary_list
-        )
-    )
-    (
-        opportunity_models.ExplorationOpportunitySummaryModel
-        .update_timestamps_multi(exploration_opportunity_summary_model_list))
-    opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
-        exploration_opportunity_summary_model_list)
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list)
     return len(exploration_opportunity_summary_list)

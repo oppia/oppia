@@ -7515,7 +7515,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'title',
             'new_value': 'First title'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
 
         test_dict: Dict[str, str] = {}
@@ -7568,7 +7568,7 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'old_value': test_dict
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2, 'Changed Interaction.')
 
         # Changing content of second state.
@@ -7596,7 +7596,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Changed content of End state.')
 
@@ -7659,7 +7659,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'content_id': 'content'
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed Content.')
 
         # Changing content of the same state to check that
@@ -7756,7 +7756,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'content'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
@@ -7826,7 +7826,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         # Using the old change_list_3 here because they already covers
         # the changes related to interaction in first state.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_1_ID, change_list_3, 'Changed Interaction')
 
         # Changes related to interaction in the second state
@@ -7972,7 +7972,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
@@ -8112,7 +8112,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'content'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed Contents and Hints')
 
@@ -8276,7 +8276,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         # Using the old change_list_2 here because they already covers
         # the changes related to customization args in first state.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Changed Interactions and Customization_args in One State')
 
@@ -8557,7 +8557,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ],
             'cmd': 'edit_state_property'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed Customization Args and related properties again')
 
@@ -8678,7 +8678,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
@@ -8738,7 +8738,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'content'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
@@ -8984,11 +8984,11 @@ class ExplorationChangesMergeabilityUnitTests(
         # Using the old change_list_2 and change_list_3 here
         # because they already covers the changes related to
         # the answer_groups in the first state.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Added Answer Group and Solution in One state')
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
@@ -9184,7 +9184,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
@@ -9372,7 +9372,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Answer Groups and related properties')
 
@@ -9525,7 +9525,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': True
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
@@ -9587,7 +9587,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'solicit_answer_details',
             'new_value': True
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
@@ -9793,11 +9793,11 @@ class ExplorationChangesMergeabilityUnitTests(
         # Using the old change_list_2 and change_list_3 here
         # because they already covers the changes related to
         # the solutions in the first state.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Added Answer Group and Solution in One state')
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
@@ -10012,7 +10012,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
@@ -10197,7 +10197,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Solutions and affected properties')
 
@@ -10269,7 +10269,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added Hint and Solution in Introduction state')
 
@@ -10451,7 +10451,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Made changes in interaction, contents, solutions, answer_groups in both states') # pylint: disable=line-too-long
 
@@ -10584,7 +10584,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added Hint and Solution in Introduction state')
 
@@ -10672,7 +10672,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ],
             'state_name': 'Introduction'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changes in the hints again.')
 
@@ -10888,7 +10888,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 ]
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Made changes in interaction, contents, solutions, answer_groups in introduction state.') # pylint: disable=line-too-long
 
@@ -10954,7 +10954,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_state_name': 'End'
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Made changes in solutions in introduction state and content, state_name in end state.') # pylint: disable=line-too-long
 
@@ -11095,7 +11095,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ]
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Changes in the Exploration Properties.')
 
@@ -11265,7 +11265,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -11303,7 +11303,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'training_data': []
             }]
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added answer group.')
 
@@ -11333,7 +11333,7 @@ class ExplorationChangesMergeabilityUnitTests(
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added some translations.')
 
@@ -11472,7 +11472,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Customization Args Placeholder in First State.')
         changes_are_mergeable_3 = exp_services.are_changes_mergeable(
@@ -11637,7 +11637,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -11720,7 +11720,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_state_name': 'Intro-Rename'
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added some translations.')
 
@@ -11766,7 +11766,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'content',
             'cmd': 'edit_state_property'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Changing Content in Second State.')
 
@@ -11910,7 +11910,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -11922,7 +11922,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'card_is_checkpoint',
             'new_value': True
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added single unrelated change.')
 
@@ -12004,7 +12004,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added some voiceovers.')
 
@@ -12095,7 +12095,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Content in First State.')
         changes_are_mergeable_3 = exp_services.are_changes_mergeable(
@@ -12120,7 +12120,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Content in Second State.')
 
@@ -12253,7 +12253,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -12332,7 +12332,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added some voiceovers.')
 
@@ -12502,7 +12502,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End'
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed various properties in both states.')
 
@@ -12676,7 +12676,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End'
         })]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added and deleted states.')
 
@@ -12939,7 +12939,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'End'
             })]
 
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, change_list,
                 'Changed various properties in both states.')
 
@@ -13090,7 +13090,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'End'
             })]
 
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, change_list_2,
                 'Added and deleted states.')
             change_list_3 = [exp_domain.ExplorationChange({
@@ -13165,7 +13165,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'property_name': 'content',
                 'cmd': 'edit_state_property'
             })]
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, change_list,
                 'Changed various properties in both states.')
 
@@ -13176,7 +13176,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'old_state_name': 'End'
             })]
 
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, change_list_2,
                 'Changed various properties in both states.')
 

@@ -194,7 +194,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
                 with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
                     with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                        exp_services.update_exploration(
+                        exp_services.compute_models_for_updating_exploration(
                             self.owner_id, 'tes_exp_id', change_list, '')
 
     def test_reverting_an_exploration_maintains_classifier_models(self) -> None:
@@ -249,7 +249,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.update_exploration(
+                    exp_services.compute_models_for_updating_exploration(
                         self.owner_id, self.EXP_0_ID, change_list, '')
 
         exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -273,7 +273,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.update_exploration(
+                    exp_services.compute_models_for_updating_exploration(
                         self.owner_id, self.EXP_0_ID, change_list, '')
 
                     exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -339,7 +339,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exp.has_state_name('Introduction'), True)
         self.assertEqual(exp.has_state_name('Fake state name'), False)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id,
             self.EXP_0_ID,
             _get_change_list(
@@ -1130,7 +1130,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_save_and_retrieve_exploration(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',
@@ -1154,7 +1154,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
 
         # Change param spec.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',
@@ -1165,7 +1165,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             })], '')
 
         # Change title and category.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -1235,7 +1235,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_publish_exploration_and_update_user_profiles(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.editor_id, self.EXP_0_ID,
             [
                 exp_domain.ExplorationChange({
@@ -1246,7 +1246,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             ],
             'changed title'
         )
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.voice_artist_id, self.EXP_0_ID,
             [
                 exp_domain.ExplorationChange({
@@ -1407,7 +1407,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 }
             })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed to CodeRepl')
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         errors = exp_services.validate_exploration_for_story(
@@ -1456,7 +1456,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'state_name': exploration.init_state_name,
                 'new_value': None})
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             change_list, 'Changed to EndExploration')
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -1509,7 +1509,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 }
             })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             change_list, 'Changed to MultipleChoiceInput')
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -1670,7 +1670,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
@@ -1681,8 +1681,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_update_exploration_by_migration_bot_not_updates_contribution_model(
         self
     ) -> None:
-        user_services.create_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, [], [])
+        user_contributions = user_services.compute_user_contributions(
+            feconf.MIGRATION_BOT_USER_ID, [], []
+        )
+        user_contributions.update_timestamps()
+        user_contributions.put()
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
@@ -1691,7 +1694,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
         self.assertIsNone(migration_bot_contributions_model)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
@@ -1710,7 +1713,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
@@ -2696,7 +2699,7 @@ title: A title
         assert init_state.interaction.default_outcome is not None
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2789,7 +2792,7 @@ title: A title
         assert init_state.interaction.default_outcome is not None
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2937,7 +2940,7 @@ title: A title
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('image/abc.png', raw_image)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.version, 2)
@@ -2947,7 +2950,7 @@ title: A title
             'old_state_name': 'New state',
             'new_state_name': 'Renamed state'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.version, 3)
@@ -3129,7 +3132,7 @@ written_translations:
         assert init_state.interaction.default_outcome is not None
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -3231,7 +3234,7 @@ written_translations:
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('abc.png', raw_image)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.version, 2)
@@ -3241,7 +3244,7 @@ written_translations:
             'old_state_name': 'New state',
             'new_state_name': 'Renamed state'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.version, 3)
@@ -3333,7 +3336,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.assertNotIn('new state', exploration.states)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
@@ -3344,7 +3347,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_are_changes_mergeable_send_email(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -3366,13 +3369,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
             })], 'Add state name')
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -3391,7 +3394,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Change state name')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3404,7 +3407,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertNotIn(u'¡Hola! αβγ', exploration.states)
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -3417,7 +3420,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_delete_state_cmd(self) -> None:
         """Test deleting a state name."""
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
@@ -3427,7 +3430,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.assertIn('new state', exploration.states)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_DELETE_STATE,
                 'state_name': 'new state',
@@ -3446,9 +3449,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'myParam': {'obj_type': 'UnicodeString'}
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
 
@@ -3466,7 +3469,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             utils.ValidationError,
             r'The parameter with name \'myParam\' .* does not exist .*'
         ):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id,
                 self.EXP_0_ID,
                 _get_change_list(
@@ -3487,7 +3490,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             re.escape(
                 'The parameter name \'all\' is reserved. Please choose '
                 'a different name for the parameter being set in')):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id,
                 self.EXP_0_ID,
                 _get_change_list(
@@ -3504,14 +3507,14 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'myParam': {'obj_type': 'UnicodeString'}
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid generator ID'
         ):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id,
                 self.EXP_0_ID,
                 _get_change_list(
@@ -3521,7 +3524,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_id(self) -> None:
         """Test updating of interaction_id."""
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id,
             self.EXP_0_ID,
             _get_change_list(
@@ -3551,7 +3554,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Adding a content change just to increase the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
@@ -3574,7 +3577,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id,
             self.EXP_0_ID,
             change_list,
@@ -3586,7 +3589,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_customization_args(self) -> None:
         """Test updating of interaction customization_args."""
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -3627,7 +3630,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Adding a content change just to increase the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
@@ -3650,7 +3653,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3662,7 +3665,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_handlers_fails(self) -> None:
         """Test legacy interaction handler updating."""
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -3691,7 +3694,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             utils.InvalidInputException,
             'Editing interaction handlers is no longer supported'
             ):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
                     self.init_state_name,
@@ -3707,7 +3710,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of interaction_answer_groups."""
         # We create a second state to use as a rule destination.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -3733,7 +3736,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.interaction_default_outcome['dest'] = 'State 2'
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -3840,7 +3843,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             change_list,
             '')
@@ -3865,7 +3868,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             utils.ValidationError,
             'The destination INVALID is not a valid state'
             ):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
                     self.init_state_name,
@@ -3905,7 +3908,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'Value has the wrong type. It should be a NonnegativeInt. '
             'The value is abc'
         ):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
                     self.init_state_name,
@@ -3923,7 +3926,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_content(self) -> None:
         """Test updating of content."""
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
@@ -3956,7 +3959,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'content_html': '<p><strong>Test content</strong></p>',
             'translation_html': '<p>Translated text</p>'
         }))
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3986,7 +3989,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'translation_html': '<p>Translated text</p>',
             'data_format': 'html'
         }))
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3998,7 +4001,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Add a change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -4026,7 +4029,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
         # Applying changed translation to the old_version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID,
             change_list,
             '')
@@ -4084,7 +4087,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'data_format': 'html'
             })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4111,7 +4114,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'content_id': 'content',
             'language_code': 'hi'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, update_change_list, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4143,7 +4146,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'data_format': 'html'
             })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4161,7 +4164,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Add a change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -4187,7 +4190,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, update_change_list_2)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, update_change_list_2,
             '')
 
@@ -4257,7 +4260,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'data_format': 'html'
             })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4283,7 +4286,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'state_name': self.init_state_name,
             'content_id': 'content'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, update_change_list, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4322,7 +4325,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'data_format': 'html'
             })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4340,7 +4343,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Add a change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -4365,7 +4368,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, update_change_list_2)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, update_change_list_2,
             '')
 
@@ -4401,7 +4404,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
@@ -4414,7 +4417,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Adding a content change just to increase the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
@@ -4429,7 +4432,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             '')
 
@@ -4450,7 +4453,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegex(
             Exception, (
                 'Expected solicit_answer_details to be a bool, received ')):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
@@ -4463,7 +4466,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Adding a content change just to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
@@ -4480,7 +4483,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegex(
             Exception, (
                 'Expected solicit_answer_details to be a bool, received ')):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, change_list, '')
 
         # Assert that exploration's final version consist of all the
@@ -4497,7 +4500,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.linked_skill_id, None)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State1',
@@ -4505,7 +4508,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.states['State1'].linked_skill_id, None)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 'State1',
                 exp_domain.STATE_PROPERTY_LINKED_SKILL_ID,
@@ -4518,7 +4521,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Adding a content change just to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
@@ -4533,7 +4536,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
         # Assert that exploration's final version consist of all the
         # changes.
@@ -4549,7 +4552,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.card_is_checkpoint, True)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State1',
@@ -4558,7 +4561,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.states['State1'].card_is_checkpoint, False)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 'State1',
                 exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
@@ -4571,7 +4574,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Check that the property can be changed when working
         # on old version.
         # Adding a content change just to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
@@ -4586,7 +4589,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
         # Assert that exploration's final version consist of all the
         # changes.
@@ -4605,7 +4608,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegex(
             Exception, (
                 'Expected card_is_checkpoint to be a bool, received ')):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
@@ -4616,7 +4619,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.init_state.card_is_checkpoint, True)
 
         # Adding a content change just to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
@@ -4634,7 +4637,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegex(
             Exception, (
                 'Expected card_is_checkpoint to be a bool, received ')):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
@@ -4652,7 +4655,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_content_missing_key(self) -> None:
         """Test that missing keys in content yield an error."""
         with self.assertRaisesRegex(KeyError, 'content_id'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name, 'content', {
                         'html': '<b>Test content</b>',
@@ -4674,7 +4677,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'ca_placeholder_0': {}
             }
         }
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'written_translations',
                 written_translations_dict), 'Added text translations.')
@@ -4697,7 +4700,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'ca_placeholder_0': {}
             }
         }
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'written_translations',
                 written_translations_dict), 'Added text translations.')
@@ -4721,7 +4724,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test update content translation with a list fails."""
         with self.assertRaisesRegex(
             Exception, 'Expected written_translations to be a dict, received '):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name, 'written_translations',
                     [1, 2]), 'Added fake text translations.')
@@ -4746,7 +4749,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'to_version': latest_schema_version
             })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, migration_change_list,
             'Ran Exploration Migration job.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4772,7 +4775,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 latest_schema_version, not_latest_schema_version)
         )
         with self.assertRaisesRegex(Exception, exception_string):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, migration_change_list,
                 'Ran Exploration Migration job.')
 
@@ -4790,7 +4793,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
         """Check published explorations record commit messages."""
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_STICKY,
@@ -4810,26 +4813,26 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
             'Exploration is public so expected a commit message but received '
             'none.'
             ):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False), '')
 
     def test_unpublished_explorations_can_accept_commit_message(self) -> None:
         """Test unpublished explorations can accept optional commit messages."""
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False
             ), 'A message')
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_STICKY, True
             ), '')
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_STICKY, True
@@ -4850,7 +4853,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         timestamp_after_first_edit = utils.get_current_time_in_millisecs()
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -4916,7 +4919,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'new_value': 'First title'
         })]
         change_list_dict = [change.to_dict() for change in change_list]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
@@ -4951,7 +4954,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             exp_services, 'apply_change_list', value=v1_exploration)
         with change_list_swap, self.assertRaisesRegex(
             Exception, 'version 1, which is too old'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 second_committer_id, self.EXP_0_ID, None, 'commit_message')
 
         # Another person modifies the exploration.
@@ -4962,7 +4965,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         })]
         new_change_list_dict = [change.to_dict() for change in new_change_list]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             second_committer_id, self.EXP_0_ID, new_change_list,
             'Second commit.')
 
@@ -5008,7 +5011,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'property_name': 'title',
             'new_value': 'First title'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
         commit_dict_2 = {
             'committer_id': self.owner_id,
@@ -5043,7 +5046,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'rows': {'value': 1}
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             'second_committer_id', exploration.id, change_list,
             'Added new state')
 
@@ -5073,7 +5076,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'cmd': exp_domain.CMD_DELETE_STATE,
             'state_name': 'New state'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             'committer_id_3', exploration.id, change_list,
             'Deleted state: New state')
 
@@ -5108,7 +5111,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'property_name': 'title',
             'new_value': 'V2 title'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
 
         # In version 3, a new state is added.
@@ -5136,7 +5139,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'rows': {'value': 1}
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             'committer_id_v3', exploration.id, change_list, 'Added new state')
 
         # It is not possible to revert from anything other than the most
@@ -5177,7 +5180,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, self.owner_id)
 
         # Upgrade to version 2.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -5211,7 +5214,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'rows': {'value': 1}
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             'second_committer_id', exploration.id, change_list,
             'Added new state and interaction')
 
@@ -5220,7 +5223,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'cmd': exp_domain.CMD_DELETE_STATE,
             'state_name': 'New state'
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             'committer_id_3', exploration.id, change_list,
             'Deleted state: New state')
 
@@ -5273,7 +5276,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self
     ) -> None:
         self.save_new_valid_exploration('0', self.owner_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5287,7 +5290,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 1')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5301,7 +5304,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 2')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5315,7 +5318,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 3')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5345,7 +5348,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self
     ) -> None:
         self.save_new_valid_exploration('0', self.owner_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5359,7 +5362,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 1')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5373,7 +5376,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 2')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5387,7 +5390,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 3')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5421,7 +5424,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self
     ) -> None:
         self.save_new_valid_exploration('0', self.owner_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5435,7 +5438,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 1')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
                 self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5449,7 +5452,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 2')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5463,7 +5466,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 3')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5493,7 +5496,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self
     ) -> None:
         self.save_new_valid_exploration('0', self.owner_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5507,7 +5510,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 1')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5521,7 +5524,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 2')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5535,7 +5538,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 3')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5568,7 +5571,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
     def test_does_not_revert_exp_when_no_models_are_missing(self) -> None:
         self.save_new_valid_exploration('0', self.owner_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5582,7 +5585,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 1')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5596,7 +5599,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 2')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5610,7 +5613,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
             })], 'Update 3')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
@@ -5755,7 +5758,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })]
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.bob_id, self.EXP_ID_1, change_list, 'Changed title.')
 
             self.save_new_valid_exploration(
@@ -5766,7 +5769,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
             })]
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.albert_id, self.EXP_ID_1,
                 change_list, 'Changed title to Albert1 title.')
 
@@ -5775,7 +5778,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
             })]
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.albert_id, self.EXP_ID_2,
                 change_list, 'Changed title to Albert2.')
 
@@ -5944,7 +5947,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             self.assertEqual(add_docs_counter.times_called, 2)
 
             actual_docs = []
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.owner_id, exp_id, [
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -6093,7 +6096,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Have Albert create a new exploration.
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         # Have Albert update that exploration.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6132,7 +6135,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(self.EXP_ID_1, {self.albert_id: 1})
 
         # Have Bob update that exploration. Version 2.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6142,7 +6145,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 1})
         # Have Bob update that exploration. Version 3.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6153,7 +6156,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 2})
 
         # Have Albert update that exploration. Version 4.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6182,7 +6185,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
     ) -> None:
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.bob_id,
             self.EXP_ID_1,
             [
@@ -6302,7 +6305,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6311,14 +6314,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
             })], 'Changed title to Albert1 title.')
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6667,7 +6670,7 @@ title: Old Title
             utils.ValidationError,
             'Voice artist does not have permission to make some '
             'changes in the change list.'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 user_id, exp_id, change_list, 'By voice artist',
                 False, True)
 
@@ -6677,7 +6680,7 @@ title: Old Title
         exp_id = 'exp_id'
         user_id = 'user_id'
         self.save_new_default_exploration(exp_id, user_id)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             user_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'correctness_feedback_enabled',
@@ -6717,7 +6720,7 @@ title: Old Title
             })]
         opportunity_services.add_new_exploration_opportunities(
             story_id, [exp_id])
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             user_id, exp_id, change_list_exp, 'story linked')
         updated_exp = exp_fetchers.get_exploration_by_id(exp_id)
         self.assertEqual(updated_exp.title, 'new title')
@@ -6733,7 +6736,7 @@ title: Old Title
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             'user_id', 'exp_id', [], 'empty commit')
 
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
@@ -6756,7 +6759,7 @@ title: Old Title
             Exception,
             'Unexpected error: trying to update version 0 of exploration '
             'from version 1. Please reload the page and try again.'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
@@ -6773,7 +6776,7 @@ title: Old Title
 
         with self.assertRaisesRegex(
             Exception, 'Invalid commit message for suggestion.'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
@@ -6789,7 +6792,7 @@ title: Old Title
         with self.assertRaisesRegex(
             Exception,
             'Commit messages for non-suggestions may not start with'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
@@ -6799,7 +6802,7 @@ title: Old Title
     def test_update_title(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'en')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6811,7 +6814,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'language_code',
@@ -6826,7 +6829,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list, 'Changed title.')
 
         # Assert that final version consists all the changes.
@@ -6837,7 +6840,7 @@ title: Old Title
     def test_update_language_code(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'en')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'language_code',
@@ -6850,7 +6853,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6865,7 +6868,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed language code again.')
 
@@ -6877,7 +6880,7 @@ title: Old Title
     def test_update_exploration_tags(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.tags, [])
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'tags',
@@ -6890,7 +6893,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6905,7 +6908,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed tags.')
 
@@ -6917,7 +6920,7 @@ title: Old Title
     def test_update_exploration_author_notes(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.author_notes, '')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'author_notes',
@@ -6930,7 +6933,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6945,7 +6948,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed author_notes.')
 
@@ -6957,7 +6960,7 @@ title: Old Title
     def test_update_exploration_blurb(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.blurb, '')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'blurb',
@@ -6970,7 +6973,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -6985,7 +6988,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed blurb.')
 
@@ -7005,7 +7008,7 @@ title: Old Title
                 'myParam': {'obj_type': 'UnicodeString'}
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list, '')
 
         param_changes: List[param_domain.ParamChangeDict] = [{
@@ -7016,7 +7019,7 @@ title: Old Title
             'generator_id': 'RandomSelector'
         }]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_changes',
@@ -7032,7 +7035,7 @@ title: Old Title
     def test_update_exploration_init_state_name(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State'
@@ -7041,7 +7044,7 @@ title: Old Title
         self.assertEqual(
             exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -7068,7 +7071,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7093,7 +7096,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 3, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed init_state_name and checkpoints again.')
 
@@ -7106,7 +7109,7 @@ title: Old Title
     def test_update_exploration_auto_tts_enabled(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.auto_tts_enabled, False)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'auto_tts_enabled',
@@ -7119,7 +7122,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7134,7 +7137,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed auto_tts_enabled again.')
 
@@ -7146,7 +7149,7 @@ title: Old Title
     def test_update_exploration_correctness_feedback_enabled(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.correctness_feedback_enabled, False)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'correctness_feedback_enabled',
@@ -7159,7 +7162,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7174,7 +7177,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed correctness_feedback_enabled.')
 
@@ -7189,7 +7192,7 @@ title: Old Title
             exploration.init_state.interaction.confirmed_unclassified_answers,
             [])
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
@@ -7205,7 +7208,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7221,7 +7224,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed confirmed_unclassified_answers.')
 
@@ -7250,7 +7253,7 @@ title: Old Title
             }
         }]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
@@ -7268,7 +7271,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7314,7 +7317,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list, 'Changed hints.')
 
         # Assert that final version consists all the changes.
@@ -7355,7 +7358,7 @@ title: Old Title
                 'state_name': exploration.init_state_name,
                 'new_value': hint_dict
             })
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.albert_id, self.NEW_EXP_ID, [hints_update],
                 'Changed hints.'
             )
@@ -7363,7 +7366,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7394,7 +7397,7 @@ title: Old Title
         self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list.*'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed hints.')
 
@@ -7405,7 +7408,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7436,7 +7439,7 @@ title: Old Title
         self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list.*'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed hints.')
 
@@ -7470,7 +7473,7 @@ title: Old Title
             }
         }]
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
@@ -7478,7 +7481,7 @@ title: Old Title
                 'new_value': hint_list
             })], 'Changed hints.')
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
@@ -7493,7 +7496,7 @@ title: Old Title
             exploration.init_state.interaction.solution.to_dict(),
             solution)
         solution = None
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
@@ -7508,7 +7511,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7533,7 +7536,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 4, change_list)
         self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
             'Changed interaction_solutions.')
 
@@ -7551,7 +7554,7 @@ title: Old Title
 
         with self.assertRaisesRegex(
             Exception, 'Expected recorded_voiceovers to be a dict'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
@@ -7563,7 +7566,7 @@ title: Old Title
         # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -7582,7 +7585,7 @@ title: Old Title
         self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegex(
             Exception, 'Expected recorded_voiceovers to be a dict'):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed recorded_voiceovers.')
 
@@ -7612,7 +7615,7 @@ title: Old Title
             self.EXP_0_ID, self.albert_id,
             end_state_name='EndState')
         exploration_model = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.albert_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
@@ -7681,7 +7684,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                 'myParam': {'obj_type': 'UnicodeString'}
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.USER_ID, self.EXP_ID1, change_list, '')
         self.save_new_valid_exploration(self.EXP_ID2, self.USER_ID)
         self.save_new_valid_exploration(self.EXP_ID3, self.USER_ID)
@@ -7718,7 +7721,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID3).put()
 
     def test_draft_cleared_after_change_list_applied(self) -> None:
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.USER_ID, self.EXP_ID1, self.draft_change_list, '')
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
@@ -7993,7 +7996,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
                 'myParam': {'obj_type': 'UnicodeString'}
             }
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.USER_ID, self.EXP_ID1, change_list, '')
 
         migration_change_list = [exp_domain.ExplorationChange({
@@ -8001,7 +8004,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             'from_version': 51,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.USER_ID, self.EXP_ID1,
             migration_change_list, 'Migrate state schema.')
 
@@ -8134,7 +8137,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             old_model.state_version_history.get('New state'), None)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'New state'
@@ -8149,7 +8152,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                 None, None, self.owner_id).to_dict())
 
     def test_version_history_on_delete_state(self) -> None:
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'New state'
@@ -8162,7 +8165,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             state_domain.StateVersionHistory(
                 None, None, self.owner_id).to_dict())
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_DELETE_STATE,
                 'state_name': 'New state',
@@ -8186,7 +8189,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             old_model.state_version_history.get(new_state_name), None)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -8215,7 +8218,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             old_model.state_version_history.get(
                 feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
@@ -8245,7 +8248,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             state_domain.StateVersionHistory(
                 None, None, self.owner_id).to_dict())
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -8290,7 +8293,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             old_model.state_version_history.get(
                 feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -8344,7 +8347,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'new_value': recorded_voiceovers_dict
         })]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Translation commits')
 
         new_model = self.version_history_model_class.get(
@@ -8362,7 +8365,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             old_model.metadata_last_edited_committer_id, self.owner_id)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
               'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
               'property_name': 'title',
@@ -8385,7 +8388,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             old_model.metadata_last_edited_committer_id, self.owner_id)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -8409,12 +8412,12 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
               'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
               'property_name': 'title',
               'new_value': 'New title'})], 'Changed title')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
@@ -8452,7 +8455,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
               'state_name': 'New state'
           })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added and deleted state')
         new_model = self.version_history_model_class.get(
@@ -8471,7 +8474,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
               'state_name': 'second'
           })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_from_v1_to_v2,
             'Added two new states')
         old_model = self.version_history_model_class.get(
@@ -8502,7 +8505,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                 'new_state_name': 'second'
             })
         ]
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, change_list_from_v2_to_v3,
             'Added two new states')
         new_model = self.version_history_model_class.get(
@@ -8523,12 +8526,12 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         self.assertNotIn(self.editor_id, old_model.committer_ids)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.editor_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'New state'
             })], 'Added a state')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'Another state'
@@ -8742,7 +8745,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # Second checkpoint reached.
@@ -8770,7 +8773,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             False)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # First checkpoint reached again.
@@ -8798,7 +8801,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 4.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -8855,7 +8858,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 2.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -9171,7 +9174,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # New second checkpoint reached as logged out user.
@@ -9215,7 +9218,7 @@ title: Title
             'Third state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # Unmark 'Next state' as a checkpoint.
@@ -9224,7 +9227,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             False)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # New third checkpoint reached as logged out user.

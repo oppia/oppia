@@ -111,7 +111,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_entity_id(cls, exp_id: str) -> str:
+    def generate_id(cls, exp_id: str) -> str:
         """Generates a unique id for the training job of the form
         '[exp_id].[random hash of 16 chars]'.
 

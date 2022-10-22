@@ -1917,7 +1917,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         created_exp_ids = ['exp1', 'exp2', 'exp3']
         edited_exp_ids = ['exp2', 'exp3', 'exp4']
 
-        user_contrib = user_services.create_user_contributions(
+        user_contrib = user_services.compute_user_contributions(
             user_id,
             created_exp_ids,
             edited_exp_ids)
@@ -1944,12 +1944,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'User contributions model for user %s already exists.'
             % user_id
         ):
-            user_services.create_user_contributions(
+            user_services.compute_user_contributions(
                 user_id,
                 ['expectedId1', 'expectedId2', 'expectedId3'],
                 ['expectedId2', 'expectedId3', 'expectedId4'])
 
-    def test_create_user_contributions(self) -> None:
+    def test_compute_user_contributions(self) -> None:
         auth_id = 'someUser'
         user_email = 'user@example.com'
         created_exp_ids = ['exp1', 'exp2', 'exp3']
@@ -2435,7 +2435,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # Second checkpoint reached.
@@ -2478,7 +2478,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             False)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # First checkpoint reached again.
@@ -2505,7 +2505,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 4.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -2561,7 +2561,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 2.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -2644,7 +2644,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
@@ -2682,7 +2682,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that commit to unpublished exploration does not update
         # contribution time.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.admin_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
@@ -2709,7 +2709,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -3222,7 +3222,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3233,7 +3233,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(editor_settings.last_edited_an_exploration)
 
     def test_last_exp_edit_time_gets_updated(self) -> None:
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3250,9 +3250,13 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
             user_settings.last_edited_an_exploration -
             datetime.timedelta(hours=13))
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-            user_services.record_user_edited_an_exploration_in_model(
-                self.editor_id
+            user_settings_model = (
+                user_services.record_user_edited_an_exploration_in_model(
+                    self.editor_id
+                )
             )
+            user_settings_model.update_timestamps()
+            user_settings_model.put()
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         previous_last_edited_an_exploration = (
@@ -3260,7 +3264,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(previous_last_edited_an_exploration)
 
         # The editor edits the exploration 13 hours after it was created.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',

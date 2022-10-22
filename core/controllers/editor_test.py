@@ -537,7 +537,7 @@ written_translations:
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id, exp_id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -682,7 +682,7 @@ written_translations:
                 'The title for ZIP download handler test!.yaml').read())
 
         # Check download to JSON.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id, exp_id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -873,7 +873,7 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(response['snapshots'], snapshots)
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id, exp_id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -928,7 +928,7 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(response, exp_stats.to_frontend_dict())
 
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             owner_id, exp_id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -1214,7 +1214,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
 
         # In version 2, change the objective and the initial state content.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',

@@ -425,7 +425,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'get_stats_for_new_exp_version',
             stats_for_new_exp_version_log):
-            exp_services.update_exploration(
+            exp_services.compute_models_for_updating_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
 
         # Now, the stats creation for new explorations method will be called
@@ -508,7 +508,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         stats_services.save_stats_model(exploration_stats)
 
         # Update exploration to next version 2 and its stats.
-        exp_services.update_exploration(
+        exp_services.compute_models_for_updating_exploration(
             'committer_id_v2', exploration.id, [], 'Updated')
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exp_id, 2)
@@ -1049,45 +1049,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 }
             })
 
-    def test_create_stats_model(self) -> None:
-        """Test the create_stats_model method."""
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version)
-        # Ruling out the possibility of None for mypy type checking.
-        assert exploration_stats is not None
-        exploration_stats.exp_version += 1
-        exploration_stats_model = stats_services.create_stats_model(
-            exploration_stats
-        )
-        # Check that the version is not updated yet.
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version + 1)
-        self.assertIsNone(exploration_stats)
-        # Put the stats model with updated version.
-        exploration_stats_model.update_timestamps()
-        exploration_stats_model.put()
-        # Check that the version is updated.
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version + 1)
-        assert exploration_stats is not None
-        self.assertEqual(exploration_stats.exp_version, self.exp_version + 1)
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version + 1)
-        # Ruling out the possibility of None for mypy type checking.
-        assert exploration_stats is not None
-        self.assertEqual(exploration_stats.exp_id, 'exp_id1')
-        self.assertEqual(exploration_stats.exp_version, 2)
-        self.assertEqual(exploration_stats.num_starts_v1, 0)
-        self.assertEqual(exploration_stats.num_starts_v2, 0)
-        self.assertEqual(exploration_stats.num_actual_starts_v1, 0)
-        self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
-        self.assertEqual(exploration_stats.num_completions_v1, 0)
-        self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {
-            'End': stats_domain.StateStats.create_default(),
-            'Introduction': stats_domain.StateStats.create_default()
-        })
-
     def test_save_stats_model(self) -> None:
         """Test the save_stats_model method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -1418,7 +1379,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         exp_issues = stats_domain.ExplorationIssues(
             self.exp.id, stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
 
-        stats_services.create_exp_issues_model(exp_issues)
+        stats_services.get_exp_issues_model_from_domain_object(exp_issues)
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             self.exp.id, self.exp.version)
@@ -1481,10 +1442,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'B'})
-        ], 'change')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'B'})
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1499,13 +1465,18 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1546,10 +1517,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_eq_playthrough('B')], 'B')
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'B'})
-        ], 'change')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'B'})
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1563,13 +1539,18 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_eq_playthrough('A')], 'A')
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1600,10 +1581,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('B', 2)], 'B', 2)
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'B'}),
-        ], 'Delete B')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'B'}),
+            ],
+            'Delete B'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1617,13 +1603,18 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('A', 2)], 'A', 2)
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1663,10 +1654,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('B', 3)], 'B', 3),
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'B'}),
-        ], 'commit')
+        exp_services.compute_models_for_updating_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'B'}),
+            ],
+            'commit'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1729,88 +1725,94 @@ class AnswerEventTests(test_utils.GenericTestBase):
         first_state_name = exp.init_state_name
         second_state_name = 'State 2'
         third_state_name = 'State 3'
-        exp_services.update_exploration('fake@user.com', 'eid', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': first_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput',
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': first_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                'new_value': {
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': 'Enter here'
-                        }
-                    },
-                    'rows': {'value': 1}
-                }
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': first_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                'new_value': 1
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': second_state_name,
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': third_state_name,
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': second_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput',
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': second_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                'new_value': {
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': 'Enter here'
-                        }
-                    },
-                    'rows': {'value': 1}
-                }
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': second_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                'new_value': 1
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': third_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'Continue',
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': third_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                'new_value': {
-                    'buttonText': {
-                        'value': {
-                            'content_id': 'ca_buttonText_1',
-                            'unicode_str': 'Continue'
-                        }
-                    },
-                }
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': third_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                'new_value': 2
-            })], 'Add new state')
+        exp_services.compute_models_for_updating_exploration(
+            'fake@user.com',
+            'eid',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': 'Enter here'
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'new_value': 1
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': second_state_name,
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': third_state_name,
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': 'Enter here'
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'new_value': 1
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': third_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'Continue',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': third_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'ca_buttonText_1',
+                                'unicode_str': 'Continue'
+                            }
+                        },
+                    }
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': third_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'new_value': 2
+                })
+            ],
+            'Add new state'
+        )
         exp = exp_fetchers.get_exploration_by_id('eid')
 
         exp_version = exp.version
