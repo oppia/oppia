@@ -38,6 +38,7 @@ export class AccessValidationBackendApiService {
 
   DOES_LEARNER_GROUP_EXIST = (
     '/access_validation_handler/does_learner_group_exist/<learner_group_id>');
+
   BLOG_HOME_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_blog_home_page');
 
