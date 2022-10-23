@@ -23,8 +23,7 @@ import os
 
 from core.tests import test_utils
 
-from typing import Pattern, Tuple
-from typing_extensions import Final
+from typing import Final, Pattern, Tuple
 
 from . import general_purpose_linter
 from . import pre_commit_linter

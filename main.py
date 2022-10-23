@@ -40,6 +40,7 @@ from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
 from core.controllers import cron
 from core.controllers import custom_landing_pages
+from core.controllers import diagnostic_test_player
 from core.controllers import editor
 from core.controllers import email_dashboard
 from core.controllers import features
@@ -205,6 +206,16 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_blog_home_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogHomePageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_blog_post_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogPostPageAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
 
@@ -358,6 +369,10 @@ URLS = [
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
+        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+        diagnostic_test_player.DiagnosticTestPlayerPage
+    ),
+    get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
         classroom.ClassroomAdminPage),
     get_redirect_route(
@@ -467,12 +482,12 @@ URLS = [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'%s/<author_username>' %
-        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
-        blog_homepage.AuthorsPageHandler),
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogPostDataHandler),
     get_redirect_route(
-        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
-        blog_homepage.BlogPostHandler),
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+        blog_homepage.AuthorsPageHandler),
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
@@ -1062,6 +1077,10 @@ URLS.extend((
     get_redirect_route(
         r'/learn/<classroom_url_fragment>',
         oppia_root.OppiaLightweightRootPage
+    ),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        oppia_root.OppiaRootPage
     ),
 ))
 

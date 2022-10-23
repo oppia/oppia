@@ -2140,7 +2140,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             dict. A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
-        if interaction_id is None:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        interaction_id_is_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_valid or interaction_id is None:
             return {}
 
         ca_specs_dict = (
@@ -5191,19 +5195,11 @@ class State(translation_domain.BaseTranslatableObject):
                 Hint.convert_html_in_hint(hint, conversion_fn))
 
         interaction_id = state_dict['interaction']['id']
-        if interaction_id is None:
-            return state_dict
-
-        # TODO(#11950): Drop the following 'if' clause once all snapshots have
-        # been migrated. This is currently causing issues in migrating old
-        # snapshots to schema v34 because MathExpressionInput was still around
-        # at the time. It is conceptually OK to ignore customization args here
-        # because the MathExpressionInput has no customization arg fields.
-        if interaction_id == 'MathExpressionInput':
-            if state_dict['interaction']['solution'] is not None:
-                state_dict['interaction']['solution']['explanation']['html'] = (
-                    conversion_fn(state_dict['interaction']['solution'][
-                        'explanation']['html']))
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        interaction_id_is_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_valid or interaction_id is None:
             return state_dict
 
         if state_dict['interaction']['solution'] is not None:

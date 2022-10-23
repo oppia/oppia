@@ -19,6 +19,7 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import blog_services
 from core.domain import classroom_services
 from core.domain import user_services
 
@@ -118,3 +119,57 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
     def get(self) -> None:
         """Handles GET requests."""
         pass
+
+
+class BlogHomePageAccessValidationHandler(base.BaseHandler):
+    """Validates access to blog home page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self) -> None:
+        """Validates access to blog home page."""
+        pass
+
+
+class BlogPostPageAccessValidationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BlogPostPageAccessValidationHandler's
+    normalized_request dictionary.
+    """
+
+    blog_post_url_fragment: str
+
+
+class BlogPostPageAccessValidationHandler(base.BaseHandler):
+    """Validates whether request made to correct blog post route."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'blog_post_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self) -> None:
+        request_data = cast(
+            BlogPostPageAccessValidationHandlerNormalizedRequestDict,
+            self.normalized_request
+        )
+        blog_post_url_fragment = request_data['blog_post_url_fragment']
+        blog_post = blog_services.get_blog_post_by_url_fragment(
+            blog_post_url_fragment)
+
+        if not blog_post:
+            raise self.PageNotFoundException
