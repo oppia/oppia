@@ -253,7 +253,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action is save_config_properties.'
         )
 
-    def test_config_id_cannot_be_None_when_action_is_revert_config_property(
+    def test_config_id_cannot_be_none_when_action_is_revert_config_property(
         self
     ) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
