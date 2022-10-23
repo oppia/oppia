@@ -28,8 +28,7 @@ from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Set, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Set, Union
 
 MYPY = False
 if MYPY: # pragma: no cover

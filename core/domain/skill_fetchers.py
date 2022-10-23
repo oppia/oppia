@@ -25,8 +25,7 @@ from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models
 
-from typing import List, Optional, overload
-from typing_extensions import Literal
+from typing import List, Literal, Optional, overload
 
 MYPY = False
 if MYPY: # pragma: no cover

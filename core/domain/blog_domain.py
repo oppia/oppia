@@ -25,8 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, Optional
-from typing_extensions import TypedDict
+from typing import List, Optional, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 
