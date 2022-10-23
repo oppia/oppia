@@ -24,8 +24,7 @@ import subprocess
 from core.tests import test_utils
 from scripts import scripts_test_utils
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 from . import css_linter
 
