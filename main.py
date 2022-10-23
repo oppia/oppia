@@ -40,6 +40,7 @@ from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
 from core.controllers import cron
 from core.controllers import custom_landing_pages
+from core.controllers import diagnostic_test_player
 from core.controllers import editor
 from core.controllers import email_dashboard
 from core.controllers import features
@@ -375,6 +376,10 @@ URLS = [
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+        diagnostic_test_player.DiagnosticTestPlayerPage
+    ),
     get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
         classroom.ClassroomAdminPage),
