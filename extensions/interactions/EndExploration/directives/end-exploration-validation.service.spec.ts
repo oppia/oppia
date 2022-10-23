@@ -88,8 +88,6 @@ describe('EndExplorationValidationService', () => {
       [],
       null
     )];
-
-    errorMessageElement = document.createElement('span');
   });
 
   it('should not have warnings for no answer groups or no default outcome',
