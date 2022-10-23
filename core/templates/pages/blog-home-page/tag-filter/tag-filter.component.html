@@ -1,0 +1,27 @@
+<div class="oppia-same-row-container tag-filter w-100">
+  <mat-form-field appearance="fill"
+                  class="w-100"
+                  [ngClass]="{'pb-5': !isSmallScreenViewActive}">
+    <mat-label>{{ 'I18N_BLOG_HOME_PAGE_TAG_FILTER_HOLDER_TEXT' | translate }}</mat-label>
+    <mat-chip-list #chipList aria-label="Tags Filter">
+      <mat-chip *ngFor="let tag of selectedTags"
+                (removed)="deselectTag(tag)">
+                {{ tag }}
+        <button matChipRemove>
+          <mat-icon class="pl-2">cancel</mat-icon>
+        </button>
+      </mat-chip>
+      <input placeholder="New tag ..."
+             #tagFilterInput
+             #trigger="matAutocompleteTrigger"
+             [formControl]="tagFilter"
+             [matAutocomplete]="auto"
+             [matChipInputFor]="chipList">
+    </mat-chip-list>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)">
+      <mat-option *ngFor="let tag of filteredTags | async" [value]="tag" (click)="$event.stopPropagation(); trigger.openPanel()">
+        {{ tag }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
