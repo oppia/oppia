@@ -20,7 +20,7 @@
 import { AppConstants } from 'app.constants';
 export interface BlogPostBackendDict {
   'id': string ;
-  'author_username': string;
+  'author_name': string;
   'title': string;
   'content': string;
   'thumbnail_filename': string | null;
@@ -30,8 +30,12 @@ export interface BlogPostBackendDict {
   'published_on'?: string;
 }
 export class BlogPostData {
-  _id: string;
-  _authorUsername: string;
+  // TODO(#13637): Remove the use of interstitial blog post
+  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
+  // blog post that is displayed in the editor until the actual
+  // is fetched from the backend.
+  _id: string | null;
+  _authorName: string;
   _title: string;
   _content: string;
   _tags: string[];
@@ -50,7 +54,7 @@ export class BlogPostData {
       lastUpdated?: string,
       publishedOn?: string) {
     this._id = id;
-    this._authorUsername = authorUsername;
+    this._authorName = authorUsername;
     this._title = title;
     this._content = content;
     this._tags = tags;
@@ -65,7 +69,7 @@ export class BlogPostData {
   }
 
   get authorUsername(): string {
-    return this._authorUsername;
+    return this._authorName;
   }
 
   get lastUpdated(): string | undefined {
@@ -178,7 +182,7 @@ export class BlogPostData {
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
-      blogPostBackendDict.author_username,
+      blogPostBackendDict.author_name,
       blogPostBackendDict.title,
       blogPostBackendDict.content,
       blogPostBackendDict.tags,
