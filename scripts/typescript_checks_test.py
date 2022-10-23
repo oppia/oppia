@@ -124,16 +124,25 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             self) -> None:
         """Test that error is produced if stdout is not empty."""
         class MockOutput:
+            """This class simulates a process stdout."""
+
             def __init__(self, call_counter: int = 0) -> None:
                 self.call_counter = call_counter
-            def readline(self) -> str: # pylint: disable=missing-docstring
+            def readline(self) -> str:
+                """This mocks the readline() method which reads and returns
+                a single line. It stops when it hits the EOF or an empty
+                string.
+
+                Returns:
+                    str. A single line of process output.
+                """
                 self.call_counter = self.call_counter + 1
-                if self.call_counter == 1:
-                    return 'core/templates/App.ts'
-                elif self.call_counter == 2:
-                    return 'core/new_directory/new_file.ts'
-                else:
-                    return ''
+                return_values = {
+                    1: 'core/templates/App.ts',
+                    2: 'core/new_directory/new_file.ts',
+                    3: ''
+                }
+                return return_values[self.call_counter]
 
         class MockProcess:
             stdout = MockOutput()
