@@ -1455,6 +1455,28 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             user_y, topic_rights))
 
+    def test_guest_user_cannot_assign_roles(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to assign roles to a user.'
+        ):
+            topic_services.assign_role(
+                guest_user, self.user_b,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
+    def test_roles_of_guest_user_cannot_be_changed_until_guest_is_logged_in(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot change the role of the Guest user.'
+        ):
+            topic_services.assign_role(
+                self.user_admin, guest_user,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
     def test_role_cannot_be_assigned_to_non_topic_manager(self) -> None:
         with self.assertRaisesRegex(
             Exception,
