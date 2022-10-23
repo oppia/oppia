@@ -970,7 +970,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             outcomes.append(self.default_outcome)
         return outcomes
 
-    def _validates_choices_should_be_unique_and_nonempty(self, choices) -> None:
+    def _validates_choices_should_be_unique_and_nonempty(
+        self, choices: List[SubtitledHtml]
+    ) -> None:
         """Validates that the choices should be unique and non empty.
 
         Args:
