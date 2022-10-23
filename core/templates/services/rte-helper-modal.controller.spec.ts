@@ -322,6 +322,12 @@ describe('Rte Helper Modal Controller', function() {
       expect($scope.currentRteIsLinkEditor).toBeTrue();
     });
 
+    it('should not disable save button when not in link editor', function() {
+      $scope.currentRteIsLinkEditor = false;
+
+      expect($scope.disableSaveButtonForLinkRte()).toBeFalse();
+    });
+
     it('should disable save button when text may be misleading', function() {
       const URLs = ['malicious.com', 'www.malicious.com',
         'https://malicious.com', 'https://www.malicious.com'];
@@ -368,8 +374,11 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should save modal customization args when closing it', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+
       expect($scope.disableSaveButtonForLinkRte()).toBe(false);
+
       $scope.save();
+
       expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
       expect($uibModalInstance.close).toHaveBeenCalledWith({
         url: 'google.com',
