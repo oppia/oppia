@@ -233,6 +233,46 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             response_dict['error'], 'Schema validation for \'new_config_'
             'property_values\' failed: Could not convert list to int: [20]')
 
+    def test_config_prop_cannot_be_saved_without_new_config_property_values(
+        self
+    ) -> None:
+        self.login(self.BLOG_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': None
+        }
+        response_dict = self.post_json(
+            '/blogadminhandler', payload, csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'The new_config_property_values cannot be None when the '
+            'action is save_config_properties.'
+        )
+
+    def test_config_id_cannot_be_None_when_action_is_revert_config_property(
+        self
+    ) -> None:
+        self.login(self.BLOG_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'action': 'revert_config_property',
+            'config_property_id': None
+        }
+        response_dict = self.post_json(
+            '/blogadminhandler', payload, csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'The config_property_id cannot be None when the action '
+            'is revert_config_property.'
+        )
+
     def test_raise_error_for_updating_value_to_zero_for_max_tags(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
