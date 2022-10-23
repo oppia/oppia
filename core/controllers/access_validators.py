@@ -165,19 +165,13 @@ class BlogHomePageAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
+    @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
         """Validates access to blog home page."""
         pass
@@ -188,12 +182,9 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'blog_post_url_fragment': {
                 'schema': {
@@ -203,9 +194,7 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
         }
     }
 
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
+    @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
         # Please use type casting here instead of type ignore[union-attr] once
         # this attribute `normalized_request` has been type annotated in the
