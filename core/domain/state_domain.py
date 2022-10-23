@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import bs4
 import collections
 import copy
 import itertools
@@ -969,6 +970,39 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             outcomes.append(self.default_outcome)
         return outcomes
 
+    def _validates_choices_should_be_unique_and_nonempty(self, choices) -> None:
+        """Validates that the choices should be unique and non empty.
+
+        Args:
+            choices: List[state_domain.SubtitledHtml]. Choices that needs to
+                be validated.
+
+        Raises:
+            utils.ValidationError. Choice is empty.
+            utils.ValidationError. Choice is duplicate.
+        """
+        seen_choices = []
+        for choice in choices:
+            if choice.html in ('<p></p>', ''):
+                raise utils.ValidationError(
+                    'Choices should be non empty.'
+                )
+
+            soup = bs4.BeautifulSoup(choice.html, 'html.parser')
+            p_value = soup.find('p').getText()
+            if p_value.strip() in ('<p></p>', ''):
+                raise utils.ValidationError(
+                    'Choices should be non empty.'
+                )
+
+        for choice in choices:
+            if choice.html not in seen_choices:
+                seen_choices.append(choice.html)
+            else:
+                raise utils.ValidationError(
+                    'Choices should be unique.'
+                )
+
     def _set_lower_and_upper_bounds(
         self,
         range_var: RangeVariableDict,
@@ -1456,6 +1490,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         rule_spec_till_now: List[RuleSpecDict] = []
 
+        choices = self.customization_args['choices'].value
+        self._validates_choices_should_be_unique_and_nonempty(choices)
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
                 answer_group.rule_specs
@@ -1488,6 +1525,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             self.customization_args['maxAllowableSelectionCount'].value)
         rule_spec_till_now: List[RuleSpecDict] = []
 
+        choices = self.customization_args['choices'].value
+        self._validates_choices_should_be_unique_and_nonempty(choices)
+
         # Minimum number of selections should be no greater than maximum
         # number of selections.
         if min_value > max_value:
@@ -1497,7 +1537,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 f'which is {str(max_value)} '
                 f'in ItemSelectionInput interaction.'
             )
-        choices = self.customization_args['choices'].value
 
         # There should be enough choices to have minimum number
         # of selections.
@@ -1561,6 +1600,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         ele_x_at_y_rules = []
         rule_spec_till_now: List[RuleSpecDict] = []
         equal_ordering_one_at_incorec_posn = []
+
+        choices = self.customization_args['choices'].value
+        self._validates_choices_should_be_unique_and_nonempty(choices)
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(

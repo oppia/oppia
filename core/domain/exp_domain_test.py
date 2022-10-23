@@ -2287,8 +2287,40 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.answer_groups = (
             test_ans_group_for_drag_and_drop_interaction)
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p> </p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '')
+        ]
         self.state.interaction.customization_args[
             'allowMultipleItemsInSamePosition'].value = False
+
+        self._assert_validation_error(
+            self.new_exploration, 'Choices should be non empty.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '')
+        ]
+
+        self._assert_validation_error(
+            self.new_exploration, 'Choices should be non empty.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>2</p>')
+        ]
+
+        self._assert_validation_error(
+            self.new_exploration, 'Choices should be unique.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
+        ]
 
         self._assert_validation_error(
             self.new_exploration, 'The rule \'0\' of answer group \'0\' '
@@ -10029,7 +10061,7 @@ states:
           - content_id: ca_choices_22
             html: <p>3</p>
           - content_id: ca_choices_23
-            html: <p></p>
+            html: <p>  </p>
         maxAllowableSelectionCount:
           value: 4
         minAllowableSelectionCount:
@@ -10049,7 +10081,7 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-          - <p></p>
+          - <p>  </p>
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
