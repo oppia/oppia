@@ -34,7 +34,6 @@ describe('EndExplorationValidationService', () => {
   let validatorService: EndExplorationValidationService;
 
   let currentState: string;
-  let errorMessageElement: HTMLSpanElement;
   let badOutcome: Outcome;
   let goodAnswerGroups: AnswerGroup[];
   let customizationArguments: EndExplorationCustomizationArgs;
