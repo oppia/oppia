@@ -13,9 +13,15 @@ puppeteer
 
     // logging into dev server!
     await page.goto("http://localhost:8181/", {waitUntil: "networkidle0"});
+
+    // accepting the cookie permission
+    let selector = "button.e2e-test-oppia-cookie-banner-accept-button";
+    await page.waitForSelector(selector);
+    await page.click(selector);
+
     await page.waitForSelector("button.e2e-mobile-test-login");
     await page.click("button.e2e-mobile-test-login");
-    let selector = "input.e2e-test-sign-in-email-input";
+    selector = "input.e2e-test-sign-in-email-input";
     await page.waitForSelector(selector);
     await page.type(selector, "testadmin@example.com");
     selector = "button.e2e-test-sign-in-button";

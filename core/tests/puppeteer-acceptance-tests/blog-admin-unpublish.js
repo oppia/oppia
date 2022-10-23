@@ -18,7 +18,7 @@ puppeteer
     let selector = "button.e2e-test-oppia-cookie-banner-accept-button";
     await page.waitForSelector(selector);
     await page.click(selector);
-    
+
     await page.waitForSelector("button.e2e-mobile-test-login");
     await page.click("button.e2e-mobile-test-login");
     selector = "input.e2e-test-sign-in-email-input";
@@ -32,41 +32,30 @@ puppeteer
     selector = ".oppia-learner-dashboard-main-content";
     await page.waitForSelector(selector);
 
-    // creating a new exploration
-    await page.goto("http://localhost:8181/creator-dashboard", {waitUntil: "networkidle0"});
-    selector = "button.e2e-test-create-new-exploration-button";
+    // blog-dashboard drafts
+    await page.goto("http://localhost:8181/blog-dashboard", {waitUntil: "networkidle0"});
+    selector = "div#mat-tab-label-0-1";
     await page.waitForSelector(selector);
     await page.click(selector);
-
-    // going into the Translations Tab
-    selector = "li#tutorialTranslationTab";
-    await page.waitForSelector(selector);
-    await page.click(selector);
-
-    // uploading the audio
-    selector = 'button.e2e-test-accessibility-translation-upload-audio';
-    await page.waitForSelector(selector);
-    await page.click(selector);
-
-    const inputUploadHandle = await page.$('input[type=file]');
-    let fileToUpload = 'A4.mp3';
-    inputUploadHandle.uploadFile(fileToUpload);
-
-    selector = 'button.e2e-test-save-uploaded-audio-button';
-    await page.waitForSelector(selector);
-    await page.click(selector);
-
-    selector = 'button.e2e-test-play-pause-audio-button';
-    await page.waitForSelector(selector)
-    await page.waitForTimeout(500);
-    await page.click(selector);
-    
-    // checking that uploaded audio also plays!
-    selector = 'i.fa-pause';
-    await page.waitForSelector(selector);
     await page.waitForTimeout(1000);
-    await page.click(selector);
+    
+    // deleting a draft if present
+    try{
+      selector = "button.e2e-test-blog-post-edit-box";
+      await page.waitForSelector(selector);
+      await page.click(selector);
+      selector = "button.e2e-test-unpublish-blog-post-button";
+      await page.waitForSelector(selector);
+      await page.waitForTimeout(100);
+      await page.click(selector);
+      selector = "button.e2e-test-confirm-button";
+      await page.waitForSelector(selector);
+      await page.click(selector);
+    } catch {
+      console.log("no published blog post");
+    }
+    
 
-    console.log("Successfully played uploaded audio!");
+    console.log("Successfully unpublished a published blogs!");
     await browser.close();
   });
