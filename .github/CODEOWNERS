@@ -110,6 +110,8 @@
 /core/controllers/blog_homepage*.py @oppia/lace-backend-reviewers
 /core/templates/domain/blog/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-home-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-post-page/ @oppia/lace-frontend-reviewers
 
 # Collection project.
 /core/controllers/collection*.py @oppia/lace-backend-reviewers
@@ -224,6 +226,7 @@
 /core/templates/pages/exploration-editor-page/settings-tab/ @oppia/lace-frontend-reviewers
 /core/templates/pages/exploration-player-page/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
+/core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/context.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
@@ -234,6 +237,7 @@
 /core/templates/services/staleness-detection.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/validators.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/yaml.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/copy-url/ @oppia/lace-frontend-reviewers
 
 
 # Forms pages.
@@ -398,6 +402,7 @@
 /core/controllers/question*.py @oppia/lace-backend-reviewers
 /core/controllers/review_tests*.py @oppia/lace-backend-reviewers
 /core/domain/classroom*.py @oppia/lace-backend-reviewers
+/core/controllers/diagnostic_test_player*.py @oppia/lace-backend-reviewers
 /core/domain/classroom_services*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
 /core/domain/rights_domain*.py @oppia/lace-backend-reviewers
@@ -453,6 +458,7 @@
 /core/templates/domain/topic/ @oppia/lace-frontend-reviewers
 /core/templates/domain/topic_viewer @oppia/lace-frontend-reviewers
 /core/templates/pages/classroom-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/diagnostic-test-player-page @oppia/lace-frontend-reviewers
 /core/templates/pages/subtopic-viewer-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/topic-editor-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/topic-viewer-page/ @oppia/lace-frontend-reviewers
