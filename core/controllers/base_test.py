@@ -518,6 +518,43 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'uh-oh: request GET /')
 
 
+class MissingHandlerArgsTests(test_utils.GenericTestBase):
+
+    class MissingArgsHandler(base.BaseHandler):
+        """Mock handler for testing."""
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+
+        def post(self) -> None:
+            """Handles POST requests."""
+            self.render_json({})
+
+    def setUp(self) -> None:
+        super(MissingHandlerArgsTests, self).setUp()
+
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        # Modify the testapp to use the MissingArgsHandler.
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [
+                webapp2.Route(
+                    '/MissingArgHandler',
+                    self.MissingArgsHandler,
+                    name='MissingArgHandler'
+                )
+            ],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_missing_arg_handler_raises_error(self) -> None:
+        response = self.testapp.post('/MissingArgHandler', status=500)
+        parsed_response = json.loads(response.body[len(feconf.XSSI_PREFIX):])
+        self.assertEqual(
+            parsed_response['error'],
+            'Missing schema for POST method in MissingArgsHandler handler class.'
+        )
+
+
 class MaintenanceModeTests(test_utils.GenericTestBase):
     """Tests BaseHandler behavior when maintenance mode is enabled.
 
