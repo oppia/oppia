@@ -479,6 +479,27 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(call_counter.times_called, 1)
 
+    def test_user_without_email_id_raises_exception(self) -> None:
+        with contextlib.ExitStack() as exit_stack:
+            swap_auth_claim = self.swap_to_always_return(
+                auth_services,
+                'get_auth_claims_from_request',
+                auth_domain.AuthClaims(
+                    'auth_id', None, role_is_super_admin=False)
+            )
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR)
+            )
+            with swap_auth_claim:
+                self.get_html_response('/')
+
+        self.assert_matches_regexps(
+            logs,
+            [
+                'No email address was found for the user.'
+            ]
+        )
+
     def test_logs_request_with_invalid_payload(self) -> None:
         with contextlib.ExitStack() as exit_stack:
             logs = exit_stack.enter_context(

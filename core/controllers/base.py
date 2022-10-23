@@ -233,9 +233,11 @@ class BaseHandler(webapp2.RequestHandler):
                 # the not-fully registered user.
                 email = auth_claims.email
                 if email is None:
-                    raise Exception(
+                    logging.exception(
                         'No email address was found for the user.'
                     )
+                    auth_services.destroy_auth_session(self.response)
+                    return
                 if 'signup?' in self.request.uri:
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
