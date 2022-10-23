@@ -205,6 +205,31 @@ const routes: Route[] = [
       'pages/learner-group-pages/view-group/view-learner-group-page.module')
       .then(m => m.ViewLearnerGroupPageModule)
   },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-home-page/blog-home-page.module')
+      .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-home-page/blog-home-page.module')
+      .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-post-page/blog-post-page.module')
+      .then(m => m.BlogPostPageModule)
+  }
 ];
 
 // Register stewards landing pages.

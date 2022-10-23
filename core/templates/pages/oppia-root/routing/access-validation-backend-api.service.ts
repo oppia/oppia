@@ -38,6 +38,11 @@ export class AccessValidationBackendApiService {
 
   DOES_LEARNER_GROUP_EXIST = (
     '/access_validation_handler/does_learner_group_exist/<learner_group_id>');
+  BLOG_HOME_PAGE_ACCESS_VALIDATOR = (
+    '/access_validation_handler/can_access_blog_home_page');
+
+  BLOG_POST_PAGE_ACCESS_VALIDATOR = (
+    '/access_validation_handler/can_access_blog_post_page');
 
   constructor(
     private http: HttpClient,
@@ -50,6 +55,21 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(this.CLASSROOM_PAGE_ACCESS_VALIDATOR, {
       params: {
         classroom_url_fragment: classroomUrlFragment
+      }
+    }).toPromise();
+  }
+
+  validateAccessToBlogHomePage(): Promise<void> {
+    return this.http.get<void>(
+      this.BLOG_HOME_PAGE_ACCESS_VALIDATOR).toPromise();
+  }
+
+  validateAccessToBlogPostPage(
+      blogPostPageUrlFragment: string
+  ): Promise<void> {
+    return this.http.get<void>(this.BLOG_POST_PAGE_ACCESS_VALIDATOR, {
+      params: {
+        blog_post_url_fragment: blogPostPageUrlFragment
       }
     }).toPromise();
   }
