@@ -63,6 +63,11 @@ oppia-tutor-card .oppia-learner-view-card.animate-card-width {
   transition: width 500ms;
 }
 
+.mat-checkbox p {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
 oppia-tutor-card .oppia-learner-view-card-top-content p:not(:last-child) {
   line-height: 1.5;
   margin-bottom: 18px;
