@@ -62,7 +62,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   startDiagnosticTest(): void {
     // fetch the math topic ID.
-    const classroomId = 'u6DmmcdaEK4d';
+    const classroomId = 'eaNl5TUmpwZs';
 
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {
@@ -70,15 +70,12 @@ export class DiagnosticTestPlayerComponent implements OnInit {
           response.classroomDict.topicIdToPrerequisiteTopicIds);
         this.diagnosticTestModelData.setCurrentTopicId();
         let currentTopicId = this.diagnosticTestModelData.getCurrentTopicId();
-        console.log('current topic...');
-        console.log(currentTopicId);
 
       this.topicsAndSkillsDashboardBackendApiService
         .fetchTopicIdToDiagnosticTestSkillIdsAsync([currentTopicId]).then(
           (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
             let diagnosticTestSkillIds = (
               responseDict.topicIdToDiagnosticTestSkillIds[currentTopicId]);
-            console.log(diagnosticTestSkillIds);
 
             this.questionPlayerConfig = {
               resultActionButtons: [],
@@ -87,9 +84,6 @@ export class DiagnosticTestPlayerComponent implements OnInit {
               questionsSortedByDifficulty: true
             };
             this.diagnosticTestStarted = true;
-
-            console.log(this.questionPlayerConfig);
-            console.log(this.diagnosticTestStarted);
           });
       }
     );

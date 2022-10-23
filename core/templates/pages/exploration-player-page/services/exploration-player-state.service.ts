@@ -332,6 +332,7 @@ export class ExplorationPlayerStateService {
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback?: () => void
   ): void {
+    this.setDiagnosticTestPlayerMode();
     this.diagnosticTestPlayerEngineService.init(
       config,
       diagnosticTestModelData,

@@ -70,7 +70,6 @@ export class DiagnosticTestModelData {
     this._topicIdToSuccessorTopicIds = {};
     this.setTopicIdToAncestorTopicIds();
     this.setTopicIdToSuccessorTopicIds();
-    console.log(topicIdToPrerequisiteTopicIds)
   }
 
   getTopicIdToAncestorTopicIds(): TopicIdToRelatedTopicIds {
@@ -173,13 +172,12 @@ export class DiagnosticTestModelData {
     let topicIdToLengthOfExpectedRemoval: {[topicId: string]: number} = {};
     let lengthOfAncestorTopicIds: number;
     let lengthOfSuccessorTopicIds: number;
-    console.log('printing min and max')
+
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
       lengthOfAncestorTopicIds = (
         this._topicIdToAncestorTopicIds[topicId].length);
       lengthOfSuccessorTopicIds = (
         this._topicIdToSuccessorTopicIds[topicId].length);
-      console.log(topicId + ": " + lengthOfAncestorTopicIds + ", " + lengthOfSuccessorTopicIds);
 
       topicIdToLengthOfExpectedRemoval[topicId] = Math.min(
         lengthOfAncestorTopicIds, lengthOfSuccessorTopicIds);

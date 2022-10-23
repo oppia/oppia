@@ -34,12 +34,10 @@ export class DiagnosticTestTopicStateData {
     this.skillIdToQuestionsList = skillIdToQuestions;
     this._currenSkillIndex = 0;
     this._diagnosticTestSkills = Object.keys(this.skillIdToQuestionsList);
+    this.skillIdToPassedStateDict = {};
     for (let skillId of this._diagnosticTestSkills) {
       this.skillIdToPassedStateDict[skillId] = false;
     }
-
-    console.log('skill ID to questions');
-    console.log(skillIdToQuestions);
   }
 
   getNextQuestionFromCurrentSkill() {
@@ -47,9 +45,13 @@ export class DiagnosticTestTopicStateData {
     return this.skillIdToQuestionsList[this.currentSkill][1];
   }
 
+  getCurrentQuestion() {
+    this.currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
+    return this.skillIdToQuestionsList[this.currentSkill][0];
+  }
+
   getNextQuestion() {
     this.numberOfAttemptedQuestion += 1;
-    this._currenSkillIndex += 1;
     this.currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
     return this.skillIdToQuestionsList[this.currentSkill][0];
   }

@@ -74,9 +74,8 @@ export class DiagnosticTestPlayerEngineService {
 
     for (let skillId of skillIds) {
       for (let question of questions) {
-        let skillIds = question.getLinkedSkillIds();
-
-        if (skillIds.indexOf(skillId)) {
+        let linkedSkillIds = question.getLinkedSkillIds();
+        if (linkedSkillIds.indexOf(skillId) !== -1) {
           skillIdToQuestions[skillId].push(question);
         }
       }
@@ -102,10 +101,10 @@ export class DiagnosticTestPlayerEngineService {
         function(questionDict) {
           return this.questionObjectFactory.createFromBackendDict(
             questionDict);
-      });
+      }, this);
 
       skillIdToQuestions = this.getSkillIdToQuestionsDict(
-        config.skillList, questions)
+        config.skillList, questions);
 
       this.diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
@@ -209,11 +208,26 @@ export class DiagnosticTestPlayerEngineService {
     return answerIsCorrect;
   }
 
+  getLanguageCode(): string {
+    return (
+      this.diagnosticTestTopicStateData.getCurrentQuestion().getLanguageCode());
+  }
+
+  recordNewCardAdded(): void {
+    this.currentIndex = this.nextIndex;
+    this.contextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.QUESTION, this.getCurrentQuestionId());
+  }
+  getCurrentQuestionId(): string {
+    return this.diagnosticTestTopicStateData.getCurrentQuestion().getId();
+  }
+
   createCard(
       successCallback:(initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void
   ) {
-    const stateData = this.diagnosticTestTopicStateData.getNextQuestion();
+    const question = this.diagnosticTestTopicStateData.getNextQuestion();
+    const stateData = question.getStateData();
 
     const questionHtml = this.makeQuestion(stateData, []);
     if (questionHtml === null) {

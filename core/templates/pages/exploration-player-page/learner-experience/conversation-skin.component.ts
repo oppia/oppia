@@ -224,9 +224,6 @@ export class ConversationSkinComponent {
   }
 
   ngOnInit(): void {
-    console.log('in the init of conversation skin');
-    console.log(this.diagnosticTestModel);
-    console.log(this.questionPlayerConfig);
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
 
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
@@ -1047,7 +1044,6 @@ export class ConversationSkinComponent {
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable);
     } else if(this.questionPlayerConfig && this.diagnosticTestModel) {
-      console.log('In the init page for diagnostic test');
       this.explorationPlayerStateService.initializeDiagnosticPlayer(
         this.questionPlayerConfig,
         this.diagnosticTestModel,
