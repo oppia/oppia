@@ -64,10 +64,10 @@ describe('Diagnostic test model', () => {
     expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
       expectedAncestorTopicIds);
 
-    expect(diagnosticTestModelData.getAncestorsTopicIds('topicID4')).toEqual(
+    expect(diagnosticTestModelData.getAncestorTopicIds('topicID4')).toEqual(
       ['topicID3', 'topicID2', 'topicID1']);
 
-    expect(diagnosticTestModelData.getAncestorsTopicIds('topicID5')).toEqual(
+    expect(diagnosticTestModelData.getAncestorTopicIds('topicID5')).toEqual(
       ['topicID4', 'topicID3', 'topicID2', 'topicID1']);
   });
 
@@ -118,9 +118,9 @@ describe('Diagnostic test model', () => {
 
     const expectedTopicId = 'topicID3';
 
-    diagnosticTestModelData.setCurrentTopicId();
+    diagnosticTestModelData.selectNextTopicIdToTest();
 
-    expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
+    expect(diagnosticTestModelData.selectNextTopicIdToTest()).toEqual(
       expectedTopicId);
   });
 
@@ -128,7 +128,7 @@ describe('Diagnostic test model', () => {
     diagnosticTestModelData = new DiagnosticTestModelData(
       topicIdToPrerequisiteTopicIds);
 
-    diagnosticTestModelData.setCurrentTopicId();
+    let currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
     diagnosticTestModelData.recordTopicFailed();
 
     const expectedEligibleTopicIDs = ['topicID1', 'topicID2', 'topicID6'];
@@ -139,29 +139,21 @@ describe('Diagnostic test model', () => {
 
     expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
       expectedEligibleTopicIDs);
-
-    expect(diagnosticTestModelData.getSkippedTopicIds()).toEqual(
-      expectedSkippedTopicIDs);
   });
 
   it('should be able to record topic as passed', () => {
     diagnosticTestModelData = new DiagnosticTestModelData(
       topicIdToPrerequisiteTopicIds);
 
-    diagnosticTestModelData.setCurrentTopicId();
+    let currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
     diagnosticTestModelData.recordTopicPassed();
 
     const expectedEligibleTopicIDs = [
       'topicID4', 'topicID5', 'topicID6', 'topicID7', 'topicID8', 'topicID9'];
     const expectedSkippedTopicIDs = ['topicID2', 'topicID1'];
 
-    expect(diagnosticTestModelData.getPassedTopicIds()).toEqual(['topicID3']);
-
     expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
       expectedEligibleTopicIDs);
-
-    expect(diagnosticTestModelData.getSkippedTopicIds()).toEqual(
-      expectedSkippedTopicIDs);
   });
 
   it('should be able to increment number of attempted questions', () => {
@@ -221,19 +213,17 @@ describe('Diagnostic test model', () => {
 
       let expectedTopicId = 'topicID3';
 
-      diagnosticTestModelData.setCurrentTopicId();
+      let currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
 
-      expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
-        expectedTopicId);
+      expect(currentTopicId).toEqual(expectedTopicId);
 
       diagnosticTestModelData.recordTopicPassed();
 
       expectedTopicId = 'topicID5';
 
-      diagnosticTestModelData.setCurrentTopicId();
+      currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
 
-      expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
-        expectedTopicId);
+      expect(currentTopicId).toEqual(expectedTopicId);
     });
 
   it(
@@ -244,18 +234,16 @@ describe('Diagnostic test model', () => {
 
       let expectedTopicId = 'topicID3';
 
-      diagnosticTestModelData.setCurrentTopicId();
+      let currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
 
-      expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
-        expectedTopicId);
+      expect(currentTopicId).toEqual(expectedTopicId);
 
       diagnosticTestModelData.recordTopicFailed();
 
       expectedTopicId = 'topicID1';
 
-      diagnosticTestModelData.setCurrentTopicId();
+      currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
 
-      expect(diagnosticTestModelData.getCurrentTopicId()).toEqual(
-        expectedTopicId);
+      expect(currentTopicId).toEqual(expectedTopicId);
     });
 });

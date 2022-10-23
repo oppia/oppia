@@ -24,53 +24,50 @@ export interface TopicIdToRelatedTopicIds {
   [topicId: string]: string[];
 }
 
-export interface DiagnosticTestModel {
-  _totalNumberOfAttemptedQuestions: number;
-  _currentTopicId: string;
-  _eligibleTopicIds: string[];
-  _skippedTopicIds: string[];
-  _passedTopicIds: string[];
-  _failedTopicIds: string[];
-  _topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
-  _topicIdToAncestorTopicIds: TopicIdToRelatedTopicIds;
-  _topicIdToSuccessorTopicIds: TopicIdToRelatedTopicIds;
-  setTopicIdToAncestorTopicIds: () => void;
-  setTopicIdToSuccessorTopicIds: () => void;
-  getAncestorsTopicIds: (topicId: string) => string[];
-  getSuccessorTopicIds: (topicId: string) => string[];
-  incrementNumberOfAttemptedQuestions: (incrementByValue: number) => void;
-  recordTopicPassed: () => void;
-  recordTopicFailed: () => void;
-  isTestFinished: () => boolean;
-  getEligibleTopicIds: () => string[];
-  getFailedTopicIds: () => string[];
-  getCurrentTopicId: () => string;
-  setCurrentTopicId: () => void;
-}
 
 export class DiagnosticTestModelData {
+  // The total number of questions attempted by a learner in the diagnostic
+  // test.
   _totalNumberOfAttemptedQuestions: number;
+
+  // The field keeps track of the topic ID that is currently being tested in the
+  // diagnostic test.
   _currentTopicId: string;
+
+  // The list of eligible topic IDs from which the next topic ID can be selected
+  // and tested in the diagnostic test.
   _eligibleTopicIds: string[];
-  _skippedTopicIds: string[];
-  _passedTopicIds: string[];
+
+  // The field keeps track of the topic ID that are failed by the learner.
+  // Failing on a topic means the learner has attempted two questions
+  // incorrectly that are associated with the given topic.
   _failedTopicIds: string[];
+
+  // The field keeps the dependencies between the topics in a classroom. The
+  // dependency is DAG represented in a form of a dict with topic ID as key and
+  // a list of an immediate parent or prerequisite topic IDs as value.
+  // Example graph: A --> B --> C, here, the prerequisite of C is only B.
   _topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
+
+  // A dict with topic ID as key and a list of ancestor topic IDs as value.
+  // Example graph: A --> B --> C, therefore the ancestor of C is both A and B.
   _topicIdToAncestorTopicIds: TopicIdToRelatedTopicIds;
+
+  // A dict with topic ID as key and a list of successor topic IDs as value.
+  // Example graph: A --> B --> C, here the successors of A are B, C, and the
+  // successor of B is only C.
   _topicIdToSuccessorTopicIds: TopicIdToRelatedTopicIds;
 
   constructor(topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds) {
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
     this._totalNumberOfAttemptedQuestions = 0;
     this._eligibleTopicIds = Object.keys(this._topicIdToPrerequisiteTopicIds);
-    this._skippedTopicIds = [];
-    this._passedTopicIds = [];
     this._failedTopicIds = [];
     this._currentTopicId = '';
     this._topicIdToAncestorTopicIds = {};
     this._topicIdToSuccessorTopicIds = {};
-    this.setTopicIdToAncestorTopicIds();
-    this.setTopicIdToSuccessorTopicIds();
+    this.regenerateTopicIdToAncestorTopicIds();
+    this.regenerateTopicIdToSuccessorTopicIds();
   }
 
   getEligibleTopicIds(): string[] {
@@ -81,20 +78,8 @@ export class DiagnosticTestModelData {
     return this._failedTopicIds;
   }
 
-  getPassedTopicIds(): string[] {
-    return this._passedTopicIds;
-  }
-
-  getCurrentTopicId(): string {
-    return this._currentTopicId;
-  }
-
-  getAncestorsTopicIds(topicId: string): string[] {
+  getAncestorTopicIds(topicId: string): string[] {
     return this._topicIdToAncestorTopicIds[topicId];
-  }
-
-  getSkippedTopicIds(): string[] {
-    return this._skippedTopicIds;
   }
 
   getTopicIdToAncestorTopicIds(): TopicIdToRelatedTopicIds {
@@ -117,16 +102,14 @@ export class DiagnosticTestModelData {
     return this._totalNumberOfAttemptedQuestions;
   }
 
-  setTopicIdToAncestorTopicIds(): void {
+  regenerateTopicIdToAncestorTopicIds(): void {
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
       let ancestors: string[] = [];
       let prerequisites: string[] = cloneDeep(
         this._topicIdToPrerequisiteTopicIds[topicId]);
 
       while (prerequisites.length > 0) {
-        let len = prerequisites.length;
-        let lastTopicId = prerequisites[len - 1];
-        prerequisites.splice(len - 1, 1);
+        let lastTopicId = prerequisites.pop();
         if (ancestors.indexOf(lastTopicId) === -1) {
           ancestors.push(lastTopicId);
         }
@@ -138,7 +121,7 @@ export class DiagnosticTestModelData {
     }
   }
 
-  setTopicIdToSuccessorTopicIds(): void {
+  regenerateTopicIdToSuccessorTopicIds(): void {
     let topicIdToChildTopicId: TopicIdToRelatedTopicIds = {};
 
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
@@ -157,9 +140,7 @@ export class DiagnosticTestModelData {
       let children: string[] = topicIdToChildTopicId[topicId];
 
       while (children.length > 0) {
-        let len = children.length;
-        let lastTopicId = children[len - 1];
-        children.splice(len - 1, 1);
+        let lastTopicId = children.pop();
         if (successors.indexOf(lastTopicId) === -1) {
           successors.push(lastTopicId);
         }
@@ -169,12 +150,22 @@ export class DiagnosticTestModelData {
     }
   }
 
-  setCurrentTopicId(): void {
-    let topicIdToLengthOfRelatedTopicIds: {[topicId: string]: number} = {};
+  selectNextTopicIdToTest(): void {
+    // The length of ancestor topic IDs that are currently present in
+    // the eligible topic IDs list.
     let lengthOfEligibleAncestorTopicIds: number;
+
+    // The length of successor topic IDs that are currently present in
+    // the eligible topic IDs list.
     let lengthOfEligibleSuccessorTopicIds: number;
 
-    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
+    // A dict with topic ID as key and minimum /between the length/ of ancestor
+    // and successor topic IDs as value.
+    let topicIdToLengthOfRelatedTopicIds: {[topicId: string]: number} = {};
+
+    // Iterating on each topic of the eligible topic IDs in order to build the
+    // /topicIdToLengthOfRelatedTopicIds/ dict.
+    for (let topicId of this._eligibleTopicIds) {
       let ancestors = this._topicIdToAncestorTopicIds[topicId];
       let successors = this._topicIdToSuccessorTopicIds[topicId];
 
@@ -186,29 +177,29 @@ export class DiagnosticTestModelData {
         return (this._eligibleTopicIds.indexOf(topic) !== -1);
       }).length;
 
+      // Considering a given topic, the assured number of topics that will be
+      // removed from the eligible topic IDs after testing, is the minimum
+      // between its ancestors and successors.
       topicIdToLengthOfRelatedTopicIds[topicId] = Math.min(
         lengthOfEligibleAncestorTopicIds, lengthOfEligibleSuccessorTopicIds);
     }
 
-    let tempTopicId = Object.keys(topicIdToLengthOfRelatedTopicIds)[0];
-    let tempLenghtOfExpectedRemoval = (
-      topicIdToLengthOfRelatedTopicIds[tempTopicId]);
-
-    for (let topicId in topicIdToLengthOfRelatedTopicIds) {
-      if (
-        topicIdToLengthOfRelatedTopicIds[topicId] >
-          tempLenghtOfExpectedRemoval
-      ) {
-        tempLenghtOfExpectedRemoval = topicIdToLengthOfRelatedTopicIds[topicId];
-        tempTopicId = topicId;
-      }
-    }
-    this._currentTopicId = tempTopicId;
+    // The topic with the maximum length value of min(ancestor, successor) among
+    // all the eligible topic IDs, should be selected for the testing. The
+    // maximum value helps us to reach the result faster which helps in quicker
+    // recommendations.
+    this._currentTopicId = Object.keys(
+      topicIdToLengthOfRelatedTopicIds).reduce(
+      (item1, item2) => (
+        topicIdToLengthOfRelatedTopicIds[item1] >
+        topicIdToLengthOfRelatedTopicIds[item2]) ? item1 : item2
+    );
   }
 
   recordTopicPassed(): void {
+    // If a topic is passed, that means we don't need to test any of the
+    // ancestor topics.
     let ancestors = this._topicIdToAncestorTopicIds[this._currentTopicId];
-    this._passedTopicIds.push(this._currentTopicId);
 
     let topicIdsToRemoveFromEligibleList: string[] = [];
     topicIdsToRemoveFromEligibleList = (
@@ -218,11 +209,11 @@ export class DiagnosticTestModelData {
     this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
       return (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1);
     });
-
-    this._skippedTopicIds = this._skippedTopicIds.concat(ancestors);
   }
 
   recordTopicFailed(): void {
+    // If a topic is failed, that means we don't need to test any of the
+    // successor topics.
     let successors = this._topicIdToSuccessorTopicIds[this._currentTopicId];
     this._failedTopicIds.push(this._currentTopicId);
 
@@ -234,15 +225,18 @@ export class DiagnosticTestModelData {
     this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
       return (topicIdsToRemoveFromEligibleList.indexOf(topicId) === -1);
     });
-
-    this._skippedTopicIds = this._skippedTopicIds.concat(successors);
   }
 
   isTestFinished(): boolean {
+    // The next topic ID testing cannot be selected from the eligible topic IDs
+    // list, hence empty eligible test should terminate the diagnostic test.
     if (this._eligibleTopicIds.length === 0) {
       return true;
     }
 
+    // If the eligible topic IDs list is non-empty but the learner has attempted
+    // the maximum allowed questions for the diagnostic test, then the test
+    // should be terminated.
     if (
       this._eligibleTopicIds.length > 0 &&
         this._totalNumberOfAttemptedQuestions >=
@@ -251,6 +245,8 @@ export class DiagnosticTestModelData {
       return true;
     }
 
+    // If none of the above conditions are satisfied then the test should not
+    // be terminated.
     return false;
   }
 }
