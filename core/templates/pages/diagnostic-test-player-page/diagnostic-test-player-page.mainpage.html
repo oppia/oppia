@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html ng-app="oppia" lang="en">
+  <head>
+    <title>Diagnostic test player</title>
+    <!-- Require head styles file using webpack -->
+    @load('pages/header_css_libs.html')
+    @load('pages/header_js_libs.html')
+  </head>
+
+  <body>
+    <background-banner></background-banner>
+    <oppia-root>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                <span>Diagnostic Test Player</span>
+              </li>
+            </ul>
+          </navbar-breadcrumb>
+
+          <content>
+            <oppia-diagnostic-test-player></oppia-diagnostic-test-player>
+          </content>
+
+          <page-footer></page-footer>
+        </oppia-base-content>
+      </div>
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

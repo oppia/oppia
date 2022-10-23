@@ -15,6 +15,7 @@
         "core.controllers.classroom_test",
         "core.domain.classroom_config_domain_test",
         "core.domain.classroom_config_services_test",
+        "core.controllers.diagnostic_test_player_test",
         "extensions.rich_text_components.components_test",
         "core.controllers.topic_editor_test",
         "core.controllers.platform_feature_test",
