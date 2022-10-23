@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for FixCommitCommandBackendApiService.
+ * @fileoverview Unit tests for fix commit command backend API service.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -31,7 +31,7 @@ describe('Fix commit commands backend api service', () => {
 
     fixCommitCommandBackendApiService = TestBed.inject(
       FixCommitCommandBackendApiService);
-    http = TestBed.get(HttpTestingController);
+    http = TestBed.inject(HttpTestingController);
   });
 
   it('should fix the commit commands correctly', fakeAsync(() => {

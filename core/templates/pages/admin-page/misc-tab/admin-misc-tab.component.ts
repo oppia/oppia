@@ -62,11 +62,11 @@ export class AdminMiscTabComponent {
   message: string = '';
 
   constructor(
-    private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
     private adminTaskManagerService: AdminTaskManagerService,
     private fixCommitCommandBackendApiService:
-      FixCommitCommandBackendApiService
+      FixCommitCommandBackendApiService,
+    private windowRef: WindowRef
   ) {}
 
   clearSearchIndex(): void {
