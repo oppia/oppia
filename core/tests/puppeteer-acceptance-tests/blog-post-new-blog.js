@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const basicFunctions = require("./utility-functions/basicFunctions");
 
 //adding headless flag to false and maximizing browser height-width
 puppeteer
@@ -16,14 +17,11 @@ puppeteer
 
     // accepting the cookie permission
     let selector = "button.e2e-test-oppia-cookie-banner-accept-button";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
 
-    await page.waitForSelector("button.e2e-mobile-test-login");
-    await page.click("button.e2e-mobile-test-login");
+    await basicFunctions.clicks(page, "button.e2e-mobile-test-login");
     selector = "input.e2e-test-sign-in-email-input";
-    await page.waitForSelector(selector);
-    await page.type(selector, "testadmin@example.com");
+    await basicFunctions.types(page, selector, "testadmin@example.com");
     selector = "button.e2e-test-sign-in-button";
     // does puppeteer waits until the typing is completed?
     await page.evaluate(() => {
@@ -37,42 +35,33 @@ puppeteer
     
     // creating new blog
     selector = "button.e2e-test-create-blog-post-button";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
     selector = "input.e2e-test-blog-post-title-field";
-    await page.waitForSelector(selector);
-    await page.type(selector, "random title");
+    await basicFunctions.types(page, selector, "random title");
     selector = "div.e2e-test-rte";
-    await page.waitForSelector(selector);
-    await page.type(selector, "my blog body content");
+    await basicFunctions.types(page, selector, "my blog body content");
 
     // uploading thumbnail image
     selector = "div.e2e-test-photo-clickable";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
     const inputUploadHandle = await page.$('input[type=file]');
     let fileToUpload = 'collection.svg';
     inputUploadHandle.uploadFile(fileToUpload);
     selector = "button.e2e-test-photo-upload-submit";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
     await page.waitForTimeout(500);
 
     // adding tags
-    selector = "button#mat-button-toggle-13-button";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    selector = "button#mat-button-toggle-14-button";
+    await basicFunctions.clicks(page, selector);
     selector = "button.e2e-test-save-blog-post-content";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
 
     // publishing blog
     selector = "button.e2e-test-publish-blog-post-button"
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
     selector = "button.e2e-test-confirm-button";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
 
     console.log("Successfully published a blog!");
     await browser.close();

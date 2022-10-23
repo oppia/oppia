@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const basicFunctions = require("./utility-functions/basicFunctions");
 
 //adding headless flag to false and maximizing browser height-width
 puppeteer
@@ -16,14 +17,11 @@ puppeteer
     
     // accepting the cookie permission
     let selector = "button.e2e-test-oppia-cookie-banner-accept-button";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
 
-    await page.waitForSelector("button.e2e-mobile-test-login");
-    await page.click("button.e2e-mobile-test-login");
+    await basicFunctions.clicks(page, "button.e2e-mobile-test-login");
     selector = "input.e2e-test-sign-in-email-input";
-    await page.waitForSelector(selector);
-    await page.type(selector, "testadmin@example.com");
+    await basicFunctions.types(page, selector, "testadmin@example.com");
     selector = "button.e2e-test-sign-in-button";
     // does puppeteer waits until the typing is completed?
     await page.evaluate(() => {
@@ -38,15 +36,11 @@ puppeteer
     // deleting a draft if present
     try{
       selector = "button.e2e-test-blog-post-edit-box";
-      await page.waitForSelector(selector);
-      await page.click(selector);
+      await basicFunctions.clicks(page, selector);
       selector = "button.e2e-test-delete-blog-post-button";
-      await page.waitForSelector(selector);
-      await page.waitForTimeout(100);
-      await page.click(selector);
+      await basicFunctions.clicks(page, selector, 100);
       selector = "button.e2e-test-confirm-button";
-      await page.waitForSelector(selector);
-      await page.click(selector);
+      await basicFunctions.clicks(page, selector);
     } catch {
       console.log("no blog post in drafts");
     }

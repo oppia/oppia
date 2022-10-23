@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const basicFunctions = require("../utility-functions/basicFunctions");
 
 //adding headless flag to false and maximizing browser height-width
 puppeteer
@@ -16,14 +17,12 @@ puppeteer
 
     // accepting the cookie permission
     let selector = "button.e2e-test-oppia-cookie-banner-accept-button";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
 
-    await page.waitForSelector("button.e2e-mobile-test-login");
-    await page.click("button.e2e-mobile-test-login");
+    selector = "button.e2e-mobile-test-login"
+    await basicFunctions.clicks(page, selector);
     selector = "input.e2e-test-sign-in-email-input";
-    await page.waitForSelector(selector);
-    await page.type(selector, "testadmin@example.com");
+    await basicFunctions.types(page, selector, "testadmin@example.com");
     selector = "button.e2e-test-sign-in-button";
     // does puppeteer waits until the typing is completed?
     await page.evaluate(() => {
@@ -35,25 +34,21 @@ puppeteer
     // creating a new exploration
     await page.goto("http://localhost:8181/creator-dashboard", {waitUntil: "networkidle0"});
     selector = "button.e2e-test-create-new-exploration-button";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
 
     // going into the Translations Tab
     selector = "li#tutorialTranslationTab";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
 
     // recording a 3sec audio
     selector = "button.e2e-test-accessibility-translation-start-record";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
     selector = "button.e2e-test-stop-record-button";
     await page.waitForSelector(selector);
     await page.waitForTimeout(3000);
     await page.keyboard.press('R');
     selector = "button.e2e-test-confirm-record";
-    await page.waitForSelector(selector);
-    await page.click(selector);
+    await basicFunctions.clicks(page, selector);
 
     console.log("Successfully tested recording of audio!");
     await browser.close();
