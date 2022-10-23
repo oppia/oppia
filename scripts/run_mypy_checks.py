@@ -47,8 +47,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/base_test.py',
     'core/controllers/contributor_dashboard.py',
     'core/controllers/contributor_dashboard_test.py',
-    'core/controllers/creator_dashboard.py',
-    'core/controllers/creator_dashboard_test.py',
     'core/controllers/domain_objects_validator.py',
     'core/controllers/domain_objects_validator_test.py',
     'core/controllers/editor.py',
