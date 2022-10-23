@@ -185,6 +185,8 @@ export class ExplorationRightsService {
         newVoiceArtistUsername).then(() => {
         this.alertsService.clearWarnings();
         this.voiceArtistNames.push(newVoiceArtistUsername);
+      }, (response) => {
+        this.alertsService.addWarning(response.error.error);
       });
   }
 
