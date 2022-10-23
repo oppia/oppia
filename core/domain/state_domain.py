@@ -995,7 +995,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     'Choices should be non empty.'
                 )
 
-        for choice in choices:
             if choice.html not in seen_choices:
                 seen_choices.append(choice.html)
             else:
@@ -1321,9 +1320,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             )
 
                     if (
-                        not allow_imp_frac and den <= num and
-                        rule_spec.rule_type in
-                        rules_that_can_have_improper_fractions
+                        not allow_imp_frac and
+                        den <= num and
+                        (
+                            rule_spec.rule_type in
+                            rules_that_can_have_improper_fractions
+                        )
                     ):
                         raise utils.ValidationError(
                             f'The rule \'{rule_spec_index}\' of '

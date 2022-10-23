@@ -4593,7 +4593,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         for tag in soup.find_all('oppia-noninteractive-link'):
             if cls._is_tag_removed_with_invalid_attributes(
-                tag, 'url-with-value'):
+                tag, 'url-with-value'
+            ):
                 continue
 
             url = tag['url-with-value'].replace(
