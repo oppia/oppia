@@ -183,11 +183,12 @@ export class AddAnswerGroupModalComponent
      this.questionModeEnabled = (
        this.stateEditorService.isInQuestionMode());
 
-     this.tmpRule = this.ruleObjectFactory.createNew('Equals', {}, {});
+     this.tmpRule = this.ruleObjectFactory.createNew(null, {}, {});
      var feedbackContentId = this.generateContentIdService.getNextStateId(
        AppConstants.COMPONENT_NAME_FEEDBACK);
      this.tmpOutcome = this.outcomeObjectFactory.createNew(
-       this.stateName, feedbackContentId, '', []);
+       this.questionModeEnabled ? null : this.stateName,
+       feedbackContentId, '', []);
    }
 
    updateAnswerGroupFeedback(outcome: Outcome): void {
