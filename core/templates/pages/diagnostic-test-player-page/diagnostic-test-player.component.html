@@ -1,10 +1,4 @@
 <div class="diagnostic-test-container">
-  <div>
-    <button class="btn oppia-diagnostic-test-button oppia-back-button"
-            (click)="returnBackToClassroom()"
-            translate="I18N_DIAGNOSTIC_TEST_BACK_BUTTON">
-    </button>
-  </div>
   <div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
   <mat-card class="introductory-card">
     <div class="oppia-introductory-container">
@@ -20,36 +14,30 @@
         </p>
       </div>
     </div>
-    <button class="btn oppia-diagnostic-test-button start-test-button"
-            disabled="true"
-            translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
-    </button>
+    <div>
+      <button class="btn oppia-diagnostic-test-start-button"
+              disabled="true"
+              translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
+      </button>
+    </div>
   </mat-card>
 </div>
 
 <style>
   .oppia-image {
-    margin-right: 5%;
+    align-items: center;
+    display: flex;
+    margin-right: 20px;
   }
   .oppia-introductory-container {
     display: flex;
   }
-  .start-test-button {
-    display: flex;
-    margin: auto;
-    margin-top: 10%;
-  }
   .introductory-card {
-    height: 350px;
     margin: auto;
     margin-top: 5%;
-    padding: 35px;
-    width: 600px;
-  }
-  .oppia-back-button {
-    margin: 10px;
-    position: absolute;
-    text-transform: uppercase;
+    overflow: auto;
+    padding: 40px;
+    width: fit-content;
   }
   .test-introduction-text {
     font-family: 'Roboto', Arial, sans-serif;
@@ -66,11 +54,12 @@
     margin-top: 20px;
     text-align: center;
   }
-  .oppia-diagnostic-test-button {
+  .oppia-diagnostic-test-start-button {
     background-color: #00645c;
     color: #fff;
+    float: right;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 1.1em;
+    margin-top: 5%;
     text-transform: uppercase;
   }
 </style>

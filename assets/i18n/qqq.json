@@ -277,7 +277,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_TITLE": "Text displayed on the browser tab when on the account deletion page.",
 	"I18N_DELETE_LEARNER_GROUP": "Delete learner group button text displayed in preferences tab on the edit learner group page.",
 	"I18N_DEST_IF_STUCK_INFO_TOOLTIP": "You can now specify a new card in which you can walk the learners through the concepts used in the question, if they get really stuck!",
-    "I18N_DIAGNOSTIC_TEST_BACK_BUTTON": "Text displayed on the diagnostic test page. - When the user clicks the back button, they were navigated from the diagnostic test player page to the classroom page.",
     "I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1": "Text displayed on the diagnostic test player page telling user that in the diagnostic test they will get a topic recommendation for getting started with Math lessons.",
     "I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2": "Text displayed on the diagnostic test player page telling user that they will not be able to change their answer after moving to the next question.",
 	"I18N_DIAGNOSTIC_TEST_START_BUTTON": "Text displayed on the diagnostic test page. - When the user clicks the start button, the diagnostic test for the topic recommendation will start.",

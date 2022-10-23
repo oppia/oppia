@@ -42,10 +42,6 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
   }
-
-  returnBackToClassroom(): void {
-    this.windowRef.nativeWindow.location.href = '/learn/math';
-  }
 }
 
 angular.module('oppia').directive(
