@@ -23,6 +23,7 @@ import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { BlogPostSearchService } from 'services/blog-search.service';
+import { BlogHomePageConstants } from '../blog-home-page.constants';
 import isEqual from 'lodash/isEqual';
 
 import '../blog-home-page.component.css';
@@ -98,7 +99,7 @@ export class TagFilterComponent implements OnInit {
   ngOnInit(): void {
     this.refreshSearchDropDownTags();
     this.filteredTags.pipe(
-      debounceTime(1500), distinctUntilChanged()
+      debounceTime(BlogHomePageConstants.DEBOUNCE_TIME), distinctUntilChanged()
     ).subscribe(() => {
       if (!isEqual(
         this.blogPostSearchService.lastSelectedTags, this.selectedTags

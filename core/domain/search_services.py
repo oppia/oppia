@@ -28,8 +28,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final, TypedDict
+from typing import Final, List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
