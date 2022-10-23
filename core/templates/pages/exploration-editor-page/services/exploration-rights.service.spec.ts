@@ -273,6 +273,21 @@ describe('Exploration rights service', () => {
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
   }));
 
+  it('should reject handler when saving a voice artist fails', fakeAsync(() => {
+    spyOn(
+      explorationRightsBackendApiService,
+      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
+      Promise.reject());
+
+    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
+      successHandler, failHandler);
+    tick();
+
+    expect(clearWarningsSpy).not.toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
   it('should remove existing voice artist', fakeAsync(() => {
     serviceData.rights.voice_artist_names = [];
 
