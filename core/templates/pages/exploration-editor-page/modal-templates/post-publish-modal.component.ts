@@ -63,21 +63,6 @@ export class PostPublishModalComponent
   cancel(): void {
     this.ngbActiveModal.dismiss();
   }
-
-  selectText(event: MouseEvent): void {
-    let codeDiv = event.currentTarget;
-    let range = document.createRange();
-    range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
-    range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
-    let selection = window.getSelection();
-    if (selection === null) {
-      throw new Error('Selection cannot be null');
-    }
-    selection.removeAllRanges();
-    selection.addRange(range);
-    document.execCommand('copy');
-    this.explorationLinkCopied = true;
-  }
 }
 
 angular.module('oppia').factory('oppiaPostPublishModal',

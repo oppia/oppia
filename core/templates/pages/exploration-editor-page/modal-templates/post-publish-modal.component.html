@@ -9,10 +9,9 @@
       Now that you're a published Oppia teacher, you can share your creation.
     </p>
     <div class="oppia-share-publish-link">
-      Here's your exploration link: <br>
-      <div (click)="selectText($event)">{{explorationLink}}</div>
-      <span *ngIf="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
+      <p>Here's your exploration link:</p>
     </div>
+    <oppia-copy-url [urlToCopy]="explorationLink"></oppia-copy-url>
     <sharing-links layoutType="row post-publish-modal-sharing-links"
                    layoutAlignType="center center"
                    shareType="exploration"
@@ -67,23 +66,17 @@
     display: inline;
   }
 
-  .oppia-share-publish-body .oppia-share-publish-link div {
-    background-color: #fcfcfc;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
-    margin-bottom: 2px;
-    margin-top: 10px;
-    max-width: 350px;
-    overflow: hidden;
-    padding: 10px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .oppia-share-publish-body .oppia-share-publish-link .oppia-share-link-container {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 10px;
   }
 
-  .oppia-share-publish-body .oppia-share-publish-link div:hover {
-    background-color: #f9f9f9;
+  .oppia-share-publish-body .oppia-share-publish-link div {
+    border-radius: 4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .oppia-share-publish-body .oppia-share-publish-link span {

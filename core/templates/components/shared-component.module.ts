@@ -176,6 +176,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateModule } from '@ngx-translate/core';
+import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 import { MatMenuModule} from '@angular/material/menu';
 import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 
@@ -210,6 +212,7 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     AngularFireAuthModule,
     MatProgressSpinnerModule,
     NgbModalModule,
+    TranslateModule,
     DynamicComponentModule
   ],
 
@@ -344,6 +347,7 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
+    ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
   ],
 
@@ -470,6 +474,7 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
+    ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     CopierComponent,
     RandomSelectorComponent
@@ -609,6 +614,8 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
     ReviewTestPageComponent,
+    ComponentOverviewComponent,
+    TranslateModule,
     VisualizationSortedTilesComponent,
   ],
 })
