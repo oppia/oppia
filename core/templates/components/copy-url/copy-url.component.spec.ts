@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for Copy Exploration URL component
+ * @fileoverview Unit tests for copy exploration URL component.
  */
 
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -26,12 +26,12 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
-  isCurrentLanguageRTL() {
+  isCurrentLanguageRTL(): boolean {
     return true;
   }
 }
 
-describe('Copy Exploration URL component', function() {
+describe('Copy Exploration URL component', () => {
   let clipboard: Clipboard;
   let component: ComponentOverviewComponent;
   let fixture: ComponentFixture<ComponentOverviewComponent>;
