@@ -89,7 +89,7 @@ describe('EndExplorationValidationService', () => {
     )];
   });
 
-  it('should not have warnings for no answer groups or no default outcome',
+  it('should not have warnings when the end exploration object is valid',
     () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
