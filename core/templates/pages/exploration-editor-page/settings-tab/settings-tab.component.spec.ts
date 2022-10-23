@@ -237,6 +237,7 @@ describe('Settings Tab Component', () => {
 
       component.filterChoices('');
 
+      explorationTagsService.displayed = ['shivam'];
       component.add({
         value: 'shivam',
         input: {
@@ -249,6 +250,52 @@ describe('Settings Tab Component', () => {
 
       flush();
     }));
+
+  it('should validate exploration editor tags properly', fakeAsync(() => {
+    spyOn(component, 'saveExplorationTags').and.stub();
+
+    explorationTagsService.displayed = [];
+    component.add({
+      value: 'name',
+      input: {
+        value: ''
+      }
+    } as MatChipInputEvent);
+    tick();
+
+    expect(explorationTagsService.displayed).toEqual(['name']);
+
+    // When user try to enter same tag again.
+    component.add({
+      value: 'name',
+      input: {
+        value: ''
+      }
+    } as MatChipInputEvent);
+    tick();
+    expect(explorationTagsService.displayed).toEqual(['name']);
+
+    component.remove('name');
+    tick();
+    expect(explorationTagsService.displayed).toEqual([]);
+
+    component.add({
+      value: 'first',
+      input: {
+        value: ''
+      }
+    } as MatChipInputEvent);
+    component.add({
+      value: 'secound',
+      input: {
+        value: ''
+      }
+    } as MatChipInputEvent);
+
+    component.remove('secound');
+    tick();
+    expect(explorationTagsService.displayed).toEqual(['first']);
+  }));
 
   it('should get explore page url based on the exploration id', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
