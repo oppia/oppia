@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import copy
 import os
-import re
 
 from core import feconf
 from core import utils
@@ -36,8 +35,7 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Tuple, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1139,6 +1137,1414 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.dummy_entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
             translation_dict)
+        self.new_exploration = (
+            exp_domain.Exploration.create_default_exploration('test_id'))
+        self.state = self.new_exploration.states['Introduction']
+        self.set_interaction_for_state(self.state, 'Continue')
+
+    def test_image_rte_tag(self) -> None:
+        """Validate image tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag does not have \'alt-with-value\' '
+            'attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="&quot;&quot;">'
+            '</oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'The length of the image tag \'alt-with'
+            '-value\' attribute value should be at least 5 characters.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="">'
+            '</oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'The length of the image tag \'alt-with'
+            '-value\' attribute value should be at least 5 characters.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
+            'caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaa&amp;quot;\"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag \'caption-with-value\' attribute '
+                'should not be greater than 500 characters.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag does not have \'caption-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image filepath-with-value="&quot;&quot;'
+            '" caption-with-value="&quot;&quot;" alt-with-value="&quot;'
+            'Image&quot;"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag \'filepath-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag does not have \'filepath-with'
+            '-value\' attribute.')
+
+    def test_skill_review_rte_tag(self) -> None:
+        """Validate SkillReview tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" ></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'SkillReview tag does not have \'text-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
+            '&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'SkillReview tag \'text-with-value\' '
+            'attribute should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-skillreview text-with-value=\"&amp;quot;'
+            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'SkillReview tag does not have '
+            '\'skill_id-with-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
+            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'SkillReview tag \'skill_id-with-value\' '
+            'attribute should not be empty.')
+
+    def test_video_rte_tag(self) -> None:
+        """Validate Video tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag does not have \'start-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag \'start-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag does not have \'end-with-value\' '
+            'attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"\" start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag \'end-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Start value should not be greater than End '
+            'value in Video tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag does not have \'autoplay-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"not valid\" '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag \'autoplay-with-value\' attribute '
+            'should be a boolean value.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"9\">'
+            '</oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag does not have \'video_id-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag \'video_id-with-value\' attribute '
+            'should not be empty.')
+
+    def test_link_rte_tag(self) -> None:
+        """Validate Link tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-link '
+            'url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">'
+            '</oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Link tag does not have \'text-with-value\' '
+            'attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-link'
+            ' text-with-value=\"&amp;quot;something&amp;quot;\">'
+            '</oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Link tag does not have \'url-with-value\' '
+            'attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-link'
+            ' text-with-value=\"&amp;quot;something&amp;quot;\"'
+            ' url-with-value=\"\"></oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Link tag \'url-with-value\' attribute '
+            'should not be empty.')
+
+    def test_math_rte_tag(self) -> None:
+        """Validate Math tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag does not have '
+            '\'math_content-with-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math'
+            ' math_content-with-value=\"\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag \'math_content-with-value\' '
+            'attribute should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag does not have \'raw_latex-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag \'raw_latex-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;not empty'
+            '&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag does not have '
+            '\'svg_filename-with-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            '&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag \'svg_filename-with-value\' '
+            'attribute should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'image.png&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag \'svg_filename-with-value\' '
+            'attribute should have svg extension.')
+
+    def test_tabs_rte_tag(self) -> None:
+        """Validate Tabs tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No tabs are present inside the tabs tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No content attribute is present inside '
+            'the tabs tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            '&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No title attribute is present inside '
+            'the tabs tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;content&amp;quot;:'
+            '&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;quot;}]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'title present inside tabs tag is empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No content attribute is present inside '
+            'the tabs tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            'content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;/p&amp;gt;'
+            '&amp;quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'content present inside tabs tag is empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            'content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-'
+            'noninteractive-tabs&amp;gt;&amp;lt;/oppia-noninteractive-tabs'
+            '&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;}]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Tabs tag should not be present inside '
+            'another Tabs or Collapsible tag.')
+
+    def test_collapsible_rte_tag(self) -> None:
+        """Validate Collapsible tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible '
+            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No collapsible content is present '
+            'inside the tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible heading-with-value='
+            '\'&amp;quot;head&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No content attribute present in '
+            'collapsible tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value='
+            '\'&amp;quot;Content&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Heading attribute inside the collapsible '
+            'tag is empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value=\'&amp;'
+            'quot;Content&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No heading attribute present in '
+            'collapsible tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value='
+            '\'&amp;quot;<oppia-noninteractive-collapsible>'
+            '</oppia-noninteractive-collapsible>&amp;quot;\' heading-with-value'
+            '=\'&amp;quot;heading&amp;quot;\'>'
+            '</oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Collapsible tag should not be present '
+            'inside another Tabs or Collapsible tag.')
+        self.state.content.html = 'Valid content'
+
+    def test_written_translations(self) -> None:
+        """Validate WrittenTranslations."""
+        cust_args = (
+            self.state.interaction.customization_args['buttonText'].value)
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(cust_args, state_domain.SubtitledUnicode)
+        content_id_of_continue_button_text = cust_args.content_id
+
+        self.state.written_translations.add_translation(
+            content_id_of_continue_button_text,
+            'en',
+            '<oppia-noninteractive-image></oppia-noninteractive-image>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag does not have \'alt-with-value\' '
+            'attribute.')
+
+        self.state.written_translations.translations_mapping[
+            content_id_of_continue_button_text]['en'].translation = (
+            '<oppia-noninteractive-collapsible '
+            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No collapsible content is present '
+            'inside the tag.')
+
+        self.state.written_translations.translations_mapping[
+            content_id_of_continue_button_text]['en'].translation = (
+            'valid value')
+
+    def test_numeric_interaction(self) -> None:
+        """Tests Numeric interaction."""
+        self.set_interaction_for_state(self.state, 'NumericInput')
+        test_ans_group_for_numeric_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 7
+                    }
+                },
+                {
+                    'rule_type': 'IsInclusivelyBetween',
+                    'inputs': {
+                        'a': 3,
+                        'b': 5
+                    }
+                },
+                {
+                    'rule_type': 'IsWithinTolerance',
+                    'inputs': {
+                        'x': 1,
+                        'tol': -1
+                    }
+                },
+                {
+                    'rule_type': 'IsInclusivelyBetween',
+                    'inputs': {
+                        'a': 8,
+                        'b': 8
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 7
+                    }
+                },
+                {
+                    'rule_type': 'IsGreaterThanOrEqualTo',
+                    'inputs': {
+                        'x': 10
+                    }
+                },
+                {
+                    'rule_type': 'IsGreaterThanOrEqualTo',
+                    'inputs': {
+                        'x': 15
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.interaction.answer_groups = (
+            test_ans_group_for_numeric_interaction)
+        self._assert_validation_error(
+            self.new_exploration, 'Rule \'1\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules')
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' having '
+            'rule type \'IsWithinTolerance\' have \'tol\' value less than or '
+            'equal to zero in NumericInput interaction.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' having '
+            'rule type \'IsInclusivelyBetween\' have `a` value greater than `b`'
+            ' value in NumericInput interaction.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'NumericInput interaction is already present.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule \'2\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules')
+
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'feedback_0')
+        self.state.written_translations.add_content_id_for_translation(
+            'feedback_0')
+
+    def test_fraction_interaction(self) -> None:
+        """Tests Fraction interaction."""
+        state = self.new_exploration.states['Introduction']
+        self.set_interaction_for_state(state, 'FractionInput')
+        test_ans_group_for_fraction_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 4,
+                            'denominator': 6
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 1,
+                            'numerator': 3,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 3,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 2,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsGreaterThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 10,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 27,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasDenominatorEqualTo',
+                    'inputs': {
+                        'x': 4
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 9,
+                            'denominator': 4
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 7,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 5,
+                            'denominator': 2
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = (
+            test_ans_group_for_fraction_interaction)
+        state.interaction.customization_args[
+            'allowNonzeroIntegerPart'].value = False
+        state.interaction.customization_args[
+            'allowImproperFraction'].value = False
+        state.interaction.customization_args[
+            'requireSimplestForm'].value = True
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'FractionInput interaction is already present.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in simple form '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in proper fraction '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in proper fraction '
+            'in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+
+        state.interaction.customization_args[
+            'allowImproperFraction'].value = True
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' has '
+            'non zero integer part in FractionInput interaction.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule \'2\' from answer group \'0\' of '
+            'FractionInput interaction will never be matched because it is '
+            'made redundant by the above rules')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule \'3\' from answer group \'0\' of '
+            'FractionInput interaction having rule type HasFractionalPart'
+            'ExactlyEqualTo will never be matched because it is '
+            'made redundant by the above rules')
+        rule_specs.remove(rule_specs[1])
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule \'3\' from answer group \'0\' of '
+            'FractionInput interaction will never be matched because it is '
+            'made redundant by the above rules')
+
+        state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
+        state.written_translations.add_content_id_for_translation('feedback_0')
+
+    def test_number_with_units_interaction(self) -> None:
+        """Tests NumberWithUnits interaction."""
+        self.set_interaction_for_state(self.state, 'NumberWithUnits')
+        test_ans_group_for_number_with_units_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'IsEquivalentTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsEquivalentTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.update_interaction_answer_groups(
+            test_ans_group_for_number_with_units_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' has '
+            'rule type equal is coming after rule type equivalent having '
+            'same value in FractionInput interaction.'
+        )
+
+        rule_specs.remove(rule_specs[1])
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'NumberWithUnitsInput interaction is already present.'
+        )
+
+    def test_multiple_choice_interaction(self) -> None:
+        """Tests MultipleChoice interaction."""
+        self.set_interaction_for_state(self.state, 'MultipleChoiceInput')
+        test_ans_group_for_multiple_choice_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.update_interaction_answer_groups(
+            test_ans_group_for_multiple_choice_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
+        ]
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'MultipleChoiceInput interaction is already present.'
+        )
+
+        rule_specs.remove(rule_specs[1])
+        self.state.interaction.customization_args[
+            'choices'].value[2].html = '<p>2</p>'
+
+    def test_item_selection_choice_interaction(self) -> None:
+        """Tests ItemSelection interaction."""
+        self.set_interaction_for_state(self.state, 'ItemSelectionInput')
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        test_ans_group_for_item_selection_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': ['ca_choices_0', 'ca_choices_1', 'ca_choices_2']
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': ['ca_choices_0', 'ca_choices_1', 'ca_choices_2']
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.update_interaction_answer_groups(
+            test_ans_group_for_item_selection_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
+        ]
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 3
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 1
+
+        self._assert_validation_error(
+            self.new_exploration, 'Min value which is 3 is greater than max '
+            'value which is 1 in ItemSelectionInput interaction.'
+        )
+
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 4
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 4
+        self._assert_validation_error(
+            self.new_exploration, 'Number of choices which is 3 is lesser '
+                'than the min value selection which is 4 in ItemSelectionInput '
+                'interaction.')
+
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        self._assert_validation_error(
+            self.new_exploration, 'The rule 1 of answer group 0 of '
+            'ItemSelectionInput interaction is already present.'
+        )
+        rule_specs.remove(rule_specs[1])
+
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 2
+        self._assert_validation_error(
+            self.new_exploration, 'Selected choices of rule \'0\' of answer '
+            'group \'0\' either less than min_selection_value or greater than '
+            'max_selection_value in ItemSelectionInput interaction.'
+        )
+
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+
+    def test_drag_and_drop_interaction(self) -> None:
+        """Tests DragAndDrop interaction."""
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'ca_choices_2')
+        self.state.written_translations.add_content_id_for_translation(
+            'ca_choices_2')
+        self.set_interaction_for_state(self.state, 'DragAndDropSortInput')
+        empty_list: List[str] = []
+        test_ans_group_for_drag_and_drop_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': (
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXBeforeElementY',
+                    'inputs': {
+                    'x': 'ca_choices_0',
+                    'y': 'ca_choices_0'
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': empty_list
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 1
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': (
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_1', 'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_2'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_1'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_2', 'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_1'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ]
+                        ]
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.interaction.answer_groups = (
+            test_ans_group_for_drag_and_drop_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        self.state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = False
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'0\' of answer group \'0\' '
+            'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
+            ' should not be there when the multiple items in same position '
+            'setting is turned off in DragAndDropSortInput interaction.')
+        rule_specs.remove(rule_specs[0])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'0\' of answer group \'0\' '
+            'have multiple items at same place when multiple items in same '
+            'position settings is turned off in DragAndDropSortInput '
+            'interaction.')
+
+        self.state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = True
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\', '
+            'the value 1 and value 2 cannot be same when rule type is '
+            'HasElementXBeforeElementY of DragAndDropSortInput interaction.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\'of answer group \'0\', '
+            'having rule type IsEqualToOrdering should not have empty values.')
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'2\' of answer group \'0\' of '
+            'DragAndDropInput interaction is already present.')
+        rule_specs.remove(rule_specs[0])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule - 1 of answer group 0 '
+            'will never be match because it is made redundant by the '
+            'HasElementXAtPositionY rule above.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule - 1 of answer group 0 will never '
+            'be match because it is made redundant by the '
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition rule above.')
+        rule_specs.remove(rule_specs[1])
+
+    def test_text_interaction(self) -> None:
+        """Tests Text interaction."""
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'feedback_0')
+        self.state.written_translations.add_content_id_for_translation(
+            'feedback_0')
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'rule_input_27')
+        self.state.written_translations.add_content_id_for_translation(
+            'rule_input_27')
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'ca_choices_0')
+        self.state.written_translations.add_content_id_for_translation(
+            'ca_choices_0')
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'ca_choices_1')
+        self.state.written_translations.add_content_id_for_translation(
+            'ca_choices_1')
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'ca_choices_2')
+        self.state.written_translations.add_content_id_for_translation(
+            'ca_choices_2')
+        self.set_interaction_for_state(self.state, 'TextInput')
+        test_ans_group_for_text_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                          'x': {
+                              'contentId': 'rule_input_27',
+                              'normalizedStrSet': [
+                                'hello',
+                                'abc',
+                                'def'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'helloooooo'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'exci'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'excitement'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.interaction.answer_groups = (
+            test_ans_group_for_text_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+
+        self.state.interaction.customization_args['rows'].value = 5
+        self._assert_validation_error(
+            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Contains\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.')
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
+            'rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.')
+        rule_specs.remove(rule_specs[0])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
+            'TextInput interaction is already present.')
 
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
@@ -1581,6 +2987,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             'Terminal interactions must not have any answer groups.')
 
+        init_state.interaction.answer_groups = []
+        self.set_interaction_for_state(init_state, 'Continue')
+        init_state.interaction.answer_groups = answer_groups
+        init_state.update_interaction_default_outcome(default_outcome)
+        self._assert_validation_error(
+            exploration,
+            'Linear interactions must not have any answer groups.')
+
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
         init_state.interaction.answer_groups = []
@@ -1591,24 +3005,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(answer_groups)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
-        solution_dict: state_domain.SolutionDict = {
-            'answer_is_exclusive': True,
-            'correct_answer': 'hello_world!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': 'hello_world is a string'
-                }
-        }
-        # Ruling out the possibility of None for mypy type checking.
-        assert init_state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict)
-        init_state.update_interaction_solution(solution)
-        self._assert_validation_error(
-            exploration,
-            re.escape('Hint(s) must be specified if solution is specified'))
-
-        init_state.update_interaction_solution(None)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
@@ -1645,7 +3041,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            'Expected tagged skill misconception id to be a str, received 1')
+            'Expected tagged skill misconception id to be None, received 1')
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected tagged skill misconception id to be None, received 1'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -1669,9 +3073,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            'Expected the format of tagged skill misconception id '
-            'to be <skill_id>-<misconception_id>, received '
+            'Expected tagged skill misconception id to be None, received '
             'invalid_tagged_skill_misconception_id')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected tagged skill misconception id to be None, received '
+            'invalid_tagged_skill_misconception_id'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
@@ -1685,8 +3098,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         first_answer_group.rule_specs = []
         self._assert_validation_error(
             exploration,
-            'There must be at least one rule or training data for each'
-            ' answer group.')
+            'There must be at least one rule for each answer group.')
+        with self.assertRaisesRegex(
+            Exception,
+            'There must be at least one rule for each answer group.'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
 
         exploration.states = {
             exploration.init_state_name: (
@@ -1775,6 +3195,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.tags = ['abc', 'abc']
         self._assert_validation_error(
             exploration, 'Some tags duplicate each other')
+
+        exploration.tags = ['randomtextwhichisprobablygreaterthanthirty']
+        self._assert_validation_error(
+            exploration, 'Tag text length should not be more than 30.')
+
+        exploration.tags = [
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+        self._assert_validation_error(
+            exploration, 'Total number of tags should be less than 10.')
 
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()

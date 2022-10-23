@@ -93,13 +93,13 @@
             class="oppia-pagination-button"
             (click)="goToPreviousItem()"
             [disabled]="isFirstItem">
-      <span class="material-icons">navigate_before</span>Previous
+      <i class="fas fa-angle-left"></i>Previous
     </button>
     <button type="button"
             class="oppia-pagination-button"
             (click)="goToNextItem()"
             [disabled]="isLastItem">
-      Next<span class="material-icons">navigate_next</span>
+      Next<i class="fas fa-angle-right"></i>
     </button>
   </div>
 </div>
@@ -184,6 +184,11 @@
   .oppia-suggestion-review-message {
     margin-left: 10px;
     margin-top: 20px;
+  }
+  .oppia-pagination-button i {
+    display: inline-block;
+    height: 24px;
+    width: 24px;
   }
 
   @media only screen and (max-width: 700px) {
