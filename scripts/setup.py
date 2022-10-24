@@ -22,16 +22,18 @@ import subprocess
 import sys
 import tarfile
 
+from typing import Final, List, Optional
+
 from . import clean
 from . import common
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Python execution environent set up for all scripts.
 """)
 
 
-def create_directory(directory_path):
+def create_directory(directory_path: str) -> None:
     """Creates a new directory. Does not do anything if directory already
     exists.
 
@@ -46,10 +48,10 @@ def create_directory(directory_path):
 # This function takes a command for python as its only input.
 # It checks this input for a specific version of python and returns false
 # if it does not match the expected prefix.
-def test_python_version():
-    running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
-    if running_python_version != '3.7':
-        print('Please use Python 3.7. Exiting...')
+def test_python_version() -> None:
+    running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
+    if running_python_version != '3.8.12':
+        print('Please use Python 3.8.12. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():
@@ -85,7 +87,7 @@ def test_python_version():
         sys.exit(1)
 
 
-def download_and_install_package(url_to_retrieve, filename):
+def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     """Downloads and installs package in Oppia tools directory.
 
     Args:
@@ -101,7 +103,7 @@ def download_and_install_package(url_to_retrieve, filename):
     os.remove(filename)
 
 
-def rename_yarn_folder(filename, path):
+def rename_yarn_folder(filename: str, path: str) -> None:
     """Removes the `v` from the yarn folder name.
 
     Args:
@@ -114,7 +116,7 @@ def rename_yarn_folder(filename, path):
         os.rename(path + '/' + old_name, path + '/' + new_name)
 
 
-def download_and_install_node():
+def download_and_install_node() -> None:
     """Download and install node to Oppia tools directory."""
     outfile_name = 'node-download'
 
@@ -156,7 +158,7 @@ def download_and_install_node():
             subprocess.check_call(['make'])
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Runs the script to setup Oppia."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     test_python_version()

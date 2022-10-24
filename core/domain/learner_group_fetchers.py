@@ -22,8 +22,7 @@ from core.domain import learner_group_domain
 from core.domain import learner_group_services
 from core.platform import models
 
-from typing import List, Optional, Sequence, overload
-from typing_extensions import Literal
+from typing import List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
