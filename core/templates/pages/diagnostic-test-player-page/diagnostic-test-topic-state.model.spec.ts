@@ -18,46 +18,51 @@
 
 
 import { TestBed } from '@angular/core/testing';
-import { DiagnosticTestTopicStateData } from './diagnostic-test-topic-state.model';
-
-
-class MockQuestion {
-  id: string;
-  description: string;
-
-  constructor(id, description) {
-    id = id;
-    description = description;
-  }
-}
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { DiagnosticTestTopicStateData, SkillIdToQuestions } from './diagnostic-test-topic-state.model';
 
 
 describe('Diagnostic test model', () => {
-  let skillID1: string, skillID2: string, skillID3: string;
-  let question1: MockQuestion, question2: MockQuestion, question3: MockQuestion;
-  let question4: MockQuestion, question5: MockQuestion, question6: MockQuestion;
+  let question1: Question, question2: Question, question3: Question;
+  let question4: Question, question5: Question, question6: Question;
+  let stateObject: StateObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: []
     });
-    console.log('in the before each');
-    skillID1 = 'skillID1';
-    skillID2 = 'skillID2';
-    skillID3 = 'skillID3';
+    stateObject = TestBed.inject(StateObjectFactory);
 
-    question1 = new MockQuestion('question1', 'Question 1');
-    question2 = new MockQuestion('question2', 'Question 2');
-    question3 = new MockQuestion('question3', 'Question 3');
-    question4 = new MockQuestion('question4', 'Question 4');
-    question5 = new MockQuestion('question5', 'Question 5');
-    question6 = new MockQuestion('question6', 'Question 6');
-    console.log('END')
+    question1 = new Question(
+      'question1', stateObject.createDefaultState('state'), '', 1,
+      ['skillID1'], []
+    );
+    question2 = new Question(
+      'question2', stateObject.createDefaultState('state'), '', 1,
+      ['skillID2'], []
+    );
+    question3 = new Question(
+      'question3', stateObject.createDefaultState('state'), '', 1,
+      ['skillID3'], []
+    );
+    question4 = new Question(
+      'question4', stateObject.createDefaultState('state'), '', 1,
+      ['skillID4'], []
+    );
+    question5 = new Question(
+      'question5', stateObject.createDefaultState('state'), '', 1,
+      ['skillID5'], []
+    );
+    question6 = new Question(
+      'question6', stateObject.createDefaultState('state'), '', 1,
+      ['skillID6'], []
+    );
   });
 
   it('should be able to get the next question', () => {
-    let skillIdToQuestions = {
+    let skillIdToQuestions: SkillIdToQuestions = {
       skillID1: [question1, question2],
       skillID2: [question3, question4],
       skillID3: [question5, question6]
@@ -66,7 +71,7 @@ describe('Diagnostic test model', () => {
     let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
       skillIdToQuestions);
 
-    expect(diagnosticTestTopicStateData._currentSkill).toEqual(skillID1);
+    expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
 
     let question = diagnosticTestTopicStateData.getNextQuestion();
 
@@ -76,16 +81,16 @@ describe('Diagnostic test model', () => {
   it(
     'should be able to get the next question from a different skill after ' +
     'marking the answer for the current question as correct', () => {
-      let skillIdToQuestions = {
+      let skillIdToQuestions: SkillIdToQuestions = {
         skillID1: [question1, question2],
         skillID2: [question3, question4],
         skillID3: [question5, question6]
-      }
+      };
 
       let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual(skillID1);
+      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
 
       let question = diagnosticTestTopicStateData.getNextQuestion();
 
@@ -93,26 +98,26 @@ describe('Diagnostic test model', () => {
 
       diagnosticTestTopicStateData.recordCorrectAttemptForCurrentQuestion();
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual(skillID2);
+      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID2');
 
       question = diagnosticTestTopicStateData.getNextQuestion();
 
       expect(question).toEqual(question3);
-  });
+    });
 
   it(
     'should be able to get the next question from the same skill after ' +
     'marking the answer for the current question as incorrect', () => {
-      let skillIdToQuestions = {
+      let skillIdToQuestions: SkillIdToQuestions = {
         skillID1: [question1, question2],
         skillID2: [question3, question4],
         skillID3: [question5, question6]
-      }
+      };
 
       let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual(skillID1);
+      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
 
       let question = diagnosticTestTopicStateData.getNextQuestion();
 
@@ -120,21 +125,21 @@ describe('Diagnostic test model', () => {
 
       diagnosticTestTopicStateData.recordIncorrectAttemptForCurrentQuestion();
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual(skillID1);
+      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
 
       question = diagnosticTestTopicStateData.getNextQuestion();
 
       expect(question).toEqual(question2);
-  });
+    });
 
   it(
     'should be able to fail the topic if the attempted answer for the ' +
     'current question is incorrect and a lifeline is already used', () => {
-      let skillIdToQuestions = {
+      let skillIdToQuestions: SkillIdToQuestions = {
         skillID1: [question1, question2],
         skillID2: [question3, question4],
         skillID3: [question5, question6]
-      }
+      };
 
       let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
@@ -144,21 +149,21 @@ describe('Diagnostic test model', () => {
       diagnosticTestTopicStateData.recordIncorrectAttemptForCurrentQuestion();
 
       expect(diagnosticTestTopicStateData.isTopicPassed()).toBeFalse();
-  });
+    });
 
   it(
     'should be able to mark the topic as passed if questions from all the ' +
     'skills were attempted correctly, with or without using the lifeline',
     () => {
-      let skillIdToQuestions = {
+      let skillIdToQuestions: SkillIdToQuestions = {
         skillID1: [question1, question2],
         skillID2: [question3, question4]
-      }
+      };
 
       let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual(skillID1);
+      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
 
       let question = diagnosticTestTopicStateData.getNextQuestion();
 
@@ -166,7 +171,7 @@ describe('Diagnostic test model', () => {
 
       diagnosticTestTopicStateData.recordCorrectAttemptForCurrentQuestion();
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual(skillID2);
+      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID2');
       expect(
         diagnosticTestTopicStateData.isTopicCompletelyTested()).toBeFalse();
 
@@ -178,13 +183,13 @@ describe('Diagnostic test model', () => {
 
       expect(diagnosticTestTopicStateData.isTopicPassed()).toBeTrue();
       expect(diagnosticTestTopicStateData.isTopicCompletelyTested()).toBeTrue();
-  });
+    });
 
   it('should be able to get the total number of attempted questions', () => {
-    let skillIdToQuestions = {
+    let skillIdToQuestions: SkillIdToQuestions = {
       skillID1: [question1, question2],
       skillID2: [question3, question4]
-    }
+    };
 
     let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
       skillIdToQuestions);
@@ -209,4 +214,3 @@ describe('Diagnostic test model', () => {
       .toEqual(2);
   });
 });
-

@@ -16,24 +16,30 @@
  * @fileoverview Diagnostic test topic state model.
  */
 
-import { Question } from "domain/question/QuestionObjectFactory";
+import { Question } from 'domain/question/QuestionObjectFactory';
+
+export interface SkillIdToQuestions {
+  [skillId: string]: Question[];
+}
 
 export class DiagnosticTestTopicStateData {
   _numberOfAttemptedQuestion: number;
-  _skillIdToQuestionsList: {[skillId: string]: Question[]};
+  _skillIdToQuestionsList: SkillIdToQuestions;
   _currentSkill: string;
   _lifeLineIsConsumed: boolean;
   _topicIsPassed: boolean;
   _diagnosticTestSkills: string[];
   _currenSkillIndex: number;
   _testedSkillIds: string[];
-  _currentQuestion: Question;
+  _currentQuestion!: Question;
 
-  constructor(skillIdToQuestions) {
+
+  constructor(skillIdToQuestions: SkillIdToQuestions) {
     this._numberOfAttemptedQuestion = 0;
     this._currenSkillIndex = 0;
     this._lifeLineIsConsumed = false;
     this._testedSkillIds = [];
+    this._topicIsPassed = false;
     this._skillIdToQuestionsList = skillIdToQuestions;
     this._diagnosticTestSkills = Object.keys(this._skillIdToQuestionsList);
     this._currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
