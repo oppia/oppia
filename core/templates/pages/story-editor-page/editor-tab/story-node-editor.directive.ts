@@ -369,11 +369,11 @@ export class StoryNodeEditorComponent {
     this.nodeTitleEditorIsShown = false;
   }
 
-  isOutlineModified(outline): boolean {
+  isOutlineModified(outline: string): boolean {
     return this.oldOutline !== outline;
   }
 
-  updatedOutline(newOutline): void {
+  updateOutline(newOutline: string): void {
     if (this.isOutlineModified(newOutline)) {
       this.storyUpdateService.setStoryNodeOutline(
         this.story, this.nodeId, newOutline);

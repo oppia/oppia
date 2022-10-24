@@ -28,9 +28,13 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('chapterEditorTab', {
   template: require('./chapter-editor-tab.component.html'),
   controller: [
+    '$rootScope',
     'StoryEditorNavigationService', 'StoryEditorStateService',
+    'StoryUpdateService',
     function(
-        StoryEditorNavigationService, StoryEditorStateService) {
+        $rootScope,
+        StoryEditorNavigationService, StoryEditorStateService,
+        StoryUpdateService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.initEditor = function() {
@@ -66,6 +70,11 @@ angular.module('oppia').component('chapterEditorTab', {
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryReinitialized.subscribe(
             () => ctrl.initEditor()
+          )
+        );
+        ctrl.directiveSubscriptions.add(
+          StoryUpdateService.storyChapterUpdateEventEmitter.subscribe(
+            () => $rootScope.$applyAsync()
           )
         );
         ctrl.initEditor();
