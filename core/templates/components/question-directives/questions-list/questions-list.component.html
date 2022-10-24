@@ -1,8 +1,8 @@
 <div class="question-editor-container">
-  <div *ngIf="editorIsOpen && question" class="question-editor-parent">
+  <div *ngIf="editorIsOpen" class="question-editor-parent">
     <mat-card class="oppia-page-card oppia-mobile-collapsible-card">
       <div class="difficulty-card-header oppia-mobile-collapsible-card-header" (click)="toggleDifficultyCard()">
-        <h3>Difficulty</h3>
+        <h3>Difficulty Question {{question}}</h3>
         <i class="fa fa-caret-down"
            *ngIf="!difficultyCardIsShown"
            aria-hidden="true">
@@ -88,7 +88,7 @@
       </div>
     </div>
   </mat-card>
-  <mat-card class="question-data-container question-editor-open-container" *ngIf="editorIsOpen && question">
+  <mat-card class="question-data-container question-editor-open-container" *ngIf="editorIsOpen">
     <div class="save-question-container">
       <div>
         <div class="list-header">
