@@ -675,6 +675,8 @@
 	"I18N_RESET_CODE": "Скидання коду",
 	"I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Огляд тесту",
 	"I18N_SAVE_PROGRESS": "Увійдіть або зареєструйтесь, щоб зберегти свій прогрес та пройти наступний урок.",
+	"I18N_SAVE_PROGRESS_BUTTON_TEXT": "Копіювати",
+	"I18N_SAVE_PROGRESS_COPY_TOOLTIP": "Скопійовано!",
 	"I18N_SHARE_LESSON": "Поділіться цим уроком",
 	"I18N_SHOW_SOLUTION_BUTTON": "Показати рішення",
 	"I18N_SIDEBAR_ABOUT_LINK": "Про Oppia",
