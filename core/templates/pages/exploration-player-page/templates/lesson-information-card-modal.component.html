@@ -194,9 +194,9 @@
   <div class="uid-box">
     <p class="guide-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3' | translate }}<br>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4' | translate }}</p>
     <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
-    <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
-      <div class="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
-      <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
+    <div [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }"
+         class="oppia-tooltip-container">
+      <oppia-copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></oppia-copy-url>
     </div>
   </div>
   <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
