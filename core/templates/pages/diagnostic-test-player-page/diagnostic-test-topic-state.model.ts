@@ -16,60 +16,71 @@
  * @fileoverview Diagnostic test topic state model.
  */
 
+import { Question } from "domain/question/QuestionObjectFactory";
 
 export class DiagnosticTestTopicStateData {
-  numberOfAttemptedQuestion: number;
-  skillIdToQuestionsList;
-  currentSkill;
-  _lifeLineIsConsumed;
-  _topicIsPassed;
-  _topicTestingIsComplete;
-  _diagnosticTestSkills;
-  _currenSkillIndex;
-  skillIdToPassedStateDict;
+  _numberOfAttemptedQuestion: number;
+  _skillIdToQuestionsList: {[skillId: string]: Question[]};
+  _currentSkill: string;
+  _lifeLineIsConsumed: boolean;
+  _topicIsPassed: boolean;
+  _diagnosticTestSkills: string[];
+  _currenSkillIndex: number;
+  _testedSkillIds: string[];
+  _currentQuestion: Question;
 
   constructor(skillIdToQuestions) {
-    this.numberOfAttemptedQuestion = 0;
-    this._lifeLineIsConsumed = false;
-    this.skillIdToQuestionsList = skillIdToQuestions;
+    this._numberOfAttemptedQuestion = 0;
     this._currenSkillIndex = 0;
-    this._diagnosticTestSkills = Object.keys(this.skillIdToQuestionsList);
-    this.skillIdToPassedStateDict = {};
-    for (let skillId of this._diagnosticTestSkills) {
-      this.skillIdToPassedStateDict[skillId] = false;
+    this._lifeLineIsConsumed = false;
+    this._testedSkillIds = [];
+    this._diagnosticTestSkills = Object.keys(this._skillIdToQuestionsList);
+    this._skillIdToQuestionsList = skillIdToQuestions;
+  }
+
+  recordCorrectAttemptForCurrentQuestion(): void {
+    this._testedSkillIds.push(this._currentSkill);
+    this._numberOfAttemptedQuestion += 1;
+    this._currenSkillIndex += 1;
+    if (this._currenSkillIndex >= this._diagnosticTestSkills.length) {
+      this._topicIsPassed = true;
+    }
+    this._currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
+  }
+
+  recordIncorrectAttemptForCurrentQuestion(): void {
+    this._numberOfAttemptedQuestion += 1;
+    if (this._lifeLineIsConsumed) {
+      this._testedSkillIds.push(this._currentSkill);
+      this._topicIsPassed = false;
+    } else {
+      this._lifeLineIsConsumed = true;
     }
   }
 
-  getNextQuestionFromCurrentSkill() {
-    this.numberOfAttemptedQuestion += 1;
-    return this.skillIdToQuestionsList[this.currentSkill][1];
-  }
-
-  getCurrentQuestion() {
-    this.currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
-    return this.skillIdToQuestionsList[this.currentSkill][0];
-  }
-
-  getNextQuestion() {
-    this.numberOfAttemptedQuestion += 1;
-    this.currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
-    return this.skillIdToQuestionsList[this.currentSkill][0];
-  }
-
-  isTopicPassed() {
-    for (let skillId of this._diagnosticTestSkills) {
-      if (this.skillIdToPassedStateDict[skillId] === false) {
-        return false;
-      }
+  getNextQuestion(): Question {
+    if (this._lifeLineIsConsumed) {
+      this._currentQuestion = (
+        this._skillIdToQuestionsList[this._currentSkill][1]);
+    } else {
+      this._currentQuestion = (
+        this._skillIdToQuestionsList[this._currentSkill][0]);
     }
-    return true;
+    return this._currentQuestion;
   }
 
-  isLifeLineConsumed() {
-    return this._lifeLineIsConsumed;
+  isTopicPassed(): boolean {
+    return this._topicIsPassed;
   }
 
-  consumeLifeLine() {
-    this._lifeLineIsConsumed = true;
+  isTopicCompletelyTested(): boolean {
+    return (
+      JSON.stringify(this._testedSkillIds) ===
+      JSON.stringify(this._diagnosticTestSkills)
+    );
+  }
+
+  getTotalNumberOfAttemptedQuestions(): number {
+    return this._numberOfAttemptedQuestion;
   }
 }
