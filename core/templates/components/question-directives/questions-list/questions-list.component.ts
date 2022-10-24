@@ -51,7 +51,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { RemoveQuestionSkillLinkModalComponent } from '../modal-templates/remove-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { LoaderService } from 'services/loader.service';
 
 interface GroupedSkillSummaries {
   current: SkillSummaryBackendDict[];
@@ -103,7 +102,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       EditableQuestionBackendApiService,
     private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private loaderService: LoaderService,
     private loggerService: LoggerService,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private ngbModal: NgbModal,
@@ -126,7 +124,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loaderService.showLoadingScreen('Loading Question Editor');
     this.newQuestionSkillIds = [this.selectedSkillId];
     this.associatedSkillSummaries = [];
     this.linkedSkillsWithDifficulty = [
@@ -151,7 +148,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     this.skillLinkageModificationsArray = [];
     this.isSkillDifficultyChanged = false;
-    this.loaderService.hideLoadingScreen();
   }
 
   updateSkillWithDifficulty(event: SkillDifficulty, index: number): void {
@@ -604,7 +600,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   _initTab(resetHistoryAndFetch: boolean): void {
-    this.question = null;
     this.questionIsBeingUpdated = false;
     this.misconceptionsBySkill = {};
     this.misconceptionIdsForSelectedSkill = [];
