@@ -120,7 +120,7 @@
                                [matChipInputAddOnBlur]="addOnBlur"
                                (matChipInputTokenEnd)="add($event)">
                       </mat-chip-list>
-                      <mat-hint *ngIf="explorationTags.length === 10">Can only contain 10 tags max</mat-hint>
+                      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-settings-tab-error-message">Can only contain 10 tags max</mat-hint>
                     </mat-form-field>
                   </div>
                 </div>
@@ -692,6 +692,10 @@
 </div>
 
 <style>
+  .oppia-settings-tab-error-message {
+    color: #f00;
+  }
+
   .mat-form-field {
     width: 100%;
   }
