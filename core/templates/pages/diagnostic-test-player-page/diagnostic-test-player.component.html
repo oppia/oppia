@@ -3,9 +3,9 @@
   <mat-card class="introductory-card">
     <div class="oppia-introductory-container">
       <div class="oppia-image">
-        <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+        <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
-      <div class="test-introduction-container">
+      <div>
         <p class="test-introduction-text">
           <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1"></span>
         </p>
@@ -27,24 +27,21 @@
   .oppia-image {
     align-items: center;
     display: flex;
-    margin-right: 20px;
+    margin-right: 60px;
   }
   .oppia-introductory-container {
     display: flex;
   }
   .introductory-card {
     margin: auto;
-    margin-top: 5%;
+    margin-top: 5vh;
     overflow: auto;
-    padding: 40px;
-    width: fit-content;
+    padding: 60px;
+    width: 704px;
   }
   .test-introduction-text {
     font-family: 'Roboto', Arial, sans-serif;
-    font-size: 1.2em;
-  }
-  .test-introduction-container {
-    width: 400px;
+    font-size: 1.5em;
   }
   .oppia-diagnostic-test-session {
     color: #01645c;
@@ -59,7 +56,11 @@
     color: #fff;
     float: right;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    margin-top: 5%;
+    font-size: 1.2em;
+    margin-top: 5vh;
     text-transform: uppercase;
+  }
+  .oppia-otter-image {
+    max-width: 7em;
   }
 </style>
