@@ -40,9 +40,6 @@
       // We only run the e2e action checks on end-to-end test files, and
       // we exclude files that we haven't fixed yet.
       "files": [
-        "core/tests/protractor/*.js",
-        "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js",
         "core/tests/webdriverio/*.js",
         "core/tests/webdriverio_utils/*.js",
         "core/tests/webdriverio_desktop/*.js"
@@ -60,7 +57,6 @@
         "LearnerDashboardPage.js",
         "LibraryPage.js",
         "ProfilePage.js",
-        "ProtractorConstants.js",
         "SkillEditorPage.js",
         "StoryEditorPage.js",
         "SubscriptionDashboardPage.js",
@@ -116,26 +112,15 @@
       }
     },
     {
-      // We only run the e2e practices checks on protractor and webdriverio
+      // We only run the e2e practices checks on webdriverio
       // end-to-end test files.
       "files": [
-        "core/tests/protractor/*.js",
-        "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js",
         "core/tests/webdriverio/*.js",
         "core/tests/webdriverio_utils/*.js",
         "core/tests/webdriverio_desktop/*.js"
       ],
       "rules": {
         "oppia/e2e-practices": "error"
-      }
-    },
-    {
-      "files": [
-        "core/tests/protractor_utils/*.js",
-      ],
-      "rules": {
-        "oppia/check-element-selector-at-top": "error"
       }
     },
     {

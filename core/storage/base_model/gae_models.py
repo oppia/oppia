@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing_extensions import Final, Literal, TypedDict
+from typing import Final, Literal, TypedDict
 
 from typing import ( # isort:skip
     Any,
@@ -690,10 +690,9 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, EXPORT_POLICY]:
-        """Model contains data corresponding to a user,
-        but this isn't exported because the history of commits is not
-        relevant to a user for the purposes of Takeout, since commits do not
-        contain any personal user data.
+        """Model contains data corresponding to a user, but this isn't exported
+        because all user-related data for a commit is already being exported
+        as part of the corresponding SnapshotMetadataModel.
         """
         return dict(BaseModel.get_export_policy(), **{
             'user_id': EXPORT_POLICY.NOT_APPLICABLE,
