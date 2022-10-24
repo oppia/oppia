@@ -48,8 +48,11 @@ WORKFLOWS_DIR = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
 MERGE_STEP = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
-    'backend_tests.yml', 'pending-review-notification.yml',
-    'revert-web-wiki-updates.yml')
+    'backend_tests.yml',
+    'develop_commit_notification.yml',
+    'pending-review-notification.yml',
+    'revert-web-wiki-updates.yml'
+)
 
 THIRD_PARTY_LIBS = [
     {
@@ -275,7 +278,8 @@ class CustomLintChecksManager:
 
     @staticmethod
     def _check_that_workflow_steps_use_merge_action(
-            workflow_dict, workflow_path):
+        workflow_dict, workflow_path
+    ):
         """Check that a workflow uses the merge action.
 
         Args:
@@ -289,14 +293,13 @@ class CustomLintChecksManager:
         """
         jobs_without_merge = []
         for job, job_dict in workflow_dict['jobs'].items():
-            if 'steps' in job_dict and MERGE_STEP not in job_dict['steps']:
+            if MERGE_STEP not in job_dict['steps']:
                 jobs_without_merge.append(job)
-        error_messages = [
+        return [
             '%s --> Job %s does not use the .github/actions/merge action.' % (
                 workflow_path, job)
             for job in jobs_without_merge
         ]
-        return error_messages
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

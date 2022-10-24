@@ -1,4 +1,4 @@
-name: Send info about commit to develop
+name: Broadcast 'push to develop' event to our release-scripts repo
 on:
   push:
     branches:
