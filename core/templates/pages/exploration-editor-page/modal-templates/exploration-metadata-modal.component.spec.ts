@@ -120,7 +120,7 @@ describe('Exploration Metadata Modal Component', () => {
       fixture.detectChanges();
     });
 
-    it('should validate exploration editor tags properly', fakeAsync(() => {
+    it('should able to add or remove exploration editor tags', fakeAsync(() => {
       component.explorationTags = [];
       explorationTagsService.displayed = [];
       component.add({

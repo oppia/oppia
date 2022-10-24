@@ -251,7 +251,7 @@ describe('Settings Tab Component', () => {
       flush();
     }));
 
-  it('should validate exploration editor tags properly', fakeAsync(() => {
+  it('should able to add or remove exploration editor tags', fakeAsync(() => {
     spyOn(component, 'saveExplorationTags').and.stub();
 
     explorationTagsService.displayed = [];
