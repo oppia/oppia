@@ -27,8 +27,7 @@ import sys
 from scripts import common
 from scripts import install_third_party_libs
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Tuple
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES: Final = [
@@ -167,12 +166,13 @@ NOT_FULLY_COVERED_FILES: Final = [
     'scripts/install_third_party_libs_test.py',
     'scripts/install_third_party.py',
     'scripts/install_third_party_test.py',
-    'scripts/pre_push_hook.py',
-    'scripts/pre_push_hook_test.py',
     'scripts/run_backend_tests.py',
-    'scripts/run_portserver.py',
-    'scripts/run_presubmit_checks.py',
-    'scripts/linters/',
+    'scripts/linters/pre_commit_linter.py',
+    'scripts/linters/pre_commit_linter_test.py',
+    'scripts/linters/pylint_extensions.py',
+    'scripts/linters/pylint_extensions_test.py',
+    'scripts/linters/python_linter.py',
+    'scripts/linters/python_linter_test.py',
 ]
 
 

@@ -25,8 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, List, Union
-from typing_extensions import Final, TypedDict
+from typing import Callable, Dict, Final, List, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -898,8 +897,6 @@ TASK_URL_FLAG_EXPLORATION_EMAILS = (
     '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
-TASK_URL_SUGGESTION_EMAILS = (
-    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS = (
     '%s/email/contributordashboardachievementnotificationemailhandler' % (
         TASKQUEUE_URL_PREFIX))
@@ -915,6 +912,7 @@ CLASSROOM_ADMIN_PAGE_URL = '/classroom-admin'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
+DIAGNOSTIC_TEST_PLAYER_PAGE_URL = '/diagnostic-test-player'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'

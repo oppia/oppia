@@ -40,18 +40,18 @@ from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
 import github
-from typing import Generator, List, NoReturn
-from typing_extensions import Literal
+from typing import Generator, List, Literal, NoReturn
 
 from . import common
 
 
-# The pool_size argument is required by Requester.__init__(), but it is missing
-# from the typing definition in Requester.pyi.  We therefore disable type
-# checking here. A PR was opened to PyGithub to fix this, but it was closed due
-# to inactivity (the project does not seem very active). Here is the PR:
+# Here we use MyPy ignore because the pool_size argument is required by
+# Requester.__init__(), but it is missing from the typing definition in
+# Requester.pyi. We therefore disable type checking here. A PR was opened
+# to PyGithub to fix this, but it was closed due to inactivity (the project
+# does not seem very active). Here is the PR:
 # https://github.com/PyGithub/PyGithub/pull/2151.
-_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore
+_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
     login_or_token=None,
     password=None,
     jwt=None,
@@ -288,16 +288,20 @@ class CommonTests(test_utils.GenericTestBase):
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_get_remote_alias_with_correct_alias(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'remote1 url1\nremote2 url2'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'remote1 url1\nremote2 url2'
         with self.swap(
             subprocess, 'check_output', mock_check_output
         ):
             self.assertEqual(common.get_remote_alias(['url1']), 'remote1')
 
     def test_get_remote_alias_with_incorrect_alias(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'remote1 url1\nremote2 url2'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
@@ -325,15 +329,19 @@ class CommonTests(test_utils.GenericTestBase):
             common.verify_local_repo_is_clean()
 
     def test_get_current_branch_name(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
     def test_update_branch_with_upstream(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test'
 
         def mock_run_cmd(cmd: str) -> str:
             return cmd
@@ -372,15 +380,19 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-1.2.3'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), False)
 
     def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-1.2.3-hotfix-1'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
@@ -388,8 +400,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_release_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-1.2.3'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -397,8 +411,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_hotfix_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-1.2.3-hotfix-1'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -406,8 +422,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_maintenance_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-maintenance-1.2.3'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-maintenance-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -415,36 +433,46 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_non_release_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), False)
 
     def test_is_current_branch_a_test_branch_with_test_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test-common'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test-common'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), True)
 
     def test_is_current_branch_a_test_branch_with_non_test_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch invalid-test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch invalid-test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), False)
 
     def test_verify_current_branch_name_with_correct_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             common.verify_current_branch_name('test')
 
     def test_verify_current_branch_name_with_incorrect_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch invalid'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
