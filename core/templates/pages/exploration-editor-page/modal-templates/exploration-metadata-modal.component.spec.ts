@@ -120,7 +120,7 @@ describe('Exploration Metadata Modal Component', () => {
       fixture.detectChanges();
     });
 
-    it('should able to add or remove exploration editor tags', fakeAsync(() => {
+    it('should be able to add exploration editor tags', fakeAsync(() => {
       component.explorationTags = [];
       explorationTagsService.displayed = [];
       component.add({
@@ -142,10 +142,11 @@ describe('Exploration Metadata Modal Component', () => {
       } as MatChipInputEvent);
       tick();
       expect(explorationTagsService.displayed).toEqual(['name']);
+    }));
 
-      component.remove('name');
-      tick();
-      expect(explorationTagsService.displayed).toEqual([]);
+    it('should be able to remove exploration editor tags', fakeAsync(() => {
+      component.explorationTags = [];
+      explorationTagsService.displayed = [];
 
       component.add({
         value: 'first',
@@ -154,17 +155,16 @@ describe('Exploration Metadata Modal Component', () => {
         }
       } as MatChipInputEvent);
       component.add({
-        value: 'secound',
+        value: 'second',
         input: {
           value: ''
         }
       } as MatChipInputEvent);
 
-      component.remove('secound');
+      component.remove('second');
       tick();
       expect(explorationTagsService.displayed).toEqual(['first']);
     }));
-
 
     it('should initialize component properties after Component is initialized',
       fakeAsync(() => {

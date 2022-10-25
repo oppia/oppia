@@ -251,33 +251,35 @@ describe('Settings Tab Component', () => {
       flush();
     }));
 
-  it('should able to add or remove exploration editor tags', fakeAsync(() => {
+  it('should be able to add exploration editor tags',
+    fakeAsync(() => {
+      spyOn(component, 'saveExplorationTags').and.stub();
+      explorationTagsService.displayed = [];
+
+      component.add({
+        value: 'name',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['name']);
+
+      // When user try to enter same tag again.
+      component.add({
+        value: 'name',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+      tick();
+      expect(explorationTagsService.displayed).toEqual(['name']);
+    }));
+
+  it('should be able to remove exploration editor tags', fakeAsync(() => {
     spyOn(component, 'saveExplorationTags').and.stub();
-
     explorationTagsService.displayed = [];
-    component.add({
-      value: 'name',
-      input: {
-        value: ''
-      }
-    } as MatChipInputEvent);
-    tick();
-
-    expect(explorationTagsService.displayed).toEqual(['name']);
-
-    // When user try to enter same tag again.
-    component.add({
-      value: 'name',
-      input: {
-        value: ''
-      }
-    } as MatChipInputEvent);
-    tick();
-    expect(explorationTagsService.displayed).toEqual(['name']);
-
-    component.remove('name');
-    tick();
-    expect(explorationTagsService.displayed).toEqual([]);
 
     component.add({
       value: 'first',
@@ -286,13 +288,13 @@ describe('Settings Tab Component', () => {
       }
     } as MatChipInputEvent);
     component.add({
-      value: 'secound',
+      value: 'second',
       input: {
         value: ''
       }
     } as MatChipInputEvent);
 
-    component.remove('secound');
+    component.remove('second');
     tick();
     expect(explorationTagsService.displayed).toEqual(['first']);
   }));
