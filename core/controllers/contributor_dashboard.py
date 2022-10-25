@@ -264,9 +264,9 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         topic_name = self.normalized_request.get('topic_name')
-        opportunity_dicts = self
-        ._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name)
+        opportunity_dicts = self.\
+            _get_reviewable_exploration_opportunity_summaries(
+        self.user_id, topic_name)
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -314,8 +314,8 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             for node in story.story_contents.get_ordered_nodes()
         ]
         in_review_suggestions, _ = (
-            suggestion_services
-            .get_reviewable_translation_suggestions_by_offset(
+            suggestion_services.
+            get_reviewable_translation_suggestions_by_offset(
                 user_id, topic_exp_ids, None, 0))
         # Filter out suggestions that should not be shown to the user.
         # This is defined as a set as we only care about the unique IDs.
@@ -331,8 +331,8 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             if exp_id in in_review_suggestion_target_ids
         ]
 
-        opportunities = opportunity_services
-        .get_exploration_opportunity_summaries_by_ids(
+        opportunities = opportunity_services.\
+        get_exploration_opportunity_summaries_by_ids(
                 exp_ids).values()
 
         # Augment the received opportunities with unique language_codes.
