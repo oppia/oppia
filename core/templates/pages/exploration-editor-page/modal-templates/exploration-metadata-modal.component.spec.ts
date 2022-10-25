@@ -144,6 +144,55 @@ describe('Exploration Metadata Modal Component', () => {
       expect(explorationTagsService.displayed).toEqual(['name']);
     }));
 
+    it('should be able to add multiple exploration editor tags',
+      fakeAsync(() => {
+        component.explorationTags = [];
+        explorationTagsService.displayed = [];
+
+        component.add({
+          value: 'tag-one',
+          input: {
+            value: ''
+          }
+        } as MatChipInputEvent);
+        tick();
+
+        component.add({
+          value: 'tag-two',
+          input: {
+            value: ''
+          }
+        } as MatChipInputEvent);
+        tick();
+
+        component.add({
+          value: 'tag-three',
+          input: {
+            value: ''
+          }
+        } as MatChipInputEvent);
+        tick();
+
+        expect(explorationTagsService.displayed).toEqual(
+          ['tag-one', 'tag-two', 'tag-three']);
+      }));
+
+    it('should be able to remove multiple exploration editor tags',
+      fakeAsync(() => {
+        component.explorationTags = ['tag-one', 'tag-two', 'tag-three'];
+        explorationTagsService.displayed = ['tag-one', 'tag-two', 'tag-three'];
+
+        component.remove('tag-two');
+        tick();
+
+        component.remove('tag-three');
+        tick();
+
+        expect(explorationTagsService.displayed).toEqual(
+          ['tag-one']);
+      }));
+
+
     it('should be able to remove exploration editor tags', fakeAsync(() => {
       component.explorationTags = [];
       explorationTagsService.displayed = [];
