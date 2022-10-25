@@ -44,16 +44,6 @@ describe('NumberConversionService', () => {
     expect(numberConversionService.currentDecimalSeparator()).toEqual(',');
   });
 
-  it('should return regex for numeric validation', ()=>{
-    spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValues('.', ',');
-
-    expect(numberConversionService.getInputValidationRegex())
-      .toEqual(/[^e0-9\.\-]/g);
-    expect(numberConversionService.getInputValidationRegex())
-      .toEqual(/[^e0-9\,\-]/g);
-  });
-
   it('should convert a number string to the English decimal number', ()=>{
     let number1 = '-1.22';
     let number2 = '1,5';

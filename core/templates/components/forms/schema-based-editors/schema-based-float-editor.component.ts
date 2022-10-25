@@ -221,13 +221,6 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   parseInput(): void {
-    let regex = this.numberConversionService.getInputValidationRegex();
-
-    // Remove anything that isn't a number,
-    // minus sign, exponent (e) sign or a decimal separator.
-    this.localStringValue = this.localStringValue
-      .replace(regex, '');
-
     // If input is empty, the number value should be null.
     if (this.localStringValue === '') {
       this.localValue = null;

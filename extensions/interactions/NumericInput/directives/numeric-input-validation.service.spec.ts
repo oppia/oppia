@@ -371,6 +371,9 @@ describe('NumericInputValidationService', () => {
     });
 
   it('should generate errors for string representation of the input', ()=>{
+    expect(validatorService.validateNumericString('12.f3', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS'
+    );
     expect(validatorService.validateNumericString('12.', '.')).toEqual(
       'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL'
     );

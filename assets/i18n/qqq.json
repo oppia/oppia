@@ -572,6 +572,7 @@
 	"I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER": "Error message shown when number is invalid.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO": "Error message shown when number is less than zero.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING": "Error message shown when number does not have minus sign in the beginning.",
+	"I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS": "Error message shown when number has invalid characters.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL": "Error message shown when number has trailing decimal points.",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "This text is displayed in pencil code editor interaction - This text is shown when user clicks on the reset button. This is body of the modal and asks the user whether they really want to proceed with the action",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Text displayed in a pencil code editor interaction - This text is shown when user clicks on reset code button. If user clicks this button in the modal then it cancels user's current action\n{{Identical|Cancel}}",

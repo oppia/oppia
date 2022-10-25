@@ -225,22 +225,7 @@ describe('Schema based float editor component', function() {
     expect(component.getCurrentDecimalSeparator()).toEqual(',');
   });
 
-  it('should remove any invalid character from the input', ()=>{
-    spyOn(numberConversionService, 'getInputValidationRegex')
-      .and.returnValues(/[^e0-9\.\-]/g, /[^e0-9\,\-]/g);
-
-    component.localStringValue = 'a';
-    component.parseInput();
-    expect(component.localStringValue).toEqual('');
-
-    component.localStringValue = '12.';
-    component.parseInput();
-    expect(component.localStringValue).toEqual('12');
-  });
-
   it('should parse the string to a number on input', () => {
-    spyOn(numberConversionService, 'getInputValidationRegex')
-      .and.returnValue(/[^e0-9\.\-]/g);
     spyOn(component, 'getCurrentDecimalSeparator').and.returnValues('.', ',');
 
     component.localStringValue = '';

@@ -572,6 +572,7 @@
     "I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER": "The answer should be a valid number.",
     "I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO": "The answer must be greater than or equal to zero.",
     "I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING": "Minus (-) sign is only allowed in beginning.",
+    "I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS": "Only digits 0-9, '.', 'e', and '-' are allowed.",
     "I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL": "Trailing decimals are not allowed.",
     "I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Are you sure you want to reset your code?",
     "I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Cancel",
