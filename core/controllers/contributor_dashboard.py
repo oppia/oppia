@@ -264,9 +264,10 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         topic_name = self.normalized_request.get('topic_name')
-        opportunity_dicts = (self.
-        _get_reviewable_exploration_opportunity_summaries(
-        self.user_id, topic_name))
+        opportunity_dicts = (
+            self.
+            _get_reviewable_exploration_opportunity_summaries(
+            self.user_id, topic_name))
         self.values = {
             'opportunities': opportunity_dicts,
         }
