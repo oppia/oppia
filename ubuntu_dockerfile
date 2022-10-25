@@ -51,8 +51,8 @@ RUN : \
     && rm -rf /var/lib/apt/lists/* \
     && :
 
-RUN python3.7 -m venv /home/opensource/venv
-ENV PATH=/home/opensource/venv/bin:$PATH
+RUN python3.7 -m venv /home/venv
+ENV PATH=/home/venv/bin:$PATH
 
 # Fix certificate issues
 RUN apt-get update && \
@@ -126,4 +126,6 @@ RUN sudo chmod -R go=rwx /home/opensource/
 
 # RUN rm -r /home/opensource/oppia/*
 
-# Once you're in run python -m scripts.start --no_browser to start the server
+# (Narrow down the list of files for which permissions are to be given for.sl)
+# Once you're in run `sudo chmod -R go=rwx /home/` to give execution permissions
+# and `python -m scripts.start --no_browser` to start the server.
