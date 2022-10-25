@@ -47,8 +47,14 @@ from core.domain import user_services
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
+# Note: '_SelfBaseHandlerType' is a private type variable because it is only
+# supposed to denote the 'self' argument of the handler function that the
+# decorator is decorating. So, do not make it public type variable in future.
 _SelfBaseHandlerType = Type[base.BaseHandler]
-_GenericReturnType = TypeVar('_GenericReturnType')
+# Note: '_GenericHandlerFunctionReturnType' is a private type variable because
+# it is only supposed to denote the return type of handler function that the
+# decorator is decorating. So, do not make it public type variable in future.
+_GenericHandlerFunctionReturnType = TypeVar('_GenericHandlerFunctionReturnType')
 
 
 def _redirect_based_on_return_type(
@@ -74,8 +80,8 @@ def _redirect_based_on_return_type(
 
 
 def open_access(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to give access to everyone.
 
     Args:
@@ -91,7 +97,7 @@ def open_access(
         self: _SelfBaseHandlerType,
         *args: Any,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Gives access to everyone.
 
         Args:
@@ -107,8 +113,8 @@ def open_access(
 
 
 def is_source_mailchimp(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the request was generated from Mailchimp.
 
     Args:
@@ -121,7 +127,7 @@ def is_source_mailchimp(
     @functools.wraps(handler)
     def test_is_source_mailchimp(
         self: _SelfBaseHandlerType, secret: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the request was generated from Mailchimp.
 
         Args:
@@ -147,8 +153,8 @@ def is_source_mailchimp(
 
 
 def does_classroom_exist(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether classroom exists.
 
     Args:
@@ -163,7 +169,7 @@ def does_classroom_exist(
         self: _SelfBaseHandlerType,
         classroom_url_fragment: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if classroom url fragment provided is valid. If so, return
         handler or else redirect to the correct classroom.
 
@@ -201,8 +207,8 @@ def does_classroom_exist(
 
 
 def can_play_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can play given exploration.
 
     Args:
@@ -216,7 +222,7 @@ def can_play_exploration(
     @functools.wraps(handler)
     def test_can_play(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can play the exploration.
 
         Args:
@@ -248,8 +254,8 @@ def can_play_exploration(
 
 
 def can_view_skills(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can view multiple given skills.
 
     Args:
@@ -265,7 +271,7 @@ def can_view_skills(
         self: _SelfBaseHandlerType,
         selected_skill_ids: List[str],
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can view the skills.
 
         Args:
@@ -299,8 +305,8 @@ def can_view_skills(
 
 
 def can_play_collection(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can play given collection.
 
     Args:
@@ -314,7 +320,7 @@ def can_play_collection(
     @functools.wraps(handler)
     def test_can_play(
         self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can play the collection.
 
         Args:
@@ -343,8 +349,8 @@ def can_play_collection(
 
 
 def can_download_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can download given exploration.
     If a user is authorized to play given exploration, they can download it.
 
@@ -359,7 +365,7 @@ def can_download_exploration(
     @functools.wraps(handler)
     def test_can_download(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can download the exploration.
 
         Args:
@@ -391,8 +397,8 @@ def can_download_exploration(
 
 
 def can_view_exploration_stats(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can view exploration stats.
     If a user is authorized to play given exploration, they can view its stats.
 
@@ -407,7 +413,7 @@ def can_view_exploration_stats(
     @functools.wraps(handler)
     def test_can_view_stats(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can view the exploration stats.
 
         Args:
@@ -439,8 +445,8 @@ def can_view_exploration_stats(
 
 
 def can_edit_collection(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can edit collection.
 
     Args:
@@ -454,7 +460,7 @@ def can_edit_collection(
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can edit the collection.
 
         Args:
@@ -488,8 +494,8 @@ def can_edit_collection(
 
 
 def can_manage_email_dashboard(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can access email dashboard.
 
     Args:
@@ -503,7 +509,7 @@ def can_manage_email_dashboard(
     @functools.wraps(handler)
     def test_can_manage_emails(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access email dashboard.
 
         Args:
@@ -530,8 +536,8 @@ def can_manage_email_dashboard(
 
 
 def can_access_blog_admin_page(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can access blog admin page.
 
     Args:
@@ -545,7 +551,7 @@ def can_access_blog_admin_page(
     @functools.wraps(handler)
     def test_can_access_blog_admin_page(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access blog admin page.
 
         Args:
@@ -572,8 +578,8 @@ def can_access_blog_admin_page(
 
 
 def can_manage_blog_post_editors(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can add and remove users as blog
     post editors.
 
@@ -588,7 +594,7 @@ def can_manage_blog_post_editors(
     @functools.wraps(handler)
     def test_can_manage_blog_post_editors(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can add and remove users as blog
         post editors.
 
@@ -616,8 +622,8 @@ def can_manage_blog_post_editors(
 
 
 def can_access_blog_dashboard(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can access blog dashboard.
 
     Args:
@@ -631,7 +637,7 @@ def can_access_blog_dashboard(
     @functools.wraps(handler)
     def test_can_access_blog_dashboard(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access blog dashboard.
 
         Args:
@@ -658,8 +664,8 @@ def can_access_blog_dashboard(
 
 
 def can_delete_blog_post(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can delete blog post.
 
     Args:
@@ -673,7 +679,7 @@ def can_delete_blog_post(
     @functools.wraps(handler)
     def test_can_delete(
         self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can delete the blog post.
 
         Args:
@@ -711,8 +717,8 @@ def can_delete_blog_post(
 
 
 def can_edit_blog_post(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can edit blog post.
 
     Args:
@@ -726,7 +732,7 @@ def can_edit_blog_post(
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can edit the blog post.
 
         Args:
@@ -764,8 +770,8 @@ def can_edit_blog_post(
 
 
 def can_access_moderator_page(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can access moderator page.
 
     Args:
@@ -779,7 +785,7 @@ def can_access_moderator_page(
     @functools.wraps(handler)
     def test_can_access_moderator_page(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access moderator page.
 
         Args:
@@ -806,8 +812,8 @@ def can_access_moderator_page(
 
 
 def can_access_release_coordinator_page(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can access release coordinator page.
 
     Args:
@@ -821,7 +827,7 @@ def can_access_release_coordinator_page(
     @functools.wraps(handler)
     def test_can_access_release_coordinator_page(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access release coordinator
         page.
 
@@ -850,8 +856,8 @@ def can_access_release_coordinator_page(
 
 
 def can_manage_memcache(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can can manage memcache.
 
     Args:
@@ -865,7 +871,7 @@ def can_manage_memcache(
     @functools.wraps(handler)
     def test_can_manage_memcache(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can manage memcache.
 
         Args:
@@ -892,8 +898,8 @@ def can_manage_memcache(
 
 
 def can_run_any_job(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can can run any job.
 
     Args:
@@ -907,7 +913,7 @@ def can_run_any_job(
     @functools.wraps(handler)
     def test_can_run_any_job(
         self: _SelfBaseHandlerType, *args: Any, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can run any job.
 
         Args:
@@ -935,8 +941,8 @@ def can_run_any_job(
 
 
 def can_send_moderator_emails(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can send moderator emails.
 
     Args:
@@ -950,7 +956,7 @@ def can_send_moderator_emails(
     @functools.wraps(handler)
     def test_can_send_moderator_emails(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can send moderator emails.
 
         Args:
@@ -977,8 +983,8 @@ def can_send_moderator_emails(
 
 
 def can_manage_own_account(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can manage their account.
 
     Args:
@@ -992,7 +998,7 @@ def can_manage_own_account(
     @functools.wraps(handler)
     def test_can_manage_account(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can manage their account.
 
         Args:
@@ -1019,8 +1025,8 @@ def can_manage_own_account(
 
 
 def can_access_admin_page(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator that checks if the current user is a super admin.
 
     Args:
@@ -1034,7 +1040,7 @@ def can_access_admin_page(
     @functools.wraps(handler)
     def test_super_admin(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a super admin.
 
         Args:
@@ -1060,8 +1066,8 @@ def can_access_admin_page(
 
 
 def can_access_contributor_dashboard_admin_page(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator that checks if the user can access the contributor dashboard
     admin page.
 
@@ -1076,7 +1082,7 @@ def can_access_contributor_dashboard_admin_page(
     @functools.wraps(handler)
     def test_can_access_contributor_dashboard_admin_page(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the contributor dashboard admin page.
 
         Args:
@@ -1105,8 +1111,8 @@ def can_access_contributor_dashboard_admin_page(
 
 
 def can_manage_contributors_role(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator that checks if the current user can modify contributor's role
     for the contributor dashboard page.
 
@@ -1121,7 +1127,7 @@ def can_manage_contributors_role(
     @functools.wraps(handler)
     def test_can_manage_contributors_role(
         self: _SelfBaseHandlerType, category: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can modify contributor's role for the contributor
         dashboard page.
 
@@ -1162,8 +1168,8 @@ def can_manage_contributors_role(
 
 
 def can_delete_any_user(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator that checks if the current user can delete any user.
 
     Args:
@@ -1177,7 +1183,7 @@ def can_delete_any_user(
     @functools.wraps(handler)
     def test_primary_admin(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a primary admin e.g. user with
         email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
 
@@ -1206,8 +1212,8 @@ def can_delete_any_user(
 
 
 def can_upload_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator that checks if the current user can upload exploration.
 
     Args:
@@ -1221,7 +1227,7 @@ def can_upload_exploration(
     @functools.wraps(handler)
     def test_can_upload(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can upload exploration.
 
         Args:
@@ -1247,8 +1253,8 @@ def can_upload_exploration(
 
 
 def can_create_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can create an exploration.
 
     Args:
@@ -1262,7 +1268,7 @@ def can_create_exploration(
     @functools.wraps(handler)
     def test_can_create(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can create an exploration.
 
         Args:
@@ -1289,8 +1295,8 @@ def can_create_exploration(
 
 
 def can_create_collection(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can create a collection.
 
     Args:
@@ -1304,7 +1310,7 @@ def can_create_collection(
     @functools.wraps(handler)
     def test_can_create(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can create a collection.
 
         Args:
@@ -1331,8 +1337,8 @@ def can_create_collection(
 
 
 def can_access_creator_dashboard(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can access creator dashboard page.
 
     Args:
@@ -1346,7 +1352,7 @@ def can_access_creator_dashboard(
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the creator dashboard page.
 
         Args:
@@ -1373,8 +1379,8 @@ def can_access_creator_dashboard(
 
 
 def can_create_feedback_thread(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can create a feedback thread.
 
     Args:
@@ -1388,7 +1394,7 @@ def can_create_feedback_thread(
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can create a feedback thread.
 
         Args:
@@ -1420,8 +1426,8 @@ def can_create_feedback_thread(
 
 
 def can_view_feedback_thread(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can view a feedback thread.
 
     Args:
@@ -1435,7 +1441,7 @@ def can_view_feedback_thread(
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, thread_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can view a feedback thread.
 
         Args:
@@ -1482,8 +1488,8 @@ def can_view_feedback_thread(
 
 
 def can_comment_on_feedback_thread(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can comment on feedback thread.
 
     Args:
@@ -1497,7 +1503,7 @@ def can_comment_on_feedback_thread(
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, thread_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can comment on the feedback thread.
 
         Args:
@@ -1544,8 +1550,8 @@ def can_comment_on_feedback_thread(
 
 
 def can_rate_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can give rating to given
     exploration.
 
@@ -1560,7 +1566,7 @@ def can_rate_exploration(
     @functools.wraps(handler)
     def test_can_rate(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can rate the exploration.
 
         Args:
@@ -1585,8 +1591,8 @@ def can_rate_exploration(
 
 
 def can_flag_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can flag given exploration.
 
     Args:
@@ -1600,7 +1606,7 @@ def can_flag_exploration(
     @functools.wraps(handler)
     def test_can_flag(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can flag the exploration.
 
         Args:
@@ -1624,8 +1630,8 @@ def can_flag_exploration(
 
 
 def can_subscribe_to_users(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can subscribe/unsubscribe a creator.
 
     Args:
@@ -1639,7 +1645,7 @@ def can_subscribe_to_users(
     @functools.wraps(handler)
     def test_can_subscribe(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can subscribe/unsubscribe a creator.
 
         Args:
@@ -1662,8 +1668,8 @@ def can_subscribe_to_users(
 
 
 def can_edit_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can edit given exploration.
 
     Args:
@@ -1680,7 +1686,7 @@ def can_edit_exploration(
         exploration_id: str,
         *args: Any,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can edit the exploration.
 
         Args:
@@ -1717,8 +1723,8 @@ def can_edit_exploration(
 
 
 def can_voiceover_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can voiceover given exploration.
 
     Args:
@@ -1732,7 +1738,7 @@ def can_voiceover_exploration(
     @functools.wraps(handler)
     def test_can_voiceover(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can voiceover the exploration.
 
         Args:
@@ -1767,8 +1773,8 @@ def can_voiceover_exploration(
 
 
 def can_add_voice_artist(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can add voice artist to
     the given activity.
 
@@ -1786,7 +1792,7 @@ def can_add_voice_artist(
         entity_type: str,
         entity_id: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can add a voice artist for the given entity.
 
         Args:
@@ -1831,8 +1837,8 @@ def can_add_voice_artist(
 
 
 def can_remove_voice_artist(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can remove voice artist
     from the given activity.
 
@@ -1850,7 +1856,7 @@ def can_remove_voice_artist(
         entity_type: str,
         entity_id: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can remove a voice artist for the given entity.
 
         Args:
@@ -1891,8 +1897,8 @@ def can_remove_voice_artist(
 
 
 def can_save_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can save exploration.
 
     Args:
@@ -1908,7 +1914,7 @@ def can_save_exploration(
         self: _SelfBaseHandlerType,
         exploration_id: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can save the exploration.
 
         Args:
@@ -1944,8 +1950,8 @@ def can_save_exploration(
 
 
 def can_delete_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can delete exploration.
 
     Args:
@@ -1959,7 +1965,7 @@ def can_delete_exploration(
     @functools.wraps(handler)
     def test_can_delete(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can delete the exploration.
 
         Args:
@@ -1992,8 +1998,8 @@ def can_delete_exploration(
 
 
 def can_suggest_changes_to_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether a user can make suggestions to an
     exploration.
 
@@ -2008,7 +2014,7 @@ def can_suggest_changes_to_exploration(
     @functools.wraps(handler)
     def test_can_suggest(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can make suggestions to an exploration.
 
         Args:
@@ -2033,8 +2039,8 @@ def can_suggest_changes_to_exploration(
 
 
 def can_suggest_changes(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether a user can make suggestions.
 
     Args:
@@ -2048,7 +2054,7 @@ def can_suggest_changes(
     @functools.wraps(handler)
     def test_can_suggest(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can make suggestions to an exploration.
 
         Args:
@@ -2071,14 +2077,14 @@ def can_suggest_changes(
 
 
 def can_resubmit_suggestion(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether a user can resubmit a suggestion."""
 
     @functools.wraps(handler)
     def test_can_resubmit_suggestion(
         self: _SelfBaseHandlerType, suggestion_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can edit the given suggestion.
 
         Args:
@@ -2110,8 +2116,8 @@ def can_resubmit_suggestion(
 
 
 def can_publish_exploration(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can publish exploration.
 
     Args:
@@ -2128,7 +2134,7 @@ def can_publish_exploration(
         exploration_id: str,
         *args: Any,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can publish the exploration.
 
         Args:
@@ -2161,8 +2167,8 @@ def can_publish_exploration(
 
 
 def can_publish_collection(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can publish collection.
 
     Args:
@@ -2176,7 +2182,7 @@ def can_publish_collection(
     @functools.wraps(handler)
     def test_can_publish_collection(
         self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can publish the collection.
 
         Args:
@@ -2207,8 +2213,8 @@ def can_publish_collection(
 
 
 def can_unpublish_collection(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can unpublish a given
     collection.
 
@@ -2223,7 +2229,7 @@ def can_unpublish_collection(
     @functools.wraps(handler)
     def test_can_unpublish_collection(
         self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can unpublish the collection.
 
         Args:
@@ -2254,8 +2260,8 @@ def can_unpublish_collection(
 
 
 def can_modify_exploration_roles(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorators to check whether user can manage rights related to an
     exploration.
 
@@ -2271,7 +2277,7 @@ def can_modify_exploration_roles(
     @functools.wraps(handler)
     def test_can_modify(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can modify the rights related to an exploration.
 
         Args:
@@ -2300,8 +2306,8 @@ def can_modify_exploration_roles(
 
 
 def can_perform_tasks_in_taskqueue(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to ensure that the handler is being called by task scheduler or
     by a superadmin of the application.
 
@@ -2317,7 +2323,7 @@ def can_perform_tasks_in_taskqueue(
     @functools.wraps(handler)
     def test_can_perform(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the handler is called by task scheduler or by a superadmin
         of the application.
 
@@ -2346,8 +2352,8 @@ def can_perform_tasks_in_taskqueue(
 
 
 def can_perform_cron_tasks(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to ensure that the handler is being called by cron or by a
     superadmin of the application.
 
@@ -2363,7 +2369,7 @@ def can_perform_cron_tasks(
     @functools.wraps(handler)
     def test_can_perform(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the handler is called by cron or by a superadmin of the
         application.
 
@@ -2391,8 +2397,8 @@ def can_perform_cron_tasks(
 
 
 def can_access_learner_dashboard(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check access to learner dashboard.
 
     Args:
@@ -2406,7 +2412,7 @@ def can_access_learner_dashboard(
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the learner dashboard.
 
         Args:
@@ -2433,8 +2439,8 @@ def can_access_learner_dashboard(
 
 
 def can_access_learner_groups(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check access to learner groups.
 
     Args:
@@ -2448,7 +2454,7 @@ def can_access_learner_groups(
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the learner groups.
 
         Args:
@@ -2475,8 +2481,8 @@ def can_access_learner_groups(
 
 
 def can_manage_question_skill_status(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can publish a question and link it
     to a skill.
 
@@ -2492,7 +2498,7 @@ def can_manage_question_skill_status(
     @functools.wraps(handler)
     def test_can_manage_question_skill_status(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can publish a question directly.
 
         Args:
@@ -2521,8 +2527,8 @@ def can_manage_question_skill_status(
 
 
 def require_user_id_else_redirect_to_homepage(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., Optional[_GenericReturnType]]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., Optional[_GenericHandlerFunctionReturnType]]:
     """Decorator that checks if a user_id is associated with the current
     session. If not, the user is redirected to the main page.
     Note that the user may not yet have registered.
@@ -2539,7 +2545,7 @@ def require_user_id_else_redirect_to_homepage(
     @functools.wraps(handler)
     def test_login(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> Optional[_GenericReturnType]:
+    ) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user for the current session is logged in.
         If not, redirects the user to the home page.
 
@@ -2558,14 +2564,14 @@ def require_user_id_else_redirect_to_homepage(
 
 
 def can_edit_topic(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can edit given topic."""
 
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType, topic_id: str, *args: Any, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can edit a given topic.
 
         Args:
@@ -2605,8 +2611,8 @@ def can_edit_topic(
 
 
 def can_edit_question(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can edit given question.
 
     Args:
@@ -2620,7 +2626,7 @@ def can_edit_question(
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can edit the given question.
 
         Args:
@@ -2653,8 +2659,8 @@ def can_edit_question(
 
 
 def can_play_question(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can play given question.
 
     Args:
@@ -2668,7 +2674,7 @@ def can_play_question(
     @functools.wraps(handler)
     def test_can_play_question(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can play the given question.
 
         Args:
@@ -2691,8 +2697,8 @@ def can_play_question(
 
 
 def can_view_question_editor(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can view any question editor.
 
     Args:
@@ -2706,7 +2712,7 @@ def can_view_question_editor(
     @functools.wraps(handler)
     def test_can_view_question_editor(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can view the question editor.
 
         Args:
@@ -2741,8 +2747,8 @@ def can_view_question_editor(
 
 
 def can_delete_question(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can delete a question.
 
     Args:
@@ -2756,7 +2762,7 @@ def can_delete_question(
     @functools.wraps(handler)
     def test_can_delete_question(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can delete a given question.
 
         Args:
@@ -2788,8 +2794,8 @@ def can_delete_question(
 
 
 def can_add_new_story_to_topic(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can add a story to a given topic.
 
     Args:
@@ -2803,7 +2809,7 @@ def can_add_new_story_to_topic(
     @functools.wraps(handler)
     def test_can_add_story(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can add a story to
         a given topic.
 
@@ -2843,8 +2849,8 @@ def can_add_new_story_to_topic(
 
 
 def can_edit_story(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can edit a story belonging to a given
     topic.
 
@@ -2859,7 +2865,7 @@ def can_edit_story(
     @functools.wraps(handler)
     def test_can_edit_story(
         self: _SelfBaseHandlerType, story_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can edit a story belonging to
         a given topic.
 
@@ -2904,8 +2910,8 @@ def can_edit_story(
 
 
 def can_edit_skill(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can edit a skill, which can be
     independent or belong to a topic.
 
@@ -2920,7 +2926,7 @@ def can_edit_skill(
     @functools.wraps(handler)
     def test_can_edit_skill(
         self: _SelfBaseHandlerType, skill_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
 
@@ -2950,8 +2956,8 @@ def can_edit_skill(
 
 
 def can_submit_images_to_questions(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can submit images to questions.
 
     Args:
@@ -2965,7 +2971,7 @@ def can_submit_images_to_questions(
     @functools.wraps(handler)
     def test_can_submit_images_to_questions(
         self: _SelfBaseHandlerType, skill_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Test to see if user can submit images to questions.
 
         Args:
@@ -2994,8 +3000,8 @@ def can_submit_images_to_questions(
 
 
 def can_delete_skill(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can delete a skill.
 
     Args:
@@ -3009,7 +3015,7 @@ def can_delete_skill(
     @functools.wraps(handler)
     def test_can_delete_skill(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can delete a skill.
 
         Args:
@@ -3037,8 +3043,8 @@ def can_delete_skill(
 
 
 def can_create_skill(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can create a skill, which can be
     independent or added to a topic.
 
@@ -3053,7 +3059,7 @@ def can_create_skill(
     @functools.wraps(handler)
     def test_can_create_skill(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can create a skill, which can be
         independent or belong to a topic.
 
@@ -3082,8 +3088,8 @@ def can_create_skill(
 
 
 def can_delete_story(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can delete a story in a given
     topic.
 
@@ -3099,7 +3105,7 @@ def can_delete_story(
     @functools.wraps(handler)
     def test_can_delete_story(
         self: _SelfBaseHandlerType, story_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can delete a story in
         a given topic.
 
@@ -3138,8 +3144,8 @@ def can_delete_story(
 
 
 def can_delete_topic(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can delete a topic.
 
     Args:
@@ -3153,7 +3159,7 @@ def can_delete_topic(
     @functools.wraps(handler)
     def test_can_delete_topic(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can delete a given topic.
 
         Args:
@@ -3189,8 +3195,8 @@ def can_delete_topic(
 
 
 def can_create_topic(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can create a topic.
 
     Args:
@@ -3204,7 +3210,7 @@ def can_create_topic(
     @functools.wraps(handler)
     def test_can_create_topic(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can create a topic.
 
         Args:
@@ -3234,8 +3240,8 @@ def can_create_topic(
 
 
 def can_access_topics_and_skills_dashboard(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can access the topics and skills
     dashboard.
 
@@ -3250,7 +3256,7 @@ def can_access_topics_and_skills_dashboard(
     @functools.wraps(handler)
     def test_can_access_topics_and_skills_dashboard(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can access the topics and skills
         dashboard.
 
@@ -3284,8 +3290,8 @@ def can_access_topics_and_skills_dashboard(
 
 
 def can_view_any_topic_editor(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can view any topic editor.
 
     Args:
@@ -3299,7 +3305,7 @@ def can_view_any_topic_editor(
     @functools.wraps(handler)
     def test_can_view_any_topic_editor(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can view any topic editor.
 
         Args:
@@ -3336,8 +3342,8 @@ def can_view_any_topic_editor(
 
 
 def can_manage_rights_for_topic(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can manage a topic's rights.
 
     Args:
@@ -3351,7 +3357,7 @@ def can_manage_rights_for_topic(
     @functools.wraps(handler)
     def test_can_manage_topic_rights(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can manage a topic's rights.
 
         Args:
@@ -3384,8 +3390,8 @@ def can_manage_rights_for_topic(
 
 
 def can_change_topic_publication_status(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can publish or unpublish a topic.
 
     Args:
@@ -3399,7 +3405,7 @@ def can_change_topic_publication_status(
     @functools.wraps(handler)
     def test_can_change_topic_publication_status(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can can publish or unpublish a topic.
 
         Args:
@@ -3437,8 +3443,8 @@ def can_change_topic_publication_status(
 
 
 def can_access_topic_viewer_page(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., Optional[_GenericReturnType]]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., Optional[_GenericHandlerFunctionReturnType]]:
     """Decorator to check whether user can access topic viewer page.
 
     Args:
@@ -3455,7 +3461,7 @@ def can_access_topic_viewer_page(
         classroom_url_fragment: str,
         topic_url_fragment: str,
         **kwargs: Any
-    ) -> Optional[_GenericReturnType]:
+    ) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user can access topic viewer page.
 
         Args:
@@ -3515,8 +3521,8 @@ def can_access_topic_viewer_page(
 
 
 def can_access_story_viewer_page(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., Optional[_GenericReturnType]]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., Optional[_GenericHandlerFunctionReturnType]]:
     """Decorator to check whether user can access story viewer page.
 
     Args:
@@ -3535,7 +3541,7 @@ def can_access_story_viewer_page(
         story_url_fragment: str,
         *args: Any,
         **kwargs: Any
-    ) -> Optional[_GenericReturnType]:
+    ) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user can access story viewer page.
 
         Args:
@@ -3619,8 +3625,8 @@ def can_access_story_viewer_page(
 
 
 def can_access_subtopic_viewer_page(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., Optional[_GenericReturnType]]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., Optional[_GenericHandlerFunctionReturnType]]:
     """Decorator to check whether user can access subtopic page viewer.
 
     Args:
@@ -3638,7 +3644,7 @@ def can_access_subtopic_viewer_page(
         topic_url_fragment: str,
         subtopic_url_fragment: str,
         **kwargs: Any
-    ) -> Optional[_GenericReturnType]:
+    ) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user can access subtopic viewer page.
 
         Args:
@@ -3725,8 +3731,8 @@ def can_access_subtopic_viewer_page(
 
 
 def get_decorator_for_accepting_suggestion(
-    decorator: Callable[..., Callable[..., _GenericReturnType]]
-) -> Callable[..., Callable[..., _GenericReturnType]]:
+    decorator: Callable[..., Callable[..., _GenericHandlerFunctionReturnType]]
+) -> Callable[..., Callable[..., _GenericHandlerFunctionReturnType]]:
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
     decorator.
@@ -3745,8 +3751,8 @@ def get_decorator_for_accepting_suggestion(
             accept/reject suggestions for that entity.
     """
     def generate_decorator_for_handler(
-        handler: Callable[..., _GenericReturnType]
-    ) -> Callable[..., _GenericReturnType]:
+        handler: Callable[..., _GenericHandlerFunctionReturnType]
+    ) -> Callable[..., _GenericHandlerFunctionReturnType]:
         """Function that generates a decorator for a given handler.
 
         Args:
@@ -3766,7 +3772,7 @@ def get_decorator_for_accepting_suggestion(
             target_id: str,
             suggestion_id: str,
             **kwargs: Any
-        ) -> _GenericReturnType:
+        ) -> _GenericHandlerFunctionReturnType:
             """Returns a (possibly-decorated) handler to test whether a
             suggestion can be accepted based on the user actions and roles.
 
@@ -3828,8 +3834,8 @@ def get_decorator_for_accepting_suggestion(
 
 
 def can_view_reviewable_suggestions(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., Optional[_GenericReturnType]]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., Optional[_GenericHandlerFunctionReturnType]]:
     """Decorator to check whether user can view the list of suggestions that
     they are allowed to review.
 
@@ -3847,7 +3853,7 @@ def can_view_reviewable_suggestions(
         target_type: str,
         suggestion_type: str,
         **kwargs: Any
-    ) -> Optional[_GenericReturnType]:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can view reviewable suggestions.
 
         Args:
@@ -3888,8 +3894,8 @@ def can_view_reviewable_suggestions(
 
 
 def can_edit_entity(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can edit entity.
 
     Args:
@@ -3906,7 +3912,7 @@ def can_edit_entity(
         entity_type: str,
         entity_id: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can edit entity.
 
         Args:
@@ -3927,7 +3933,7 @@ def can_edit_entity(
         # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
-        functions: Dict[str, Callable[[str], _GenericReturnType]] = {
+        functions: Dict[str, Callable[[str], _GenericHandlerFunctionReturnType]] = {
             feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (
                 can_edit_exploration(reduced_handler)(
                     self, entity_id, **kwargs)),
@@ -3958,8 +3964,8 @@ def can_edit_entity(
 
 
 def can_play_entity(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether user can play entity.
 
     Args:
@@ -3976,7 +3982,7 @@ def can_play_entity(
         entity_type: str,
         entity_id: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can play entity.
 
         Args:
@@ -4013,8 +4019,8 @@ def can_play_entity(
 
 
 def is_from_oppia_ml(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the incoming request is from a valid Oppia-ML
     VM instance.
 
@@ -4030,7 +4036,7 @@ def is_from_oppia_ml(
     def test_request_originates_from_valid_oppia_ml_instance(
         self: base.OppiaMLVMHandler,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks if the incoming request is from a valid Oppia-ML VM
         instance.
 
@@ -4058,8 +4064,8 @@ def is_from_oppia_ml(
 
 
 def can_update_suggestion(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the current user can update suggestions.
 
     Args:
@@ -4083,7 +4089,7 @@ def can_update_suggestion(
         self: _SelfBaseHandlerType,
         suggestion_id: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Returns a handler to test whether a suggestion can be updated based
         on the user's roles.
 
@@ -4148,8 +4154,8 @@ def can_update_suggestion(
 
 
 def can_fetch_contributor_dashboard_stats(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the current user can fetch contributor
     dashboard stats.
 
@@ -4173,7 +4179,7 @@ def can_fetch_contributor_dashboard_stats(
         contribution_subtype: str,
         username: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Returns a handler to test whether stats can be fetched based
         on the logged in user.
 
@@ -4208,8 +4214,8 @@ def can_fetch_contributor_dashboard_stats(
 
 
 def can_fetch_all_contributor_dashboard_stats(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the current user can fetch contributor
     dashboard stats.
 
@@ -4231,7 +4237,7 @@ def can_fetch_all_contributor_dashboard_stats(
         self: _SelfBaseHandlerType,
         username: str,
         **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Returns a handler to test whether stats can be fetched based
         on the logged in user.
 
@@ -4261,8 +4267,8 @@ def can_fetch_all_contributor_dashboard_stats(
 
 
 def is_from_oppia_android(
-    handler: Callable[..., _GenericReturnType]
-) -> Callable[..., _GenericReturnType]:
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the request was sent from Oppia Android.
 
     Args:
@@ -4275,7 +4281,7 @@ def is_from_oppia_android(
     @functools.wraps(handler)
     def test_is_from_oppia_android(
         self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericReturnType:
+    ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the request was sent from Oppia Android.
 
         Args:
