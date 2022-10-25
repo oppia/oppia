@@ -113,10 +113,6 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.displayHint(3)).toBeNull();
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(true);
-
-    tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
-
-    expect(hasms.isSolutionViewable()).toBe(true);
   }));
 
   it('should not continue to display hints after after a correct answer is' +
@@ -208,10 +204,6 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.displayHint(0)?.html).toBe('one');
     expect(hasms.displayHint(1)?.html).toBe('two');
     expect(hasms.displayHint(2)?.html).toBe('three');
-
-    tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
-
-    expect(hasms.isSolutionViewable()).toBe(true);
   }));
 
   it('should reset the service when timeouts was called before',
@@ -286,8 +278,20 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isSolutionViewable()).toBe(false);
+
+    hasms.displayHint(1);
+    hasms.recordWrongAnswer();
+    hasms.recordWrongAnswer();
+    hasms.recordWrongAnswer();
+    expect(hasms.wrongAnswersAfterHintsExhausted).toEqual(3);
   }));
 
+  it('should ensure that solution is released', () => {
+    expect(hasms.solutionReleased).toEqual(false);
+    hasms.releaseSolution();
+    expect(hasms.solutionReleased).toEqual(true);
+  });
+  
   it('should send the solution viewed event emitter', () => {
     let mockSolutionViewedEventEmitter = new EventEmitter();
     expect(hasms.onSolutionViewedEventEmitter).toEqual(
@@ -297,5 +301,15 @@ describe('HintsAndSolutionManager service', () => {
   it('should fetch EventEmitter for consumption of hint', () => {
     let mockHintConsumedEvent = new EventEmitter();
     expect(hasms.onHintConsumed).toEqual(mockHintConsumedEvent);
+  });
+
+  it('should fetch EventEmitter for exhaustion of hints', () => {
+    let mockOnHintsExhausted = new EventEmitter();
+    expect(hasms.onHintsExhausted).toEqual(mockOnHintsExhausted);
+  });
+
+  it('should send the learner really stuck event emitter', () => {
+    let mockOnLearnerGetsReallyStuck = new EventEmitter();
+    expect(hasms.onLearnerReallyStuck).toEqual(mockOnLearnerGetsReallyStuck);
   });
 });

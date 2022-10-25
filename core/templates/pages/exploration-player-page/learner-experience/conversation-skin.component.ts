@@ -299,7 +299,6 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.add(
       this.hintsAndSolutionManagerService.onHintsExhausted.subscribe(
         () => {
-          console.log("Subscribed");
           this.triggerIfLearnerStuckAction();
         }
       )
@@ -1023,7 +1022,6 @@ export class ConversationSkinComponent {
   }
 
   triggerIfLearnerStuckAction(): void {
-    console.log("func run");
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
@@ -1032,6 +1030,9 @@ export class ConversationSkinComponent {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
     }
+    // console.log("\n\n");
+    // console.log(this.nextCardIfStuck);
+    // console.log("\n\n");
     this.responseTimeout = setTimeout(() => {
       if (this.nextCardIfStuck) {
         // Let the learner know about the redirection to a state
@@ -1054,7 +1055,6 @@ export class ConversationSkinComponent {
   }
 
   triggerIfLearnerStuckActionDirectly(): void {
-    console.log("func run directly");
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
