@@ -288,12 +288,13 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'version': version
                 }
-            # The handler schema defines the possible values of 'action'.
-            # If 'action' has a value other than those defined in the schema,
-            # a Bad Request error will be thrown. This means that the else
-            # branch of this if/elif/else chain will never execute.
-            # Hence, we use the 'no branch' flag.
-            elif action == 'update_feature_flag_rules': # pragma: no branch
+            else:
+                # The handler schema defines the possible values of 'action'.
+                # If 'action' has a value other than those defined in the
+                # schema, a Bad Request error will be thrown. Hence, 'action'
+                # must be 'update_feature_flag_rules' if this branch is
+                # executed.
+                assert action == 'update_feature_flag_rules'
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rules = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')
@@ -882,13 +883,15 @@ class AdminRoleHandler(base.BaseHandler):
             self.render_json({
                 'usernames': user_services.get_usernames_by_role(role)
             })
-        # The handler schema defines the possible values of 'filter_criterion'.
-        # If 'filter_criterion' has a value other than those defined in the
-        # schema, a Bad Request error will be thrown. This means that the else
-        # branch of this if/elif/else chain will never execute.
-        # Hence, we use the 'no branch' flag.
-        elif filter_criterion == ( # pragma: no branch
-                feconf.USER_FILTER_CRITERION_USERNAME):
+        else:
+            # The handler schema defines the possible values of
+            # 'filter_criterion'. If 'filter_criterion' has a value other than
+            # those defined in the schema, a Bad Request error will be thrown.
+            # Hence, 'filter_criterion' must be
+            # 'feconf.USER_FILTER_CRITERION_USERNAME' if this branch is
+            # executed.
+            assert filter_criterion == (
+                feconf.USER_FILTER_CRITERION_USERNAME)
             username = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_USERNAME)
             user_id = user_services.get_user_id_from_username(username)
@@ -999,12 +1002,12 @@ class TopicManagerRoleHandler(base.BaseHandler):
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
-        # The handler schema defines the possible values of 'action'.
-        # If 'action' has a value other than those defined in the schema,
-        # a Bad Request error will be thrown. This means that the else branch
-        # of this if/elif/else chain will never execute.
-        # Hence, we use the 'no branch' flag.
-        elif action == 'deassign': # pragma: no branch
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'deassign' if this branch is executed.
+            assert action == 'deassign'
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 
