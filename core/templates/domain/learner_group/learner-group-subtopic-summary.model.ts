@@ -25,6 +25,8 @@ export interface LearnerGroupSubtopicSummaryBackendDict {
   thumbnail_filename: string;
   thumbnail_bg_color: string;
   subtopic_mastery?: number;
+  parent_topic_url_fragment?: string;
+  classroom_url_fragment?: string;
 }
 
 export class LearnerGroupSubtopicSummary {
@@ -36,6 +38,8 @@ export class LearnerGroupSubtopicSummary {
   _thumbnailBgColor: string;
   // Optional, if it's none, it means the subtopic has not started yet.
   _subtopicMastery?: number;
+  _parentTopicUrlFragment?: string;
+  _classroomUrlFragment?: string;
 
   constructor(
       parentTopicId: string,
@@ -44,7 +48,9 @@ export class LearnerGroupSubtopicSummary {
       subtopicTitle: string,
       thumbnailFilename: string,
       thumbnailBgColor: string,
-      subtopicMastery?: number
+      subtopicMastery?: number,
+      parentTopicUrlFragment?: string,
+      classroomUrlFragment?: string
   ) {
     this._parentTopicId = parentTopicId;
     this._parentTopicName = parentTopicName;
@@ -53,6 +59,8 @@ export class LearnerGroupSubtopicSummary {
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
     this._subtopicMastery = subtopicMastery;
+    this._parentTopicUrlFragment = parentTopicUrlFragment;
+    this._classroomUrlFragment = classroomUrlFragment;
   }
 
   get parentTopicId(): string {
@@ -87,6 +95,14 @@ export class LearnerGroupSubtopicSummary {
     return this._parentTopicId + ':' + String(this._subtopicId);
   }
 
+  get parentTopicUrlFragment(): string | undefined {
+    return this._parentTopicUrlFragment;
+  }
+
+  get classroomUrlFragment(): string | undefined {
+    return this._classroomUrlFragment;
+  }
+
   static createFromBackendDict(
       LearnerGroupSubtopicSummaryBackendDict:
         LearnerGroupSubtopicSummaryBackendDict
@@ -98,6 +114,8 @@ export class LearnerGroupSubtopicSummary {
       LearnerGroupSubtopicSummaryBackendDict.subtopic_title,
       LearnerGroupSubtopicSummaryBackendDict.thumbnail_filename,
       LearnerGroupSubtopicSummaryBackendDict.thumbnail_bg_color,
-      LearnerGroupSubtopicSummaryBackendDict.subtopic_mastery);
+      LearnerGroupSubtopicSummaryBackendDict.subtopic_mastery,
+      LearnerGroupSubtopicSummaryBackendDict.parent_topic_url_fragment,
+      LearnerGroupSubtopicSummaryBackendDict.classroom_url_fragment);
   }
 }

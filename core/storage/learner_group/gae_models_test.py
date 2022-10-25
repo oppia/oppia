@@ -46,9 +46,9 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             id='learner_group_32',
             title='title',
             description='description',
-            facilitator_user_ids=['user_1', 'user_11'],
-            learner_user_ids=['user_2', 'user_3', 'user_4'],
-            invited_learner_user_ids=['user_5', 'user_6'],
+            facilitator_user_ids=['facilitator_1', 'facilitator_2'],
+            learner_user_ids=['learner_1', 'learner_2', 'learner_3'],
+            invited_learner_user_ids=['invited_user_1', 'invited_user_2'],
             subtopic_page_ids=['subtopic_1', 'subtopic_2'],
             story_ids=['story_1', 'story_2'])
         self.learner_group_model.update_timestamps()
@@ -144,7 +144,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         """Test export data on users that are learners of the learner group."""
 
         learner_user_data = (
-            learner_group_models.LearnerGroupModel.export_data('user_2'))
+            learner_group_models.LearnerGroupModel.export_data('learner_1'))
         expected_learner_user_data = {
             'learner_group_32': {
                 'title': 'title',
@@ -161,7 +161,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         learner group.
         """
         invited_learner_data = (
-            learner_group_models.LearnerGroupModel.export_data('user_6'))
+            learner_group_models.LearnerGroupModel.export_data(
+                'invited_user_2'))
         expected_invited_learner_data = {
             'learner_group_32': {
                 'title': 'title',
@@ -178,7 +179,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         the learner group.
         """
         facilitator_user_data = (
-            learner_group_models.LearnerGroupModel.export_data('user_1'))
+            learner_group_models.LearnerGroupModel.export_data('facilitator_1')
+        )
         expected_facilitator_user_data = {
             'learner_group_32': {
                 'title': 'title',
@@ -195,7 +197,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         the learner group.
         """
         uninvolved_user_data = (
-            learner_group_models.LearnerGroupModel.export_data('user_31'))
+            learner_group_models.LearnerGroupModel.export_data('learner_21'))
         expected_uninvolved_user_data: Dict[str, Union[str, List[str]]] = {}
 
         self.assertEqual(
@@ -208,13 +210,14 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         """
         self.assertTrue(
             learner_group_models.LearnerGroupModel
-            .has_reference_to_user_id('user_2'))
+            .has_reference_to_user_id('learner_1'))
 
-        learner_group_models.LearnerGroupModel.apply_deletion_policy('user_2')
+        learner_group_models.LearnerGroupModel.apply_deletion_policy(
+            'learner_1')
 
         self.assertFalse(
             learner_group_models.LearnerGroupModel
-            .has_reference_to_user_id('user_2'))
+            .has_reference_to_user_id('learner_1'))
 
     def test_apply_deletion_policy_on_invited_users(self) -> None:
         """Test apply_deletion_policy on users that have been
@@ -222,13 +225,14 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         """
         self.assertTrue(
             learner_group_models.LearnerGroupModel
-            .has_reference_to_user_id('user_5'))
+            .has_reference_to_user_id('invited_user_1'))
 
-        learner_group_models.LearnerGroupModel.apply_deletion_policy('user_5')
+        learner_group_models.LearnerGroupModel.apply_deletion_policy(
+            'invited_user_1')
 
         self.assertFalse(
             learner_group_models.LearnerGroupModel
-            .has_reference_to_user_id('user_5'))
+            .has_reference_to_user_id('invited_user_1'))
 
     def test_apply_deletion_policy_on_facilitators(self) -> None:
         """Test apply_deletion_policy on users that are facilitators of
@@ -236,28 +240,67 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         """
         self.assertTrue(
             learner_group_models.LearnerGroupModel
-            .has_reference_to_user_id('user_1'))
+            .has_reference_to_user_id('facilitator_1'))
         self.assertTrue(
             learner_group_models.LearnerGroupModel
-            .has_reference_to_user_id('user_11'))
+            .has_reference_to_user_id('facilitator_2'))
 
         # Deleting a facilitator when more than 1 facilitators are present.
-        learner_group_models.LearnerGroupModel.apply_deletion_policy('user_1')
+        learner_group_models.LearnerGroupModel.apply_deletion_policy(
+            'facilitator_1')
 
         self.assertFalse(
             learner_group_models.LearnerGroupModel
-            .has_reference_to_user_id('user_1'))
+            .has_reference_to_user_id('facilitator_1'))
 
         # Deleting a facilitator when only 1 facilitator is present.
-        learner_group_models.LearnerGroupModel.apply_deletion_policy('user_11')
+        learner_group_models.LearnerGroupModel.apply_deletion_policy(
+            'facilitator_2')
 
         self.assertFalse(
             learner_group_models.LearnerGroupModel
-            .has_reference_to_user_id('user_11'))
+            .has_reference_to_user_id('facilitator_2'))
 
     def test_get_by_facilitator_id(self) -> None:
         """Test get_by_facilitator_id."""
         learner_group_model = (
             learner_group_models.LearnerGroupModel.get_by_facilitator_id(
-                'user_1'))
+                'facilitator_1'))
         self.assertEqual(learner_group_model[0].id, 'learner_group_32')
+
+    def test_get_by_invited_learner_user_id(self) -> None:
+        """Test get_by_invited_learner_user_id."""
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel
+                .get_by_invited_learner_user_id(
+                    'facilitator_1'))
+        self.assertEqual(len(learner_grp_models), 0)
+
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel
+                .get_by_invited_learner_user_id(
+                    'learner_2'))
+        self.assertEqual(len(learner_grp_models), 0)
+
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel
+                .get_by_invited_learner_user_id(
+                    'invited_user_1'))
+        self.assertEqual(learner_grp_models[0].id, 'learner_group_32')
+
+    def test_get_by_learner_user_id(self) -> None:
+        """Test get_by_learner_user_id."""
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel.get_by_learner_user_id(
+                'facilitator_1'))
+        self.assertEqual(len(learner_grp_models), 0)
+
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel.get_by_learner_user_id(
+                'invited_user_1'))
+        self.assertEqual(len(learner_grp_models), 0)
+
+        learner_grp_models = (
+            learner_group_models.LearnerGroupModel.get_by_learner_user_id(
+                'learner_2'))
+        self.assertEqual(learner_grp_models[0].id, 'learner_group_32')
