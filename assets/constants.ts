@@ -6767,6 +6767,15 @@ export default {
         }
       ]
     },
+    "LEARNER_GROUP_VIEWER": {
+      "ROUTE": "learner-group/:learner_group_id",
+      "TITLE": "I18N_LEARNER_GROUP_PAGE_TITLE",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
     "SPLASH": {
       "ROUTE": "",
       "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",

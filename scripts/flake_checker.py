@@ -21,8 +21,7 @@ import os
 
 import requests
 
-from typing import Dict, List, Optional
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Optional, TypedDict
 
 
 class FlakeReportDict(TypedDict):
