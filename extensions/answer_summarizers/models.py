@@ -478,12 +478,11 @@ class TopAnswersByCategorization(BaseCalculation):
             # have a value other than those defined in
             # CLASSIFICATION_CATEGORIES. This is made sure by validate()
             # method in stats_domain.SubmittedAnswer class which defines
-            # valid classification categories. Therefore a branch where
-            # category in CLASSIFICATION_CATEGORIES is false would not arise.
-            # Hence we use the 'no branch' flag.
-            if category in CLASSIFICATION_CATEGORIES: # pragma: no branch
-                submitted_answers_by_categorization[category].extend(
-                    d['answer'] for d in answer_dicts)
+            # valid classification categories. Hence, 'category' must be in
+            # 'CLASSIFICATION_CATEGORIES'.
+            assert category in CLASSIFICATION_CATEGORIES
+            submitted_answers_by_categorization[category].extend(
+                d['answer'] for d in answer_dicts)
 
         categorized_answer_frequency_lists = (
             stats_domain.CategorizedAnswerFrequencyLists({
