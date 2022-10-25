@@ -521,6 +521,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.ngbModal.open(ConfirmQuestionExitModalComponent, {
       backdrop: true,
     }).result.then(() => {
+      this.question = null;
       this.contextService.resetImageSaveDestination();
       this.editorIsOpen = false;
       this.windowRef.nativeWindow.location.hash = null;
