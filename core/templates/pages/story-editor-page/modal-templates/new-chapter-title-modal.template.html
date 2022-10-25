@@ -44,6 +44,12 @@
       <span class="new-chapter-error-msg" ng-if="!categoryIsDefault">
         <span>The category of this exploration is invalid. Curated lessons need to have their category to be one of the default categories.</span>
       </span>
+      <span class="new-chapter-error-msg" ng-if="statesWithRestrictedInteractions.length > 0">
+        <span>The states [<[statesWithRestrictedInteractions.join(', ')]>] contain restricted interaction types.</span>
+      </span>
+      <span class="new-chapter-error-msg" ng-if="statesWithTooFewMultipleChoiceOptions.length > 0">
+        <span>The states [<[statesWithTooFewMultipleChoiceOptions.join(', ')]>] contain invalid multiple choice interactions. They must each have at least 4 options.</span>
+      </span>
     </div>
     <div class="chapter-input chapter-input-thumbnail e2e-test-chapter-input-thumbnail">
       <div class="chapter-input-header">

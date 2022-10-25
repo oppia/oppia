@@ -50,10 +50,10 @@ export class MultipleChoiceInputValidationService {
     var seenChoices = [];
     var numChoices = customizationArgs.choices.value.length;
 
-    if (numChoices < 4) {
+    if (numChoices < 2) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please enter at least four choices.'
+        message: 'Please enter at least two choices.'
       });
     }
 
