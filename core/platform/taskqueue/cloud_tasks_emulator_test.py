@@ -29,9 +29,10 @@ from typing import Any, Dict, List, Optional
 class CloudTasksEmulatorUnitTests(test_utils.TestBase):
     """Tests for cloud tasks emulator."""
 
-    # In the type annotation below, payload is of type Dict[str, Any]
-    # because it emulates the behaviour of
-    # dev_mode_taskqueue_services._task_handler.
+    # Here we use type Any because it emulates the behaviour of
+    # dev_mode_taskqueue_services._task_handler. So, to match the
+    # type annotations with '_task_handler' we annotated the payload
+    # as 'Dict[str, Any]'.
     def mock_task_handler(
             self,
             url: str,

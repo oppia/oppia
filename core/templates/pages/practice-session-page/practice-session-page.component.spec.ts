@@ -16,80 +16,103 @@
  * @fileoverview Unit tests for practice session page component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { PracticeSessionPageComponent } from 'pages/practice-session-page/practice-session-page.component';
+import { UrlService } from 'services/contextual/url.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { LoaderService } from 'services/loader.service';
+import { PageTitleService } from 'services/page-title.service';
+import { PracticeSessionsBackendApiService } from './practice-session-backend-api.service';
 
-require('pages/practice-session-page/practice-session-page.component.ts');
+describe('Practice session page', () => {
+  let component: PracticeSessionPageComponent;
+  let fixture: ComponentFixture<PracticeSessionPageComponent>;
+  let csrfTokenService: CsrfTokenService;
+  let pageTitleService: PageTitleService;
+  let urlService: UrlService;
+  let translateService: TranslateService;
+  let loaderService: LoaderService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let practiceSessionsBackendApiService: PracticeSessionsBackendApiService;
 
-describe('Practice session page', function() {
-  var ctrl = null;
-  var $httpBackend = null;
-  var $scope = null;
-  var CsrfTokenService = null;
-  var PageTitleService = null;
-  var UrlService = null;
-  var LoaderService = null;
-  var $translate = null;
-  var I18nLanguageCodeService = null;
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader
+          }
+        })
+      ],
+      declarations: [
+        PracticeSessionPageComponent,
+      ],
+      providers: [
+        TranslateService,
+        PracticeSessionsBackendApiService,
+        CsrfTokenService,
+        PageTitleService,
+        UrlService,
+        LoaderService,
+        I18nLanguageCodeService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
-    var $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
-    CsrfTokenService = $injector.get('CsrfTokenService');
-    PageTitleService = $injector.get('PageTitleService');
-    UrlService = $injector.get('UrlService');
-    LoaderService = $injector.get('LoaderService');
-    $translate = $injector.get('$translate');
-    I18nLanguageCodeService = $injector.get('I18nLanguageCodeService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PracticeSessionPageComponent);
+    component = fixture.componentInstance;
 
-    spyOn(CsrfTokenService, 'getTokenAsync')
-      .and.returnValue($q.resolve('sample-csrf-token'));
-    spyOn($translate, 'use').and.returnValue($q.resolve());
+    csrfTokenService = TestBed.inject(CsrfTokenService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    urlService = TestBed.inject(UrlService);
+    loaderService = TestBed.inject(LoaderService);
+    translateService = TestBed.inject(TranslateService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    practiceSessionsBackendApiService = (
+      TestBed.inject(PracticeSessionsBackendApiService));
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('practiceSessionPage', {
-      $scope: $scope
-    });
-  }));
+    spyOn(translateService, 'use').and.stub();
+    spyOn(translateService, 'instant').and.returnValue('translatedTitle');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+      .and.returnValue('abbrev-topic');
+    spyOn(urlService, 'getSelectedSubtopicsFromUrl')
+      .and.returnValue('["1","2","3","4","5"]');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('math');
+    spyOn(csrfTokenService, 'getTokenAsync')
+      .and.returnValue(Promise.resolve('sample-csrf-token'));
+
+    fixture.detectChanges();
+  });
 
   it('should load topic based on its id on url when component is initialized' +
-    ' and subscribe to languageCodeChange emitter', function() {
-    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      'abbrev-topic');
-    spyOn(UrlService, 'getSelectedSubtopicsFromUrl').and.returnValue(
-      '["1","2","3","4","5"]');
-    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'math');
-    spyOn(LoaderService, 'hideLoadingScreen');
-    spyOn(ctrl, 'subscribeToOnLanguageCodeChange');
+    ' and subscribe to languageCodeChange emitter', fakeAsync(() => {
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(component, 'subscribeToOnLanguageCodeChange');
 
-    $httpBackend.expectGET(
-      '/practice_session/data/math/abbrev-topic?' +
-      'selected_subtopic_ids=' + encodeURIComponent(
-        '["1","2","3","4","5"]')).respond({
-      skill_ids_to_descriptions_map: {
-        skill_1: 'Description 1',
-        skill_2: 'Description 2',
-      },
-      topic_name: 'Foo Topic'
-    });
+    spyOn(practiceSessionsBackendApiService, 'fetchPracticeSessionsData')
+      .and.returnValue(Promise.resolve({
+        skill_ids_to_descriptions_map: {
+          skill_1: 'Description 1',
+          skill_2: 'Description 2',
+        },
+        topic_name: 'Foo Topic'
+      }));
 
-    ctrl.$onInit();
-    $httpBackend.flush();
+    component.ngOnInit();
+    tick();
 
-    expect(ctrl.topicName).toBe('Foo Topic');
-    expect(ctrl.stringifiedSubtopicIds).toBe('["1","2","3","4","5"]');
-    expect(ctrl.questionPlayerConfig).toEqual({
+    expect(component.topicName).toBe('Foo Topic');
+    expect(component.stringifiedSubtopicIds).toBe('["1","2","3","4","5"]');
+    expect(component.questionPlayerConfig).toEqual({
       resultActionButtons: [
         {
           type: 'REVIEW_LOWEST_SCORED_SKILL',
@@ -112,51 +135,45 @@ describe('Practice session page', function() {
       questionCount: 20,
       questionsSortedByDifficulty: false
     });
-    expect(ctrl.subscribeToOnLanguageCodeChange).toHaveBeenCalled();
-    expect(LoaderService.hideLoadingScreen).toHaveBeenCalled();
-  });
+    expect(component.subscribeToOnLanguageCodeChange).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
 
   it('should subscribe to onLanguageCodeChange', () => {
-    spyOn(ctrl.directiveSubscriptions, 'add');
-    spyOn(I18nLanguageCodeService.onI18nLanguageCodeChange, 'subscribe');
+    spyOn(component.directiveSubscriptions, 'add');
+    spyOn(i18nLanguageCodeService.onI18nLanguageCodeChange, 'subscribe');
 
-    ctrl.subscribeToOnLanguageCodeChange();
+    component.subscribeToOnLanguageCodeChange();
 
-    expect(ctrl.directiveSubscriptions.add).toHaveBeenCalled();
-    expect(I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe)
+    expect(component.directiveSubscriptions.add).toHaveBeenCalled();
+    expect(i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe)
       .toHaveBeenCalled();
   });
 
   it('should update title whenever the language changes', () => {
-    ctrl.subscribeToOnLanguageCodeChange();
-    spyOn(ctrl, 'setPageTitle');
+    component.subscribeToOnLanguageCodeChange();
+    spyOn(component, 'setPageTitle');
 
-    I18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
 
-    expect(ctrl.setPageTitle).toHaveBeenCalled();
+    expect(component.setPageTitle).toHaveBeenCalled();
   });
 
   it('should obtain translated title and set it', () => {
-    spyOn($translate, 'instant').and.returnValue('translated_title');
-    spyOn(PageTitleService, 'setDocumentTitle');
-    ctrl.topicName = 'dummy_topic_name';
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.topicName = 'dummy_topic_name';
 
-    ctrl.setPageTitle();
-    $scope.$apply();
+    component.setPageTitle();
 
-    expect($translate.instant).toHaveBeenCalledWith(
-      'I18N_PRACTICE_SESSION_PAGE_TITLE', {
-        topicName: 'dummy_topic_name'
-      });
-    expect(PageTitleService.setDocumentTitle)
-      .toHaveBeenCalledWith('translated_title');
+    expect(pageTitleService.setDocumentTitle)
+      .toHaveBeenCalledWith('translatedTitle');
   });
 
   it('should unsubscribe on component destruction', () => {
-    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
 
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
 
-    expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });

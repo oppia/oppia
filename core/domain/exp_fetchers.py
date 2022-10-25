@@ -34,8 +34,7 @@ from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -44,7 +43,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user
+    models.Names.EXPLORATION, models.Names.USER
 ])
 datastore_services = models.Registry.import_datastore_services()
 

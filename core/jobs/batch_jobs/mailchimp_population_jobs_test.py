@@ -28,8 +28,7 @@ from core.platform import models
 
 from mailchimp3 import mailchimpclient
 
-from typing import Dict, List, Mapping, Type, Union
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Mapping, Type, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -37,7 +36,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (config_models, user_models) = models.Registry.import_models([
-    models.NAMES.config, models.NAMES.user
+    models.Names.CONFIG, models.Names.USER
 ])
 
 

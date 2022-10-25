@@ -16,23 +16,35 @@
  * @fileoverview Unit tests for Delete Skill Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AssignedSkill, AssignedSkillBackendDict } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { DeleteSkillModalComponent } from './delete-skill-modal.component';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { DeleteSkillModalComponent, TopicAssignmentsSummary } from './delete-skill-modal.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-describe('Assign Skill to Topic Modal Component', () => {
+describe('Delete Skill Modal Component', () => {
   let fixture: ComponentFixture<DeleteSkillModalComponent>;
   let componentInstance: DeleteSkillModalComponent;
+  let urlInterpolationService: UrlInterpolationService;
   let skillBackendDict: AssignedSkillBackendDict = {
-    topic_id: 'test_id',
-    topic_name: 'topic_name',
+    topic_id: 'topicId1',
+    topic_name: 'topicName',
     topic_version: 1,
     subtopic_id: 2
   };
-  const testSkills: AssignedSkill[] = [AssignedSkill
-    .createFromBackendDict(skillBackendDict)];
+
+  const testSkills: AssignedSkill[] = [
+    AssignedSkill.createFromBackendDict(skillBackendDict)
+  ];
+
+  const testTopicIdToDiagnosticTestSkillIds:
+    TopicIdToDiagnosticTestSkillIdsResponse = {
+      topicIdToDiagnosticTestSkillIds: {
+        topicId1: []
+      }
+    };
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     fetchTopicAssignmentsForSkillAsync(skillId: string) {
@@ -42,10 +54,22 @@ describe('Assign Skill to Topic Modal Component', () => {
         }
       };
     }
+
+    fetchTopicIdToDiagnosticTestSkillIdsAsync(topicIds: string[]) {
+      return {
+        then: (callback: (
+          resp: TopicIdToDiagnosticTestSkillIdsResponse) => void) => {
+          callback(testTopicIdToDiagnosticTestSkillIds);
+        }
+      };
+    }
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        MatProgressSpinnerModule
+      ],
       declarations: [
         DeleteSkillModalComponent
       ],
@@ -54,7 +78,8 @@ describe('Assign Skill to Topic Modal Component', () => {
         {
           provide: TopicsAndSkillsDashboardBackendApiService,
           useClass: MockTopicsAndSkillsDashboardBackendApiService
-        }
+        },
+        UrlInterpolationService
       ]
     }).compileComponents();
   }));
@@ -64,6 +89,7 @@ describe('Assign Skill to Topic Modal Component', () => {
     componentInstance = fixture.componentInstance;
     componentInstance.topicsAssignments = [];
     componentInstance.skillId = '';
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
   it('should create', () => {
@@ -86,10 +112,66 @@ describe('Assign Skill to Topic Modal Component', () => {
     expect(componentInstance.showTopicsAssignments()).toBeFalse();
   });
 
-  it('should fetch Topic Assignments for Skill', () => {
+  it('should fetch Topic Assignments for Skill', fakeAsync(() => {
     componentInstance.topicsAssignmentsAreFetched = false;
     componentInstance.fetchTopicAssignmentsForSkill();
+    tick();
     expect(componentInstance.topicsAssignments).toEqual(testSkills);
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
+  }));
+
+  it('should allow skill deletion', fakeAsync(() => {
+    let topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+      TopicsAndSkillsDashboardBackendApiService);
+    componentInstance.skillId = 'skill_id';
+    componentInstance.topicsAssignmentsAreFetched = false;
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchTopicIdToDiagnosticTestSkillIdsAsync'
+    ).and.returnValue(Promise.resolve({
+      topicIdToDiagnosticTestSkillIds: {topicId1: []}
+    }));
+    componentInstance.fetchTopicAssignmentsForSkill();
+    tick(50);
+    expect(componentInstance.skillCanBeDeleted).toBeTrue();
+  }));
+
+  it(
+    'should not be able to delete the skill when the skill is linked to the ' +
+    'diagnostic test of any topic',
+    fakeAsync(() => {
+      let topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+        TopicsAndSkillsDashboardBackendApiService);
+      componentInstance.skillId = 'skill_id';
+      componentInstance.topicsAssignmentsAreFetched = false;
+
+      // The backend API request is spied such that the skill is linked to the
+      // diagnostic test of a topic with topic ID topicId1.
+      spyOn(
+        topicsAndSkillsDashboardBackendApiService,
+        'fetchTopicIdToDiagnosticTestSkillIdsAsync'
+      ).and.returnValue(Promise.resolve({
+        topicIdToDiagnosticTestSkillIds: {
+          topicId1: ['skill_id'],
+          topicId2: []
+        }
+      }));
+
+      componentInstance.fetchTopicAssignmentsForSkill();
+      tick();
+      expect(componentInstance.skillCanBeDeleted).toBeFalse();
+    }));
+
+  it('should get topic editor url', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl').and
+      .returnValue('test_url');
+    let topicsAssignment: TopicAssignmentsSummary = {
+      subtopicId: 1,
+      topicVersion: 1,
+      topicId: 'topicID'
+    };
+    expect(
+      componentInstance.getTopicEditorUrl(topicsAssignment)).toEqual(
+      'test_url');
   });
 });

@@ -30,7 +30,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 
 
 class AuthIdUserIdPairTests(test_utils.TestBase):
@@ -122,9 +122,9 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
                 'deleted': True,
             })
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_user_id(self) -> None:
         self.user_auth_details.user_id = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -184,9 +184,9 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         ):
             self.user_auth_details.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_gae_id(self) -> None:
         self.user_auth_details.gae_id = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -194,9 +194,9 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         ):
             self.user_auth_details.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_firebase_auth_id(self) -> None:
         self.user_auth_details.firebase_auth_id = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(

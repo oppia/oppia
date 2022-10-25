@@ -19,6 +19,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { fakeAsync, tick } from '@angular/core/testing';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { StoryReference } from 'domain/topic/story-reference-object.model';
@@ -51,6 +52,7 @@ describe('Topic editor tab directive', function() {
   var StoryCreationService = null;
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
+  var QuestionBackendApiService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
 
   var mockTasdReinitializedEventEmitter = null;
@@ -100,6 +102,7 @@ describe('Topic editor tab directive', function() {
     UndoRedoService = $injector.get('UndoRedoService');
     EntityCreationService = $injector.get('EntityCreationService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
+    QuestionBackendApiService = $injector.get('QuestionBackendApiService');
     mockTasdReinitializedEventEmitter = new EventEmitter();
 
     topicInitializedEventEmitter = new EventEmitter();
@@ -129,7 +132,8 @@ describe('Topic editor tab directive', function() {
       TopicEditorStateService: TopicEditorStateService,
       EntityCreationService: EntityCreationService,
       TopicsAndSkillsDashboardBackendApiService:
-        MockTopicsAndSkillsDashboardBackendApiService
+        MockTopicsAndSkillsDashboardBackendApiService,
+      QuestionBackendApiService: QuestionBackendApiService
     });
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
@@ -648,4 +652,52 @@ describe('Topic editor tab directive', function() {
     topicReinitializedEventEmitter.emit();
     expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
   });
+
+  it('should call the TopicUpdateService if skillId is added in the ' +
+     'diagnostic test', fakeAsync(function() {
+    var updateSkillIdForDiagnosticTestSpy = spyOn(
+      TopicUpdateService, 'updateDiagnosticTestSkills');
+    $scope.selectedSkillForDiagnosticTest = skillSummary;
+    $scope.availableSkillSummariesForDiagnosticTest = [skillSummary];
+    $scope.addSkillForDiagnosticTest();
+    $rootScope.$apply();
+    tick();
+    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalledWith(
+      $scope.topic, $scope.selectedSkillSummariesForDiagnosticTest);
+  }));
+
+  it('should call the TopicUpdateService if any skillId is removed from the ' +
+     'diagnostic test', function() {
+    var updateSkillIdForDiagnosticTestSpy = spyOn(
+      TopicUpdateService, 'updateDiagnosticTestSkills');
+    $scope.selectedSkillSummariesForDiagnosticTest = [skillSummary];
+
+    $scope.removeSkillFromDiagnosticTest(skillSummary);
+    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalledWith(
+      $scope.topic, $scope.selectedSkillSummariesForDiagnosticTest);
+  });
+
+  it('should get eligible skill for diagnostic test selection', function() {
+    $scope.skillQuestionCountDict = {
+      skill_1: 3
+    };
+    topic._uncategorizedSkillSummaries = [];
+    topic._subtopics = [];
+    expect($scope.getEligibleSkillSummariesForDiagnosticTest()).toEqual([]);
+
+    spyOn($scope.topic, 'getAvailableSkillSummariesForDiagnosticTest')
+      .and.returnValue([skillSummary]);
+    expect($scope.getEligibleSkillSummariesForDiagnosticTest()).toEqual(
+      [skillSummary]);
+  });
+
+  it('should be able to present diagnostic test dropdown selector correctly',
+    function() {
+      expect($scope.diagnosticTestSkillsDropdownIsShown).toBeFalse();
+      $scope.presentDiagnosticTestSkillDropdown();
+      expect($scope.diagnosticTestSkillsDropdownIsShown).toBeTrue();
+
+      $scope.removeDiagnosticTestSkillDropdown();
+      expect($scope.diagnosticTestSkillsDropdownIsShown).toBeFalse();
+    });
 });

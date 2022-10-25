@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core.constants import constants
 from core.domain import config_services
@@ -33,7 +35,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class ContributorDashboardPageTest(test_utils.GenericTestBase):
@@ -487,12 +489,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self
     ):
         # Create a new exploration and linked story.
-        multiple_choice_state_name = 'Multiple choice state'
+        continue_state_name = 'continue state'
         exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
             '100',
             self.owner_id,
-            ['Introduction', multiple_choice_state_name, 'End state'],
-            ['TextInput', 'MultipleChoiceInput'],
+            ['Introduction', continue_state_name, 'End state'],
+            ['TextInput', 'Continue'],
             category='Algebra',
             correctness_feedback_enabled=True
         )
@@ -501,44 +503,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
             exp_100.id)
 
-        # Add two pieces of content to the exploration multiple choice
-        # interaction state.
-        exp_services.update_exploration(
-            self.owner_id, exp_100.id, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': 1
-                })], 'Add state name')
-
-        # Create a translation suggestion for the first multiple choice text
-        # content.
+        # Create a translation suggestion for continue text.
+        continue_state = exp_100.states['continue state']
+        content_id_of_continue_button_text = (
+            continue_state.interaction.customization_args[
+                'buttonText'].value.content_id)
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'ca_choices_0',
+            'content_id': content_id_of_continue_button_text,
             'language_code': 'hi',
-            'content_html': '<p>Option A</p>',
-            'state_name': multiple_choice_state_name,
+            'content_html': 'Continue',
+            'state_name': continue_state_name,
             'translation_html': '<p>Translation for content.</p>'
         }
         suggestion_services.create_suggestion(
@@ -560,8 +535,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'topic_name': 'topic',
                 'story_title': 'title story_id_100',
                 'chapter_title': 'Node1',
-                # Introduction + Multiple choice with 2 options + End state.
-                'content_count': 5,
+                # Introduction + Continue + End state.
+                'content_count': 4,
                 'translation_counts': {},
                 'translation_in_review_counts': {}
             }]
@@ -581,7 +556,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'Multiple choice state',
+                    'state_name': 'continue state',
                 }),
             ], 'delete state')
 
@@ -597,12 +572,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self
     ):
         # Create a new exploration and linked story.
-        multiple_choice_state_name = 'Multiple choice state'
+        continue_state_name = 'continue state'
         exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
             '100',
             self.owner_id,
-            ['Introduction', multiple_choice_state_name, 'End state'],
-            ['TextInput', 'MultipleChoiceInput'],
+            ['Introduction', continue_state_name, 'End state'],
+            ['TextInput', 'Continue'],
             category='Algebra',
             correctness_feedback_enabled=True
         )
@@ -611,44 +586,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
             exp_100.id)
 
-        # Add two pieces of content to the exploration multiple choice
-        # interaction state.
-        exp_services.update_exploration(
-            self.owner_id, exp_100.id, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': 1
-                })], 'Add state name')
-
-        # Create a translation suggestion for the second multiple choice
-        # text content.
+        # Create a translation suggestion for the continue text.
+        continue_state = exp_100.states['continue state']
+        content_id_of_continue_button_text = (
+            continue_state.interaction.customization_args[
+                'buttonText'].value.content_id)
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'ca_choices_1',
+            'content_id': content_id_of_continue_button_text,
             'language_code': 'hi',
-            'content_html': '<p>Option B</p>',
-            'state_name': multiple_choice_state_name,
+            'content_html': 'Continue',
+            'state_name': continue_state_name,
             'translation_html': '<p>Translation for content.</p>'
         }
         suggestion_services.create_suggestion(
@@ -672,7 +620,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'story_title': 'title story_id_100',
                 'chapter_title': 'Node1',
                 # Introduction + Multiple choice with 2 options + End state.
-                'content_count': 5,
+                'content_count': 4,
                 'translation_counts': {},
                 'translation_in_review_counts': {}
             }]
@@ -684,17 +632,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name':
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': multiple_choice_state_name,
+                    'state_name': continue_state_name,
                     'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'choices_0',
+                                'unicode_str': 'Continua'
+                            }
+                        }
                     }
-                })], 'Remove multiple choice option')
+                })], 'Update continue cust args')
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
@@ -1444,3 +1391,409 @@ class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
 
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
+
+
+class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
+    """Test for the ContributorStatsSummariesHandler."""
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+    def _publish_topic(self, topic_id, topic_name):
+        """Creates and publishes a topic.
+
+        Args:
+            topic_id: str. Topic ID.
+            topic_name: str. Topic name.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, topic_name, 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
+        topic_services.save_new_topic(self.admin_id, topic)
+        topic_services.publish_topic(topic_id, self.admin_id)
+
+    def test_get_translation_contribution_stats(self):
+        # Create and publish a topic.
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code='es',
+            contributor_user_id=self.owner_id,
+            topic_id='topic_id',
+            submitted_translations_count=2,
+            submitted_translation_word_count=100,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=50,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[
+                datetime.date.fromtimestamp(1616173836)
+            ]
+        )
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/translation/submission/%s' % (
+                self.OWNER_USERNAME))
+
+        self.assertEqual(
+            response, {
+                'translation_contribution_stats': [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_translation_review_stats(self):
+        # Create and publish a topic.
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code='es',
+            reviewer_user_id=self.owner_id,
+            topic_id='topic_id',
+            reviewed_translations_count=1,
+            reviewed_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_with_reviewer_edits_count=0,
+            accepted_translation_word_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/translation/review/%s' % (
+                self.OWNER_USERNAME))
+
+        self.assertEqual(
+            response, {
+                'translation_review_stats': [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_question_contribution_stats(self):
+        # Create and publish a topic.
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.owner_id,
+            topic_id='topic_id',
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/question/submission/%s' % (
+                self.OWNER_USERNAME))
+
+        self.assertEqual(
+            response, {
+                'question_contribution_stats': [
+                    {
+                        'topic_name': 'published_topic_name',
+                        'submitted_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_without_reviewer_edits_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_question_review_stats(self):
+        # Create and publish a topic.
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.owner_id,
+            topic_id='topic_id',
+            reviewed_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/question/review/%s' % (
+                self.OWNER_USERNAME))
+
+        self.assertEqual(
+            response, {
+                'question_review_stats': [
+                    {
+                        'topic_name': 'published_topic_name',
+                        'reviewed_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_with_reviewer_edits_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_stats_with_invalid_contribution_type_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            '/contributorstatssummaries/a/review/%s' % (
+                self.OWNER_USERNAME), expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid contribution type a.')
+
+        self.logout()
+
+    def test_get_stats_with_invalid_contribution_subtype_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            '/contributorstatssummaries/question/a/%s' % (
+                self.OWNER_USERNAME), expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid contribution subtype a.')
+
+        self.logout()
+
+    def test_get_stats_without_logging_in_error(self):
+        response = self.get_json(
+            '/contributorstatssummaries/question/a/abc',
+            expected_status_int=401)
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.')
+
+    def test_get_all_stats_of_other_users_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorstatssummaries/question/review/abc',
+            expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'The user %s is not allowed to fetch the stats of other users.' % (
+                self.OWNER_USERNAME))
+
+        self.logout()
+
+
+class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
+    """Test for the ContributorAllStatsSummariesHandler."""
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        published_topic_id = 'topic_id'
+        published_topic_name = 'published_topic_name'
+        self._publish_topic(published_topic_id, published_topic_name)
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code='es',
+            contributor_user_id=self.owner_id,
+            topic_id='topic_id',
+            submitted_translations_count=2,
+            submitted_translation_word_count=100,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=50,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[
+                datetime.date.fromtimestamp(1616173836)
+            ]
+        )
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code='es',
+            reviewer_user_id=self.owner_id,
+            topic_id='topic_id',
+            reviewed_translations_count=1,
+            reviewed_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_with_reviewer_edits_count=0,
+            accepted_translation_word_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.owner_id,
+            topic_id='topic_id',
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.owner_id,
+            topic_id='topic_id',
+            reviewed_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+
+    def _publish_topic(self, topic_id, topic_name):
+        """Creates and publishes a topic.
+
+        Args:
+            topic_id: str. Topic ID.
+            topic_name: str. Topic name.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, topic_name, 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
+        topic_services.save_new_topic(self.admin_id, topic)
+        topic_services.publish_topic(topic_id, self.admin_id)
+
+    def test_get_all_stats(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorallstatssummaries/%s' % self.OWNER_USERNAME)
+
+        self.assertEqual(
+            response, {
+                'translation_contribution_stats': [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ],
+                'translation_review_stats': [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'reviewed_translations_count': 1,
+                        'reviewed_translation_word_count': 1,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_with_reviewer_edits_count': 0,
+                        'accepted_translation_word_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ],
+                'question_contribution_stats': [
+                    {
+                        'topic_name': 'published_topic_name',
+                        'submitted_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_without_reviewer_edits_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ],
+                'question_review_stats': [
+                    {
+                        'topic_name': 'published_topic_name',
+                        'reviewed_questions_count': 1,
+                        'accepted_questions_count': 1,
+                        'accepted_questions_with_reviewer_edits_count': 1,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
+            })
+
+        self.logout()
+
+    def test_get_stats_without_logging_in_error(self):
+        response = self.get_json(
+            '/contributorallstatssummaries/abc',
+            expected_status_int=401)
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.')
+
+    def test_get_all_stats_of_other_users_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorallstatssummaries/abc', expected_status_int=401
+        )
+
+        self.assertEqual(
+            response['error'],
+            'The user %s is not allowed to fetch the stats of other users.' % (
+                self.OWNER_USERNAME))
+
+        self.logout()

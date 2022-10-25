@@ -24,6 +24,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
+from core.domain import classroom_config_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -56,8 +57,8 @@ from core.tests import test_utils
     audit_models, blog_models, exp_models, opportunity_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.blog, models.NAMES.exploration,
-    models.NAMES.opportunity, models.NAMES.user
+    models.Names.AUDIT, models.Names.BLOG, models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY, models.Names.USER
 ])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -155,7 +156,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             self.post_json(
                 '/adminhandler', {
                     'action': 'reload_exploration',
-                    'exploration_id': '2'
+                    'exploration_id': '3'
                 }, csrf_token=csrf_token)
 
         self.logout()
@@ -200,6 +201,20 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
         self.logout()
 
+    def test_cannot_generate_classroom_data_in_production_mode(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy classroom in production.')
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_classroom'
+                }, csrf_token=csrf_token)
+        self.logout()
+
     def test_non_admins_cannot_generate_dummy_skill_data(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -209,6 +224,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_new_skill_data'
+                }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_classroom_data(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.')
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_classroom'
                 }, csrf_token=csrf_token)
         self.logout()
 
@@ -314,6 +341,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 20, [skill_summaries[0].id], 0)
         )
         self.assertEqual(len(questions), 15)
+        self.logout()
+
+    def test_generate_dummy_classroom_data(self):
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_classroom'
+            }, csrf_token=csrf_token)
+        classrooms = classroom_config_services.get_all_classrooms()
+        self.assertEqual(len(classrooms), 2)
         self.logout()
 
     def test_regenerate_topic_related_opportunities_action(self):
@@ -1838,6 +1877,19 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         self.assertEqual(result_collections, ['0'])
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        user_id_a = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )  # type: ignore[no-untyped-call]
+        blog_post = blog_services.create_new_blog_post(user_id_a)
+        change_dict = blog_services.BlogPostChangeDict = {
+            'title': 'Welcome to Oppia',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': 'Hello Blog Authors',
+            'tags': ['Math', 'Science']
+        }
+        blog_services.update_blog_post(blog_post.id, change_dict)
+        blog_services.publish_blog_post(blog_post.id)
+
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(
             '/adminhandler', {
@@ -1851,6 +1903,10 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         result_collections = search_services.search_collections(
             'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, [])
+        result_blog_posts = (
+            search_services.search_blog_post_summaries('Welcome', [], 2)[0]
+        )
+        self.assertEqual(result_blog_posts, [])
 
 
 class SendDummyMailTest(test_utils.GenericTestBase):

@@ -55,9 +55,9 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         }
         task_name = 'task1'
 
-        # In the type annotation below, task is of type Dict[str, Any]
-        # because it mocks the behaviour of
-        # cloud_taskqueue_services.CLIENT.create_task.
+        # Here we use type Any because this method mocks the behaviour of
+        # cloud_taskqueue_services.CLIENT.create_task and in 'create_task'
+        # task is defined as Dict[str, Any].
         def mock_create_task(
                 parent: str,
                 task: Dict[str, Any],
@@ -104,9 +104,9 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         timestamp.FromDatetime(datetime_to_execute_task)
         task_name = 'task1'
 
-        # In the type annotation below, task is of type Dict[str, Any]
-        # because it mocks the behaviour of
-        # cloud_taskqueue_services.CLIENT.create_task.
+        # Here we use type Any because this method mocks the behaviour of
+        # cloud_taskqueue_services.CLIENT.create_task and in 'create_task'
+        # task is defined as Dict[str, Any].
         def mock_create_task(
                 parent: str,
                 task: Dict[str, Any],

@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import logging
-import string
 
 from core import feconf
 from core import utils
@@ -263,34 +262,24 @@ class SearchHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        query_string = utils.unescape_encoded_uri_component(
-            self.normalized_request.get('q'))
-        # Remove all punctuation from the query string, and replace it with
-        # spaces. See http://stackoverflow.com/a/266162 and
-        # http://stackoverflow.com/a/11693937
-        remove_punctuation_map = dict(
-            (ord(char), None) for char in string.punctuation)
-        query_string = query_string.translate(remove_punctuation_map)
+        query_string = utils.get_formatted_query_string(
+            self.normalized_request.get('q')
+        )
 
         # If there is a category parameter, it should be in the following form:
         #     category=("Algebra" OR "Math")
         category_string = self.normalized_request.get('category')
-
-        # The 2 and -2 account for the '("" and '")' characters at the
-        # beginning and end.
-        categories = (
-            category_string[2:-2].split('" OR "') if category_string else [])
+        categories = utils.convert_filter_parameter_string_into_list(
+            category_string
+        )
 
         # If there is a language code parameter, it should be in the following
         # form:
         #     language_code=("en" OR "hi")
         language_code_string = self.normalized_request.get('language_code')
-
-        # The 2 and -2 account for the '("" and '")' characters at the
-        # beginning and end.
-        language_codes = (
-            language_code_string[2:-2].split('" OR "')
-            if language_code_string else [])
+        language_codes = utils.convert_filter_parameter_string_into_list(
+            language_code_string
+        )
 
         search_offset = self.normalized_request.get('offset')
 

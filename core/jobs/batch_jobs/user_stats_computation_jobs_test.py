@@ -26,14 +26,13 @@ from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = False
 if MYPY:
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):

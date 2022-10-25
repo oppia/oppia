@@ -29,8 +29,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, List, Set, Tuple, Type, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Set, Tuple, Type, Union
 
 MYPY = False
 if MYPY:
@@ -38,7 +37,7 @@ if MYPY:
     from mypy_imports import suggestion_models
 
 (opportunity_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.opportunity, models.NAMES.suggestion
+    models.Names.OPPORTUNITY, models.Names.SUGGESTION
 ])
 
 StatsType = List[Tuple[str, Dict[str, Union[bool, int, str]]]]

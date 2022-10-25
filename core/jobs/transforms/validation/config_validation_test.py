@@ -26,8 +26,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, List, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -35,7 +34,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import config_models
 
 (base_models, config_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.config])
+    [models.Names.BASE_MODEL, models.Names.CONFIG])
 
 
 class ValidateConfigPropertySnapshotMetadataModelTests(

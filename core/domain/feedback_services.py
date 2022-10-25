@@ -30,8 +30,7 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, Type, cast
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional, Tuple, Type, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -54,13 +53,13 @@ if MYPY:  # pragma: no cover
     suggestion_models,
     topic_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model,
-    models.NAMES.exploration,
-    models.NAMES.feedback,
-    models.NAMES.question,
-    models.NAMES.skill,
-    models.NAMES.suggestion,
-    models.NAMES.topic
+    models.Names.BASE_MODEL,
+    models.Names.EXPLORATION,
+    models.Names.FEEDBACK,
+    models.Names.QUESTION,
+    models.Names.SKILL,
+    models.Names.SUGGESTION,
+    models.Names.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -797,8 +796,9 @@ def get_exp_thread_summaries(
     ]
     exp_model_ids = [model.entity_id for model in exp_thread_models]
 
-    # Here, cast is used to narrow down the return type of following method from
-    # List[Optional[Model]] to List[Optional[exp_models.ExplorationModel]].
+    # Here we use cast because we are narrowing down the return type
+    # of following method from List[Optional[Model]] to List[Optional[
+    # exp_models.ExplorationModel]].
     exp_thread_user_models, exploration_models = (
         cast(
             Tuple[

@@ -24,15 +24,14 @@ from core.jobs.batch_jobs import math_interactions_audit_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 datastore_services = models.Registry.import_datastore_services()
 

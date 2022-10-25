@@ -38,7 +38,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (stats_models, user_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.user
+    models.Names.STATISTICS, models.Names.USER
 ])
 
 transaction_services = models.Registry.import_transaction_services()
@@ -56,9 +56,9 @@ class BaseEventHandler:
     # has type Callable[..., None].
     _handle_event: Callable[..., None]
 
-    # Here both the arguments are annotated with Any type because in child
-    # classes this method can be redefined with any number of named and keyword
-    # arguments with different kinds of types.
+    # TODO(#16047): Here we use type Any because in child classes this
+    # method can be redefined with any number of named and keyword arguments
+    # with different kinds of types.
     @classmethod
     def record(cls, *args: Any, **kwargs: Any) -> None:
         """Process incoming events.
@@ -142,7 +142,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         user.
         """
         # TODO(sll): Escape these args?
-        stats_services.record_answer(  # type: ignore[no-untyped-call]
+        stats_services.record_answer(
             exploration_id, exploration_version, state_name, interaction_id,
             stats_domain.SubmittedAnswer(
                 normalized_answer, interaction_id, answer_group_index,

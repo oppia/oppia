@@ -36,6 +36,7 @@ from core.constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
+from extensions.objects.models import objects
 
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -88,8 +89,8 @@ ALL_SCHEMAS: Dict[str, type] = {
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
-# Using Dict[str, Any] here for schema because the following schema can have a
-# recursive structure and mypy doesn't support recursive type currently.
+# Here we use type Any because the following schema can have a recursive
+# structure and mypy doesn't support recursive type currently.
 # See: https://github.com/python/mypy/issues/731
 def normalize_against_schema(
         obj: Any,
@@ -113,7 +114,10 @@ def normalize_against_schema(
 
     Raises:
         Exception. The object fails to validate against the schema.
+        AssertionError. The validation for schema validators fails.
     """
+    # Here we use type Any because 'normalized_obj' can be of type int, str,
+    # Dict, List and other types too.
     normalized_obj: Any = None
 
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_WEAK_MULTIPLE:
@@ -138,7 +142,7 @@ def normalize_against_schema(
             normalized_obj = normalize_against_schema(
                 obj, obj_class.get_schema(), apply_custom_validators=False)
         else:
-            normalized_obj = obj_class.normalize(obj)  # type: ignore[no-untyped-call]
+            normalized_obj = obj_class.normalize(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
@@ -211,7 +215,9 @@ def normalize_against_schema(
                     schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
             normalize_against_schema(
-                item, item_schema, global_validators=global_validators
+                item,
+                item_schema,
+                global_validators=global_validators
             ) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
@@ -285,11 +291,21 @@ def normalize_against_schema(
         if SCHEMA_KEY_VALIDATORS in schema:
             for validator in schema[SCHEMA_KEY_VALIDATORS]:
                 kwargs = dict(validator)
+                expect_invalid_default_value = False
+                if 'expect_invalid_default_value' in kwargs:
+                    expect_invalid_default_value = kwargs[
+                        'expect_invalid_default_value']
+                    del kwargs['expect_invalid_default_value']
                 del kwargs['id']
-                assert get_validator(
-                    validator['id'])(normalized_obj, **kwargs), (
+                validator_func = get_validator(validator['id'])
+                if (
+                    not validator_func(normalized_obj, **kwargs) and
+                    not expect_invalid_default_value
+                ):
+                    raise AssertionError(
                         'Validation failed: %s (%s) for object %s' % (
-                            validator['id'], kwargs, normalized_obj))
+                            validator['id'], kwargs, normalized_obj)
+                    )
 
     if global_validators is not None:
         for validator in global_validators:
@@ -350,7 +366,7 @@ class Normalizers:
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
-        # Using a cast here because the return value of getattr() method is
+        # Here we use cast because the return value of getattr() method is
         # dynamic and mypy will assume it to be Any otherwise.
         return cast(Callable[..., str], getattr(cls, normalizer_id))
 
@@ -428,7 +444,7 @@ class _Validators:
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
-        # Using a cast here because the return value of getattr() method is
+        # Here we use cast because the return value of getattr() method is
         # dynamic and mypy will assume it to be Any otherwise.
         return cast(Callable[..., bool], getattr(cls, validator_id))
 
@@ -541,11 +557,11 @@ class _Validators:
         return obj <= max_value
 
     @staticmethod
-    def does_not_contain_email(obj: object) -> bool:
+    def does_not_contain_email(obj: str) -> bool:
         """Ensures that obj doesn't contain a valid email.
 
         Args:
-            obj: object. The object to validate.
+            obj: str. The object to validate.
 
         Returns:
             bool. Whether the given object doesn't contain a valid email.
@@ -721,3 +737,57 @@ class _Validators:
             return True
         except utils.ValidationError:
             return False
+
+    @staticmethod
+    def has_expected_subtitled_content_length(
+        obj: objects.SubtitledUnicode, max_value: int
+    ) -> bool:
+        """Checks if the given subtitled content length is within max value.
+
+        Args:
+            obj: objects.SubtitledUnicode. The object to verify.
+            max_value: int. The maximum allowed value for the obj.
+
+        Returns:
+            bool. Whether the given object has length atmost the max_value.
+        """
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(obj, dict)
+        return len(obj['unicode_str']) <= max_value
+
+    @staticmethod
+    def has_subtitled_html_non_empty(obj: objects.SubtitledHtml) -> bool:
+        """Checks if the given subtitled html content is empty
+
+        Args:
+            obj: objects.SubtitledHtml. The object to verify.
+
+        Returns:
+            bool. Whether the given object is empty.
+        """
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(obj, dict)
+        return obj['html'] not in ('', '<p></p>')
+
+    @staticmethod
+    def has_unique_subtitled_contents(
+        obj: List[objects.SubtitledHtml]
+    ) -> bool:
+        """Checks if the given subtitled html content is uniquified.
+
+        Args:
+            obj: List[objects.SubtitledHtml]. The list of SubtitledHtml
+                content.
+
+        Returns:
+            bool. Returns True if the content inside the list is uniquified.
+        """
+        seen_choices = []
+        for choice in obj:
+            # Ruling out the possibility of different types for mypy type
+            # checking.
+            assert isinstance(choice, dict)
+            if choice['html'] in seen_choices:
+                return False
+            seen_choices.append(choice['html'])
+        return True

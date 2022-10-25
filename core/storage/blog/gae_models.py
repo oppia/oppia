@@ -21,8 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence
-from typing_extensions import Literal, TypedDict
+from typing import Dict, List, Literal, Optional, Sequence, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -30,7 +29,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 (base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user])
+    models.Names.BASE_MODEL, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 

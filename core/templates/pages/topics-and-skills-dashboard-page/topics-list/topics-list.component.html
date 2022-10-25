@@ -74,22 +74,22 @@
             <i class="fa fa-pen"></i>
             <span>Edit</span>
           </a>
-          <span *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
+          <div *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
             <a>
               <i class="fas fa-trash-alt e2e-test-delete-topic-button"></i>
               <span>Delete</span>
             </a>
-          </span>
+          </div>
         </div>
       </td>
     </tr>
   </table>
-  <div class="topics-list-mobile">
+  <div class="topics-list-mobile e2e-test-mobile-topic-table">
     <div *ngFor="let topic of topicSummaries; index as idx">
       <div class="topic-item">
         <div class="topic-item-header">
           <div class="topic-item-name-box">
-            <div class="topic-item-name">
+            <div class="topic-item-name e2e-test-mobile-topic-name">
               <span>
                 {{getSerialNumberForTopic(idx)}}
               </span>
@@ -208,9 +208,19 @@
   .topic-edit-options a {
     display: block;
     padding: 5px;
+    padding-left: 10px;
     text-align: left;
     text-decoration: none;
     width: 100%;
+  }
+
+  .topic-edit-options div {
+    display: block;
+    width: 100%;
+  }
+
+  .topic-edit-options span {
+    padding-left: 8px;
   }
   .topic-primary-information-container {
     height: 100%;

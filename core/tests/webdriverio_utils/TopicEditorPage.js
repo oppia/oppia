@@ -85,6 +85,12 @@ var TopicEditorPage = function() {
   var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
   var saveTopicButton = $('.e2e-test-save-topic-button');
   var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
+  var addNewDiagnosticTestSkillButton = $(
+    '.e2e-test-add-diagnostic-test-skill');
+  var diagnosticTestSkillSelector = $(
+    '.e2e-test-diagnostic-test-skill-selector');
+  var removeDiagnosticTestButtonElement = $(
+    '.e2e-test-remove-skill-from-diagnostic-test');
   var storyListItemsSelector = function() {
     return $$('.e2e-test-story-list-item');
   };
@@ -161,9 +167,9 @@ var TopicEditorPage = function() {
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
-    await waitFor.visibilityOf(
-      selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
-    await selectSkillDropdown.selectByVisibleText(skillDescription);
+    await action.click('Select Skill Dropdown', selectSkillDropdown);
+    var dropdownOption = await $(`.mat-option-text=${skillDescription}`);
+    await action.click(skillDescription, dropdownOption);
     await waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
     var questionItems = await questionItemsSelector();
@@ -178,9 +184,9 @@ var TopicEditorPage = function() {
   };
 
   this.createQuestionForSkillWithName = async function(skillDescription) {
-    await waitFor.visibilityOf(
-      selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
-    await selectSkillDropdown.selectByVisibleText(skillDescription);
+    await action.click('Select Skill Dropdown', selectSkillDropdown);
+    var dropdownOption = await $(`.mat-option-text=${skillDescription}`);
+    await action.click(skillDescription, dropdownOption);
     await action.click('Create question button', createQuestionButton);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
@@ -354,6 +360,16 @@ var TopicEditorPage = function() {
     }
   };
 
+  this.addDiagnosticTestSkill = async function(skillId) {
+    await action.click(
+      'Add new diagnostic test', addNewDiagnosticTestSkillButton);
+    await action.select(
+      'New skill selector', diagnosticTestSkillSelector, skillId);
+    await waitFor.visibilityOf(
+      removeDiagnosticTestButtonElement,
+      'Diagnostic test skill removal button takes too long to appear.');
+  };
+
   this.getTargetMoveSkill = async function(
       subtopicIndex, skillDescription) {
     var fromSubtopicColumn = await subtopicColumnsSelector()[subtopicIndex];
@@ -451,8 +467,15 @@ var TopicEditorPage = function() {
 
   this.createStory = async function(
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
-    await general.scrollToTop();
-    await action.click('Create Story Button', createStoryButton);
+    let width = (await browser.getWindowSize()).width;
+    if (width < 831) {
+      var storiesDropdown = $('.e2e-test-story-dropdown');
+      await action.click('Story dropdown', storiesDropdown);
+      await action.click('Create Story Button', createStoryButton);
+    } else {
+      await general.scrollToTop();
+      await action.click('Create Story Button', createStoryButton);
+    }
 
     await action.setValue(
       'Create new story title', newStoryTitleField, storyTitle);

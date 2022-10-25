@@ -25,9 +25,8 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_services
-from core.domain import rights_manager
 from core.domain import stats_services
-from core.domain import suggestion_services
+from core.domain import suggestion_registry
 from core.domain import taskqueue_services
 from core.domain import wipeout_service
 
@@ -72,23 +71,60 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         self.render_json({})
 
 
-class SuggestionEmailHandler(base.BaseHandler):
-    """Handler task of sending email of suggestion."""
+class ContributorDashboardAchievementEmailHandler(base.BaseHandler):
+    """Handler task of sending email of contributor dashboard achievements."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'contributor_user_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'contribution_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'contribution_sub_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'rank_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
-        exploration_id = payload['exploration_id']
-        thread_id = payload['thread_id']
+        contributor_user_id = payload['contributor_user_id']
+        contribution_type = payload['contribution_type']
+        contribution_sub_type = payload['contribution_sub_type']
+        language_code = payload['language_code']
+        rank_name = payload['rank_name']
 
-        exploration_rights = (
-            rights_manager.get_exploration_rights(exploration_id))
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        email_info = suggestion_registry.ContributorMilestoneEmailInfo(
+            contributor_user_id, contribution_type, contribution_sub_type,
+            language_code, rank_name)
 
-        email_manager.send_suggestion_email(
-            exploration.title, exploration.id, suggestion.author_id,
-            exploration_rights.owner_ids)
+        email_manager.send_mail_to_notify_contributor_ranking_achievement(
+            email_info)
         self.render_json({})
 
 

@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -109,10 +109,10 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
         )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
     """DoFn to create empty user stats model."""
 
@@ -135,10 +135,10 @@ class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
         yield user_stats_model
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
     """DoFn to update weekly dashboard stats in the user stats model."""
 

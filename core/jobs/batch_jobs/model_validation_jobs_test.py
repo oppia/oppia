@@ -26,8 +26,7 @@ from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -36,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (auth_models, base_models, user_models) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.base_model, models.NAMES.user
+    models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER
 ])
 
 

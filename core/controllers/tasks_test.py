@@ -17,23 +17,20 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import rights_domain
 from core.domain import stats_domain
 from core.domain import stats_services
-from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
 (job_models, email_models) = models.Registry.import_models(
-    [models.NAMES.job, models.NAMES.email])
+    [models.Names.JOB, models.Names.EMAIL])
 (feedback_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.suggestion])
+    [models.Names.FEEDBACK, models.Names.SUGGESTION])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -144,75 +141,49 @@ class TasksTests(test_utils.EmailTestBase):
             # Check that there are three messages.
             self.assertEqual(len(messages), 3)
 
-    def test_email_is_sent_when_suggestion_created(self):
-        """Tests SuggestionEmailHandler functionality."""
+    def test_email_is_sent_when_contributor_achieves_a_new_rank(self):
+        """Tests ContributorDashboardAchievementEmailHandler functionality."""
 
-        user_id_b = self.user_id_b
-        class MockActivityRights:
-            def __init__(
-                    self, exploration_id, owner_ids, editor_ids,
-                    voice_artist_ids, viewer_ids, community_owned=False,
-                    cloned_from=None, status=True, viewable_if_private=False,
-                    first_published_msec=None):
-                # User B ID hardcoded into owner_ids to get email_manager
-                # to send email to user B to test functionality.
-                self.id = exploration_id
-                self.getLintToShutUp = owner_ids
-                self.editor_ids = editor_ids
-                self.voice_artist_ids = voice_artist_ids
-                self.viewer_ids = viewer_ids
-                self.community_owned = community_owned
-                self.cloned_from = cloned_from
-                self.status = status
-                self.viewable_if_private = viewable_if_private
-                self.first_published_msec = first_published_msec
-                self.owner_ids = [user_id_b]
+        user_id = self.user_id_a
+        user_services.update_email_preferences(
+            user_id, True, False, False, False)
 
-        email_user_b = self.swap(
-            rights_domain, 'ActivityRights', MockActivityRights)
-        with email_user_b, self.can_send_feedback_email_ctx:
-            with self.can_send_emails_ctx:
-                change = {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'state_name': 'state_1',
-                    'new_value': 'new suggestion content'}
+        with self.can_send_emails_ctx:
+            payload = {
+                'contributor_user_id': user_id,
+                'contribution_type': feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                'contribution_sub_type': (
+                    feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE),
+                'language_code': 'hi',
+                'rank_name': 'Initial Contributor',
+            }
+            taskqueue_services.enqueue_task(
+                feconf
+                .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
+                payload, 0)
+            self.process_and_flush_pending_tasks()
 
-                # Create suggestion from user A to user B.
-                suggestion_services.create_suggestion(
-                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    feconf.ENTITY_TYPE_EXPLORATION,
-                    self.exploration.id, 1,
-                    self.user_id_a, change, 'test description')
-                threadlist = feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION,
-                    self.exploration.id, True)
-                thread_id = threadlist[0].id
+            # Check that user A received message.
+            messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL)
+            self.assertEqual(len(messages), 1)
 
-                # Enqueue and send suggestion email task.
-                payload = {
-                    'exploration_id': self.exploration.id,
-                    'thread_id': thread_id}
-                messages = self._get_all_sent_email_messages()
-                self.assertEqual(len(messages), 0)
-                taskqueue_services.enqueue_task(
-                    feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
-                self.process_and_flush_pending_tasks()
-
-                # Check that user B received message.
-                messages = self._get_sent_email_messages(
-                    self.USER_B_EMAIL)
-                self.assertEqual(len(messages), 1)
-
-                # Check that user B received correct message.
-                expected_message = (
-                    'Hi userB,\nuserA has submitted a new suggestion'
-                    ' for your Oppia exploration, "Title".\nYou can'
-                    ' accept or reject this suggestion by visiting'
-                    ' the feedback page for your exploration.\n\nTha'
-                    'nks!\n- The Oppia Team\n\nYou can change your'
-                    ' email preferences via the Preferences page.')
-                self.assertEqual(messages[0].body, expected_message)
+            # Check that user A received correct message.
+            expected_email_subject = 'Oppia Translator Rank Achievement!'
+            expected_email_html_body = (
+                'Hi userA,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the Initial Contributor rank for submitting translations in '
+                'हिन्दी (Hindi). Your efforts help Oppia grow better every '
+                'day and support students around the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="http://localhost:8181/contributor-dashboard">'
+                'Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'The Oppia Contributor Dashboard Team')
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].subject, expected_email_subject)
 
     def test_instant_feedback_reply_email(self):
         """Tests Instant feedback message handler."""

@@ -24,8 +24,7 @@ from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
-from typing_extensions import Final
+from typing import Final, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -33,7 +32,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (email_models, user_models) = models.Registry.import_models([
-    models.NAMES.email, models.NAMES.user])
+    models.Names.EMAIL, models.Names.USER])
 
 
 class InformSubscribersTest(test_utils.EmailTestBase):

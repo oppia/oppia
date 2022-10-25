@@ -22,7 +22,7 @@ import heapq
 
 from core import utils
 
-from typing import Any, List, Tuple # isort: skip
+from typing import Any, List, Tuple, Union # isort: skip
 
 # This is just to make sure that the output of the job have some reasonable
 # length. The maximum that model can hold is around 1 MB and this is much lower.
@@ -65,7 +65,9 @@ class JobRunResult:
             )
 
     @classmethod
-    def as_stdout(cls, value: Any, use_repr: bool = False) -> JobRunResult:
+    def as_stdout(
+        cls, value: Union[str, int], use_repr: bool = False
+    ) -> JobRunResult:
         """Returns a new JobRunResult with a stdout value.
 
         Args:
@@ -80,7 +82,9 @@ class JobRunResult:
         return JobRunResult(stdout=str_value)
 
     @classmethod
-    def as_stderr(cls, value: Any, use_repr: bool = False) -> JobRunResult:
+    def as_stderr(
+        cls, value: Union[str, int], use_repr: bool = False
+    ) -> JobRunResult:
         """Returns a new JobRunResult with a stderr value.
 
         Args:
@@ -155,14 +159,16 @@ class JobRunResult:
     def __hash__(self) -> int:
         return hash((self.stdout, self.stderr))
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because the function could also return
+    # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         return (
             (self.stdout, self.stderr) == (other.stdout, other.stderr) # pylint: disable=protected-access
             if self.__class__ is other.__class__ else NotImplemented)
 
-    # NOTE: Needs to return Any because of:
+    # NOTE: Here we use type Any because the function could also return
+    # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __ne__(self, other: Any) -> Any:
         return (

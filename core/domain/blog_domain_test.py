@@ -45,7 +45,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate(strict=True)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
         self, expected_error_substring: str
@@ -255,9 +255,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Tag should not be empty.', ['abc', ''])
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_passes_validate(self) -> None:
         """Tests validation for blog post."""
         self.blog_post.validate(strict=False)
@@ -276,9 +276,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.content = '<p>Hello</p>'
         self.blog_post.validate(strict=True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_thumbnail_passes_string_validation(self) -> None:
         self.blog_post.title = 'Sample Title'
         self.blog_post.thumbnail_filename = 123  # type: ignore[assignment]
@@ -292,9 +292,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.thumbnail_filename = 'thumbnail.svg'
         self.blog_post.validate(strict=True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_thumbnail_filename_strict_validation_for_blog_post(self) -> None:
         self.blog_post.title = 'Sample Title'
         self.blog_post.thumbnail_filename = 123  # type: ignore[assignment]
@@ -305,9 +305,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Expected thumbnail filename to be a string, received: 123'
         )
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_url_passes_strict_validation(self) -> None:
         self.blog_post.title = 'Sample Title'
         self.blog_post.thumbnail_filename = 'sample-thumbnail.png'
@@ -319,13 +319,16 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Received 123.'
         )
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_valid_thumbnail_update(self) -> None:
         self.blog_post.title = 'Sample Title'
         self.blog_post.thumbnail_filename = 123  # type: ignore[assignment]
         self.blog_post.tags = ['tag']
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
         self.blog_post.url_fragment = 123  # type: ignore[assignment]
         self.blog_post.content = '<p>Hello</p>'
         self._assert_valid_thumbnail_update(
@@ -509,7 +512,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate(strict=True)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error( # type: ignore[override]
         self, expected_error_substring: str
@@ -519,9 +522,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_url_fragment_passes_strict_validation(self) -> None:
         self.blog_post_summary.title = 'Sample Title'
         self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.png'
@@ -534,9 +537,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.url_fragment = 'sample-url-fragment'
         self.blog_post_summary.validate(strict=True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_thumbnail_passes_strict_validation(self) -> None:
         self.blog_post_summary.title = 'Sample Title'
         self.blog_post_summary.thumbnail_filename = 123  # type: ignore[assignment]
@@ -549,9 +552,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.png'
         self.blog_post_summary.validate(strict=True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_summary_passes_validate(self) -> None:
         """Tests validation for blog post summary."""
         self.blog_post_summary.validate(strict=False)
@@ -559,27 +562,27 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected summary to be a string, received: 123')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_passes_valid_thumbnail_filename(self) -> None:
         """Tests validation for blog post thumbnail."""
         self.blog_post_summary.thumbnail_filename = 123  # type: ignore[assignment]
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
             'Expected thumbnail filename to be a string, received: 123')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_passes_valid_url_fragment(self) -> None:
         self.blog_post_summary.url_fragment = 123  # type: ignore[assignment]
         self._assert_url_fragment_passes_valid_url_fragment(
             'Blog Post URL Fragment field must be a string. '
             'Received 123')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_passes_valid_title(self) -> None:
         self.blog_post_summary.title = 123  # type: ignore[assignment]
         self._assert_title_passes_valid_title(
@@ -620,9 +623,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_strict_valid_tags_for_blog_post(
             'Atleast one tag should be selected', [])
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_blog_post_tags_passes_validation(self) -> None:
         self.blog_post_summary.tags = ['tag', 123]  # type: ignore[list-item]
         self._assert_valid_tag_elements(

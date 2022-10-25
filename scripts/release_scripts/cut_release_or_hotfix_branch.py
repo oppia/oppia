@@ -43,6 +43,8 @@ import json
 import re
 import subprocess
 
+from typing import Final, List, Optional, Pattern, Tuple
+
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -52,7 +54,8 @@ from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
 
 def require_release_version_to_have_correct_format(
-        arg, pattern=re.compile(r'\d\.\d\.\d')):
+    arg: str, pattern: Pattern[str] = re.compile(r'\d\.\d\.\d')
+) -> str:
     """Checks that the release version name matches the expected pattern.
 
     Args:
@@ -73,7 +76,7 @@ def require_release_version_to_have_correct_format(
     return arg
 
 
-_PARSER = argparse.ArgumentParser()
+_PARSER: Final = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--release_version',
     help=(
@@ -83,7 +86,9 @@ _PARSER.add_argument(
 _PARSER.add_argument('--hotfix_number', default=0)
 
 
-def verify_target_branch_does_not_already_exist(remote_alias, new_branch_name):
+def verify_target_branch_does_not_already_exist(
+    remote_alias: str, new_branch_name: str
+) -> None:
     """Checks that the new release branch doesn't already exist locally or
     remotely.
 
@@ -102,13 +107,15 @@ def verify_target_branch_does_not_already_exist(remote_alias, new_branch_name):
     """
 
     git_branch_output = subprocess.check_output(
-        ['git', 'branch']).decode().split('\n')
+        ['git', 'branch'], encoding='utf-8'
+    ).split('\n')
     if new_branch_name in git_branch_output:
         raise Exception(
             'ERROR: The target branch name already exists locally. '
             'Run "git branch -D %s" to delete it.' % new_branch_name)
     git_ls_remote_output = subprocess.check_output(
-        ['git', 'ls-remote', '--heads', remote_alias]).decode().split('\n')
+        ['git', 'ls-remote', '--heads', remote_alias], encoding='utf-8'
+    ).split('\n')
     remote_branch_ref = 'refs/heads/%s' % new_branch_name
     if remote_branch_ref in git_ls_remote_output:
         raise Exception(
@@ -116,7 +123,8 @@ def verify_target_branch_does_not_already_exist(remote_alias, new_branch_name):
 
 
 def verify_target_version_compatible_with_latest_release(
-        target_version):
+    target_version: str
+) -> None:
     """Checks that the target version is consistent with the latest released
     version on GitHub.
 
@@ -151,6 +159,10 @@ def verify_target_version_compatible_with_latest_release(
     prev_major, prev_minor, prev_patch = match_result.group(1, 2, 3)
 
     match_result = re.match(r'(\d)\.(\d)\.(\d)', target_version)
+    if match_result is None:
+        raise Exception(
+            'ERROR: Could not parse target version.'
+        )
     curr_major, curr_minor, curr_patch = match_result.group(1, 2, 3)
 
     # This will need to be overridden if the major version changes.
@@ -168,7 +180,8 @@ def verify_target_version_compatible_with_latest_release(
 
 
 def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
-        remote_alias, target_version, hotfix_number):
+    remote_alias: str, target_version: str, hotfix_number: int
+) -> None:
     """Checks that the hotfix number is one ahead of previous hotfix
     number.
 
@@ -185,8 +198,9 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         Exception. The difference between two continuous hotfix numbers
             is not one.
     """
-    all_branches = subprocess.check_output([
-        'git', 'branch', '-a']).decode().split('\n')
+    all_branches = subprocess.check_output(
+        ['git', 'branch', '-a'], encoding='utf-8'
+    ).split('\n')
 
     last_hotfix_number = 0
     release_branch_exists = False
@@ -207,7 +221,7 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         'The difference between two continuous hotfix numbers is not one.')
 
 
-def _get_release_branch_type_and_name(target_version):
+def _get_release_branch_type_and_name(target_version: str) -> Tuple[str, str]:
     """Returns type and name of release branch for a target version.
 
     Args:
@@ -221,7 +235,9 @@ def _get_release_branch_type_and_name(target_version):
         'release-%s' % target_version)
 
 
-def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
+def _get_hotfix_branch_type_and_name(
+    target_version: str, hotfix_number: int
+) -> Tuple[str, str]:
     """Returns type and name of hotfix branch for a target version.
 
     Args:
@@ -236,7 +252,7 @@ def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
         'release-%s-hotfix-%s' % (target_version, hotfix_number))
 
 
-def execute_branch_cut(target_version, hotfix_number):
+def execute_branch_cut(target_version: str, hotfix_number: int) -> None:
     """Creates & pushes the new release branch to Github.
 
     Args:
@@ -327,7 +343,7 @@ def execute_branch_cut(target_version, hotfix_number):
     print('Done!')
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Main method for creating a release or hotfix branch."""
     parsed_args = _PARSER.parse_args(args=args)
     if parsed_args.release_version:

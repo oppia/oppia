@@ -1721,4 +1721,582 @@ describe('Exploration Warnings Service', () => {
       ]
     });
   });
+
+  it('should show warnings if learner is directed more than 3 cards' +
+     ' back in the exploration', () => {
+    explorationStatesService.init({
+      Hola: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: true,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          confirmed_unclassified_answers: null,
+          solution: null,
+          default_outcome: null,
+          id: 'TextInput',
+          answer_groups: [
+            {
+              rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: null,
+              outcome: {
+                labelled_as_correct: true,
+                param_changes: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
+                dest: 'State1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+              },
+            },
+            {
+              rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: null,
+              outcome: {
+                labelled_as_correct: true,
+                param_changes: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
+                dest: 'State2',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+            }
+          ],
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: 1
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      },
+      State1: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: true,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          confirmed_unclassified_answers: null,
+          solution: null,
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'State3',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
+          }],
+          default_outcome: null,
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: 1
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      },
+      State2: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: true,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          confirmed_unclassified_answers: null,
+          solution: null,
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'State5',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
+          }],
+          default_outcome: null,
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: 1
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      },
+      State3: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: true,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          confirmed_unclassified_answers: null,
+          solution: null,
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'State4',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
+          }],
+          default_outcome: null,
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: 1
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      },
+      State4: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: true,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          confirmed_unclassified_answers: null,
+          solution: null,
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'State6',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
+          }],
+          default_outcome: null,
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: 1
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      },
+      State5: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: true,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          confirmed_unclassified_answers: null,
+          solution: null,
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'End',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
+          }],
+          default_outcome: null,
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: 1
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      },
+      State6: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: true,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          confirmed_unclassified_answers: null,
+          solution: null,
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'State7',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
+          }],
+          default_outcome: {
+            labelled_as_correct: false,
+            param_changes: null,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
+            dest: 'Hola',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: 'feedback',
+              html: 'feedback',
+            },
+          },
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: 1
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      },
+      State7: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: false,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          confirmed_unclassified_answers: null,
+          solution: null,
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'End',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
+          }, {
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'Hola',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
+          }],
+          default_outcome: null,
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: 1
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      },
+      End: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        card_is_checkpoint: false,
+        content: {
+          content_id: 'content',
+          html: '{{HtmlValue}}'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {},
+        },
+        param_changes: [],
+        interaction: {
+          id: 'EndExploration',
+          confirmed_unclassified_answers: null,
+          solution: null,
+          answer_groups: [{
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: '',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            },
+            rule_specs: [],
+            training_data: []
+          }],
+          default_outcome: null,
+          customization_args: {
+            recommendedExplorationIds: {
+              value: []
+            }
+          },
+          hints: [],
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+      }
+    });
+
+    explorationWarningsService.updateWarnings();
+    expect(explorationWarningsService.countWarnings()).toBe(12);
+    expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
+    expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      Hola: [
+        'Placeholder text must be a string.',
+        'Number of rows must be integral.',
+      ],
+      State1: [
+        'Placeholder text must be a string.',
+        'Number of rows must be integral.',
+        'Checkpoints must not be assigned to cards that can be bypassed.'
+      ],
+      State2: [
+        'Placeholder text must be a string.',
+        'Number of rows must be integral.',
+        'Checkpoints must not be assigned to cards that can be bypassed.'
+      ],
+      State3: [
+        'Placeholder text must be a string.',
+        'Number of rows must be integral.',
+        'Checkpoints must not be assigned to cards that can be bypassed.'
+      ],
+      State4: [
+        'Placeholder text must be a string.',
+        'Number of rows must be integral.',
+        'Checkpoints must not be assigned to cards that can be bypassed.'
+      ],
+      State5: [
+        'Placeholder text must be a string.',
+        'Number of rows must be integral.',
+        'Checkpoints must not be assigned to cards that can be bypassed.'
+      ],
+      State6: [
+        'Placeholder text must be a string.',
+        'Number of rows must be integral.',
+        'Learner should not be directed back by more than' +
+          ' 3 cards in the lesson.',
+        'Checkpoints must not be assigned to cards that can be bypassed.'
+      ],
+      State7: [
+        'Placeholder text must be a string.',
+        'Number of rows must be integral.',
+        'Learner should not be directed back by more than' +
+          ' 3 cards in the lesson.'
+      ],
+      End: [
+        'Please make sure end exploration interactions do not ' +
+           'have any answer groups.',
+      ]
+    });
+  });
 });

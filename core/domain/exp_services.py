@@ -25,7 +25,6 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import collections
-import copy
 import datetime
 import io
 import logging
@@ -58,6 +57,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_domain
@@ -65,8 +65,8 @@ from core.domain import user_services
 from core.platform import models
 
 import deepdiff
-from typing import Dict, List, Optional, Sequence, Tuple, Type, Union
-from typing_extensions import Final, TypedDict
+from typing import (
+    Dict, Final, List, Optional, Sequence, Tuple, Type, TypedDict, Union, cast)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -77,9 +77,9 @@ if MYPY:  # pragma: no cover
 
 (base_models, exp_models, user_models) = (
     models.Registry.import_models([
-        models.NAMES.base_model,
-        models.NAMES.exploration,
-        models.NAMES.user
+        models.Names.BASE_MODEL,
+        models.Names.EXPLORATION,
+        models.Names.USER
     ])
 )
 
@@ -455,38 +455,65 @@ def apply_change_list(
 
     Raises:
         Exception. Any entries in the changelist are invalid.
+        Exception. Solution cannot exist with None interaction id.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
         to_param_domain = param_domain.ParamChange.from_dict
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
-                exploration.add_states([change.state_name])
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                add_state_cmd = cast(
+                    exp_domain.AddExplorationStateCmd,
+                    change
+                )
+                exploration.add_states([add_state_cmd.state_name])
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                rename_state_cmd = cast(
+                    exp_domain.RenameExplorationStateCmd,
+                    change
+                )
                 exploration.rename_state(
-                    change.old_state_name, change.new_state_name)
+                    rename_state_cmd.old_state_name,
+                    rename_state_cmd.new_state_name
+                )
             elif change.cmd == exp_domain.CMD_DELETE_STATE:
-                exploration.delete_state(change.state_name)
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                delete_state_cmd = cast(
+                    exp_domain.DeleteExplorationStateCmd,
+                    change
+                )
+                exploration.delete_state(delete_state_cmd.state_name)
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state: state_domain.State = exploration.states[
                     change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to list, we have used assert here.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditExpStatePropertyParamChangesCmd.
+                    edit_param_changes_cmd = cast(
+                        exp_domain.EditExpStatePropertyParamChangesCmd,
+                        change
+                    )
                     state.update_param_changes(list(map(
-                            to_param_domain, change.new_value)))
+                        to_param_domain, edit_param_changes_cmd.new_value
+                    )))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to dict, we have used assert here.
-                    assert isinstance(change.new_value, dict)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExpStatePropertyContentCmd.
+                    edit_content_cmd = cast(
+                        exp_domain.EditExpStatePropertyContentCmd,
+                        change
+                    )
                     content = (
-                        state_domain.SubtitledHtml.from_dict(change.new_value))
+                        state_domain.SubtitledHtml.from_dict(
+                            edit_content_cmd.new_value
+                        )
+                    )
                     content.validate()
                     state.update_content(content)
                 elif (change.property_name ==
@@ -494,39 +521,56 @@ def apply_change_list(
                     state.update_interaction_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to int, we have used assert here.
-                    assert isinstance(change.new_value, int)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyNextContentIdIndexCmd.
+                    edit_next_content_id_index_cmd = cast(
+                        exp_domain.EditExpStatePropertyNextContentIdIndexCmd,
+                        change
+                    )
                     next_content_id_index = max(
-                        change.new_value, state.next_content_id_index)
+                        edit_next_content_id_index_cmd.new_value,
+                        state.next_content_id_index
+                    )
                     state.update_next_content_id_index(next_content_id_index)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
-                    state.update_linked_skill_id(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyLinkedSkillIdCmd.
+                    edit_linked_skill_id_cmd = cast(
+                        exp_domain.EditExpStatePropertyLinkedSkillIdCmd,
+                        change
+                    )
+                    state.update_linked_skill_id(
+                        edit_linked_skill_id_cmd.new_value
+                    )
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to dict, we have used assert here.
-                    assert isinstance(change.new_value, dict)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionCustArgsCmd.
+                    edit_interaction_cust_arg_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionCustArgsCmd,
+                        change
+                    )
                     state.update_interaction_customization_args(
-                        change.new_value)
+                        edit_interaction_cust_arg_cmd.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
                         'Editing interaction handlers is no longer supported')
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to list, we have used assert here.
-                    assert isinstance(change.new_value, list)
-                    answer_groups: List[state_domain.AnswerGroup] = (
-                        change.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionAnswerGroupsCmd.
+                    edit_interaction_answer_group_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,  # pylint: disable=line-too-long
+                        change
+                    )
+                    answer_groups = (
+                        edit_interaction_answer_group_cmd.new_value
                     )
                     new_answer_groups = [
                         state_domain.AnswerGroup.from_dict(answer_group)
@@ -537,48 +581,69 @@ def apply_change_list(
                       exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
-                        # Here change is an instance of ExplorationChange and
-                        # every attribute on ExplorationChange is defined
-                        # dynamically, and every dynamically defined attribute
-                        # have str type. Thus to convert the type to dict, we
-                        # have used assert here.
-                        assert isinstance(change.new_value, dict)
+                        # Here we use cast because this 'elif'
+                        # condition forces change to have type
+                        # EditExpStatePropertyInteractionDefaultOutcomeCmd.
+                        edit_interaction_default_outcome_cmd = cast(
+                            exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,  # pylint: disable=line-too-long
+                            change
+                        )
                         new_outcome = state_domain.Outcome.from_dict(
-                            change.new_value
+                            edit_interaction_default_outcome_cmd.new_value
                         )
                     state.update_interaction_default_outcome(new_outcome)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to list, we have used assert here.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyUnclassifiedAnswersCmd.
+                    edit_unclassified_answers_cmd = cast(
+                        exp_domain.EditExpStatePropertyUnclassifiedAnswersCmd,
+                        change
+                    )
                     state.update_interaction_confirmed_unclassified_answers(
-                        change.new_value)
+                        edit_unclassified_answers_cmd.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                    if not isinstance(change.new_value, list):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionHintsCmd.
+                    edit_state_interaction_hints_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionHintsCmd,
+                        change
+                    )
+                    hint_dicts = (
+                        edit_state_interaction_hints_cmd.new_value
+                    )
+                    if not isinstance(hint_dicts, list):
                         raise Exception(
                             'Expected hints_list to be a list,'
-                            ' received %s' % change.new_value)
+                            ' received %s' % hint_dicts)
                     new_hints_list = [
                         state_domain.Hint.from_dict(hint_dict)
-                        for hint_dict in change.new_value
+                        for hint_dict in hint_dicts
                     ]
                     state.update_interaction_hints(new_hints_list)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     new_solution = None
-                    if change.new_value is not None:
-                        # Here change is an instance of ExplorationChange and
-                        # every attribute on ExplorationChange is defined
-                        # dynamically, and every dynamically defined attribute
-                        # have str type. Thus to convert the type to dict, we
-                        # have used assert here.
-                        assert isinstance(change.new_value, dict)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionSolutionCmd.
+                    edit_interaction_solution_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionSolutionCmd,
+                        change
+                    )
+                    if edit_interaction_solution_cmd.new_value is not None:
+                        if state.interaction.id is None:
+                            raise Exception(
+                                'solution cannot exist with None '
+                                'interaction id.'
+                            )
                         new_solution = state_domain.Solution.from_dict(
-                            state.interaction.id, change.new_value)
+                            state.interaction.id,
+                            edit_interaction_solution_cmd.new_value
+                        )
                     state.update_interaction_solution(new_solution)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
@@ -586,14 +651,32 @@ def apply_change_list(
                         raise Exception(
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
-                    state.update_solicit_answer_details(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertySolicitAnswerDetailsCmd.
+                    edit_solicit_answer_details_cmd = cast(
+                        exp_domain.EditExpStatePropertySolicitAnswerDetailsCmd,
+                        change
+                    )
+                    state.update_solicit_answer_details(
+                        edit_solicit_answer_details_cmd.new_value
+                    )
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
                             'Expected card_is_checkpoint to be a ' +
                             'bool, received %s' % change.new_value)
-                    state.update_card_is_checkpoint(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyCardIsCheckpointCmd.
+                    edit_card_is_checkpoint_cmd = cast(
+                        exp_domain.EditExpStatePropertyCardIsCheckpointCmd,
+                        change
+                    )
+                    state.update_card_is_checkpoint(
+                        edit_card_is_checkpoint_cmd.new_value
+                    )
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
@@ -607,8 +690,18 @@ def apply_change_list(
                     # treats any number that can be float and int as
                     # int (no explicit types). For example,
                     # 10.000 is not 10.000 it is 10.
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyRecordedVoiceoversCmd.
+                    edit_recorded_voiceovers_cmd = cast(
+                        exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
+                        change
+                    )
                     new_voiceovers_mapping = (
-                        change.new_value['voiceovers_mapping'])
+                        edit_recorded_voiceovers_cmd.new_value[
+                            'voiceovers_mapping'
+                        ]
+                    )
                     language_codes_to_audio_metadata = (
                         new_voiceovers_mapping.values())
                     for language_codes in language_codes_to_audio_metadata:
@@ -626,10 +719,20 @@ def apply_change_list(
                         raise Exception(
                             'Expected written_translations to be a dict, '
                             'received %s' % change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyWrittenTranslationsCmd.
+                    edit_written_translations_cmd = cast(
+                        exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
+                        change
+                    )
                     cleaned_written_translations_dict = (
                         state_domain.WrittenTranslations
                         .convert_html_in_written_translations(
-                            change.new_value, html_cleaner.clean))
+                            edit_written_translations_cmd.new_value,
+                            html_cleaner.clean
+                        )
+                    )
                     written_translations = (
                         state_domain.WrittenTranslations.from_dict(
                             cleaned_written_translations_dict))
@@ -641,64 +744,168 @@ def apply_change_list(
                     change.content_id, change.language_code,
                     change.translation_html)
             elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                exploration.states[change.state_name].add_written_translation(
-                    change.content_id, change.language_code,
-                    change.translation_html, change.data_format)
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                add_written_translation_cmd = cast(
+                    exp_domain.AddWrittenTranslationCmd,
+                    change
+                )
+                exploration.states[
+                    add_written_translation_cmd.state_name
+                ].add_written_translation(
+                    add_written_translation_cmd.content_id,
+                    add_written_translation_cmd.language_code,
+                    add_written_translation_cmd.translation_html,
+                    add_written_translation_cmd.data_format
+                )
             elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                written_translation_as_needing_update_cmd = cast(
+                    exp_domain.MarkWrittenTranslationAsNeedingUpdateCmd,
+                    change
+                )
                 exploration.states[
-                    change.state_name
+                    written_translation_as_needing_update_cmd.state_name
                 ].mark_written_translation_as_needing_update(
-                    change.content_id,
-                    change.language_code
+                    written_translation_as_needing_update_cmd.content_id,
+                    written_translation_as_needing_update_cmd.language_code
                 )
             elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                written_translations_as_needing_update_cmd = cast(
+                    exp_domain.MarkWrittenTranslationsAsNeedingUpdateCmd,
+                    change
+                )
                 exploration.states[
-                    change.state_name
-                ].mark_written_translations_as_needing_update(change.content_id)
+                    written_translations_as_needing_update_cmd.state_name
+                ].mark_written_translations_as_needing_update(
+                    written_translations_as_needing_update_cmd.content_id
+                )
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
-                    exploration.update_title(change.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditExplorationPropertyTitleCmd.
+                    edit_title_cmd = cast(
+                        exp_domain.EditExplorationPropertyTitleCmd,
+                        change
+                    )
+                    exploration.update_title(edit_title_cmd.new_value)
                 elif change.property_name == 'category':
-                    exploration.update_category(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyCategoryCmd.
+                    edit_category_cmd = cast(
+                        exp_domain.EditExplorationPropertyCategoryCmd,
+                        change
+                    )
+                    exploration.update_category(edit_category_cmd.new_value)
                 elif change.property_name == 'objective':
-                    exploration.update_objective(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyObjectiveCmd.
+                    edit_objective_cmd = cast(
+                        exp_domain.EditExplorationPropertyObjectiveCmd,
+                        change
+                    )
+                    exploration.update_objective(edit_objective_cmd.new_value)
                 elif change.property_name == 'language_code':
-                    exploration.update_language_code(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyLanguageCodeCmd.
+                    edit_language_code_cmd = cast(
+                        exp_domain.EditExplorationPropertyLanguageCodeCmd,
+                        change
+                    )
+                    exploration.update_language_code(
+                        edit_language_code_cmd.new_value
+                    )
                 elif change.property_name == 'tags':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
-                    exploration.update_tags(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyTagsCmd.
+                    edit_tags_cmd = cast(
+                        exp_domain.EditExplorationPropertyTagsCmd,
+                        change
+                    )
+                    exploration.update_tags(edit_tags_cmd.new_value)
                 elif change.property_name == 'blurb':
-                    exploration.update_blurb(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyBlurbCmd.
+                    edit_blurb_cmd = cast(
+                        exp_domain.EditExplorationPropertyBlurbCmd,
+                        change
+                    )
+                    exploration.update_blurb(edit_blurb_cmd.new_value)
                 elif change.property_name == 'author_notes':
-                    exploration.update_author_notes(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyAuthorNotesCmd.
+                    edit_author_notes_cmd = cast(
+                        exp_domain.EditExplorationPropertyAuthorNotesCmd,
+                        change
+                    )
+                    exploration.update_author_notes(
+                        edit_author_notes_cmd.new_value
+                    )
                 elif change.property_name == 'param_specs':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, dict)
-                    exploration.update_param_specs(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyParamSpecsCmd.
+                    edit_param_specs_cmd = cast(
+                        exp_domain.EditExplorationPropertyParamSpecsCmd,
+                        change
+                    )
+                    exploration.update_param_specs(
+                        edit_param_specs_cmd.new_value
+                    )
                 elif change.property_name == 'param_changes':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
-                    exploration.update_param_changes(list(
-                        map(to_param_domain, change.new_value)))
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyParamChangesCmd.
+                    edit_exp_param_changes_cmd = cast(
+                        exp_domain.EditExplorationPropertyParamChangesCmd,
+                        change
+                    )
+                    exploration.update_param_changes(
+                        list(
+                            map(
+                                to_param_domain,
+                                edit_exp_param_changes_cmd.new_value
+                            )
+                        )
+                    )
                 elif change.property_name == 'init_state_name':
-                    exploration.update_init_state_name(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyInitStateNameCmd.
+                    edit_init_state_name_cmd = cast(
+                        exp_domain.EditExplorationPropertyInitStateNameCmd,
+                        change
+                    )
+                    exploration.update_init_state_name(
+                        edit_init_state_name_cmd.new_value
+                    )
                 elif change.property_name == 'auto_tts_enabled':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, bool)
-                    exploration.update_auto_tts_enabled(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyAutoTtsEnabledCmd.
+                    edit_auto_tts_enabled_cmd = cast(
+                        exp_domain.EditExplorationPropertyAutoTtsEnabledCmd,
+                        change
+                    )
+                    exploration.update_auto_tts_enabled(
+                        edit_auto_tts_enabled_cmd.new_value
+                    )
                 elif change.property_name == 'correctness_feedback_enabled':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, bool)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyCorrectnessFeedbackEnabledCmd.
+                    edit_correctness_feedback_enabled_cmd = cast(
+                        exp_domain.EditExplorationPropertyCorrectnessFeedbackEnabledCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     exploration.update_correctness_feedback_enabled(
-                        change.new_value)
+                        edit_correctness_feedback_enabled_cmd.new_value
+                    )
             elif (change.cmd ==
                   exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
@@ -708,15 +915,22 @@ def apply_change_list(
                 # schema update. Thus, no action is needed here other than
                 # to make sure that the version that the user is trying to
                 # migrate to is the latest version.
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                migrate_states_schema_cmd = cast(
+                    exp_domain.MigrateStatesSchemaToLatestVersionCmd,
+                    change
+                )
                 target_version_is_current_state_schema_version = (
-                    change.to_version ==
-                    str(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                    migrate_states_schema_cmd.to_version ==
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+                )
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
                         'Expected to migrate to the latest state schema '
                         'version %s, received %s' % (
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
-                            change.to_version))
+                            migrate_states_schema_cmd.to_version))
         return exploration
 
     except Exception as e:
@@ -814,8 +1028,8 @@ def populate_exp_summary_model_fields(
 def update_states_version_history(
     states_version_history: Dict[str, state_domain.StateVersionHistory],
     change_list: List[exp_domain.ExplorationChange],
-    old_states: Dict[str, state_domain.State],
-    new_states: Dict[str, state_domain.State],
+    old_states_dict: Dict[str, state_domain.StateDict],
+    new_states_dict: Dict[str, state_domain.StateDict],
     current_version: int,
     committer_id: str
 ) -> Dict[str, state_domain.StateVersionHistory]:
@@ -828,9 +1042,9 @@ def update_states_version_history(
             exploration.
         change_list: list(ExplorationChange). A list of changes introduced in
             this commit.
-        old_states: dict(str, State). The states in the previous version of
+        old_states_dict: dict(str, dict). The states in the previous version of
             the exploration.
-        new_states: dict(str, State). The states in the current version of
+        new_states_dict: dict(str, dict). The states in the current version of
             the exploration.
         current_version: int. The latest version of the exploration.
         committer_id: str. The id of the user who made the commit.
@@ -841,26 +1055,11 @@ def update_states_version_history(
     """
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
     prev_version = current_version - 1
-    old_states_dict = copy.deepcopy({
-        state_name: state.to_dict()
-        for (state_name, state) in old_states.items()
-    })
-    new_states_dict = copy.deepcopy({
-        state_name: state.to_dict()
-        for (state_name, state) in new_states.items()
-    })
 
     # Firstly, delete the states from the state version history which were
     # deleted during this commit.
     for state_name in exp_versions_diff.deleted_state_names:
         del states_version_history[state_name]
-
-    # Now, add the states which were newly added during this commit. The
-    # version history of these states are initialized as None because they
-    # were newly added and have no 'previously edited version'.
-    for state_name in exp_versions_diff.added_state_names:
-        states_version_history[state_name] = (
-            state_domain.StateVersionHistory(None, None, committer_id))
 
     # Now, handle the updation of version history of states which were renamed.
     # Firstly, we need to clean up the exp_versions_diff.old_to_new_state_names
@@ -886,7 +1085,7 @@ def update_states_version_history(
     # The following list includes states which exist in both the old states
     # and new states and were not renamed.
     states_which_were_not_renamed = []
-    for state_name in old_states:
+    for state_name in old_states_dict:
         if (
             state_name not in exp_versions_diff.deleted_state_names and
             state_name not in effective_old_to_new_state_names
@@ -921,17 +1120,6 @@ def update_states_version_history(
     for state_name, state_property_changed in (
         state_property_changed_data.items()):
         if state_property_changed:
-            old_state_dict = copy.deepcopy(old_states_dict[state_name])
-            new_state_dict = copy.deepcopy(new_states_dict[state_name])
-
-            # Deleting the attributes from the state dicts which are present
-            # in the ignore list.
-            for property_name in state_property_ignore_list:
-                # MyPy doesn't allow key deletion from TypedDict,
-                # thus we add an ignore.
-                del new_state_dict[property_name]  # type: ignore[misc]
-                del old_state_dict[property_name]  # type: ignore[misc]
-
             # The purpose of checking the diff_dict between the two state
             # dicts ensure that we do not change the version history of that
             # particular state if the overall changes (by EDIT_STATE_PROPERTY)
@@ -944,14 +1132,21 @@ def update_states_version_history(
                         prev_version, state_name, committer_id
                     ))
 
+    # Finally, add the states which were newly added during this commit. The
+    # version history of these states are initialized as None because they
+    # were newly added and have no 'previously edited version'.
+    for state_name in exp_versions_diff.added_state_names:
+        states_version_history[state_name] = (
+            state_domain.StateVersionHistory(None, None, committer_id))
+
     return states_version_history
 
 
 def update_metadata_version_history(
     metadata_version_history: exp_domain.MetadataVersionHistory,
     change_list: List[exp_domain.ExplorationChange],
-    old_metadata: exp_domain.ExplorationMetadata,
-    new_metadata: exp_domain.ExplorationMetadata,
+    old_metadata_dict: exp_domain.ExplorationMetadataDict,
+    new_metadata_dict: exp_domain.ExplorationMetadataDict,
     current_version: int,
     committer_id: str
 ) -> exp_domain.MetadataVersionHistory:
@@ -963,9 +1158,9 @@ def update_metadata_version_history(
             history at the previous version of the exploration.
         change_list: list(ExplorationChange). A list of changes introduced in
             this commit.
-        old_metadata: ExplorationMetadata. The exploration metadata at the
+        old_metadata_dict: dict. The exploration metadata at the
             previous version of the exploration.
-        new_metadata: ExplorationMetadata. The exploration metadata at the
+        new_metadata_dict: dict. The exploration metadata at the
             current version of the exploration.
         current_version: int. The latest version of the exploration.
         committer_id: str. The id of the user who made the commit.
@@ -973,8 +1168,6 @@ def update_metadata_version_history(
     Returns:
         MetadataVersionHistory. The updated metadata version history.
     """
-    old_metadata_dict = copy.deepcopy(old_metadata.to_dict())
-    new_metadata_dict = copy.deepcopy(new_metadata.to_dict())
     prev_version = current_version - 1
 
     metadata_was_changed = any(
@@ -1049,8 +1242,16 @@ def update_version_history(
         version_history_model_id, strict=False)
 
     if version_history_model is not None:
-        new_states = exploration.states
-        new_metadata = exploration.get_metadata()
+        old_states_dict = {
+            state_name: state.to_dict()
+            for state_name, state in old_states.items()
+        }
+        new_states_dict = {
+            state_name: state.to_dict()
+            for state_name, state in exploration.states.items()
+        }
+        old_metadata_dict = old_metadata.to_dict()
+        new_metadata_dict = exploration.get_metadata().to_dict()
         states_version_history = {
             state_name: state_domain.StateVersionHistory.from_dict(
                 state_version_history_dict)
@@ -1062,12 +1263,12 @@ def update_version_history(
             version_history_model.metadata_last_edited_committer_id)
 
         updated_states_version_history = update_states_version_history(
-            states_version_history, change_list, old_states, new_states,
-            exploration.version, committer_id
+            states_version_history, change_list, old_states_dict,
+            new_states_dict, exploration.version, committer_id
         )
         updated_metadata_version_history = update_metadata_version_history(
-            metadata_version_history, change_list, old_metadata, new_metadata,
-            exploration.version, committer_id)
+            metadata_version_history, change_list, old_metadata_dict,
+            new_metadata_dict, exploration.version, committer_id)
         updated_committer_ids = get_updated_committer_ids(
             updated_states_version_history,
             updated_metadata_version_history.last_edited_committer_id)
@@ -1166,11 +1367,11 @@ def _save_exploration(
         exploration, change_list, committer_id, old_states, old_metadata)
 
     # Trigger statistics model update.
-    new_exp_stats = stats_services.get_stats_for_new_exp_version(  # type: ignore[no-untyped-call]
-        exploration.id, exploration.version, exploration.states,
+    new_exp_stats = stats_services.get_stats_for_new_exp_version(
+        exploration.id, exploration.version, list(exploration.states.keys()),
         exp_versions_diff, None)
 
-    stats_services.create_stats_model(new_exp_stats)  # type: ignore[no-untyped-call]
+    stats_services.create_stats_model(new_exp_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         trainable_states_dict = exploration.get_trainable_states_dict(
@@ -1192,7 +1393,7 @@ def _save_exploration(
                 exploration, state_names_to_train_classifier)
 
     # Trigger exploration issues model updation.
-    stats_services.update_exp_issues_for_new_exp_version(  # type: ignore[no-untyped-call]
+    stats_services.update_exp_issues_for_new_exp_version(
         exploration, exp_versions_diff, None)
 
 
@@ -1262,9 +1463,9 @@ def _create_exploration(
     version_history_model.put()
 
     # Trigger statistics model creation.
-    exploration_stats = stats_services.get_stats_for_new_exploration(  # type: ignore[no-untyped-call]
-        exploration.id, exploration.version, exploration.states)
-    stats_services.create_stats_model(exploration_stats)  # type: ignore[no-untyped-call]
+    exploration_stats = stats_services.get_stats_for_new_exploration(
+        exploration.id, exploration.version, list(exploration.states.keys()))
+    stats_services.create_stats_model(exploration_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -1279,7 +1480,7 @@ def _create_exploration(
                 exploration, state_names_to_train)
 
     # Trigger exploration issues model creation.
-    stats_services.create_exp_issues_for_new_exploration(  # type: ignore[no-untyped-call]
+    stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
     regenerate_exploration_summary_with_new_contributor(
@@ -1300,7 +1501,7 @@ def save_new_exploration(
         if exploration.title else 'New exploration created.')
     _create_exploration(
         committer_id, exploration, commit_message, [
-            exp_domain.ExplorationChange({
+            exp_domain.CreateNewExplorationCmd({
                 'cmd': exp_domain.CMD_CREATE_NEW,
                 'title': exploration.title,
                 'category': exploration.category,
@@ -1681,6 +1882,19 @@ def validate_exploration_for_story(
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
+
+        if state.interaction.id == 'MultipleChoiceInput':
+            choices = (
+                state.interaction.customization_args['choices'].value)
+            error_string = (
+                'Exploration in a story having MultipleChoiceInput '
+                'interaction should have at least 4 choices present. '
+                'Exploration with ID %s and state name %s have fewer than '
+                '4 choices.' % (exp.id, state_name)
+            )
+            if len(choices) < 4 and strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
 
         if state.classifier_model_id is not None:
             error_string = (
@@ -2170,14 +2384,14 @@ def revert_exploration(
 
     regenerate_exploration_and_contributors_summaries(exploration_id)
 
-    exploration_stats = stats_services.get_stats_for_new_exp_version(  # type: ignore[no-untyped-call]
-        exploration.id, current_version + 1, exploration.states,
+    exploration_stats = stats_services.get_stats_for_new_exp_version(
+        exploration.id, current_version + 1, list(exploration.states.keys()),
         None, revert_to_version)
-    stats_services.create_stats_model(exploration_stats)  # type: ignore[no-untyped-call]
+    stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
-    stats_services.update_exp_issues_for_new_exp_version(  # type: ignore[no-untyped-call]
+    stats_services.update_exp_issues_for_new_exp_version(
         current_exploration, None, revert_to_version)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
@@ -2265,7 +2479,7 @@ def save_new_exploration_from_yaml_and_assets(
 
     _create_exploration(
         committer_id, exploration, create_commit_message, [
-            exp_domain.ExplorationChange({
+            exp_domain.CreateNewExplorationCmd({
                 'cmd': exp_domain.CMD_CREATE_NEW,
                 'title': exploration.title,
                 'category': exploration.category,
@@ -2830,6 +3044,230 @@ def get_interaction_id_for_state(exp_id: str, state_name: str) -> Optional[str]:
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def regenerate_missing_stats_for_exploration(
+    exp_id: str
+) -> Tuple[List[str], List[str], int, int]:
+    """Regenerates missing ExplorationStats models and entries for all
+    corresponding states in an exploration.
+
+    Args:
+        exp_id: str. The ID of the exp.
+
+    Returns:
+        4-tuple(missing_exp_stats, missing_state_stats, num_valid_exp_stats,
+        num_valid_state_stats). where:
+            missing_exp_stats: list(str). List of missing exploration stats.
+            missing_state_stats: list(str). List of missing state stats.
+            num_valid_exp_stats: int. Number of valid exploration stats.
+            num_valid_state_stats: int. Number of valid state stats.
+
+    Raises:
+        Exception. Fetching exploration versions failed.
+        Exception. No ExplorationStatsModels found.
+        Exception. Exploration snapshots contain invalid commit_cmds.
+        Exception. Exploration does not have a given state.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+    num_valid_state_stats = 0
+    num_valid_exp_stats = 0
+
+    exp_versions = list(range(1, exploration.version + 1))
+    missing_exp_stats_indices = []
+
+    exp_stats_list = stats_services.get_multiple_exploration_stats_by_version(
+        exp_id, exp_versions)
+
+    exp_list = (
+        exp_fetchers
+        .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+            exp_id, exp_versions))
+
+    if all(exp_stats is None for exp_stats in exp_stats_list):
+        for index, version in enumerate(exp_versions):
+            exp_stats_for_version = (
+                stats_services.get_stats_for_new_exploration(
+                    exp_id, version,
+                    list(exp_list[index].state_interaction_ids_dict.keys())))
+            stats_services.create_stats_model(exp_stats_for_version)
+        raise Exception('No ExplorationStatsModels found')
+
+    snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, exp_versions)
+    change_lists = []
+    for snapshot in snapshots:
+        change_list_for_snapshot = []
+        for commit_cmd in snapshot['commit_cmds']:
+            try:
+                change_list_for_snapshot.append(
+                    exp_domain.ExplorationChange(commit_cmd)
+                )
+            except utils.ValidationError:
+                logging.error(
+                    'Exploration(id=%r) snapshots contains invalid '
+                    'commit_cmd: %r'
+                    % (exp_id, commit_cmd)
+                )
+                continue
+        change_lists.append(change_list_for_snapshot)
+
+    missing_exp_stats = []
+    missing_state_stats = []
+
+    zipped_items = list(
+        zip(exp_stats_list, exp_list, change_lists))
+    revert_commit_cmd = exp_models.ExplorationModel.CMD_REVERT_COMMIT
+    for i, (exp_stats, exp, change_list) in enumerate(zipped_items):
+        revert_to_version = next(
+            (
+                int(change.version_number) for change in change_list
+                if change.cmd == revert_commit_cmd
+            ), None)
+        new_exp_version = None
+
+        if revert_to_version is not None:
+            exp_versions_diff = None
+            # We subtract 2 from revert_to_version to get the index of the
+            # previous exploration version because exp_stats_list and
+            # prev_exp start with version 1 in the 0th index.
+            prev_exp_version_index = revert_to_version - 2
+            prev_exp_stats = exp_stats_list[prev_exp_version_index]
+            prev_exp = exp_list[prev_exp_version_index]
+            new_exp_version = revert_to_version
+        else:
+            exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                change_list)
+            # We subtract 2 from exp.version to get the index of the
+            # previous exploration version because exp_stats_list and
+            # prev_exp start with version 1 in the 0th index.
+            prev_exp_version_index = exp.version - 2
+            prev_exp_stats = exp_stats_list[prev_exp_version_index]
+            prev_exp = exp_list[prev_exp_version_index]
+            new_exp_version = exp.version
+
+        # Fill missing Exploration-level stats.
+        if exp_stats:
+            num_valid_exp_stats += 1
+        elif exp.version == 1:
+            new_exploration_stats = (
+                stats_services.get_stats_for_new_exploration(
+                    exp_id, exp.version,
+                    list(exp.state_interaction_ids_dict.keys())))
+            stats_services.create_stats_model(new_exploration_stats)
+            missing_exp_stats_indices.append(i)
+            missing_exp_stats.append(
+                'ExplorationStats(exp_id=%r, exp_version=%r)'
+                % (exp_id, exp.version))
+            num_valid_state_stats += len(
+                new_exploration_stats.state_stats_mapping)
+            continue
+        else:
+            exp_stats = prev_exp_stats and prev_exp_stats.clone()
+
+            if exp_stats is None:
+                new_exploration_stats = (
+                    stats_services.get_stats_for_new_exploration(
+                        exp_id, exp.version,
+                        list(exp.state_interaction_ids_dict.keys())))
+                stats_services.create_stats_model(new_exploration_stats)
+                missing_exp_stats_indices.append(i)
+                missing_exp_stats.append(
+                    'ExplorationStats(exp_id=%r, exp_version=%r)'
+                    % (exp_id, exp.version))
+                num_valid_state_stats += len(
+                    new_exploration_stats.state_stats_mapping)
+                continue
+
+            if exp_versions_diff:
+                exp_stats = stats_services.advance_version_of_exp_stats(
+                    new_exp_version, exp_versions_diff, exp_stats, None,
+                    None)
+            else:
+                exp_stats.exp_version = exp.version
+            stats_services.create_stats_model(exp_stats)
+            missing_exp_stats_indices.append(i)
+            missing_exp_stats.append(
+                'ExplorationStats(exp_id=%r, exp_version=%r)'
+                % (exp_id, exp.version))
+
+        # Fill missing State-level stats.
+        state_stats_mapping = exp_stats.state_stats_mapping
+        for state_name in exp.state_interaction_ids_dict.keys():
+            if state_name in state_stats_mapping:
+                num_valid_state_stats += 1
+                continue
+
+            if exp_versions_diff:
+                prev_state_name = (
+                    exp_versions_diff.new_to_old_state_names.get(
+                        state_name, state_name))
+            else:
+                prev_state_name = state_name
+
+            try:
+                prev_interaction_id = (
+                    prev_exp.state_interaction_ids_dict[prev_state_name]
+                    if prev_state_name in prev_exp.state_interaction_ids_dict
+                    else None)
+                current_interaction_id = (
+                    exp.state_interaction_ids_dict[state_name])
+                exp_stats_list_item = exp_stats_list[i]
+                assert exp_stats_list_item is not None
+                # In early schema versions of ExplorationModel, the END
+                # card was a persistant, implicit state present in every
+                # exploration. The snapshots of these old explorations have
+                # since been migrated but they do not have corresponding state
+                # stats models for the END state. So for such versions, a
+                # default state stats model should be created.
+                if (
+                    current_interaction_id != prev_interaction_id or
+                    (
+                        current_interaction_id == 'EndExploration' and
+                        prev_state_name == 'END'
+                    )
+                ):
+                    exp_stats_list_item.state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default()
+                    )
+                else:
+                    assert prev_exp_stats is not None
+                    exp_stats_list_item.state_stats_mapping[state_name] = (
+                        prev_exp_stats.state_stats_mapping[
+                            prev_state_name].clone()
+                    )
+                missing_state_stats.append(
+                    'StateStats(exp_id=%r, exp_version=%r, '
+                    'state_name=%r)' % (exp_id, exp.version, state_name))
+            except Exception as e:
+                assert exp_versions_diff is not None
+                raise Exception(
+                    'Exploration(id=%r, exp_version=%r) has no '
+                    'State(name=%r): %r' % (
+                        exp_id, exp_stats.exp_version, prev_state_name, {
+                            'added_state_names': (
+                                exp_versions_diff.added_state_names),
+                            'deleted_state_names': (
+                                exp_versions_diff.deleted_state_names),
+                            'new_to_old_state_names': (
+                                exp_versions_diff.new_to_old_state_names),
+                            'old_to_new_state_names': (
+                                exp_versions_diff.old_to_new_state_names),
+                            'prev_exp.states': (
+                                prev_exp.state_interaction_ids_dict.keys()),
+                            'prev_exp_stats': prev_exp_stats
+                        })) from e
+
+    for index, exp_stats in enumerate(exp_stats_list):
+        if index not in missing_exp_stats_indices:
+            assert exp_stats is not None
+            stats_services.save_stats_model(exp_stats)
+
+    return (
+        missing_exp_stats, missing_state_stats,
+        num_valid_exp_stats, num_valid_state_stats
+    )
 
 
 def update_logged_out_user_progress(

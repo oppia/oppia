@@ -847,7 +847,9 @@ class FetchIssuesHandler(EditorHandler):
     def get(self, exp_id):
         """Handles GET requests."""
         exp_version = self.normalized_request.get('exp_version')
-        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        exp_issues = stats_services.get_exp_issues(
+            exp_id, exp_version, strict=False
+        )
         if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid version %s for exploration ID %s'
@@ -921,7 +923,9 @@ class ResolveIssueHandler(EditorHandler):
         exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload.get('exp_version')
 
-        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        exp_issues = stats_services.get_exp_issues(
+            exp_id, exp_version, strict=False
+        )
         if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid exploration ID %s' % (exp_id))

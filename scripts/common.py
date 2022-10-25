@@ -160,6 +160,8 @@ WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
 WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
+ANALYTICS_CONSTANTS_FILE_PATH = (
+    os.path.join('assets', 'analytics-constants.json'))
 
 PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
 
@@ -308,7 +310,8 @@ def open_new_tab_in_browser_if_possible(url: str) -> None:
 def get_remote_alias(remote_urls: List[str]) -> str:
     """Finds the correct alias for the given remote repository URLs."""
     git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v']).decode('utf-8').split('\n')
+        ['git', 'remote', '-v'], encoding='utf-8'
+    ).split('\n')
     remote_alias = None
     remote_url = None
     for remote_url in remote_urls:
@@ -347,7 +350,8 @@ def get_current_branch_name() -> str:
         str. The name of current branch.
     """
     git_status_output = subprocess.check_output(
-        ['git', 'status']).decode('utf-8').strip().split('\n')
+        ['git', 'status'], encoding='utf-8'
+    ).strip().split('\n')
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)

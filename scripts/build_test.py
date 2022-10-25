@@ -74,10 +74,10 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_INPUT_FILEPATH,
                 INVALID_OUTPUT_FILEPATH,
                 INVALID_FILENAME)
-        # Stubs of 'assertRaisesRegex' does not contain any returncode
-        # attribute, so because of this MyPy throws an '"Exception" has
-        # no attribute "returncode"' error. Thus to avoid the error, we
-        # used ignore here.
+        # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
+        # not contain any returncode attribute, so because of this MyPy throws
+        # an '"Exception" has no attribute "returncode"' error. Thus to avoid
+        # the error, we used ignore here.
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
 
@@ -88,10 +88,10 @@ class BuildTests(test_utils.GenericTestBase):
             'returned non-zero exit status 1') as called_process:
             build._minify_and_create_sourcemap(  # pylint: disable=protected-access
                 INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
-        # Stubs of 'assertRaisesRegex' does not contain any returncode
-        # attribute, so because of this MyPy throws an '"Exception" has
-        # no attribute "returncode"' error. Thus to avoid the error, we
-        # used ignore here.
+        # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
+        # not contain any returncode attribute, so because of this MyPy throws
+        # an '"Exception" has no attribute "returncode"' error. Thus to avoid
+        # the error, we used ignore here.
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
 
@@ -268,7 +268,7 @@ class BuildTests(test_utils.GenericTestBase):
         """
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
-        protractor_filepath = os.path.join('extensions', 'protractor.js')
+        webdriverio_filepath = os.path.join('extensions', 'webdriverio.js')
 
         python_controller_filepath = os.path.join('base.py')
         pyc_test_filepath = os.path.join(
@@ -277,7 +277,7 @@ class BuildTests(test_utils.GenericTestBase):
             'core', 'tests', 'base_test.py')
 
         self.assertFalse(build.should_file_be_built(spec_js_filepath))
-        self.assertFalse(build.should_file_be_built(protractor_filepath))
+        self.assertFalse(build.should_file_be_built(webdriverio_filepath))
 
         self.assertFalse(build.should_file_be_built(service_ts_filepath))
 

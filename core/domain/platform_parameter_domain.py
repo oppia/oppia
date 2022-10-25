@@ -27,8 +27,8 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Callable, Dict, List, Optional, Pattern, Union
-from typing_extensions import Final, TypedDict
+from typing import (
+    Callable, Dict, Final, List, Optional, Pattern, TypedDict, Union)
 
 
 class ServerMode(enum.Enum):
@@ -98,6 +98,14 @@ class PlatformParameterChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class EditRulesPlatformParameterCmd(PlatformParameterChange):
+    """Class representing the PlatformParameterChange's
+    CMD_EDIT_RULES command.
+    """
+
+    new_rules: List[str]
 
 
 class ClientSideContextDict(TypedDict):

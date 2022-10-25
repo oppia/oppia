@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
 (base_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration])
+    [models.Names.BASE_MODEL, models.Names.EXPLORATION])
 
 
 class ValidateExplorationSnapshotMetadataModelTests(

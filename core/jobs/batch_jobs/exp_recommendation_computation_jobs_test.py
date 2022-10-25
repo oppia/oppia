@@ -27,8 +27,7 @@ from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, List, Tuple, Type, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:
@@ -36,7 +35,7 @@ if MYPY:
     from mypy_imports import recommendations_models
 
 (exp_models, recommendations_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.recommendations
+    models.Names.EXPLORATION, models.Names.RECOMMENDATIONS
 ])
 
 StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]

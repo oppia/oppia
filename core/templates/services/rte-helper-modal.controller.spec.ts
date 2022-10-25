@@ -382,8 +382,60 @@ describe('Rte Helper Modal Controller', function() {
         });
     }));
 
+    it('should detect whether the default RTE component is used', ()=>{
+      expect($scope.defaultRTEComponent).toBeTrue();
+    });
+
     it('should close modal and remove the tag', function() {
       $scope.cancel();
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('when delete is clicked', () => {
+    var customizationArgSpecs = [{
+      name: 'filepath',
+      default_value: ''
+    }, {
+      name: 'caption',
+      default_value: ''
+    }, {
+      name: 'alt',
+      default_value: ''
+    }];
+
+    beforeEach(angular.mock.module('oppia'));
+
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      mockExternalRteSaveEventEmitter = new EventEmitter();
+      $provide.value('ExternalRteSaveService', {
+        onExternalRteSave: mockExternalRteSaveEventEmitter
+      });
+    }));
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      $timeout = $injector.get('$timeout');
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $controller(
+        'RteHelperModalController', {
+          $scope: $scope,
+          $uibModalInstance: $uibModalInstance,
+          attrsCustomizationArgsDict: {
+            alt: '',
+            caption: '',
+            filepath: ''
+          },
+          customizationArgSpecs: customizationArgSpecs,
+        });
+    }));
+
+    it('should delete the RTE component', ()=>{
+      $scope.delete();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith(true);
     });
   });

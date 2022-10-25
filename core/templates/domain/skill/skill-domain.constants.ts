@@ -34,6 +34,9 @@ export const SkillDomainConstants = {
   SKILL_MASTERY_DATA_URL_TEMPLATE:
     '/skill_mastery_handler/data',
 
+  SKILL_ASSIGNMENT_FOR_DIAGNOSTIC_TEST_URL_TEMPLATE:
+    '/diagnostic_test_skill_assignment_handler/<skill_id>',
+
   SKILL_PROPERTY_DESCRIPTION: 'description',
   SKILL_PROPERTY_LANGUAGE_CODE: 'language_code',
   SKILL_CONTENTS_PROPERTY_EXPLANATION: 'explanation',

@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Optional
+from typing import Dict, Final, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -29,11 +29,12 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import user_models
 
-base_models, user_models = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+base_models, user_models = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.USER
+])
 datastore_services = models.Registry.import_datastore_services()
 
-ONLY_FIREBASE_SEED_MODEL_ID = '1'
+ONLY_FIREBASE_SEED_MODEL_ID: Final = '1'
 
 
 class UserAuthDetailsModel(base_models.BaseModel):

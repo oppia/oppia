@@ -27,14 +27,13 @@ from __future__ import annotations
 from core.domain import classroom_config_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classroom_models
 
-(classroom_models,) = models.Registry.import_models([models.NAMES.classroom])
+(classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
 
 
 def get_all_classrooms() -> List[classroom_config_domain.Classroom]:

@@ -16,16 +16,23 @@
  * @fileoverview Initialization of Google Analytics (gtag.js).
  */
 
-import constants from 'assets/constants';
+
+import analyticsConstants from 'analytics-constants';
+
+initializeGoogleAnalytics();
 
 export function initializeGoogleAnalytics() {
-  if (!constants.CAN_SEND_ANALYTICS_EVENTS) {
+  if (!analyticsConstants.CAN_SEND_ANALYTICS_EVENTS) {
     // Mock gtag function will prevent sending analytics to google.
     window.gtag = function() {}
     return;
   }
 
-  if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
+  if (
+    analyticsConstants.GA_ANALYTICS_ID &&
+    analyticsConstants.UA_ANALYTICS_ID &&
+    analyticsConstants.SITE_NAME_FOR_ANALYTICS
+  ) {
     // Reference doc:
     // https://developers.google.com/analytics/devguides/collection/gtagjs
     window.dataLayer = window.dataLayer || [];
@@ -33,10 +40,14 @@ export function initializeGoogleAnalytics() {
       window.dataLayer.push(arguments);
     }
     gtag('set', 'linker', {
-      'domains': [constants.SITE_NAME_FOR_ANALYTICS]
+      'domains': [analyticsConstants.SITE_NAME_FOR_ANALYTICS]
     });
     gtag('js', new Date());
-    gtag('config', constants.ANALYTICS_ID, {
+    gtag('config', analyticsConstants.GA_ANALYTICS_ID, {
+      'anonymize_ip': true,
+      'forceSSL': true,
+    });
+    gtag('config', analyticsConstants.UA_ANALYTICS_ID, {
       'anonymize_ip': true,
       'forceSSL': true,
     });

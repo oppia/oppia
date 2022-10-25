@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
 
 auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 
 UidsPartitionTupleType = Tuple[
     List[Tuple[int, str]],
@@ -252,6 +252,10 @@ class FirebaseAdminSdkStub:
             uids_to_delete = set(uids)
             errors = []
         else:
+            # Here we use cast because method 'utils.partition' returns a
+            # broader type Tuple[Iterable[...], Iterable[...]], thus to
+            # narrow down the type to 'UidsPartitionTupleType' we used
+            # cast here.
             disabled_uids, enabled_uids = cast(
                 UidsPartitionTupleType,
                 utils.partition(
@@ -651,6 +655,10 @@ class FirebaseAdminSdkStub:
             if error_to_raise is not None:
                 raise error_to_raise
 
+            # Here we use cast because method 'utils.partition' returns a
+            # broader type Tuple[Iterable[...], Iterable[...]], thus to
+            # narrow down the type to 'UidsZipPartitionTupleType' we used
+            # cast here.
             uids_to_delete, uids_to_fail = cast(
                 UidsZipPartitionTupleType,
                 utils.partition(
@@ -709,6 +717,10 @@ class FirebaseAdminSdkStub:
             if error_to_raise is not None:
                 raise error_to_raise
 
+            # Here we use cast because method 'utils.partition' returns a
+            # broader type Tuple[Iterable[...], Iterable[...]], thus to
+            # narrow down the type to 'RecordsPartitionTupleType' we used
+            # cast here.
             records_to_import, records_to_fail = cast(
                 RecordsPartitionTupleType,
                 utils.partition(
@@ -719,10 +731,10 @@ class FirebaseAdminSdkStub:
 
             self.import_users([record for _, (record, _) in records_to_import])
 
+            errors = [(i, error) for i, (_, error) in records_to_fail]
             return self._create_user_import_result_fragile(
-                len(records), cast(
-                    List[Tuple[int, str]],
-                    [(i, error) for i, (_, error) in records_to_fail]))
+                len(records), errors=errors
+            )
 
         assert self._test is not None
         return self._test.swap(firebase_auth, 'import_users', mock_import_users)
@@ -756,7 +768,7 @@ class FirebaseAdminSdkStub:
             dict(str: *)|None. The decoded claims or None.
         """
         try:
-            # Casting the result here because the type stubs for library 'json'
+            # Here we use cast because the type stubs for library 'json'
             # returns 'Any' from json.loads.
             # https://github.com/python/typeshed/blob/30ad9e945f42cca1190cdba58c65bdcfc313480f/stdlib/json/__init__.pyi#L36
             return cast(

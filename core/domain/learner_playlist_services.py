@@ -23,14 +23,13 @@ from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT: Final = (
     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT

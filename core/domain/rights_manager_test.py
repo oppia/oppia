@@ -29,14 +29,14 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([
-    models.NAMES.exploration
+    models.Names.EXPLORATION
 ])
 
 

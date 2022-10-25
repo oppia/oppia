@@ -29,6 +29,7 @@ import os
 import re
 
 import github
+from typing import Final, List, Optional
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -36,16 +37,15 @@ import github
 from .. import common  # isort:skip  # pylint: disable=wrong-import-position
 from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
-
-CONSTANTS_CONFIG_PATH = os.path.join(
+CONSTANTS_CONFIG_PATH: Final = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
-FECONF_REGEX = '^([A-Z_]+ = ).*$'
-CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
-TERMS_PAGE_FOLDER_URL = (
+FECONF_REGEX: Final = '^([A-Z_]+ = ).*$'
+CONSTANTS_REGEX: Final = '^(  "[A-Z_]+": ).*$'
+TERMS_PAGE_FOLDER_URL: Final = (
     'https://github.com/oppia/oppia/commits/develop/core/'
     'templates/pages/terms-page')
 
-_PARSER = argparse.ArgumentParser(description='Updates configs.')
+_PARSER: Final = argparse.ArgumentParser(description='Updates configs.')
 _PARSER.add_argument(
     '--release_dir_path',
     dest='release_dir_path',
@@ -70,8 +70,8 @@ _PARSER.add_argument(
 
 
 def apply_changes_based_on_config(
-    local_filepath, config_filepath, expected_config_line_regex
-):
+    local_filepath: str, config_filepath: str, expected_config_line_regex: str
+) -> None:
     """Updates the local file based on the deployment configuration specified
     in the config file.
 
@@ -109,8 +109,8 @@ def apply_changes_based_on_config(
             line_number for (line_number, line) in enumerate(local_lines)
             if line.startswith(match_result.group(1))]
         assert len(matching_local_line_numbers) == 1, (
-            'Could not find correct number of lines in %s matching: %s' %
-            (local_filename, config_line))
+            'Could not find correct number of lines in %s matching: %s, %s' %
+            (local_filename, config_line, matching_local_line_numbers))
         local_line_numbers.append(matching_local_line_numbers[0])
 
     # Then, apply the changes.
@@ -122,8 +122,8 @@ def apply_changes_based_on_config(
 
 
 def check_updates_to_terms_of_service(
-    release_feconf_path, personal_access_token
-):
+    release_feconf_path: str, personal_access_token: str
+) -> None:
     """Checks if updates are made to terms of service and updates
     REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
 
@@ -169,12 +169,17 @@ def check_updates_to_terms_of_service(
                 f.write(line)
 
 
-def update_app_yaml(release_app_dev_yaml_path, feconf_config_path):
+def update_app_yaml(
+    release_app_dev_yaml_path: str, feconf_config_path: str
+) -> None:
     """Updates app.yaml file with more strict CORS HTTP header.
 
     Args:
         release_app_dev_yaml_path: str. Absolute path of the app_dev.yaml file.
         feconf_config_path: str. Absolute path of the feconf config file.
+
+    Raises:
+        Exception. No OPPIA_SITE_URL key found.
     """
     with utils.open_file(feconf_config_path, 'r') as feconf_config_file:
         feconf_config_contents = feconf_config_file.read()
@@ -182,8 +187,13 @@ def update_app_yaml(release_app_dev_yaml_path, feconf_config_path):
     with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
-    project_origin = re.search(
-        r'OPPIA_SITE_URL = \'(.*)\'', feconf_config_contents).group(1)
+    oppia_site_url_searched_key = re.search(
+        r'OPPIA_SITE_URL = \'(.*)\'', feconf_config_contents)
+    if oppia_site_url_searched_key is None:
+        raise Exception(
+            'Error: No OPPIA_SITE_URL key found.'
+        )
+    project_origin = oppia_site_url_searched_key.group(1)
     access_control_allow_origin_header = (
         'Access-Control-Allow-Origin: %s' % project_origin)
 
@@ -198,8 +208,10 @@ def update_app_yaml(release_app_dev_yaml_path, feconf_config_path):
 
 
 def verify_config_files(
-    release_feconf_path, release_app_dev_yaml_path, verify_email_api_keys
-):
+    release_feconf_path: str,
+    release_app_dev_yaml_path: str,
+    verify_email_api_keys: bool
+) -> None:
     """Verifies that feconf is updated correctly to include
     mailgun api key, mailchimp api key and redishost.
 
@@ -243,7 +255,7 @@ def verify_config_files(
         )
 
 
-def add_mailgun_api_key(release_feconf_path):
+def add_mailgun_api_key(release_feconf_path: str) -> None:
     """Adds mailgun api key to feconf config file.
 
     Args:
@@ -273,7 +285,7 @@ def add_mailgun_api_key(release_feconf_path):
             f.write(line)
 
 
-def add_mailchimp_api_key(release_feconf_path):
+def add_mailchimp_api_key(release_feconf_path: str) -> None:
     """Adds mailchimp api key to feconf config file.
 
     Args:
@@ -305,7 +317,72 @@ def add_mailchimp_api_key(release_feconf_path):
             f.write(line)
 
 
-def main(args=None):
+def update_analytics_constants_based_on_config(
+    release_analytics_constants_path: str,
+    analytics_constants_config_path: str
+) -> None:
+    """Updates the GA4 and UA IDs in the analytics constants JSON file.
+
+    Args:
+        release_analytics_constants_path: str. The path to constants file.
+        analytics_constants_config_path: str. The path to constants config file.
+
+    Raises:
+        Exception. No GA_ANALYTICS_ID key found.
+        Exception. No UA_ANALYTICS_ID key found.
+        Exception. No SITE_NAME_FOR_ANALYTICS key found.
+        Exception. No CAN_SEND_ANALYTICS_EVENTS key found.
+    """
+    with utils.open_file(analytics_constants_config_path, 'r') as config_file:
+        config_file_contents = config_file.read()
+    ga_analytics_searched_key = re.search(
+        r'"GA_ANALYTICS_ID": "(.*)"', config_file_contents)
+    if ga_analytics_searched_key is None:
+        raise Exception(
+            'Error: No GA_ANALYTICS_ID key found.'
+        )
+    ga_analytics_id = ga_analytics_searched_key.group(1)
+    ua_analytics_searched_key = re.search(
+        r'"UA_ANALYTICS_ID": "(.*)"', config_file_contents)
+    if ua_analytics_searched_key is None:
+        raise Exception(
+            'Error: No UA_ANALYTICS_ID key found.'
+        )
+    ua_analytics_id = ua_analytics_searched_key.group(1)
+    site_name_for_analytics_searched_key = re.search(
+        r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', config_file_contents)
+    if site_name_for_analytics_searched_key is None:
+        raise Exception(
+            'Error: No SITE_NAME_FOR_ANALYTICS key found.'
+        )
+    site_name_for_analytics = site_name_for_analytics_searched_key.group(1)
+    can_send_analytics_events_searched_key = re.search(
+        r'"CAN_SEND_ANALYTICS_EVENTS": (true|false)',
+        config_file_contents)
+    if can_send_analytics_events_searched_key is None:
+        raise Exception(
+            'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'
+        )
+    can_send_analytics_events = can_send_analytics_events_searched_key.group(1)
+    common.inplace_replace_file(
+        release_analytics_constants_path,
+        '"GA_ANALYTICS_ID": ""',
+        '"GA_ANALYTICS_ID": "%s"' % ga_analytics_id)
+    common.inplace_replace_file(
+        release_analytics_constants_path,
+        '"UA_ANALYTICS_ID": ""',
+        '"UA_ANALYTICS_ID": "%s"' % ua_analytics_id)
+    common.inplace_replace_file(
+        release_analytics_constants_path,
+        '"SITE_NAME_FOR_ANALYTICS": ""',
+        '"SITE_NAME_FOR_ANALYTICS": "%s"' % site_name_for_analytics)
+    common.inplace_replace_file(
+        release_analytics_constants_path,
+        '"CAN_SEND_ANALYTICS_EVENTS": false',
+        '"CAN_SEND_ANALYTICS_EVENTS": %s' % can_send_analytics_events)
+
+
+def main(args: Optional[List[str]] = None) -> None:
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
     """
@@ -316,6 +393,8 @@ def main(args=None):
         options.deploy_data_path, 'feconf_updates.config')
     constants_config_path = os.path.join(
         options.deploy_data_path, 'constants_updates.config')
+    analytics_constants_config_path = os.path.join(
+        options.deploy_data_path, 'analytics_constants_updates.config')
 
     release_feconf_path = os.path.join(
         options.release_dir_path, common.FECONF_PATH)
@@ -323,6 +402,8 @@ def main(args=None):
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
     release_app_dev_yaml_path = os.path.join(
         options.release_dir_path, common.APP_DEV_YAML_PATH)
+    release_analytics_constants_path = os.path.join(
+        options.release_dir_path, common.ANALYTICS_CONSTANTS_FILE_PATH)
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
@@ -339,6 +420,9 @@ def main(args=None):
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
     update_app_yaml(release_app_dev_yaml_path, feconf_config_path)
+    update_analytics_constants_based_on_config(
+        release_analytics_constants_path,
+        analytics_constants_config_path)
     verify_config_files(
         release_feconf_path,
         release_app_dev_yaml_path,

@@ -71,6 +71,8 @@ export const AppConstants = {
     INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
+    INVALID_REDIRECTION: 'Learner should not be directed back by more than' +
+      ' 3 cards in the lesson.'
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
@@ -116,6 +118,10 @@ export const AppConstants = {
   // If an $http request fails with the following error codes, a warning is
   // displayed.
   FATAL_ERROR_CODES: [400, 401, 404, 500],
+
+  // Maximum number of states the learner can be directed back from a state
+  // by an editor in an exploration.
+  MAX_CARD_COUNT_FOR_VALID_REDIRECTION: 3,
 
   // Do not modify these, for backwards-compatibility reasons. These strings are
   // used to identify components, to generate content ids, and to determine what
@@ -195,5 +201,10 @@ export const AppConstants = {
   IMAGE_SAVE_DESTINATION_SERVER: 'imageSaveDestinationServer',
   IMAGE_SAVE_DESTINATION_LOCAL_STORAGE:
     'imageSaveDestinationLocalStorage',
-  SVG_MIME_TYPE: 'data:image/svg+xml'
+  SVG_MIME_TYPE: 'data:image/svg+xml',
+
+  CONTRIBUTION_STATS_TYPE_TRANSLATION: 'translation',
+  CONTRIBUTION_STATS_TYPE_QUESTION: 'question',
+  CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
+  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review'
 } as const;

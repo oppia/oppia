@@ -204,10 +204,10 @@ describe('HintEditorComponent', () => {
     expect(component.hintEditorIsOpen).toBe(false);
   });
 
-  it('should check if hint HTML length exceeds 10000 characters', () => {
+  it('should check if hint HTML length exceeds 500 characters', () => {
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        'a'.repeat(10000), 'contentID'),
+        'a'.repeat(500), 'contentID'),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -219,7 +219,7 @@ describe('HintEditorComponent', () => {
 
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        'a'.repeat(10001), 'contentID'),
+        'a'.repeat(501), 'contentID'),
 
       toBackendDict(): HintBackendDict {
         return {

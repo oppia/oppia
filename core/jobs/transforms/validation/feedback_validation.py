@@ -35,15 +35,15 @@ if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
 
 (exp_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.exploration,
-    models.NAMES.feedback
+    models.Names.EXPLORATION,
+    models.Names.FEEDBACK
 ])
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(
     feedback_models.GeneralFeedbackThreadModel)
 class ValidateEntityType(beam.DoFn):  # type: ignore[misc]

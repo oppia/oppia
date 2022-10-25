@@ -22,8 +22,7 @@ import inspect
 
 from extensions.answer_summarizers import models
 
-from typing import Callable, Dict, overload
-from typing_extensions import Literal
+from typing import Callable, Dict, Literal, overload
 
 
 class Registry:
@@ -83,6 +82,12 @@ class Registry:
     def get_calculation_by_id(
         cls, calculation_id: Literal['TopNUnresolvedAnswersByFrequency']
     ) -> models.TopNUnresolvedAnswersByFrequency: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: str
+    ) -> models.BaseCalculation: ...
 
     @classmethod
     def get_calculation_by_id(

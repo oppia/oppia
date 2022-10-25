@@ -42,7 +42,7 @@
       </div>
     </div>
   </div>
-  <div class="story-editor-parent">
+  <div ng-if="$ctrl.story" class="story-editor-parent">
     <div ng-if="$ctrl.getActiveTab() === 'story_editor'">
       <story-editor></story-editor>
     </div>

@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { Misconception, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
@@ -44,6 +44,8 @@ describe('Skill Misconceptions Editor Component', () => {
   let sampleSkill: Skill;
   let testSubscriptions: Subscription;
   const skillChangeSpy = jasmine.createSpy('saveOutcomeDestDetails');
+  let resizeEvent = new Event('resize');
+  let mockEventEmitter = new EventEmitter();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -55,7 +57,13 @@ describe('Skill Misconceptions Editor Component', () => {
         ChangeDetectorRef,
         SkillEditorStateService,
         SkillUpdateService,
-        WindowDimensionsService
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
+          }
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -224,5 +232,67 @@ describe('Skill Misconceptions Editor Component', () => {
     component.changeActiveMisconceptionIndex(1);
 
     expect(component.activeMisconceptionIndex).toBe(null);
+  });
+
+  it('should toggle skill editor card on clicking', () => {
+    component.skillEditorCardIsShown = true;
+    spyOn(windowDimensionsService, 'isWindowNarrow')
+      .and.returnValue(true);
+
+    component.toggleSkillEditorCard();
+
+    expect(component.skillEditorCardIsShown).toBeFalse();
+
+    component.toggleSkillEditorCard();
+
+    expect(component.skillEditorCardIsShown).toBeTrue();
+  });
+
+  it('should show Misconceptions list when the window is narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+      mockEventEmitter);
+    component.windowIsNarrow = false;
+
+    expect(component.misconceptionsListIsShown).toBe(false);
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.misconceptionsListIsShown).toBe(false);
+    expect(component.windowIsNarrow).toBe(true);
+  });
+
+  it('should show Misconceptions list when the window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    component.windowIsNarrow = true;
+
+    expect(component.misconceptionsListIsShown).toBe(false);
+
+    component.ngOnInit();
+    mockEventEmitter.emit();
+
+    expect(component.misconceptionsListIsShown).toBe(true);
+    expect(component.windowIsNarrow).toBe(false);
+  });
+
+  it('should not toggle Misconceptions list when window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    component.misconceptionsListIsShown = true;
+
+    component.toggleMisconceptionLists();
+
+    expect(component.misconceptionsListIsShown).toBe(true);
+  });
+
+  it('should not toggle skill card editor when window is wide', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    component.skillEditorCardIsShown = true;
+
+    component.toggleMisconceptionLists();
+
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 });

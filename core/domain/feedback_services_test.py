@@ -28,8 +28,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Optional
-from typing_extensions import Final, TypedDict
+from typing import Final, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -37,8 +36,8 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
 (feedback_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.feedback,
-    models.NAMES.suggestion
+    models.Names.FEEDBACK,
+    models.Names.SUGGESTION
 ])
 
 

@@ -32,7 +32,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -129,9 +129,9 @@ class GetModelKindTests(test_utils.TestBase):
         self.assertEqual(
             job_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_get_from_bad_value(self) -> None:
         with self.assertRaisesRegex(
             TypeError, 'not a model type or instance'
@@ -156,6 +156,9 @@ class GetModelPropertyTests(test_utils.TestBase):
 
         self.assertEqual(job_utils.get_model_property(model, 'prop'), None)
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_get_property_from_bad_value(self) -> None:
         with self.assertRaisesRegex(TypeError, 'not a model instance'):
             job_utils.get_model_property(123, 'prop') # type: ignore[arg-type]
@@ -168,6 +171,9 @@ class GetModelIdTests(test_utils.TestBase):
 
         self.assertEqual(job_utils.get_model_id(model), '123')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_get_id_from_bad_value(self) -> None:
         with self.assertRaisesRegex(TypeError, 'not a model instance'):
             job_utils.get_model_id(123) # type: ignore[arg-type]

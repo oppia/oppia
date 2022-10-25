@@ -90,7 +90,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ]
             },
             'allowMultipleItemsInSamePosition': {
-                'value': False
+                'value': True
             }
         }
         state_answer_group = state_domain.AnswerGroup(
@@ -1242,7 +1242,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return state
 
         def _verify_interaction_supports_android(
-            self: StateDomainUnitTests, interaction_id: str
+            self: StateDomainUnitTests, interaction_id: Optional[str]
         ) -> None:
             """Checks that the provided interaction is supported on Android."""
             init_state = _create_init_state_for_interaction_verification()
@@ -1287,10 +1287,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_supports_android(self, 'TextInput')
         _verify_interaction_supports_android(self, 'NumericExpressionInput')
         _verify_interaction_supports_android(self, 'RatioExpressionInput')
-        # Here, method can only accept string values but for testing purposes
-        # we are providing None, which causes MyPy to throw an error. Thus
-        # to avoid the error, we used ignore here.
-        _verify_interaction_supports_android(self, None)  # type: ignore[arg-type]
+        _verify_interaction_supports_android(self, None)
 
         _verify_interaction_does_not_support_android(self, 'CodeRepl')
         _verify_interaction_does_not_support_android(self, 'GraphInput')
@@ -1646,6 +1643,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'content_id': 'ca_choices_2',
                         'html': '100'
+                    },
+                    {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>1,000</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_4',
+                        'html': '<p>100</p>'
                     }
                 ]
             }
@@ -1666,14 +1671,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {},
                 'ca_choices_0': {},
                 'ca_choices_1': {},
-                'ca_choices_2': {}
+                'ca_choices_2': {},
+                'ca_choices_3': {},
+                'ca_choices_4': {}
             }
         }
         written_translations = state_domain.WrittenTranslations.from_dict(
             written_translations_dict)
         init_state.update_written_translations(written_translations)
 
-        # Choice 2 should not be returned as its value is numeric.
+        # Choice 2 and 4 should not be returned as its value is numeric.
         content_id_mapping_needing_translations = (
             init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
@@ -1694,6 +1701,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ].content, '1,000')
         self.assertFalse(
             'ca_choices_2' in content_id_mapping_needing_translations)
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_3'
+            ].content, '<p>1,000</p>')
+        self.assertFalse(
+            'ca_choices_4' in content_id_mapping_needing_translations)
 
     def test_content_id_existance_checks_work_correctly(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1864,9 +1877,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_solicit_answer_details(True)
         self.assertEqual(state.solicit_answer_details, True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_update_solicit_answer_details_with_non_bool_fails(self) -> None:
         """Test updating solicit_answer_details with non bool value."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -1892,9 +1905,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_card_is_checkpoint(True)
         self.assertEqual(state.card_is_checkpoint, True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_update_card_is_checkpoint_with_non_bool_fails(self) -> None:
         """Test updating card_is_checkpoint with non bool value."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -2702,185 +2715,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
 
-    def test_convert_html_fields_in_state_with_math_expression_input(
-        self
-    ) -> None:
-        """Test the method for converting all the HTML in a state having
-        MathExpressionInput interaction.
-        """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
-        html_with_new_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
-        answer_group_with_old_math_schema: state_domain.AnswerGroupDict = {
-            'outcome': {
-                'dest': 'Introduction',
-                'dest_if_really_stuck': None,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': html_with_old_math_schema
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Equals'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        answer_group_with_new_math_schema = {
-            'outcome': {
-                'dest': 'Introduction',
-                'dest_if_really_stuck': None,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': html_with_new_math_schema
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Equals'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-
-        state_dict_with_old_math_schema: state_domain.StateDict = {
-            'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
-            },
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'card_is_checkpoint': False,
-            'linked_skill_id': None,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': '42',
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': html_with_old_math_schema
-                    }
-                },
-                'answer_groups': [answer_group_with_old_math_schema],
-                'default_outcome': {
-                    'param_changes': [],
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': html_with_old_math_schema
-                    },
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': 'MathExpressionInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
-                        }
-                    },
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
-                        }
-                    }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
-        }
-
-        state_dict_with_new_math_schema = {
-            'content': {
-                'content_id': 'content', 'html': html_with_new_math_schema
-            },
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'card_is_checkpoint': False,
-            'linked_skill_id': None,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': '42',
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': html_with_new_math_schema
-                    }
-                },
-                'answer_groups': [answer_group_with_new_math_schema],
-                'default_outcome': {
-                    'param_changes': [],
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': html_with_new_math_schema
-                    },
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': 'MathExpressionInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
-                        }
-                    },
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
-                        }
-                    }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
-        }
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict_with_old_math_schema,
-                html_validation_service.
-                add_math_content_to_math_rte_components),
-            state_dict_with_new_math_schema)
-
     def test_convert_html_fields_in_state_with_old_written_translations(
         self
     ) -> None:
@@ -2899,11 +2733,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-        # Here, we are defining older version dictionary of WrittenTranslations
-        # that contains `html` key, but the type of this dict is defined
-        # according to the latest version of WrittenTranslations. So, while
-        # accessing keys that are removed from the latest version MyPy throws an
-        # error. Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because we are defining an older version
+        # dictionary of WrittenTranslations that contains `html` key, but
+        # the type of this dict is defined according to the latest version
+        # of WrittenTranslations that do not contain 'html' key. So, due to
+        # this conflict in presences of keys MyPy throws an error. Thus to
+        # avoid the error, we used ignore here.
         written_translations_dict_with_old_math_schema_and_old_format: (
             state_domain.WrittenTranslationsDict
         ) = {
@@ -2913,16 +2748,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema,
                         'needs_update': True
                     },
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
                     'hi': {  # type: ignore[typeddict-item]
                         'html': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
                     'hi': {  # type: ignore[typeddict-item]
                         'html': html_with_old_math_schema,
                         'needs_update': False
                     },
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
                     'en': {  # type: ignore[typeddict-item]
                         'html': 'hello!',
                         'needs_update': False
@@ -2930,11 +2774,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        # Here, we are defining older version dictionary of WrittenTranslations
-        # that contains `html` key, but the type of this dict is defined
-        # according to the latest version of WrittenTranslations. So, while
-        # accessing keys that are removed from the latest version MyPy throws an
-        # error. Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because we are defining an older version
+        # dictionary of WrittenTranslations that contains `html` key, but
+        # the type of this dict is defined according to the latest version
+        # of WrittenTranslations that do not contain 'html' key. So, due to
+        # this conflict in presences of keys MyPy throws an error. Thus to
+        # avoid the error, we used ignore here.
         written_translations_dict_with_new_math_schema_and_old_format: (
             state_domain.WrittenTranslationsDict
         ) = {
@@ -2944,16 +2789,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_new_math_schema,
                         'needs_update': True
                     },
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
                     'hi': {  # type: ignore[typeddict-item]
                         'html': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
                     'hi': {  # type: ignore[typeddict-item]
                         'html': html_with_new_math_schema,
                         'needs_update': False
                     },
+                    # Here we use MyPy ignore because we want to avoid the error
+                    # that was generated when we are defining an older version
+                    # Dict of WrittenTranslations with deprecated 'html' key.
                     'en': {  # type: ignore[typeddict-item]
                         'html': 'hello!',
                         'needs_update': False
@@ -3663,8 +3517,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_dict_with_new_math_schema)
         # Assert that no action is performed on a solution dict when the
         # interaction ID is None.
-        # For testing purposes here we are not defining BaseInteractionDict's
-        # Key.
+        # Here we use MyPy ignore because for testing purposes here we are
+        # not defining BaseInteractionDict's Key.
         self.assertEqual(
             state_domain.Solution.convert_html_in_solution(
                 None, solution_dict,
@@ -3909,9 +3763,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
         init_state.update_interaction_hints(hints_list)
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
-            'correct_answer': [0, 0],
+            'correct_answer': [0, 0],  # type: ignore[typeddict-item]
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
@@ -4046,9 +3904,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 exploration.validate()
         self.assertEqual(init_state.card_is_checkpoint, True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_solution_answer_is_exclusive(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
@@ -4076,6 +3931,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         solution_dict = {
             'answer_is_exclusive': 1,  # type: ignore[typeddict-item]
             'correct_answer': 'hello_world!',
@@ -4091,9 +3949,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected answer_is_exclusive to be bool, received 1'):
             exploration.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_list_param_changes(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         exploration.init_state.param_changes = 0  # type: ignore[assignment]
@@ -4160,7 +4018,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'x': {
                             'contentId': 'rule_input_Contains',
-                            'normalizedStrSet': ['Test1']
+                            'normalizedStrSet': ['Temp']
                             }
                     })
             ],
@@ -4244,14 +4102,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Found a duplicate content id solution'):
             exploration.init_state.validate({}, True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(
         self
     ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         with contextlib.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
@@ -4449,9 +4307,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'The content_id hint_2 already exists in recorded_voiceovers'):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_cannot_update_interaction_solution_with_non_dict_solution(
         self
     ) -> None:
@@ -4483,14 +4338,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.solution.to_dict(),
             solution_dict)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected solution to be a Solution object,'
             'received test string'):
             exploration.init_state.update_interaction_solution('test string')  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_update_interaction_solution_with_no_solution(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         hints_list = [
@@ -4506,9 +4361,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertIsNone(exploration.init_state.interaction.solution)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_cannot_update_interaction_hints_with_non_list_hints(
         self
     ) -> None:
@@ -4518,9 +4373,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected hints_list to be a list'):
             exploration.init_state.update_interaction_hints({})  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_cannot_update_non_list_interaction_confirmed_unclassified_answers(
         self
     ) -> None:
@@ -4564,9 +4419,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.confirmed_unclassified_answers,
             [state_answer_group])
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_cannot_update_non_list_interaction_answer_groups(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
@@ -4575,9 +4430,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups')  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_cannot_update_answer_groups_with_non_dict_rule_inputs(
         self
     ) -> None:
@@ -4595,6 +4447,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         state_answer_group.rule_specs[0].inputs = []  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -4604,9 +4459,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 [state_answer_group])
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_cannot_update_answer_groups_with_non_list_rule_specs(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
@@ -4622,9 +4477,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 [state_answer_group])
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_cannot_update_answer_groups_with_invalid_rule_input_value(
         self
     ) -> None:
@@ -5130,9 +4985,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_for_text_translation(),
             ['content_id'])
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
         self
     ) -> None:
@@ -5209,9 +5064,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.delete_content_id_for_translation(
                 nonexisting_content_id_to_delete)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(  # pylint: disable=line-too-long
         self
     ) -> None:
@@ -5224,10 +5079,10 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.delete_content_id_for_translation(
                 invalid_content_id_to_delete)  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validation_with_invalid_content_id_raise_error(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 123: {}  # type: ignore[dict-item]
@@ -5237,13 +5092,16 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         written_translations = state_domain.WrittenTranslations.from_dict(
             written_translations_dict)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected content_id to be a string, '):
             written_translations.validate([123])  # type: ignore[list-item]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_dict_language_code_to_written_translation(
         self
     ) -> None:
@@ -5256,9 +5114,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Expected content_id value to be a dict, received []')):
             written_translations.validate(None)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_type_language_code_raise_error(
         self
     ) -> None:
@@ -5457,9 +5315,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers.get_content_ids_for_voiceovers(),
             ['content_id'])
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_add_content_id_for_voiceover_with_invalid_content_id_raise_error(
         self
     ) -> None:
@@ -5536,9 +5394,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers.delete_content_id_for_voiceover(
                 nonexisting_content_id_to_delete)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
     def test_delete_content_id_for_voiceover_with_invalid_content_id_raise_error(  # pylint: disable=line-too-long
         self
     ) -> None:
@@ -5551,10 +5409,10 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers.delete_content_id_for_voiceover(
                 invalid_content_id_to_delete)  # type: ignore[arg-type]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validation_with_invalid_content_id_raise_error(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 123: {}  # type: ignore[dict-item]
@@ -5564,13 +5422,16 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
             recorded_voiceovers_dict)
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception, 'Expected content_id to be a string, '):
             recorded_voiceovers.validate([123])  # type: ignore[list-item]
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_dict_language_code_to_voiceover(self) -> None:
         recorded_voiceovers = state_domain.RecordedVoiceovers({
             'en': []  # type: ignore[dict-item]
@@ -5581,9 +5442,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Expected content_id value to be a dict, received []')):
             recorded_voiceovers.validate(None)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_type_language_code_raise_error(
         self
     ) -> None:
@@ -5658,9 +5519,9 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
         super().setUp()
         self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_str_filename(self) -> None:
         self.voiceover.validate()
         self.voiceover.filename = 0  # type: ignore[assignment]
@@ -5685,9 +5546,9 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
                 % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))):
             self.voiceover.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_int_file_size_bytes(self) -> None:
         self.voiceover.validate()
         self.voiceover.file_size_bytes = 'file_size_bytes'  # type: ignore[assignment]
@@ -5701,9 +5562,9 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Invalid file size'):
             self.voiceover.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_non_bool_needs_update(self) -> None:
         self.voiceover.validate()
         self.voiceover.needs_update = 'needs_update'  # type: ignore[assignment]
@@ -5711,9 +5572,9 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception, 'Expected needs_update to be a bool'):
             self.voiceover.validate()
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_str_duration_secs(self) -> None:
         self.voiceover.validate()
         self.voiceover.duration_secs = 'duration_secs'  # type: ignore[assignment]

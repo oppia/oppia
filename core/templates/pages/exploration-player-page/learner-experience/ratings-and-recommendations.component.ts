@@ -43,7 +43,7 @@ import { AppConstants } from 'app.constants';
 interface ResultActionButton {
   type: string;
   i18nId: string;
-  url: string;
+  url?: string;
 }
 
 export interface QuestionPlayerConfig {
@@ -51,7 +51,7 @@ export interface QuestionPlayerConfig {
   skillList: string[];
   skillDescriptions: string[];
   questionCount: number;
-  questionPlayerMode: {
+  questionPlayerMode?: {
     modeType: string;
     passCutoff: number;
   };

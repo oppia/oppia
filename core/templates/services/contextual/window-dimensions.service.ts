@@ -38,6 +38,13 @@ export class WindowDimensionsService {
       this.windowRef.nativeWindow.document.body.clientWidth);
   }
 
+  getHeight(): number {
+    return (
+      this.windowRef.nativeWindow.innerHeight ||
+      this.windowRef.nativeWindow.document.documentElement.clientHeight ||
+      this.windowRef.nativeWindow.document.body.clientHeight);
+  }
+
   isWindowNarrow(): boolean {
     let NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
     return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;

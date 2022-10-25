@@ -49,7 +49,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Run all the tests."""
     unused_parsed_args = _PARSER.parse_args(args=args)
 
-    setup.main(args=[])  # type: ignore[no-untyped-call]
+    setup.main(args=[])
     setup_gae.main(args=[])
 
     # Run frontend unit tests.
@@ -69,5 +69,5 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     print('SUCCESS    All frontend, backend and end-to-end tests passed!')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

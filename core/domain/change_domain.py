@@ -51,12 +51,18 @@ if MYPY: # pragma: no cover
         int,
         None,
         List[str],
+        List[int],
+        # Here we use type Any because we want to allow differently nested dicts
+        # being accepted by BaseChange.
         Dict[str, Any],
+        # Here we use type Any because we want to allow list of differently
+        # nested dicts being accepted by BaseChange.
         List[Dict[str, Any]],
         List[param_domain.ParamChangeDict],
         List[state_domain.AnswerGroupDict],
         List[state_domain.HintDict],
         List[skill_domain.WorkedExampleDict],
+        state_domain.WrittenTranslationsDict,
         List[platform_parameter_domain.PlatformParameterRuleDict],
         question_domain.QuestionDict,
         state_domain.AnswerGroupDict,
@@ -64,10 +70,7 @@ if MYPY: # pragma: no cover
         state_domain.SolutionDict,
         state_domain.StateDict,
         state_domain.OutcomeDict,
-        state_domain.RecordedVoiceoversDict,
-        # This Dict type is added to allow BaseChange to accept
-        # customization_args.
-        Dict[str, Dict[str, Any]]
+        state_domain.RecordedVoiceoversDict
     ]
 
 
@@ -98,7 +101,10 @@ def validate_cmd(
         'required_attribute_names']
     optional_attribute_names = valid_cmd_attribute_specs[
         'optional_attribute_names']
-    actual_attribute_names = list(actual_cmd_attributes.keys())
+    actual_attribute_names = [
+        key for key in actual_cmd_attributes.keys()
+        if key != 'cmd'
+    ]
 
     missing_attribute_names = [
         key for key in required_attribute_names if key not in (
@@ -246,17 +252,7 @@ class BaseChange:
         if not valid_cmd_attribute_specs:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
 
-        # Here we are deleting the 'name' key which cause MyPy to throw error,
-        # because MyPy does not allow key deletion from TypedDict. So to silent
-        # the error, we added an ignore here.
-        valid_cmd_attribute_specs.pop('name', None)  # type: ignore[misc]
-
         actual_cmd_attributes = copy.deepcopy(change_dict)
-        # Here, `actual_cmd_attributes` is of type Mapping and Mapping does not
-        # contain extra methods (e.g: .pop()). But here we are accessing `pop()`
-        # method, which causes MyPy to throw error. Thus to avoid the error,
-        # we used ignore here.
-        actual_cmd_attributes.pop('cmd', None)  # type: ignore[attr-defined]
 
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
@@ -318,14 +314,15 @@ class BaseChange:
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
-        # In method to_dict(), we are calling getattr() but if for some reason
-        # getattr() is not able to fetch the attribute, it calls `__getattr__`
-        # so that an AttributeError is raised, and in __getattr__ we are doing
-        # self.__dict__[name] to raise and catch the exception. But the return
-        # value of `self.__dict__[name]` is Any type which causes MyPy to throw
-        # error. Thus to avoid the error, we used cast here. We have not used
-        # assert here because that will be written after `self.__dict__[name]`
-        # and never be executed, which causes backend coverage to throw error.
+        # Here we use cast because in method to_dict(), we are calling
+        # getattr() but if for some reason getattr() is not able to fetch
+        # the attribute, it calls `__getattr__` so that an AttributeError
+        # is raised, and in __getattr__ we are doing self.__dict__[name]
+        # to raise and catch the exception. But the return value of
+        # `self.__dict__[name]` is Any type which causes MyPy to throw error.
+        # Thus to avoid the error, we used cast here. We have not used assert
+        # here because that will be written after `self.__dict__[name]` and
+        # never be executed, which causes backend coverage to throw error.
         try:
             return cast(str, self.__dict__[name])
         except KeyError as e:

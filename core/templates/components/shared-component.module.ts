@@ -145,12 +145,22 @@ import { QuestionEditorComponent } from './question-directives/question-editor/q
 import { QuestionPlayerConceptCardModalComponent } from './question-directives/question-player/question-player-concept-card-modal.component';
 import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
 import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
+import { RemoveQuestionSkillLinkModalComponent } from './question-directives/modal-templates/remove-question-skill-link-modal.component';
 import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
 import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
 import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
 import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
+import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { AnswerContentModalComponent } from './common-layout-directives/common-elements/answer-content-modal.component';
+import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualization-sorted-tiles.component';
+import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
+import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
+import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
+import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
+import { CopierComponent } from 'value_generators/templates/copier.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -161,10 +171,15 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
+import { JoyrideModule } from 'ngx-joyride';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateModule } from '@ngx-translate/core';
+import { ComponentOverviewComponent } from './copy-url/copy-url.component';
+import { MatMenuModule} from '@angular/material/menu';
+import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 
 @NgModule({
   imports: [
@@ -172,6 +187,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     BaseModule,
     CommonModule,
     DragDropModule,
+    MatMenuModule,
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
@@ -189,11 +205,15 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    JoyrideModule.forRoot(),
     RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
-    NgbModalModule
+    MatProgressSpinnerModule,
+    NgbModalModule,
+    TranslateModule,
+    DynamicComponentModule
   ],
 
   providers: [
@@ -316,11 +336,19 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    AnswerContentModalComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    ComponentOverviewComponent,
+    VisualizationSortedTilesComponent,
   ],
 
   entryComponents: [
@@ -356,7 +384,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent,
     OnScreenKeyboardComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
@@ -434,11 +463,21 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    AnswerContentModalComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    ComponentOverviewComponent,
+    VisualizationSortedTilesComponent,
+    CopierComponent,
+    RandomSelectorComponent
   ],
 
   exports: [
@@ -497,6 +536,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     InputResponsePairComponent,
     LazyLoadingComponent,
     ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
@@ -563,11 +603,20 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    AnswerContentModalComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    ComponentOverviewComponent,
+    TranslateModule,
+    VisualizationSortedTilesComponent,
   ],
 })
 

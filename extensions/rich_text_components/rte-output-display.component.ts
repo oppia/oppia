@@ -82,7 +82,15 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     this.rteString = this.rteString.replace(/\n/g, '');
     let domparser = new DOMParser();
     let dom = domparser.parseFromString(this.rteString, 'text/html').body;
-    this.node = this.oppiaHtmlParserService.constructFromDomParser(dom);
+    try {
+      this.node = this.oppiaHtmlParserService.constructFromDomParser(dom);
+    } catch (e) {
+      const additionalInfo = (
+        '\nRTE String: ' + this.rteString
+      );
+      e.message += additionalInfo;
+      throw e;
+    }
     const dfs = (node: OppiaRteNode | TextNode) => {
       node.portal = this._getTemplatePortal(node);
       if (!('children' in node)) {

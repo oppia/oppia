@@ -49,11 +49,12 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
             self.invalid_activity_reference_with_invalid_type.validate()
 
     def test_validate_with_invalid_id(self) -> None:
-        # TODO(#13528): Remove this test after the backend is fully
-        # type-annotated. Here ignore[arg-type] is used to test the constructor
-        # for ActivityReference for invalid argument type.
+        # TODO(#13528): Here we use MyPy ignore because we remove this test
+        # after the backend is fully type-annotated. Here ignore[arg-type]
+        # is used to test the constructor of ActivityReference for invalid
+        # argument type.
         invalid_activity_reference_with_invalid_id = (
-            activity_domain.ActivityReference('exploration', 1234)) # type: ignore[arg-type]
+            activity_domain.ActivityReference('exploration', 1234))  # type: ignore[arg-type]
         with self.assertRaisesRegex(
             Exception, ('Expected id to be a string but found 1234')):
             invalid_activity_reference_with_invalid_id.validate()

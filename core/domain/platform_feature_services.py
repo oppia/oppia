@@ -39,7 +39,7 @@ from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, List, Set
 
-ALL_FEATURES_LIST: List[platform_feature_list.PARAM_NAMES] = (
+ALL_FEATURES_LIST: List[platform_feature_list.ParamNames] = (
     platform_feature_list.DEV_FEATURES_LIST +
     platform_feature_list.TEST_FEATURES_LIST +
     platform_feature_list.PROD_FEATURES_LIST
@@ -175,12 +175,13 @@ def _create_evaluation_context_for_server() -> (
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    # TODO(#11208): Due to missing `browser_type` key MyPy throwing missing
-    # key error. Also, `app_version` key is set as none which forces us to
-    # use `.get()` method while fetching the values from dictionaries. So,
-    # to remove 'type ignore' from here and '.get()' method from '.from_dict'
-    # method, properly set app version and browser type key below using GAE
-    # app version as part of the server & client context.
+    # TODO(#11208): Here we use MyPy ignore because due to the missing
+    # `browser_type` key MyPy throwing missing key error. Also, `app_version`
+    # key is set as none which forces us to use `.get()` method while fetching
+    # the values from dictionaries. So, to remove 'type ignore' from here and
+    # '.get()' method from '.from_dict' method, properly set app version and
+    # browser type key below using GAE app version as part of the server &
+    # client context.
     return platform_parameter_domain.EvaluationContext.from_dict(
         {  # type: ignore[typeddict-item]
             'platform_type': 'Backend',

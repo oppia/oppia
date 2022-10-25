@@ -26,15 +26,14 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict
-from typing_extensions import Final
+from typing import Dict, Final
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import recommendations_models
 
 (recommendations_models,) = models.Registry.import_models(
-    [models.NAMES.recommendations]
+    [models.Names.RECOMMENDATIONS]
 )
 
 

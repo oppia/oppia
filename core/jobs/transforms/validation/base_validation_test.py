@@ -40,8 +40,8 @@ if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
 (base_models, exp_models) = models.Registry.import_models([
-    models.NAMES.base_model,
-    models.NAMES.exploration
+    models.Names.BASE_MODEL,
+    models.Names.EXPLORATION
 ])
 
 
@@ -345,9 +345,13 @@ class MockValidateModelDomainObjectInstancesWithInvalid(
         """
         return MockDomainObject()
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's _get_domain_object_validation_type
-    # method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's _get_domain_object_validation_type method,
+    # because in super class's method we are returning 'ValidationModes' Enum
+    # and here for testing purposes we are returning string value. So, due
+    # to this conflict in return types, a conflict in signatures occurred
+    # which causes MyPy to throw an error. Thus, to avoid the error, we
+    # used ignore here.
     def _get_domain_object_validation_type(  # type: ignore[override]
         self, _: base_models.BaseModel
     ) -> str:
@@ -537,8 +541,13 @@ class MockValidateCommitCmdsSchema(
     base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
 ):
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's process() method.
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with super class's process() method, because in
+    # in super class's process() method we are returning CommitCmdsValidateError
+    # and here for testing purposes we are returning 'None'. So, due
+    # to this conflict in return types, a conflict in signatures occurred
+    # which causes to MyPy throw an error. Thus, to avoid the error,
+    # we used ignore here.
     def process(  # type: ignore[override]
         self, input_model: base_models.BaseModel
     ) -> None:
@@ -553,8 +562,12 @@ class MockValidateCommitCmdsSchemaChangeDomain(
     base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
 ):
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's `_get_change_domain_class()` method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's `_get_change_domain_class()` method, because
+    # in super class's method we are returning Type[BaseChange] and here for
+    # testing purposes we are returning 'None'. So, due to this conflict in
+    # return types, a conflict in signatures occurred which causes MyPy to
+    # throw an error. Thus, to avoid the error, we used ignore here.
     def _get_change_domain_class(self, _: base_models.BaseModel) -> None:  # type: ignore[override]
         """Method defined for testing purpose."""
         pass

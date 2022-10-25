@@ -30,19 +30,34 @@ import urllib
 from core import utils
 from scripts import common
 
+from typing import Dict, Final, List, Optional, Tuple, TypedDict
 
-GITHUB_API_PR_ENDPOINT = (
+GITHUB_API_PR_ENDPOINT: Final = (
     'https://api.github.com/repos/%s/%s/pulls/%s')
-PR_URL_REGEX = (
+PR_URL_REGEX: Final = (
     r'^https://github.com/(?P<owner>\w+)/(?P<repo>\w+)/pull/(?P<num>\w+)/?$')
-UPSTREAM_REMOTE = 'upstream'
-FILES_THAT_NEED_DIFFS = (
+UPSTREAM_REMOTE: Final = 'upstream'
+FILES_THAT_NEED_DIFFS: Final = (
     'package.json'
     'core/templates/pages/about-page/about-page.constants.ts',
 )
 
 
-def parse_pr_url(pr_url):
+class RepoDict(TypedDict):
+    """Dictionary representation of repository with branch reference."""
+
+    repo: Dict[str, str]
+    ref: str
+
+
+class PRDict(TypedDict):
+    """Dictionary representation of PR JSON object."""
+
+    head: RepoDict
+    base: RepoDict
+
+
+def parse_pr_url(pr_url: str) -> Optional[Tuple[str, ...]]:
     """Extract the owner, repo, and PR number from a PR URL.
 
     For example, in the URL https://github.com/foobar/oppia/pull/23, the
@@ -61,7 +76,9 @@ def parse_pr_url(pr_url):
         return None
 
 
-def load_diff(base_branch):
+def load_diff(
+    base_branch: str
+) -> Tuple[List[Tuple[str, str]], Dict[str, List[str]]]:
     """Load the diff between the head and base.
 
     Only determine the diffs for files in FILES_THAT_NEED_DIFFS. Other
@@ -125,7 +142,7 @@ def load_diff(base_branch):
     return diff_files, file_diffs
 
 
-def lookup_pr(owner, repo, pull_number):
+def lookup_pr(owner: str, repo: str, pull_number: str) -> Optional[PRDict]:
     """Lookup a PR using the GitHub API.
 
     Args:
@@ -144,13 +161,18 @@ def lookup_pr(owner, repo, pull_number):
         {'Accept': 'application/vnd.github.v3+json'})
     response = utils.url_open(request)
     if response.getcode() != 200:
-        return {}
-    pr = json.load(response)
+        response.close()
+        return None
+    pr: PRDict = json.load(response)
     response.close()
     return pr
 
 
-def check_if_pr_is_translation_pr(pr, diff_files, unused_file_diffs):
+def check_if_pr_is_translation_pr(
+    pr: PRDict,
+    diff_files: List[Tuple[str, str]],
+    unused_file_diffs: Dict[str, List[str]]
+) -> str:
     """Check if a PR is low-risk by virtue of being a translation PR.
 
     To be a low-risk translation PR, a PR must:
@@ -189,7 +211,9 @@ def check_if_pr_is_translation_pr(pr, diff_files, unused_file_diffs):
     return ''
 
 
-def _check_changelog_pr_diff(diff_files, file_diffs):
+def _check_changelog_pr_diff(
+    diff_files: List[Tuple[str, str]], file_diffs: Dict[str, List[str]]
+) -> str:
     """Check whether a changelog PR diff is valid.
 
     Args:
@@ -233,7 +257,11 @@ def _check_changelog_pr_diff(diff_files, file_diffs):
     return ''
 
 
-def check_if_pr_is_changelog_pr(pr, diff_files, file_diffs):
+def check_if_pr_is_changelog_pr(
+    pr: PRDict,
+    diff_files: List[Tuple[str, str]],
+    file_diffs: Dict[str, List[str]]
+) -> str:
     """Check if a PR is low-risk by virtue of being a changelog PR.
 
     To be a low-risk changelog PR, a PR must:
@@ -274,13 +302,13 @@ def check_if_pr_is_changelog_pr(pr, diff_files, file_diffs):
     return _check_changelog_pr_diff(diff_files, file_diffs)
 
 
-LOW_RISK_CHECKERS = (
+LOW_RISK_CHECKERS: Final = (
     ('translatewiki', check_if_pr_is_translation_pr),
     ('changelog', check_if_pr_is_changelog_pr),
 )
 
 
-def main(tokens=None):
+def main(tokens: Optional[List[str]] = None) -> int:
     """Check if a PR is low-risk."""
     parser = argparse.ArgumentParser()
     parser.add_argument(

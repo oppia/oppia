@@ -32,7 +32,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (improvements_models,) = (
-    models.Registry.import_models([models.NAMES.improvements]))
+    models.Registry.import_models([models.Names.IMPROVEMENTS]))
 
 
 class ImprovementsTestBase(test_utils.GenericTestBase):

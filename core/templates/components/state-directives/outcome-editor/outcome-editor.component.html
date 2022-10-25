@@ -54,7 +54,7 @@
 
       <!-- Desktop -->
       <div class="oppia-click-to-start-editing e2e-test-open-outcome-feedback-editor"
-           *ngIf="isEditable" (click)="openFeedbackEditor()">
+           *ngIf="!onMobile && isEditable" (click)="openFeedbackEditor()">
         <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
            title="Edit Feedback">
         </i>
@@ -209,7 +209,11 @@
 
   <div class="oppia-outcome-container" *ngIf="isEditable">
     <div *ngIf="outcome">
-      <input class="mr-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+      <input class="mr-2 e2e-test-editor-correctness-toggle"
+             type="checkbox"
+             [disabled]="isSelfLoop(savedOutcome)"
+             [(ngModel)]="outcome.labelledAsCorrect"
+             (change)="onChangeCorrectnessLabel()">
     </div>
     <strong class="oppia-outcome-heading">The answers in this group are correct</strong>
   </div>

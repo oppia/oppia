@@ -77,6 +77,24 @@ describe('Stopwatch model', () => {
       'Tried to retrieve the elapsed time, but no start time was set.');
   });
 
+  it('should error if the start time is later than the current time', () => {
+    // LoggerService is private, so to check if it's being called
+    // console.error needs to be spied.
+    const errorLog = spyOn(console, 'error').and.callThrough();
+    let stopwatch = Stopwatch.create();
+
+    changeCurrentTime(1000);
+    expect(stopwatch._getCurrentTime()).toBe(1000);
+    stopwatch.reset();
+
+    changeCurrentTime(10);
+
+    expect(stopwatch._getCurrentTime()).toBe(10);
+    expect(stopwatch.getTimeInSecs()).toEqual(0);
+    expect(errorLog).toHaveBeenCalledWith(
+      'Start time was set incorrectly.');
+  });
+
   it('should instantiate independent stopwatches', () => {
     let stopwatch1 = Stopwatch.create();
     let stopwatch2 = Stopwatch.create();

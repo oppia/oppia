@@ -31,14 +31,13 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 COLLECTION_ID: Final = 'col_id'
 COLLECTION_ID_2: Final = 'col_id_2'

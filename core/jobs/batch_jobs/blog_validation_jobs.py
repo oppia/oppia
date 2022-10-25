@@ -34,7 +34,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class FindDuplicateBlogPostTitlesJob(base_jobs.JobBase):
@@ -113,10 +113,11 @@ class FindDuplicateBlogPostSummaryUrlsJob(base_jobs.JobBase):
         )
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus to
-# avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')) , we
-# added an ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[misc]
     """Helper class to retrieve models with duplicate properties."""
 
@@ -138,7 +139,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
             | 'Discard %s key' % self.property_name >> (
                 beam.Values()) # pylint: disable=no-value-for-parameter
             | 'Discard models with unique %s' % self.property_name >> (
-                beam.Filter(lambda models: len(models) > 1))
+                beam.Filter(lambda models: len(list(models)) > 1))
         )
 
     def get_property_value(

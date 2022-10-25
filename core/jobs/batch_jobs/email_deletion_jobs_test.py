@@ -26,8 +26,7 @@ from core.jobs.batch_jobs import email_deletion_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -36,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (email_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.email, models.NAMES.feedback, models.NAMES.user
+    models.Names.EMAIL, models.Names.FEEDBACK, models.Names.USER
 ])
 
 

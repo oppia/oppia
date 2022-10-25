@@ -405,6 +405,63 @@ describe('Topics and Skills Dashboard backend API service', () => {
     })
   );
 
+  it('should successfully fetch topic id to diagnostic test skill ids from ' +
+    'the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let topicIds = ['topicID1'];
+
+    topicsAndSkillsDashboardBackendApiService
+      .fetchTopicIdToDiagnosticTestSkillIdsAsync(
+        topicIds).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      'topic_id_to_diagnostic_test_skill_ids_handler/' +
+      '?comma_separated_topic_ids=topicID1'
+    );
+    expect(req.request.method).toEqual('GET');
+
+
+    const backendResponse = {
+      topic_id_to_diagnostic_test_skill_ids: {
+        topicID1: ['skillID1']
+      }
+    };
+
+    req.flush(backendResponse);
+    flushMicrotasks();
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalledWith();
+  }));
+
+  it('should fail to fetch topic id to diagnostic test skill ids from ' +
+    'the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let topicIds = ['topicID1'];
+
+    topicsAndSkillsDashboardBackendApiService
+      .fetchTopicIdToDiagnosticTestSkillIdsAsync(
+        topicIds).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      'topic_id_to_diagnostic_test_skill_ids_handler/?' +
+      'comma_separated_topic_ids=topicID1'
+    );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      error: 'Error loading topic id to diagnostic test skill ids.'
+    }, {
+      status: 500, statusText: 'Internal Server Error.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error loading topic id to diagnostic test skill ids.');
+  }));
+
   it('should successfully fetch assigned skills data from the backend',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');

@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
 (base_models, subtopic_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.subtopic])
+    models.Names.BASE_MODEL, models.Names.SUBTOPIC])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
@@ -95,10 +95,10 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'other-subtopic-url')]
         topic.next_subtopic_id = 3
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
-        topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.admin_id, topic)
 
         # Publish the topic and its stories.
-        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id) # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
     def test_get_subtopic_page_from_model(self) -> None:
         subtopic_page_model = subtopic_models.SubtopicPageModel.get(
@@ -283,12 +283,13 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+            'mp;quot;+,-,-,+&amp;quot;" svg_filename-with-value="&a'
+            'mp;quot;abc.svg&amp;quot;"></oppia-noninteractive-math>')
         expected_html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>')
         written_translations_dict = {
             'translations_mapping': {
                 'content1': {

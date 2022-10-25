@@ -23,14 +23,13 @@ from core.domain import email_manager
 from core.domain import user_query_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 def _get_user_query_from_model(

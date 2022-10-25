@@ -156,7 +156,7 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
       expect(component.currentMode).toBe('MODE_SELECT_DIFFICULTY');
     });
 
-  it('should select skill and its difficulty proerly when closing the modal',
+  it('should select skill and its difficulty properly when closing the modal',
     () => {
       spyOn(ngbActiveModal, 'close');
       let summary = allSkillSummaries[1];
@@ -166,7 +166,7 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
 
       expect(ngbActiveModal.close).toHaveBeenCalledWith([
         SkillDifficulty.create(
-          allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
+          allSkillSummaries[1].id, allSkillSummaries[1].description, 0.6)
       ]);
 
       // Remove summary to not affect other specs.
