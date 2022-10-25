@@ -985,13 +985,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         collection_rights = rights_manager.get_collection_rights('0')
         guest_user = user_services.get_user_actions_info(None)
 
-        # Testing guest user is not allowed to access activity.
-        self.assertFalse(
-            rights_manager.check_can_access_activity(
-                guest_user, collection_rights
-            )
-        )
-
         # Testing guest user is not allowed to delete activity.
         self.assertFalse(
             rights_manager.check_can_delete_activity(
