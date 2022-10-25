@@ -89,12 +89,12 @@ describe('EndExplorationValidationService', () => {
     )];
   });
 
-  it('should not have warnings when the end exploration object is valid',
-    () => {
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([]);
-    });
+  it('should not have warnings when the EndExploration object does not have ' +
+    'answer groups or a default outcome or empty recommended exp IDs', () => {
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], null);
+    expect(warnings).toEqual([]);
+  });
 
   it('should have warnings for any answer groups or default outcome',
     () => {
