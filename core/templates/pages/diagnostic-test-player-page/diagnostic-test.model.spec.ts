@@ -17,147 +17,226 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { DiagnosticTestModelData, TopicIdToRelatedTopicIds } from './diagnostic-test.model';
+import { DiagnosticTestModelData } from './diagnostic-test.model';
 
 
 describe('Diagnostic test model', () => {
-  let diagnosticTestModelData: DiagnosticTestModelData;
-  let topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: []
     });
-
-    topicIdToPrerequisiteTopicIds = {
-      topicID1: [],
-      topicID2: ['topicID1'],
-      topicID3: ['topicID2'],
-      topicID4: ['topicID3'],
-      topicID5: ['topicID4'],
-      topicID6: [],
-      topicID7: ['topicID2', 'topicID3', 'topicID6'],
-      topicID8: ['topicID7'],
-      topicID9: ['topicID5', 'topicID8'],
-    };
   });
 
   it('should be able to get topic ID to ancestor topic IDs', () => {
-    diagnosticTestModelData = new DiagnosticTestModelData(
-      topicIdToPrerequisiteTopicIds);
-    const expectedAncestorTopicIds = {
+    // A linear graph with 3 nodes.
+    const topicIdToPrerequisiteTopicIds = {
       topicID1: [],
       topicID2: ['topicID1'],
-      topicID3: ['topicID2', 'topicID1'],
-      topicID4: ['topicID3', 'topicID2', 'topicID1'],
-      topicID5: ['topicID4', 'topicID3', 'topicID2', 'topicID1'],
-      topicID6: [],
-      topicID7: ['topicID6', 'topicID3', 'topicID2', 'topicID1'],
-      topicID8: [
-        'topicID7', 'topicID6', 'topicID3', 'topicID2', 'topicID1'],
-      topicID9: [
-        'topicID8', 'topicID7', 'topicID6', 'topicID3', 'topicID2',
-        'topicID1', 'topicID5', 'topicID4']
+      topicID3: ['topicID2']
+    };
+    const expectedTopicIdToAncestorTopicIds = {
+      topicID1: [],
+      topicID2: ['topicID1'],
+      topicID3: ['topicID1', 'topicID2']
     };
 
+    const diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
+
     expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
-      expectedAncestorTopicIds);
-
-    expect(diagnosticTestModelData.getAncestorTopicIds('topicID4')).toEqual(
-      ['topicID3', 'topicID2', 'topicID1']);
-
-    expect(diagnosticTestModelData.getAncestorTopicIds('topicID5')).toEqual(
-      ['topicID4', 'topicID3', 'topicID2', 'topicID1']);
+      expectedTopicIdToAncestorTopicIds);
+    expect(diagnosticTestModelData.getAncestorTopicIds('topicID1')).toEqual(
+      []);
+    expect(diagnosticTestModelData.getAncestorTopicIds('topicID2')).toEqual(
+      ['topicID1']);
+    expect(diagnosticTestModelData.getAncestorTopicIds('topicID3')).toEqual(
+      ['topicID1', 'topicID2']);
   });
 
   it('should be able to able to get topic ID to successor topic IDs', () => {
-    diagnosticTestModelData = new DiagnosticTestModelData(
+    // A non-linear graph with 3 nodes.
+    const topicIdToPrerequisiteTopicIds = {
+      topicID1: [],
+      topicID2: ['topicID1'],
+      topicID3: ['topicID1']
+    };
+    const diagnosticTestModelData = new DiagnosticTestModelData(
       topicIdToPrerequisiteTopicIds);
 
-    const expectedSuccessorTopicIds = {
-      topicID1: [
-        'topicID2', 'topicID7', 'topicID8', 'topicID9', 'topicID3',
-        'topicID4', 'topicID5'],
-      topicID2: [
-        'topicID7', 'topicID8', 'topicID9', 'topicID3', 'topicID4', 'topicID5'],
-      topicID3: ['topicID7', 'topicID8', 'topicID9', 'topicID4', 'topicID5'],
-      topicID4: ['topicID5', 'topicID9'],
-      topicID5: ['topicID9'],
-      topicID6: ['topicID7', 'topicID8', 'topicID9'],
-      topicID7: ['topicID8', 'topicID9'],
-      topicID8: ['topicID9'],
-      topicID9: [],
+    const expectedTopicIdToSuccessorTopicIds = {
+      topicID1: ['topicID2', 'topicID3'],
+      topicID2: [],
+      topicID3: []
     };
 
     expect(diagnosticTestModelData.getTopicIdToSuccessorTopicIds()).toEqual(
-      expectedSuccessorTopicIds);
-
+      expectedTopicIdToSuccessorTopicIds);
+    expect(diagnosticTestModelData.getSuccessorTopicIds('topicID1')).toEqual(
+      ['topicID2', 'topicID3']);
+    expect(diagnosticTestModelData.getSuccessorTopicIds('topicID2')).toEqual(
+      []);
     expect(diagnosticTestModelData.getSuccessorTopicIds('topicID3')).toEqual(
-      ['topicID7', 'topicID8', 'topicID9', 'topicID4', 'topicID5']);
-
-    expect(diagnosticTestModelData.getSuccessorTopicIds('topicID6')).toEqual(
-      ['topicID7', 'topicID8', 'topicID9']);
+      []);
   });
 
-  it('should be able to get eligible topic IDs', () => {
-    diagnosticTestModelData = new DiagnosticTestModelData(
-      topicIdToPrerequisiteTopicIds);
+  it('should be able to get initial eligible topic IDs', () => {
+    const topicIdToPrerequisiteTopicIds = {
+      topicID1: [],
+      topicID2: ['topicID1'],
+      topicID3: ['topicID1']
+    };
+    // Initially, all the topics are eligible for testing, then eventually
+    // topics were filtered from the eligible list based on the performance
+    // in any selected topic.
+    const expectedEligibleTopicIDs = ['topicID1', 'topicID2', 'topicID3'];
 
-    const expectedEligibleTopicIDs = [
-      'topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5', 'topicID6',
-      'topicID7', 'topicID8', 'topicID9'];
+    const diagnosticTestModelData = new DiagnosticTestModelData(
+      topicIdToPrerequisiteTopicIds);
 
     expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
       expectedEligibleTopicIDs);
   });
 
-  it('should be able to get current topic ID', () => {
-    diagnosticTestModelData = new DiagnosticTestModelData(
-      topicIdToPrerequisiteTopicIds);
+  it(
+    'should be able to get eligible topic IDs after the initially selected' +
+    ' topic is marked as failed', () => {
+      // A non-linear topics dependency graph with 5 nodes.
+      const topicIdToPrerequisiteTopicIds = {
+        topicID1: [],
+        topicID2: ['topicID1'],
+        topicID3: ['topicID1'],
+        topicID4: ['topicID2', 'topicID3'],
+        topicID5: ['topicID3']
+      };
 
-    const expectedTopicId = 'topicID3';
+      const diagnosticTestModelData = new DiagnosticTestModelData(
+        topicIdToPrerequisiteTopicIds);
 
-    diagnosticTestModelData.selectNextTopicIdToTest();
+      const expectedTopicIdToAncestorTopicIds = {
+        topicID1: [],
+        topicID2: ['topicID1'],
+        topicID3: ['topicID1'],
+        topicID4: ['topicID1', 'topicID2', 'topicID3'],
+        topicID5: ['topicID1', 'topicID3']
+      };
 
-    expect(diagnosticTestModelData.selectNextTopicIdToTest()).toEqual(
-      expectedTopicId);
-  });
+      const expectedTopicIdToSuccessorTopicId = {
+        topicID1: ['topicID2', 'topicID3', 'topicID4', 'topicID5'],
+        topicID2: ['topicID4'],
+        topicID3: ['topicID4', 'topicID5'],
+        topicID4: [],
+        topicID5: []
+      };
 
-  it('should be able to record topic as failed', () => {
-    diagnosticTestModelData = new DiagnosticTestModelData(
-      topicIdToPrerequisiteTopicIds);
+      expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
+        expectedTopicIdToAncestorTopicIds);
+      expect(diagnosticTestModelData.getTopicIdToSuccessorTopicIds()).toEqual(
+        expectedTopicIdToSuccessorTopicId);
 
-    let currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
-    diagnosticTestModelData.recordTopicFailed();
+      // Initially, all the topics are eligible for testing, then eventually
+      // topics were filtered from the eligible list based on the performance
+      // in any selected topic.
+      expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
+        ['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
 
-    const expectedEligibleTopicIDs = ['topicID1', 'topicID2', 'topicID6'];
-    const expectedSkippedTopicIDs = [
-      'topicID7', 'topicID8', 'topicID9', 'topicID4', 'topicID5'];
+      // Assuming L = min(length of ancestors, length of successors). Among all
+      // the eligible topic IDs, topic 2 has the maximum value for L. Thus
+      // topic 2 should be selected as the next eligible topic ID.
+      expect(diagnosticTestModelData.selectNextTopicIdToTest()).toEqual(
+        'topicID2');
 
-    expect(diagnosticTestModelData.getFailedTopicIds()).toEqual(['topicID3']);
+      // Marking the current topic (topic 3) as failed, will remove the current
+      // topic and all of its successors (topic 4, topic 5) from the
+      // eligible topic IDs list.
+      diagnosticTestModelData.recordTopicFailed();
 
-    expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
-      expectedEligibleTopicIDs);
-  });
+      expect(diagnosticTestModelData.getFailedTopicIds()).toEqual(['topicID2']);
 
-  it('should be able to record topic as passed', () => {
-    diagnosticTestModelData = new DiagnosticTestModelData(
-      topicIdToPrerequisiteTopicIds);
+      // New eligible topic IDs list after removing the successors.
+      expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
+        ['topicID1', 'topicID3', 'topicID5']);
 
-    let currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
-    diagnosticTestModelData.recordTopicPassed();
+      // Assuming L = min(length of ancestors, length of successors). Among all
+      // the eligible topic IDs, topic 3 has the maximum value for L. Thus
+      // topic 3 should be selected as the next eligible topic ID.
+      expect(diagnosticTestModelData.selectNextTopicIdToTest()).toEqual(
+        'topicID3');
+    });
 
-    const expectedEligibleTopicIDs = [
-      'topicID4', 'topicID5', 'topicID6', 'topicID7', 'topicID8', 'topicID9'];
-    const expectedSkippedTopicIDs = ['topicID2', 'topicID1'];
+  it(
+    'should be able to get eligible topic IDs after the initially selected' +
+    ' topic is marked as passed', () => {
+      const topicIdToPrerequisiteTopicIds = {
+        topicID1: [],
+        topicID2: ['topicID1'],
+        topicID3: ['topicID1'],
+        topicID4: ['topicID2', 'topicID3'],
+        topicID5: ['topicID3']
+      };
 
-    expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
-      expectedEligibleTopicIDs);
-  });
+      const diagnosticTestModelData = new DiagnosticTestModelData(
+        topicIdToPrerequisiteTopicIds);
+
+      const expectedTopicIdToAncestorTopicIds = {
+        topicID1: [],
+        topicID2: ['topicID1'],
+        topicID3: ['topicID1'],
+        topicID4: ['topicID1', 'topicID2', 'topicID3'],
+        topicID5: ['topicID1', 'topicID3']
+      };
+
+      const expectedTopicIdToSuccessorTopicId = {
+        topicID1: ['topicID2', 'topicID3', 'topicID4', 'topicID5'],
+        topicID2: ['topicID4'],
+        topicID3: ['topicID4', 'topicID5'],
+        topicID4: [],
+        topicID5: []
+      };
+
+      expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
+        expectedTopicIdToAncestorTopicIds);
+      expect(diagnosticTestModelData.getTopicIdToSuccessorTopicIds()).toEqual(
+        expectedTopicIdToSuccessorTopicId);
+
+      // Initially, all the topics are eligible for testing, then eventually
+      // topics were filtered from the eligible list based on the performance
+      // in any selected topic.
+      expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
+        ['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
+
+      // Assuming L = min(length of ancestors, length of successors). Among all
+      // the eligible topic IDs, topic 2 has the maximum value for L. Thus
+      // topic 2 should be selected as the next eligible topic ID.
+      expect(diagnosticTestModelData.selectNextTopicIdToTest()).toEqual(
+        'topicID2');
+
+      // Marking the current topic (topic 3) as passed, will remove the current
+      // topic and all of its ancestors (topic 1) from the eligible
+      // topic IDs list.
+      diagnosticTestModelData.recordTopicPassed();
+
+      // New eligible topic IDs list after removing the ancestors.
+      expect(diagnosticTestModelData.getEligibleTopicIds()).toEqual(
+        ['topicID3', 'topicID4', 'topicID5']);
+
+      // Assuming L = min(length of ancestors, length of successors). Among all
+      // the eligible topic IDs, topic 3 has the maximum value for L. Thus
+      // topic 3 should be selected as the next eligible topic ID.
+      expect(diagnosticTestModelData.selectNextTopicIdToTest()).toEqual(
+        'topicID3');
+    });
+
 
   it('should be able to increment number of attempted questions', () => {
-    diagnosticTestModelData = new DiagnosticTestModelData(
+    const topicIdToPrerequisiteTopicIds = {
+      topicID1: [],
+      topicID2: ['topicID1'],
+      topicID3: ['topicID1'],
+      topicID4: ['topicID2', 'topicID3'],
+      topicID5: ['topicID3']
+    };
+    const diagnosticTestModelData = new DiagnosticTestModelData(
       topicIdToPrerequisiteTopicIds);
 
     const initialAttemptedQuestions = 0;
@@ -174,7 +253,8 @@ describe('Diagnostic test model', () => {
   it(
     'should be able to terminate the test when eligible topic IDs list is ' +
     'empty', () => {
-      diagnosticTestModelData = new DiagnosticTestModelData(
+      let topicIdToPrerequisiteTopicIds = {};
+      let diagnosticTestModelData = new DiagnosticTestModelData(
         topicIdToPrerequisiteTopicIds);
       diagnosticTestModelData._eligibleTopicIds = [];
 
@@ -185,9 +265,17 @@ describe('Diagnostic test model', () => {
     'should be able to terminate the test when eligible topic IDs list ' +
     'is non empty and the number of attempted question is greater than or ' +
     'equal to 15', () => {
-      diagnosticTestModelData = new DiagnosticTestModelData(
+      let topicIdToPrerequisiteTopicIds = {};
+      let diagnosticTestModelData = new DiagnosticTestModelData(
         topicIdToPrerequisiteTopicIds);
+
+      // The eligible topic IDs list is set explicitly because of the testing
+      // purpose, this value is not related to the sample graph data above.
       diagnosticTestModelData._eligibleTopicIds = ['topicID'];
+
+      // The number of questions assigned here is arbitrary, this assigned value
+      // is not related to the sample graph above and it only for the
+      // testing purpose.
       diagnosticTestModelData._totalNumberOfAttemptedQuestions = 15;
 
       expect(diagnosticTestModelData.isTestFinished()).toBeTrue();
@@ -197,53 +285,53 @@ describe('Diagnostic test model', () => {
     'should not be able to terminate the test when any eligible topic ID ' +
     'is left for testing and number of attempted question is less than 15',
     () => {
-      diagnosticTestModelData = new DiagnosticTestModelData(
+      let topicIdToPrerequisiteTopicIds = {};
+      let diagnosticTestModelData = new DiagnosticTestModelData(
         topicIdToPrerequisiteTopicIds);
+
+      // The eligible topic IDs list is set explicitly because of the testing
+      // purpose, this value is not related to the sample graph data above.
       diagnosticTestModelData._eligibleTopicIds = ['topicID'];
+
+      // The number of questions assigned here is arbitrary, this assigned value
+      // is not related to the sample graph above and it only for the
+      // testing purpose.
       diagnosticTestModelData._totalNumberOfAttemptedQuestions = 13;
 
       expect(diagnosticTestModelData.isTestFinished()).toBeFalse();
     });
 
   it(
-    'should be able to update the current topic after recording the existing' +
-    ' topic as passed', () => {
-      diagnosticTestModelData = new DiagnosticTestModelData(
+    'should be able to generate ancestors and successors of each topic for ' +
+    'a dependency graph containing loops', () => {
+      const topicIdToPrerequisiteTopicIds = {
+        topicID1: [],
+        topicID2: ['topicID1'],
+        topicID3: ['topicID1'],
+        topicID4: ['topicID3', 'topicID5'],
+        topicID5: ['topicID2']
+      };
+      const expectedTopicIdToAncestorTopicIds = {
+        topicID1: [],
+        topicID2: ['topicID1'],
+        topicID3: ['topicID1'],
+        topicID4: ['topicID1', 'topicID2', 'topicID3', 'topicID5'],
+        topicID5: ['topicID1', 'topicID2']
+      };
+      const expectedTopicIdToSuccessorTopicIds = {
+        topicID1: ['topicID2', 'topicID3', 'topicID4', 'topicID5'],
+        topicID2: ['topicID4', 'topicID5'],
+        topicID3: ['topicID4'],
+        topicID4: [],
+        topicID5: ['topicID4']
+      };
+
+      const diagnosticTestModelData = new DiagnosticTestModelData(
         topicIdToPrerequisiteTopicIds);
 
-      let expectedTopicId = 'topicID3';
-
-      let currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
-
-      expect(currentTopicId).toEqual(expectedTopicId);
-
-      diagnosticTestModelData.recordTopicPassed();
-
-      expectedTopicId = 'topicID5';
-
-      currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
-
-      expect(currentTopicId).toEqual(expectedTopicId);
-    });
-
-  it(
-    'should be able to update the current topic after recording the existing' +
-    ' topic as failed', () => {
-      diagnosticTestModelData = new DiagnosticTestModelData(
-        topicIdToPrerequisiteTopicIds);
-
-      let expectedTopicId = 'topicID3';
-
-      let currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
-
-      expect(currentTopicId).toEqual(expectedTopicId);
-
-      diagnosticTestModelData.recordTopicFailed();
-
-      expectedTopicId = 'topicID1';
-
-      currentTopicId = diagnosticTestModelData.selectNextTopicIdToTest();
-
-      expect(currentTopicId).toEqual(expectedTopicId);
+      expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
+        expectedTopicIdToAncestorTopicIds);
+      expect(diagnosticTestModelData.getTopicIdToSuccessorTopicIds()).toEqual(
+        expectedTopicIdToSuccessorTopicIds);
     });
 });
