@@ -132,6 +132,21 @@ describe('Exploration Metadata Modal Component', () => {
       tick();
 
       expect(explorationTagsService.displayed).toEqual(['name']);
+    }));
+
+    it('should not add same exploration editor tags' +
+      'when user enter same tag again', fakeAsync(() => {
+      component.explorationTags = [];
+      explorationTagsService.displayed = [];
+      component.add({
+        value: 'name',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['name']);
 
       // When user try to enter same tag again.
       component.add({

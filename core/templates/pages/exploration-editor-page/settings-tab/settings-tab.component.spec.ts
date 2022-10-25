@@ -265,17 +265,34 @@ describe('Settings Tab Component', () => {
       tick();
 
       expect(explorationTagsService.displayed).toEqual(['name']);
-
-      // When user try to enter same tag again.
-      component.add({
-        value: 'name',
-        input: {
-          value: ''
-        }
-      } as MatChipInputEvent);
-      tick();
-      expect(explorationTagsService.displayed).toEqual(['name']);
     }));
+
+  it('should not add same exploration editor tags' +
+      'when user enter same tag again', fakeAsync(() => {
+    spyOn(component, 'saveExplorationTags').and.stub();
+    explorationTagsService.displayed = [];
+
+    component.add({
+      value: 'name',
+      input: {
+        value: ''
+      }
+    } as MatChipInputEvent);
+    tick();
+
+    expect(explorationTagsService.displayed).toEqual(['name']);
+
+    // When user try to enter same tag again.
+    component.add({
+      value: 'name',
+      input: {
+        value: ''
+      }
+    } as MatChipInputEvent);
+    tick();
+
+    expect(explorationTagsService.displayed).toEqual(['name']);
+  }));
 
   it('should be able to add multiple exploration editor tags',
     fakeAsync(() => {
