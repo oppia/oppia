@@ -55,8 +55,8 @@ export class SkillEditorPageComponent implements OnInit {
     private windowRef: WindowRef,
   ) {}
 
-  skill!: Skill;
-  skillIsInitialized: boolean = false;
+  skill: Skill;
+  skillIsInitialized = false;
   directiveSubscriptions = new Subscription();
 
   getActiveTabName(): string {
@@ -103,14 +103,10 @@ export class SkillEditorPageComponent implements OnInit {
   onClosingSkillEditorBrowserTab(): void {
     const skill = this.skillEditorStateService.getSkill();
 
-    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null = (
+    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
-    if (!skillEditorBrowserTabsInfo) {
-      return;
-    }
 
     if (skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
             this.undoRedoService.getChangeCount() > 0) {
@@ -127,14 +123,10 @@ export class SkillEditorPageComponent implements OnInit {
   createOrUpdateSkillEditorBrowserTabsInfo(): void {
     const skill = this.skillEditorStateService.getSkill();
 
-    let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null = (
+    let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
-    if (!skillEditorBrowserTabsInfo) {
-      return;
-    }
 
     if (this.skillIsInitialized) {
       skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
@@ -171,8 +163,7 @@ export class SkillEditorPageComponent implements OnInit {
   ngOnInit(): void {
     this.bottomNavbarStatusService.markBottomNavbarStatus(true);
     this.preventPageUnloadEventService.addListener(
-      this.undoRedoService.getChangeCount.bind(this.undoRedoService) ? (
-        () => true) : (() => false));
+      this.undoRedoService.getChangeCount.bind(this.undoRedoService));
     this.skillEditorStateService.loadSkill(this.urlService.getSkillIdFromUrl());
     this.skill = this.skillEditorStateService.getSkill();
     this.directiveSubscriptions.add(

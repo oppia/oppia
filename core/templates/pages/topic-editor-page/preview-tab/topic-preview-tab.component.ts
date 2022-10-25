@@ -47,8 +47,8 @@ export class TopicPreviewTabComponent {
   ngOnInit(): void {
     this.topic = this.topicEditorStateService.getTopic();
     this.topicName = (
-      this.topic ? this.topic.getName() : 'Topic name is loading.');
-    this.subtopics = this.topic ? this.topic.getSubtopics() : [];
+      this.topic.getName());
+    this.subtopics = this.topic.getSubtopics();
     this.cannonicalStorySummaries = (
       this.topicEditorStateService.getCanonicalStorySummaries());
     for (let idx in this.cannonicalStorySummaries) {

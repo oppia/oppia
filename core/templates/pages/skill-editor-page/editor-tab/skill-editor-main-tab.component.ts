@@ -101,11 +101,8 @@ export class SkillEditorMainTabComponent implements OnInit,
   }
 
   changeSelectedTopic(topicName: string): void {
-    let assignedSkillTopicData = this.assignedSkillTopicData;
-    if (!assignedSkillTopicData) {
-      return;
-    }
-    this.subtopicName = assignedSkillTopicData[topicName];
+    this.subtopicName = (
+      this.assignedSkillTopicData[topicName]);
   }
 
   hasLoadedSkill(): boolean {

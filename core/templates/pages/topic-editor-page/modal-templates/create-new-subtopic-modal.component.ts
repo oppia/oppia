@@ -80,7 +80,7 @@ export class CreateNewSubtopicModalComponent
     this.editableUrlFragment = '';
     this.allowedBgColors = (
       AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
-    this.subtopicId = this.topic ? this.topic.getNextSubtopicId() : 0;
+    this.subtopicId = this.topic.getNextSubtopicId();
     this.MAX_CHARS_IN_SUBTOPIC_TITLE = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
     this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
       AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
@@ -126,7 +126,7 @@ export class CreateNewSubtopicModalComponent
 
   cancel(): void {
     this.topicEditorStateService.deleteSubtopicPage(
-      this.topic ? this.topic.getId() : 'Topic id is loading',
+      this.topic.getId(),
       this.subtopicId);
     this.topicUpdateService.deleteSubtopic(this.topic, this.subtopicId);
     this.topicEditorStateService.onTopicReinitialized.emit();
@@ -157,7 +157,7 @@ export class CreateNewSubtopicModalComponent
       this.topic, this.subtopicId, this.editableUrlFragment);
 
     this.subtopicPage = SubtopicPage.createDefault(
-      this.topic ? this.topic.getId() : 'Topic id is loading', this.subtopicId);
+      this.topic.getId(), this.subtopicId);
 
     let subtitledHtml = angular.copy(
       this.subtopicPage.getPageContents().getSubtitledHtml());
