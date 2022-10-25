@@ -121,7 +121,7 @@ describe('Diagnostic test model', () => {
         topicID5: ['topicID1', 'topicID3']
       };
 
-      const expectedTopicIdToSuccessorTopicId = {
+      const expectedTopicIdToSuccessorTopicIds = {
         topicID1: ['topicID2', 'topicID3', 'topicID4', 'topicID5'],
         topicID2: ['topicID4'],
         topicID3: ['topicID4', 'topicID5'],
@@ -132,7 +132,7 @@ describe('Diagnostic test model', () => {
       expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
         expectedTopicIdToAncestorTopicIds);
       expect(diagnosticTestModelData.getTopicIdToSuccessorTopicIds()).toEqual(
-        expectedTopicIdToSuccessorTopicId);
+        expectedTopicIdToSuccessorTopicIds);
 
       // Initially, all the topics are eligible for testing, then eventually
       // topics were filtered from the eligible list based on the performance
@@ -186,7 +186,7 @@ describe('Diagnostic test model', () => {
         topicID5: ['topicID1', 'topicID3']
       };
 
-      const expectedTopicIdToSuccessorTopicId = {
+      const expectedTopicIdToSuccessorTopicIds = {
         topicID1: ['topicID2', 'topicID3', 'topicID4', 'topicID5'],
         topicID2: ['topicID4'],
         topicID3: ['topicID4', 'topicID5'],
@@ -197,7 +197,7 @@ describe('Diagnostic test model', () => {
       expect(diagnosticTestModelData.getTopicIdToAncestorTopicIds()).toEqual(
         expectedTopicIdToAncestorTopicIds);
       expect(diagnosticTestModelData.getTopicIdToSuccessorTopicIds()).toEqual(
-        expectedTopicIdToSuccessorTopicId);
+        expectedTopicIdToSuccessorTopicIds);
 
       // Initially, all the topics are eligible for testing, then eventually
       // topics were filtered from the eligible list based on the performance
