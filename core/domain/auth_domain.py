@@ -22,8 +22,7 @@ import collections
 
 from core import utils
 
-from typing import Any, Optional
-from typing_extensions import TypedDict
+from typing import Any, Optional, TypedDict
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles

@@ -21,12 +21,12 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
-  selector: 'copy-url',
+  selector: 'oppia-copy-url',
   templateUrl: './copy-url.component.html'
 })
 
 export class ComponentOverviewComponent {
-  @Input() urlToCopy !: string;
+  @Input() urlToCopy!: string;
   showTooltip: boolean = false;
 
   constructor(

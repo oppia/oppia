@@ -22,6 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AddMessagePayload, LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 describe('Learner Dashboard Backend API Service', () => {
@@ -968,4 +969,56 @@ describe('Learner Dashboard Backend API Service', () => {
       'Given URL is invalid.');
   }
   ));
+
+  it('should fetch learner groups to show on learner dashboard successfully',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      const sampleShortLearnerGroupSummaryDict1 = {
+        id: 'sampleId1',
+        title: 'sampleTitle',
+        description: 'sampleDescription',
+        facilitator_usernames: ['username1'],
+        learners_count: 5
+      };
+      const sampleShortLearnerGroupSummaryDict2 = {
+        id: 'sampleId2',
+        title: 'sampleTitle 2',
+        description: 'sampleDescription 2',
+        facilitator_usernames: ['username1'],
+        learners_count: 7
+      };
+      const sampleShortLearnerGroupSummary1 = (
+        ShortLearnerGroupSummary.createFromBackendDict(
+          sampleShortLearnerGroupSummaryDict1)
+      );
+      const sampleShortLearnerGroupSummary2 = (
+        ShortLearnerGroupSummary.createFromBackendDict(
+          sampleShortLearnerGroupSummaryDict2)
+      );
+
+      learnerDashboardBackendApiService
+        .fetchLearnerDashboardLearnerGroupsAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/learner_dashboard_learner_groups_handler');
+      expect(req.request.method).toEqual('GET');
+
+      req.flush({
+        learner_groups_joined: [sampleShortLearnerGroupSummaryDict1],
+        invited_to_learner_groups: [sampleShortLearnerGroupSummaryDict2]
+      });
+      flushMicrotasks();
+
+      const learnerDashboardLearnerGroupsData = {
+        learnerGroupsJoined: [sampleShortLearnerGroupSummary1],
+        invitedToLearnerGroups: [sampleShortLearnerGroupSummary2]
+      };
+      expect(successHandler).toHaveBeenCalledWith(
+        learnerDashboardLearnerGroupsData);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });
