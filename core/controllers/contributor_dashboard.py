@@ -264,9 +264,9 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         topic_name = self.normalized_request.get('topic_name')
-        opportunity_dicts = self.\
-            _get_reviewable_exploration_opportunity_summaries(
-        self.user_id, topic_name)
+        opportunity_dicts = (self.
+        _get_reviewable_exploration_opportunity_summaries(
+        self.user_id, topic_name))
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -331,17 +331,17 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             if exp_id in in_review_suggestion_target_ids
         ]
 
-        opportunities = opportunity_services.\
+        opportunities = (opportunity_services.
         get_exploration_opportunity_summaries_by_ids(
-                exp_ids).values()
+                exp_ids).values())
 
         # Augment the received opportunities with unique language_codes.
         opportunities_array = []
         for opportunity in opportunities:
-            opportunities_array.append({**opportunity.__dict__, 
-            'language_codes': list(set([review_suggestion.language_code
+            opportunities_array.append({**opportunity.__dict__,
+            'language_codes': list({review_suggestion.language_code
             for review_suggestion in in_review_suggestions
-            if review_suggestion.target_id == opportunity.id]))})
+            if review_suggestion.target_id == opportunity.id})})
 
         return opportunities_array
 
