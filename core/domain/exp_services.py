@@ -115,7 +115,7 @@ class UserExplorationDataDict(TypedDict):
     is_version_of_draft_valid: Optional[bool]
     draft_changes: Dict[str, str]
     email_preferences: user_domain.UserExplorationPrefsDict
-    exploration_metadata: exp_domain.ExplorationMetadata
+    exploration_metadata: exp_domain.ExplorationMetadataDict
 
 
 class SnapshotsMetadataDict(TypedDict):
