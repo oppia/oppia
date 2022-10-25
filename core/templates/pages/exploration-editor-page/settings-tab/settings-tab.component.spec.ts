@@ -237,7 +237,7 @@ describe('Settings Tab Component', () => {
 
       component.filterChoices('');
 
-      explorationTagsService.displayed = ['shivam'];
+      explorationTagsService.displayed = ['name'];
       component.add({
         value: 'shivam',
         input: {
