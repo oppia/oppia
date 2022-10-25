@@ -61,7 +61,7 @@ describe('Diagnostic test model', () => {
     );
   });
 
-  it('should be able to get the next question', () => {
+  it('should be able to get the next question from the topic', () => {
     let skillIdToQuestions: SkillIdToQuestions = {
       skillID1: [question1, question2],
       skillID2: [question3, question4],
@@ -71,8 +71,9 @@ describe('Diagnostic test model', () => {
     let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
       skillIdToQuestions);
 
-    expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
+    expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID1');
 
+    // Getting the first question from skill 1 i.e., question 1.
     let question = diagnosticTestTopicStateData.getNextQuestion();
 
     expect(question).toEqual(question1);
@@ -90,16 +91,20 @@ describe('Diagnostic test model', () => {
       let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
+      expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID1');
 
+      // Getting the first question from skill 1 i.e., question1.
       let question = diagnosticTestTopicStateData.getNextQuestion();
 
       expect(question).toEqual(question1);
 
       diagnosticTestTopicStateData.recordCorrectAttemptForCurrentQuestion();
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID2');
+      // Since the current question is answered correctly, the next skill
+      // (skill 2) should be tested.
+      expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID2');
 
+      // Getting the first question from skill 2 i.e., question 3.
       question = diagnosticTestTopicStateData.getNextQuestion();
 
       expect(question).toEqual(question3);
@@ -108,6 +113,9 @@ describe('Diagnostic test model', () => {
   it(
     'should be able to get the next question from the same skill after ' +
     'marking the answer for the current question as incorrect', () => {
+      // The first wrong answer does not mark the topic as fail. The first
+      // incorrect attempt for a topic is given another chance to try, so
+      // another question from the same skill should be tested.
       let skillIdToQuestions: SkillIdToQuestions = {
         skillID1: [question1, question2],
         skillID2: [question3, question4],
@@ -117,7 +125,7 @@ describe('Diagnostic test model', () => {
       let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
+      expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID1');
 
       let question = diagnosticTestTopicStateData.getNextQuestion();
 
@@ -125,16 +133,19 @@ describe('Diagnostic test model', () => {
 
       diagnosticTestTopicStateData.recordIncorrectAttemptForCurrentQuestion();
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
+      // Since the answer to the current question is wrong, skill 1 is
+      // not passed.
+      expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID1');
 
+      // Getting the second question from skill 1 i.e., question 2.
       question = diagnosticTestTopicStateData.getNextQuestion();
 
       expect(question).toEqual(question2);
     });
 
   it(
-    'should be able to fail the topic if the attempted answer for the ' +
-    'current question is incorrect and a lifeline is already used', () => {
+    'should be able to fail the topic, if two incorrect answers were ' +
+    'recorded for any topic', () => {
       let skillIdToQuestions: SkillIdToQuestions = {
         skillID1: [question1, question2],
         skillID2: [question3, question4],
@@ -144,17 +155,24 @@ describe('Diagnostic test model', () => {
       let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
 
-      diagnosticTestTopicStateData._lifeLineIsConsumed = true;
+      expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID1');
+      expect(diagnosticTestTopicStateData.getNextQuestion()).toEqual(question1);
 
       diagnosticTestTopicStateData.recordIncorrectAttemptForCurrentQuestion();
+
+      // Answering wrongly twice in a topic marks the topic as fail.
+      diagnosticTestTopicStateData.recordIncorrectAttemptForCurrentQuestion();
+
+      expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID1');
+      expect(diagnosticTestTopicStateData.getNextQuestion()).toEqual(question2);
 
       expect(diagnosticTestTopicStateData.isTopicPassed()).toBeFalse();
     });
 
   it(
     'should be able to mark the topic as passed if questions from all the ' +
-    'skills were attempted correctly, with or without using the lifeline',
-    () => {
+    'skills were attempted correctly', () => {
+      // Attempting questions from all the skills mark the topic as passed.
       let skillIdToQuestions: SkillIdToQuestions = {
         skillID1: [question1, question2],
         skillID2: [question3, question4]
@@ -163,7 +181,7 @@ describe('Diagnostic test model', () => {
       let diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
         skillIdToQuestions);
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID1');
+      expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID1');
 
       let question = diagnosticTestTopicStateData.getNextQuestion();
 
@@ -171,7 +189,7 @@ describe('Diagnostic test model', () => {
 
       diagnosticTestTopicStateData.recordCorrectAttemptForCurrentQuestion();
 
-      expect(diagnosticTestTopicStateData._currentSkill).toEqual('skillID2');
+      expect(diagnosticTestTopicStateData._currentSkillId).toEqual('skillID2');
       expect(
         diagnosticTestTopicStateData.isTopicCompletelyTested()).toBeFalse();
 

@@ -23,16 +23,41 @@ export interface SkillIdToQuestions {
 }
 
 export class DiagnosticTestTopicStateData {
+  // The field keeps track of the number of attempted questions on a topic.
   _numberOfAttemptedQuestion: number;
-  _skillIdToQuestionsList: SkillIdToQuestions;
-  _currentSkill: string;
-  _lifeLineIsConsumed: boolean;
-  _topicIsPassed: boolean;
-  _diagnosticTestSkills: string[];
-  _currenSkillIndex: number;
-  _testedSkillIds: string[];
-  _currentQuestion!: Question;
 
+  // A dict with topic ID as key and Question list as value.
+  _skillIdToQuestionsList: SkillIdToQuestions;
+
+  // Current topic ID from which the questions were presented in the
+  // diagnostic test.
+  _currentSkillId: string;
+
+  // A boolean variable that keeps track of whether a wrong attempt has
+  // already been made in any previous questions. This lifeline option
+  // provides learners to attempt another question from the same skill if the
+  // earlier one has been attempted incorrectly. Attempting a question
+  // incorrectly after the lifeline has been used, then the topic is
+  // marked as failed.
+  _lifeLineIsConsumed: boolean;
+
+  // A boolean variable to keep track of whether the topic is passed or failed.
+  _topicIsPassed: boolean;
+
+  // A list of diagnostic test skill IDs associated with a topic.
+  _diagnosticTestSkillIds: string[];
+
+  // An integer recording the index for current skill Id.
+  _currenSkillIndex: number;
+
+  // A list of skill IDs that are passed by the learner. Passing a skill means
+  // the learner has answered the question correctly, which is associated with
+  // the given skill ID.
+  _testedSkillIds: string[];
+
+  // A field that keeps track of the current question that the learner
+  // is facing.
+  _currentQuestion!: Question;
 
   constructor(skillIdToQuestions: SkillIdToQuestions) {
     this._numberOfAttemptedQuestion = 0;
@@ -41,24 +66,24 @@ export class DiagnosticTestTopicStateData {
     this._testedSkillIds = [];
     this._topicIsPassed = false;
     this._skillIdToQuestionsList = skillIdToQuestions;
-    this._diagnosticTestSkills = Object.keys(this._skillIdToQuestionsList);
-    this._currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
+    this._diagnosticTestSkillIds = Object.keys(this._skillIdToQuestionsList);
+    this._currentSkillId = this._diagnosticTestSkillIds[this._currenSkillIndex];
   }
 
   recordCorrectAttemptForCurrentQuestion(): void {
-    this._testedSkillIds.push(this._currentSkill);
+    this._testedSkillIds.push(this._currentSkillId);
     this._numberOfAttemptedQuestion += 1;
     this._currenSkillIndex += 1;
-    if (this._currenSkillIndex >= this._diagnosticTestSkills.length) {
+    if (this._currenSkillIndex >= this._diagnosticTestSkillIds.length) {
       this._topicIsPassed = true;
     }
-    this._currentSkill = this._diagnosticTestSkills[this._currenSkillIndex];
+    this._currentSkillId = this._diagnosticTestSkillIds[this._currenSkillIndex];
   }
 
   recordIncorrectAttemptForCurrentQuestion(): void {
     this._numberOfAttemptedQuestion += 1;
     if (this._lifeLineIsConsumed) {
-      this._testedSkillIds.push(this._currentSkill);
+      this._testedSkillIds.push(this._currentSkillId);
       this._topicIsPassed = false;
     } else {
       this._lifeLineIsConsumed = true;
@@ -68,10 +93,10 @@ export class DiagnosticTestTopicStateData {
   getNextQuestion(): Question {
     if (this._lifeLineIsConsumed) {
       this._currentQuestion = (
-        this._skillIdToQuestionsList[this._currentSkill][1]);
+        this._skillIdToQuestionsList[this._currentSkillId][1]);
     } else {
       this._currentQuestion = (
-        this._skillIdToQuestionsList[this._currentSkill][0]);
+        this._skillIdToQuestionsList[this._currentSkillId][0]);
     }
     return this._currentQuestion;
   }
@@ -83,7 +108,7 @@ export class DiagnosticTestTopicStateData {
   isTopicCompletelyTested(): boolean {
     return (
       JSON.stringify(this._testedSkillIds) ===
-      JSON.stringify(this._diagnosticTestSkills)
+      JSON.stringify(this._diagnosticTestSkillIds)
     );
   }
 
