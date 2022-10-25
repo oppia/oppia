@@ -106,7 +106,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with isfile_swap, rename_swap:
             install_third_party_libs.tweak_yarn_executable()
         self.assertTrue(mock_rename.called)
-    
+
     def test_tweak_yarn_executable_handles_yarn_file_not_found(self):
         # If the yarn file is not found, os.rename() is not called and the
         # method simply exits.
