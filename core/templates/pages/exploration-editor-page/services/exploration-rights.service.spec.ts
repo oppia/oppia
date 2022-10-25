@@ -36,6 +36,7 @@ describe('Exploration rights service', () => {
   let clearWarningsSpy = null;
   let successHandler = null;
   let failHandler = null;
+  let alertsService: AlertsService;
   let serviceData = {
     rights: {
       owner_names: ['abc'],
@@ -53,6 +54,7 @@ describe('Exploration rights service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
+        AlertsService,
         {
           provide: ExplorationDataService,
           useValue: {
@@ -81,6 +83,7 @@ describe('Exploration rights service', () => {
     clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
+    alertsService = TestBed.inject(AlertsService);
   });
 
   afterEach(() => {
@@ -286,6 +289,7 @@ describe('Exploration rights service', () => {
     expect(clearWarningsSpy).not.toHaveBeenCalled();
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalled();
   }));
 
   it('should remove existing voice artist', fakeAsync(() => {
