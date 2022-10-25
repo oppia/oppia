@@ -232,7 +232,6 @@ var SkillEditorPage = function() {
       skillChangeCount, 'Skill change count takes too long to update.');
     await waitFor.visibilityOfSuccessToast('Changes Saved.');
     expect(await saveOrPublishSkillButton.isEnabled()).toEqual(false);
-    await waitFor.invisibilityOfSuccessToast('Changes Saved.');
   };
 
   this.editConceptCard = async function(explanation) {

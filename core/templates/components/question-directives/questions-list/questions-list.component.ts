@@ -600,7 +600,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   _initTab(resetHistoryAndFetch: boolean): void {
-    this.question = null;
     this.questionIsBeingUpdated = false;
     this.misconceptionsBySkill = {};
     this.misconceptionIdsForSelectedSkill = [];
@@ -646,10 +645,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     // The _initTab function is written separately since it is also
     // called in subscription when some external events are triggered.
     this._initTab(true);
-  }
-
-  ngOnChanges() {
-    this.changeDetectorRef.detectChanges();
   }
 
   ngOnDestroy(): void {
