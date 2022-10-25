@@ -45,7 +45,9 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   // misconception.
   activeMisconceptionIndex!: number | null;
   misconceptionsListIsShown: boolean = false;
+  skillEditorCardIsShown: boolean = false;
   isEditable: boolean = true;
+  windowIsNarrow!: boolean;
 
   constructor(
     private ngbModal: NgbModal,
@@ -55,6 +57,18 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.skillEditorCardIsShown = true;
+    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+          this.misconceptionsListIsShown = (
+            !this.windowDimensionsService.isWindowNarrow());
+        }
+      )
+    );
+
     this.skill = this.skillEditorStateService.getSkill();
     this.misconceptionsListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
@@ -122,6 +136,12 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
     if (this.windowDimensionsService.isWindowNarrow()) {
       this.misconceptionsListIsShown = (
         !this.misconceptionsListIsShown);
+    }
+  }
+
+  toggleSkillEditorCard(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.skillEditorCardIsShown = !this.skillEditorCardIsShown;
     }
   }
 }

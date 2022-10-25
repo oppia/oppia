@@ -26,7 +26,7 @@ from core import feconf
 from core.domain import feedback_services
 from core.tests import test_utils
 
-from typing_extensions import Final, TypedDict
+from typing import Final, TypedDict
 
 
 class ExpectedThreadDict(TypedDict):
