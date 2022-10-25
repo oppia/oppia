@@ -2796,7 +2796,7 @@ title: Title
     # whose value can be of any type, like int, bool, str, and other
     # types too. Also, the 'params' argument can accept different types
     # of dictionaries that need to be sent over to the handler, those
-    # dictionaries can contain any type of value. So, to allow different
+    # dictionaries can contain any type of values. So, to allow different
     # dictionaries, we used Any type here.
     def get_json(
         self,
@@ -2904,7 +2904,7 @@ title: Title
     # whose values can contain different types of values, like int, bool,
     # str and other types too. Also, the 'params' argument can accept different
     # types of dictionaries that need to be sent over to the handler, those
-    # dictionaries can contain any type of value. So, to allow different
+    # dictionaries can contain any type of values. So, to allow different
     # dictionaries, we used Any type here.
     def delete_json(  # pylint: disable=dangerous-default-value
         self,
@@ -3014,7 +3014,7 @@ title: Title
     # whose values can contain different types of values, like int, bool,
     # str and other types too. Also, the 'payload' argument can accept
     # different types of dictionaries that need to be sent over to the handler,
-    # those dictionaries can contain any type of value. So, to allow different
+    # those dictionaries can contain any type of values. So, to allow different
     # dictionaries, we used Any type here.
     def put_json(
         self,
