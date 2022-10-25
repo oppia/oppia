@@ -94,12 +94,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
 
     def test_tweak_yarn_executable(self):
-        call_counter = 0
         def mock_is_file(unused_filename):
-            nonlocal call_counter
-            if call_counter == 0:
-                call_counter = 1
-                return False
             return True
 
         def mock_rename(origin_name, new_name):
@@ -110,9 +105,23 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         rename_swap = self.swap(os, 'rename', mock_rename)
         with isfile_swap, rename_swap:
             install_third_party_libs.tweak_yarn_executable()
-            self.assertFalse(mock_rename.called)
+        self.assertTrue(mock_rename.called)
+    
+    def test_tweak_yarn_executable_handles_yarn_file_not_found(self):
+        # If the yarn file is not found, os.rename() is not called and the
+        # method simply exits.
+        def mock_is_file(unused_filename):
+            return False
+
+        def mock_rename(origin_name, new_name):
+            self.assertEqual(origin_name + '.sh', new_name)
+            mock_rename.called = True
+        mock_rename.called = False
+        isfile_swap = self.swap(os.path, 'isfile', mock_is_file)
+        rename_swap = self.swap(os, 'rename', mock_rename)
+        with isfile_swap, rename_swap:
             install_third_party_libs.tweak_yarn_executable()
-            self.assertTrue(mock_rename.called)
+        self.assertFalse(mock_rename.called)
 
     def test_get_yarn_command_on_windows(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
