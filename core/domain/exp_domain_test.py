@@ -11394,6 +11394,290 @@ title: ''
             exploration.to_yaml(),
             latest_sample_yaml_content_for_drag_and_drop_interac_2)
 
+        sample_yaml_content_for_drag_and_drop_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_27
+              - ca_choices_28
+            - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x: ca_choices_28
+            y: ca_choices_26
+          rule_type: HasElementXBeforeElementY
+        - inputs:
+            x: ca_choices_26
+            y: ca_choices_28
+          rule_type: HasElementXBeforeElementY
+        - inputs:
+            x: ca_choices_27
+            y: 2
+          rule_type: HasElementXAtPositionY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p></p>
+          - content_id: ca_choices_27
+            html: <p>  </p>
+          - content_id: ca_choices_28
+            html: <p>1</p>
+          - content_id: ca_choices_29
+            html: <p>2</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_29
+        - - ca_choices_27
+          - ca_choices_28
+        - - ca_choices_26
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        solution: {}
+        default_outcome: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        solution: {}
+        default_outcome: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_drag_and_drop_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_28
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_28
+            html: <p>1</p>
+          - content_id: ca_choices_29
+            html: <p>2</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_29
+        - - ca_choices_28
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+        solution: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_drag_and_drop_interac_3)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_drag_and_drop_interac_3)
+
     def test_fixing_invalid_text_exp_data_by_migrating_to_v58(
         self
     ) -> None:

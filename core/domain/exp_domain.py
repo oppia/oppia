@@ -4149,7 +4149,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _update_rule_value_having_empty_choices(
         cls,
         empty_choices: List[state_domain.SubtitledHtmlDict],
-        rule_value_x,
+        rule_value_x: List[List[str]],
         solution: Optional[List[List[str]]]
     ) -> None:
         """Removing empty choice from the rule values.
@@ -4176,6 +4176,28 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if len(choice_list) == 0:
                         solution.remove(choice_list)
                         break
+
+    @classmethod
+    def _is_empty_choice_in_rule_value(
+        cls,
+        empty_choices: List[state_domain.SubtitledHtmlDict],
+        value: str
+    ) -> bool:
+        """Returns True if the empty choice is present inside the value.
+
+        Args:
+            empty_choices: List[state_domain.SubtitledHtmlDict]. The list of
+                choices.
+            value: str. The value which needs to be checked
+
+        Returns:
+            bool. Returns True if the empty choice is equal to the given value.
+        """
+        for empty_choice in empty_choices:
+            if value == empty_choice['content_id']:
+                return True
+
+        return False
 
     @classmethod
     def _fix_drag_and_drop_input_interaction(
@@ -4218,7 +4240,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args'][
                 'choices']['value']
         )
-        solution = state_dict['interaction']['solution']['correct_answer']
+        if state_dict['interaction']['solution'] is not None:
+            solution = state_dict['interaction']['solution']['correct_answer']
+        else:
+            solution = None
 
         # Fix RTE content and check for empty choices.
         empty_choices = []
@@ -4266,18 +4291,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 elif rule_spec['rule_type'] == 'HasElementXBeforeElementY':
                     value_x = rule_spec['inputs']['x']
                     value_y = rule_spec['inputs']['y']
-                    if (
-                        value_x == value_y or
-                        (
-                            value_x in empty_choice['content_id']
-                            for empty_choice in empty_choices
-                        ) or
-                        (
-                            value_y in empty_choice['content_id']
-                            for empty_choice in empty_choices
-                        )
-                    ):
+                    if value_x == value_y:
                         invalid_rules.append(rule_spec)
+
+                    if len(empty_choices) > 0:
+                        if cls._is_empty_choice_in_rule_value(
+                            empty_choices, value_x
+                        ):
+                            invalid_rules.append(rule_spec)
+                            continue
+
+                        elif cls._is_empty_choice_in_rule_value(
+                            empty_choices, value_y
+                        ):
+                            invalid_rules.append(rule_spec)
+                            continue
 
                 elif rule_spec['rule_type'] == 'HasElementXAtPositionY':
                     element = rule_spec['inputs']['x']
@@ -4285,12 +4313,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     position = rule_spec['inputs']['y']
                     assert isinstance(position, int)
 
-                    if (
-                        element in empty_choice['content_id']
-                        for empty_choice in empty_choices
-                    ):
-                        invalid_rules.append(rule_spec)
-                        continue
+                    if len(empty_choices) > 0:
+                        if cls._is_empty_choice_in_rule_value(
+                            empty_choices, element
+                        ):
+                            invalid_rules.append(rule_spec)
+                            continue
 
                     ele_x_at_y_rules.append(
                         {'element': element, 'position': position}
