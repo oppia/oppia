@@ -43,7 +43,7 @@
                         </div>
                         <div class="subtopic-progress-info">
                           <div class="subtopic-title">{{subtopicProgress.subtopicTitle}}</div>
-                          <div class="subtopic-progress">
+                          <div class="subtopic-progress" [ngClass]="{'no-progress': !subtopicProgress.subtopicMastery}">
                             <div *ngIf="!subtopicProgress.subtopicMastery">
                               &#8212; {{'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate}} &#8212;
                             </div>

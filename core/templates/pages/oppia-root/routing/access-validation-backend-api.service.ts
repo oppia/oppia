@@ -36,6 +36,9 @@ export class AccessValidationBackendApiService {
   RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_release_coordinator_page');
 
+  DOES_LEARNER_GROUP_EXIST = (
+    '/access_validation_handler/does_learner_group_exist/<learner_group_id>');
+
   BLOG_HOME_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_blog_home_page');
 
@@ -90,5 +93,14 @@ export class AccessValidationBackendApiService {
   Promise<void> {
     return this.http.get<void>(
       this.RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR).toPromise();
+  }
+
+  doesLearnerGroupExist(learnerGroupId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.DOES_LEARNER_GROUP_EXIST, {
+        learner_group_id: learnerGroupId
+      });
+
+    return this.http.get<void>(url).toPromise();
   }
 }
