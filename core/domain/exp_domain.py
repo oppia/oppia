@@ -3258,7 +3258,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if '<p>' in choice['html']:
             soup = bs4.BeautifulSoup(choice['html'], 'html.parser')
             p_value = soup.find('p').getText()
-            if p_value.strip() in ('<p></p>', ''):
+            if p_value.strip() in (
+                '<p></p>', '', '<i></i>', '<br>', '<span></span>', '<b></b>'
+            ):
                 return True
             
         return False
