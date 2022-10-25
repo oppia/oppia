@@ -54,6 +54,7 @@ angular.module('oppia').controller('RteHelperModalController', [
     });
 
     $scope.currentRteIsMathExpressionEditor = false;
+    $scope.currentRteIsLinkEditor = false;
     $scope.tmpCustomizationArgs = [];
     for (var i = 0; i < customizationArgSpecs.length; i++) {
       var caName = customizationArgSpecs[i].name;
@@ -83,6 +84,13 @@ angular.module('oppia').controller('RteHelperModalController', [
               customizationArgSpecs[i].default_value)
         });
       }
+    }
+    // Infer that the RTE component is a Link if it contains the `url` and
+    // `text` customization arg names.
+    const customizationArgNames = customizationArgSpecs.map(x => x.name);
+    if (customizationArgNames.includes('url') &&
+        customizationArgNames.includes('text')) {
+      $scope.currentRteIsLinkEditor = true;
     }
 
     // The 'defaultRTEComponent' variable controls whether the delete button
@@ -137,6 +145,46 @@ angular.module('oppia').controller('RteHelperModalController', [
         );
       }
     };
+
+    $scope.disableSaveButtonForLinkRte = function() {
+      // This method disables the save button when the `text` field for the
+      // Link RTE looks like a URL but it does not match the `url`. Otherwise,
+      // creators can make the `url` a malicious website and make the `text`
+      // a safe website.
+      if (!$scope.currentRteIsLinkEditor) {
+        return false;
+      }
+
+      let url = $scope.tmpCustomizationArgs[0].value;
+      let text = $scope.tmpCustomizationArgs[1].value;
+
+      // First check if the `text` looks like a URL.
+      const suffixes = ['.com', '.org', '.edu', '.gov'];
+      let textLooksLikeUrl = false;
+      for (const suffix of suffixes) {
+        if (text.endsWith(suffix)) {
+          textLooksLikeUrl = true;
+        }
+      }
+      if (!textLooksLikeUrl) {
+        return false;
+      }
+      // If the text looks like a URL, strip the leading 'http://' or
+      // 'https://' or 'www.'.
+      const prefixes = ['https://', 'http://', 'www.'];
+      for (const prefix of prefixes) {
+        if (url.startsWith(prefix)) {
+          url = url.substring(prefix.length);
+        }
+        if (text.startsWith(prefix)) {
+          text = text.substring(prefix.length);
+        }
+      }
+      // After the cleanup, if the strings are not equal, then we do not
+      // allow the lesson creator to save it.
+      return url !== text;
+    };
+
     $scope.save = function() {
       ExternalRteSaveService.onExternalRteSave.emit();
 
@@ -210,6 +258,11 @@ angular.module('oppia').controller('RteHelperModalController', [
             var temp = $scope.tmpCustomizationArgs[i].value;
             customizationArgsDict[caName] = (
               extractVideoIdFromVideoUrl(temp.toString()));
+          } else if (caName === 'text' && $scope.currentRteIsLinkEditor) {
+            // Set the link `text` to the link `url` if the `text` is empty.
+            customizationArgsDict[caName] = (
+              $scope.tmpCustomizationArgs[i].value ||
+              $scope.tmpCustomizationArgs[i - 1].value);
           } else {
             customizationArgsDict[caName] = (
               $scope.tmpCustomizationArgs[i].value);
