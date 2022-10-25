@@ -980,6 +980,39 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 guest_user, 'exp_id', False
             )
 
+    def test_guest_user_cannot_perform_activity_actions(self) -> None:
+        collection_services.load_demo('0')
+        collection_rights = rights_manager.get_collection_rights('0')
+        guest_user = user_services.get_user_actions_info(None)
+
+        # Testing guest user is not allowed to access activity.
+        self.assertFalse(
+            rights_manager.check_can_access_activity(
+                guest_user, collection_rights
+            )
+        )
+
+        # Testing guest user is not allowed to delete activity.
+        self.assertFalse(
+            rights_manager.check_can_delete_activity(
+                guest_user, collection_rights
+            )
+        )
+
+        # Testing guest user is not allowed to modify core activity roles.
+        self.assertFalse(
+            rights_manager.check_can_modify_core_activity_roles(
+                guest_user, collection_rights
+            )
+        )
+
+        # Testing guest user is not allowed to publish activity.
+        self.assertFalse(
+            rights_manager.check_can_publish_activity(
+                guest_user, collection_rights
+            )
+        )
+
 
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""

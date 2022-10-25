@@ -3777,6 +3777,50 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         )
         self.logout()
 
+    def test_user_without_review_rights_cannot_review_question_suggestions(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        question_review_swap = self.swap_to_always_return(
+            user_services, 'can_review_question_suggestions', value=False)
+        with testapp_swap, question_review_swap:
+            response = self.get_json(
+                '/mock_review_suggestion/%s/%s' % (
+                    self.TARGET_TYPE, feconf.SUGGESTION_TYPE_ADD_QUESTION
+                ),
+                expected_status_int=500
+            )
+        self.assertEqual(
+            'User with user_id: %s is not allowed to review '
+            'question suggestions.' % user_id,
+            response['error']
+        )
+        self.logout()
+
+    def test_user_without_review_rights_cannot_review_translation_suggestions(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        translation_review_swap = self.swap_to_always_return(
+            user_services, 'can_review_translation_suggestions', value=False)
+        with testapp_swap, translation_review_swap:
+            response = self.get_json(
+                '/mock_review_suggestion/%s/%s' % (
+                    self.TARGET_TYPE, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                ),
+                expected_status_int=500
+            )
+        self.assertEqual(
+            'User with user_id: %s is not allowed to review '
+            'translation suggestions.' % user_id,
+            response['error']
+        )
+        self.logout()
+
 
 class PublishExplorationTests(test_utils.GenericTestBase):
     """Tests for can_publish_exploration decorator."""

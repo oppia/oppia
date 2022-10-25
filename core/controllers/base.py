@@ -532,7 +532,7 @@ class BaseHandler(webapp2.RequestHandler):
             'error': 'Could not find the page %s.' % self.request.uri,
             'status_code': 404
         }
-        self._render_exception(404, values)
+        self._render_exception(values)
 
     def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle POST requests.
@@ -681,19 +681,16 @@ class BaseHandler(webapp2.RequestHandler):
             self.render_json(values)
 
     def _render_exception(
-        self, error_code: int, values: ResponseValueDict
+        self, values: ResponseValueDict
     ) -> None:
         """Renders an error page, or an error JSON response.
 
         Args:
-            error_code: int. The HTTP status code (expected to be one of
-                400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert error_code in [400, 401, 404, 500]
-        values['status_code'] = error_code
+        assert values['status_code'] in [400, 401, 404, 500]
         method = self.request.environ['REQUEST_METHOD']
 
         if method == 'GET':
@@ -746,7 +743,7 @@ class BaseHandler(webapp2.RequestHandler):
                     'error': 'You must be logged in to access this resource.',
                     'status_code': 401
                 }
-                self._render_exception(401, values)
+                self._render_exception(values)
             else:
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
@@ -761,7 +758,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'error': 'Could not find the page %s.' % self.request.uri,
                 'status_code': 404
             }
-            self._render_exception(404, values)
+            self._render_exception(values)
             return
 
         logging.exception('Exception raised: %s', exception)
@@ -772,7 +769,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'error': str(exception),
                 'status_code': 401
             }
-            self._render_exception(401, values)
+            self._render_exception(values)
             return
 
         if isinstance(exception, self.InvalidInputException):
@@ -781,7 +778,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'error': str(exception),
                 'status_code': 400
             }
-            self._render_exception(400, values)
+            self._render_exception(values)
             return
 
         if isinstance(exception, self.InternalErrorException):
@@ -790,7 +787,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'error': str(exception),
                 'status_code': 500
             }
-            self._render_exception(500, values)
+            self._render_exception(values)
             return
 
         self.error(500)
@@ -798,7 +795,7 @@ class BaseHandler(webapp2.RequestHandler):
             'error': str(exception),
             'status_code': 500
         }
-        self._render_exception(500, values)
+        self._render_exception(values)
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -954,9 +951,6 @@ class OppiaMLVMHandler(BaseHandler):
     """Base class for the handlers that communicate with Oppia-ML VM instances.
     """
 
-    # Here we use type Any because this method is implemented in a subclasses
-    # with a return type. So, if we define return type as None here then
-    # subclasses will throw error for incompatible signature.
     @abc.abstractmethod
     def extract_request_message_vm_id_and_signature(
         self

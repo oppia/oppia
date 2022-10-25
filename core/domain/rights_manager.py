@@ -614,6 +614,8 @@ def check_can_access_activity(
     """
     if activity_rights is None:
         return False
+    elif user.user_id is None:
+        return False
     elif activity_rights.is_published():
         return bool(
             role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY in user.actions)
@@ -621,13 +623,11 @@ def check_can_access_activity(
         return bool(
             role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user.actions or
             (
-                user.user_id and (
-                    activity_rights.is_viewer(user.user_id) or
-                    activity_rights.is_owner(user.user_id) or
-                    activity_rights.is_editor(user.user_id) or
-                    activity_rights.is_voice_artist(user.user_id) or
-                    activity_rights.viewable_if_private
-                )
+                activity_rights.is_viewer(user.user_id) or
+                activity_rights.is_owner(user.user_id) or
+                activity_rights.is_editor(user.user_id) or
+                activity_rights.is_voice_artist(user.user_id) or
+                activity_rights.viewable_if_private
             )
         )
     return False
@@ -775,12 +775,15 @@ def check_can_delete_activity(
     if activity_rights is None:
         return False
 
+    if user.user_id is None:
+        return False
+
     if role_services.ACTION_DELETE_ANY_ACTIVITY in user.actions:
         return True
     elif (
         activity_rights.is_private() and
         role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions and
-        user.user_id and activity_rights.is_owner(user.user_id)
+        activity_rights.is_owner(user.user_id)
     ):
         return True
     elif (activity_rights.is_published() and
@@ -809,6 +812,9 @@ def check_can_modify_core_activity_roles(
     if activity_rights is None:
         return False
 
+    if user.user_id is None:
+        return False
+
     if activity_rights.community_owned or activity_rights.cloned_from:
         return False
 
@@ -816,7 +822,7 @@ def check_can_modify_core_activity_roles(
         return True
     if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY in
             user.actions):
-        if user.user_id and activity_rights.is_owner(user.user_id):
+        if activity_rights.is_owner(user.user_id):
             return True
     return False
 
@@ -864,6 +870,9 @@ def check_can_publish_activity(
     if activity_rights is None:
         return False
 
+    if user.user_id is None:
+        return False
+
     if activity_rights.cloned_from:
         return False
 
@@ -874,7 +883,7 @@ def check_can_publish_activity(
         return True
 
     if role_services.ACTION_PUBLISH_OWNED_ACTIVITY in user.actions:
-        if user.user_id and activity_rights.is_owner(user.user_id):
+        if activity_rights.is_owner(user.user_id):
             return True
 
     return False

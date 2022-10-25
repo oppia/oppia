@@ -3860,6 +3860,8 @@ def can_view_reviewable_suggestions(
 
         Raises:
             PageNotFoundException. The given page cannot be found.
+            Exception. User is not allowed to review translation suggestions.
+            Exception. User is not allowed to review question suggestions.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -3867,12 +3869,18 @@ def can_view_reviewable_suggestions(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
-            return None
+            raise Exception(
+                'User with user_id: %s is not allowed to review translation '
+                'suggestions.' % self.user_id
+            )
         elif suggestion_type == (
                 feconf.SUGGESTION_TYPE_ADD_QUESTION):
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
-            return None
+            raise Exception(
+                'User with user_id: %s is not allowed to review question '
+                'suggestions.' % self.user_id
+            )
         else:
             raise self.PageNotFoundException
 
