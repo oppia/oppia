@@ -734,9 +734,6 @@ URLS = [
         feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToSkillActionHandler),
     get_redirect_route(
-        r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        suggestion.SuggestionListHandler),
-    get_redirect_route(
         r'/getreviewablesuggestions/<target_type>/<suggestion_type>',
         suggestion.ReviewableSuggestionsHandler),
     get_redirect_route(

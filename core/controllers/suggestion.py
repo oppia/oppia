@@ -476,34 +476,6 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
-class SuggestionListHandler(base.BaseHandler):
-    """Handles list operations on suggestions."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        # The query_fields_and_values variable is a list of tuples. The first
-        # element in each tuple is the field being queried and the second
-        # element is the value of the field being queried.
-        # request.GET.items() parses the params from the url into the above
-        # format. So in the url, the query should be passed as:
-        # ?field1=value1&field2=value2...fieldN=valueN.
-        query_fields_and_values = list(self.request.GET.items())
-
-        for query in query_fields_and_values:
-            if query[0] not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
-                raise self.InvalidInputException(
-                    'Not allowed to query on field %s' % query[0])
-
-        suggestions = suggestion_services.query_suggestions(
-            query_fields_and_values)
-
-        self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
-        self.render_json(self.values)
-
-
 class UpdateTranslationSuggestionHandler(base.BaseHandler):
     """Handles update operations relating to translation suggestions."""
 

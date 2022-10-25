@@ -1037,7 +1037,6 @@ SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUBTOPIC_MASTERY_DATA_URL = '/subtopic_mastery_handler/data'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
-SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX = (
     '/updatetranslationsuggestionhandler')
