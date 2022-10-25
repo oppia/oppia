@@ -1011,14 +1011,12 @@ class TopicManagerRoleHandler(base.BaseHandler):
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 
-            # We add 'no branch' coverage flag here because if the case where
-            # user does not have manager rights in topic happens, it will be
+            # The case where user does not have manager rights it will be
             # caught before in topic_services.deassign_manager_role_from_topic
-            # method. This means that the else part this if/else chain will
-            # never execute.
-            if not topic_fetchers.get_topic_rights_with_user(user_id): # pragma: no branch pylint: disable=line-too-long
-                user_services.remove_user_role(
-                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+            # method.
+            assert not topic_fetchers.get_topic_rights_with_user(user_id)
+            user_services.remove_user_role(
+                user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
         self.render_json({})
 
