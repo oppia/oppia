@@ -40,6 +40,7 @@ from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
 from core.controllers import cron
 from core.controllers import custom_landing_pages
+from core.controllers import diagnostic_test_player
 from core.controllers import editor
 from core.controllers import email_dashboard
 from core.controllers import features
@@ -213,6 +214,16 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_blog_home_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogHomePageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_blog_post_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogPostPageAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
 
@@ -226,6 +237,11 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ReleaseCoordinatorAccessValidationHandler
     ),
+
+    get_redirect_route(
+        r'%s/does_learner_group_exist/<learner_group_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ViewLearnerGroupPageAccessValidationHandler),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -366,6 +382,10 @@ URLS = [
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
+        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+        diagnostic_test_player.DiagnosticTestPlayerPage
+    ),
+    get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
         classroom.ClassroomAdminPage),
     get_redirect_route(
@@ -475,12 +495,12 @@ URLS = [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'%s/<author_username>' %
-        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
-        blog_homepage.AuthorsPageHandler),
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogPostDataHandler),
     get_redirect_route(
-        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
-        blog_homepage.BlogPostHandler),
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+        blog_homepage.AuthorsPageHandler),
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
@@ -993,8 +1013,11 @@ URLS = [
         r'%s' % feconf.FACILITATOR_DASHBOARD_HANDLER,
         learner_group.FacilitatorDashboardHandler),
     get_redirect_route(
-        r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
-        learner_group.FacilitatorLearnerGroupViewHandler),
+        r'%s' % feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER,
+        learner_group.LearnerDashboardLearnerGroupsHandler),
+    get_redirect_route(
+        r'/view_learner_group_info_handler/<learner_group_id>',
+        learner_group.ViewLearnerGroupInfoHandler),
     get_redirect_route(
         r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
@@ -1004,6 +1027,10 @@ URLS = [
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerProgressHandler),
+    get_redirect_route(
+        r'/learner_group_learner_specific_progress_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnerSpecificProgressHandler
+    ),
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
@@ -1020,10 +1047,19 @@ URLS = [
         r'/learner_group_learner_invitation_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerInvitationHandler),
     get_redirect_route(
+        r'/learner_group_progress_sharing_permission_handler/<learner_group_id>', # pylint: disable=line-too-long
+        learner_group.LearnerGroupProgressSharingPermissionHandler),
+    get_redirect_route(
+        r'/exit_learner_group_handler/<learner_group_id>',
+        learner_group.ExitLearnerGroupHandler),
+    get_redirect_route(
         r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
-        learner_group.LearnerStoriesChaptersProgressHandler)
+        learner_group.LearnerStoriesChaptersProgressHandler),
+    get_redirect_route(
+        '/learner_groups_feature_status_handler',
+        learner_group.LearnerGroupsFeatureStatusHandler)
 ]
 
 # Adding redirects for topic landing pages.
@@ -1070,6 +1106,10 @@ URLS.extend((
     get_redirect_route(
         r'/learn/<classroom_url_fragment>',
         oppia_root.OppiaLightweightRootPage
+    ),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        oppia_root.OppiaRootPage
     ),
 ))
 

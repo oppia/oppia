@@ -57,8 +57,7 @@ import socket
 import sys
 import threading
 
-from typing import Callable, Deque, List, Optional, Sequence
-from typing_extensions import Final
+from typing import Callable, Deque, Final, List, Optional, Sequence
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
