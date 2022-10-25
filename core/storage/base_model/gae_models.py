@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing_extensions import Final, Literal, TypedDict
+from typing import Final, Literal, TypedDict
 
 from typing import ( # isort:skip
     Any,

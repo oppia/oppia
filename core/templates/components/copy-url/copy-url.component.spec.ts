@@ -14,24 +14,24 @@
 
 
 /**
- * @fileoverview Unit tests for Copy Exploration URL component
+ * @fileoverview Unit tests for copy exploration URL component.
  */
 
 import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ComponentOverviewComponent } from './copy-url.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
-  isCurrentLanguageRTL() {
+  isCurrentLanguageRTL(): boolean {
     return true;
   }
 }
 
-describe('Copy Exploration URL component', function() {
+describe('Copy Exploration URL component', () => {
   let clipboard: Clipboard;
   let component: ComponentOverviewComponent;
   let fixture: ComponentFixture<ComponentOverviewComponent>;
@@ -62,14 +62,15 @@ describe('Copy Exploration URL component', function() {
     clipboard = TestBed.inject(Clipboard);
   });
 
-  it('should correctly copy progress URL', () => {
+  it('should correctly copy progress URL', fakeAsync(() => {
     spyOn(clipboard, 'copy').and.callThrough();
     let explorationURL = 'https://oppia.org/progress/abcdef';
     component.urlToCopy = explorationURL;
 
     component.copyUrlButton();
+    tick(1000);
 
     expect(clipboard.copy).toHaveBeenCalledWith(
       explorationURL);
-  });
+  }));
 });

@@ -196,7 +196,7 @@
     <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
     <div [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }"
          class="oppia-tooltip-container">
-      <copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></copy-url>
+      <oppia-copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></oppia-copy-url>
     </div>
   </div>
   <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">

@@ -159,6 +159,8 @@ import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualiz
 import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
 import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
 import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
+import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
+import { CopierComponent } from 'value_generators/templates/copier.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -169,12 +171,15 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
+import { JoyrideModule } from 'ngx-joyride';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { ComponentOverviewComponent } from './copy-url/copy-url.component';
+import { MatMenuModule} from '@angular/material/menu';
+import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 
 @NgModule({
   imports: [
@@ -182,6 +187,7 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
     BaseModule,
     CommonModule,
     DragDropModule,
+    MatMenuModule,
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
@@ -199,6 +205,7 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    JoyrideModule.forRoot(),
     RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
@@ -206,6 +213,7 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
     MatProgressSpinnerModule,
     NgbModalModule,
     TranslateModule,
+    DynamicComponentModule
   ],
 
   providers: [
@@ -468,6 +476,8 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
     ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
+    CopierComponent,
+    RandomSelectorComponent
   ],
 
   exports: [
