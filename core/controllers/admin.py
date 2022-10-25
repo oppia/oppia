@@ -245,6 +245,10 @@ class AdminHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         assert self.user_id is not None
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             AdminHandlerNormalizePayloadDict, self.normalized_payload
         )
@@ -994,6 +998,10 @@ class AdminRoleHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         assert self.user_id is not None
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             AdminRoleHandlerNormalizedGetRequestDict,
             self.normalized_request
@@ -1038,6 +1046,10 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             AdminRoleHandlerNormalizedPayloadDict,
             self.normalized_payload
@@ -1062,6 +1074,10 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             AdminRoleHandlerNormalizedDeleteRequestDict,
             self.normalized_request
@@ -1120,6 +1136,10 @@ class TopicManagerRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             TopicManagerRoleHandlerNormalizedPayloadDict,
             self.normalized_payload
@@ -1195,6 +1215,10 @@ class BannedUsersHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             BannedUsersHandlerNormalizedPayloadDict,
             self.normalized_payload
@@ -1212,6 +1236,10 @@ class BannedUsersHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             BannedUsersHandlerNormalizedRequestDict,
             self.normalized_request
@@ -1272,6 +1300,10 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
 
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict,
             self.normalized_payload
@@ -1291,8 +1323,12 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
 
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
-            AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict,
+            AdminSuperAdminPrivilegesHandlerNormalizedRequestDict,
             self.normalized_request
         )
         username = request_data['username']
@@ -1373,6 +1409,10 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             DataExtractionQueryHandlerNormalizedRequestDict,
             self.normalized_request
@@ -1467,6 +1507,10 @@ class UpdateUsernameHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
         assert self.user_id is not None
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             UpdateUsernameHandlerNormalizedPayloadDict,
             self.normalized_payload
@@ -1530,6 +1574,10 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             VerifyUserModelsDeletedHandlerNormalizedRequestDict,
             self.normalized_request
@@ -1571,6 +1619,10 @@ class DeleteUserHandler(base.BaseHandler):
 
     @acl_decorators.can_delete_any_user
     def delete(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             DeleteUserHandlerNormalizedRequestDict,
             self.normalized_request
@@ -1634,6 +1686,10 @@ class UpdateBlogPostHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             UpdateBlogPostHandlerNormalizedPayloadDict,
             self.normalized_payload

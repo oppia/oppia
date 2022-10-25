@@ -95,6 +95,10 @@ class BeamJobRunHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def put(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             BeamJobRunHandlerNormalizedPayloadDict, self.normalized_payload
         )
@@ -104,6 +108,10 @@ class BeamJobRunHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def delete(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             BeamJobRunHandlerNormalizedRequestDict, self.normalized_request
         )
@@ -141,6 +149,10 @@ class BeamJobRunResultHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             BeamJobRunResultHandlerNormalizedRequestDict,
             self.normalized_request

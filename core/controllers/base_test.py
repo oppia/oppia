@@ -1249,6 +1249,10 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         }
 
         def get(self) -> None:
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_request' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             request_data = cast(
                 MockHandlerForTestingPageIframingNormalizedRequestDict,
                 self.normalized_request
@@ -1419,6 +1423,10 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
             """Returns the message, vm_id and signature retrieved from the
             incoming requests.
             """
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_payload' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             payload_data = cast(
                 CorrectMockVMHandlerNormalizedPayloadDict,
                 self.normalized_payload
@@ -1845,6 +1853,10 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration
         def get(self) -> None:
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_request' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             request_data = cast(
                 MockHandlerWithInvalidSchemaNormalizedRequestDict,
                 self.normalized_request
@@ -1859,6 +1871,10 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration
         def get(self) -> None:
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_request' from Dict[str, Any] to a particular
+            # Dict type that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             payload = cast(Dict[str, str], self.normalized_request)
             exploration_id = payload.get('exploration_id')
             self.render_json({'exploration_id': exploration_id})
@@ -1884,6 +1900,10 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         }
 
         def get(self) -> None:
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_request' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             request_data = cast(
                 MockHandlerWithDefaultGetSchemaNormalizedRequestDict,
                 self.normalized_request
@@ -1910,6 +1930,10 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         }
 
         def put(self) -> None:
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_payload' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             payload_data = cast(
                 MockHandlerWithDefaultPutSchemaNormalizedPayloadDict,
                 self.normalized_payload
@@ -2127,6 +2151,10 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             """Handles POST requests. This request method contains both type
             of args, i.e., request args as well as payload args.
             """
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_request' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             request_data = cast(
                 MockHandlerNormalizedRequestDict,
                 self.normalized_request
@@ -2235,10 +2263,19 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         def post(self, entity_type: str, entity_id: str) -> None:
             """Saves an image uploaded by a content creator."""
 
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_payload' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             payload_data = cast(
                 MockUploadHandlerNormalizedPayloadDict,
                 self.normalized_payload
             )
+
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_request' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             request_data = cast(
                 MockUploadHandlerNormalizedRequestDict,
                 self.normalized_request

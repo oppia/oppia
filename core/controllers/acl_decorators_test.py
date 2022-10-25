@@ -6704,6 +6704,10 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
                 OppiaMLAuthInfo. Message at index 0, vm_id at index 1 and
                 signature at index 2.
             """
+            # Here we use cast because we are narrowing down the type of
+            # 'normalized_payload' from Dict[str, Any] to a particular
+            # TypedDict that was defined according to the schemas. So that
+            # the type of fetched values is not considered as Any type.
             payload = cast(
                 MockHandlerNormalizedPayloadDict, self.normalized_payload
             )

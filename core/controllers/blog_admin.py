@@ -119,6 +119,10 @@ class BlogAdminHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         assert self.user_id is not None
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             BlogAdminHandlerNormalizedPayloadDict, self.normalized_payload
         )
@@ -191,6 +195,10 @@ class BlogAdminRolesHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         assert self.user_id is not None
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             BlogAdminRolesHandlerNormalizedPayloadDict, self.normalized_payload
         )
@@ -209,6 +217,10 @@ class BlogAdminRolesHandler(base.BaseHandler):
     @acl_decorators.can_manage_blog_post_editors
     def put(self) -> None:
         """Handles PUT requests."""
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_payload' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         payload_data = cast(
             BlogAdminRolesHandlerNormalizedPayloadDict, self.normalized_payload
         )

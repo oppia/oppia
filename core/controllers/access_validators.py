@@ -47,7 +47,6 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'classroom_url_fragment': {
@@ -60,6 +59,10 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             ClassroomAccessValidationHandlerNormalizedRequestDict,
             self.normalized_request
@@ -79,7 +82,6 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -120,7 +122,6 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -147,7 +148,6 @@ class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
             }
         }
     }
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -172,7 +172,6 @@ class BlogHomePageAccessValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -197,7 +196,6 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'blog_post_url_fragment': {
@@ -210,6 +208,10 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Dict[str, Any] to a particular
+        # TypedDict that was defined according to the schemas. So that
+        # the type of fetched values is not considered as Any type.
         request_data = cast(
             BlogPostPageAccessValidationHandlerNormalizedRequestDict,
             self.normalized_request
