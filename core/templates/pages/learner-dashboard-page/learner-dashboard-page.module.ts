@@ -33,11 +33,15 @@ import { GoalsTabComponent } from './goals-tab.component';
 import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
 import { LearnerTopicSummaryTileComponent } from 'components/summary-tile/learner-topic-summary-tile.component';
 import { HomeTabComponent } from './home-tab.component';
+import { LearnerGroupsTabComponent } from './learner-groups-tab.component';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
+import { DeclineInvitationModalComponent } from './modal-templates/decline-invitaiton-modal.component';
+import { ViewLearnerGroupInvitationModalComponent } from './modal-templates/view-learner-group-invitation-modal.component';
 import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
+import { ViewLearnerGroupDetailsModalComponent } from './modal-templates/view-learner-group-details-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
@@ -60,10 +64,14 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     ProgressTabComponent,
     GoalsTabComponent,
     HomeTabComponent,
+    LearnerGroupsTabComponent,
     LearnerTopicSummaryTileComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
-    LearnerDashboardSuggestionModalComponent
+    LearnerDashboardSuggestionModalComponent,
+    DeclineInvitationModalComponent,
+    ViewLearnerGroupInvitationModalComponent,
+    ViewLearnerGroupDetailsModalComponent
   ],
   entryComponents: [
     LearnerDashboardPageComponent,
@@ -72,10 +80,14 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     ProgressTabComponent,
     GoalsTabComponent,
     HomeTabComponent,
+    LearnerGroupsTabComponent,
     LearnerTopicSummaryTileComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
-    LearnerDashboardSuggestionModalComponent
+    LearnerDashboardSuggestionModalComponent,
+    DeclineInvitationModalComponent,
+    ViewLearnerGroupInvitationModalComponent,
+    ViewLearnerGroupDetailsModalComponent
   ],
   providers: [
     {

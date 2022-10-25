@@ -2072,6 +2072,7 @@ class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
     all_node_dicts: List[StoryNodeDict]
     topic_name: str
     topic_url_fragment: str
+    classroom_url_fragment: Optional[str]
 
 
 class StoryChapterProgressSummaryDict(TypedDict):

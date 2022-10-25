@@ -27,6 +27,8 @@ import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupAllLearnersInfo } from 'domain/learner_group/learner-group-all-learners-info.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { LoaderService } from 'services/loader.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
@@ -35,11 +37,22 @@ class MockTrunctePipe {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: '',
+    },
+    gtag: () => {}
+  };
+}
+
 describe('LearnerGroupPreferencesComponent', () => {
   let component: LearnerGroupPreferencesComponent;
   let fixture: ComponentFixture<LearnerGroupPreferencesComponent>;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let ngbModal: NgbModal;
+  let loaderService: LoaderService;
+  let windowRef: MockWindowRef;
 
   const learnerGroupBackendDict = {
     id: 'groupId',
@@ -55,6 +68,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     learnerGroupBackendDict);
 
   beforeEach(() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
@@ -62,7 +76,12 @@ describe('LearnerGroupPreferencesComponent', () => {
         MockTranslatePipe,
         MockTrunctePipe
       ],
-      providers: [],
+      providers: [
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
@@ -71,6 +90,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
+    loaderService = TestBed.inject(LoaderService);
     fixture = TestBed.createComponent(LearnerGroupPreferencesComponent);
     component = fixture.componentInstance;
 
@@ -157,7 +177,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     expect(component.learnerGroup).toEqual(learnerGroup);
 
     component.ngOnInit();
-    tick(100);
+    tick();
 
     expect(component.currentLearnersInfo).toEqual([learnerInfo3]);
     expect(component.invitedLearnersInfo).toEqual([learnerInfo1, learnerInfo2]);
@@ -185,7 +205,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     component.newLearnerGroupDescription = 'description';
 
     component.saveLearnerGroupInfo();
-    tick(100);
+    tick();
     fixture.detectChanges();
 
     expect(component.learnerGroup.title).toBe('title');
@@ -197,40 +217,6 @@ describe('LearnerGroupPreferencesComponent', () => {
     component.updateInvitedLearners(['username1', 'username2']);
     expect(component.invitedLearners).toEqual(['username1', 'username2']);
   });
-
-  it('should add new learner to learner group successfully', fakeAsync(() => {
-    const demoLearnerGroupBackendDict = {
-      id: 'groupId',
-      title: 'title',
-      description: 'description',
-      facilitator_usernames: ['facilitator_username'],
-      learner_usernames: [],
-      invited_learner_usernames: ['username1', 'username2'],
-      subtopic_page_ids: [],
-      story_ids: ['story_id_1']
-    };
-    const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
-      demoLearnerGroupBackendDict);
-    const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
-      username: 'username1',
-      profile_picture_data_url: 'picture',
-      error: ''
-    });
-
-    spyOn(learnerGroupBackendApiService, 'updateLearnerGroupInviteAsync')
-      .and.returnValue(Promise.resolve(learnerGroup));
-
-    component.learnerGroup = demoLearnerGroup;
-    component.currentLearnersInfo = [];
-    component.invitedLearnersInfo = [newLearnerInfo];
-
-    component.addLearnerToLearnerGroup(newLearnerInfo);
-    tick(100);
-    fixture.detectChanges();
-
-    expect(component.learnerGroup).toEqual(learnerGroup);
-    expect(component.currentLearnersInfo).toEqual([newLearnerInfo]);
-  }));
 
   it('should get user profile image data url correctly', () => {
     const dataUrl = '%2Fimages%2Furl%2F1';
@@ -280,7 +266,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     component.invitedLearnersInfo = [];
 
     component.openInviteLearnersModal();
-    tick(100);
+    tick();
     fixture.detectChanges();
 
     expect(component.learnerGroup).toEqual(learnerGroup);
@@ -321,7 +307,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       component.currentLearnersInfo = [learnerInfo];
 
       component.openInviteLearnersModal();
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(demoLearnerGroup);
@@ -373,7 +359,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       component.invitedLearnersInfo = [];
 
       component.openInviteLearnersModal();
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
@@ -416,7 +402,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       component.currentLearnersInfo = [learnerInfo];
 
       component.openRemoveLearnerFromGroupModal(learnerInfo);
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
@@ -459,11 +445,33 @@ describe('LearnerGroupPreferencesComponent', () => {
       component.invitedLearnersInfo = [learnerInfo];
 
       component.openWithdrawLearnerInvitationModal(learnerInfo);
-      tick(100);
+      tick();
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
       expect(component.invitedLearnersInfo).toEqual([]);
     })
   );
+
+  it('should successfully delete learner group', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        learnerGroupTitle: learnerGroup.title,
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
+    spyOn(learnerGroupBackendApiService, 'deleteLearnerGroupAsync')
+      .and.returnValue(Promise.resolve(true));
+    spyOn(loaderService, 'showLoadingScreen');
+
+    component.learnerGroup = learnerGroup;
+
+    component.deleteLearnerGroup();
+    tick();
+
+    expect(windowRef.nativeWindow.location.href).toBe(
+      '/facilitator-dashboard');
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
+      'Deleting Group');
+  }));
 });

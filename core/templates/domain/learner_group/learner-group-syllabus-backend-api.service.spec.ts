@@ -186,4 +186,37 @@ describe('Learner Group Syllabus Backend API Service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should successfully fetch learner specific progress in assigned ' +
+    'syllabus', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    const LEARNER_GROUP_LEARNER_SPECIFIC_PROGRESS_URL = (
+      '/learner_group_learner_specific_progress_handler/groupId');
+
+    const learnerProgressDict = {
+      username: 'user1',
+      progress_sharing_is_turned_on: true,
+      profile_picture_data_url: 'picture',
+      stories_progress: [sampleStorySummaryBackendDict],
+      subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
+    };
+
+    learnerGroupSyllabusBackendApiService
+      .fetchLearnerSpecificProgressInAssignedSyllabus('groupId')
+      .then(successHandler, failHandler);
+
+    var req = httpTestingController.expectOne(
+      LEARNER_GROUP_LEARNER_SPECIFIC_PROGRESS_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(learnerProgressDict);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      LearnerGroupUserProgress.createFromBackendDict(
+        learnerProgressDict));
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

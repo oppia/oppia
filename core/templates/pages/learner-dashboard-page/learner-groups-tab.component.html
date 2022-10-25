@@ -1,0 +1,86 @@
+<div class="learner-groups-tab" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+  <div class="learner-of-learner-groups-section">
+    <h3 class="learner-groups-section-heading">
+      <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION' | translate"></span>
+    </h3>
+    <div class="oppia-learner-groups-feature-info">
+      <div class="oppia-learner-groups-feature-info-desc-container">
+        <span translate="I18N_LEARNER_GROUP_SECTION_FEATURE_INFO_DESC"></span>
+      </div>
+    </div>
+  </div>
+  <mat-accordion class="invited-to-learner-groups-section">
+    <mat-expansion-panel hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="invited-groups-info-summary-container">
+            <div class="invited-groups-info-summary">
+              <div class="learner-groups-heading">
+                <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_INVITATIONS' | translate"></span>
+              </div>
+              <div *ngIf="invitedToLearnerGroups.length > 0" class="invitations-count-pill">{{ invitedToLearnerGroups.length }}</div>
+            </div>
+            <div class="drop-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                <path d="M15.1414 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                <path d="M0.999244 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="oppia-learner-group-summary-cards-container"
+            *ngIf="invitedToLearnerGroups.length > 0">
+        <div class="oppia-learner-group-summary-card"
+              *ngFor="let learnerGroupSummary of invitedToLearnerGroups">
+          <div class="oppia-learner-group-summary-card-info">
+            <div class="oppia-learner-group-summary-card-title">
+              {{ learnerGroupSummary.title }}
+            </div>
+            <div class="oppia-learner-group-summary-card-learners">
+              <span translate="I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT"></span>: &nbsp;
+              <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
+            </div>
+          </div>
+          <div class="oppia-learner-group-summary-card-cta-buttons">
+            <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">
+              <span [innerHTML]="'I18N_LEARNER_GROUP_VIEW_DETAILS' | translate"></span>
+            </div>
+            <i class="fa fa-check learner-group-accept-invite-button" aria-hidden="true" (click)="acceptLearnerGroupInvitation(learnerGroupSummary)"></i>
+            <i class="fa fa-times learner-group-decline-invite-button" (click)="declineLearnerGroupInvitation(learnerGroupSummary)"></i>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-learner-groups-feature-info"
+           *ngIf="invitedToLearnerGroups.length == 0">
+        <span class="oppia-learner-group-no-invitations" translate="I18N_LEARNER_GROUP_NO_INVITATIONS"></span>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <div class="learner-of-learner-groups-section">
+    <div class="learner-groups-heading">
+      <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_GROUPS' | translate"></span>
+    </div>
+    <div class="oppia-learner-group-summary-cards-container"
+         *ngIf="learnerGroupsJoined.length > 0">
+      <div class="oppia-learner-group-summary-card"
+            *ngFor="let learnerGroupSummary of learnerGroupsJoined; let idx = index;">
+        <a [href]="getLearnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
+          <div class="oppia-learner-group-summary-card-title">
+            {{ learnerGroupSummary.title }}
+          </div>
+          <div class="oppia-learner-group-summary-card-learners">
+            <span translate="I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT"></span>: &nbsp;
+            <span *ngFor="let facilitator of learnerGroupSummary.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
+          </div>
+        </a>
+        <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">
+          <span [innerHTML]="'I18N_LEARNER_GROUP_VIEW_DETAILS' | translate"></span>
+        </div>
+      </div>
+    </div>
+    <div class="oppia-learner-groups-feature-info" *ngIf="learnerGroupsJoined.length == 0">
+      <span class="oppia-no-learner-groups" translate="I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_NO_GROUPS"></span>
+    </div>
+  </div>
+</div>

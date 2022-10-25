@@ -55,6 +55,8 @@ import { LearnerGroupLearnerSpecificProgressComponent } from
   './learner-group-learner-specific-progress.component';
 import { InviteSuccessfulModalComponent } from
   '../templates/invite-successful-modal.component';
+import { DeleteLearnerGroupModalComponent } from
+  '../templates/delete-learner-group-modal.component';
 
 @NgModule({
   imports: [
@@ -81,7 +83,8 @@ import { InviteSuccessfulModalComponent } from
     RemoveItemModalComponent,
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
-    InviteSuccessfulModalComponent
+    InviteSuccessfulModalComponent,
+    DeleteLearnerGroupModalComponent
   ],
   entryComponents: [
     EditLearnerGroupPageComponent,
@@ -96,7 +99,8 @@ import { InviteSuccessfulModalComponent } from
     RemoveItemModalComponent,
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
-    InviteSuccessfulModalComponent
+    InviteSuccessfulModalComponent,
+    DeleteLearnerGroupModalComponent
   ],
   providers: [
     {

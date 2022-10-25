@@ -40,14 +40,13 @@
       </form>
     </div>
 
-    <div class="oppia-same-row-container">
+    <div class="oppia-same-row-container oppia-search-filter">
       <div ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'type')"
                 type="button"
                 class="btn oppia-search-bar-type-input dropdown-toggle"
                 title="{{ selectionDetails.types.description | translate }}">
-          <i *ngIf="isMobileViewActive()" class="material-icons md-18 type-selector-icon">&#xE574;</i>
           {{ typeButtonText | truncate:14 }}
         </button>
         <ul ngbDropdownMenu
@@ -73,14 +72,13 @@
       </div>
     </div>
 
-    <div class="oppia-same-row-container">
+    <div class="oppia-same-row-container oppia-search-filter">
       <div ngbDropdown class="search-bar-float-left oppia-search-bar-category-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'category')"
                 type="button"
                 class="btn oppia-search-bar-category-input dropdown-toggle"
                 title="{{ selectionDetails.categories.description | translate }}">
-          <i *ngIf="isMobileViewActive()" class="material-icons md-18 category-selector-icon">&#xE574;</i>
           {{ categoryButtonText | truncate:14 }}
         </button>
         <ul ngbDropdownMenu
@@ -106,14 +104,13 @@
       </div>
     </div>
 
-    <div class="oppia-same-row-container">
+    <div class="oppia-same-row-container oppia-search-filter">
       <div ngbDropdown class="search-bar-float-left oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'language')"
                 type="button"
                 class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle"
                 title="{{selectionDetails.languageCodes.description | translate}}">
-          <i *ngIf="isMobileViewActive()" class="material-icons md-18 language-selector-icon">&#xe8e2;</i>
           {{ languageButtonText | truncate:14 }}
         </button>
         <ul ngbDropdownMenu class="oppia-search-bar-dropdown-menu-section dropdown-menu"

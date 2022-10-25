@@ -22,7 +22,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
+import { DeleteLearnerGroupModalComponent } from '../templates/delete-learner-group-modal.component';
 import { InviteLearnersModalComponent } from '../templates/invite-learners-modal.component';
 import { InviteSuccessfulModalComponent } from '../templates/invite-successful-modal.component';
 import { RemoveItemModalComponent } from
@@ -49,6 +52,8 @@ export class LearnerGroupPreferencesComponent implements OnInit {
 
   constructor(
     private ngbModal: NgbModal,
+    private windowRef: WindowRef,
+    private loaderService: LoaderService,
     private learnerGroupBackendApiService:
       LearnerGroupBackendApiService
   ) {}
@@ -210,17 +215,27 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     return decodeURIComponent(dataUrl);
   }
 
-  addLearnerToLearnerGroup(learner: LearnerGroupUserInfo): void {
-    this.learnerGroup.addLearner(learner.username);
-    this.learnerGroup.revokeInvitation(learner.username);
-    this.invitedLearnersInfo = this.invitedLearnersInfo.filter(
-      (invitedLearner) => invitedLearner.username !== learner.username
+  deleteLearnerGroup(): void {
+    let modalRef = this.ngbModal.open(
+      DeleteLearnerGroupModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'delete-learner-group-modal'
+      }
     );
-    this.learnerGroupBackendApiService.updateLearnerGroupInviteAsync(
-      this.learnerGroup.id, learner.username, true, true
-    ).then((learnerGroup) => {
-      this.learnerGroup = learnerGroup;
-      this.currentLearnersInfo.push(learner);
+    modalRef.componentInstance.learnerGroupTitle = this.learnerGroup.title;
+
+    modalRef.result.then(() => {
+      this.loaderService.showLoadingScreen('Deleting Group');
+      this.learnerGroupBackendApiService.deleteLearnerGroupAsync(
+        this.learnerGroup.id
+      ).then(() => {
+        this.windowRef.nativeWindow.location.href = '/facilitator-dashboard';
+      });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     });
   }
 }

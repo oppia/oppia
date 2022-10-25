@@ -169,3 +169,53 @@ def can_multi_learners_share_progress(
                 break
 
     return progress_sharing_permissions
+
+
+def get_invited_learner_groups_of_learner(
+    user_id: str
+) -> List[learner_group_domain.LearnerGroup]:
+    """Returns a list of learner groups that the given learner has been
+    invited to join.
+
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        list(LearnerGroup). A list of learner groups that the given learner
+        has been invited to join.
+    """
+    learner_grp_models = (
+        learner_group_models.LearnerGroupModel.get_by_invited_learner_user_id(
+            user_id))
+
+    if not learner_grp_models:
+        return []
+
+    return [
+        learner_group_services.get_learner_group_from_model(model)
+        for model in learner_grp_models
+    ]
+
+
+def get_learner_groups_joined_by_learner(
+    user_id: str
+) -> List[learner_group_domain.LearnerGroup]:
+    """Returns a list of learner groups that the given learner has joined.
+
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        list(LearnerGroup). A list of learner groups that the given learner
+        is part of.
+    """
+    learner_grp_models = (
+        learner_group_models.LearnerGroupModel.get_by_learner_user_id(user_id))
+
+    if not learner_grp_models:
+        return []
+
+    return [
+        learner_group_services.get_learner_group_from_model(model)
+        for model in learner_grp_models
+    ]

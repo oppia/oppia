@@ -467,7 +467,7 @@ class SubtopicPageSummaryTests(test_utils.GenericTestBase):
         self.subtopic_page_summary = subtopic_page_domain.SubtopicPageSummary(
             self.SUBTOPIC_ID, self.SUBTOPIC_TITLE, self.TOPIC_ID,
             self.TOPIC_TITLE, 'thumbnail_filename', 'red',
-            self.SUBTOPIC_MASTERY
+            self.SUBTOPIC_MASTERY, 'topic-url', 'classroom-url'
         )
 
     def test_to_dict(self) -> None:

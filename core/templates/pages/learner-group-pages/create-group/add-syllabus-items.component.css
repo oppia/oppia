@@ -93,6 +93,7 @@
   gap: 10px;
   height: 170px;
   margin: 10px 0;
+  overflow-y: hidden;
   padding: 10px;
 }
 
@@ -101,8 +102,9 @@
   border-radius: 4px;
   display: grid;
   justify-items: center;
+  max-width: 130px;
+  min-width: 130px;
   position: relative;
-  width: 130px;
 }
 
 .oppia-add-learner-group-syllabus .added-syllabus-item-card .syllabus-item-image {
@@ -253,4 +255,62 @@
 
 .oppia-add-learner-group-syllabus .oppia-search-spinner .oppia-animate-spin {
   font-size: 50px;
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-add-learner-group-syllabus .learner-group-syllabus-filters-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .oppia-add-learner-group-syllabus .oppia-same-row-container.oppia-search-box-container {
+    grid-column: 1/-1;
+    width: unset;
+  }
+
+  .oppia-add-learner-group-syllabus .oppia-same-row-container.oppia-search-filter {
+    grid-row: 2;
+    width: unset;
+  }
+
+  .oppia-add-learner-group-syllabus .oppia-same-row-container .oppia-search-bar-category-selector,
+  .oppia-add-learner-group-syllabus .oppia-same-row-container .oppia-search-bar-language-selector {
+    right: unset;
+    transform: unset;
+  }
+
+  .oppia-create-learner-group .add-syllabus-items-message {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .oppia-add-learner-group-syllabus .syllabus-item-card {
+    display: grid;
+    max-height: unset;
+    padding-right: 0;
+  }
+
+  .oppia-add-learner-group-syllabus .syllabus-item-image-title-container {
+    align-items: unset;
+    display: grid;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .oppia-add-learner-group-syllabus .syllabus-item-cta-buttons-container {
+    justify-content: unset;
+    padding: 10px;
+    width: 100%;
+  }
+
+  .oppia-add-learner-group-syllabus .syllabus-item-image {
+    height: 130px;
+    width: 100%;
+  }
+
+  .oppia-add-learner-group-syllabus .syllabus-item-title-container {
+    justify-content: unset;
+    padding: 10px;
+  }
 }

@@ -691,7 +691,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color':
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-            'subtopic_mastery': None
+            'subtopic_mastery': None,
+            'parent_topic_url_fragment': 'abbrev',
+            'classroom_url_fragment': None
         }]
         summaries = (
             subtopic_page_services

@@ -207,6 +207,23 @@ def is_user_facilitator(user_id: str, group_id: str) -> bool:
     return user_id in learner_group_model.facilitator_user_ids
 
 
+def is_user_learner(user_id: str, group_id: str) -> bool:
+    """Checks if the user is a learner of the learner group.
+
+    Args:
+        user_id: str. The id of the user.
+        group_id: str. The id of the learner group.
+
+    Returns:
+        bool. Whether the user is a learner of the learner group.
+    """
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
+
+    return user_id in learner_group_model.learner_user_ids
+
+
 def remove_learner_group(group_id: str) -> None:
     """Removes the learner group with of given learner group ID.
 
@@ -386,7 +403,9 @@ def get_matching_subtopic_syllabus_item_dicts(
                     'parent_topic_name': topic.name,
                     'thumbnail_filename': subtopic.thumbnail_filename,
                     'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                    'subtopic_mastery': None
+                    'subtopic_mastery': None,
+                    'parent_topic_url_fragment': topic.url_fragment,
+                    'classroom_url_fragment': None
                 })
 
     return matching_subtopic_syllabus_item_dicts
@@ -448,7 +467,8 @@ def get_matching_story_syllabus_item_dicts(
                     story.story_contents.nodes
                 ],
                 'topic_name': topic.name,
-                'topic_url_fragment': topic.url_fragment
+                'topic_url_fragment': topic.url_fragment,
+                'classroom_url_fragment': None
             })
 
     return matching_story_syllabus_item_dicts
@@ -738,3 +758,37 @@ def remove_subtopic_page_reference_from_learner_groups(
     learner_group_models.LearnerGroupModel.update_timestamps_multi(
         models_to_put)
     learner_group_models.LearnerGroupModel.put_multi(models_to_put)
+
+
+def update_progress_sharing_permission(
+    user_id: str,
+    group_id: str,
+    new_progress_sharing_permission: bool
+) -> None:
+    """Updates the progress sharing permission of the learner group.
+
+    Args:
+        user_id: str. The id of the user.
+        group_id: str. The id of the learner group.
+        new_progress_sharing_permission: bool. The new progress sharing
+            permission of the learner group.
+    """
+    learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
+        user_id, strict=True
+    )
+
+    old_user_details = learner_grps_user_model.learner_groups_user_details
+    learner_grps_user_model.learner_groups_user_details = []
+    for group_details in old_user_details:
+        if group_details['group_id'] == group_id:
+            learner_grps_user_model.learner_groups_user_details.append({
+                'group_id': group_id,
+                'progress_sharing_is_turned_on':
+                    new_progress_sharing_permission
+            })
+        else:
+            learner_grps_user_model.learner_groups_user_details.append(
+                group_details)
+
+    learner_grps_user_model.update_timestamps()
+    learner_grps_user_model.put()
