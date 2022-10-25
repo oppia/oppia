@@ -179,8 +179,7 @@ class ExplorationOpportunitySummary:
             'chapter_title': self.chapter_title,
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
-            'translation_in_review_counts': self.translation_in_review_counts,
-            'language_codes': self.language_codes_needing_voice_artists
+            'translation_in_review_counts': self.translation_in_review_counts
         }
 
     def validate(self) -> None:
