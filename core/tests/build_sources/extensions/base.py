@@ -50,8 +50,7 @@ from extensions import domain
 from extensions.visualizations import models
 from extensions.objects.models import objects
 
-from typing import Any, Dict, List, Optional, Set, Tuple
-from typing_extensions import Final, TypedDict
+from typing import Any, Dict, Final, List, Optional, Set, Tuple, TypedDict
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.

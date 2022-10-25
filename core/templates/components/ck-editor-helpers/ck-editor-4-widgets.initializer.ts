@@ -21,7 +21,7 @@ import { NgZone } from '@angular/core';
 import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
-export interface RteComponentSpecs {
+interface RteComponentSpecs {
   backendId: string;
   customizationArgSpecs: {
     name: string; value: unknown; 'default_value': unknown;
@@ -205,11 +205,13 @@ export class CkEditorInitializerService {
                   const customEl = that.element.getChild(0).$;
                   customEl[capital.join('') + 'WithValue'] = (
                     htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] || ''));
+                      that.data[spec.name] !== undefined ?
+                      that.data[spec.name] : ''));
                   that.element.getChild(0).setAttribute(
                     spec.name + '-with-value',
                     htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] || ''));
+                      that.data[spec.name] !== undefined ?
+                      that.data[spec.name] : ''));
                 });
               },
               init: function() {

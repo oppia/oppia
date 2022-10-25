@@ -40,7 +40,9 @@
       "filters/*": ["core/templates/filters/*"],
       "static/*": ["third_party/static/*"],
       "tests/*": ["core/templates/tests/*"],
-      "utility/*": ["core/templates/utility/*"]
+      "utility/*": ["core/templates/utility/*"],
+      "visualizations/*": ["extensions/visualizations/*"],
+      "value_generators/*": ["extensions/value_generators/*"]
     }
   },
   "files": [

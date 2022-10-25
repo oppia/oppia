@@ -213,16 +213,6 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
-        r'%s/can_access_blog_home_page' %
-        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.BlogHomePageAccessValidationHandler),
-
-    get_redirect_route(
-        r'%s/can_access_blog_post_page' %
-        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.BlogPostPageAccessValidationHandler),
-
-    get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
 
@@ -485,12 +475,12 @@ URLS = [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
-        blog_homepage.BlogPostDataHandler),
-    get_redirect_route(
         r'%s/<author_username>' %
-        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
         blog_homepage.AuthorsPageHandler),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        blog_homepage.BlogPostHandler),
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
@@ -1081,10 +1071,6 @@ URLS.extend((
         r'/learn/<classroom_url_fragment>',
         oppia_root.OppiaLightweightRootPage
     ),
-    get_redirect_route(
-        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
-        oppia_root.OppiaRootPage
-    ),
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work
@@ -1125,9 +1111,6 @@ URLS.extend((
     get_redirect_route(
         r'%s' % feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS,
         tasks.UnsentFeedbackEmailHandler),
-    get_redirect_route(
-        r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
-        tasks.SuggestionEmailHandler),
     get_redirect_route(
         r'%s' % (
             feconf

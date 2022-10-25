@@ -27,6 +27,8 @@ import subprocess
 
 import github
 
+from typing import Final, List
+
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -34,17 +36,16 @@ from scripts import common  # isort:skip  # pylint: disable=wrong-import-positio
 from core import constants  # isort:skip  # pylint: disable=wrong-import-position
 from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
-
-ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
+ABOUT_PAGE_CONSTANTS_FILEPATH: Final = os.path.join(
     'core', 'templates', 'pages', 'about-page',
     'about-page.constants.ts')
-AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
-CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
-CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
-PACKAGE_JSON_FILEPATH = os.path.join('', 'package.json')
-SETUP_PY_FILEPATH = os.path.join('', 'setup.py')
-FECONF_PY_FILEPATH = os.path.join('core', 'feconf.py')
-LIST_OF_FILEPATHS_TO_MODIFY = (
+AUTHORS_FILEPATH: Final = os.path.join('', 'AUTHORS')
+CHANGELOG_FILEPATH: Final = os.path.join('', 'CHANGELOG')
+CONTRIBUTORS_FILEPATH: Final = os.path.join('', 'CONTRIBUTORS')
+PACKAGE_JSON_FILEPATH: Final = os.path.join('', 'package.json')
+SETUP_PY_FILEPATH: Final = os.path.join('', 'setup.py')
+FECONF_PY_FILEPATH: Final = os.path.join('core', 'feconf.py')
+LIST_OF_FILEPATHS_TO_MODIFY: Final = (
     CHANGELOG_FILEPATH,
     AUTHORS_FILEPATH,
     CONTRIBUTORS_FILEPATH,
@@ -52,20 +53,22 @@ LIST_OF_FILEPATHS_TO_MODIFY = (
     ABOUT_PAGE_CONSTANTS_FILEPATH,
     PACKAGE_JSON_FILEPATH
 )
-GIT_CMD_CHECKOUT = 'git checkout -- %s' % ' '.join(LIST_OF_FILEPATHS_TO_MODIFY)
+GIT_CMD_CHECKOUT: Final = (
+    'git checkout -- %s' % ' '.join(LIST_OF_FILEPATHS_TO_MODIFY)
+)
 
 # These constants should match the format defined in
 # about-page.constants.ts. If the patterns do not match,
 # update_changelog_and_credits_test will fail.
-CREDITS_START_LINE = '  CREDITS_CONSTANTS: [\n'
-CREDITS_END_LINE = '  ]\n'
-CREDITS_INDENT = '    '
+CREDITS_START_LINE: Final = '  CREDITS_CONSTANTS: [\n'
+CREDITS_END_LINE: Final = '  ]\n'
+CREDITS_INDENT: Final = '    '
 
 # This ordering should not be changed. The automatic updates to
 # changelog and credits performed using this script will work
 # correctly only if the ordering of sections in release summary
 # file matches this expected ordering.
-EXPECTED_ORDERING_DICT = {
+EXPECTED_ORDERING_DICT: Final = {
     constants.release_constants.CHANGELOG_HEADER: (
         constants.release_constants.COMMIT_HISTORY_HEADER),
     constants.release_constants.NEW_AUTHORS_HEADER: (
@@ -73,14 +76,14 @@ EXPECTED_ORDERING_DICT = {
     constants.release_constants.NEW_CONTRIBUTORS_HEADER: (
         constants.release_constants.EMAIL_HEADER)
 }
-CURRENT_DATE = datetime.date.today().strftime('%d %b %Y')
+CURRENT_DATE: Final = datetime.date.today().strftime('%d %b %Y')
 
-_PARSER = argparse.ArgumentParser()
+_PARSER: Final = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--github_username', help=('Your GitHub username.'), type=str)
 
 
-def update_sorted_file(filepath, new_list):
+def update_sorted_file(filepath: str, new_list: List[str]) -> None:
     """Updates the files AUTHORS and CONTRIBUTORS with a sorted list of
     new authors or contributors.
 
@@ -110,7 +113,7 @@ def update_sorted_file(filepath, new_list):
             f.write(line)
 
 
-def is_order_of_sections_valid(release_summary_lines):
+def is_order_of_sections_valid(release_summary_lines: List[str]) -> bool:
     """Checks that the ordering of sections in release_summary file
     matches the expected ordering.
 
@@ -145,7 +148,9 @@ def is_order_of_sections_valid(release_summary_lines):
     return True
 
 
-def get_previous_release_version(branch_type, current_release_version_number):
+def get_previous_release_version(
+    branch_type: str, current_release_version_number: str
+) -> str:
     """Finds previous version given the current version.
 
     Args:
@@ -160,8 +165,8 @@ def get_previous_release_version(branch_type, current_release_version_number):
         Exception. Previous release version is same as current release version.
     """
     all_tags = subprocess.check_output(
-        ['git', 'tag']
-    )[:-1].decode('utf-8').split('\n')
+        ['git', 'tag'], encoding='utf-8'
+    )[:-1].split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
     # version.
     # Standard output is in bytes, we need to decode the line to print it.
@@ -177,15 +182,17 @@ def get_previous_release_version(branch_type, current_release_version_number):
 
 
 def remove_repetition_from_changelog(
-        current_release_version_number, previous_release_version,
-        changelog_lines):
+    current_release_version_number: str,
+    previous_release_version: str,
+    changelog_lines: List[str]
+) -> List[str]:
     """Removes information about current version from changelog before
     generation of changelog again.
 
     Args:
         current_release_version_number: str. The current release version.
         previous_release_version: str. The previous release version.
-        changelog_lines: str. The lines of changelog file.
+        changelog_lines: List[str]. The lines of changelog file.
 
     Returns:
         list(str). Changelog lines with no information on current release
@@ -203,7 +210,10 @@ def remove_repetition_from_changelog(
 
 
 def update_changelog(
-        branch_name, release_summary_lines, current_release_version_number):
+    branch_name: str,
+    release_summary_lines: List[str],
+    current_release_version_number: str
+) -> None:
     """Updates CHANGELOG file.
 
     Args:
@@ -253,7 +263,7 @@ def update_changelog(
     print('Updated Changelog!')
 
 
-def get_new_authors(release_summary_lines):
+def get_new_authors(release_summary_lines: List[str]) -> List[str]:
     """Returns the list of new authors in release_summary_lines.
 
     Args:
@@ -273,7 +283,9 @@ def get_new_authors(release_summary_lines):
     return new_authors
 
 
-def get_new_contributors(release_summary_lines, return_only_names=False):
+def get_new_contributors(
+    release_summary_lines: List[str], return_only_names: bool = False
+) -> List[str]:
     """Returns the list of new contributors in release_summary_lines.
 
     Args:
@@ -301,7 +313,7 @@ def get_new_contributors(release_summary_lines, return_only_names=False):
         contributor.split('<')[0].strip() for contributor in new_contributors]
 
 
-def update_authors(release_summary_lines):
+def update_authors(release_summary_lines: List[str]) -> None:
     """Updates AUTHORS file.
 
     Args:
@@ -314,7 +326,7 @@ def update_authors(release_summary_lines):
     print('Updated AUTHORS file!')
 
 
-def update_contributors(release_summary_lines):
+def update_contributors(release_summary_lines: List[str]) -> None:
     """Updates CONTRIBUTORS file.
 
     Args:
@@ -327,7 +339,7 @@ def update_contributors(release_summary_lines):
     print('Updated CONTRIBUTORS file!')
 
 
-def update_developer_names(release_summary_lines):
+def update_developer_names(release_summary_lines: List[str]) -> None:
     """Updates about-page.constants.ts file.
 
     Args:
@@ -357,7 +369,10 @@ def update_developer_names(release_summary_lines):
     print('Updated about-page file!')
 
 
-def remove_updates_and_delete_branch(repo_fork, target_branch):
+def remove_updates_and_delete_branch(
+    repo_fork: github.Repository.Repository,
+    target_branch: str
+) -> None:
     """Remove changes made to AUTHORS, CHANGELOG, CONTRIBUTORS
     and about-page and delete the branch created with these changes.
 
@@ -384,8 +399,12 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
 
 
 def create_branch(
-        repo, repo_fork, target_branch, github_username,
-        current_release_version_number):
+    repo: github.Repository.Repository,
+    repo_fork: github.Repository.Repository,
+    target_branch: str,
+    github_username: str,
+    current_release_version_number: str
+) -> None:
     """Creates a new branch with updates to AUTHORS, CHANGELOG,
     CONTRIBUTORS, about-page, and package.json.
 
@@ -407,6 +426,12 @@ def create_branch(
 
     for filepath in LIST_OF_FILEPATHS_TO_MODIFY:
         contents = repo_fork.get_contents(filepath, ref=target_branch)
+        # The return type of 'get_contents' method is Union[Content,
+        # List[Content]], but as we are providing single filepath every
+        # time to this 'get_contents' method, the return type is always
+        # going to be 'Content'. So, to rule out the list type for MyPy
+        # type checking, we used assert here.
+        assert not isinstance(contents, list)
         with utils.open_file(filepath, 'r') as f:
             repo_fork.update_file(
                 contents.path, 'Update %s' % filepath, f.read(),
@@ -425,7 +450,7 @@ def create_branch(
             target_branch, current_release_version_number))
 
 
-def is_invalid_email_present(release_summary_lines):
+def is_invalid_email_present(release_summary_lines: List[str]) -> bool:
     """Checks if any invalid email is present in the list of
     new authors and contributors.
 
@@ -446,7 +471,7 @@ def is_invalid_email_present(release_summary_lines):
     return bool(invalid_email_ids)
 
 
-def get_release_summary_lines():
+def get_release_summary_lines() -> List[str]:
     """Returns the lines from release summary file. It checks whether
     incorrect email is present or ordering of sections is invalid.
     In either case, the user will be asked to update the release
@@ -483,7 +508,7 @@ def get_release_summary_lines():
     return release_summary_lines
 
 
-def update_version_in_config_files():
+def update_version_in_config_files() -> None:
     """Updates version param in package json file to match the current
     release version.
     """
@@ -504,7 +529,9 @@ def update_version_in_config_files():
     )
 
 
-def inform_server_errors_team(release_rota_url, server_error_playbook_url):
+def inform_server_errors_team(
+    release_rota_url: str, server_error_playbook_url: str
+) -> None:
     """Asks the release coordinator to inform the server errors team
     that the release will be deployed to production.
 
@@ -526,7 +553,7 @@ def inform_server_errors_team(release_rota_url, server_error_playbook_url):
             release_rota_url, server_error_playbook_url))
 
 
-def main():
+def main() -> None:
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
     if not common.is_current_branch_a_release_branch():
