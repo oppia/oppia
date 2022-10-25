@@ -205,7 +205,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
     def test_dependencies_syntax_testing_with_valid_syntax(self):
         install_third_party.test_dependencies_syntax(
-            'files', {
+            'zip', {
                 'version': 'c26ebb9baaf0abc060c8a13254dad283c6ee7304',
                 'downloadFormat': 'zip',
                 'url': 'https://github.com/oppia/MIDI.js/archive/c26e.zip',
@@ -275,7 +275,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 'dependencies': {
                     'frontend': {
                         'mathJax': {
-                            'url': 'https://github.com/mathjax/2.7.5.zip',
+                            'url': 'https://github.com/mathjax/2.7.5',
                             'files': ['MathJax-2.7.5.jar'],
                             'version': '2.7.5',
                             'targetDirPrefix': 'MathJax-',
@@ -298,7 +298,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                         'mathJax': {
                             'version': '2.7.5',
                             'url': 'https://github.com/mathjax/2.7.5.zip',
-                            'rootDirPrefix': 'MathJax-',
                             'targetDirPrefix': 'MathJax-'
                         }
                     }
@@ -309,9 +308,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         with return_json_swap, self.assertRaisesRegex(
             Exception,
             re.escape(
-                'downloadFormat not specified in {\'url\': '
-                '\'https://github.com/mathjax/2.7.5.zip\', \'files\': '
-                '[\'MathJax-2.4.5.jar\'], \'version\': \'2.4.5\', '
+                'downloadFormat not specified in {\'version\': \'2.7.5\', '
+                '\'url\': \'https://github.com/mathjax/2.7.5.zip\', '
                 '\'targetDirPrefix\': \'MathJax-\'}'
             )
         ):
@@ -356,7 +354,18 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                             'downloadFormat': 'zip',
                             'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
                             'rootDir': 'bootstrap-4.3.1-dist',
-                            'targetDir': 'bootstrap'}}}}
+                            'targetDir': 'bootstrap'
+                        },
+                        'angularTest': {
+                            'version': '1.8.2',
+                            'downloadFormat': 'files',
+                            'url': 'https://code.angularjs.org/1.8.2',
+                            'targetDirPrefix': 'angularjs-',
+                            'files': ['angular-mocks.js']
+                        },
+                    }
+                }
+            }
 
         def mock_validate_dependencies(unused_filepath):
             check_function_calls['validate_dependencies_is_called'] = True
