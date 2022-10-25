@@ -985,17 +985,18 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         seen_choices = []
         for choice in choices:
-            if choice.html in ('<p></p>', ''):
+            if choice.html.strip() in ('<p></p>', ''):
                 raise utils.ValidationError(
                     'Choices should be non empty.'
                 )
 
-            soup = bs4.BeautifulSoup(choice.html, 'html.parser')
-            p_value = soup.find('p').getText()
-            if p_value.strip() in ('<p></p>', ''):
-                raise utils.ValidationError(
-                    'Choices should be non empty.'
-                )
+            if '<p>' in choice.html:
+                soup = bs4.BeautifulSoup(choice.html, 'html.parser')
+                p_value = soup.find('p').getText()
+                if p_value.strip() in ('<p></p>', ''):
+                    raise utils.ValidationError(
+                        'Choices should be non empty.'
+                    )
 
             if choice.html not in seen_choices:
                 seen_choices.append(choice.html)

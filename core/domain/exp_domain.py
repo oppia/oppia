@@ -3242,6 +3242,28 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # Fix validation errors for exploration state interaction.
     # ########################################################.
     @classmethod
+    def _is_choice_empty(cls, choice: state_domain.SubtitledHtmlDict) -> bool:
+        """Checks if the choice is empty or not.
+
+        Args:
+            choice: state_domain.SubtitledHtmlDict. The choice that
+                needs to be validated.
+
+        Returns:
+            bool. Returns True if the choice is empty.
+        """
+        if choice['html'].strip() in ('<p></p>', ''):
+            return True
+
+        if '<p>' in choice['html']:
+            soup = bs4.BeautifulSoup(choice['html'], 'html.parser')
+            p_value = soup.find('p').getText()
+            if p_value.strip() in ('<p></p>', ''):
+                return True
+            
+        return False
+
+    @classmethod
     def _choices_should_be_unique_and_non_empty(
         cls,
         choices: List[state_domain.SubtitledHtmlDict],
@@ -3275,12 +3297,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         choices_content = []
         for choice in choices:
             choices_content.append(choice['html'])
-            if choice['html'] in ('<p></p>', ''):
-                empty_choices.append(choice)
-                continue
-            soup = bs4.BeautifulSoup(choice['html'], 'html.parser')
-            p_value = soup.find('p').getText()
-            if p_value.strip() in ('<p></p>', ''):
+            if cls._is_choice_empty(choice):
                 empty_choices.append(choice)
 
         if len(empty_choices) == 1:
@@ -4129,6 +4146,38 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
+    def _update_rule_value_having_empty_choices(
+        cls,
+        empty_choices: List[state_domain.SubtitledHtmlDict],
+        rule_value_x,
+        solution: Optional[List[List[str]]]
+    ) -> None:
+        """Removing empty choice from the rule values.
+
+        Args:
+            answer_groups: List[state_domain.AnswerGroupDict]. The answer group.
+        """
+        for empty_choice in empty_choices:
+            for rule_value in rule_value_x:
+                for choice in rule_value:
+                    if choice == empty_choice['content_id']:
+                        rule_value.remove(choice)
+                        break
+                if len(rule_value) == 0:
+                    rule_value_x.remove(rule_value)
+                    break
+
+            if solution is not None and isinstance(solution, list):
+                for choice_list in solution:
+                    for choice in choice_list:
+                       if choice == empty_choice['content_id']:
+                        choice_list.remove(choice)
+                        break
+                    if len(choice_list) == 0:
+                        solution.remove(choice_list)
+                        break
+
+    @classmethod
     def _fix_drag_and_drop_input_interaction(
         cls, state_dict: state_domain.StateDict, state_name: str
     ) -> None:
@@ -4169,11 +4218,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args'][
                 'choices']['value']
         )
+        solution = state_dict['interaction']['solution']['correct_answer']
 
-        # Fix RTE content present inside the choices.
+        # Fix RTE content and check for empty choices.
+        empty_choices = []
         for choice_drag in choices_drag_drop:
+            if cls._is_choice_empty(choice_drag):
+                empty_choices.append(choice_drag)
             choice_html = choice_drag['html']
             choice_drag['html'] = cls.fix_content(choice_html)
+
+        if len(empty_choices) > 0:
+            for empty_choice in empty_choices:
+                choices_drag_drop.remove(empty_choice)
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -4181,20 +4238,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group['rule_specs']:
                 rule_inputs = rule_spec['inputs']
                 assert isinstance(rule_inputs, dict)
-                rule_spec_x = (
-                    rule_inputs['x'])
+                rule_spec_x = rule_inputs['x']
 
                 if (
                     rule_spec['rule_type'] ==
                     'IsEqualToOrderingWithOneItemAtIncorrectPosition'
                 ):
+                    assert isinstance(rule_spec_x, list)
+                    if len(empty_choices) > 0:
+                        cls._update_rule_value_having_empty_choices(
+                            empty_choices, rule_spec_x, solution)
                     # `IsEqualToOrderingWithOneItemAtIncorrectPosition`
                     # rule should not be present when `multiple items at same
                     # place` setting is turned off.
                     if not multi_item_value:
                         invalid_rules.append(rule_spec)
                     else:
-                        assert isinstance(rule_spec_x, list)
                         temp = []
                         for x in rule_spec_x:
                             assert isinstance(x, list)
@@ -4204,23 +4263,45 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 # In `HasElementXBeforeElementY` rule, `X` value
                 # should not be equal to `Y` value.
-                elif (
-                    rule_spec['rule_type'] == 'HasElementXBeforeElementY' and
-                    rule_spec['inputs']['x'] == rule_spec['inputs']['y']
-                ):
-                    invalid_rules.append(rule_spec)
+                elif rule_spec['rule_type'] == 'HasElementXBeforeElementY':
+                    value_x = rule_spec['inputs']['x']
+                    value_y = rule_spec['inputs']['y']
+                    if (
+                        value_x == value_y or
+                        (
+                            value_x in empty_choice['content_id']
+                            for empty_choice in empty_choices
+                        ) or
+                        (
+                            value_y in empty_choice['content_id']
+                            for empty_choice in empty_choices
+                        )
+                    ):
+                        invalid_rules.append(rule_spec)
 
                 elif rule_spec['rule_type'] == 'HasElementXAtPositionY':
                     element = rule_spec['inputs']['x']
                     assert isinstance(element, str)
                     position = rule_spec['inputs']['y']
                     assert isinstance(position, int)
+
+                    if (
+                        element in empty_choice['content_id']
+                        for empty_choice in empty_choices
+                    ):
+                        invalid_rules.append(rule_spec)
+                        continue
+
                     ele_x_at_y_rules.append(
                         {'element': element, 'position': position}
                     )
 
                 elif rule_spec['rule_type'] == 'IsEqualToOrdering':
                     assert isinstance(rule_spec_x, list)
+                    if len(empty_choices) > 0:
+                        cls._update_rule_value_having_empty_choices(
+                            empty_choices, rule_spec_x, solution)
+
                     # Multiple items cannot be in the same place iff the
                     # setting is turned off.
                     for ele in rule_spec_x:
