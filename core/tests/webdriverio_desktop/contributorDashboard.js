@@ -231,6 +231,10 @@ describe('Contributor dashboard page', function() {
       copyButton, 'Copy button taking too long to appear');
     await action.click('Copy button', copyButton);
     await action.click('Image', images[0]);
+    await waitFor.visibilityOf(
+      doneButton, 'Done button is not visible');
+    await waitFor.elementToBeClickable(
+      doneButton, 'Done button is not clickable');
     await action.click('Done', doneButton);
     images = await $$('.e2e-test-image');
     expect(images.length).toEqual(2);
