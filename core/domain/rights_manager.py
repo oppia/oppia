@@ -870,9 +870,6 @@ def check_can_publish_activity(
     if activity_rights is None:
         return False
 
-    if user.user_id is None:
-        return False
-
     if activity_rights.cloned_from:
         return False
 
@@ -883,7 +880,7 @@ def check_can_publish_activity(
         return True
 
     if role_services.ACTION_PUBLISH_OWNED_ACTIVITY in user.actions:
-        if activity_rights.is_owner(user.user_id):
+        if user.user_id and activity_rights.is_owner(user.user_id):
             return True
 
     return False

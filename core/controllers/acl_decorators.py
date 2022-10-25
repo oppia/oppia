@@ -3875,18 +3875,20 @@ def can_view_reviewable_suggestions(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
-            raise Exception(
-                'User with user_id: %s is not allowed to review translation '
-                'suggestions.' % self.user_id
-            )
+            else:
+                raise Exception(
+                    'User with user_id: %s is not allowed to review '
+                    'translation suggestions.' % self.user_id
+                )
         elif suggestion_type == (
                 feconf.SUGGESTION_TYPE_ADD_QUESTION):
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
-            raise Exception(
-                'User with user_id: %s is not allowed to review question '
-                'suggestions.' % self.user_id
-            )
+            else:
+                raise Exception(
+                    'User with user_id: %s is not allowed to review question '
+                    'suggestions.' % self.user_id
+                )
         else:
             raise self.PageNotFoundException
 
@@ -3933,7 +3935,9 @@ def can_edit_entity(
         # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
-        functions: Dict[str, Callable[[str], _GenericHandlerFunctionReturnType]] = {
+        functions: (
+            Dict[str, Callable[[str], _GenericHandlerFunctionReturnType]]
+         ) = {
             feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (
                 can_edit_exploration(reduced_handler)(
                     self, entity_id, **kwargs)),
