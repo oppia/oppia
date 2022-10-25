@@ -80,8 +80,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
   );
 
-  @ViewChild('oppiaRTE') oppiaRTE: ElementRef;
-
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,

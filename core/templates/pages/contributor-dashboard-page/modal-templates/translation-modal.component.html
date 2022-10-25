@@ -71,14 +71,12 @@
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
                                [schema]="HTML_SCHEMA"
                                [localValue]="activeWrittenTranslation"
-                               (localValueChange)="updateHtml($event)"
-                               #oppiaRTE>
+                               (localValueChange)="updateHtml($event)">
           </schema-based-editor>
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'"
                                [schema]="UNICODE_SCHEMA"
                                [localValue]="activeWrittenTranslation"
-                               (localValueChange)="updateHtml($event)"
-                               #oppiaRTE>
+                               (localValueChange)="updateHtml($event)">
           </schema-based-editor>
           <div *ngIf="editorIsShown && isSetOfStringDataFormat()"
                class="oppia-rules-to-translate-container">
