@@ -17,10 +17,13 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import classroom_services
+from core.domain import config_domain
+from core.domain import learner_group_services
 from core.domain import user_services
 
 from typing import Dict, TypedDict, cast
@@ -44,6 +47,7 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'classroom_url_fragment': {
@@ -75,7 +79,10 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
@@ -113,12 +120,50 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
         """Handles GET requests."""
         pass
+
+
+class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
+    """Validates access to view learner group page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id: str) -> None:
+        """Handles GET requests."""
+        assert self.user_id is not None
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+            raise self.PageNotFoundException
+
+        is_valid_request = learner_group_services.is_user_learner(
+            self.user_id, learner_group_id)
+
+        if not is_valid_request:
+            raise self.PageNotFoundException
 
 
 class BlogHomePageAccessValidationHandler(base.BaseHandler):
@@ -127,6 +172,7 @@ class BlogHomePageAccessValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -151,6 +197,7 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'blog_post_url_fragment': {
