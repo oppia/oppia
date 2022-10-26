@@ -1523,7 +1523,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.assertRaisesRegex(
             Exception,
-            'The username must be provided when the filter criterion is \'username\'.'
+            'The username must be provided when the filter criterion '
+            'is \'username\'.'
         ):
             self.get_json(
                 feconf.ADMIN_ROLE_HANDLER_URL,
