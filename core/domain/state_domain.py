@@ -970,6 +970,26 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             outcomes.append(self.default_outcome)
         return outcomes
 
+    def _validate_continue_interaction(self) -> None:
+        """Validates Continue interaction."""
+        text_value = (
+            self.customization_args['buttonText'].value.unicode_str)
+        if len(text_value) > 20:
+            raise utils.ValidationError(
+                'The `continue` interaction text length should be atmost '
+                '20 characters.'
+            )
+
+    def _validate_end_interaction(self) -> None:
+        """Validates End interaction."""
+        recc_exp_ids = (
+            self.customization_args['recommendedExplorationIds'].value)
+        if len(recc_exp_ids) > 3:
+            raise utils.ValidationError(
+                'The total number of recommended explorations inside End '
+                'interaction should be atmost 3.'
+            )
+
     def _validates_choices_should_be_unique_and_nonempty(
         self, choices: List[SubtitledHtml]
     ) -> None:
@@ -985,20 +1005,21 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         seen_choices = []
         for choice in choices:
-            if choice.html.strip() in ('<p></p>', ''):
+            html = choice.html
+            html = (
+                html.replace('<p>', '').replace('</p>', '').replace('<br>', '').
+                replace('<i>', '').replace('</i>', '').replace('<span>', '').
+                replace('</span>', '').replace('<b>', '').replace('</b>', '').
+                replace('<ol>', '').replace('</ol>', '').replace('<ul>', '').
+                replace('</ul>', '').replace('<h1>', '').replace('</h1>', '').
+                replace('<h2>', '').replace('</h2>', '').replace('<h3>', '').
+                replace('</h3>', '').replace('<h4>', '').replace('</h4>', '').
+                replace('<h5>', '').replace('</h5>', '').replace('<h6>', '').
+                replace('</h6>', '').replace('<li>', '').replace('</li>', ''))
+            if html.strip() == '':
                 raise utils.ValidationError(
                     'Choices should be non empty.'
                 )
-
-            if '<p>' in choice.html:
-                soup = bs4.BeautifulSoup(choice.html, 'html.parser')
-                p_value = soup.find('p').getText()
-                if p_value.strip() in (
-                    '<p></p>', '', '<i></i>', '<br>', '<span></span>', '<b></b>'
-                ):
-                    raise utils.ValidationError(
-                        'Choices should be non empty.'
-                    )
 
             if choice.html not in seen_choices:
                 seen_choices.append(choice.html)
@@ -1609,6 +1630,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         equal_ordering_one_at_incorec_posn = []
 
         choices = self.customization_args['choices'].value
+        if len(choices) < 2:
+            raise utils.ValidationError(
+                'There should be atleast 2 values inside DragAndDrop '
+                'interaction.'
+            )
+
         self._validates_choices_should_be_unique_and_nonempty(choices)
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
@@ -1939,6 +1966,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # to figure out a way to put these validations following the
         # same format.
         interaction_id_to_validation_func = {
+            'Continue': self._validate_continue_interaction,
+            'EndExploration': self._validate_end_interaction,
             'NumericInput': self._validate_numeric_input,
             'FractionInput': self._validate_fraction_input,
             'NumberWithUnits': self._validate_number_with_units_input,

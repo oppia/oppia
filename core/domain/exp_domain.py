@@ -3252,17 +3252,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Returns True if the choice is empty.
         """
-        if choice['html'].strip() in ('<p></p>', ''):
+        html = choice['html']
+        html = (
+            html.replace('<p>', '').replace('</p>', '').replace('<br>', '').
+            replace('<i>', '').replace('</i>', '').replace('<span>', '').
+            replace('</span>', '').replace('<b>', '').replace('</b>', '').
+            replace('<ol>', '').replace('</ol>', '').replace('<ul>', '').
+            replace('</ul>', '').replace('<h1>', '').replace('</h1>', '').
+            replace('<h2>', '').replace('</h2>', '').replace('<h3>', '').
+            replace('</h3>', '').replace('<h4>', '').replace('</h4>', '').
+            replace('<h5>', '').replace('</h5>', '').replace('<h6>', '').
+            replace('</h6>', '').replace('<li>', '').replace('</li>', ''))
+        if html.strip() == '':
             return True
 
-        if '<p>' in choice['html']:
-            soup = bs4.BeautifulSoup(choice['html'], 'html.parser')
-            p_value = soup.find('p').getText()
-            if p_value.strip() in (
-                '<p></p>', '', '<i></i>', '<br>', '<span></span>', '<b></b>'
-            ):
-                return True
-            
         return False
 
     @classmethod
@@ -4157,7 +4160,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Removing empty choice from the rule values.
 
         Args:
-            answer_groups: List[state_domain.AnswerGroupDict]. The answer group.
+            empty_choices: List[state_domain.SubtitledHtmlDict]. The list of
+                empty choices.
+            rule_value_x: List[List[str]]. The rule spec value.
+            solution: Optional[List[List[str]]]. The solution of the state.
         """
         for empty_choice in empty_choices:
             for rule_value in rule_value_x:
@@ -4172,9 +4178,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if solution is not None and isinstance(solution, list):
                 for choice_list in solution:
                     for choice in choice_list:
-                       if choice == empty_choice['content_id']:
-                        choice_list.remove(choice)
-                        break
+                        if choice == empty_choice['content_id']:
+                            choice_list.remove(choice)
+                            break
                     if len(choice_list) == 0:
                         solution.remove(choice_list)
                         break
@@ -4190,7 +4196,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Args:
             empty_choices: List[state_domain.SubtitledHtmlDict]. The list of
                 choices.
-            value: str. The value which needs to be checked
+            value: str. The value which needs to be checked.
 
         Returns:
             bool. Returns True if the empty choice is equal to the given value.
@@ -4242,6 +4248,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['customization_args'][
                 'choices']['value']
         )
+
         if state_dict['interaction']['solution'] is not None:
             solution = state_dict['interaction']['solution']['correct_answer']
         else:
@@ -4293,6 +4300,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 elif rule_spec['rule_type'] == 'HasElementXBeforeElementY':
                     value_x = rule_spec['inputs']['x']
                     value_y = rule_spec['inputs']['y']
+                    assert isinstance(value_x, str)
+                    assert isinstance(value_y, str)
                     if value_x == value_y:
                         invalid_rules.append(rule_spec)
 
@@ -4303,7 +4312,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             invalid_rules.append(rule_spec)
                             continue
 
-                        elif cls._is_empty_choice_in_rule_value(
+                        if cls._is_empty_choice_in_rule_value(
                             empty_choices, value_y
                         ):
                             invalid_rules.append(rule_spec)

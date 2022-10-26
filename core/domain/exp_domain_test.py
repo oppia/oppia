@@ -1560,6 +1560,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             content_id_of_continue_button_text]['en'].translation = (
             'valid value')
 
+    def test_continue_interaction(self) -> None:
+      """Tests Continue interaction."""
+      self.set_interaction_for_state(self.state, 'Continue')
+      self.state.interaction.customization_args[
+        'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeee'
+      self._assert_validation_error(
+        self.new_exploration, (
+          'The `continue` interaction text length should be atmost '
+          '20 characters.')
+      )
+
+    def test_end_interaction(self) -> None:
+      """Tests End interaction."""
+      self.set_interaction_for_state(self.state, 'EndExploration')
+      self.state.interaction.customization_args[
+        'recommendedExplorationIds'].value = ['id1', 'id2', 'id3', 'id4']
+      self.state.update_interaction_default_outcome(None)
+      self._assert_validation_error(
+        self.new_exploration, (
+          'The total number of recommended explorations inside End '
+          'interaction should be atmost 3.')
+        )
+
     def test_numeric_interaction(self) -> None:
         """Tests Numeric interaction."""
         self.set_interaction_for_state(self.state, 'NumericInput')
@@ -2287,6 +2310,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.answer_groups = (
             test_ans_group_for_drag_and_drop_interaction)
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
+
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>')
+        ]
+        self._assert_validation_error(
+            self.new_exploration, (
+              'There should be atleast 2 values inside DragAndDrop '
+              'interaction.')
+        )
+
         self.state.interaction.customization_args['choices'].value = [
             state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
             state_domain.SubtitledHtml('ca_choices_1', '<p> </p>'),
