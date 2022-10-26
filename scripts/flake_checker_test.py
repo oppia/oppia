@@ -25,9 +25,20 @@ from scripts import flake_checker
 import requests
 
 from typing import Dict, Optional, Union
+from typing_extensions import TypedDict
+
+
+class FlakeReportDictWithoutLog(TypedDict):
+    """Dictionary representation of flake's report without log."""
+
+    result: bool
+    flake: Dict[str, str]
+    rerun: str
+
 
 AllowedMockJsonTypes = Union[
-    flake_checker.FlakeReportDict, Dict[str, str], str, None
+    flake_checker.FlakeReportDict,
+    FlakeReportDictWithoutLog, Dict[str, str], str, None
 ]
 
 
@@ -433,9 +444,8 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             allow_redirects: bool,  # pylint: disable=unused-argument
             headers: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockResponse:
-            response: flake_checker.FlakeReportDict = {
-                'log': ['log1', 'log2'],
-                'result': True,
+            response: FlakeReportDictWithoutLog = {
+                'result': False,
                 'flake': {
                     'suite': 'suiteName',
                     'test': 'testName',

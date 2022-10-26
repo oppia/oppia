@@ -143,6 +143,10 @@ def download_and_install_node() -> None:
                 node_file_name = 'node-v%s-darwin-x64' % (common.NODE_VERSION)
             elif common.is_linux_os():
                 node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
+            # Oppia only suppports windows, mac and linux operating systems.
+            else:
+                raise Exception(
+                    'System\'s Operating System is not compatible.')
         else:
             node_file_name = 'node-v%s' % common.NODE_VERSION
         download_and_install_package(

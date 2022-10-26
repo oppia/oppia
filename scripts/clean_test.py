@@ -117,7 +117,7 @@ class CleanTests(test_utils.GenericTestBase):
         def mock_delete_file(unused_path: str) -> None:
             check_function_calls['delete_file_is_called'] += 1
         def mock_listdir(unused_path: str) -> List[str]:
-            return ['tmpcompiledjs_dir']
+            return ['some_dir', 'tmpcompiledjs_dir']
         delete_dir_swap = self.swap(
             clean, 'delete_directory_tree', mock_delete_dir)
         delete_file_swap = self.swap(clean, 'delete_file', mock_delete_file)

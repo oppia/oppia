@@ -497,6 +497,24 @@ class SetupTests(test_utils.GenericTestBase):
                 'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
+    def test_package_install_with_incompatible_system_raises_error(
+            self) -> None:
+        def mock_exists(unused_path: str) -> bool:
+            return False
+        def mock_is_x64() -> bool:
+            return True
+        os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
+        architecture_swap = self.swap(
+            common, 'is_x64_architecture', mock_is_x64)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
+            with self.rename_swap, self.chown_swap, architecture_swap:
+                with self.assertRaisesRegex(
+                        Exception,
+                        'System\'s Operating System is not compatible.'):
+                    setup.main(args=[])
+
     def test_chrome_bin_setup_with_google_chrome(self) -> None:
         def mock_isfile(path: str) -> bool:
             return path == '/usr/bin/google-chrome'
