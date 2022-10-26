@@ -536,7 +536,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         threadId: threadId
       });
     let payload = {
-      updated_status: null,
+      updated_status: false,
       updated_subject: null,
       text: newMessage
     };
