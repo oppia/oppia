@@ -1561,27 +1561,27 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'valid value')
 
     def test_continue_interaction(self) -> None:
-      """Tests Continue interaction."""
-      self.set_interaction_for_state(self.state, 'Continue')
-      self.state.interaction.customization_args[
-        'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeee'
-      self._assert_validation_error(
-        self.new_exploration, (
-          'The `continue` interaction text length should be atmost '
-          '20 characters.')
-      )
+        """Tests Continue interaction."""
+        self.set_interaction_for_state(self.state, 'Continue')
+        self.state.interaction.customization_args[
+          'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeee'
+        self._assert_validation_error(
+          self.new_exploration, (
+            'The `continue` interaction text length should be atmost '
+            '20 characters.')
+        )
 
     def test_end_interaction(self) -> None:
-      """Tests End interaction."""
-      self.set_interaction_for_state(self.state, 'EndExploration')
-      self.state.interaction.customization_args[
-        'recommendedExplorationIds'].value = ['id1', 'id2', 'id3', 'id4']
-      self.state.update_interaction_default_outcome(None)
-      self._assert_validation_error(
-        self.new_exploration, (
-          'The total number of recommended explorations inside End '
-          'interaction should be atmost 3.')
-        )
+        """Tests End interaction."""
+        self.set_interaction_for_state(self.state, 'EndExploration')
+        self.state.interaction.customization_args[
+          'recommendedExplorationIds'].value = ['id1', 'id2', 'id3', 'id4']
+        self.state.update_interaction_default_outcome(None)
+        self._assert_validation_error(
+          self.new_exploration, (
+            'The total number of recommended explorations inside End '
+            'interaction should be atmost 3.')
+          )
 
     def test_numeric_interaction(self) -> None:
         """Tests Numeric interaction."""
